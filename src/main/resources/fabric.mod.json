@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "mine-fortress",
+  "version": "${version}",
+
+  "name": "MineFortress",
+  "description": "The first Real-Time Strategy mod in minecraft. Manage a group of pawns, to survive and fight against ",
+  "authors": [
+    "remmintan"
+  ],
+  "contact": {
+    "homepage": "https://minecraftfortress.org/"
+  },
+
+  "license": "Proprietary. All Rights Reserved",
+  "icon": "assets/minefortress/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.minecraftfortress.MineFortressMod"
+    ]
+  },
+  "mixins": [],
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.17.1",
+    "java": ">=16"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
