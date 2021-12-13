@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "mine-fortress",
+  "id": "minefortress",
   "version": "${version}",
 
   "name": "MineFortress",
@@ -18,10 +18,15 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.minecraftfortress.MineFortressMod"
+      "org.minefortress.MineFortressMod"
+    ],
+    "mm:early_risers": [
+      "org.minefortress.earlyriser.GameModeEarlyRiser"
     ]
   },
-  "mixins": [],
+  "mixins": [
+    "minefortress.mixins.json"
+  ],
 
   "depends": {
     "fabricloader": ">=0.11.3",
