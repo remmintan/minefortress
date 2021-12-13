@@ -11,11 +11,10 @@
     "interaction.FortressServerInteractionManagerMixin",
     "renderer.FortressGameRendererMixin",
     "world.FortressClientWorldMixin",
-    "interfaces.FortressDimensionTypeMixin"
-  ],
-  "server": [
+    "interfaces.FortressDimensionTypeMixin",
     "world.FortressServerWorldMixin"
   ],
+  "server": [],
   "injectors": {
     "defaultRequire": 1
   }

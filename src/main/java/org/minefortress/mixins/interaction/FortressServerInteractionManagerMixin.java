@@ -7,9 +7,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EntityList;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
+import org.minefortress.FortressEntities;
 import org.minefortress.entity.Colonist;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,7 +45,7 @@ public abstract class FortressServerInteractionManagerMixin {
             });
             int needToSpawn = (int)Math.max(DEFAULT_COLONIST_COUNT - spawned.get(), 0);
 
-            EntityType<?> colonistType = EntityType.get("colonist").orElseThrow();
+            EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
             Iterable<BlockPos> spawnPlaces = BlockPos.iterateRandomly(world.random, needToSpawn, blockPos, 3);
             for(BlockPos spawnPlace : spawnPlaces) {
                 int spawnY = world.getTopY(Heightmap.Type.WORLD_SURFACE, spawnPlace.getX(), spawnPlace.getZ());

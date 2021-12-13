@@ -20,6 +20,9 @@
     "main": [
       "org.minefortress.MineFortressMod"
     ],
+    "client": [
+      "org.minefortress.MineFortressClient"
+    ],
     "mm:early_risers": [
       "org.minefortress.earlyriser.GameModeEarlyRiser"
     ]
