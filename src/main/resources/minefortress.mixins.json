@@ -9,6 +9,7 @@
     "entity.FortressSlimeEntityMixin",
     "interaction.FortressInteractionManagerMixin",
     "interaction.FortressServerInteractionManagerMixin",
+    "interaction.FortressGameModeMixin",
     "renderer.FortressGameRendererMixin",
     "world.FortressClientWorldMixin",
     "interfaces.FortressDimensionTypeMixin",
