@@ -11,6 +11,7 @@
     "interaction.FortressServerInteractionManagerMixin",
     "interaction.FortressGameModeMixin",
     "renderer.FortressGameRendererMixin",
+    "renderer.FortressGuiMixin",
     "world.FortressClientWorldMixin",
     "interfaces.FortressDimensionTypeMixin",
     "world.FortressServerWorldMixin"
