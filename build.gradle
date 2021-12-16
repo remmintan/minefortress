@@ -53,6 +53,10 @@ java {
 	withSourcesJar()
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/minefortress.accesswidener")
+}
+
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}

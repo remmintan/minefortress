@@ -1,6 +1,7 @@
 package org.minefortress.mixins.renderer;
 
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
@@ -17,6 +18,7 @@ import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.BuildingManager;
 import org.minefortress.ClickType;
+import org.minefortress.FortressRenderLayer;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressWorldRenderer;
@@ -131,21 +133,19 @@ public abstract class FortressWorldRendererMixin implements FortressWorldRendere
             List<Pair<Vec3i, Vec3i>> selections = selectionManager.getSelectionSize();
             for(Pair<Vec3i, Vec3i> selectionSize : selections) {
                 if(clickType == ClickType.REMOVE && selectionSize != null) {
-                    VertexConsumer noDepthBuffer = multibuffersource$buffersource.getBuffer(RenderLayer.getLines());
-                    Vec3i selectionStart = selectionSize.getFirst();
-                    Vec3i selectionEnd = selectionSize.getSecond();
-
-                    double startX = selectionStart.getX() - cameraPos.x;
-                    double startY = selectionStart.getY() - cameraPos.y;
-                    double startZ = selectionStart.getZ() - cameraPos.z;
-
-                    double endX = selectionEnd.getX() - cameraPos.x;
-                    double endY = selectionEnd.getY() - cameraPos.y;
-                    double endZ = selectionEnd.getZ() - cameraPos.z;
-
+                    VertexConsumer noDepthBuffer = multibuffersource$buffersource.getBuffer(FortressRenderLayer.getLinesNoDepth());
+                    Vec3i selectionDimensions = selectionSize.getFirst();
+                    VoxelShape generalSelectionBox = Block.createCuboidShape(
+                            0,
+                            0,
+                            0,
+                            selectionDimensions.getX(),
+                            selectionDimensions.getY(),
+                            selectionDimensions.getZ()
+                    );
+                    Vec3i selectionStart = selectionSize.getSecond();
                     Vector4f clickColors = selectionManager.getClickColors();
-
-                    WorldRenderer.drawBox(matrices, noDepthBuffer, startX, startY, startZ, endX, endY, endZ, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());
+                    drawShapeOutline(matrices, noDepthBuffer, generalSelectionBox, selectionStart.getX() - cameraPos.x, selectionStart.getY() - cameraPos.y, selectionStart.getZ() -  cameraPos.z, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());
                 }
             }
 
