@@ -15,17 +15,19 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.minefortress.selections.SelectionManager;
 
+import java.util.function.Supplier;
+
 public class MineFortressEntityRenderer {
 
     private final TextRenderer font;
-    private final SelectionManager manager;
+    private final Supplier<SelectionManager> managerSupplier;
     private World level;
     private Camera camera;
     private Quaternion cameraOrientation;
 
-    public MineFortressEntityRenderer(TextRenderer font, SelectionManager manager) {
+    public MineFortressEntityRenderer(TextRenderer font, Supplier<SelectionManager> managerSupplier) {
         this.font = font;
-        this.manager = manager;
+        this.managerSupplier = managerSupplier;
     }
 
     public void prepare(World level, Camera camera) {
@@ -37,7 +39,7 @@ public class MineFortressEntityRenderer {
     public void render(double x, double y, double z, MatrixStack poseStack, VertexConsumerProvider source, int packLightCoords) {
 
         try {
-            for(Pair<Vec3d, String> pair : manager.getLabels()) {
+            for(Pair<Vec3d, String> pair : getSelectionManager().getLabels()) {
                 Vec3d pos = pair.getFirst();
                 String stringToDisplay = pair.getSecond();
                 poseStack.push();
@@ -80,4 +82,9 @@ public class MineFortressEntityRenderer {
     public void setLevel(World level) {
         this.level = level;
     }
+
+    public SelectionManager getSelectionManager() {
+        return managerSupplier.get();
+    }
+
 }

@@ -23,7 +23,7 @@ public class CameraTools {
         double xpos = minecraft.mouse.getX();
         double ypos = minecraft.mouse.getY();
         if(Math.abs(xpos - oldMouseX) + Math.abs(ypos - oldMouseY) > 0.01 || xRot != oldPlayerXRot || yRot != oldPlayerYRot) {
-            mouseBasedViewVector = getMouseBasedViewVector(minecraft,  minecraft.mouse.getY(), minecraft.mouse.getX());
+            mouseBasedViewVector = getMouseBasedViewVector(minecraft,  xpos, ypos);
             oldMouseX = xpos;
             oldMouseY = ypos;
             oldPlayerXRot = xRot;
@@ -68,7 +68,7 @@ public class CameraTools {
         ClientPlayerEntity player = minecraft.player;
         if(player != null) {
             modelViewMatrix.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(player.getRotationClient().x));
-            modelViewMatrix.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(player.getRotationClient().x));
+            modelViewMatrix.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(player.getRotationClient().y + 180f));
         }
         FloatBuffer modelViewBuffer = FloatBuffer.allocate(16);
         modelViewMatrix.writeColumnMajor(modelViewBuffer);

@@ -3,17 +3,21 @@
   "minVersion": "0.8",
   "package": "org.minefortress.mixins",
   "compatibilityLevel": "JAVA_16",
-  "mixins": [],
+  "mixins": [
+    "renderer.FortressWorldRendererMixin"
+  ],
   "client": [
     "FortressMinecraftClientMixin",
+    "entity.FortressClientPlayerEntityMixin",
     "entity.FortressSlimeEntityMixin",
-    "interaction.FortressInteractionManagerMixin",
-    "interaction.FortressServerInteractionManagerMixin",
     "interaction.FortressGameModeMixin",
+    "interaction.FortressInteractionManagerMixin",
+    "interaction.FortressMouseMixin",
+    "interaction.FortressServerInteractionManagerMixin",
+    "interfaces.FortressDimensionTypeMixin",
     "renderer.FortressGameRendererMixin",
     "renderer.FortressGuiMixin",
     "world.FortressClientWorldMixin",
-    "interfaces.FortressDimensionTypeMixin",
     "world.FortressServerWorldMixin"
   ],
   "server": [],

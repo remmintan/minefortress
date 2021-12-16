@@ -41,7 +41,7 @@ public abstract class FortressInteractionManagerMixin {
     @Shadow
     private void syncSelectedSlot() {}
 
-    @Inject(method = "setGameModes", at = @At("HEAD"))
+    @Inject(method = "setGameModes", at = @At("TAIL"))
     public void setGameModes(GameMode gameMode, GameMode previousGameMode, CallbackInfo ci) {
         if(gameMode == FORTRESS) {
             setFortressMode();
