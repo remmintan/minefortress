@@ -3,10 +3,10 @@
   "minVersion": "0.8",
   "package": "org.minefortress.mixins",
   "compatibilityLevel": "JAVA_16",
-  "mixins": [
-    "renderer.FortressWorldRendererMixin"
-  ],
+  "mixins": [],
   "client": [
+    "renderer.FortressChunkRendererRegionMixin",
+    "renderer.FortressWorldRendererMixin"
     "FortressMinecraftClientMixin",
     "entity.FortressClientPlayerEntityMixin",
     "entity.FortressSlimeEntityMixin",
