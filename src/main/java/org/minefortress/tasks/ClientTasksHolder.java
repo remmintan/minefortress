@@ -7,10 +7,11 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.network.ServerboundCancelTaskPacket;
 import org.minefortress.selections.ClientSelection;
 import org.minefortress.selections.SelectionType;
-import org.minefortress.tasks.TaskType;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,22 +33,16 @@ public class ClientTasksHolder {
         this.levelRenderer = levelRenderer;
     }
 
-
     public void cancelTask() {
         if(tasksStack.empty()) return;
         final UUID lastTaskId = tasksStack.pop();
         final ClientConnection connection = MinecraftClient.getInstance().getNetworkHandler().getConnection();
         subtasksMap.entrySet().stream().filter(it -> it.getValue().equals(lastTaskId)).map(Map.Entry::getKey).forEach(it -> {
             removeTask(it);
-            if (connection != null) {
-                connection.send(new ServerboundCancelTaskPacket(lastTaskId));
-            }
+            FortressClientNetworkHelper.send(FortressChannelNames.CANCEL_TASK, new ServerboundCancelTaskPacket(it));
         });
         removeTask(lastTaskId);
-
-        if (connection != null) {
-            connection.send(new ServerboundCancelTaskPacket(lastTaskId));
-        }
+        FortressClientNetworkHelper.send(FortressChannelNames.CANCEL_TASK, new ServerboundCancelTaskPacket(lastTaskId));
     }
 
     public void cancelAllTasks() {

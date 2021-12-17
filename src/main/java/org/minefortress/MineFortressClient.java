@@ -7,6 +7,9 @@ import net.minecraft.client.world.ClientWorld;
 import org.minefortress.entity.renderer.ColonistRenderer;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.ClientboundTaskExecutedPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressKeybindings;
 import org.minefortress.tasks.ClientTasksHolder;
@@ -34,5 +37,7 @@ public class MineFortressClient implements ClientModInitializer {
                 }
             }
         });
+
+        FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FINISH_TASK, ClientboundTaskExecutedPacket::new);
     }
 }

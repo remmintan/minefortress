@@ -23,6 +23,9 @@
     "client": [
       "org.minefortress.MineFortressClient"
     ],
+    "server": [
+      "org.minefortress.MineFortressServer"
+    ],
     "mm:early_risers": [
       "org.minefortress.earlyriser.GameModeEarlyRiser"
     ]

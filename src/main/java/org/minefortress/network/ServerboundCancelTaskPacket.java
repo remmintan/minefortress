@@ -1,13 +1,15 @@
 package org.minefortress.network;
 
-import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.listener.ServerPlayPacketListener;
-import org.apache.commons.lang3.NotImplementedException;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.minefortress.interfaces.FortressServerWorld;
+import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.tasks.TaskManager;
 
 import java.util.UUID;
 
-public class ServerboundCancelTaskPacket implements Packet<ServerPlayPacketListener> {
+public class ServerboundCancelTaskPacket implements FortressServerPacket {
 
     private final UUID taskId;
 
@@ -24,12 +26,14 @@ public class ServerboundCancelTaskPacket implements Packet<ServerPlayPacketListe
         buf.writeUuid(taskId);
     }
 
-    @Override
-    public void apply(ServerPlayPacketListener listener) {
-        throw new NotImplementedException("ServerboundCancelTaskPacket.handle");
-    }
-
     public UUID getTaskId() {
         return taskId;
+    }
+
+    @Override
+    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+        UUID id = this.getTaskId();
+        TaskManager taskManager = ((FortressServerWorld)player.getServerWorld()).getTaskManager();
+        taskManager.cancelTask(id);
     }
 }

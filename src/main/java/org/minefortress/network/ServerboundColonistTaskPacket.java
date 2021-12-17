@@ -1,19 +1,24 @@
 package org.minefortress.network;
 
-import net.minecraft.network.Packet;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import org.apache.commons.lang3.NotImplementedException;
+import org.minefortress.interfaces.FortressServerWorld;
+import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.selections.SelectionType;
+import org.minefortress.tasks.Task;
+import org.minefortress.tasks.TaskManager;
 import org.minefortress.tasks.TaskType;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public class ServerboundColonistTaskPacket implements Packet<ServerPlayPacketListener> {
+public class ServerboundColonistTaskPacket implements FortressServerPacket {
 
     private final UUID id;
     private final TaskType taskType;
@@ -59,11 +64,6 @@ public class ServerboundColonistTaskPacket implements Packet<ServerPlayPacketLis
         buffer.writeEnumConstant(selectionType);
     }
 
-    @Override
-    public void apply(ServerPlayPacketListener listener) {
-        throw new NotImplementedException("ServerboundColonistTaskPacket.handle");
-    }
-
     public TaskType getTaskType() {
         return taskType;
     }
@@ -86,5 +86,27 @@ public class ServerboundColonistTaskPacket implements Packet<ServerPlayPacketLis
 
     public UUID getId() {
         return id;
+    }
+
+    @Override
+    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+        UUID id = this.getId();
+        TaskType taskType = this.getTaskType();
+        TaskManager taskManager = ((FortressServerWorld)player.getServerWorld()).getTaskManager();
+        BlockPos startingBlock = this.getStart();
+        BlockPos endingBlock = this.getEnd();
+        HitResult hitResult = this.getHitResult();
+        SelectionType selectionType = this.getSelectionType();
+        Task task = new Task(id, taskType, startingBlock, endingBlock, hitResult, selectionType);
+        if(task.getTaskType() == TaskType.BUILD) {
+            final ItemStack itemInHand = player.getStackInHand(Hand.MAIN_HAND);
+            if(itemInHand != ItemStack.EMPTY) {
+                task.setPlacingItem(itemInHand.getItem());
+            } else {
+//                throw new IllegalStateException();
+            }
+        }
+
+        taskManager.addTask(task);
     }
 }

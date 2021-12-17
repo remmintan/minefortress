@@ -11,6 +11,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.network.ServerboundColonistTaskPacket;
 import org.minefortress.tasks.TaskType;
 import org.minefortress.utils.BlockUtils;
@@ -184,7 +186,8 @@ public class WallsSelection extends Selection {
                                     p.getSecond().up(upDelta),
                                     hitResult,
                                     getSelectionType());
-                            connection.sendPacket(packet);
+
+                            FortressClientNetworkHelper.send(FortressChannelNames.NEW_TASK, packet);
                         });
             }
             return true;

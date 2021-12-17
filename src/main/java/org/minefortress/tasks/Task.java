@@ -12,6 +12,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import org.minefortress.entity.ai.PathUtils;
 import org.minefortress.network.ClientboundTaskExecutedPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.selections.SelectionType;
 
 import java.util.ArrayDeque;
@@ -142,8 +144,7 @@ public class Task {
         if(parts.isEmpty() && totalParts == completedParts) {
             ServerPlayerEntity randomPlayer = level.getRandomAlivePlayer();
             if(randomPlayer != null) {
-                ServerPlayNetworkHandler connection = randomPlayer.networkHandler;
-                connection.sendPacket(new ClientboundTaskExecutedPacket(this.getId()));
+                FortressServerNetworkHelper.send(randomPlayer, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
             }
         }
     }

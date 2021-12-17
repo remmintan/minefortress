@@ -1,13 +1,13 @@
 package org.minefortress.network;
 
-import net.minecraft.network.Packet;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import org.apache.commons.lang3.NotImplementedException;
+import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.network.interfaces.FortressClientPacket;
 
 import java.util.UUID;
 
-public class ClientboundTaskExecutedPacket implements Packet<ClientPlayPacketListener> {
+public class ClientboundTaskExecutedPacket implements FortressClientPacket {
 
     private final UUID taskId;
 
@@ -29,8 +29,11 @@ public class ClientboundTaskExecutedPacket implements Packet<ClientPlayPacketLis
     }
 
     @Override
-    public void apply(ClientPlayPacketListener listener) {
-        throw new NotImplementedException("TODO");
+    public void handle(MinecraftClient client) {
+        UUID taskId = this.getTaskId();
+        final FortressClientWorld world = (FortressClientWorld) client.world;
+        if (world != null) {
+            world.getClientTasksHolder().removeTask(taskId);
+        }
     }
-
 }
