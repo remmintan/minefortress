@@ -1,4 +1,4 @@
-package org.minefortress.selections;
+package org.minefortress.tasks;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -8,6 +8,8 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.network.ServerboundCancelTaskPacket;
+import org.minefortress.selections.ClientSelection;
+import org.minefortress.selections.SelectionType;
 import org.minefortress.tasks.TaskType;
 
 import java.util.*;

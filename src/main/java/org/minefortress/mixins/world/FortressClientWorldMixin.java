@@ -9,7 +9,7 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.selections.ClientTasksHolder;
+import org.minefortress.tasks.ClientTasksHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
