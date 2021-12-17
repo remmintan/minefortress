@@ -4,6 +4,8 @@ import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.RunArgs;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.GameOptions;
@@ -92,6 +94,24 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         if (isNotFortressGamemode() || middleMouseButtonIsDown) {
             if(player != null) {
                 this.cameraManager.setRot(player.getPitch(), player.getYaw());
+            }
+        }
+    }
+
+    @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/TutorialManager;onInventoryOpened()V", shift = At.Shift.BEFORE))
+    private void handleInputEvents(CallbackInfo ci) {
+        if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+            if(this.options.keySprint.isPressed()) {
+                this.getSelectionManager().moveSelectionUp();
+            }
+        }
+    }
+
+    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
+    public void setScreen(Screen screen, CallbackInfo ci) {
+        if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+            if(this.options.keySprint.isPressed() && screen instanceof InventoryScreen) {
+                ci.cancel();
             }
         }
     }

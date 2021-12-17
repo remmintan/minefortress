@@ -5,20 +5,22 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [],
   "client": [
-    "renderer.FortressChunkRendererRegionMixin",
-    "renderer.FortressWorldRendererMixin"
     "FortressMinecraftClientMixin",
     "entity.FortressClientPlayerEntityMixin",
     "entity.FortressSlimeEntityMixin",
     "interaction.FortressGameModeMixin",
     "interaction.FortressInteractionManagerMixin",
+    "interaction.FortressKeyboardInputMixin",
     "interaction.FortressMouseMixin",
     "interaction.FortressServerInteractionManagerMixin",
     "interfaces.FortressDimensionTypeMixin",
+    "renderer.FortressChunkRendererRegionMixin",
     "renderer.FortressGameRendererMixin",
     "renderer.FortressGuiMixin",
+    "renderer.FortressWorldRendererMixin",
     "world.FortressClientWorldMixin",
-    "world.FortressServerWorldMixin"
+    "world.FortressServerWorldMixin",
+    "interaction.FortressTutorialManagerMixin"
   ],
   "server": [],
   "injectors": {

@@ -27,7 +27,6 @@ public abstract class FortressChunkRendererRegionMixin {
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(World world, int chunkX, int chunkZ, WorldChunk[][] chunks, BlockPos startPos, BlockPos endPos, CallbackInfo ci) {
         final FortressWorldRenderer worldRenderer = (FortressWorldRenderer) MinecraftClient.getInstance().worldRenderer;
-
         if(worldRenderer.getClickType() == ClickType.BUILD) {
             final Set<BlockPos> selectedBlocks = worldRenderer.getSelectedBlocks();
             final BlockState state = worldRenderer.getClickingBlock();
