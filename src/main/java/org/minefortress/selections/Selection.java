@@ -7,7 +7,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
-import org.minefortress.ClickType;
 import org.minefortress.tasks.TaskType;
 
 import java.util.ArrayList;

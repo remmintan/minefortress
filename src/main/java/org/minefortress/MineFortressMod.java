@@ -6,6 +6,9 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.minefortress.entity.Colonist;
+import org.minefortress.registries.FortressBlocks;
+import org.minefortress.registries.FortressEntities;
+import org.minefortress.registries.FortressItems;
 
 public class MineFortressMod implements ModInitializer {
     @Override

@@ -1,4 +1,4 @@
-package org.minefortress;
+package org.minefortress.registries;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;

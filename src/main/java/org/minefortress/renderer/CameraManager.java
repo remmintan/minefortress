@@ -1,4 +1,4 @@
-package org.minefortress;
+package org.minefortress.renderer;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;

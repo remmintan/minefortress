@@ -1,4 +1,4 @@
-package org.minefortress;
+package org.minefortress.renderer;
 
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;

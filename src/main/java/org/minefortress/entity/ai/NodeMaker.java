@@ -1,4 +1,4 @@
-package org.minefortress.ai;
+package org.minefortress.entity.ai;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
@@ -8,7 +8,7 @@ import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.ai.pathing.TargetPathNode;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.*;
-import org.minefortress.BuildingManager;
+import org.minefortress.tasks.BuildingManager;
 
 import java.util.HashSet;
 import java.util.Optional;

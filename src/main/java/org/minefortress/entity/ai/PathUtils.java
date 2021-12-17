@@ -1,4 +1,4 @@
-package org.minefortress.ai;
+package org.minefortress.entity.ai;
 
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.math.BlockPos;

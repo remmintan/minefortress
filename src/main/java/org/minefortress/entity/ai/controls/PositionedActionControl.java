@@ -1,4 +1,4 @@
-package org.minefortress.ai.controls;
+package org.minefortress.entity.ai.controls;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;

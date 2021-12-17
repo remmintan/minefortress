@@ -10,7 +10,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import org.minefortress.ai.PathUtils;
+import org.minefortress.entity.ai.PathUtils;
 import org.minefortress.network.ClientboundTaskExecutedPacket;
 import org.minefortress.selections.SelectionType;
 

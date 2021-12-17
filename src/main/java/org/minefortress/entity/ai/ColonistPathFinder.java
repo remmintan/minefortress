@@ -1,4 +1,4 @@
-package org.minefortress.ai;
+package org.minefortress.entity.ai;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -9,7 +9,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.SampleType;
 import net.minecraft.world.chunk.ChunkCache;
-import org.minefortress.BuildingManager;
+import org.minefortress.tasks.BuildingManager;
 
 import java.util.*;
 

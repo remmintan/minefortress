@@ -1,4 +1,4 @@
-package org.minefortress.ai;
+package org.minefortress.entity.ai;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;

@@ -12,7 +12,7 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.CameraManager;
+import org.minefortress.renderer.CameraManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.SelectionManager;
 import org.spongepowered.asm.mixin.Final;

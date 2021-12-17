@@ -7,7 +7,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
-import org.minefortress.ClickType;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
 
 import java.util.Collections;

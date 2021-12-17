@@ -1,4 +1,4 @@
-package org.minefortress.ai;
+package org.minefortress.entity.ai;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.ai.pathing.Path;

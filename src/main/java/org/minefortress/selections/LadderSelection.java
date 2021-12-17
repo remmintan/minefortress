@@ -3,8 +3,8 @@ package org.minefortress.selections;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import static org.minefortress.ai.PathUtils.findDeltaForAxis;
-import static org.minefortress.ai.PathUtils.getLadderSelection;
+import static org.minefortress.entity.ai.PathUtils.findDeltaForAxis;
+import static org.minefortress.entity.ai.PathUtils.getLadderSelection;
 
 public class LadderSelection extends TwoDotsSelection{
 

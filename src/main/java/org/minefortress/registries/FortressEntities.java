@@ -1,4 +1,4 @@
-package org.minefortress;
+package org.minefortress.registries;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.client.render.entity.model.EntityModelLayer;

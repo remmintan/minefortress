@@ -1,4 +1,4 @@
-package org.minefortress.ai.goal;
+package org.minefortress.entity.ai.goal;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -6,9 +6,9 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.minefortress.BuildingManager;
-import org.minefortress.ai.ColonistNavigation;
-import org.minefortress.ai.MovementHelper;
+import org.minefortress.tasks.BuildingManager;
+import org.minefortress.entity.ai.ColonistNavigation;
+import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.tasks.Task;

@@ -1,4 +1,4 @@
-package org.minefortress;
+package org.minefortress.tasks;
 
 
 import net.minecraft.block.BlockState;

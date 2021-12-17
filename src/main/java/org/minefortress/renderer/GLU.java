@@ -1,4 +1,4 @@
-package org.minefortress;
+package org.minefortress.renderer;
 
 import org.lwjgl.BufferUtils;
 

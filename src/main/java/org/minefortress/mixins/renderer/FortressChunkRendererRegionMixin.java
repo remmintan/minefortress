@@ -6,7 +6,7 @@ import net.minecraft.client.render.chunk.ChunkRendererRegion;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import org.minefortress.ClickType;
+import org.minefortress.selections.ClickType;
 import org.minefortress.interfaces.FortressWorldRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

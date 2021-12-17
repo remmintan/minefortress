@@ -1,4 +1,4 @@
-package org.minefortress.ai;
+package org.minefortress.entity.ai;
 
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.ai.pathing.MobNavigation;
@@ -7,7 +7,7 @@ import net.minecraft.entity.ai.pathing.PathNodeNavigator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.minefortress.BuildingManager;
+import org.minefortress.tasks.BuildingManager;
 import org.minefortress.entity.Colonist;
 
 public class ColonistNavigation extends MobNavigation {

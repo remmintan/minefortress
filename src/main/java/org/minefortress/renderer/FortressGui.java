@@ -1,4 +1,4 @@
-package org.minefortress;
+package org.minefortress.renderer;
 
 import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.client.MinecraftClient;

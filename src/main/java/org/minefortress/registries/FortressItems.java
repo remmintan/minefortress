@@ -1,4 +1,4 @@
-package org.minefortress;
+package org.minefortress.registries;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
