@@ -33,14 +33,13 @@
   "mixins": [
     "minefortress.mixins.json"
   ],
-
+  "accessWidener" : "minefortress.accesswidener",
   "depends": {
     "fabricloader": ">=0.11.3",
     "fabric": "*",
     "minecraft": "1.17.1",
-    "java": ">=16"
+    "java": ">=16",
+    "mm": ">=2.3"
   },
-  "suggests": {
-    "another-mod": "*"
-  }
+  "suggests": {}
 }
