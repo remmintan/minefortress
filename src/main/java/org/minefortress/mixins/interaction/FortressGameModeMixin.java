@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameMode.class)
 public class FortressGameModeMixin {
@@ -19,6 +20,13 @@ public class FortressGameModeMixin {
             abilities.allowFlying = true;
             abilities.creativeMode = true;
             abilities.invulnerable = true;
+        }
+    }
+
+    @Inject(method = "isCreative", at = @At("HEAD"), cancellable = true)
+    public void isCreative(CallbackInfoReturnable<Boolean> cir) {
+        if((Object) this == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+            cir.setReturnValue(true);
         }
     }
 

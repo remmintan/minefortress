@@ -21,7 +21,8 @@ public class FortressServerNetworkHelper {
 
     public static void registerReceiver(String channelName, Function<PacketByteBuf, FortressServerPacket> packetConstructor) {
         ServerPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName), (server, player, handler, buf, sender) -> {
-            packetConstructor.apply(buf).handle(server, player);
+            final FortressServerPacket packet = packetConstructor.apply(buf);
+            server.execute(() -> packet.handle(server, player));
         });
     }
 

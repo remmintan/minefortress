@@ -19,7 +19,8 @@ public class FortressTutorialManagerMixin {
     @Inject(method = "onInventoryOpened", at = @At("HEAD"), cancellable = true)
     public void onOpenInventory(CallbackInfo ci) {
         if(client.interactionManager != null && client.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
-            ci.cancel();
+            if(client.options.keySprint.isPressed())
+                ci.cancel();
         }
     }
 

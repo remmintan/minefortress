@@ -75,7 +75,7 @@ public abstract class FortressWorldRendererMixin implements FortressWorldRendere
         return clickType;
     }
 
-    @Inject(method = "method_34808", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/ObjectArrayList;clear()V"))
+    @Inject(method = "method_34808", at = @At("RETURN"))
     private void method_34808(Frustum frustum, int i, boolean bl, Vec3d vec3d, BlockPos blockPos, ChunkBuilder.BuiltChunk builtChunk, int j, BlockPos blockPos2, CallbackInfo ci) {
         updateSelectedBlocks();
     }

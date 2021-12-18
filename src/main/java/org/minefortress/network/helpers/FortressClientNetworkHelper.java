@@ -14,7 +14,6 @@ public class FortressClientNetworkHelper {
     public static void send(String channelName, FortressPacket packet) {
         final PacketByteBuf packetByteBuf = PacketByteBufs.create();
         packet.write(packetByteBuf);
-
         ClientPlayNetworking.send(new Identifier(FortressChannelNames.NAMESPACE, channelName), packetByteBuf);
     }
 
