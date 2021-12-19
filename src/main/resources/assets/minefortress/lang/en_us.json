@@ -4,5 +4,8 @@
   "gameMode.fortress": "Fortress",
   "key.minefortress.switch_selection": "Switch Selection",
   "category.minefortress.general": "Mine Fortress",
-  "key.minefortress.cancel_task": "Cancel Task"
+  "key.minefortress.cancel_task": "Cancel Task",
+  "selectWorld.gameMode.fortress": "Fortress",
+  "selectWorld.gameMode.fortress.line1": "Real-Time Strategy in Minecraft",
+  "selectWorld.gameMode.fortress.line2": "Manage group of people and Survive"
 }

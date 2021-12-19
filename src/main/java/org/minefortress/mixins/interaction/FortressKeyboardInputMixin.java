@@ -1,8 +1,10 @@
 package org.minefortress.mixins.interaction;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.option.GameOptions;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,7 +19,10 @@ public class FortressKeyboardInputMixin extends Input {
 
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick(boolean slowDown, CallbackInfo ci) {
-        if(this.settings.keySprint.isPressed()) {
+        if(
+            ((FortressMinecraftClient)MinecraftClient.getInstance()).isFortressGamemode() &&
+            this.settings.keySprint.isPressed()
+        ) {
             this.movementForward = 0.0f;
             this.movementSideways = 0.0f;
         }
