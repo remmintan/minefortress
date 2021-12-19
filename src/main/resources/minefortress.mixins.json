@@ -13,14 +13,14 @@
     "interaction.FortressKeyboardInputMixin",
     "interaction.FortressMouseMixin",
     "interaction.FortressServerInteractionManagerMixin",
+    "interaction.FortressTutorialManagerMixin",
     "interfaces.FortressDimensionTypeMixin",
     "renderer.FortressChunkRendererRegionMixin",
     "renderer.FortressGameRendererMixin",
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
     "world.FortressClientWorldMixin",
-    "world.FortressServerWorldMixin",
-    "interaction.FortressTutorialManagerMixin"
+    "world.FortressServerWorldMixin"
   ],
   "server": [],
   "injectors": {
