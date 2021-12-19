@@ -41,21 +41,26 @@ public abstract class FortressInteractionManagerMixin {
     @Shadow
     private void syncSelectedSlot() {}
 
-    @Inject(method = "setGameModes", at = @At("TAIL"))
+    @Inject(method = "setGameModes", at = @At("RETURN"))
     public void setGameModes(GameMode gameMode, GameMode previousGameMode, CallbackInfo ci) {
         if(gameMode == FORTRESS) {
             setFortressMode();
         } else {
-            client.mouse.lockCursor();
+            unsetFortressMode();
         }
     }
 
-    @Inject(method = "setGameMode", at = @At("HEAD"))
+    private void unsetFortressMode() {
+        client.mouse.lockCursor();
+        client.gameRenderer.setRenderHand(true);
+    }
+
+    @Inject(method = "setGameMode", at = @At("RETURN"))
     public void setGameMode(GameMode gameMode, CallbackInfo ci) {
         if(gameMode == FORTRESS) {
             setFortressMode();
         } else {
-            client.mouse.lockCursor();
+            unsetFortressMode();
         }
     }
 
@@ -119,6 +124,7 @@ public abstract class FortressInteractionManagerMixin {
 
     private void setFortressMode() {
         client.mouse.unlockCursor();
+        client.gameRenderer.setRenderHand(false);
     }
 
 }

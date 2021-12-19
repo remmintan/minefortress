@@ -47,10 +47,10 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         }
     }
 
-    @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
-    private void renderHand(MatrixStack matrices, Camera camera, float tickDelta, CallbackInfo ci) {
-        if(((FortressMinecraftClient)client).isFortressGamemode())
-            ci.cancel();
-    }
+//    @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
+//    private void renderHand(MatrixStack matrices, Camera camera, float tickDelta, CallbackInfo ci) {
+//        if(((FortressMinecraftClient)client).isFortressGamemode())
+//            ci.cancel();
+//    }
 
 }
