@@ -21,15 +21,19 @@ public class FortressMouseMixin {
     public void lockCursor(CallbackInfo ci) {
         FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         final boolean fortressGamemode = !fortressClient.isNotFortressGamemode();
-        final boolean middleMouseNotPressed = !client.options.keyPickItem.isPressed();
+        final boolean middleMouseNotPressed = isMiddleMouseNotPressed();
         if (fortressGamemode && middleMouseNotPressed) {
             ci.cancel();
         }
     }
 
+    private boolean isMiddleMouseNotPressed() {
+        return !client.options.keyPickItem.isPressed();
+    }
+
     @Inject(method = "updateMouse", at = @At("HEAD"), cancellable = true)
     public void updateMouse(CallbackInfo ci) {
-        if(!((FortressMinecraftClient) this.client).isNotFortressGamemode()) {
+        if(((FortressMinecraftClient) this.client).isFortressGamemode() && isMiddleMouseNotPressed()) {
             ci.cancel();
         }
     }

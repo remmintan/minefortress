@@ -78,16 +78,9 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             }
         }
 
-        if(!isNotFortressGamemode() && !middleMouseButtonIsDown) {
+        if(isFortressGamemode() && !middleMouseButtonIsDown) {
             if(player != null) {
-                float xRot = player.getPitch();
-                float yRot = player.getYaw();
-                if(!cameraManager.isNeededRotSet() && (xRot != 0 || yRot != 0)) {
-                    cameraManager.setRot(xRot, yRot);
-                }
-
-                if(cameraManager.isNeededRotSet())
-                    this.cameraManager.updateCameraPosition();
+                this.cameraManager.updateCameraPosition();
             }
         }
 
@@ -113,6 +106,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             if(this.options.keySprint.isPressed() && screen instanceof InventoryScreen) {
                 ci.cancel();
             }
+        }
+    }
+
+    @Inject(method="doItemPick", at=@At("HEAD"), cancellable = true)
+    public void doItemPick(CallbackInfo ci) {
+        if(this.isFortressGamemode()) {
+            ci.cancel();
         }
     }
 

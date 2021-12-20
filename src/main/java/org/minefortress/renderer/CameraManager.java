@@ -15,7 +15,6 @@ public class CameraManager {
 
     private final MinecraftClient minecraft;
 
-    private boolean neededRotSet = false;
     private float neededXRot = 60f;
     private float neededYRot = 125f;
 
@@ -63,14 +62,9 @@ public class CameraManager {
         }
     }
 
-    public boolean isNeededRotSet() {
-        return neededRotSet;
-    }
-
     public void setRot(float x, float y) {
         this.neededXRot = x;
         this.neededYRot = y;
-        this.neededRotSet = true;
     }
 
     private void updateYRotation(ClientPlayerEntity player) {

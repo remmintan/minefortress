@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,6 +44,11 @@ public abstract class FortressInteractionManagerMixin {
 
     @Inject(method = "setGameModes", at = @At("RETURN"))
     public void setGameModes(GameMode gameMode, GameMode previousGameMode, CallbackInfo ci) {
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final SelectionManager selectionManager = fortressClient.getSelectionManager();
+        if(selectionManager.isSelecting()) {
+            selectionManager.resetSelection();
+        }
         if(gameMode == FORTRESS) {
             setFortressMode();
         } else {
