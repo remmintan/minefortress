@@ -1,41 +1,40 @@
 package org.minefortress.mixins.renderer;
 
+import me.jellysquid.mods.sodium.client.world.WorldSlice;
+import me.jellysquid.mods.sodium.client.world.cloned.ClonedChunkSection;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.chunk.ChunkRendererRegion;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.util.math.ChunkSectionPos;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.ClickType;
 import org.minefortress.selections.SelectionManager;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Set;
 
-@Mixin(ChunkRendererRegion.class)
-public abstract class FortressChunkRendererRegionMixin {
+@Mixin(WorldSlice.class)
+public abstract class FortressWorldSliceMixin {
 
-    @Shadow @Final protected BlockState[] blockStates;
-
-    @Shadow protected abstract int getIndex(BlockPos pos);
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(World world, int chunkX, int chunkZ, WorldChunk[][] chunks, BlockPos startPos, BlockPos endPos, CallbackInfo ci) {
+    @Inject(method = "unpackBlockData", at = @At("TAIL"))
+    public void unpackBlockData(BlockState[] states, ClonedChunkSection section, BlockBox box, CallbackInfo ci) {
         final SelectionManager selectionManager = ((FortressMinecraftClient) MinecraftClient.getInstance()).getSelectionManager();
         if(selectionManager.getClickType() == ClickType.BUILD) {
             final Set<BlockPos> selectedBlocks = selectionManager.getSelectedBlocks();
             final BlockState state = selectionManager.getClickingBlock();
 
+            final ChunkSectionPos sectionPos = section.getPosition();
+            BlockPos startPos = new BlockPos(sectionPos.getMinX(), sectionPos.getMinY(), sectionPos.getMinZ());
+            BlockPos endPos = new BlockPos(sectionPos.getMaxX(), sectionPos.getMaxY(), sectionPos.getMaxZ());
+
             for (BlockPos blockPos : BlockPos.iterate(startPos, endPos)) {
                 if (selectedBlocks.contains(blockPos)) {
-                    final int index = this.getIndex(blockPos);
-                    this.blockStates[index] = state;
+                    final int index = WorldSlice.getLocalBlockIndex(blockPos.getX()&15, blockPos.getY()&15, blockPos.getZ()&15);
+                    states[index] = state;
                 }
             }
         }

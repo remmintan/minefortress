@@ -6,7 +6,8 @@
   "mixins": [
     "entity.FortressMobMixin",
     "renderer.FortressCreateWorldScreenMixin",
-    "renderer.FortressCyclingButtonMixin"
+    "renderer.FortressCyclingButtonMixin",
+    "renderer.FortressWorldSliceMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",

@@ -31,6 +31,8 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
+	modCompileOnly files('run/mods/sodium-fabric-mc1.17.1-0.3.3+build.8.jar')
+
 }
 
 processResources {

@@ -6,17 +6,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.Nullable;
+import org.minefortress.interfaces.FortressWorldRenderer;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-public class SelectionManager {
+public class SelectionManager implements FortressWorldRenderer {
 
-    private final MinecraftClient minecraft;
+    private final MinecraftClient client;
 
     private int selectionTypeIndex = 0;
     private SelectionType currentSelectionType = SelectionType.SQUARES;
@@ -26,8 +27,38 @@ public class SelectionManager {
     private BlockState clickingBlockState = null;
     private int upSelectionDelta = 0;
 
-    public SelectionManager(MinecraftClient minecraft) {
-        this.minecraft = minecraft;
+    private final Set<BlockPos> selectedBlocks = new HashSet<>();
+
+    @Override
+    public @Nullable BlockState getClickingBlock() {
+        return clickingBlockState;
+    }
+
+    @Override
+    public Set<BlockPos> getSelectedBlocks() {
+        return selectedBlocks;
+    }
+
+    private void updateSelectedBlocks() {
+        HitResult hitResult = client.crosshairTarget;
+        ClientWorld level = client.world;
+        if(hitResult != null && hitResult.getType() == HitResult.Type.BLOCK && level != null) {
+            BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+            BlockPos blockPos = blockHitResult.getBlockPos();
+            if(!level.getBlockState(blockPos).isAir()) {
+                this.selectedBlocks.clear();
+                if(this.clickType == ClickType.BUILD && clickingBlockState != null) {
+                    Iterator<BlockPos> selectionIterator = this.getCurrentSelection();
+                    while (selectionIterator.hasNext()) {
+                        this.selectedBlocks.add(selectionIterator.next().toImmutable());
+                    }
+                }
+            }
+        }
+    }
+
+    public SelectionManager(MinecraftClient client) {
+        this.client = client;
     }
 
     public void selectBlock(BlockPos blockPos) {
@@ -53,7 +84,7 @@ public class SelectionManager {
     }
 
     public void tickSelectionUpdate(BlockPos blockPos, Direction clickedFace) {
-        final ClientWorld level = minecraft.world;
+        final ClientWorld level = client.world;
         if(level == null || level.getDimension().equals(FortressDimensionTypeMixin.getNether()) || level.getDimension().equals(FortressDimensionTypeMixin.getEnd())) {
             if(selection.isSelecting()) {
                 selection.reset();
@@ -64,8 +95,10 @@ public class SelectionManager {
         BlockPos pickedPos = this.clickType == ClickType.BUILD? blockPos.offset(clickedFace) : blockPos;
         if(this.selection.needUpdate(pickedPos, upSelectionDelta)) {
             this.selection.update(pickedPos, upSelectionDelta);
-            this.selection.setRendererDirty(minecraft.worldRenderer);
+            this.selection.setRendererDirty(client.worldRenderer);
         }
+
+        updateSelectedBlocks();
     }
 
     public Vector4f getClickColors() {
@@ -98,7 +131,7 @@ public class SelectionManager {
     }
 
     private void selectBlock(BlockPos blockPos, ClickType click, BlockState blockState) {
-        final ClientWorld level = minecraft.world;
+        final ClientWorld level = client.world;
         if(level == null || level.getDimension().equals(FortressDimensionTypeMixin.getNether()) || level.getDimension().equals(FortressDimensionTypeMixin.getEnd())) return;
 
         if(blockState == null && click == ClickType.BUILD) {
@@ -109,16 +142,16 @@ public class SelectionManager {
             this.clickingBlockState = blockState;
         }
 
-        Item mainHandItem = Optional.ofNullable(minecraft.player).map(it -> it.getStackInHand(Hand.MAIN_HAND).getItem()).orElse(null);
+        Item mainHandItem = Optional.ofNullable(client.player).map(it -> it.getStackInHand(Hand.MAIN_HAND).getItem()).orElse(null);
 
         boolean result = this.selection.selectBlock(
-                minecraft.world,
+                client.world,
                 mainHandItem,
                 blockPos,
                 upSelectionDelta,
                 click,
-                this.minecraft.getNetworkHandler(),
-                this.minecraft.crosshairTarget
+                this.client.getNetworkHandler(),
+                this.client.crosshairTarget
         );
         if(result) resetSelection();
     }
@@ -128,7 +161,7 @@ public class SelectionManager {
     }
 
     public void resetSelection() {
-        selection.setRendererDirty(minecraft.worldRenderer);
+        selection.setRendererDirty(client.worldRenderer);
         selection.reset();
         this.clickType = null;
         this.upSelectionDelta = 0;

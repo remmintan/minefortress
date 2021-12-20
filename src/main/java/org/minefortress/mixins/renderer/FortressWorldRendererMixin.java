@@ -7,7 +7,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -15,16 +14,14 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
-import org.jetbrains.annotations.Nullable;
-import org.minefortress.tasks.BuildingManager;
-import org.minefortress.selections.ClickType;
-import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.interfaces.FortressWorldRenderer;
+import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.MineFortressEntityRenderer;
+import org.minefortress.selections.ClickType;
 import org.minefortress.selections.ClientSelection;
 import org.minefortress.selections.SelectionManager;
+import org.minefortress.tasks.BuildingManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,11 +29,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 @Mixin(WorldRenderer.class)
-public abstract class FortressWorldRendererMixin implements FortressWorldRenderer {
-
+public abstract class FortressWorldRendererMixin  {
 
     @Shadow @Final private MinecraftClient client;
     @Shadow private ClientWorld world;
@@ -45,10 +44,6 @@ public abstract class FortressWorldRendererMixin implements FortressWorldRendere
     @Shadow private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
 
     private MineFortressEntityRenderer entityRenderer;
-
-    private final Set<BlockPos> selectedBlocks = new HashSet<>();
-    private ClickType clickType = null;
-    private BlockState clickingBlockState = null;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(MinecraftClient client, BufferBuilderStorage bufferBuilders, CallbackInfo ci) {
@@ -60,46 +55,6 @@ public abstract class FortressWorldRendererMixin implements FortressWorldRendere
         this.entityRenderer.setLevel(world);
     }
 
-    @Override
-    public @Nullable BlockState getClickingBlock() {
-        return clickingBlockState;
-    }
-
-    @Override
-    public Set<BlockPos> getSelectedBlocks() {
-        return selectedBlocks;
-    }
-
-    @Override
-    public ClickType getClickType() {
-        return clickType;
-    }
-
-    @Inject(method = "method_34808", at = @At("RETURN"))
-    private void method_34808(Frustum frustum, int i, boolean bl, Vec3d vec3d, BlockPos blockPos, ChunkBuilder.BuiltChunk builtChunk, int j, BlockPos blockPos2, CallbackInfo ci) {
-        updateSelectedBlocks();
-    }
-
-    private void updateSelectedBlocks() {
-        HitResult hitResult = client.crosshairTarget;
-        ClientWorld level = client.world;
-        if(hitResult != null && hitResult.getType() == HitResult.Type.BLOCK && level != null) {
-            BlockHitResult blockHitResult = (BlockHitResult) hitResult;
-            BlockPos blockPos = blockHitResult.getBlockPos();
-            if(!level.getBlockState(blockPos).isAir()) {
-                this.selectedBlocks.clear();
-                final SelectionManager selectionManager = ((FortressMinecraftClient) client).getSelectionManager();
-                this.clickType = selectionManager.getClickType();
-                this.clickingBlockState = selectionManager.getClickingBlockState();
-                if(this.clickType == ClickType.BUILD && clickingBlockState != null) {
-                    Iterator<BlockPos> selectionIterator = selectionManager.getCurrentSelection();
-                    while (selectionIterator.hasNext()) {
-                        this.selectedBlocks.add(selectionIterator.next().toImmutable());
-                    }
-                }
-            }
-        }
-    }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/BlockHitResult;getBlockPos()Lnet/minecraft/util/math/BlockPos;", shift = At.Shift.BEFORE))
     public void render(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
