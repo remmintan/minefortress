@@ -32,4 +32,9 @@ public class ToolsGui extends FortressGuiScreen {
     boolean isHovered() {
         return this.itemButton.isHovered();
     }
+
+    @Override
+    void onClick(double mouseX, double mouseY) {
+        this.itemButton.onClick(mouseX, mouseY);
+    }
 }

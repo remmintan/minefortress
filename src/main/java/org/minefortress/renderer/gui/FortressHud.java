@@ -91,6 +91,12 @@ public class FortressHud {
         return this.colonistsGui.isHovered() || this.toolsGui.isHovered();
     }
 
+    public void onClick(double mouseX, double mouseY) {
+
+        this.toolsGui.onClick(mouseX, mouseY);
+
+    }
+
     private TextRenderer getTextRenderer() {
         return client.textRenderer;
     }
