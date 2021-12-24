@@ -27,4 +27,9 @@ public class ToolsGui extends FortressGuiScreen {
         this.itemButton.setPos(screenWidth - 25, 5);
         this.itemButton.render(p, (int)mouseX, (int)mouseY, 0);
     }
+
+    @Override
+    boolean isHovered() {
+        return this.itemButton.isHovered();
+    }
 }

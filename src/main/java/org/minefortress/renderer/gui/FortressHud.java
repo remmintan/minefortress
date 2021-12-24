@@ -87,6 +87,10 @@ public class FortressHud {
         this.toolsGui.tick();
     }
 
+    public boolean isHovered() {
+        return this.colonistsGui.isHovered() || this.toolsGui.isHovered();
+    }
+
     private TextRenderer getTextRenderer() {
         return client.textRenderer;
     }

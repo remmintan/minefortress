@@ -14,6 +14,8 @@ public class ColonistsGui extends FortressGuiScreen{
 
     private int colonistsCount = 0;
 
+    private boolean hovered;
+
     protected ColonistsGui(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
     }
@@ -35,9 +37,29 @@ public class ColonistsGui extends FortressGuiScreen{
 
     @Override
     void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
+        final String colonistsCountString = "x" + colonistsCount;
+
+        final int iconX = screenWidth / 2 - 91;
+        final int iconY = screenHeight - 40;
+        final float textX = screenWidth / 2f - 91 + 15;
+        final int textY = screenHeight - 35;
+
+        final int boundLeftX = iconX;
+        final int boundRightX = (int)textX + font.getWidth(colonistsCountString);
+        final int boundTopY = iconY;
+        final int boundBottomY = iconY + 20;
+
+        this.hovered = mouseX >= boundLeftX && mouseX <= boundRightX && mouseY >= boundTopY && mouseY < boundBottomY;
+
         RenderSystem.setShaderTexture(0, GUI_ICONS_TEXTURE);
-//        super.drawTexture(p, 5, 15, 16, 0, 8, 8);
-        super.itemRenderer.renderGuiItemIcon(new ItemStack(Items.PLAYER_HEAD), screenWidth/2 - 91, screenHeight - 40);
-        font.draw(p,"x"+colonistsCount, screenWidth/2f - 91 + 15, screenHeight - 35, 0xFFFFFF);
+
+        super.itemRenderer.renderGuiItemIcon(new ItemStack(Items.PLAYER_HEAD), iconX, iconY);
+
+        font.draw(p, colonistsCountString, textX, textY, 0xFFFFFF);
+    }
+
+    @Override
+    boolean isHovered() {
+        return this.hovered;
     }
 }

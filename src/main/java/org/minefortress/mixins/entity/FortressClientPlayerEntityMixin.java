@@ -8,7 +8,9 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.RaycastContext;
@@ -47,8 +49,13 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
 
     @Override
     public HitResult raycast(double maxDistance, float tickDelta, boolean includeFluids) {
-        if(((FortressMinecraftClient)client).isNotFortressGamemode() || client.options.keyPickItem.isPressed()){
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        if(fortressClient.isNotFortressGamemode() || this.client.options.keyPickItem.isPressed()){
             return super.raycast(maxDistance, tickDelta, includeFluids);
+        }
+
+        if(fortressClient.getFortressHud().isHovered()) {
+            return BlockHitResult.createMissed(new Vec3d(0, 0, 0), null, null);
         }
 
         Vec3d vec3 = this.getCameraPosVec(tickDelta);
@@ -67,22 +74,5 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
             }
         }
     }
-
-//    @Redirect(method = "tickMovement", at = @At(value = "HEAD"))
-//    public void tickMovement(CallbackInfo ci) {
-//        boolean bl2 = this.input.sneaking;
-//        boolean bl3 = this.isWalking();
-//
-//        boolean bl5 = (float)this.getHungerManager().getFoodLevel() > 6.0f || this.getAbilities().allowFlying;
-//        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
-//        if (!(!fortressClient.isFortressGamemode() && !this.isSubmergedInWater() || bl2 || bl3 || !this.isWalking() || this.isSprinting() || !bl5 || this.isUsingItem() || this.hasStatusEffect(StatusEffects.BLINDNESS))) {
-//            if (this.ticksLeftToDoubleTapSprint > 0 || this.client.options.keySprint.isPressed()) {
-//                this.setSprinting(true);
-//            } else {
-//                this.ticksLeftToDoubleTapSprint = 7;
-//            }
-//        }
-//
-//    }
 
 }
