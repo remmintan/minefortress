@@ -14,6 +14,7 @@ import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.renderer.CameraManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.renderer.gui.FortressHud;
 import org.minefortress.selections.SelectionManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,6 +28,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     private SelectionManager selectionManager;
     private CameraManager cameraManager;
+    private FortressHud fortressHud;
 
     @Shadow
     @Final
@@ -45,9 +47,10 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void constructorHead(RunArgs args, CallbackInfo ci) {
+    public void constructor(RunArgs args, CallbackInfo ci) {
         this.selectionManager = new SelectionManager((MinecraftClient)(Object)this);
         this.cameraManager = new CameraManager((MinecraftClient)(Object)this);
+        this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
     }
 
     @Override
@@ -116,4 +119,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         }
     }
 
+    @Inject(method="tick", at=@At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;tick()V", shift = At.Shift.AFTER))
+    public void guiTick(CallbackInfo ci) {
+        this.fortressHud.tick();
+    }
+
+    @Override
+    public FortressHud getFortressHud() {
+        return fortressHud;
+    }
 }

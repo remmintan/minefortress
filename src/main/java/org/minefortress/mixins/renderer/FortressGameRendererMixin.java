@@ -27,6 +27,8 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Shadow @Final private MinecraftClient client;
 
+    @Shadow public abstract void tick();
+
     @Override
     public double getFov(float f, boolean b) {
         return this.getFov(this.getCamera(), f, b);
@@ -47,10 +49,11 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         }
     }
 
-//    @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
-//    private void renderHand(MatrixStack matrices, Camera camera, float tickDelta, CallbackInfo ci) {
-//        if(((FortressMinecraftClient)client).isFortressGamemode())
-//            ci.cancel();
-//    }
+    @Inject(method = "render", at = @At("TAIL"))
+    public void render(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        if(client.currentScreen == null && fortressClient.isFortressGamemode())
+            fortressClient.getFortressHud().render(new MatrixStack(), tickDelta);
+    }
 
 }
