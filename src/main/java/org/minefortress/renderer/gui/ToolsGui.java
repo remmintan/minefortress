@@ -43,7 +43,7 @@ public class ToolsGui extends FortressGuiScreen {
         );
         this.questionButton = new ButtonWidget(0, 0, 20, 20, new LiteralText("?"), btn -> {
             this.selectionType.checked = false;
-            final BookScreen questionsScreen = new BookScreen(new FortressBookContents("Test\n\nTest\nhttps://minecraftfortress.org"));
+            final BookScreen questionsScreen = new BookScreen(new FortressBookContents(FortressBookContents.HELP_BOOK));
 
             this.client.setScreen(questionsScreen);
         });
