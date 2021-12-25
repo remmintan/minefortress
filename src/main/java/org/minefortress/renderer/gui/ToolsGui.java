@@ -53,7 +53,6 @@ public class ToolsGui extends FortressGuiScreen {
             this.selectionButtons.add(
                     new ButtonWidget(0, 0, 20, 20, new LiteralText(type.getButtonText()), btn -> {
                         fortressClient.getSelectionManager().setSelectionType(type);
-
                     }, (button, matrices, mouseX, mouseY) -> renderTooltip(matrices, new LiteralText(type.getName()), mouseX, mouseY))
             );
         }

@@ -132,6 +132,7 @@ public class SelectionManager implements FortressWorldRenderer {
 
         currentSelectionType = type;
         selectionTypeIndex = type.ordinal();
+        selection = currentSelectionType.generate();
     }
 
     public SelectionType getCurrentSelectionType() {
