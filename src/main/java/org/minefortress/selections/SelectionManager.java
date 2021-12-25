@@ -126,6 +126,14 @@ public class SelectionManager implements FortressWorldRenderer {
         selection = currentSelectionType.generate();
     }
 
+    public void setSelectionType(SelectionType type) {
+        this.upSelectionDelta = 0;
+        resetSelection();
+
+        currentSelectionType = type;
+        selectionTypeIndex = type.ordinal();
+    }
+
     public SelectionType getCurrentSelectionType() {
         return currentSelectionType;
     }

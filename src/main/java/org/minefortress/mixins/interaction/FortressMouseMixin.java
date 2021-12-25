@@ -44,7 +44,7 @@ public class FortressMouseMixin {
 
     private int fortressControlledLeftClicks;
 
-    @Inject(method = "onMouseButton", at = @At("TAIL"))
+    @Inject(method = "onMouseButton", at = @At("HEAD"))
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         if(fortressClient.isNotFortressGamemode()) {
