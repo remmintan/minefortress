@@ -8,6 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.text.Text;
 import org.minefortress.entity.Colonist;
 
 public class ColonistsGui extends FortressGuiScreen{
@@ -56,6 +57,10 @@ public class ColonistsGui extends FortressGuiScreen{
         super.itemRenderer.renderGuiItemIcon(new ItemStack(Items.PLAYER_HEAD), iconX, iconY);
 
         font.draw(p, colonistsCountString, textX, textY, 0xFFFFFF);
+
+        if(this.isHovered()) {
+            super.renderTooltip(p, Text.of("Your Pawns count"), (int)mouseX, (int)mouseY);
+        }
     }
 
     @Override
