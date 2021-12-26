@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Map;
 import java.util.Set;
 
 @Mixin(WorldSlice.class)
@@ -26,7 +27,19 @@ public abstract class FortressWorldSliceMixin {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) MinecraftClient.getInstance();
         final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
         if(blueprintManager.hasSelectedBlueprint()) {
-            blueprintManager.getBlueprintStates();
+            final Map<BlockPos, BlockState> blueprintStates = blueprintManager.getBlueprintStates();
+
+            final ChunkSectionPos sectionPos = section.getPosition();
+            BlockPos startPos = new BlockPos(sectionPos.getMinX(), sectionPos.getMinY(), sectionPos.getMinZ());
+            BlockPos endPos = new BlockPos(sectionPos.getMaxX(), sectionPos.getMaxY(), sectionPos.getMaxZ());
+
+            for (BlockPos blockPos : BlockPos.iterate(startPos, endPos)) {
+                if (blueprintStates.containsKey(blockPos)) {
+                    final int index = WorldSlice.getLocalBlockIndex(blockPos.getX()&15, blockPos.getY()&15, blockPos.getZ()&15);
+                    states[index] = blueprintStates.get(blockPos);
+                }
+            }
+
         } else {
             addSelectionToChunk(states, section, fortressClient);
         }

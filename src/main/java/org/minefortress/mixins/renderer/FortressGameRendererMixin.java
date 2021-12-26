@@ -40,13 +40,13 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         final SelectionManager selectionManager = fortressClient.getSelectionManager();
         if(fortressClient.isFortressGamemode())  {
-            final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
-            if(blueprintManager.hasSelectedBlueprint()) {
-                resetSelection(selectionManager);
-                blueprintManager.tickUpdate();
-            } else {
-                if(this.client.crosshairTarget != null && this.client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
-                    BlockHitResult blockHitResult = (BlockHitResult) this.client.crosshairTarget;
+            if(this.client.crosshairTarget != null && this.client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+                BlockHitResult blockHitResult = (BlockHitResult) this.client.crosshairTarget;
+                final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+                if(blueprintManager.hasSelectedBlueprint()) {
+                    resetSelection(selectionManager);
+                    blueprintManager.tickUpdate(blockHitResult.getBlockPos());
+                } else {
                     selectionManager.tickSelectionUpdate(blockHitResult.getBlockPos(), blockHitResult.getSide());
                 }
             }

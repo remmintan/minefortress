@@ -10,3 +10,4 @@ mutable  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode   
 accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode    text   Lnet/minecraft/text/Text;
 mutable  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode   translationSuffix   Ljava/lang/String;
 accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode   translationSuffix   Ljava/lang/String;
+accessible  field   net/minecraft/structure/Structure   blockInfoLists  Ljava/util/List;
