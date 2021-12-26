@@ -102,7 +102,6 @@ public abstract class FortressWorldRendererMixin  {
                     drawShapeOutline(matrices, noDepthBuffer, generalSelectionBox, selectionStart.getX() - cameraPos.x, selectionStart.getY() - cameraPos.y, selectionStart.getZ() -  cameraPos.z, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());
                 }
             }
-
         }
 
         Collection<ClientSelection> allRemoveTasks = ((FortressClientWorld)world).getClientTasksHolder().getAllRemoveTasks();

@@ -12,6 +12,7 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.renderer.CameraManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.FortressHud;
@@ -29,6 +30,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private SelectionManager selectionManager;
     private CameraManager cameraManager;
     private FortressHud fortressHud;
+    private BlueprintManager blueprintManager;
 
     @Shadow
     @Final
@@ -51,11 +53,17 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.selectionManager = new SelectionManager((MinecraftClient)(Object)this);
         this.cameraManager = new CameraManager((MinecraftClient)(Object)this);
         this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
+        this.blueprintManager = new BlueprintManager((MinecraftClient)(Object)this);
     }
 
     @Override
     public SelectionManager getSelectionManager() {
         return selectionManager;
+    }
+
+    @Override
+    public BlueprintManager getBlueprintManager() {
+        return blueprintManager;
     }
 
     @Override

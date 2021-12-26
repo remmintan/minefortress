@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.ClickType;
 import org.minefortress.selections.SelectionManager;
@@ -22,7 +23,17 @@ public abstract class FortressWorldSliceMixin {
 
     @Inject(method = "unpackBlockData", at = @At("TAIL"))
     public void unpackBlockData(BlockState[] states, ClonedChunkSection section, BlockBox box, CallbackInfo ci) {
-        final SelectionManager selectionManager = ((FortressMinecraftClient) MinecraftClient.getInstance()).getSelectionManager();
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) MinecraftClient.getInstance();
+        final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+        if(blueprintManager.hasSelectedBlueprint()) {
+            blueprintManager.getBlueprintStates();
+        } else {
+            addSelectionToChunk(states, section, fortressClient);
+        }
+    }
+
+    private void addSelectionToChunk(BlockState[] states, ClonedChunkSection section, FortressMinecraftClient fortressClient) {
+        final SelectionManager selectionManager = fortressClient.getSelectionManager();
         if(selectionManager.getClickType() == ClickType.BUILD) {
             final Set<BlockPos> selectedBlocks = selectionManager.getSelectedBlocks();
             final BlockState state = selectionManager.getClickingBlock();

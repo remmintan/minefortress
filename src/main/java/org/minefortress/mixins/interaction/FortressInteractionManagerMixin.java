@@ -73,8 +73,14 @@ public abstract class FortressInteractionManagerMixin {
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if(getCurrentGameMode() == FORTRESS) {
-            ((FortressMinecraftClient)client).getSelectionManager().selectBlock(pos);
-            cir.setReturnValue(true);
+            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+            if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
+                // TODO: blueprint dig
+            } else {
+                fortressClient.getSelectionManager().selectBlock(pos);
+                cir.setReturnValue(true);
+            }
+
         }
     }
 
@@ -90,15 +96,20 @@ public abstract class FortressInteractionManagerMixin {
             syncSelectedSlot();
             BlockPos blockPos = hitResult.getBlockPos();
             if(world.getWorldBorder().contains(blockPos)) {
-                Item item = player.getStackInHand(hand).getItem();
-                ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);
-                final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
-                if(blockStateFromItem != null) {
-                    final ActionResult returnValue = clickBuild(useoncontext, blockStateFromItem);
-                    cir.setReturnValue(returnValue);
-                    return;
+                final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+                if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
+                    // TODO: blueprint place
+                } else {
+                    Item item = player.getStackInHand(hand).getItem();
+                    ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);
+                    final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
+                    if(blockStateFromItem != null) {
+                        final ActionResult returnValue = clickBuild(useoncontext, blockStateFromItem);
+                        cir.setReturnValue(returnValue);
+                        return;
+                    }
+                    fortressClient.getSelectionManager().selectBlock(blockPos, null);
                 }
-                ((FortressMinecraftClient)client).getSelectionManager().selectBlock(blockPos, null);
             }
         }
     }

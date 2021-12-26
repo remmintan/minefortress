@@ -14,9 +14,7 @@ import org.minefortress.entity.Colonist;
 public class ColonistsGui extends FortressGuiScreen{
 
     private int colonistsCount = 0;
-
     private boolean hovered;
-
     protected ColonistsGui(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
     }

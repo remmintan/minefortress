@@ -6,6 +6,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.interfaces.FortressGameRenderer;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.SelectionManager;
@@ -36,16 +37,27 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick(CallbackInfo ci) {
-        final SelectionManager selectionManager = ((FortressMinecraftClient) client).getSelectionManager();
-        if(((FortressMinecraftClient)client).isFortressGamemode())  {
-            if(client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
-                BlockHitResult blockHitResult = (BlockHitResult) client.crosshairTarget;
-                selectionManager.tickSelectionUpdate(blockHitResult.getBlockPos(), blockHitResult.getSide());
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final SelectionManager selectionManager = fortressClient.getSelectionManager();
+        if(fortressClient.isFortressGamemode())  {
+            final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+            if(blueprintManager.hasSelectedBlueprint()) {
+                resetSelection(selectionManager);
+                blueprintManager.tickUpdate();
+            } else {
+                if(this.client.crosshairTarget != null && this.client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+                    BlockHitResult blockHitResult = (BlockHitResult) this.client.crosshairTarget;
+                    selectionManager.tickSelectionUpdate(blockHitResult.getBlockPos(), blockHitResult.getSide());
+                }
             }
         } else {
-            if(selectionManager.isSelecting()) {
-                selectionManager.resetSelection();
-            }
+            resetSelection(selectionManager);
+        }
+    }
+
+    private void resetSelection(SelectionManager selectionManager) {
+        if (selectionManager.isSelecting()) {
+            selectionManager.resetSelection();
         }
     }
 
