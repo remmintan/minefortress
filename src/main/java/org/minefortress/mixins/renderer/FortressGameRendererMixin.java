@@ -45,7 +45,6 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                 final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
                 if(blueprintManager.hasSelectedBlueprint()) {
                     resetSelection(selectionManager);
-                    blueprintManager.tickUpdate(blockHitResult.getBlockPos());
                 } else {
                     selectionManager.tickSelectionUpdate(blockHitResult.getBlockPos(), blockHitResult.getSide());
                 }

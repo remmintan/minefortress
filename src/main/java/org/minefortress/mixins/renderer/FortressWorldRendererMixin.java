@@ -1,12 +1,14 @@
 package org.minefortress.mixins.renderer;
 
 import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -14,6 +16,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
+import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.FortressRenderLayer;
@@ -43,6 +46,7 @@ public abstract class FortressWorldRendererMixin  {
 
     @Shadow private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
 
+    @Shadow private ChunkBuilder chunkBuilder;
     private MineFortressEntityRenderer entityRenderer;
 
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -63,7 +67,17 @@ public abstract class FortressWorldRendererMixin  {
         final VertexConsumerProvider.Immediate multibuffersource$buffersource = this.bufferBuilders.getEntityVertexConsumers();
         this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, multibuffersource$buffersource, LightmapTextureManager.pack(15, 15));
 
-        SelectionManager selectionManager = ((FortressMinecraftClient)client).getSelectionManager();
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+
+        final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+
+        blueprintManager.buildStructure(this.chunkBuilder);
+
+        blueprintManager.renderLayer(RenderLayer.getSolid(), matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
+        blueprintManager.renderLayer(RenderLayer.getCutout(), matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
+//        blueprintManager.renderLayer(RenderLayer.getTranslucent(), matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
+
+        SelectionManager selectionManager = fortressClient.getSelectionManager();
         Iterator<BlockPos> currentSelection = selectionManager.getCurrentSelection();
         VertexConsumer vertexconsumer2 = multibuffersource$buffersource.getBuffer(RenderLayer.getLines());
         if(currentSelection.hasNext()) {
@@ -124,7 +138,7 @@ public abstract class FortressWorldRendererMixin  {
             }
         }
 
-        if(((FortressMinecraftClient)client).isFortressGamemode()) {
+        if(fortressClient.isFortressGamemode()) {
             HitResult hitResult = this.client.crosshairTarget;
             if (renderBlockOutline && hitResult != null && hitResult.getType() == HitResult.Type.BLOCK) {
 

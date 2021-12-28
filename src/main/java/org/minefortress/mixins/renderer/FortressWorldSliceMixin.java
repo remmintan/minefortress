@@ -26,21 +26,7 @@ public abstract class FortressWorldSliceMixin {
     public void unpackBlockData(BlockState[] states, ClonedChunkSection section, BlockBox box, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) MinecraftClient.getInstance();
         final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
-        if(blueprintManager.hasSelectedBlueprint()) {
-            final Map<BlockPos, BlockState> blueprintStates = blueprintManager.getBlueprintStates();
-
-            final ChunkSectionPos sectionPos = section.getPosition();
-            BlockPos startPos = new BlockPos(sectionPos.getMinX(), sectionPos.getMinY(), sectionPos.getMinZ());
-            BlockPos endPos = new BlockPos(sectionPos.getMaxX(), sectionPos.getMaxY(), sectionPos.getMaxZ());
-
-            for (BlockPos blockPos : BlockPos.iterate(startPos, endPos)) {
-                if (blueprintStates.containsKey(blockPos)) {
-                    final int index = WorldSlice.getLocalBlockIndex(blockPos.getX()&15, blockPos.getY()&15, blockPos.getZ()&15);
-                    states[index] = blueprintStates.get(blockPos);
-                }
-            }
-
-        } else {
+        if (!blueprintManager.hasSelectedBlueprint()) {
             addSelectionToChunk(states, section, fortressClient);
         }
     }
