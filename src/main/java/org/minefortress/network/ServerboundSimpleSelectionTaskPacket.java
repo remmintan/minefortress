@@ -18,7 +18,7 @@ import org.minefortress.tasks.TaskType;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ServerboundColonistTaskPacket implements FortressServerPacket {
+public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacket {
 
     private final UUID id;
     private final TaskType taskType;
@@ -27,7 +27,7 @@ public class ServerboundColonistTaskPacket implements FortressServerPacket {
     private final HitResult hitResult;
     private final SelectionType selectionType;
 
-    public ServerboundColonistTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, SelectionType selectionType) {
+    public ServerboundSimpleSelectionTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, SelectionType selectionType) {
         this.id = id;
         this.taskType = taskType;
         this.start = start;
@@ -36,7 +36,7 @@ public class ServerboundColonistTaskPacket implements FortressServerPacket {
         this.selectionType = selectionType;
     }
 
-    public ServerboundColonistTaskPacket(PacketByteBuf buffer) {
+    public ServerboundSimpleSelectionTaskPacket(PacketByteBuf buffer) {
         this.id = buffer.readUuid();
         this.taskType = buffer.readEnumConstant(TaskType.class);
         this.start = buffer.readBlockPos();

@@ -13,7 +13,7 @@ import net.minecraft.util.math.Vec3i;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.network.ServerboundColonistTaskPacket;
+import org.minefortress.network.ServerboundSimpleSelectionTaskPacket;
 import org.minefortress.tasks.TaskType;
 import org.minefortress.utils.BlockUtils;
 
@@ -56,7 +56,7 @@ public class TwoDotsSelection extends Selection {
                 TaskType taskType = mapClickTypeToTaskType(clickType);
                 final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
                 ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelectionType(), getSelection(), blockStateFromItem, taskType);
-                ServerboundColonistTaskPacket packet = new ServerboundColonistTaskPacket(
+                ServerboundSimpleSelectionTaskPacket packet = new ServerboundSimpleSelectionTaskPacket(
                         newTaskId,
                         taskType,
                         this.selectionStart,

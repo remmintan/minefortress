@@ -4,17 +4,12 @@ package org.minefortress;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.block.Blocks;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.minefortress.entity.Colonist;
 import org.minefortress.network.ServerboundCancelTaskPacket;
-import org.minefortress.network.ServerboundColonistTaskPacket;
+import org.minefortress.network.ServerboundSimpleSelectionTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.registries.FortressBlocks;
@@ -33,7 +28,7 @@ public class MineFortressMod implements ModInitializer {
         Registry.register(Registry.ITEM, new Identifier("minefortress", "colonist_spawn_egg"), FortressItems.COLONIST_SPAWN_EGG);
 
         // networking
-        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.NEW_TASK, ServerboundColonistTaskPacket::new);
+        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.NEW_TASK, ServerboundSimpleSelectionTaskPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.CANCEL_TASK, ServerboundCancelTaskPacket::new);
     }
 }

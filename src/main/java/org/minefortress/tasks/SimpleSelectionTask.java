@@ -16,10 +16,7 @@ import org.minefortress.network.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.selections.SelectionType;
-import org.minefortress.tasks.block.info.BlockInfoUtils;
-import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
-import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
+import org.minefortress.tasks.block.info.*;
 import org.minefortress.tasks.interfaces.Task;
 
 import java.util.*;
@@ -161,15 +158,19 @@ public class SimpleSelectionTask implements Task {
 
     private List<TaskBlockInfo> getPartBlocksInfo(Pair<BlockPos, BlockPos> startAndEnd, ServerWorld world) {
         final List<TaskBlockInfo> blocksInfo = new ArrayList<>();
-        getBlocksForPart(startAndEnd).spliterator().forEachRemaining(block -> {
-            if(BlockInfoUtils.shouldBePlacedAsItem(placingItem)) {
-                final ItemUsageContext useOnContext = BlockInfoUtils.getUseOnContext(this.hitResult, this.placingItem, block, world);
-                final ItemTaskBlockInfo itemTaskBlockInfo = new ItemTaskBlockInfo(placingItem, block, useOnContext);
-                blocksInfo.add(itemTaskBlockInfo);
+        getBlocksForPart(startAndEnd).spliterator().forEachRemaining(pos -> {
+            if(placingItem != null) {
+                if(BlockInfoUtils.shouldBePlacedAsItem(placingItem)) {
+                    final ItemUsageContext useOnContext = BlockInfoUtils.getUseOnContext(this.hitResult, this.placingItem, pos, world);
+                    final ItemTaskBlockInfo itemTaskBlockInfo = new ItemTaskBlockInfo(placingItem, pos, useOnContext);
+                    blocksInfo.add(itemTaskBlockInfo);
+                } else {
+                    final BlockState blockStateForPlacement = BlockInfoUtils.getBlockStateForPlacement(placingItem, hitResult, horizontalDirection, world, pos);
+                    final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(placingItem, pos, blockStateForPlacement);
+                    blocksInfo.add(blockStateTaskBlockInfo);
+                }
             } else {
-                final BlockState blockStateForPlacement = BlockInfoUtils.getBlockStateForPlacement(placingItem, hitResult, horizontalDirection, world, block);
-                final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(placingItem, block, blockStateForPlacement);
-                blocksInfo.add(blockStateTaskBlockInfo);
+                blocksInfo.add(new DigTaskBlockInfo(pos));
             }
         });
         return blocksInfo;

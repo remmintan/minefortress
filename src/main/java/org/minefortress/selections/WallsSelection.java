@@ -13,7 +13,7 @@ import net.minecraft.util.math.Vec3i;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.network.ServerboundColonistTaskPacket;
+import org.minefortress.network.ServerboundSimpleSelectionTaskPacket;
 import org.minefortress.tasks.TaskType;
 import org.minefortress.utils.BlockUtils;
 
@@ -179,7 +179,7 @@ public class WallsSelection extends Selection {
                         .forEach(p -> {
                             UUID uuid = UUID.randomUUID();
                             ((FortressClientWorld)level).getClientTasksHolder().addTask(uuid, getSelectionType(), getSelection(), blockStateFromItem, taskType, supertaskUuid);
-                            ServerboundColonistTaskPacket packet = new ServerboundColonistTaskPacket(
+                            ServerboundSimpleSelectionTaskPacket packet = new ServerboundSimpleSelectionTaskPacket(
                                     uuid,
                                     taskType,
                                     p.getFirst(),
