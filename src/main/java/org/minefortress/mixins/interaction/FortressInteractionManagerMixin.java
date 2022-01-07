@@ -99,6 +99,7 @@ public abstract class FortressInteractionManagerMixin {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
                 if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
                     // TODO: blueprint place
+                    cir.setReturnValue(ActionResult.SUCCESS);
                 } else {
                     Item item = player.getStackInHand(hand).getItem();
                     ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);

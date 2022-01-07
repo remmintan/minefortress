@@ -34,6 +34,7 @@ import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
 import org.minefortress.interfaces.FortressSlimeEntity;
+import org.minefortress.tasks.TaskBlockInfo;
 
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -330,10 +331,11 @@ public class Colonist extends PassiveEntity {
     private HitResult hitResult;
     private Direction horizontalDirection;
 
-    public void setGoal(BlockPos goal, Item placingItem, HitResult hitResult, Direction horizontalDirection) {
-        this.goal = goal;
-        this.hitResult = hitResult;
-        this.horizontalDirection = horizontalDirection;
+    public void setGoal(TaskBlockInfo taskBlockInfo) {
+        this.goal = taskBlockInfo.pos();
+        this.hitResult = taskBlockInfo.hitResult();
+        this.horizontalDirection = taskBlockInfo.horizontalDirection();
+        Item placingItem = taskBlockInfo.placingItem();
         if(placingItem != null) {
             this.setStackInHand(Hand.MAIN_HAND, new ItemStack(placingItem));
             this.placeControl.set(goal, placingItem);

@@ -4,15 +4,16 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Iterator;
+import java.util.List;
 
 public class TaskPart {
 
     private final Pair<BlockPos, BlockPos> startAndEnd;
-    private final Iterator<BlockPos> iterator;
-    private final Task task;
+    private final List<TaskBlockInfo> iterator;
+    private final SimpleSelectionTask task;
 
 
-    public TaskPart(final Pair<BlockPos, BlockPos> startAndEnd, final Iterator<BlockPos> iterator, Task task) {
+    public TaskPart(final Pair<BlockPos, BlockPos> startAndEnd, List<TaskBlockInfo> iterator, SimpleSelectionTask task) {
         this.startAndEnd = startAndEnd;
         this.iterator = iterator;
         this.task = task;
@@ -22,11 +23,11 @@ public class TaskPart {
         return startAndEnd;
     }
 
-    public Iterator<BlockPos> getIterator() {
-        return iterator;
+    public Iterator<TaskBlockInfo> getIterator() {
+        return iterator.iterator();
     }
 
-    public Task getTask() {
+    public SimpleSelectionTask getTask() {
         return task;
     }
 }

@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.selections.SelectionType;
-import org.minefortress.tasks.Task;
+import org.minefortress.tasks.SimpleSelectionTask;
 import org.minefortress.tasks.TaskManager;
 import org.minefortress.tasks.TaskType;
 
@@ -97,16 +97,16 @@ public class ServerboundColonistTaskPacket implements FortressServerPacket {
         BlockPos endingBlock = this.getEnd();
         HitResult hitResult = this.getHitResult();
         SelectionType selectionType = this.getSelectionType();
-        Task task = new Task(id, taskType, startingBlock, endingBlock, hitResult, selectionType);
-        if(task.getTaskType() == TaskType.BUILD) {
+        SimpleSelectionTask simpleSelectionTask = new SimpleSelectionTask(id, taskType, startingBlock, endingBlock, hitResult, selectionType);
+        if(simpleSelectionTask.getTaskType() == TaskType.BUILD) {
             final ItemStack itemInHand = player.getStackInHand(Hand.MAIN_HAND);
             if(itemInHand != ItemStack.EMPTY) {
-                task.setPlacingItem(itemInHand.getItem());
+                simpleSelectionTask.setPlacingItem(itemInHand.getItem());
             } else {
 //                throw new IllegalStateException();
             }
         }
 
-        taskManager.addTask(task);
+        taskManager.addTask(simpleSelectionTask);
     }
 }

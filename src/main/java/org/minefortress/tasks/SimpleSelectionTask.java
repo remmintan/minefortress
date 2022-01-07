@@ -2,7 +2,6 @@ package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.item.Item;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
@@ -15,13 +14,11 @@ import org.minefortress.network.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.selections.SelectionType;
+import org.minefortress.tasks.interfaces.Task;
 
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 
-public class Task {
+public class SimpleSelectionTask implements Task {
 
     // CAUTION: ID is not actually unique!
     private final UUID id;
@@ -41,7 +38,7 @@ public class Task {
     private int totalParts;
     private int completedParts;
 
-    public Task(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, HitResult hitResult, SelectionType selectionType) {
+    public SimpleSelectionTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, HitResult hitResult, SelectionType selectionType) {
         this.id = id;
         this.selectionType = selectionType;
         this.taskType = taskType;
@@ -70,19 +67,18 @@ public class Task {
         }
     }
 
-    public Direction getHorizontalDirection() {
-        return horizontalDirection;
+    @Override
+    public TaskType getTaskType() {
+        return taskType;
     }
 
-    public Item getPlacingItem() {
-        return placingItem;
+    @Override
+    public UUID getId() {
+        return id;
     }
 
-    public void setPlacingItem(Item placingItem) {
-        this.placingItem = placingItem;
-    }
-
-    void prepareTask() {
+    @Override
+    public void prepareTask() {
         if(selectionType == SelectionType.WALLS_EVERY_SECOND) {
             parts.add(Pair.of(startingBlock, endingBlock));
         } else {
@@ -124,21 +120,29 @@ public class Task {
         return cursor.toImmutable();
     }
 
+    public void setPlacingItem(Item placingItem) {
+        this.placingItem = placingItem;
+    }
+
+    @Override
     public boolean hasAvailableParts() {
         return !this.parts.isEmpty();
     }
 
-    public TaskPart getPart() {
+    @Override
+    public TaskPart getNextPart() {
         Pair<BlockPos, BlockPos> startAndEnd = parts.poll();
         if(startAndEnd == null) throw new IllegalStateException("Null part for task!");
-        Iterator<BlockPos> blocks = getBlocks(startAndEnd);
+        final List<TaskBlockInfo> blocks = getPartBlocksInfo(startAndEnd);
         return new TaskPart(startAndEnd, blocks, this);
     }
 
+    @Override
     public void returnPart(Pair<BlockPos, BlockPos> part) {
         parts.add(part);
     }
 
+    @Override
     public void finishPart(ServerWorld level) {
         completedParts++;
         if(parts.isEmpty() && totalParts == completedParts) {
@@ -149,25 +153,25 @@ public class Task {
         }
     }
 
-    private Iterator<BlockPos> getBlocks(Pair<BlockPos, BlockPos> part) {
+    private List<TaskBlockInfo> getPartBlocksInfo(Pair<BlockPos, BlockPos> startAndEnd) {
+        final List<TaskBlockInfo> blocksInfo = new ArrayList<>();
+        getBlocksForPart(startAndEnd).spliterator().forEachRemaining(block -> {
+            TaskBlockInfo info = new TaskBlockInfo(this.hitResult, this.horizontalDirection, this.placingItem, block);
+            blocksInfo.add(info);
+        });
+        return blocksInfo;
+    }
+
+    private Iterable<BlockPos> getBlocksForPart(Pair<BlockPos, BlockPos> part) {
         if(selectionType == SelectionType.LADDER) {
-            return PathUtils.getLadderSelection(this.startingBlock, part.getFirst(), part.getSecond(), Direction.Axis.X).iterator();
+            return PathUtils.getLadderSelection(this.startingBlock, part.getFirst(), part.getSecond(), Direction.Axis.X);
         } else if(selectionType == SelectionType.LADDER_Z_DIRECTION) {
-            return PathUtils.getLadderSelection(this.startingBlock, part.getFirst(), part.getSecond(), Direction.Axis.Z).iterator();
+            return PathUtils.getLadderSelection(this.startingBlock, part.getFirst(), part.getSecond(), Direction.Axis.Z);
         } else {
-            return PathUtils.fromStartToEnd(part.getFirst(), part.getSecond(), selectionType).iterator();
+            return PathUtils.fromStartToEnd(part.getFirst(), part.getSecond(), selectionType);
         }
     }
 
-    public TaskType getTaskType() {
-        return taskType;
-    }
 
-    public UUID getId() {
-        return id;
-    }
 
-    public HitResult getHitResult() {
-        return hitResult;
-    }
 }

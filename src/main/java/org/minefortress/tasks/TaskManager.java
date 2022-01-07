@@ -1,5 +1,7 @@
 package org.minefortress.tasks;
 
+import org.minefortress.tasks.interfaces.Task;
+
 import java.util.*;
 
 public class TaskManager {
@@ -33,7 +35,7 @@ public class TaskManager {
     }
 
     public void returnTask(TaskPart taskPart) {
-        Task task = taskPart.getTask();
+        SimpleSelectionTask task = taskPart.getTask();
         task.returnPart(taskPart.getStartAndEnd());
 
         if(!tasks.contains(task)) {

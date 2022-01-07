@@ -30,7 +30,7 @@ public class FortressBookContents implements BookScreen.Contents {
             ctrl + D - rotate camera right
             """,
             """
-            Z - cancel latest task
+            Z - cancel latest simpleSelectionTask
             ctrl + Z - cancel all tasks
             """
     );

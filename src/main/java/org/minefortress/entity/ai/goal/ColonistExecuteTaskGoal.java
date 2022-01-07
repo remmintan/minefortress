@@ -6,20 +6,14 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.tasks.*;
 import org.minefortress.entity.ai.ColonistNavigation;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressServerWorld;
-import org.minefortress.tasks.Task;
-import org.minefortress.tasks.TaskManager;
-import org.minefortress.tasks.TaskPart;
-import org.minefortress.tasks.TaskType;
+import org.minefortress.tasks.interfaces.Task;
 
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ColonistExecuteTaskGoal extends Goal {
@@ -32,7 +26,9 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     private Task task;
     private TaskPart part;
-    private Iterator<BlockPos> currentPartBlocksIterator;
+    private Iterator<TaskBlockInfo> currentPartBlocksIterator;
+
+    private TaskBlockInfo taskBlockInfo = null;
     private BlockPos nextBlock =  null;
 
     private final Cache<UUID, Object> returnedIds = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build();
@@ -67,7 +63,7 @@ public class ColonistExecuteTaskGoal extends Goal {
     public void start() {
         colonist.setHasTask(true);
         task = manager.getTask();
-        part = task.getPart();
+        part = task.getNextPart();
         currentPartBlocksIterator = part.getIterator();
 
         if(!task.hasAvailableParts())
@@ -133,7 +129,8 @@ public class ColonistExecuteTaskGoal extends Goal {
         this.movementHelper.reset();
         this.nextBlock = null;
         while (currentPartBlocksIterator.hasNext()) {
-            nextBlock = currentPartBlocksIterator.next().toImmutable();
+            taskBlockInfo = currentPartBlocksIterator.next();
+            nextBlock = taskBlockInfo.pos();
             if(currentBlockInCorrectState()) break; // skipping air blocks
         }
         if(!currentBlockInCorrectState()){
@@ -142,7 +139,7 @@ public class ColonistExecuteTaskGoal extends Goal {
 
         if(nextBlock == null) return;
         movementHelper.set(this.nextBlock);
-        colonist.setGoal(this.nextBlock, task.getPlacingItem(), task.getHitResult(), task.getHorizontalDirection());
+        colonist.setGoal(this.taskBlockInfo);
     }
 
     private boolean currentBlockInCorrectState() {

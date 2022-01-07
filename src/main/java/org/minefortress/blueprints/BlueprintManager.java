@@ -16,27 +16,34 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BlueprintManager {
 
     private static final String CURRENT_STRUCTURE = "village/plains/houses/plains_small_house_1";
 //    private static final String CURRENT_STRUCTURE = "village/plains/houses/plains_butcher_shop_1";
 
     private final MinecraftClient client;
-    private BlueprintInfo blueprintInfo;
+
+    private StructureInfo selectedStructure;
+    private final Map<String, BlueprintInfo> blueprintInfos = new HashMap<>();
 
     public BlueprintManager(MinecraftClient client) {
         this.client = client;
     }
 
     public void buildStructure(ChunkBuilder chunkBuilder) {
-        if(blueprintInfo == null) {
-            this.blueprintInfo = BlueprintInfo.create(CURRENT_STRUCTURE, client.world, chunkBuilder);
+        final String selectedStructureName = selectedStructure.fileId();
+        if(!blueprintInfos.containsKey(selectedStructureName)) {
+            final BlueprintInfo blueprintInfo = BlueprintInfo.create(selectedStructureName, client.world, chunkBuilder);
+            blueprintInfos.put(selectedStructureName, blueprintInfo);
         }
 
         if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
             final BlockPos blockPos = blockHitResult.getBlockPos();
             if(blockPos != null)
-                this.blueprintInfo.rebuild(blockPos);
+                this.blueprintInfos.get(selectedStructureName).rebuild(blockPos);
         }
     }
 
@@ -136,12 +143,20 @@ public class BlueprintManager {
 
     @Nullable
     private ChunkBuilder.BuiltChunk getBuiltChunk() {
-        return this.blueprintInfo != null ? this.blueprintInfo.getBuiltChunk() : null;
+        return this.blueprintInfos.get(this.selectedStructure.fileId()).getBuiltChunk();
     }
 
 
     public boolean hasSelectedBlueprint() {
-        return true;
+        return selectedStructure != null;
+    }
+
+    public void selectStructure(StructureInfo structureInfo) {
+        this.selectedStructure = structureInfo;
+    }
+
+    public void clearStructure() {
+        this.selectedStructure = null;
     }
 
 }
