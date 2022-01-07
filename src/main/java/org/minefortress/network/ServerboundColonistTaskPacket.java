@@ -103,7 +103,7 @@ public class ServerboundColonistTaskPacket implements FortressServerPacket {
             if(itemInHand != ItemStack.EMPTY) {
                 simpleSelectionTask.setPlacingItem(itemInHand.getItem());
             } else {
-//                throw new IllegalStateException();
+                throw new IllegalStateException();
             }
         }
 
