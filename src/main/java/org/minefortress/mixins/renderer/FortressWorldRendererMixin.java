@@ -8,7 +8,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.chunk.ChunkBuilder;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -47,6 +49,7 @@ public abstract class FortressWorldRendererMixin  {
     @Shadow private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
 
     @Shadow private ChunkBuilder chunkBuilder;
+    @Shadow @Final private BlockEntityRenderDispatcher blockEntityRenderDispatcher;
     private MineFortressEntityRenderer entityRenderer;
 
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -59,27 +62,36 @@ public abstract class FortressWorldRendererMixin  {
         this.entityRenderer.setLevel(world);
     }
 
+    @Inject(method = "setupTerrain", at = @At("TAIL"))
+    public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, int frame, boolean spectator, CallbackInfo ci) {
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+        if(blueprintManager.hasSelectedBlueprint()) {
+            blueprintManager.buildStructure(this.chunkBuilder);
+        }
+    }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/BlockHitResult;getBlockPos()Lnet/minecraft/util/math/BlockPos;", shift = At.Shift.BEFORE))
     public void render(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
         this.entityRenderer.prepare(this.world, camera);
         final Vec3d cameraPos = camera.getPos();
-        final VertexConsumerProvider.Immediate multibuffersource$buffersource = this.bufferBuilders.getEntityVertexConsumers();
-        this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, multibuffersource$buffersource, LightmapTextureManager.pack(15, 15));
+        final VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
+        this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-
         final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
 
-        blueprintManager.buildStructure(this.chunkBuilder);
+        if(blueprintManager.hasSelectedBlueprint()) {
+            blueprintManager.renderLayer(RenderLayer.getSolid(), matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
+            blueprintManager.renderLayer(RenderLayer.getCutout(), matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
+            blueprintManager.renderLayer(RenderLayer.getCutoutMipped(), matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
 
-        blueprintManager.renderLayer(RenderLayer.getSolid(), matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
-        blueprintManager.renderLayer(RenderLayer.getCutout(), matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
-//        blueprintManager.renderLayer(RenderLayer.getTranslucent(), matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
+//            blueprintManager.renderBlockEntities(immediate, matrices, cameraPos, this.blockEntityRenderDispatcher, tickDelta);
+        }
 
         SelectionManager selectionManager = fortressClient.getSelectionManager();
         Iterator<BlockPos> currentSelection = selectionManager.getCurrentSelection();
-        VertexConsumer vertexconsumer2 = multibuffersource$buffersource.getBuffer(RenderLayer.getLines());
+        VertexConsumer vertexconsumer2 = immediate.getBuffer(RenderLayer.getLines());
         if(currentSelection.hasNext()) {
             ClickType clickType = selectionManager.getClickType();
             while(currentSelection.hasNext()) {
@@ -101,7 +113,7 @@ public abstract class FortressWorldRendererMixin  {
             List<Pair<Vec3i, Vec3i>> selections = selectionManager.getSelectionSize();
             for(Pair<Vec3i, Vec3i> selectionSize : selections) {
                 if(clickType == ClickType.REMOVE && selectionSize != null) {
-                    VertexConsumer noDepthBuffer = multibuffersource$buffersource.getBuffer(FortressRenderLayer.getLinesNoDepth());
+                    VertexConsumer noDepthBuffer = immediate.getBuffer(FortressRenderLayer.getLinesNoDepth());
                     Vec3i selectionDimensions = selectionSize.getFirst();
                     VoxelShape generalSelectionBox = Block.createCuboidShape(
                             0,
@@ -119,7 +131,7 @@ public abstract class FortressWorldRendererMixin  {
         }
 
         Collection<ClientSelection> allRemoveTasks = ((FortressClientWorld)world).getClientTasksHolder().getAllRemoveTasks();
-        VertexConsumer buffer = multibuffersource$buffersource.getBuffer(RenderLayer.getLines());
+        VertexConsumer buffer = immediate.getBuffer(RenderLayer.getLines());
         final Vector4f color = new Vector4f(170f/255f, 0, 0, 1f);
         for(ClientSelection task : allRemoveTasks) {
             for(BlockPos pos: task.getBlockPositions()) {
@@ -145,12 +157,12 @@ public abstract class FortressWorldRendererMixin  {
                 BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
                 BlockState blockState = this.world.getBlockState(blockPos);
                 if (!blockState.isAir() && this.world.getWorldBorder().contains(blockPos)) {
-                    VertexConsumer outlineVertexConsumerProvider3 = multibuffersource$buffersource.getBuffer(RenderLayer.getLines());
+                    VertexConsumer outlineVertexConsumerProvider3 = immediate.getBuffer(RenderLayer.getLines());
                     this.drawBlockOutline(matrices, outlineVertexConsumerProvider3, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, blockPos, blockState);
                 }
             }
 
-            multibuffersource$buffersource.drawCurrentLayer();
+            immediate.drawCurrentLayer();
         }
     }
 

@@ -6,6 +6,7 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.structure.Structure;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,10 +45,10 @@ public class BlueprintInfo {
     }
 
     private void setOrigin(BlockPos pos) {
-        pos = new BlockPos(pos.getX() + (16 - pos.getX()%16), pos.getY() + 16, pos.getZ() + (16 - pos.getZ()%16));
-
+        final Vec3i originDelta = new Vec3i(-pos.getX() % 16, 16 - pos.getY() % 16, -pos.getZ() % 16);
+        pos = new BlockPos(pos.getX(), pos.getY(), pos.getZ()).add(originDelta);
         this.builtChunk.setOrigin(pos.getX(), pos.getY(), pos.getZ());
-        this.chunkRendererRegion.setOrigin(pos);
+        this.chunkRendererRegion.setOrigin(pos, originDelta);
     }
 
     public void rebuild(BlockPos pos) {

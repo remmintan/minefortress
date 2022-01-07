@@ -6,7 +6,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.chunk.ChunkRendererRegion;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.util.math.BlockPos;
@@ -23,6 +22,7 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
 
     private final Map<BlockPos, BlockState> structureData;
     private BlockPos origin = BlockPos.ORIGIN;
+    private Vec3i originDelta = BlockPos.ORIGIN;
 
     public static BlueprintChunkRendererRegion create(Structure structure, World world, BlockPos originPos) {
         final StructurePlacementData placementData = new StructurePlacementData();
@@ -31,6 +31,8 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
                 .getAll();
         final Map<BlockPos, BlockState> structureData = blockInfos
                 .stream()
+                .filter(info -> info.state.getBlock() != Blocks.AIR)
+                .filter(info -> info.state.getBlock() != Blocks.JIGSAW)
                 .collect(Collectors.toMap(inf -> inf.pos.add(originPos), inf -> inf.state));
 
 
@@ -67,10 +69,9 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
     @Nullable
     @Override
     public BlockEntity getBlockEntity(BlockPos pos) {
-        pos = adjustPos(pos);
         final BlockState blockState = this.getBlockState(pos);
         if (blockState.getBlock() instanceof BlockEntityProvider provider) {
-            return provider.createBlockEntity(pos, blockState);
+            return provider.createBlockEntity(pos.subtract(originDelta), blockState);
         } else {
             return null;
         }
@@ -79,12 +80,12 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
     @Nullable
     @Override
     public BlockEntity getBlockEntity(BlockPos pos, WorldChunk.CreationType creationType) {
-        pos = adjustPos(pos);
         return this.getBlockEntity(pos);
     }
 
-    public void setOrigin(BlockPos origin) {
+    public void setOrigin(BlockPos origin, Vec3i originDelta) {
         this.origin = origin;
+        this.originDelta = originDelta;
     }
 
     private BlockPos adjustPos(BlockPos pos) {

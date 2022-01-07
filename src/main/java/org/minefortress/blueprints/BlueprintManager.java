@@ -1,17 +1,20 @@
 package org.minefortress.blueprints;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.structure.StructureManager;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
+import org.jetbrains.annotations.Nullable;
 
 public class BlueprintManager {
 
@@ -30,8 +33,38 @@ public class BlueprintManager {
             this.blueprintInfo = BlueprintInfo.create(CURRENT_STRUCTURE, client.world, chunkBuilder);
         }
 
-        if(client.crosshairTarget instanceof BlockHitResult blockHitResult)
-            this.blueprintInfo.rebuild(blockHitResult.getBlockPos());
+        if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
+            final BlockPos blockPos = blockHitResult.getBlockPos();
+            if(blockPos != null)
+                this.blueprintInfo.rebuild(blockPos);
+        }
+    }
+
+    public void renderBlockEntities(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, Vec3d cameraPos, BlockEntityRenderDispatcher blockEntityRenderDispatcher, float tickDelta) {
+        BlockPos selectedPos = client.crosshairTarget instanceof BlockHitResult ? ((BlockHitResult) client.crosshairTarget).getBlockPos() : null;
+        if(selectedPos == null) return;
+        final ChunkBuilder.BuiltChunk builtChunk = getBuiltChunk();
+        if(builtChunk == null) return;
+
+//        immediate.draw(RenderLayer.getEntitySolid(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE));
+//        immediate.draw(RenderLayer.getEntityCutout(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE));
+//        immediate.draw(RenderLayer.getEntityCutoutNoCull(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE));
+//        immediate.draw(RenderLayer.getEntitySmoothCutout(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE));
+
+        for (BlockEntity entity : builtChunk.getData().getBlockEntities()) {
+            BlockPos r = entity.getPos();
+            matrices.push();
+            matrices.translate((double)r.getX() - cameraPos.x, (double)r.getY() - cameraPos.y, (double)r.getZ() - cameraPos.z);
+            blockEntityRenderDispatcher.render(entity, tickDelta, matrices, immediate);
+            matrices.pop();
+        }
+
+        immediate.draw(TexturedRenderLayers.getEntitySolid());
+        immediate.draw(TexturedRenderLayers.getEntityCutout());
+        immediate.draw(TexturedRenderLayers.getBeds());
+        immediate.draw(TexturedRenderLayers.getShulkerBoxes());
+        immediate.draw(TexturedRenderLayers.getSign());
+        immediate.draw(TexturedRenderLayers.getChest());
     }
 
     public void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
@@ -77,7 +110,7 @@ public class BlueprintManager {
         GlUniform i = shader.chunkOffset;
         k = 0;
 
-        final ChunkBuilder.BuiltChunk chunk = this.blueprintInfo != null ? this.blueprintInfo.getBuiltChunk() : null;
+        final ChunkBuilder.BuiltChunk chunk = getBuiltChunk();
         if(chunk != null && !chunk.getData().isEmpty(renderLayer)) {
             VertexBuffer vertexBuffer = chunk.getBuffer(renderLayer);
             BlockPos blockPos = client.crosshairTarget instanceof BlockHitResult ? ((BlockHitResult) client.crosshairTarget).getBlockPos() : chunk.getOrigin();
@@ -99,6 +132,11 @@ public class BlueprintManager {
         VertexBuffer.unbindVertexArray();
         this.client.getProfiler().pop();
         renderLayer.endDrawing();
+    }
+
+    @Nullable
+    private ChunkBuilder.BuiltChunk getBuiltChunk() {
+        return this.blueprintInfo != null ? this.blueprintInfo.getBuiltChunk() : null;
     }
 
 
