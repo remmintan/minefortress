@@ -15,7 +15,7 @@ public interface Task {
     default void prepareTask() {}
 
     boolean hasAvailableParts();
-    TaskPart getNextPart();
+    TaskPart getNextPart(ServerWorld level);
     void returnPart(Pair<BlockPos, BlockPos> partStartAndEnd);
     void finishPart(ServerWorld level);
 

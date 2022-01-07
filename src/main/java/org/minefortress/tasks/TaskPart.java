@@ -2,6 +2,7 @@ package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.Iterator;
 import java.util.List;

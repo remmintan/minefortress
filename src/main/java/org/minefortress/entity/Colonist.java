@@ -34,7 +34,7 @@ import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
 import org.minefortress.interfaces.FortressSlimeEntity;
-import org.minefortress.tasks.TaskBlockInfo;
+import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -328,75 +328,16 @@ public class Colonist extends PassiveEntity {
     }
 
     private BlockPos goal;
-    private HitResult hitResult;
-    private Direction horizontalDirection;
 
     public void setGoal(TaskBlockInfo taskBlockInfo) {
-        this.goal = taskBlockInfo.pos();
-        this.hitResult = taskBlockInfo.hitResult();
-        this.horizontalDirection = taskBlockInfo.horizontalDirection();
-        Item placingItem = taskBlockInfo.placingItem();
+        this.goal = taskBlockInfo.getPos();
+        Item placingItem = taskBlockInfo.getPlacingItem();
         if(placingItem != null) {
             this.setStackInHand(Hand.MAIN_HAND, new ItemStack(placingItem));
-            this.placeControl.set(goal, placingItem);
+            this.placeControl.set(taskBlockInfo);
         } else {
-            this.digControl.set(goal, null);
+            this.digControl.set(taskBlockInfo);
         }
-    }
-
-    public ItemUsageContext getUseOnContext(Item placingItem, BlockPos goal) {
-        if(hitResult instanceof BlockHitResult) {
-            ServerPlayerEntity randomPlayer = ((ServerWorld) world).getRandomAlivePlayer();
-            if (randomPlayer == null) {
-                throw new IllegalStateException("Player can't be null");
-            }
-            final BlockHitResult movedHitResult = moveHitResult(goal);
-            return new FortressUseOnContext(
-                    world,
-                    randomPlayer,
-                    Hand.MAIN_HAND,
-                    new ItemStack(placingItem),
-                    movedHitResult
-            );
-        }
-
-        return null;
-    }
-
-    public ItemPlacementContext getBlockPlaceContext(Item placingItem, BlockPos goal) {
-        if(hitResult instanceof BlockHitResult) {
-            ServerPlayerEntity randomPlayer = ((ServerWorld)world).getRandomAlivePlayer();
-            if(randomPlayer == null) {
-                throw new IllegalStateException("Player can't be null");
-            }
-
-            final BlockHitResult movedHitResult = moveHitResult(goal);
-            if(horizontalDirection != null){
-                return new FortressBlockPlaceContext(
-                        randomPlayer,
-                        Hand.MAIN_HAND,
-                        new ItemStack(placingItem, 64),
-                        movedHitResult,
-                        horizontalDirection
-                );
-            } else {
-                return new ItemPlacementContext(
-                        randomPlayer,
-                        Hand.MAIN_HAND,
-                        new ItemStack(placingItem, 64),
-                        movedHitResult
-                );
-            }
-
-        } else {
-            return null;
-        }
-    }
-
-    private BlockHitResult moveHitResult(BlockPos goal) {
-        BlockHitResult blockHit = (BlockHitResult) this.hitResult;
-        final BlockPos clickedPos = goal.offset(blockHit.getSide().getOpposite()).toImmutable();
-        return blockHit.withBlockPos(clickedPos);
     }
 
     public void lookAtGoal() {

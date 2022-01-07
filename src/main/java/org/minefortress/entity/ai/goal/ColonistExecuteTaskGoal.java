@@ -11,6 +11,7 @@ import org.minefortress.entity.ai.ColonistNavigation;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressServerWorld;
+import org.minefortress.tasks.block.info.TaskBlockInfo;
 import org.minefortress.tasks.interfaces.Task;
 
 import java.util.*;
@@ -63,7 +64,7 @@ public class ColonistExecuteTaskGoal extends Goal {
     public void start() {
         colonist.setHasTask(true);
         task = manager.getTask();
-        part = task.getNextPart();
+        part = task.getNextPart(world);
         currentPartBlocksIterator = part.getIterator();
 
         if(!task.hasAvailableParts())
@@ -130,7 +131,7 @@ public class ColonistExecuteTaskGoal extends Goal {
         this.nextBlock = null;
         while (currentPartBlocksIterator.hasNext()) {
             taskBlockInfo = currentPartBlocksIterator.next();
-            nextBlock = taskBlockInfo.pos();
+            nextBlock = taskBlockInfo.getPos();
             if(currentBlockInCorrectState()) break; // skipping air blocks
         }
         if(!currentBlockInCorrectState()){

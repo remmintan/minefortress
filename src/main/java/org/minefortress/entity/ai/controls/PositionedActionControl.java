@@ -4,15 +4,18 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
+import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 abstract class PositionedActionControl  {
 
     protected BlockPos goal;
     protected Item item;
+    protected TaskBlockInfo taskBlockInfo;
 
-    public void set(BlockPos pos, Item item) {
-        this.goal = pos.toImmutable();
-        this.item = item;
+    public void set(TaskBlockInfo taskBlockInfo) {
+        this.taskBlockInfo = taskBlockInfo;
+        this.goal = taskBlockInfo.getPos();
+        this.item = taskBlockInfo.getPlacingItem();
     }
 
     public abstract void tick();

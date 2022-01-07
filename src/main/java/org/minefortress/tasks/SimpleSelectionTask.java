@@ -1,7 +1,9 @@
 package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
@@ -14,6 +16,10 @@ import org.minefortress.network.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.selections.SelectionType;
+import org.minefortress.tasks.block.info.BlockInfoUtils;
+import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
+import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
+import org.minefortress.tasks.block.info.TaskBlockInfo;
 import org.minefortress.tasks.interfaces.Task;
 
 import java.util.*;
@@ -130,10 +136,10 @@ public class SimpleSelectionTask implements Task {
     }
 
     @Override
-    public TaskPart getNextPart() {
+    public TaskPart getNextPart(ServerWorld world) {
         Pair<BlockPos, BlockPos> startAndEnd = parts.poll();
         if(startAndEnd == null) throw new IllegalStateException("Null part for task!");
-        final List<TaskBlockInfo> blocks = getPartBlocksInfo(startAndEnd);
+        final List<TaskBlockInfo> blocks = getPartBlocksInfo(startAndEnd, world);
         return new TaskPart(startAndEnd, blocks, this);
     }
 
@@ -153,11 +159,18 @@ public class SimpleSelectionTask implements Task {
         }
     }
 
-    private List<TaskBlockInfo> getPartBlocksInfo(Pair<BlockPos, BlockPos> startAndEnd) {
+    private List<TaskBlockInfo> getPartBlocksInfo(Pair<BlockPos, BlockPos> startAndEnd, ServerWorld world) {
         final List<TaskBlockInfo> blocksInfo = new ArrayList<>();
         getBlocksForPart(startAndEnd).spliterator().forEachRemaining(block -> {
-            TaskBlockInfo info = new TaskBlockInfo(this.hitResult, this.horizontalDirection, this.placingItem, block);
-            blocksInfo.add(info);
+            if(BlockInfoUtils.shouldBePlacedAsItem(placingItem)) {
+                final ItemUsageContext useOnContext = BlockInfoUtils.getUseOnContext(this.hitResult, this.placingItem, block, world);
+                final ItemTaskBlockInfo itemTaskBlockInfo = new ItemTaskBlockInfo(placingItem, block, useOnContext);
+                blocksInfo.add(itemTaskBlockInfo);
+            } else {
+                final BlockState blockStateForPlacement = BlockInfoUtils.getBlockStateForPlacement(placingItem, hitResult, horizontalDirection, world, block);
+                final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(placingItem, block, blockStateForPlacement);
+                blocksInfo.add(blockStateTaskBlockInfo);
+            }
         });
         return blocksInfo;
     }
