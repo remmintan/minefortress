@@ -93,7 +93,8 @@ public class ColonistExecuteTaskGoal extends Goal {
         }
     }
 
-    private void returnTask() {
+    public void returnTask() {
+        if(part == null) return;
         manager.returnTask(part);
         this.returnedIds.put(part.getTask().getId(), new Object());
         part = null;

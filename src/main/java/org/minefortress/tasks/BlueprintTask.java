@@ -27,11 +27,14 @@ public class BlueprintTask extends AbstractTask {
     @Override
     public TaskPart getNextPart(ServerWorld level) {
         final Pair<BlockPos, BlockPos> partStartAndEnd = parts.poll();
-        final Iterable<BlockPos> allPositionsInPart = BlockPos.iterate(partStartAndEnd.getFirst(), partStartAndEnd.getSecond());
+        final BlockPos start = partStartAndEnd.getFirst();
+        final BlockPos delta = start.subtract(startingBlock);
+        final Iterable<BlockPos> allPositionsInPart = BlockPos.iterate(start, partStartAndEnd.getSecond());
 
         List<TaskBlockInfo> blockInfos = new ArrayList<>();
         for (BlockPos pos : allPositionsInPart) {
-            final BlockState state = blueprintData.getOrDefault(pos, Blocks.AIR.getDefaultState());
+            final BlockState state = blueprintData.getOrDefault(pos.subtract(start).add(delta), Blocks.AIR.getDefaultState());
+            if(state.isAir()) continue;
             final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(getItemFromState(state), pos.toImmutable(), state);
             blockInfos.add(blockStateTaskBlockInfo);
         }

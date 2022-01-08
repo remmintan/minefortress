@@ -9,6 +9,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import org.minefortress.registries.FortressBlocks;
 
 public class BuildingManager {
 
@@ -21,8 +22,8 @@ public class BuildingManager {
         return inWorldBounds(level, pos) && (
                 isAirOrFluid(state) ||
                 isGrass(level, state, pos) ||
-                doesNotHaveCollisions(level, pos) //||
-//                state.getBlock().equals(Blocks.SCAFFOLD_OAK_PLANKS)
+                doesNotHaveCollisions(level, pos) ||
+                state.getBlock().equals(FortressBlocks.SCAFFOLD_OAK_PLANKS)
         );
     }
 

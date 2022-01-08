@@ -1,6 +1,7 @@
 package org.minefortress.blueprints;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
@@ -25,7 +26,8 @@ public class ServerBlueprintManager {
         }
 
         final ServerStructureInfo serverStructureInfo = structures.get(structureId);
-        return new BlueprintTask(taskId, serverStructureInfo.getStartPos(), serverStructureInfo.getEndPos(), serverStructureInfo.getStructureData());
+        final Vec3i size = serverStructureInfo.getSize();
+        return new BlueprintTask(taskId, startPos, startPos.add(new Vec3i(size.getX(), size.getY(), size.getZ())), serverStructureInfo.getStructureData());
     }
 
     private ServerStructureInfo create(String structureId, BlockPos startPos, ServerWorld world) {
@@ -34,14 +36,14 @@ public class ServerBlueprintManager {
             final Structure structure = structureOpt.get();
 
             final Vec3i size = structure.getSize();
-            BlockPos endPos = startPos.add(size.getX() - 1, size.getY() - 1, size.getZ() - 1);
             Map<BlockPos, BlockState> structureData = new StructurePlacementData()
                     .getRandomBlockInfos(structure.blockInfoLists, startPos)
                     .getAll()
                     .stream()
+                    .filter(inf -> inf.state.getBlock() != Blocks.JIGSAW)
                     .collect(Collectors.toUnmodifiableMap(inf -> inf.pos, inf -> inf.state));
 
-            return new ServerStructureInfo(structureData, startPos, endPos);
+            return new ServerStructureInfo(structureData, size);
         } else {
             throw new IllegalArgumentException("Structure " + structureId + " does not exist");
         }
@@ -49,26 +51,21 @@ public class ServerBlueprintManager {
 
     private static class ServerStructureInfo {
         private final Map<BlockPos, BlockState> structureData;
-        private final BlockPos startPos;
-        private final BlockPos endPos;
+        private final Vec3i size;
 
-        public ServerStructureInfo(Map<BlockPos, BlockState> structureData, BlockPos startPos, BlockPos endPos) {
+        public ServerStructureInfo(Map<BlockPos, BlockState> structureData, Vec3i size) {
             this.structureData = structureData;
-            this.startPos = startPos;
-            this.endPos = endPos;
+            this.size = size;
         }
 
         public Map<BlockPos, BlockState> getStructureData() {
             return structureData;
         }
 
-        public BlockPos getStartPos() {
-            return startPos;
+        public Vec3i getSize() {
+            return size;
         }
 
-        public BlockPos getEndPos() {
-            return endPos;
-        }
     }
 
 }

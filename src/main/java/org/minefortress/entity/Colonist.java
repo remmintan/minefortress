@@ -48,6 +48,8 @@ public class Colonist extends PassiveEntity {
     private final ScaffoldsControl scaffoldsControl;
     private final MLGControl mlgControl;
 
+    private ColonistExecuteTaskGoal executeTaskGoal;
+
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
         super(entityType, world);
 
@@ -174,7 +176,8 @@ public class Colonist extends PassiveEntity {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
         this.goalSelector.add(3, new MeleeAttackGoal(this, 1.5, true));
-        this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
+        executeTaskGoal  = new ColonistExecuteTaskGoal(this);
+        this.goalSelector.add(6, executeTaskGoal);
         this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0D));
         this.goalSelector.add(8, new LookAroundGoal(this));
 
@@ -210,6 +213,9 @@ public class Colonist extends PassiveEntity {
     @Override
     public void remove(RemovalReason p_146876_) {
         super.remove(p_146876_);
+        if(this.executeTaskGoal != null) {
+            this.executeTaskGoal.returnTask();
+        }
     }
 
     @Override
@@ -244,22 +250,6 @@ public class Colonist extends PassiveEntity {
         if(getPlaceControl() != null) getPlaceControl().tick();
         if(getMlgControl() != null) getMlgControl().tick();
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();
-    }
-
-    private Vec3d realPos = null;
-
-    public void setFakePosition(BlockPos pos) {
-        if(realPos != null) {
-            throw new IllegalStateException("Already set fake position");
-        }
-
-        realPos = this.getPos();
-        this.setPos(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-    }
-
-    public void resetFakePosition() {
-        this.setPos(realPos.x, realPos.y, realPos.z);
-        realPos = null;
     }
 
     private boolean isHalfInWall() {

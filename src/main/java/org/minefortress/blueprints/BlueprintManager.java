@@ -187,12 +187,17 @@ public class BlueprintManager {
         final FortressClientWorld world = (FortressClientWorld) client.world;
         if(world != null) {
             final Map<BlockPos, BlockState> structureData = blueprintInfos.get(selectedStructure.fileId()).getChunkRendererRegion().getStructureData();
-            final List<BlockPos> blocks = structureData.entrySet().stream().filter(ent -> ent.getValue().getBlock() != Blocks.AIR).map(Map.Entry::getKey).collect(Collectors.toList());
+            final List<BlockPos> blocks = structureData
+                    .entrySet()
+                    .stream()
+                    .filter(ent -> ent.getValue().getBlock() != Blocks.AIR)
+                    .map(Map.Entry::getKey)
+                    .map(it -> it.add(startPos))
+                    .collect(Collectors.toList());
             world.getClientTasksHolder().addTask(taskId, blocks);
         }
         final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket = new ServerboundBlueprintTaskPacket(taskId, selectedStructure.fileId(), startPos);
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
-        clearStructure();
     }
 
     public void clearStructure() {
