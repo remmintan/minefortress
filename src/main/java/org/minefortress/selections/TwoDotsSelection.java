@@ -65,7 +65,7 @@ public class TwoDotsSelection extends Selection {
                         getSelectionType());
 
 
-                FortressClientNetworkHelper.send(FortressChannelNames.NEW_TASK, packet);
+                FortressClientNetworkHelper.send(FortressChannelNames.NEW_SELECTION_TASK, packet);
             }
 
             return true;
