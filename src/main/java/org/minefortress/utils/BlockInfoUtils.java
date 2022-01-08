@@ -1,4 +1,4 @@
-package org.minefortress.tasks.block.info;
+package org.minefortress.utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

@@ -6,6 +6,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import org.minefortress.blueprints.ServerBlueprintManager;
 import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.tasks.TaskManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,6 +17,7 @@ import java.util.function.Supplier;
 public abstract class FortressServerWorldMixin extends World implements FortressServerWorld {
 
     private final TaskManager taskManager = new TaskManager();
+    private final ServerBlueprintManager blueprintManager = new ServerBlueprintManager();
 
     protected FortressServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, DimensionType dimensionType, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
         super(properties, registryRef, dimensionType, profiler, isClient, debugWorld, seed);
@@ -24,5 +26,10 @@ public abstract class FortressServerWorldMixin extends World implements Fortress
     @Override
     public TaskManager getTaskManager() {
         return taskManager;
+    }
+
+    @Override
+    public ServerBlueprintManager getBlueprintManager() {
+        return blueprintManager;
     }
 }

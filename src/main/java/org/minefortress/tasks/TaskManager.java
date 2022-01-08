@@ -35,7 +35,7 @@ public class TaskManager {
     }
 
     public void returnTask(TaskPart taskPart) {
-        SimpleSelectionTask task = taskPart.getTask();
+        Task task = taskPart.getTask();
         task.returnPart(taskPart.getStartAndEnd());
 
         if(!tasks.contains(task)) {
