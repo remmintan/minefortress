@@ -204,4 +204,8 @@ public class BlueprintManager {
         this.selectedStructure = null;
     }
 
+    public String getSelectedStructureName() {
+        return this.selectedStructure != null ? this.selectedStructure.name() : "";
+    }
+
 }

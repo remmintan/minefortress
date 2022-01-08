@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.world.ClientWorld;
+import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.entity.renderer.ColonistRenderer;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -21,7 +22,13 @@ public class MineFortressClient implements ClientModInitializer {
         EntityRendererRegistry.register(FortressEntities.COLONIST_ENTITY_TYPE, ColonistRenderer::new);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
-                ((FortressMinecraftClient)client).getSelectionManager().toggleSelectionType();
+                final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
+                final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+                if(blueprintManager.hasSelectedBlueprint()) {
+                    fortressClient.getBlueprintDataManager().selectNext();
+                } else {
+                    fortressClient.getSelectionManager().toggleSelectionType();
+                }
             }
 
             while (FortressKeybindings.cancelTaskKeybinding.wasPressed()) {

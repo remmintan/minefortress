@@ -8,6 +8,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.world.GameMode;
+import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.SelectionManager;
 
@@ -50,9 +51,17 @@ public class FortressHud {
         prepareRenderSystem();
 
         renderWatermarks(p, font, scaledWidth, scaledHeight);
-        if(this.client.interactionManager != null && this.client.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+
+        final FortressMinecraftClient client = (FortressMinecraftClient) this.client;
+        final BlueprintManager blueprintManager = client.getBlueprintManager();
+        if(blueprintManager.hasSelectedBlueprint()) {
+            final String selectedBlueprintName = blueprintManager.getSelectedStructureName();
+            renderInfoText(p, font, "Blueprint: " + selectedBlueprintName);
+        } else {
             renderSelectTypeName(p, font);
         }
+
+
         this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
         this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
     }
@@ -81,6 +90,10 @@ public class FortressHud {
     private void renderSelectTypeName(MatrixStack p, TextRenderer font) {
         String name = getSelectionManager().getCurrentSelectionType().getName();
         String selectionText = "Selection type: " + name;
+        renderInfoText(p, font, selectionText);
+    }
+
+    private void renderInfoText(MatrixStack p, TextRenderer font, String selectionText) {
         DrawableHelper.drawStringWithShadow(p, font, selectionText, 5, 5, MOD_GUI_COLOR);
     }
 

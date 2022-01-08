@@ -26,8 +26,6 @@ public class ToolsGui extends FortressGuiScreen {
 
     private final List<ButtonWidget> selectionButtons = new ArrayList<>();
 
-    private final StructureInfo basicHouse = new StructureInfo("House", "village/plains/houses/plains_small_house_1");
-
     protected ToolsGui(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
         this.selectionType = new FortressItemButtonWidget(
@@ -57,9 +55,8 @@ public class ToolsGui extends FortressGuiScreen {
                     if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
                         fortressClient.getBlueprintManager().clearStructure();
                     } else {
-                        fortressClient.getBlueprintManager().selectStructure(basicHouse);
+                        fortressClient.getBlueprintDataManager().selectFirst();
                     }
-
                 },
                 (button, matrices, mouseX, mouseY) -> {
                     if (fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
