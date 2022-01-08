@@ -25,9 +25,6 @@ import java.util.stream.Collectors;
 
 public class BlueprintManager {
 
-    private static final String CURRENT_STRUCTURE = "village/plains/houses/plains_small_house_1";
-//    private static final String CURRENT_STRUCTURE = "village/plains/houses/plains_butcher_shop_1";
-
     private final MinecraftClient client;
 
     private StructureInfo selectedStructure;

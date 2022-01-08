@@ -9,7 +9,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import org.minefortress.blueprints.StructureInfo;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.widget.FortressItemButtonWidget;
 import org.minefortress.selections.SelectionType;
