@@ -23,6 +23,8 @@ public class FortressHud {
    private final ColonistsGui colonistsGui;
    private final ToolsGui toolsGui;
 
+   private boolean isHovered = false;
+
     public FortressHud(MinecraftClient client) {
         this.client = client;
         this.colonistsGui = new ColonistsGui(client, client.getItemRenderer());
@@ -85,16 +87,16 @@ public class FortressHud {
     public void tick() {
         this.colonistsGui.tick();
         this.toolsGui.tick();
+
+        this.isHovered = this.colonistsGui.isHovered() || this.toolsGui.isHovered();
     }
 
     public boolean isHovered() {
-        return this.colonistsGui.isHovered() || this.toolsGui.isHovered();
+        return this.isHovered;
     }
 
     public void onClick(double mouseX, double mouseY) {
-
         this.toolsGui.onClick(mouseX, mouseY);
-
     }
 
     private TextRenderer getTextRenderer() {

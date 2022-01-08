@@ -4,15 +4,11 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.minefortress.network.ClientboundTaskExecutedPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.selections.SelectionType;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
@@ -69,6 +65,7 @@ public class SimpleSelectionTask extends AbstractTask {
     public void prepareTask() {
         if(selectionType == SelectionType.WALLS_EVERY_SECOND) {
             parts.add(Pair.of(startingBlock, endingBlock));
+            super.totalParts = 1;
         } else {
             super.prepareTask();
         }
@@ -91,6 +88,7 @@ public class SimpleSelectionTask extends AbstractTask {
     private List<TaskBlockInfo> getPartBlocksInfo(Pair<BlockPos, BlockPos> startAndEnd, ServerWorld world) {
         final List<TaskBlockInfo> blocksInfo = new ArrayList<>();
         getBlocksForPart(startAndEnd).spliterator().forEachRemaining(pos -> {
+            pos = pos.toImmutable();
             if(placingItem != null) {
                 if(BlockInfoUtils.shouldBePlacedAsItem(placingItem)) {
                     final ItemUsageContext useOnContext = BlockInfoUtils.getUseOnContext(this.hitResult, this.placingItem, pos, world);

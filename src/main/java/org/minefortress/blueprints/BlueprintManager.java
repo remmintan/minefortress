@@ -18,6 +18,7 @@ import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.network.ServerboundBlueprintTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.tasks.BuildingManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -90,7 +91,10 @@ public class BlueprintManager {
     private BlockPos moveToStructureSize(BlockPos pos) {
         final Vec3i size = blueprintInfos.get(selectedStructure.fileId()).getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
-        return pos.subtract(halfSize);
+        final BlockPos movedPos = pos.subtract(halfSize);
+        final boolean movedPosSolid = !BuildingManager.doesNotHaveCollisions(client.world, movedPos);
+
+        return movedPosSolid?movedPos.up():movedPos;
     }
 
     public void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {

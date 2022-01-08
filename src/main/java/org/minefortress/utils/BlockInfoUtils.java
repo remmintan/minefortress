@@ -23,6 +23,7 @@ public class BlockInfoUtils {
     public static boolean shouldBePlacedAsItem(Item item) {
         if(item == Items.WATER_BUCKET || item == Items.LAVA_BUCKET) return false;
         if(item instanceof TallBlockItem) return true;
+        if(item instanceof BedItem) return true;
         if(!(item instanceof final BlockItem blockItem)) return true;
 
 

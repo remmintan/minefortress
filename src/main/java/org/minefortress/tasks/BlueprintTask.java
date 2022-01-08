@@ -32,7 +32,7 @@ public class BlueprintTask extends AbstractTask {
         List<TaskBlockInfo> blockInfos = new ArrayList<>();
         for (BlockPos pos : allPositionsInPart) {
             final BlockState state = blueprintData.getOrDefault(pos, Blocks.AIR.getDefaultState());
-            final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(getItemFromState(state), pos, state);
+            final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(getItemFromState(state), pos.toImmutable(), state);
             blockInfos.add(blockStateTaskBlockInfo);
         }
         return new TaskPart(partStartAndEnd, blockInfos, this);

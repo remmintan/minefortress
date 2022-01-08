@@ -9,6 +9,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import org.minefortress.blueprints.StructureInfo;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.widget.FortressItemButtonWidget;
 import org.minefortress.selections.SelectionType;
@@ -19,8 +20,13 @@ import java.util.List;
 public class ToolsGui extends FortressGuiScreen {
 
     private final FortressItemButtonWidget selectionType;
+    private final FortressItemButtonWidget blueprints;
     private final ButtonWidget questionButton;
+
+
     private final List<ButtonWidget> selectionButtons = new ArrayList<>();
+
+    private final StructureInfo basicHouse = new StructureInfo("House", "village/plains/houses/plains_small_house_1");
 
     protected ToolsGui(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
@@ -41,6 +47,29 @@ public class ToolsGui extends FortressGuiScreen {
                 },
                 Text.of("")
         );
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
+        this.blueprints = new FortressItemButtonWidget(
+                0,
+                0,
+                Items.BOOK,
+                itemRenderer,
+                btn -> {
+                    if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
+                        fortressClient.getBlueprintManager().clearStructure();
+                    } else {
+                        fortressClient.getBlueprintManager().selectStructure(basicHouse);
+                    }
+
+                },
+                (button, matrices, mouseX, mouseY) -> {
+                    if (fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
+                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
+                    } else {
+                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Blueprints"), mouseX, mouseY);
+                    }
+                },
+                Text.of("")
+        );
         this.questionButton = new ButtonWidget(0, 0, 20, 20, new LiteralText("?"), btn -> {
             this.selectionType.checked = false;
             final BookScreen questionsScreen = new BookScreen(new FortressBookContents(FortressBookContents.HELP_BOOK));
@@ -48,7 +77,7 @@ public class ToolsGui extends FortressGuiScreen {
             this.client.setScreen(questionsScreen);
         });
 
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
+
         for(final SelectionType type : SelectionType.values()) {
             this.selectionButtons.add(
                     new ButtonWidget(0, 0, 20, 20, new LiteralText(type.getButtonText()), btn -> {
@@ -69,25 +98,39 @@ public class ToolsGui extends FortressGuiScreen {
 
     @Override
     void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
-        this.selectionType.setPos(screenWidth - 25, 5);
-        this.selectionType.render(p, (int)mouseX, (int)mouseY, delta);
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
 
-        for (int i = 0; i < selectionButtons.size(); i++) {
-            ButtonWidget btn = selectionButtons.get(i);
-            btn.x = screenWidth - 60;
-            btn.y = i * 25 + 5;
+        if(!fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
+            this.selectionType.setPos(screenWidth - 25, 5);
+            this.selectionType.render(p, (int)mouseX, (int)mouseY, delta);
 
-            btn.render(p, (int)mouseX, (int)mouseY, delta);
+            for (int i = 0; i < selectionButtons.size(); i++) {
+                ButtonWidget btn = selectionButtons.get(i);
+                btn.x = screenWidth - 60;
+                btn.y = i * 25 + 5;
+
+                btn.render(p, (int)mouseX, (int)mouseY, delta);
+            }
+
+            this.questionButton.x = screenWidth - 25;
+            this.questionButton.y = 55;
+            this.questionButton.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
-        this.questionButton.x = screenWidth - 25;
-        this.questionButton.y = 35;
-        this.questionButton.render(p, (int)mouseX, (int)mouseY, delta);
+        this.blueprints.setPos(screenWidth - 25, 30);
+        this.blueprints.render(p, (int)mouseX, (int)mouseY, delta);
+
     }
 
     @Override
     boolean isHovered() {
-        return this.selectionType.isHovered() || this.questionButton.isHovered() || this.selectionButtons.stream().anyMatch(btn -> btn.visible && btn.isHovered());
+        final FortressMinecraftClient client = (FortressMinecraftClient) this.client;
+
+        return this.selectionType.isHovered() ||
+                this.questionButton.isHovered() ||
+                this.selectionButtons.stream().anyMatch(btn -> btn.visible && btn.isHovered()) ||
+                this.blueprints.isHovered();
+
     }
 
     @Override
@@ -95,6 +138,9 @@ public class ToolsGui extends FortressGuiScreen {
         this.selectionType.onClick(mouseX, mouseY);
         if(questionButton.isHovered())
             this.questionButton.onClick(mouseX, mouseY);
+
+        if(this.blueprints.isHovered())
+            this.blueprints.onClick(mouseX, mouseY);
 
         for (ButtonWidget btn : selectionButtons) {
             if (btn.visible && btn.isHovered())

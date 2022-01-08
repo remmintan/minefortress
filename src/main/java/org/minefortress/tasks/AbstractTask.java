@@ -26,6 +26,8 @@ public abstract class AbstractTask implements Task {
     protected BlockPos endingBlock;
 
     protected final Queue<Pair<BlockPos, BlockPos>> parts = new ArrayDeque<>();
+
+    protected int totalParts;
     private int completedParts;
 
     protected AbstractTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock) {
@@ -45,9 +47,6 @@ public abstract class AbstractTask implements Task {
         return taskType;
     }
 
-    protected int getTotalPartsCount() {
-        return parts.size();
-    }
 
     @Override
     public boolean hasAvailableParts() {
@@ -79,12 +78,14 @@ public abstract class AbstractTask implements Task {
                 cursor.move(direction.getX() * PART_SIZE, 0, 0);
             }
         } while (true);
+
+        this.totalParts = parts.size();
     }
 
     @Override
     public void finishPart(ServerWorld world) {
         completedParts++;
-        if(parts.isEmpty() && getTotalPartsCount() == completedParts) {
+        if(parts.isEmpty() && totalParts == completedParts) {
             ServerPlayerEntity randomPlayer = world.getRandomAlivePlayer();
             if(randomPlayer != null) {
                 FortressServerNetworkHelper.send(randomPlayer, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));

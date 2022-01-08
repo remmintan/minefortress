@@ -1,6 +1,8 @@
 package org.minefortress.renderer.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -9,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.minefortress.interfaces.FortressMinecraftClient;
 
 public class FortressItemButtonWidget extends TexturedButtonWidget {
 
@@ -35,7 +38,16 @@ public class FortressItemButtonWidget extends TexturedButtonWidget {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
-        itemRenderer.renderInGui(stack, x+1, y+1);
+        final MinecraftClient instance = MinecraftClient.getInstance();
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) instance;
+        if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
+            final TextRenderer textRenderer = instance.textRenderer;
+            drawCenteredText(matrices, textRenderer, "X", this.x + this.width / 2, this.y + this.height / 4, 0xFFFFFF);
+        } else {
+            itemRenderer.renderInGui(stack, x+2, y+2);
+        }
+
+
         RenderSystem.setShaderTexture(0, ARROWS_TEXTURE);
         if(this.checked)
             this.drawTexture(matrices, x-15, y+2, 12, 208, 14, 18);
@@ -47,4 +59,5 @@ public class FortressItemButtonWidget extends TexturedButtonWidget {
         if(!this.isHovered()) return;
         super.onClick(mouseX, mouseY);
     }
+
 }
