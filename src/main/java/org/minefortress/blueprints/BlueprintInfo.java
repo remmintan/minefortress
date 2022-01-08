@@ -17,6 +17,7 @@ public class BlueprintInfo {
 
     private final ChunkBuilder.BuiltChunk builtChunk;
     private final BlueprintChunkRendererRegion chunkRendererRegion;
+    private final Vec3i size;
     private final ChunkBuilder chunkBuilder;
     private CompletableFuture currentRebuildTask;
 
@@ -35,12 +36,13 @@ public class BlueprintInfo {
         final ChunkBuilder.BuiltChunk builtChunk = builder.new BuiltChunk(0);
         builtChunk.setOrigin(chunckOrigin.getX(), chunckOrigin.getY(), chunckOrigin.getZ());
 
-        return new BlueprintInfo(builtChunk, blueprintChunkRendererRegion, builder);
+        return new BlueprintInfo(builtChunk, blueprintChunkRendererRegion, structure.getSize(), builder);
     }
 
-    private BlueprintInfo(ChunkBuilder.BuiltChunk builtChunk, BlueprintChunkRendererRegion chunkRendererRegion, ChunkBuilder builder) {
+    private BlueprintInfo(ChunkBuilder.BuiltChunk builtChunk, BlueprintChunkRendererRegion chunkRendererRegion, Vec3i size, ChunkBuilder builder) {
         this.builtChunk = builtChunk;
         this.chunkRendererRegion = chunkRendererRegion;
+        this.size = size;
         this.chunkBuilder = builder;
     }
 
@@ -61,5 +63,13 @@ public class BlueprintInfo {
 
     public ChunkBuilder.BuiltChunk getBuiltChunk() {
         return builtChunk;
+    }
+
+    public Vec3i getSize() {
+        return size;
+    }
+
+    public BlueprintChunkRendererRegion getChunkRendererRegion() {
+        return chunkRendererRegion;
     }
 }

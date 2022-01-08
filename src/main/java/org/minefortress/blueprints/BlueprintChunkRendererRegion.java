@@ -91,4 +91,8 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
     private BlockPos adjustPos(BlockPos pos) {
         return pos.subtract(origin);
     }
+
+    public Map<BlockPos, BlockState> getStructureData() {
+        return structureData;
+    }
 }

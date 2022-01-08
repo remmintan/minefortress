@@ -55,7 +55,7 @@ public class TwoDotsSelection extends Selection {
                 UUID newTaskId = UUID.randomUUID();
                 TaskType taskType = mapClickTypeToTaskType(clickType);
                 final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
-                ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelectionType(), getSelection(), blockStateFromItem, taskType);
+                ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelection(), blockStateFromItem, taskType);
                 ServerboundSimpleSelectionTaskPacket packet = new ServerboundSimpleSelectionTaskPacket(
                         newTaskId,
                         taskType,

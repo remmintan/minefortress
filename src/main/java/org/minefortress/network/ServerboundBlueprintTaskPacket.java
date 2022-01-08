@@ -12,19 +12,19 @@ import org.minefortress.tasks.BlueprintTask;
 
 import java.util.UUID;
 
-public class SeverboundBlueprintTaskPacket implements FortressServerPacket {
+public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
 
     private final UUID taskId;
     private final String blueprintId;
     private final BlockPos startPos;
 
-    public SeverboundBlueprintTaskPacket(UUID taskId, String blueprintId, BlockPos startPos) {
+    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintId, BlockPos startPos) {
         this.taskId = taskId;
         this.blueprintId = blueprintId;
         this.startPos = startPos;
     }
 
-    public SeverboundBlueprintTaskPacket(PacketByteBuf buf) {
+    public ServerboundBlueprintTaskPacket(PacketByteBuf buf) {
         this.taskId = buf.readUuid();
         this.blueprintId = buf.readString();
         this.startPos = buf.readBlockPos();

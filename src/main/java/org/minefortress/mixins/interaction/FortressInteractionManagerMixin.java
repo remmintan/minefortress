@@ -14,6 +14,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
+import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
@@ -74,13 +75,13 @@ public abstract class FortressInteractionManagerMixin {
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if(getCurrentGameMode() == FORTRESS) {
             final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-            if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
-                // TODO: blueprint dig
+            final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+            if(blueprintManager.hasSelectedBlueprint()) {
+               blueprintManager.clearStructure();
             } else {
                 fortressClient.getSelectionManager().selectBlock(pos);
                 cir.setReturnValue(true);
             }
-
         }
     }
 
@@ -97,8 +98,9 @@ public abstract class FortressInteractionManagerMixin {
             BlockPos blockPos = hitResult.getBlockPos();
             if(world.getWorldBorder().contains(blockPos)) {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-                if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
-                    // TODO: blueprint place
+                final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+                if(blueprintManager.hasSelectedBlueprint()) {
+                    blueprintManager.buildCurrentStructure(blockPos);
                     cir.setReturnValue(ActionResult.SUCCESS);
                 } else {
                     Item item = player.getStackInHand(hand).getItem();

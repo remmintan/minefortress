@@ -11,7 +11,6 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.network.ServerboundCancelTaskPacket;
 import org.minefortress.selections.ClientSelection;
-import org.minefortress.selections.SelectionType;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,15 +50,19 @@ public class ClientTasksHolder {
         }
     }
 
-    public void addTask(UUID uuid, SelectionType selectionType, Iterable<BlockPos> blocks, BlockState blockState, TaskType type) {
-        addTask(uuid, selectionType, blocks, blockState, type, null);
+    public void addTask(UUID uuid, Iterable<BlockPos> blocks) {
+        addTask(uuid, blocks, Blocks.DIRT.getDefaultState(), TaskType.BUILD);
     }
 
-    public void addTask(UUID uuid, SelectionType selectionType, Iterable<BlockPos> blocks, BlockState blockState, TaskType type, UUID superTaskId) {
+    public void addTask(UUID uuid, Iterable<BlockPos> blocks, BlockState blockState, TaskType type) {
+        addTask(uuid, blocks, blockState, type, null);
+    }
+
+    public void addTask(UUID uuid, Iterable<BlockPos> blocks, BlockState blockState, TaskType type, UUID superTaskId) {
         if(blockState == null) {
             blockState = Blocks.DIRT.getDefaultState();
         }
-        ClientSelection newTask = new ClientSelection(uuid, selectionType, blocks, blockState);
+        ClientSelection newTask = new ClientSelection(blocks, blockState);
         if(superTaskId != null) {
             subtasksMap.put(uuid, superTaskId);
         }

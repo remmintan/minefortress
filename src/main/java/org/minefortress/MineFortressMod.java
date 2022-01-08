@@ -10,7 +10,7 @@ import net.minecraft.util.registry.Registry;
 import org.minefortress.entity.Colonist;
 import org.minefortress.network.ServerboundCancelTaskPacket;
 import org.minefortress.network.ServerboundSimpleSelectionTaskPacket;
-import org.minefortress.network.SeverboundBlueprintTaskPacket;
+import org.minefortress.network.ServerboundBlueprintTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.registries.FortressBlocks;
@@ -30,7 +30,7 @@ public class MineFortressMod implements ModInitializer {
 
         // networking
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.NEW_SELECTION_TASK, ServerboundSimpleSelectionTaskPacket::new);
-        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.NEW_BLUEPRINT_TASK, SeverboundBlueprintTaskPacket::new);
+        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.NEW_BLUEPRINT_TASK, ServerboundBlueprintTaskPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.CANCEL_TASK, ServerboundCancelTaskPacket::new);
     }
 }

@@ -1,6 +1,8 @@
 package org.minefortress.blueprints;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
@@ -10,14 +12,15 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.*;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.network.ServerboundBlueprintTaskPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BlueprintManager {
 
@@ -48,7 +51,7 @@ public class BlueprintManager {
     }
 
     public void renderBlockEntities(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, Vec3d cameraPos, BlockEntityRenderDispatcher blockEntityRenderDispatcher, float tickDelta) {
-        BlockPos selectedPos = client.crosshairTarget instanceof BlockHitResult ? ((BlockHitResult) client.crosshairTarget).getBlockPos() : null;
+        BlockPos selectedPos = getSelectedPos();
         if(selectedPos == null) return;
         final ChunkBuilder.BuiltChunk builtChunk = getBuiltChunk();
         if(builtChunk == null) return;
@@ -72,6 +75,22 @@ public class BlueprintManager {
         immediate.draw(TexturedRenderLayers.getShulkerBoxes());
         immediate.draw(TexturedRenderLayers.getSign());
         immediate.draw(TexturedRenderLayers.getChest());
+    }
+
+    @Nullable
+    private BlockPos getSelectedPos() {
+        if(client.crosshairTarget instanceof BlockHitResult) {
+            final BlockPos originalPos = ((BlockHitResult) client.crosshairTarget).getBlockPos();
+            return moveToStructureSize(originalPos);
+        } else {
+            return null;
+        }
+    }
+
+    private BlockPos moveToStructureSize(BlockPos pos) {
+        final Vec3i size = blueprintInfos.get(selectedStructure.fileId()).getSize();
+        final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
+        return pos.subtract(halfSize);
     }
 
     public void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
@@ -118,9 +137,9 @@ public class BlueprintManager {
         k = 0;
 
         final ChunkBuilder.BuiltChunk chunk = getBuiltChunk();
-        if(chunk != null && !chunk.getData().isEmpty(renderLayer)) {
+        BlockPos blockPos = getSelectedPos();
+        if(chunk != null && !chunk.getData().isEmpty(renderLayer) && blockPos != null) {
             VertexBuffer vertexBuffer = chunk.getBuffer(renderLayer);
-            BlockPos blockPos = client.crosshairTarget instanceof BlockHitResult ? ((BlockHitResult) client.crosshairTarget).getBlockPos() : chunk.getOrigin();
             if (i != null) {
                 i.set((float)((double)blockPos.getX() - d), (float)((double)blockPos.getY() - e), (float)((double)blockPos.getZ() - f));
                 i.upload();
@@ -153,6 +172,23 @@ public class BlueprintManager {
 
     public void selectStructure(StructureInfo structureInfo) {
         this.selectedStructure = structureInfo;
+    }
+
+    public void buildCurrentStructure(BlockPos clickPos) {
+        if(selectedStructure == null) throw new IllegalStateException("No blueprint selected");
+
+        final BlockPos startPos = moveToStructureSize(clickPos);
+
+        UUID taskId = UUID.randomUUID();
+        final FortressClientWorld world = (FortressClientWorld) client.world;
+        if(world != null) {
+            final Map<BlockPos, BlockState> structureData = blueprintInfos.get(selectedStructure.fileId()).getChunkRendererRegion().getStructureData();
+            final List<BlockPos> blocks = structureData.entrySet().stream().filter(ent -> ent.getValue().getBlock() != Blocks.AIR).map(Map.Entry::getKey).collect(Collectors.toList());
+            world.getClientTasksHolder().addTask(taskId, blocks);
+        }
+        final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket = new ServerboundBlueprintTaskPacket(taskId, selectedStructure.fileId(), startPos);
+        FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
+        clearStructure();
     }
 
     public void clearStructure() {
