@@ -6,7 +6,7 @@ import java.util.*;
 
 public class TaskManager {
 
-    private final Queue<Task> tasks = new ArrayDeque<>();
+    private final Deque<Task> tasks = new ArrayDeque<>();
     private final Set<UUID> cancelledTasks = new HashSet<>();
 
     public void addTask(Task task) {
@@ -39,7 +39,7 @@ public class TaskManager {
         task.returnPart(taskPart.getStartAndEnd());
 
         if(!tasks.contains(task)) {
-            tasks.add(task);
+            tasks.addFirst(task);
         }
     }
 

@@ -4,8 +4,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.*;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
+import org.minefortress.tasks.BuildingManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 
@@ -15,6 +17,7 @@ public class PlaceControl extends PositionedActionControl {
 
     private int placeCooldown = 0;
     private int failedInteractions = 0;
+    private boolean cantPlaceUnderMyself = false;
 
     public PlaceControl(Colonist colonist) {
         this.colonist = colonist;
@@ -27,8 +30,13 @@ public class PlaceControl extends PositionedActionControl {
 
         if(placeCooldown>0) placeCooldown--;
 
-        if(colonist.getBlockPos().equals(goal))
-            colonist.getJumpControl().setActive();
+        final BlockPos blockPos = colonist.getBlockPos();
+        final BlockPos aboveTheHead = blockPos.up().up();
+        if(blockPos.equals(goal))
+            if(BuildingManager.doesNotHaveCollisions(colonist.world, aboveTheHead))
+                colonist.getJumpControl().setActive();
+            else
+                cantPlaceUnderMyself = true;
         else
             placeBlock();
     }
@@ -37,6 +45,7 @@ public class PlaceControl extends PositionedActionControl {
     public void reset() {
         super.reset();
         failedInteractions = 0;
+        cantPlaceUnderMyself = false;
     }
 
     protected void placeBlock() {
@@ -75,4 +84,7 @@ public class PlaceControl extends PositionedActionControl {
         this.placeCooldown = 6;
     }
 
+    public boolean isCantPlaceUnderMyself() {
+        return cantPlaceUnderMyself;
+    }
 }

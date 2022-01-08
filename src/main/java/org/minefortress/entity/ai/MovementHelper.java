@@ -79,6 +79,16 @@ public class MovementHelper {
             this.cantFindPath = true;
             stuckOnSamePosition = 0;
         }
+
+        if(navigation.isCantCreateScaffold()) {
+            this.cantFindPath = true;
+            stuckOnSamePosition = 0;
+        }
+
+        if(colonist.getPlaceControl().isCantPlaceUnderMyself()) {
+            this.cantFindPath = true;
+            stuckOnSamePosition = 0;
+        }
     }
 
     public boolean isCantFindPath() {

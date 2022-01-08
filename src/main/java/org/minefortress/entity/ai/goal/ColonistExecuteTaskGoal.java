@@ -86,7 +86,7 @@ public class ColonistExecuteTaskGoal extends Goal {
         }
 
         this.movementHelper.tick();
-        if(this.movementHelper.isCantFindPath()) {
+        if(this.movementHelper.isCantFindPath() || this.colonist.getPlaceControl().isCantPlaceUnderMyself()) {
             returnTask();
             this.colonist.resetControls();
             this.task = null;
@@ -109,6 +109,7 @@ public class ColonistExecuteTaskGoal extends Goal {
                 colonist.diggingOrPlacing()
         ) &&
             !movementHelper.isCantFindPath() &&
+            !this.colonist.getPlaceControl().isCantPlaceUnderMyself() &&
             !manager.isCancelled(task.getId());
     }
 
