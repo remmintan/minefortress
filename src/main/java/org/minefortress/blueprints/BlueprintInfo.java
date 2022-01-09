@@ -11,7 +11,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 public class BlueprintInfo {
 
@@ -19,7 +18,8 @@ public class BlueprintInfo {
     private final BlueprintChunkRendererRegion chunkRendererRegion;
     private final Vec3i size;
     private final ChunkBuilder chunkBuilder;
-    private CompletableFuture currentRebuildTask;
+
+    private int rebuildCooldown;
 
     @NotNull
     public static BlueprintInfo create(String structureName, World world, ChunkBuilder builder) {
@@ -54,10 +54,13 @@ public class BlueprintInfo {
     }
 
     public void rebuild(BlockPos pos) {
-        if(currentRebuildTask != null) return;
+        if(rebuildCooldown-- > 0) {
+            return;
+        }
+        rebuildCooldown = 100;
 
         this.setOrigin(pos);
-        this.currentRebuildTask = this.builtChunk.new RebuildTask(0, this.chunkRendererRegion)
+        this.builtChunk.new RebuildTask(0, this.chunkRendererRegion)
                 .run(this.chunkBuilder.buffers);
     }
 
