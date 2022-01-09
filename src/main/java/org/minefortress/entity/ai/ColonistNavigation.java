@@ -4,15 +4,14 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.ai.pathing.PathNodeNavigator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.minefortress.tasks.BuildingManager;
 import org.minefortress.entity.Colonist;
+import org.minefortress.tasks.BuildingManager;
 
 public class ColonistNavigation extends MobNavigation {
 
