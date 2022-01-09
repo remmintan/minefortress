@@ -93,6 +93,10 @@ public abstract class AbstractTask implements Task {
         }
     }
 
+    protected int getCompletedParts() {
+        return completedParts;
+    }
+
     private BlockPos createPartEnd(BlockPos start, Vec3i direction) {
         BlockPos.Mutable cursor = start.mutableCopy();
         cursor.setY(endingBlock.getY());

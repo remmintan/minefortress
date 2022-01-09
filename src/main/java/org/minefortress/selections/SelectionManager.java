@@ -70,12 +70,12 @@ public class SelectionManager implements FortressWorldRenderer {
     }
 
     public void moveSelectionUp() {
-        if(this.clickType == ClickType.REMOVE && upSelectionDelta == 0) return;
+//        if(this.clickType == ClickType.REMOVE && upSelectionDelta == 0) return;
         upSelectionDelta++;
     }
 
     public void moveSelectionDown() {
-        if (clickType == ClickType.BUILD && upSelectionDelta == 0) return;
+//        if (clickType == ClickType.BUILD && upSelectionDelta == 0) return;
         upSelectionDelta--;
     }
 

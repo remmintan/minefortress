@@ -32,7 +32,7 @@ public class ColonistExecuteTaskGoal extends Goal {
     private TaskBlockInfo taskBlockInfo = null;
     private BlockPos nextBlock =  null;
 
-    private final Cache<UUID, Object> returnedIds = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build();
+    private final Cache<UUID, Object> returnedIds = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS).build();
 
     @Override
     public boolean canStop() {
@@ -48,7 +48,6 @@ public class ColonistExecuteTaskGoal extends Goal {
             this.manager = ((FortressServerWorld)world).getTaskManager();
         } else
             throw new IllegalStateException("AI should run on the server entities!");
-
 
         this.movementHelper = new MovementHelper((ColonistNavigation) this.colonist.getNavigation(), this.colonist);
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Goal.Control.JUMP));

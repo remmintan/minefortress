@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
@@ -18,10 +19,12 @@ import java.util.UUID;
 public class BlueprintTask extends AbstractTask {
 
     private final Map<BlockPos, BlockState> blueprintData;
+    private final Map<BlockPos, BlockState> blueprintEntityData;
 
-    public BlueprintTask(UUID id, BlockPos startingPos, BlockPos endingPos, Map<BlockPos, BlockState> blueprintData) {
+    public BlueprintTask(UUID id, BlockPos startingPos, BlockPos endingPos, Map<BlockPos, BlockState> blueprintData, Map<BlockPos, BlockState> blueprintEntityData) {
         super(id, TaskType.BUILD, startingPos, endingPos);
         this.blueprintData = blueprintData;
+        this.blueprintEntityData = blueprintEntityData;
     }
 
     @Override
@@ -39,6 +42,19 @@ public class BlueprintTask extends AbstractTask {
             blockInfos.add(blockStateTaskBlockInfo);
         }
         return new TaskPart(partStartAndEnd, blockInfos, this);
+    }
+
+    @Override
+    public void finishPart(ServerWorld world) {
+        if(parts.isEmpty() && getCompletedParts()+1 == totalParts) {
+            final ServerPlayerEntity randomAlivePlayer = world.getRandomAlivePlayer();
+            blueprintEntityData.forEach((pos, state) -> {
+                world.setBlockState(pos.add(startingBlock), state, 3);
+//                world.emitGameEvent(randomAlivePlayer, GameEvent.BLOCK_PLACE, pos);
+            });
+
+        }
+        super.finishPart(world);
     }
 
     private Item getItemFromState(BlockState state) {
