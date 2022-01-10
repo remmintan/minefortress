@@ -94,6 +94,7 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     public void returnTask() {
         if(part == null) return;
+
         manager.returnTask(part);
         this.returnedIds.put(part.getTask().getId(), new Object());
         part = null;
@@ -101,15 +102,14 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return (
+        return this.task != null &&
+            (
                 movementHelper.stillTryingToReachGoal() ||
                 nextBlock!=null ||
                 currentPartBlocksIterator.hasNext() ||
                 colonist.diggingOrPlacing()
-        ) &&
-            !movementHelper.isCantFindPath() &&
-            !this.colonist.getPlaceControl().isCantPlaceUnderMyself() &&
-            !manager.isCancelled(task.getId());
+            ) &&
+                !manager.isCancelled(task.getId());
     }
 
     @Override

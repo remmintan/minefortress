@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
@@ -30,6 +31,12 @@ public class BlueprintTask extends AbstractTask {
     @Override
     public TaskPart getNextPart(ServerWorld level) {
         final Pair<BlockPos, BlockPos> partStartAndEnd = parts.poll();
+        List<TaskBlockInfo> blockInfos = getTaskBlockInfos(partStartAndEnd);
+        return new TaskPart(partStartAndEnd, blockInfos, this);
+    }
+
+    @NotNull
+    private List<TaskBlockInfo> getTaskBlockInfos(Pair<BlockPos, BlockPos> partStartAndEnd) {
         final BlockPos start = partStartAndEnd.getFirst();
         final BlockPos delta = start.subtract(startingBlock);
         final Iterable<BlockPos> allPositionsInPart = BlockPos.iterate(start, partStartAndEnd.getSecond());
@@ -41,7 +48,7 @@ public class BlueprintTask extends AbstractTask {
             final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(getItemFromState(state), pos.toImmutable(), state);
             blockInfos.add(blockStateTaskBlockInfo);
         }
-        return new TaskPart(partStartAndEnd, blockInfos, this);
+        return blockInfos;
     }
 
     @Override
