@@ -270,10 +270,10 @@ public class Colonist extends PassiveEntity {
         if (this.noClip) {
             return false;
         } else {
-            Box aabb = Box.of(this.getEyePos(), (double)getWidth(), 1.0E-6D, (double)getWidth());
-            Box upperCollisionBox = aabb.offset(0, 0.5, 0);
+            Box legsBox = Box.of(this.getPos(), getWidth(), 1, getWidth());
+            Box aboveTheHeadBox = legsBox.offset(0, 2.5, 0);
             return this.world
-                    .getBlockCollisions(this, upperCollisionBox, (p_20129_, p_20130_) -> !p_20129_.isAir())
+                    .getBlockCollisions(this, aboveTheHeadBox, (p_20129_, p_20130_) -> !p_20129_.isAir())
                     .findAny()
                     .isPresent();
         }

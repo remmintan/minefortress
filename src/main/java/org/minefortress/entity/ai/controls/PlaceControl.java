@@ -31,9 +31,8 @@ public class PlaceControl extends PositionedActionControl {
         if(placeCooldown>0) placeCooldown--;
 
         final BlockPos blockPos = colonist.getBlockPos();
-        final BlockPos aboveTheHead = blockPos.up().up();
         if(blockPos.equals(goal))
-            if(BuildingManager.doesNotHaveCollisions(colonist.world, aboveTheHead))
+            if(!colonist.isWallAboveTheHead())
                 colonist.getJumpControl().setActive();
             else
                 cantPlaceUnderMyself = true;
