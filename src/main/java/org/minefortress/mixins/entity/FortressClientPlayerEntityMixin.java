@@ -14,6 +14,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.RaycastContext;
+import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
 import org.minefortress.selections.SelectionManager;
@@ -68,8 +69,14 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
         if(client.interactionManager != null && client.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
             if(client.options.keySprint.isPressed()) {
-                final SelectionManager selectionManager = ((FortressMinecraftClient) client).getSelectionManager();
-                selectionManager.moveSelectionDown();
+                final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+                final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+                if(blueprintManager.hasSelectedBlueprint()) {
+                    blueprintManager.rotateSelectedStructureCounterClockwise();
+                } else {
+                    final SelectionManager selectionManager = fortressClient.getSelectionManager();
+                    selectionManager.moveSelectionDown();
+                }
                 cir.setReturnValue(false);
             }
         }

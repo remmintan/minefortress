@@ -11,6 +11,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.Nullable;
@@ -35,16 +36,18 @@ public class BlueprintManager {
     }
 
     public void buildStructure(ChunkBuilder chunkBuilder) {
-        final String selectedStructureName = selectedStructure.fileId();
-        if(!blueprintInfos.containsKey(selectedStructureName)) {
-            final BlueprintInfo blueprintInfo = BlueprintInfo.create(selectedStructureName, client.world, chunkBuilder);
-            blueprintInfos.put(selectedStructureName, blueprintInfo);
+        final String selectedStructureId = selectedStructure.getId();
+        final String file = selectedStructure.getFile();
+        if(!blueprintInfos.containsKey(selectedStructureId)) {
+            final BlockRotation rotation = selectedStructure.getRotation();
+            final BlueprintInfo blueprintInfo = BlueprintInfo.create(file, client.world, chunkBuilder, rotation);
+            blueprintInfos.put(selectedStructureId, blueprintInfo);
         }
 
         if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
             final BlockPos blockPos = blockHitResult.getBlockPos();
             if(blockPos != null)
-                this.blueprintInfos.get(selectedStructureName).rebuild(blockPos);
+                this.blueprintInfos.get(selectedStructureId).rebuild(blockPos);
         }
     }
 
@@ -86,7 +89,7 @@ public class BlueprintManager {
     }
 
     private BlockPos moveToStructureSize(BlockPos pos) {
-        final Vec3i size = blueprintInfos.get(selectedStructure.fileId()).getSize();
+        final Vec3i size = blueprintInfos.get(selectedStructure.getId()).getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
         final BlockPos movedPos = pos.subtract(halfSize);
         final boolean movedPosSolid = !BuildingManager.doesNotHaveCollisions(client.world, movedPos);
@@ -163,7 +166,7 @@ public class BlueprintManager {
 
     @Nullable
     private ChunkBuilder.BuiltChunk getBuiltChunk() {
-        return this.blueprintInfos.get(this.selectedStructure.fileId()).getBuiltChunk();
+        return this.blueprintInfos.get(this.selectedStructure.getId()).getBuiltChunk();
     }
 
 
@@ -183,7 +186,7 @@ public class BlueprintManager {
         UUID taskId = UUID.randomUUID();
         final FortressClientWorld world = (FortressClientWorld) client.world;
         if(world != null) {
-            final Map<BlockPos, BlockState> structureData = blueprintInfos.get(selectedStructure.fileId()).getChunkRendererRegion().getStructureData();
+            final Map<BlockPos, BlockState> structureData = blueprintInfos.get(selectedStructure.getId()).getChunkRendererRegion().getStructureData();
             final List<BlockPos> blocks = structureData
                     .entrySet()
                     .stream()
@@ -193,7 +196,7 @@ public class BlueprintManager {
                     .collect(Collectors.toList());
             world.getClientTasksHolder().addTask(taskId, blocks);
         }
-        final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket = new ServerboundBlueprintTaskPacket(taskId, selectedStructure.fileId(), startPos);
+        final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket = new ServerboundBlueprintTaskPacket(taskId, selectedStructure.getId(), selectedStructure.getFile(), startPos, selectedStructure.getRotation());
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
     }
 
@@ -202,7 +205,17 @@ public class BlueprintManager {
     }
 
     public String getSelectedStructureName() {
-        return this.selectedStructure != null ? this.selectedStructure.name() : "";
+        return this.selectedStructure != null ? this.selectedStructure.getName() : "";
+    }
+
+    public void rotateSelectedStructureClockwise() {
+        if(selectedStructure == null) throw new IllegalStateException("No blueprint selected");
+        this.selectedStructure.rotateRight();
+    }
+
+    public void rotateSelectedStructureCounterClockwise() {
+        if(selectedStructure == null) throw new IllegalStateException("No blueprint selected");
+        this.selectedStructure.rotateLeft();
     }
 
 }

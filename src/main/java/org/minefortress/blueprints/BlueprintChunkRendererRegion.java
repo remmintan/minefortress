@@ -8,6 +8,7 @@ import net.minecraft.client.render.chunk.ChunkRendererRegion;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -24,21 +25,28 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
     private BlockPos origin = BlockPos.ORIGIN;
     private Vec3i originDelta = BlockPos.ORIGIN;
 
-    public static BlueprintChunkRendererRegion create(Structure structure, World world, BlockPos originPos) {
-        final StructurePlacementData placementData = new StructurePlacementData();
+    public static BlueprintChunkRendererRegion create(Structure structure, World world, BlockPos originPos, BlockRotation rotation) {
+        final StructurePlacementData placementData = new StructurePlacementData().setRotation(rotation);
         final List<Structure.StructureBlockInfo> blockInfos = placementData
                 .getRandomBlockInfos(structure.blockInfoLists, BlockPos.ORIGIN)
                 .getAll();
+
+        final Vec3i structureSize = structure.getRotatedSize(rotation);
+        final BlockPos startPos = BlockPos.ORIGIN;
+        final Vec3i delta = new Vec3i(structureSize.getX() / 2, 0, structureSize.getZ() / 2);
+        final BlockPos pivot = startPos.add(delta);
+        placementData.setPosition(pivot);
+        final BlockPos endPos = startPos.add(structureSize);
+
+
         final Map<BlockPos, BlockState> structureData = blockInfos
                 .stream()
                 .filter(info -> info.state.getBlock() != Blocks.AIR)
                 .filter(info -> info.state.getBlock() != Blocks.JIGSAW)
-                .collect(Collectors.toMap(inf -> inf.pos.add(originPos), inf -> inf.state));
-
-
-        final Vec3i structureSize = structure.getSize();
-        final BlockPos startPos = BlockPos.ORIGIN;
-        final BlockPos endPos = startPos.add(structureSize);
+                .collect(Collectors.toMap(
+                        inf -> Structure.transform(placementData, inf.pos.add(originPos)),
+                        inf -> inf.state.rotate(rotation)
+                ));
 
         final WorldChunk[][] worldChunks = new WorldChunk[1][1];
         worldChunks[0][0] = world.getChunk(0,0);

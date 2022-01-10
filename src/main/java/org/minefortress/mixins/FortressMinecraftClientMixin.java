@@ -114,7 +114,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private void handleInputEvents(CallbackInfo ci) {
         if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
             if(this.options.keySprint.isPressed()) {
-                this.getSelectionManager().moveSelectionUp();
+                if(this.getBlueprintManager().hasSelectedBlueprint()) {
+                    this.getBlueprintManager().rotateSelectedStructureClockwise();
+                } else {
+                    this.getSelectionManager().moveSelectionUp();
+                }
             }
         }
     }

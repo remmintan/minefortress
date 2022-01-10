@@ -6,24 +6,22 @@ import net.minecraft.block.Blocks;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.minefortress.tasks.BlueprintTask;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ServerBlueprintManager {
 
     private final Map<String, ServerStructureInfo> structures = new HashMap<>();
 
-    public BlueprintTask createTask(UUID taskId, String structureId, BlockPos startPos, ServerWorld world) {
+    public BlueprintTask createTask(UUID taskId, String structureId, String structureFile, BlockPos startPos, ServerWorld world, BlockRotation rotation) {
         if(!structures.containsKey(structureId)) {
-            structures.put(structureId, create(structureId, startPos, world));
+            structures.put(structureId, create(structureFile, startPos, world, rotation));
         }
 
         final ServerStructureInfo serverStructureInfo = structures.get(structureId);
@@ -31,18 +29,30 @@ public class ServerBlueprintManager {
         return new BlueprintTask(taskId, startPos, startPos.add(new Vec3i(size.getX(), size.getY(), size.getZ())), serverStructureInfo.getStructureData(), serverStructureInfo.getStructureEntityData());
     }
 
-    private ServerStructureInfo create(String structureId, BlockPos startPos, ServerWorld world) {
+    private ServerStructureInfo create(String structureId, BlockPos startPos, ServerWorld world, BlockRotation rotation) {
         final Optional<Structure> structureOpt = world.getServer().getStructureManager().getStructure(new Identifier(structureId));
         if(structureOpt.isPresent()) {
             final Structure structure = structureOpt.get();
 
-            final Vec3i size = structure.getSize();
-            Map<BlockPos, BlockState> totalStructureData = new StructurePlacementData()
+            final Vec3i size = structure.getRotatedSize(rotation);
+            final Vec3i delta = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
+            final BlockPos pivot = BlockPos.ORIGIN.add(delta);
+
+            final StructurePlacementData structurePlacementData = new StructurePlacementData()
+                    .setRotation(rotation);
+            final List<Structure.StructureBlockInfo> allBlockInfos = structurePlacementData
                     .getRandomBlockInfos(structure.blockInfoLists, startPos)
-                    .getAll()
+                    .getAll();
+
+            structurePlacementData.setPosition(pivot);
+
+            Map<BlockPos, BlockState> totalStructureData = allBlockInfos
                     .stream()
                     .filter(inf -> inf.state.getBlock() != Blocks.JIGSAW)
-                    .collect(Collectors.toUnmodifiableMap(inf -> inf.pos, inf -> inf.state));
+                    .collect(Collectors.toUnmodifiableMap(
+                            inf -> Structure.transform(structurePlacementData, inf.pos),
+                            inf -> inf.state.rotate(rotation)
+                    ));
 
             final Map<BlockPos, BlockState> structureData = totalStructureData.entrySet()
                     .stream()

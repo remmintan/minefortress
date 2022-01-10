@@ -4,8 +4,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.structure.Structure;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +24,7 @@ public class BlueprintInfo {
     private int rebuildCooldown;
 
     @NotNull
-    public static BlueprintInfo create(String structureName, World world, ChunkBuilder builder) {
+    public static BlueprintInfo create(String structureName, World world, ChunkBuilder builder, BlockRotation rotation) {
         final IntegratedServer server = MinecraftClient.getInstance().getServer();
         if(server == null) throw new IllegalStateException("Cannot create blueprint info without a server");
         final Identifier structureId = new Identifier(structureName);
@@ -30,13 +32,14 @@ public class BlueprintInfo {
         if(structureOptional.isEmpty()) throw new IllegalStateException("Can't find structure with id: " + structureName);
         final Structure structure = structureOptional.get();
 
+
         final BlockPos chunckOrigin = BlockPos.ORIGIN;
-        final BlueprintChunkRendererRegion blueprintChunkRendererRegion = BlueprintChunkRendererRegion.create(structure, world, chunckOrigin);
+        final BlueprintChunkRendererRegion blueprintChunkRendererRegion = BlueprintChunkRendererRegion.create(structure, world, chunckOrigin, rotation);
 
         final ChunkBuilder.BuiltChunk builtChunk = builder.new BuiltChunk(0);
         builtChunk.setOrigin(chunckOrigin.getX(), chunckOrigin.getY(), chunckOrigin.getZ());
 
-        return new BlueprintInfo(builtChunk, blueprintChunkRendererRegion, structure.getSize(), builder);
+        return new BlueprintInfo(builtChunk, blueprintChunkRendererRegion, structure.getRotatedSize(rotation), builder);
     }
 
     private BlueprintInfo(ChunkBuilder.BuiltChunk builtChunk, BlueprintChunkRendererRegion chunkRendererRegion, Vec3i size, ChunkBuilder builder) {
