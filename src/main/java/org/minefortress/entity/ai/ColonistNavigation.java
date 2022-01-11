@@ -52,11 +52,10 @@ public class ColonistNavigation extends MobNavigation {
         double currentY = entity.getBlockY();
         double neededY = nextEntityPos.y - 1; // we need to subtract one to prevent from building scaffold on one block heojt
 
-        if(flatHasReached(nextEntityPos) && neededY > currentY && this.colonist.fallDistance <= 1 && !this.colonist.isWallAboveTheHead()) {
+        if(flatHasReached(nextEntityPos) && neededY > currentY && this.colonist.fallDistance <= 1) {
             needScaffold();
         } else if(flatHasReached(nextEntityPos) &&
                 neededY + 1 > currentY && this.colonist.fallDistance <= 1 &&
-                !this.colonist.isWallAboveTheHead() &&
                 BuildingManager.doesNotHaveCollisions(this.colonist.world, new BlockPos(nextEntityPos).down())
         ) {
             needScaffold();
@@ -70,12 +69,11 @@ public class ColonistNavigation extends MobNavigation {
     private void needScaffold() {
         final BlockState blockState = world.getBlockState(this.colonist.getBlockPos());
         final Block block = blockState.getBlock();
-        if(block instanceof BedBlock) {
+        if(block instanceof BedBlock || (colonist.isOnGround() && colonist.isWallAboveTheHead())) {
             cantCreateScaffold = true;
         } else {
             this.colonist.getScaffoldsControl().needAction();
         }
-
     }
 
     public boolean isCantCreateScaffold() {

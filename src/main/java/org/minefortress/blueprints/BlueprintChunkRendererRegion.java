@@ -1,5 +1,6 @@
 package org.minefortress.blueprints;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -24,6 +25,7 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
     private final Map<BlockPos, BlockState> structureData;
     private BlockPos origin = BlockPos.ORIGIN;
     private Vec3i originDelta = BlockPos.ORIGIN;
+    private final boolean standsOnGrass;
 
     public static BlueprintChunkRendererRegion create(Structure structure, World world, BlockPos originPos, BlockRotation rotation) {
         final StructurePlacementData placementData = new StructurePlacementData().setRotation(rotation);
@@ -31,13 +33,15 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
                 .getRandomBlockInfos(structure.blockInfoLists, BlockPos.ORIGIN)
                 .getAll();
 
+
         final Vec3i structureSize = structure.getRotatedSize(rotation);
         final BlockPos startPos = BlockPos.ORIGIN;
-        final Vec3i delta = new Vec3i(structureSize.getX() / 2, 0, structureSize.getZ() / 2);
+
+        final int biggerStructureSide = Math.max(structureSize.getX(), structureSize.getZ());
+        final Vec3i delta = new Vec3i(biggerStructureSide / 2, 0, biggerStructureSide / 2);
         final BlockPos pivot = startPos.add(delta);
         placementData.setPosition(pivot);
         final BlockPos endPos = startPos.add(structureSize);
-
 
         final Map<BlockPos, BlockState> structureData = blockInfos
                 .stream()
@@ -48,13 +52,19 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
                         inf -> inf.state.rotate(rotation)
                 ));
 
+        final boolean standsOnGrass = structureData.entrySet().stream().filter(entry -> entry.getKey().getY() == 0).allMatch(entry -> {
+            final Block block = entry.getValue().getBlock();
+            return block == Blocks.DIRT || block == Blocks.GRASS_BLOCK;
+        });
+
         final WorldChunk[][] worldChunks = new WorldChunk[1][1];
         worldChunks[0][0] = world.getChunk(0,0);
-        return new BlueprintChunkRendererRegion(world, 0, 0, worldChunks, startPos, endPos, structureData);
+        return new BlueprintChunkRendererRegion(world, 0, 0, worldChunks, startPos, endPos, structureData, standsOnGrass);
     }
 
-    public BlueprintChunkRendererRegion(World world, int chunkX, int chunkZ, WorldChunk[][] chunks, BlockPos startPos, BlockPos endPos, Map<BlockPos, BlockState> structureData) {
+    public BlueprintChunkRendererRegion(World world, int chunkX, int chunkZ, WorldChunk[][] chunks, BlockPos startPos, BlockPos endPos, Map<BlockPos, BlockState> structureData, boolean standsOnGrass) {
         super(world, chunkX, chunkZ, chunks, BlockPos.ORIGIN, BlockPos.ORIGIN);
+        this.standsOnGrass = standsOnGrass;
         this.sizeX = endPos.getX() - startPos.getX() + 1;
         this.sizeY = endPos.getY() - startPos.getY() + 1;
         this.sizeZ = endPos.getZ() - startPos.getZ() + 1;
@@ -89,6 +99,10 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
     @Override
     public BlockEntity getBlockEntity(BlockPos pos, WorldChunk.CreationType creationType) {
         return this.getBlockEntity(pos);
+    }
+
+    public boolean isStandsOnGround() {
+        return standsOnGrass;
     }
 
     public void setOrigin(BlockPos origin, Vec3i originDelta) {

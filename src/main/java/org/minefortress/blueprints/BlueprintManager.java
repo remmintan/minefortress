@@ -89,12 +89,14 @@ public class BlueprintManager {
     }
 
     private BlockPos moveToStructureSize(BlockPos pos) {
-        final Vec3i size = blueprintInfos.get(selectedStructure.getId()).getSize();
+        final boolean posSolid = !BuildingManager.doesNotHaveCollisions(client.world, pos);
+        final BlueprintInfo selectedInfo = blueprintInfos.get(selectedStructure.getId());
+        final Vec3i size = selectedInfo.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
-        final BlockPos movedPos = pos.subtract(halfSize);
-        final boolean movedPosSolid = !BuildingManager.doesNotHaveCollisions(client.world, movedPos);
-
-        return movedPosSolid?movedPos.up():movedPos;
+        BlockPos movedPos = pos.subtract(halfSize);
+        movedPos = selectedInfo.getChunkRendererRegion().isStandsOnGround() ? movedPos.down() : movedPos;
+        movedPos = posSolid? movedPos.up():movedPos;
+        return movedPos;
     }
 
     public void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {

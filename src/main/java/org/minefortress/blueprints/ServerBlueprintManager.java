@@ -35,7 +35,8 @@ public class ServerBlueprintManager {
             final Structure structure = structureOpt.get();
 
             final Vec3i size = structure.getRotatedSize(rotation);
-            final Vec3i delta = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
+            final double biggerSideSize = Math.max(size.getX(), size.getZ());
+            final Vec3i delta = new Vec3i(biggerSideSize / 2, 0, biggerSideSize / 2);
             final BlockPos pivot = BlockPos.ORIGIN.add(delta);
 
             final StructurePlacementData structurePlacementData = new StructurePlacementData()

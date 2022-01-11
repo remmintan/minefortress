@@ -32,7 +32,6 @@ public class BlueprintInfo {
         if(structureOptional.isEmpty()) throw new IllegalStateException("Can't find structure with id: " + structureName);
         final Structure structure = structureOptional.get();
 
-
         final BlockPos chunckOrigin = BlockPos.ORIGIN;
         final BlueprintChunkRendererRegion blueprintChunkRendererRegion = BlueprintChunkRendererRegion.create(structure, world, chunckOrigin, rotation);
 
