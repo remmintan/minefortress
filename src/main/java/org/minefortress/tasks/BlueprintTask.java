@@ -53,7 +53,7 @@ public class BlueprintTask extends AbstractTask {
 
     @Override
     public void finishPart(ServerWorld world) {
-        if(parts.isEmpty() && getCompletedParts()+1 == totalParts) {
+        if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
             final ServerPlayerEntity randomAlivePlayer = world.getRandomAlivePlayer();
             blueprintEntityData.forEach((pos, state) -> {
                 world.setBlockState(pos.add(startingBlock), state, 3);

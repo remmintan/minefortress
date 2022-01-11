@@ -51,7 +51,7 @@ public class ServerBlueprintManager {
                     .stream()
                     .filter(inf -> inf.state.getBlock() != Blocks.JIGSAW)
                     .collect(Collectors.toUnmodifiableMap(
-                            inf -> Structure.transform(structurePlacementData, inf.pos),
+                            inf -> Structure.transform(structurePlacementData, inf.pos).toImmutable(),
                             inf -> inf.state.rotate(rotation)
                     ));
 

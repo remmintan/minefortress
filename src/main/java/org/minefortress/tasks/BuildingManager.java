@@ -22,6 +22,20 @@ public class BuildingManager {
         return inWorldBounds(level, pos) && (
                 isAirOrFluid(state) ||
                 isGrass(level, state, pos) ||
+//                doesNotHaveCollisions(level, pos) ||
+                state.getBlock().equals(FortressBlocks.SCAFFOLD_OAK_PLANKS)
+        );
+    }
+
+    public static boolean canPlaceScaffold(World level, BlockPos pos) {
+        final BlockState blockState = level.getBlockState(pos);
+        return canPlaceScaffold(level, blockState, pos);
+    }
+
+    public static boolean canPlaceScaffold(World level, BlockState state, BlockPos pos) {
+        return inWorldBounds(level, pos) && (
+                isAirOrFluid(state) ||
+                isGrass(level, state, pos) ||
                 doesNotHaveCollisions(level, pos) ||
                 state.getBlock().equals(FortressBlocks.SCAFFOLD_OAK_PLANKS)
         );

@@ -31,7 +31,7 @@ public class ScaffoldsControl extends ActionControl {
         }
 
         final BlockPos placePosition = colonist.getBlockPos().down();
-        if(BuildingManager.canPlaceBlock(colonist.world, placePosition)) {
+        if(BuildingManager.canPlaceScaffold(colonist.world, placePosition)) {
             colonist.putItemInHand(SCAFFOLD_ITEM);
             colonist.world.setBlockState(placePosition, SCAFFOLD_BLOCK.getDefaultState(), 3);
             colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, placePosition);

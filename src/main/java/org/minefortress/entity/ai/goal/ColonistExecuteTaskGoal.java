@@ -125,6 +125,7 @@ public class ColonistExecuteTaskGoal extends Goal {
         this.nextBlock = null;
         this.currentPartBlocksIterator = null;
         this.task = null;
+        this.part = null;
     }
 
     private void moveToNextBlock() {
