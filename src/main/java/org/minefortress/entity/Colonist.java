@@ -12,22 +12,18 @@ import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.item.*;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.ColonistNavigation;
-import org.minefortress.entity.ai.FortressBlockPlaceContext;
-import org.minefortress.entity.ai.FortressUseOnContext;
 import org.minefortress.entity.ai.controls.DigControl;
 import org.minefortress.entity.ai.controls.MLGControl;
 import org.minefortress.entity.ai.controls.PlaceControl;
@@ -270,12 +266,9 @@ public class Colonist extends PassiveEntity {
         if (this.noClip) {
             return false;
         } else {
-            Box legsBox = Box.of(this.getPos(), getWidth()/1.3, 1, getWidth()/1.3);
+            Box legsBox = Box.of(this.getPos(), getWidth()/1.4, 0.5, getWidth()/1.4);
             Box aboveTheHeadBox = legsBox.offset(0, 2.5, 0);
-            return this.world
-                    .getBlockCollisions(this, aboveTheHeadBox, (p_20129_, p_20130_) -> !p_20129_.isAir())
-                    .findAny()
-                    .isPresent();
+            return this.world.getBlockCollisions(this, aboveTheHeadBox).count() >0;
         }
     }
 

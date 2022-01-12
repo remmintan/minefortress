@@ -74,7 +74,7 @@ public class MovementHelper {
         }
         lastPos = currentPos.toImmutable();
 
-        int maxStuckTime = colonist.isTouchingWater()? 200: 100;
+        int maxStuckTime = colonist.isTouchingWater()? 200: 50;
         if(stuckOnSamePosition > maxStuckTime) {
             this.cantFindPath = true;
             stuckOnSamePosition = 0;
