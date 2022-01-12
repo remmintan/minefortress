@@ -82,10 +82,9 @@ public class BlueprintManager {
     private BlockPos getSelectedPos() {
         if(client.crosshairTarget instanceof BlockHitResult) {
             final BlockPos originalPos = ((BlockHitResult) client.crosshairTarget).getBlockPos();
-            return moveToStructureSize(originalPos);
-        } else {
-            return null;
+            if(originalPos != null) return moveToStructureSize(originalPos);
         }
+        return null;
     }
 
     private BlockPos moveToStructureSize(BlockPos pos) {

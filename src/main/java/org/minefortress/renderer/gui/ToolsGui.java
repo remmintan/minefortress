@@ -10,7 +10,9 @@ import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.renderer.gui.widget.FortressBlueprintsButtonWidget;
 import org.minefortress.renderer.gui.widget.FortressItemButtonWidget;
+import org.minefortress.renderer.gui.widget.FortressSelectionVisibilityButtonWidget;
 import org.minefortress.selections.SelectionType;
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ public class ToolsGui extends FortressGuiScreen {
     private final FortressItemButtonWidget selectionType;
     private final FortressItemButtonWidget blueprints;
     private final ButtonWidget questionButton;
-
+    private final ButtonWidget selectionVisibilityButton;
 
     private final List<ButtonWidget> selectionButtons = new ArrayList<>();
 
@@ -45,7 +47,7 @@ public class ToolsGui extends FortressGuiScreen {
                 Text.of("")
         );
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
-        this.blueprints = new FortressItemButtonWidget(
+        this.blueprints = new FortressBlueprintsButtonWidget(
                 0,
                 0,
                 Items.BOOK,
@@ -66,6 +68,20 @@ public class ToolsGui extends FortressGuiScreen {
                 },
                 Text.of("")
         );
+
+        this.selectionVisibilityButton = new FortressSelectionVisibilityButtonWidget(
+                0,
+                0,
+                (button, matrices, mouseX, mouseY) -> {
+                    if (fortressClient.getSelectionManager().isSelectionHidden()) {
+                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Show Tasks outline"), mouseX, mouseY);
+                    } else {
+                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Hide Tasks outline"), mouseX, mouseY);
+                    }
+                },
+                itemRenderer
+        );
+
         this.questionButton = new ButtonWidget(0, 0, 20, 20, new LiteralText("?"), btn -> {
             this.selectionType.checked = false;
             final BookScreen questionsScreen = new BookScreen(new FortressBookContents(FortressBookContents.HELP_BOOK));
@@ -116,6 +132,10 @@ public class ToolsGui extends FortressGuiScreen {
         this.blueprints.setPos(screenWidth - 25, 30);
         this.blueprints.render(p, (int)mouseX, (int)mouseY, delta);
 
+        this.selectionVisibilityButton.x = screenWidth - 25;
+        this.selectionVisibilityButton.y = 80;
+        this.selectionVisibilityButton.render(p, (int)mouseX, (int)mouseY, delta);
+
     }
 
     @Override
@@ -125,7 +145,8 @@ public class ToolsGui extends FortressGuiScreen {
         return this.selectionType.isHovered() ||
                 this.questionButton.isHovered() ||
                 this.selectionButtons.stream().anyMatch(btn -> btn.visible && btn.isHovered()) ||
-                this.blueprints.isHovered();
+                this.blueprints.isHovered() ||
+                this.selectionVisibilityButton.isHovered();
 
     }
 
@@ -137,6 +158,9 @@ public class ToolsGui extends FortressGuiScreen {
 
         if(this.blueprints.isHovered())
             this.blueprints.onClick(mouseX, mouseY);
+
+        if(this.selectionVisibilityButton.isHovered())
+            this.selectionVisibilityButton.onClick(mouseX, mouseY);
 
         for (ButtonWidget btn : selectionButtons) {
             if (btn.visible && btn.isHovered())

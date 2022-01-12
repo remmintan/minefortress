@@ -71,7 +71,7 @@ public abstract class FortressWorldRendererMixin  {
         }
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/BlockHitResult;getBlockPos()Lnet/minecraft/util/math/BlockPos;", shift = At.Shift.BEFORE))
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
     public void render(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
         this.entityRenderer.prepare(this.world, camera);
         final Vec3d cameraPos = camera.getPos();
@@ -110,8 +110,8 @@ public abstract class FortressWorldRendererMixin  {
                 }
             }
 
-            List<Pair<Vec3i, Vec3i>> selections = selectionManager.getSelectionSize();
-            for(Pair<Vec3i, Vec3i> selectionSize : selections) {
+            List<Pair<Vec3i, Vec3i>> selectionSizes = selectionManager.getSelectionSize();
+            for(Pair<Vec3i, Vec3i> selectionSize : selectionSizes) {
                 if(clickType == ClickType.REMOVE && selectionSize != null) {
                     VertexConsumer noDepthBuffer = immediate.getBuffer(FortressRenderLayer.getLinesNoDepth());
                     Vec3i selectionDimensions = selectionSize.getFirst();
@@ -130,40 +130,42 @@ public abstract class FortressWorldRendererMixin  {
             }
         }
 
-        Collection<ClientSelection> allRemoveTasks = ((FortressClientWorld)world).getClientTasksHolder().getAllRemoveTasks();
-        VertexConsumer buffer = immediate.getBuffer(RenderLayer.getLines());
-        final Vector4f color = new Vector4f(170f/255f, 0, 0, 1f);
-        for(ClientSelection task : allRemoveTasks) {
-            for(BlockPos pos: task.getBlockPositions()) {
-                if(BuildingManager.canRemoveBlock(world, pos)) {
-                    BlockState blockState = world.getBlockState(pos);
-                    this.drawBlockOutlineWithColor(matrices, buffer, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, pos, blockState, color);
+        if(!selectionManager.isSelectionHidden()) {
+            Collection<ClientSelection> allRemoveTasks = ((FortressClientWorld)world).getClientTasksHolder().getAllRemoveTasks();
+            VertexConsumer buffer = immediate.getBuffer(RenderLayer.getLines());
+            final Vector4f color = new Vector4f(170f/255f, 0, 0, 1f);
+            for(ClientSelection task : allRemoveTasks) {
+                for(BlockPos pos: task.getBlockPositions()) {
+                    if(BuildingManager.canRemoveBlock(world, pos)) {
+                        BlockState blockState = world.getBlockState(pos);
+                        this.drawBlockOutlineWithColor(matrices, buffer, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, pos, blockState, color);
+                    }
+                }
+            }
+
+            Set<BlockPos> buildTasksPos = ((FortressClientWorld)world).getClientTasksHolder().getAllBuildTasks().keySet();
+            final Vector4f buildColor = new Vector4f(0, 170f/255f, 0, 1f);
+            for(BlockPos pos: buildTasksPos) {
+                if(BuildingManager.canPlaceBlock(world, pos)) {
+                    this.drawBlockOutlineWithColor(matrices, buffer, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, pos, Blocks.DIRT.getDefaultState(), buildColor);
                 }
             }
         }
 
-        Set<BlockPos> buildTasksPos = ((FortressClientWorld)world).getClientTasksHolder().getAllBuildTasks().keySet();
-        final Vector4f buildColor = new Vector4f(0, 170f/255f, 0, 1f);
-        for(BlockPos pos: buildTasksPos) {
-            if(BuildingManager.canPlaceBlock(world, pos)) {
-                this.drawBlockOutlineWithColor(matrices, buffer, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, pos, Blocks.DIRT.getDefaultState(), buildColor);
-            }
-        }
-
-        if(fortressClient.isFortressGamemode()) {
-            HitResult hitResult = this.client.crosshairTarget;
-            if (renderBlockOutline && hitResult != null && hitResult.getType() == HitResult.Type.BLOCK) {
-
-                BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
-                BlockState blockState = this.world.getBlockState(blockPos);
-                if (!blockState.isAir() && this.world.getWorldBorder().contains(blockPos)) {
-                    VertexConsumer outlineVertexConsumerProvider3 = immediate.getBuffer(RenderLayer.getLines());
-                    this.drawBlockOutline(matrices, outlineVertexConsumerProvider3, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, blockPos, blockState);
-                }
-            }
-
-            immediate.drawCurrentLayer();
-        }
+//        if(fortressClient.isFortressGamemode()) {
+//            HitResult hitResult = this.client.crosshairTarget;
+//            if (renderBlockOutline && hitResult != null && hitResult.getType() == HitResult.Type.BLOCK) {
+//
+//                BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
+//                BlockState blockState = this.world.getBlockState(blockPos);
+//                if (!blockState.isAir() && this.world.getWorldBorder().contains(blockPos)) {
+//                    VertexConsumer outlineVertexConsumerProvider3 = immediate.getBuffer(RenderLayer.getLines());
+//                    this.drawBlockOutline(matrices, outlineVertexConsumerProvider3, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, blockPos, blockState);
+//                }
+//            }
+//
+//            immediate.drawCurrentLayer();
+//        }
     }
 
     private void drawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState) {

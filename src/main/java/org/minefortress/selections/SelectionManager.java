@@ -29,6 +29,16 @@ public class SelectionManager implements FortressWorldRenderer {
 
     private final Set<BlockPos> selectedBlocks = new HashSet<>();
 
+    private boolean selectionHidden = false;
+
+    public void toggleSelectionVisibility() {
+        this.selectionHidden = !this.selectionHidden;
+    }
+
+    public boolean isSelectionHidden() {
+        return selectionHidden;
+    }
+
     @Override
     public @Nullable BlockState getClickingBlock() {
         return clickingBlockState;
