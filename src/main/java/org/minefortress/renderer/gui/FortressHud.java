@@ -58,9 +58,9 @@ public class FortressHud {
             final String selectedBlueprintName = blueprintManager.getSelectedStructureName();
             renderInfoText(p, font, "Blueprint: " + selectedBlueprintName);
 
-            DrawableHelper.drawStringWithShadow(p, font, "ctrl + R - next blueprint", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
-            DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - rotate left", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
-            DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - rotate right", 5, scaledHeight - font.fontHeight - 5, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "ctrl + R - next blueprint", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - rotate left", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - rotate right", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
         } else {
             renderSelectTypeName(p, font);
         }
