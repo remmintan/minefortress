@@ -199,6 +199,8 @@ public class BlueprintManager {
         }
         final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket = new ServerboundBlueprintTaskPacket(taskId, selectedStructure.getId(), selectedStructure.getFile(), startPos, selectedStructure.getRotation());
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
+        
+        clearStructure();
     }
 
     public void clearStructure() {

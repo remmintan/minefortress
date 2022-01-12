@@ -8,6 +8,7 @@ import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.ai.pathing.TargetPathNode;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.*;
+import net.minecraft.world.chunk.ChunkCache;
 import org.minefortress.tasks.BuildingManager;
 
 import java.util.HashSet;
@@ -42,7 +43,14 @@ public class NodeMaker extends LandPathNodeMaker {
     }
 
     @Override
+    public void init(ChunkCache cachedWorld, MobEntity entity) {
+        super.init(cachedWorld, entity);
+        entity.setPathfindingPenalty(PathNodeType.LEAVES, 0.0F);
+    }
+
+    @Override
     public void clear() {
+        entity.setPathfindingPenalty(PathNodeType.LEAVES, -1.0F);
         collisionCache.clear();
         fakeWalkablePos = Vec3i.ZERO;
         fakeBlockingForTargets.clear();
