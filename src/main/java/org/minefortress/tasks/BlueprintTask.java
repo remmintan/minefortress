@@ -21,11 +21,13 @@ public class BlueprintTask extends AbstractTask {
 
     private final Map<BlockPos, BlockState> blueprintData;
     private final Map<BlockPos, BlockState> blueprintEntityData;
+    private final Map<BlockPos, BlockState> blueprintAutomaticData;
 
-    public BlueprintTask(UUID id, BlockPos startingPos, BlockPos endingPos, Map<BlockPos, BlockState> blueprintData, Map<BlockPos, BlockState> blueprintEntityData) {
+    public BlueprintTask(UUID id, BlockPos startingPos, BlockPos endingPos, Map<BlockPos, BlockState> blueprintData, Map<BlockPos, BlockState> blueprintEntityData, Map<BlockPos, BlockState> blueprintAutomaticData) {
         super(id, TaskType.BUILD, startingPos, endingPos);
         this.blueprintData = blueprintData;
         this.blueprintEntityData = blueprintEntityData;
+        this.blueprintAutomaticData = blueprintAutomaticData;
     }
 
     @Override
@@ -54,11 +56,14 @@ public class BlueprintTask extends AbstractTask {
     @Override
     public void finishPart(ServerWorld world) {
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
-            final ServerPlayerEntity randomAlivePlayer = world.getRandomAlivePlayer();
             blueprintEntityData.forEach((pos, state) -> {
                 world.setBlockState(pos.add(startingBlock), state, 3);
-//                world.emitGameEvent(randomAlivePlayer, GameEvent.BLOCK_PLACE, pos);
             });
+
+            if(blueprintAutomaticData != null)
+                blueprintAutomaticData
+                        .forEach((pos, state) -> world.setBlockState(pos.add(startingBlock), state, 3));
+
 
         }
         super.finishPart(world);
