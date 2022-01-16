@@ -2,7 +2,6 @@ package org.minefortress.blueprints;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.VertexBuffer;
@@ -25,15 +24,13 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.tasks.BuildingManager;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlueprintManager {
 
     private static final Vec3f WRONG_PLACEMENT_COLOR = new Vec3f(1.0F, 0.5F, 0.5F);
+    private static final Vec3f CORRECT_PLACEMENT_COLOR = new Vec3f(1F, 1.0F, 1F);
 
     private final MinecraftClient client;
     private final BlueprintBlockDataManager blockDataManager;
@@ -41,6 +38,7 @@ public class BlueprintManager {
     private BlueprintMetadata selectedStructure;
     private final Map<String, BlueprintRenderInfo> blueprintInfos = new HashMap<>();
     private BlockPos blueprintBuildPos = null;
+    private boolean cantBuild = false;
 
     public BlueprintManager(MinecraftClient client) {
         this.client = client;
@@ -70,6 +68,31 @@ public class BlueprintManager {
     public void tick() {
         if(!hasSelectedBlueprint()) return;
         blueprintBuildPos = getSelectedPos();
+        if(blueprintBuildPos == null) return;
+        checkCantBuild();
+    }
+
+    private void checkCantBuild() {
+        final BlueprintBlockDataManager.BlueprintBlockData blockData = blockDataManager
+                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation(), false);
+        final Set<BlockPos> blueprintDataPositions = blockData.getBlueprintData().keySet();
+        final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
+                .filter(blockPos -> !(blockData.isStandsOnGrass() && blockPos.getY() == 0))
+                .map(pos -> pos.add(blueprintBuildPos))
+                .anyMatch(pos -> !BuildingManager.canPlaceBlock(client.world, pos));
+
+        final boolean blueprintPartInTheAir = blueprintDataPositions.stream()
+                .filter(blockPos -> {
+                    if (blockData.isStandsOnGrass()) {
+                        return blockPos.getY() == 1 && !blueprintDataPositions.contains(blockPos.down());
+                    } else {
+                        return blockPos.getY() == 0;
+                    }
+                })
+                .map(pos -> pos.add(blueprintBuildPos))
+                .anyMatch(pos -> BuildingManager.canPlaceBlock(client.world, pos.down()));
+
+        cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
     }
 
     @Nullable
@@ -115,7 +138,7 @@ public class BlueprintManager {
             shader.projectionMat.set(matrix4f);
         }
         if (shader.colorModulator != null) {
-            shader.colorModulator.set(WRONG_PLACEMENT_COLOR);
+            shader.colorModulator.set(cantBuild ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR);
         }
         if (shader.fogStart != null) {
             shader.fogStart.set(RenderSystem.getShaderFogStart());
@@ -177,6 +200,8 @@ public class BlueprintManager {
     public void buildCurrentStructure(BlockPos clickPos) {
         if(selectedStructure == null) throw new IllegalStateException("No blueprint selected");
         if(blueprintBuildPos == null) throw new IllegalStateException("No blueprint build position");
+
+        if(cantBuild) return;
 
         UUID taskId = UUID.randomUUID();
         final FortressClientWorld world = (FortressClientWorld) client.world;

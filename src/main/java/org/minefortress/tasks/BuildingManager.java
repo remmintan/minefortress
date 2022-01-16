@@ -4,6 +4,7 @@ package org.minefortress.tasks;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Fertilizable;
+import net.minecraft.block.FlowerBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -14,7 +15,8 @@ import org.minefortress.registries.FortressBlocks;
 
 public class BuildingManager {
 
-    public static boolean canPlaceBlock(World level, BlockPos pos) {
+    public static boolean canPlaceBlock(@Nullable World level, BlockPos pos) {
+        if (level == null) return false;
         final BlockState blockState = level.getBlockState(pos);
         return canPlaceBlock(level, blockState, pos);
     }
@@ -23,6 +25,7 @@ public class BuildingManager {
         return inWorldBounds(level, pos) && (
                 isAirOrFluid(state) ||
                 isGrass(level, state, pos) ||
+                state.getMaterial().isReplaceable() ||
 //                doesNotHaveCollisions(level, pos) ||
                 state.getBlock().equals(FortressBlocks.SCAFFOLD_OAK_PLANKS)
         );
@@ -89,7 +92,7 @@ public class BuildingManager {
 
     private static boolean isGrass(World level, BlockState state, BlockPos pos) {
         final VoxelShape collisionShape = state.getCollisionShape(level, pos);
-        return collisionShape == VoxelShapes.empty() && state.getBlock() instanceof Fertilizable;
+        return collisionShape == VoxelShapes.empty() && (state.getBlock() instanceof Fertilizable || state.getBlock() instanceof FlowerBlock);
     }
 
     private static boolean isAirOrFluid(BlockState state) {
