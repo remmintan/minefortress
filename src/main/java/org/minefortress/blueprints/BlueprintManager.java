@@ -36,6 +36,7 @@ public class BlueprintManager {
     private static final Vec3f WRONG_PLACEMENT_COLOR = new Vec3f(1.0F, 0.5F, 0.5F);
 
     private final MinecraftClient client;
+    private final BlueprintBlockDataManager blockDataManager;
 
     private BlueprintMetadata selectedStructure;
     private final Map<String, BlueprintRenderInfo> blueprintInfos = new HashMap<>();
@@ -43,6 +44,7 @@ public class BlueprintManager {
 
     public BlueprintManager(MinecraftClient client) {
         this.client = client;
+        this.blockDataManager = new BlueprintBlockDataManager(client);
     }
 
     public void buildStructure(ChunkBuilder chunkBuilder) {
@@ -50,7 +52,11 @@ public class BlueprintManager {
         final String file = selectedStructure.getFile();
         if(!blueprintInfos.containsKey(selectedStructureId)) {
             final BlockRotation rotation = selectedStructure.getRotation();
-            final BlueprintRenderInfo blueprintRenderInfo = BlueprintRenderInfo.create(file, client.world, chunkBuilder, rotation);
+
+            final BlueprintBlockDataManager.BlueprintBlockData blueprintBlockData = blockDataManager
+                    .getBlockData(file, rotation, false);
+
+            final BlueprintRenderInfo blueprintRenderInfo = BlueprintRenderInfo.create(blueprintBlockData, client.world, chunkBuilder);
             blueprintInfos.put(selectedStructureId, blueprintRenderInfo);
         }
 
@@ -76,12 +82,15 @@ public class BlueprintManager {
     }
 
     private BlockPos moveToStructureSize(BlockPos pos) {
+        if(selectedStructure == null) return pos;
+
         final boolean posSolid = !BuildingManager.doesNotHaveCollisions(client.world, pos);
-        final BlueprintRenderInfo selectedInfo = blueprintInfos.get(selectedStructure.getId());
-        final Vec3i size = selectedInfo.getSize();
+        final BlueprintBlockDataManager.BlueprintBlockData blockData = blockDataManager
+                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation(), false);
+        final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
         BlockPos movedPos = pos.subtract(halfSize);
-        movedPos = selectedInfo.getChunkRendererRegion().isStandsOnGround() ? movedPos.down() : movedPos;
+        movedPos = blockData.isStandsOnGrass() ? movedPos.down() : movedPos;
         movedPos = posSolid? movedPos.up():movedPos;
         return movedPos;
     }
@@ -172,12 +181,12 @@ public class BlueprintManager {
         UUID taskId = UUID.randomUUID();
         final FortressClientWorld world = (FortressClientWorld) client.world;
         if(world != null) {
-            final Map<BlockPos, BlockState> structureData = blueprintInfos.get(selectedStructure.getId()).getChunkRendererRegion().getStructureData();
+            final Map<BlockPos, BlockState> structureData = blockDataManager
+                    .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation(), false)
+                    .getBlueprintData();
             final List<BlockPos> blocks = structureData
-                    .entrySet()
+                    .keySet()
                     .stream()
-                    .filter(ent -> ent.getValue().getBlock() != Blocks.AIR)
-                    .map(Map.Entry::getKey)
                     .map(it -> it.add(blueprintBuildPos))
                     .collect(Collectors.toList());
             world.getClientTasksHolder().addTask(taskId, blocks);

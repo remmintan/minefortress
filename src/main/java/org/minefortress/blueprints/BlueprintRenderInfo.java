@@ -23,21 +23,18 @@ public class BlueprintRenderInfo {
     private int rebuildCooldown;
 
     @NotNull
-    public static BlueprintRenderInfo create(String structureName, World world, ChunkBuilder builder, BlockRotation rotation) {
+    public static BlueprintRenderInfo create(BlueprintBlockDataManager.BlueprintBlockData blockData, World world, ChunkBuilder builder) {
         final IntegratedServer server = MinecraftClient.getInstance().getServer();
         if(server == null) throw new IllegalStateException("Cannot create blueprint info without a server");
-        final Identifier structureId = new Identifier(structureName);
-        final Optional<Structure> structureOptional = server.getStructureManager().getStructure(structureId);
-        if(structureOptional.isEmpty()) throw new IllegalStateException("Can't find structure with id: " + structureName);
-        final Structure structure = structureOptional.get();
+
 
         final BlockPos chunckOrigin = BlockPos.ORIGIN;
-        final BlueprintChunkRendererRegion blueprintChunkRendererRegion = BlueprintChunkRendererRegion.create(structure, world, chunckOrigin, rotation);
+        final BlueprintChunkRendererRegion blueprintChunkRendererRegion = BlueprintChunkRendererRegion.create(blockData, world);
 
         final ChunkBuilder.BuiltChunk builtChunk = builder.new BuiltChunk(0);
         builtChunk.setOrigin(chunckOrigin.getX(), chunckOrigin.getY(), chunckOrigin.getZ());
 
-        return new BlueprintRenderInfo(builtChunk, blueprintChunkRendererRegion, structure.getRotatedSize(rotation), builder);
+        return new BlueprintRenderInfo(builtChunk, blueprintChunkRendererRegion, blockData.getSize(), builder);
     }
 
     private BlueprintRenderInfo(ChunkBuilder.BuiltChunk builtChunk, BlueprintChunkRendererRegion chunkRendererRegion, Vec3i size, ChunkBuilder builder) {
@@ -73,7 +70,4 @@ public class BlueprintRenderInfo {
         return size;
     }
 
-    public BlueprintChunkRendererRegion getChunkRendererRegion() {
-        return chunkRendererRegion;
-    }
 }

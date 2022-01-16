@@ -9,6 +9,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.registries.FortressBlocks;
 
 public class BuildingManager {
@@ -75,7 +76,8 @@ public class BuildingManager {
                 doesNotHaveCollisions((WorldAccess)level, pos.up().up());
     }
 
-    public static boolean doesNotHaveCollisions(WorldAccess level, BlockPos pos) {
+    public static boolean doesNotHaveCollisions(@Nullable WorldAccess level, BlockPos pos) {
+        if (level == null) return false;
         final BlockState state = level.getBlockState(pos);
         return state.getCollisionShape(level, pos) == VoxelShapes.empty();
     }
