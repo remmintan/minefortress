@@ -1,10 +1,13 @@
 package org.minefortress.blueprints;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.command.argument.BlockArgumentParser;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
@@ -52,7 +55,7 @@ public class BlueprintBlockDataManager {
             final Map<BlockPos, BlockState> structureData = blockInfos
                     .stream()
                     .filter(info -> info.state.getBlock() != Blocks.AIR)
-                    .map(BlueprintMetadataManager::convertJigsawBlock)
+                    .map(BlueprintBlockDataManager::convertJigsawBlock)
                     .collect(Collectors.toMap(
                             inf -> Structure.transform(placementData, inf.pos.add(origin)),
                             inf -> inf.state.rotate(rotation)
@@ -66,7 +69,6 @@ public class BlueprintBlockDataManager {
             if(separateLayers) {
                 final BlueprintMetadata blueprintMetadata = BlueprintMetadataManager.getByFile(fileName);
 
-
                 final Map<BlockPos, BlockState> structureEntityData = structureData.entrySet()
                         .stream()
                         .filter(entry -> entry.getValue().getBlock() instanceof BlockEntityProvider)
@@ -74,11 +76,13 @@ public class BlueprintBlockDataManager {
 
                 final Map<BlockPos, BlockState> structureManualData = structureData.entrySet()
                         .stream()
+                        .filter(entry -> !(entry.getValue().getBlock() instanceof BlockEntityProvider))
                         .filter(ent -> blueprintMetadata == null || !blueprintMetadata.isPartOfAutomaticLayer(ent.getKey(), ent.getValue()))
                         .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
                 final Map<BlockPos, BlockState> structureAutomaticData = structureData.entrySet()
                         .stream()
+                        .filter(entry -> !(entry.getValue().getBlock() instanceof BlockEntityProvider))
                         .filter(ent -> blueprintMetadata != null && blueprintMetadata.isPartOfAutomaticLayer(ent.getKey(), ent.getValue()))
                         .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -134,6 +138,27 @@ public class BlueprintBlockDataManager {
         public Map<BlockPos, BlockState> getAutomaticLayer() {
             return automaticLayer;
         }
+    }
+
+    private static Structure.StructureBlockInfo convertJigsawBlock(Structure.StructureBlockInfo inf) {
+        if(inf.state.isOf(Blocks.JIGSAW)) {
+            final NbtElement final_state = inf.nbt.get("final_state");
+            if(final_state != null) {
+                final String stateString = final_state.asString();
+                BlockState blockState = null;
+                try {
+                    blockState = new BlockArgumentParser(new StringReader(stateString), false)
+                            .parse(false)
+                            .getBlockState();
+                } catch (CommandSyntaxException e) {
+                    e.printStackTrace();
+                }
+
+                if(blockState != null)
+                    return new Structure.StructureBlockInfo(inf.pos, blockState, inf.nbt);
+            }
+        }
+        return inf;
     }
 
 }
