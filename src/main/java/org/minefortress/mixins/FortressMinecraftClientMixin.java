@@ -12,7 +12,7 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.BlueprintDataManager;
+import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.renderer.CameraManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -32,7 +32,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private CameraManager cameraManager;
     private FortressHud fortressHud;
     private BlueprintManager blueprintManager;
-    private BlueprintDataManager blueprintDataManager;
+    private BlueprintMetadataManager blueprintMetadataManager;
 
     @Shadow
     @Final
@@ -56,7 +56,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.cameraManager = new CameraManager((MinecraftClient)(Object)this);
         this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
         this.blueprintManager = new BlueprintManager((MinecraftClient)(Object)this);
-        this.blueprintDataManager = new BlueprintDataManager((MinecraftClient)(Object)this);
+        this.blueprintMetadataManager = new BlueprintMetadataManager((MinecraftClient)(Object)this);
     }
 
     @Override
@@ -70,8 +70,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public BlueprintDataManager getBlueprintDataManager() {
-        return blueprintDataManager;
+    public BlueprintMetadataManager getBlueprintMetadataManager() {
+        return blueprintMetadataManager;
     }
 
     @Override
@@ -139,13 +139,16 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         }
     }
 
-    @Inject(method="tick", at=@At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;tick()V", shift = At.Shift.AFTER))
-    public void guiTick(CallbackInfo ci) {
+    @Inject(method="tick", at=@At("TAIL"))
+    public void tick(CallbackInfo ci) {
         this.fortressHud.tick();
+        this.blueprintManager.tick();
     }
 
     @Override
     public FortressHud getFortressHud() {
         return fortressHud;
     }
+
+
 }

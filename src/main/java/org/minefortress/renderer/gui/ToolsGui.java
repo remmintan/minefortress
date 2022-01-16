@@ -56,7 +56,7 @@ public class ToolsGui extends FortressGuiScreen {
                     if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
                         fortressClient.getBlueprintManager().clearStructure();
                     } else {
-                        fortressClient.getBlueprintDataManager().selectFirst();
+                        fortressClient.getBlueprintMetadataManager().selectFirst();
                     }
                 },
                 (button, matrices, mouseX, mouseY) -> {

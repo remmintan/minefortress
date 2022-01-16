@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StructureInfo {
+public class BlueprintMetadata {
 
     private final String name;
     private final String file;
@@ -17,13 +17,7 @@ public class StructureInfo {
 
     private BlockRotation rotation = BlockRotation.NONE;
 
-    public StructureInfo(String name, String file) {
-        this.name = name;
-        this.file = file;
-        this.roofHeight = 0;
-    }
-
-    public StructureInfo(String name, String file, int roofHeight, List<Block> roofBlocks) {
+    public BlueprintMetadata(String name, String file, int roofHeight, List<Block> roofBlocks) {
         this.name = name;
         this.file = file;
         this.roofHeight = roofHeight;

@@ -46,7 +46,7 @@ public class BlueprintChunkRendererRegion extends ChunkRendererRegion {
         final Map<BlockPos, BlockState> structureData = blockInfos
                 .stream()
                 .filter(info -> info.state.getBlock() != Blocks.AIR)
-                .map(BlueprintDataManager::convertJigsawBlock)
+                .map(BlueprintMetadataManager::convertJigsawBlock)
                 .collect(Collectors.toMap(
                         inf -> Structure.transform(placementData, inf.pos.add(originPos)),
                         inf -> inf.state.rotate(rotation)

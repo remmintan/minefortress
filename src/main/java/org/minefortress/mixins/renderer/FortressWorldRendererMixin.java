@@ -151,21 +151,6 @@ public abstract class FortressWorldRendererMixin  {
                 }
             }
         }
-
-//        if(fortressClient.isFortressGamemode()) {
-//            HitResult hitResult = this.client.crosshairTarget;
-//            if (renderBlockOutline && hitResult != null && hitResult.getType() == HitResult.Type.BLOCK) {
-//
-//                BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
-//                BlockState blockState = this.world.getBlockState(blockPos);
-//                if (!blockState.isAir() && this.world.getWorldBorder().contains(blockPos)) {
-//                    VertexConsumer outlineVertexConsumerProvider3 = immediate.getBuffer(RenderLayer.getLines());
-//                    this.drawBlockOutline(matrices, outlineVertexConsumerProvider3, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, blockPos, blockState);
-//                }
-//            }
-//
-//            immediate.drawCurrentLayer();
-//        }
     }
 
     private void drawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState) {

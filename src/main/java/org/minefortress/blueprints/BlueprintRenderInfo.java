@@ -7,14 +7,13 @@ import net.minecraft.structure.Structure;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class BlueprintInfo {
+public class BlueprintRenderInfo {
 
     private final ChunkBuilder.BuiltChunk builtChunk;
     private final BlueprintChunkRendererRegion chunkRendererRegion;
@@ -24,7 +23,7 @@ public class BlueprintInfo {
     private int rebuildCooldown;
 
     @NotNull
-    public static BlueprintInfo create(String structureName, World world, ChunkBuilder builder, BlockRotation rotation) {
+    public static BlueprintRenderInfo create(String structureName, World world, ChunkBuilder builder, BlockRotation rotation) {
         final IntegratedServer server = MinecraftClient.getInstance().getServer();
         if(server == null) throw new IllegalStateException("Cannot create blueprint info without a server");
         final Identifier structureId = new Identifier(structureName);
@@ -38,10 +37,10 @@ public class BlueprintInfo {
         final ChunkBuilder.BuiltChunk builtChunk = builder.new BuiltChunk(0);
         builtChunk.setOrigin(chunckOrigin.getX(), chunckOrigin.getY(), chunckOrigin.getZ());
 
-        return new BlueprintInfo(builtChunk, blueprintChunkRendererRegion, structure.getRotatedSize(rotation), builder);
+        return new BlueprintRenderInfo(builtChunk, blueprintChunkRendererRegion, structure.getRotatedSize(rotation), builder);
     }
 
-    private BlueprintInfo(ChunkBuilder.BuiltChunk builtChunk, BlueprintChunkRendererRegion chunkRendererRegion, Vec3i size, ChunkBuilder builder) {
+    private BlueprintRenderInfo(ChunkBuilder.BuiltChunk builtChunk, BlueprintChunkRendererRegion chunkRendererRegion, Vec3i size, ChunkBuilder builder) {
         this.builtChunk = builtChunk;
         this.chunkRendererRegion = chunkRendererRegion;
         this.size = size;

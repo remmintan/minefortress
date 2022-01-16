@@ -48,7 +48,7 @@ public class ServerBlueprintManager {
 
             Map<BlockPos, BlockState> totalStructureData = allBlockInfos
                     .stream()
-                    .map(BlueprintDataManager::convertJigsawBlock)
+                    .map(BlueprintMetadataManager::convertJigsawBlock)
                     .collect(
                         Collectors.toUnmodifiableMap(
                             inf -> Structure.transform(structurePlacementData, inf.pos).toImmutable(),
@@ -56,7 +56,7 @@ public class ServerBlueprintManager {
                         )
                     );
 
-            final StructureInfo structureInfo = BlueprintDataManager.getByFile(structureId);
+            final BlueprintMetadata blueprintMetadata = BlueprintMetadataManager.getByFile(structureId);
 
 
             final List<Map.Entry<BlockPos, BlockState>> structureData = totalStructureData.entrySet()
@@ -71,12 +71,12 @@ public class ServerBlueprintManager {
 
             final Map<BlockPos, BlockState> structureManualData = structureData
                     .stream()
-                    .filter(ent -> structureInfo == null || !structureInfo.isPartOfAutomaticLayer(ent.getKey(), ent.getValue()))
+                    .filter(ent -> blueprintMetadata == null || !blueprintMetadata.isPartOfAutomaticLayer(ent.getKey(), ent.getValue()))
                     .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
             final Map<BlockPos, BlockState> structureAutomaticData = structureData
                     .stream()
-                    .filter(ent -> structureInfo != null && structureInfo.isPartOfAutomaticLayer(ent.getKey(), ent.getValue()))
+                    .filter(ent -> blueprintMetadata != null && blueprintMetadata.isPartOfAutomaticLayer(ent.getKey(), ent.getValue()))
                     .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
             return new ServerStructureInfo(structureManualData, structureEntityData, structureAutomaticData, size);

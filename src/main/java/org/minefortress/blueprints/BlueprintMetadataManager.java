@@ -2,40 +2,37 @@ package org.minefortress.blueprints;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.structure.Structure;
-import net.minecraft.util.math.BlockPos;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class BlueprintDataManager {
+public class BlueprintMetadataManager {
 
     private final MinecraftClient client;
 
-    private static final List<StructureInfo> STRUCTURES = Arrays.asList(
-            new StructureInfo("Small House 1", "village/plains/houses/plains_small_house_1", 4, Collections.singletonList(Blocks.OAK_STAIRS)),
-            new StructureInfo("Small House 2", "village/plains/houses/plains_small_house_2", 4, Collections.singletonList(Blocks.OAK_PLANKS)),
-            new StructureInfo("Small House 3", "village/plains/houses/plains_small_house_3", 4, Collections.singletonList(Blocks.OAK_STAIRS)),
-            new StructureInfo("Small House 4", "village/plains/houses/plains_small_house_4", 4, Collections.singletonList(Blocks.OAK_STAIRS)),
-            new StructureInfo("Medium House 1", "village/plains/houses/plains_medium_house_1", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
-            new StructureInfo("Medium House 2", "village/plains/houses/plains_medium_house_2", 3, Collections.singletonList(Blocks.OAK_STAIRS)),
-            new StructureInfo("Big House 1", "village/plains/houses/plains_big_house_1",7 , Collections.singletonList(Blocks.OAK_PLANKS)),
-            new StructureInfo("Butcher Shop 1", "village/plains/houses/plains_butcher_shop_1", 3, Collections.singletonList(Blocks.OAK_STAIRS)),
-            new StructureInfo("Butcher Shop 2", "village/plains/houses/plains_butcher_shop_2", 4, Collections.singletonList(Blocks.OAK_STAIRS))
+    private static final List<BlueprintMetadata> STRUCTURES = Arrays.asList(
+            new BlueprintMetadata("Small House 1", "village/plains/houses/plains_small_house_1", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
+            new BlueprintMetadata("Small House 2", "village/plains/houses/plains_small_house_2", 4, Collections.singletonList(Blocks.OAK_PLANKS)),
+            new BlueprintMetadata("Small House 3", "village/plains/houses/plains_small_house_3", 4, Collections.singletonList(Blocks.OAK_STAIRS)),
+            new BlueprintMetadata("Small House 4", "village/plains/houses/plains_small_house_4", 4, Collections.singletonList(Blocks.OAK_STAIRS)),
+            new BlueprintMetadata("Medium House 1", "village/plains/houses/plains_medium_house_1", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
+            new BlueprintMetadata("Medium House 2", "village/plains/houses/plains_medium_house_2", 3, Collections.singletonList(Blocks.OAK_STAIRS)),
+            new BlueprintMetadata("Big House 1", "village/plains/houses/plains_big_house_1",7 , Collections.singletonList(Blocks.OAK_PLANKS)),
+            new BlueprintMetadata("Butcher Shop 1", "village/plains/houses/plains_butcher_shop_1", 3, Collections.singletonList(Blocks.OAK_STAIRS)),
+            new BlueprintMetadata("Butcher Shop 2", "village/plains/houses/plains_butcher_shop_2", 4, Collections.singletonList(Blocks.OAK_STAIRS))
     );
-
 
     private int index = 0;
 
-    public BlueprintDataManager(MinecraftClient client) {
+    public BlueprintMetadataManager(MinecraftClient client) {
         this.client = client;
     }
 
@@ -60,8 +57,8 @@ public class BlueprintDataManager {
         return (FortressMinecraftClient) this.client;
     }
 
-    public static StructureInfo getByFile(String file) {
-        for(StructureInfo info : STRUCTURES) {
+    public static BlueprintMetadata getByFile(String file) {
+        for(BlueprintMetadata info : STRUCTURES) {
             if(info.getFile().equals(file)) {
                 return info;
             }
