@@ -44,7 +44,7 @@ public class BlueprintManager {
 
     public BlueprintManager(MinecraftClient client) {
         this.client = client;
-        this.blockDataManager = new BlueprintBlockDataManager(client);
+        this.blockDataManager = new BlueprintBlockDataManager(client::getServer);
     }
 
     public void buildStructure(ChunkBuilder chunkBuilder) {

@@ -16,25 +16,23 @@ import net.minecraft.util.math.Vec3i;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class BlueprintBlockDataManager {
 
-    private final MinecraftServer server;
+    private final Supplier<MinecraftServer> serverSupplier;
     private final Map<String, BlueprintBlockData> blueprints = new HashMap<>();
 
-    public BlueprintBlockDataManager(MinecraftServer server) {
-        this.server = server;
-    }
-
-    public BlueprintBlockDataManager(MinecraftClient client) {
-        this.server = client.getServer();
+    public BlueprintBlockDataManager(Supplier<MinecraftServer> serverSupplier) {
+        this.serverSupplier = serverSupplier;
     }
 
     public BlueprintBlockData getBlockData(String fileName, BlockRotation rotation, boolean separateLayers) {
         String key = fileName + ":" + rotation.name() + ":" + separateLayers;
         if (!blueprints.containsKey(key)) {
-            final Structure structure = server
+            final Structure structure = serverSupplier
+                    .get()
                     .getStructureManager()
                     .getStructure(new Identifier(fileName))
                     .orElseThrow(() -> new IllegalArgumentException("Blueprint file not found: " + fileName));
