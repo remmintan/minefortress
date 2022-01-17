@@ -9,11 +9,13 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.renderer.CameraManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.FortressHud;
@@ -31,7 +33,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private SelectionManager selectionManager;
     private CameraManager cameraManager;
     private FortressHud fortressHud;
-    private BlueprintManager blueprintManager;
     private BlueprintMetadataManager blueprintMetadataManager;
 
     @Shadow
@@ -46,6 +47,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Nullable
     public ClientPlayerEntity player;
 
+    @Shadow @Nullable public ClientWorld world;
+
     public FortressMinecraftClientMixin(String string) {
         super(string);
     }
@@ -55,7 +58,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.selectionManager = new SelectionManager((MinecraftClient)(Object)this);
         this.cameraManager = new CameraManager((MinecraftClient)(Object)this);
         this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
-        this.blueprintManager = new BlueprintManager((MinecraftClient)(Object)this);
         this.blueprintMetadataManager = new BlueprintMetadataManager((MinecraftClient)(Object)this);
     }
 
@@ -64,10 +66,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return selectionManager;
     }
 
-    @Override
-    public BlueprintManager getBlueprintManager() {
-        return blueprintManager;
-    }
 
     @Override
     public BlueprintMetadataManager getBlueprintMetadataManager() {
@@ -142,7 +140,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Inject(method="tick", at=@At("TAIL"))
     public void tick(CallbackInfo ci) {
         this.fortressHud.tick();
-        this.blueprintManager.tick();
     }
 
     @Override
@@ -150,5 +147,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return fortressHud;
     }
 
-
+    @Override
+    public BlueprintManager getBlueprintManager() {
+        final ClientWorld world = this.world;
+        if(world != null) {
+            return ((FortressClientWorld) world).getBlueprintManager();
+        } else {
+            throw new IllegalStateException("Client world is null");
+        }
+    }
 }

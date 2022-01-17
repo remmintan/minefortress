@@ -45,10 +45,12 @@ public class BlueprintBlockDataManager {
                     .getRandomBlockInfos(structure.blockInfoLists, BlockPos.ORIGIN)
                     .getAll();
 
-            final Vec3i size = structure.getRotatedSize(rotation);
+            Vec3i size = structure.getRotatedSize(rotation);
             final BlockPos origin = BlockPos.ORIGIN;
             final int biggerSide = Math.max(size.getX(), size.getZ());
             final BlockPos pivot = origin.add(biggerSide / 2, 0, biggerSide / 2);
+
+            size = new Vec3i(biggerSide, size.getY(), biggerSide);
 
             placementData.setPosition(pivot);
 

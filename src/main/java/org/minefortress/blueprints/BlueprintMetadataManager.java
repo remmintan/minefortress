@@ -16,12 +16,12 @@ public class BlueprintMetadataManager {
             new BlueprintMetadata("Small House 1", "village/plains/houses/plains_small_house_1", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
             new BlueprintMetadata("Small House 2", "village/plains/houses/plains_small_house_2", 4, Collections.singletonList(Blocks.OAK_PLANKS)),
             new BlueprintMetadata("Small House 3", "village/plains/houses/plains_small_house_3", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
-            new BlueprintMetadata("Small House 4", "village/plains/houses/plains_small_house_4", 4, Collections.singletonList(Blocks.OAK_STAIRS)),
+            new BlueprintMetadata("Small House 4", "village/plains/houses/plains_small_house_4", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
             new BlueprintMetadata("Medium House 1", "village/plains/houses/plains_medium_house_1", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
-            new BlueprintMetadata("Medium House 2", "village/plains/houses/plains_medium_house_2", 3, Collections.singletonList(Blocks.OAK_STAIRS)),
+            new BlueprintMetadata("Medium House 2", "village/plains/houses/plains_medium_house_2", 3, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
             new BlueprintMetadata("Big House 1", "village/plains/houses/plains_big_house_1",7 , Collections.singletonList(Blocks.OAK_PLANKS)),
-            new BlueprintMetadata("Butcher Shop 1", "village/plains/houses/plains_butcher_shop_1", 3, Collections.singletonList(Blocks.OAK_STAIRS)),
-            new BlueprintMetadata("Butcher Shop 2", "village/plains/houses/plains_butcher_shop_2", 4, Collections.singletonList(Blocks.OAK_STAIRS))
+            new BlueprintMetadata("Butcher Shop 1", "village/plains/houses/plains_butcher_shop_1", 3, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
+            new BlueprintMetadata("Butcher Shop 2", "village/plains/houses/plains_butcher_shop_2", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS))
     );
 
     private int index = 0;
