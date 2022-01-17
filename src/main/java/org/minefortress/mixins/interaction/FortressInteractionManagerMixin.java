@@ -111,7 +111,11 @@ public abstract class FortressInteractionManagerMixin {
                         cir.setReturnValue(returnValue);
                         return;
                     }
-                    fortressClient.getSelectionManager().selectBlock(blockPos, null);
+                    final SelectionManager selectionManager = fortressClient.getSelectionManager();
+                    if(selectionManager.isSelecting()) {
+                        selectionManager.selectBlock(blockPos, null);
+                        cir.setReturnValue(ActionResult.SUCCESS);
+                    }
                 }
             }
         }
