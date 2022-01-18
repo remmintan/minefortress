@@ -5,14 +5,14 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import org.minefortress.network.interfaces.FortressPacket;
+import org.minefortress.network.interfaces.FortressClientPacket;
 import org.minefortress.network.interfaces.FortressServerPacket;
 
 import java.util.function.Function;
 
 public class FortressServerNetworkHelper {
 
-    public static void send(ServerPlayerEntity player, String channelName, FortressPacket packet) {
+    public static void send(ServerPlayerEntity player, String channelName, FortressClientPacket packet) {
         final PacketByteBuf packetByteBuf = PacketByteBufs.create();
         packet.write(packetByteBuf);
 

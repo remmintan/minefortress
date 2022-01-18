@@ -5,22 +5,21 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import org.minefortress.network.interfaces.FortressClientPacket;
-import org.minefortress.network.interfaces.FortressPacket;
+import org.minefortress.network.interfaces.FortressServerPacket;
 
 import java.util.function.Function;
 
 public class FortressClientNetworkHelper {
 
-    public static void send(String channelName, FortressPacket packet) {
+    public static void send(String channelName, FortressServerPacket packet) {
         final PacketByteBuf packetByteBuf = PacketByteBufs.create();
         packet.write(packetByteBuf);
         ClientPlayNetworking.send(new Identifier(FortressChannelNames.NAMESPACE, channelName), packetByteBuf);
     }
 
     public static void registerReceiver(String channelName, Function<PacketByteBuf, FortressClientPacket> packetConstructor) {
-        ClientPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName), (client, handler, buf, sender) -> {
-            packetConstructor.apply(buf).handle(client);
-        });
+        ClientPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName),
+                (client, handler, buf, sender) -> packetConstructor.apply(buf).handle(client));
     }
 
 }

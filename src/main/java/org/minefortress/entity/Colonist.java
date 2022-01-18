@@ -2,12 +2,15 @@ package org.minefortress.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.SlimeEntity;
@@ -15,12 +18,18 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.ColonistNavigation;
@@ -29,8 +38,14 @@ import org.minefortress.entity.ai.controls.MLGControl;
 import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
+import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressSlimeEntity;
+import org.minefortress.network.ClientboundColonistStateChangedPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
+import org.minefortress.village.ColonistStateEnum;
 
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -62,6 +77,11 @@ public class Colonist extends PassiveEntity {
         }
     }
 
+    @Override
+    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
+        sendColonistStateChangePaket(ColonistStateEnum.SPAWNED);
+        return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+    }
 
     @Override
     protected float getBaseMovementSpeedMultiplier() {
@@ -212,6 +232,16 @@ public class Colonist extends PassiveEntity {
         if(this.executeTaskGoal != null) {
             this.executeTaskGoal.returnTask();
         }
+
+        if(world instanceof ServerWorld) {
+            sendColonistStateChangePaket(ColonistStateEnum.REMOVED);
+        }
+    }
+
+    private void sendColonistStateChangePaket(ColonistStateEnum state) {
+        final ClientboundColonistStateChangedPacket packet = new ClientboundColonistStateChangedPacket(state);
+        final ServerPlayerEntity randomAlivePlayer = ((ServerWorld) world).getRandomAlivePlayer();
+        FortressServerNetworkHelper.send(randomAlivePlayer, FortressChannelNames.COLONIST_STATE_CHANGE, packet);
     }
 
     @Override

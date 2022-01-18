@@ -12,6 +12,7 @@ import net.minecraft.world.dimension.DimensionType;
 import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.village.ColonistsManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,6 +26,7 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
 
     private ClientTasksHolder tasksHolder;
     private BlueprintManager blueprintManager;
+    private ColonistsManager colonistsManager;
 
     protected FortressClientWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, DimensionType dimensionType, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
         super(properties, registryRef, dimensionType, profiler, isClient, debugWorld, seed);
@@ -35,6 +37,7 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
     public void constructorHead(ClientPlayNetworkHandler networkHandler, ClientWorld.Properties properties, RegistryKey registryRef, DimensionType dimensionType, int loadDistance, Supplier profiler, WorldRenderer worldRenderer, boolean debugWorld, long seed, CallbackInfo ci) {
         tasksHolder = new ClientTasksHolder((ClientWorld) (Object)this, worldRenderer);
         blueprintManager = new BlueprintManager(MinecraftClient.getInstance());
+        colonistsManager = new ColonistsManager();
     }
 
     @Override
@@ -45,6 +48,11 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
     @Override
     public BlueprintManager getBlueprintManager() {
         return this.blueprintManager;
+    }
+
+    @Override
+    public ColonistsManager getColonistsManager() {
+        return colonistsManager;
     }
 
     @Inject(method = "tick", at = @At("TAIL"))

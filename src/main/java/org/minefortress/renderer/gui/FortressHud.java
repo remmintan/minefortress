@@ -10,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.selections.ClickType;
 import org.minefortress.selections.SelectionManager;
 
 public class FortressHud {
@@ -63,7 +64,7 @@ public class FortressHud {
             DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - rotate left", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
             DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - rotate right", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
         } else {
-            renderSelectTypeName(p, font);
+            renderSelectTypeName(p, font, scaledHeight);
         }
 
 
@@ -92,10 +93,28 @@ public class FortressHud {
         }
     }
 
-    private void renderSelectTypeName(MatrixStack p, TextRenderer font) {
-        String name = getSelectionManager().getCurrentSelectionType().getName();
+    private void renderSelectTypeName(MatrixStack p, TextRenderer font, int scaledHeight) {
+        final SelectionManager selectionManager = getSelectionManager();
+        String name = selectionManager.getCurrentSelectionType().getName();
         String selectionText = "Selection type: " + name;
         renderInfoText(p, font, selectionText);
+
+        if(selectionManager.isSelecting()) {
+            if(selectionManager.getClickType() == ClickType.REMOVE) {
+                DrawableHelper.drawStringWithShadow(p, font, "left click - confirm task", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
+                DrawableHelper.drawStringWithShadow(p, font, "right click - cancel", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+            } else {
+                DrawableHelper.drawStringWithShadow(p, font, "left click - cancel", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
+                DrawableHelper.drawStringWithShadow(p, font, "right click - confirm task", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+            }
+
+            DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - move selection up", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - move selection down", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+        } else {
+            DrawableHelper.drawStringWithShadow(p, font, "left click - start dig selection", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "right click - start build selection", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+        }
+
     }
 
     private void renderInfoText(MatrixStack p, TextRenderer font, String selectionText) {
