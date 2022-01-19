@@ -1,13 +1,11 @@
 package org.minefortress.renderer.gui;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.ClickType;
@@ -67,8 +65,7 @@ public class FortressHud {
             renderSelectTypeName(p, font, scaledHeight);
         }
 
-
-        this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+//        this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
         this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
     }
 
@@ -108,11 +105,11 @@ public class FortressHud {
                 DrawableHelper.drawStringWithShadow(p, font, "right click - confirm task", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
             }
 
-            DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - move selection up", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
-            DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - move selection down", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - move up", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - move down", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
         } else {
-            DrawableHelper.drawStringWithShadow(p, font, "left click - start dig selection", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
-            DrawableHelper.drawStringWithShadow(p, font, "right click - start build selection", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "left click - dig", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "right click - build", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
         }
 
     }

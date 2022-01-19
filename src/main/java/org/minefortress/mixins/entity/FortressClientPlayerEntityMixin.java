@@ -3,14 +3,11 @@ package org.minefortress.mixins.entity;
 import com.chocohead.mm.api.ClassTinkerers;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.input.Input;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.RaycastContext;
@@ -23,8 +20,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
@@ -37,12 +32,6 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     @Shadow public abstract float getYaw(float tickDelta);
 
     @Shadow public abstract float getPitch(float tickDelta);
-
-    @Shadow public Input input;
-
-    @Shadow protected int ticksLeftToDoubleTapSprint;
-
-    @Shadow protected abstract boolean isWalking();
 
     public FortressClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);

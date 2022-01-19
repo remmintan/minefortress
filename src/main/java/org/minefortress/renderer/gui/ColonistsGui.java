@@ -6,11 +6,9 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
-import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressClientWorld;
 
 public class ColonistsGui extends FortressGuiScreen{
@@ -23,12 +21,7 @@ public class ColonistsGui extends FortressGuiScreen{
 
     @Override
     void tick() {
-        final ClientWorld world = client.world;
-        if(world instanceof final FortressClientWorld fortressClientWorld) {
-            colonistsCount = fortressClientWorld.getColonistsManager().getColonistsCount();
-        } else {
-            colonistsCount = 0;
-        }
+
     }
 
     @Override
