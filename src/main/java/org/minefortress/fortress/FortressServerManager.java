@@ -1,7 +1,6 @@
 package org.minefortress.fortress;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
