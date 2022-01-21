@@ -34,25 +34,25 @@ public abstract class FortressServerInteractionManagerMixin {
     @Inject(method = "setGameMode", at = @At(value = "TAIL"))
     protected void setGameMode(GameMode gameMode, GameMode previousGameMode, CallbackInfo ci) {
 
-        if(gameMode == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
-            BlockPos blockPos = player.getBlockPos();
-            AtomicLong spawned = new AtomicLong();
-            world.iterateEntities().forEach(entity -> {
-                if(entity instanceof Colonist && entity.isAlive()) {
-                    spawned.getAndIncrement();
-                }
-            });
-            int needToSpawn = (int)Math.max(DEFAULT_COLONIST_COUNT - spawned.get(), 0);
-
-            EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
-            Iterable<BlockPos> spawnPlaces = BlockPos.iterateRandomly(world.random, needToSpawn, blockPos, 3);
-            for(BlockPos spawnPlace : spawnPlaces) {
-                int spawnY = world.getTopY(Heightmap.Type.WORLD_SURFACE, spawnPlace.getX(), spawnPlace.getZ());
-                BlockPos spawnPos = new BlockPos(spawnPlace.getX(), spawnY, spawnPlace.getZ());
-                colonistType.spawn(world, null, null, player, spawnPos, SpawnReason.MOB_SUMMONED, true, false);
-            }
-
-        }
+//        if(gameMode == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+//            BlockPos blockPos = player.getBlockPos();
+//            AtomicLong spawned = new AtomicLong();
+//            world.iterateEntities().forEach(entity -> {
+//                if(entity instanceof Colonist && entity.isAlive()) {
+//                    spawned.getAndIncrement();
+//                }
+//            });
+//            int needToSpawn = (int)Math.max(DEFAULT_COLONIST_COUNT - spawned.get(), 0);
+//
+//            EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
+//            Iterable<BlockPos> spawnPlaces = BlockPos.iterateRandomly(world.random, needToSpawn, blockPos, 3);
+//            for(BlockPos spawnPlace : spawnPlaces) {
+//                int spawnY = world.getTopY(Heightmap.Type.WORLD_SURFACE, spawnPlace.getX(), spawnPlace.getZ());
+//                BlockPos spawnPos = new BlockPos(spawnPlace.getX(), spawnY, spawnPlace.getZ());
+//                colonistType.spawn(world, null, null, player, spawnPos, SpawnReason.MOB_SUMMONED, true, false);
+//            }
+//
+//        }
 
     }
 }

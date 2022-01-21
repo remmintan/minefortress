@@ -15,6 +15,7 @@ import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.renderer.CameraManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -34,6 +35,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private CameraManager cameraManager;
     private FortressHud fortressHud;
     private BlueprintMetadataManager blueprintMetadataManager;
+    private FortressClientManager fortressClientManager;
 
     @Shadow
     @Final
@@ -59,6 +61,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.cameraManager = new CameraManager((MinecraftClient)(Object)this);
         this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
         this.blueprintMetadataManager = new BlueprintMetadataManager((MinecraftClient)(Object)this);
+        this.fortressClientManager = new FortressClientManager();
     }
 
     @Override
@@ -155,5 +158,10 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         } else {
             throw new IllegalStateException("Client world is null");
         }
+    }
+
+    @Override
+    public FortressClientManager getFortressClientManager() {
+        return fortressClientManager;
     }
 }
