@@ -18,7 +18,11 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
 
     public ClientboundSyncFortressManagerPacket(PacketByteBuf buf) {
         this.colonistsCount = buf.readInt();
-        this.fortressPos = buf.readBlockPos();
+        final boolean centerExists = buf.readBoolean();
+        if(centerExists)
+            this.fortressPos = buf.readBlockPos();
+        else
+            this.fortressPos = null;
     }
 
     @Override
@@ -31,6 +35,9 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeInt(colonistsCount);
-        buf.writeBlockPos(fortressPos);
+        final boolean centerExists = fortressPos != null;
+        buf.writeBoolean(centerExists);
+        if(centerExists)
+            buf.writeBlockPos(fortressPos);
     }
 }

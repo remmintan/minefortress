@@ -7,6 +7,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.ClickType;
 import org.minefortress.selections.SelectionManager;
@@ -33,7 +34,7 @@ public class FortressHud {
 
     private SelectionManager getSelectionManager() {
         if(this.selectionManager == null)
-            this.selectionManager = ((FortressMinecraftClient) client).getSelectionManager();
+            this.selectionManager = getFortressClient().getSelectionManager();
 
         return this.selectionManager;
     }
@@ -49,10 +50,23 @@ public class FortressHud {
 
         prepareRenderSystem();
 
-        renderWatermarks(p, font, scaledWidth, scaledHeight);
+        final FortressMinecraftClient fortressClient = getFortressClient();
+        final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
-        final FortressMinecraftClient client = (FortressMinecraftClient) this.client;
-        final BlueprintManager blueprintManager = client.getBlueprintManager();
+        renderWatermarks(p, font, scaledWidth, scaledHeight);
+        renderHints(p, scaledHeight, font);
+
+        if(!fortressManager.isFortressInitializationNeeded()) {
+            this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+            this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+        } else {
+            DrawableHelper.drawStringWithShadow(p, font, "Choose where to place your Fortress", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "right click - set fortress center", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+        }
+    }
+
+    private void renderHints(MatrixStack p, int scaledHeight, TextRenderer font) {
+        final BlueprintManager blueprintManager = getBlueprintManager();
         if(blueprintManager.hasSelectedBlueprint()) {
             final String selectedBlueprintName = blueprintManager.getSelectedStructureName();
             renderInfoText(p, font, "Blueprint: " + selectedBlueprintName);
@@ -61,12 +75,19 @@ public class FortressHud {
             DrawableHelper.drawStringWithShadow(p, font, "ctrl + R - next blueprint", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
             DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - rotate left", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
             DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - rotate right", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
-        } else {
-            renderSelectTypeName(p, font, scaledHeight);
+            return;
         }
 
-        this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
-        this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+        renderSelectTypeName(p, font, scaledHeight);
+    }
+
+    private BlueprintManager getBlueprintManager() {
+        final FortressMinecraftClient client = getFortressClient();
+        return client.getBlueprintManager();
+    }
+
+    private FortressMinecraftClient getFortressClient() {
+        return (FortressMinecraftClient) this.client;
     }
 
     private void prepareRenderSystem() {

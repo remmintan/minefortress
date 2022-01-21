@@ -26,4 +26,8 @@ public final class FortressClientManager {
     public boolean isInitialized() {
         return initialized;
     }
+
+    public boolean isFortressInitializationNeeded() {
+        return initialized && fortressCenter == null;
+    }
 }
