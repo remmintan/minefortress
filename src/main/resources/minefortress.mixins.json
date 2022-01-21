@@ -13,7 +13,6 @@
     "interaction.FortressInteractionManagerMixin",
     "interaction.FortressKeyboardInputMixin",
     "interaction.FortressMouseMixin",
-    "interaction.FortressServerInteractionManagerMixin",
     "interaction.FortressTutorialManagerMixin",
     "interfaces.FortressDimensionTypeMixin",
     "network.FortressServerPlayNetworkHandlerMixin",

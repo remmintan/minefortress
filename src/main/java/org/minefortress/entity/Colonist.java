@@ -18,6 +18,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Hand;
@@ -34,10 +35,12 @@ import org.minefortress.entity.ai.controls.MLGControl;
 import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.BiPredicate;
 
 public class Colonist extends PassiveEntity {
@@ -50,6 +53,8 @@ public class Colonist extends PassiveEntity {
     private final MLGControl mlgControl;
 
     private ColonistExecuteTaskGoal executeTaskGoal;
+
+    private UUID masterPlayerId;
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
         super(entityType, world);
@@ -69,6 +74,12 @@ public class Colonist extends PassiveEntity {
 
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
+        if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
+        this.masterPlayerId = entityNbt.getUuid("playerId");
+        final ServerPlayerEntity player = getServer().getPlayerManager().getPlayer(this.masterPlayerId);
+        if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
+            fortressServerPlayer.getFortressServerManager().addColonist();
+        }
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
 
@@ -220,6 +231,12 @@ public class Colonist extends PassiveEntity {
         super.remove(p_146876_);
         if(this.executeTaskGoal != null) {
             this.executeTaskGoal.returnTask();
+        }
+        if(this.masterPlayerId != null) {
+            final ServerPlayerEntity player = getServer().getPlayerManager().getPlayer(this.masterPlayerId);
+            if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
+                fortressServerPlayer.getFortressServerManager().removeColonist();
+            }
         }
     }
 
