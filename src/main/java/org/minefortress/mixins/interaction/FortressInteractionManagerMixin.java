@@ -108,7 +108,7 @@ public abstract class FortressInteractionManagerMixin {
                 final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
                 final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
                 if(fortressManager.isFortressInitializationNeeded()) {
-                    fortressManager.setupFortressCenter(blockPos);
+                    fortressManager.setupFortressCenter();
                     cir.setReturnValue(ActionResult.SUCCESS);
                     return;
                 }

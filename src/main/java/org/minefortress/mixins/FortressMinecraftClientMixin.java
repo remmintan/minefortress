@@ -10,6 +10,9 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +53,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     public ClientPlayerEntity player;
 
     @Shadow @Nullable public ClientWorld world;
+
+    @Shadow @Nullable public HitResult crosshairTarget;
 
     public FortressMinecraftClientMixin(String string) {
         super(string);
@@ -143,6 +148,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Inject(method="tick", at=@At("TAIL"))
     public void tick(CallbackInfo ci) {
         this.fortressHud.tick();
+        this.fortressClientManager.tick(this);
     }
 
     @Override
@@ -163,5 +169,15 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public FortressClientManager getFortressClientManager() {
         return fortressClientManager;
+    }
+
+    @Override
+    public BlockPos getHoveredBlockPos() {
+        final HitResult hitResult = this.crosshairTarget;
+        if(hitResult instanceof BlockHitResult) {
+            return ((BlockHitResult) hitResult).getBlockPos();
+        } else {
+            return null;
+        }
     }
 }

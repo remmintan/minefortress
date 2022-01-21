@@ -1,5 +1,6 @@
 package org.minefortress.interfaces;
 
+import net.minecraft.util.math.BlockPos;
 import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
@@ -15,5 +16,6 @@ public interface FortressMinecraftClient {
     FortressClientManager getFortressClientManager();
     boolean isNotFortressGamemode();
     boolean isFortressGamemode();
+    BlockPos getHoveredBlockPos();
 
 }

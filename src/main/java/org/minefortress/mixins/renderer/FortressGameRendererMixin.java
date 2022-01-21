@@ -1,12 +1,16 @@
 package org.minefortress.mixins.renderer;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressGameRenderer;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.SelectionManager;
@@ -42,12 +46,21 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         if(fortressClient.isFortressGamemode())  {
             if(this.client.crosshairTarget != null && this.client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
                 BlockHitResult blockHitResult = (BlockHitResult) this.client.crosshairTarget;
+
+                final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
+                if(fortressClientManager.isFortressInitializationNeeded()) {
+                    resetSelection(selectionManager);
+                    fortressClientManager.updateRenderer(client.worldRenderer);
+                    return;
+                }
+
                 final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
                 if(blueprintManager.hasSelectedBlueprint()) {
                     resetSelection(selectionManager);
-                } else {
-                    selectionManager.tickSelectionUpdate(blockHitResult.getBlockPos(), blockHitResult.getSide());
+                    return;
                 }
+
+                selectionManager.tickSelectionUpdate(blockHitResult.getBlockPos(), blockHitResult.getSide());
             }
         } else {
             resetSelection(selectionManager);
