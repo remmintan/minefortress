@@ -15,7 +15,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -76,6 +78,11 @@ public abstract class FortressInteractionManagerMixin {
         if(getCurrentGameMode() == FORTRESS) {
             final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
             final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+            final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+            if(fortressManager.isFortressInitializationNeeded()) {
+                cir.setReturnValue(true);
+                return;
+            }
             if(blueprintManager.hasSelectedBlueprint()) {
                blueprintManager.clearStructure();
             } else {
@@ -99,23 +106,30 @@ public abstract class FortressInteractionManagerMixin {
             if(world.getWorldBorder().contains(blockPos)) {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
                 final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+                final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+                if(fortressManager.isFortressInitializationNeeded()) {
+                    fortressManager.setupFortressCenter(blockPos);
+                    cir.setReturnValue(ActionResult.SUCCESS);
+                    return;
+                }
+
                 if(blueprintManager.hasSelectedBlueprint()) {
                     blueprintManager.buildCurrentStructure(blockPos);
                     cir.setReturnValue(ActionResult.SUCCESS);
-                } else {
-                    Item item = player.getStackInHand(hand).getItem();
-                    ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);
-                    final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
-                    if(blockStateFromItem != null) {
-                        final ActionResult returnValue = clickBuild(useoncontext, blockStateFromItem);
-                        cir.setReturnValue(returnValue);
-                        return;
-                    }
-                    final SelectionManager selectionManager = fortressClient.getSelectionManager();
-                    if(selectionManager.isSelecting()) {
-                        selectionManager.selectBlock(blockPos, null);
-                        cir.setReturnValue(ActionResult.SUCCESS);
-                    }
+                    return;
+                }
+                Item item = player.getStackInHand(hand).getItem();
+                ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);
+                final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
+                if(blockStateFromItem != null) {
+                    final ActionResult returnValue = clickBuild(useoncontext, blockStateFromItem);
+                    cir.setReturnValue(returnValue);
+                    return;
+                }
+                final SelectionManager selectionManager = fortressClient.getSelectionManager();
+                if(selectionManager.isSelecting()) {
+                    selectionManager.selectBlock(blockPos, null);
+                    cir.setReturnValue(ActionResult.SUCCESS);
                 }
             }
         }

@@ -9,6 +9,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.minefortress.entity.Colonist;
 import org.minefortress.network.ServerboundCancelTaskPacket;
+import org.minefortress.network.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.ServerboundSimpleSelectionTaskPacket;
 import org.minefortress.network.ServerboundBlueprintTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -32,5 +33,6 @@ public class MineFortressMod implements ModInitializer {
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.NEW_SELECTION_TASK, ServerboundSimpleSelectionTaskPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.NEW_BLUEPRINT_TASK, ServerboundBlueprintTaskPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.CANCEL_TASK, ServerboundCancelTaskPacket::new);
+        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SET_CENTER, ServerboundFortressCenterSetPacket::new);
     }
 }
