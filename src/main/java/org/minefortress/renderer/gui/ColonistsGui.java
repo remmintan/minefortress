@@ -9,7 +9,9 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.interfaces.FortressMinecraftClient;
 
 public class ColonistsGui extends FortressGuiScreen{
 
@@ -21,11 +23,17 @@ public class ColonistsGui extends FortressGuiScreen{
 
     @Override
     void tick() {
+        final FortressClientManager fortressManager = getFortressClientManager();
+        if(!fortressManager.isInitialized()) return;
 
+        colonistsCount = fortressManager.getColonistsCount();
     }
 
     @Override
     void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
+        final FortressClientManager fortressManager = getFortressClientManager();
+        if(!fortressManager.isInitialized()) return;
+
         final String colonistsCountString = "x" + colonistsCount;
 
         final int iconX = screenWidth / 2 - 91;
@@ -49,6 +57,12 @@ public class ColonistsGui extends FortressGuiScreen{
         if(this.isHovered()) {
             super.renderTooltip(p, Text.of("Your Pawns count"), (int)mouseX, (int)mouseY);
         }
+    }
+
+    private FortressClientManager getFortressClientManager() {
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+        return fortressManager;
     }
 
     @Override

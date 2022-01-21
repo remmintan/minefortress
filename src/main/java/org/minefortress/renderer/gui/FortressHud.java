@@ -65,7 +65,7 @@ public class FortressHud {
             renderSelectTypeName(p, font, scaledHeight);
         }
 
-//        this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+        this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
         this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
     }
 
