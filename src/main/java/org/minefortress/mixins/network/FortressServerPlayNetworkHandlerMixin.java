@@ -1,9 +1,7 @@
 package org.minefortress.mixins.network;
 
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -21,11 +19,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.registries.FortressEntities;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import javax.swing.border.CompoundBorder;
 
 import static org.minefortress.MineFortressConstants.PICK_DISTANCE;
 
@@ -47,6 +50,7 @@ public class FortressServerPlayNetworkHandlerMixin {
         int i = this.player.world.getTopY();
         if (blockPos.getY() < i) {
             if (this.requestedTeleportPos == null && this.player.squaredDistanceTo((double)blockPos.getX() + 0.5, (double)blockPos.getY() + 0.5, (double)blockPos.getZ() + 0.5) < PICK_DISTANCE*PICK_DISTANCE && serverWorld.canPlayerModifyAt(this.player, blockPos)) {
+                this.addCustomNbtToStack(itemStack);
                 ActionResult actionResult = this.player.interactionManager.interactBlock(this.player, serverWorld, itemStack, hand, blockHitResult);
                 if (direction == Direction.UP && !actionResult.isAccepted() && blockPos.getY() >= i - 1 && FortressServerPlayNetworkHandlerMixin.canPlace(this.player, itemStack)) {
                     MutableText text = new TranslatableText("build.tooHigh", i - 1).formatted(Formatting.RED);
@@ -67,6 +71,26 @@ public class FortressServerPlayNetworkHandlerMixin {
         }
         Item item = stack.getItem();
         return (item instanceof BlockItem || item instanceof BucketItem) && !player.getItemCooldownManager().isCoolingDown(item);
+    }
+
+    private void addCustomNbtToStack(ItemStack stack) {
+        if(stack == null) return;
+        if(stack.getItem() instanceof SpawnEggItem eggItem) {
+            if(eggItem.getEntityType(stack.getNbt()) != FortressEntities.COLONIST_ENTITY_TYPE) return;
+            if(stack.getNbt() == null) stack.setNbt(new NbtCompound());
+            if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
+                final NbtCompound nbt = stack.getNbt();
+                nbt.putUuid("playerId", player.getUuid());
+
+                final FortressServerManager fortressManager = fortressServerPlayer.getFortressServerManager();
+                final BlockPos fortressCenter = fortressManager.getFortressCenter();
+                if(fortressCenter != null) {
+                    nbt.putInt("centerX", fortressCenter.getX());
+                    nbt.putInt("centerY", fortressCenter.getY());
+                    nbt.putInt("centerZ", fortressCenter.getZ());
+                }
+            }
+        }
     }
 
 }

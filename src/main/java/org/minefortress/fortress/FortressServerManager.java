@@ -96,4 +96,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.scheduleSync();
     }
 
+    public BlockPos getFortressCenter() {
+        return fortressCenter;
+    }
 }
