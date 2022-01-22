@@ -1,9 +1,12 @@
 package org.minefortress.fortress;
 
+import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.GameMode;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -16,6 +19,8 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private BlockPos fortressCenter = null;
     private int colonistsCount = 0;
+
+    private FortressToast setCenterToast;
 
     private BlockPos posAppropriateForCenter;
     private BlockPos oldPosAppropriateForCenter;
@@ -32,8 +37,26 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public void tick(FortressMinecraftClient fortressClient) {
         final MinecraftClient client = (MinecraftClient) fortressClient;
+        if(
+                client.world == null ||
+                client.interactionManager == null ||
+                client.interactionManager.getCurrentGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS")
+        ) {
+            if(setCenterToast != null) {
+                setCenterToast.hide();
+                setCenterToast = null;
+            }
+
+            posAppropriateForCenter = null;
+            return;
+        }
         if(!initialized) return;
         if(isFortressInitializationNeeded()) {
+            if(setCenterToast == null) {
+                this.setCenterToast = new FortressToast("Set up your Fortress", "Right-click to place", Items.CAMPFIRE);
+                client.getToastManager().add(setCenterToast);
+            }
+
             final BlockPos hoveredBlockPos = fortressClient.getHoveredBlockPos();
             if(hoveredBlockPos!=null && !hoveredBlockPos.equals(BlockPos.ORIGIN)) {
                 if(hoveredBlockPos.equals(oldPosAppropriateForCenter)) return;
@@ -65,6 +88,8 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public void setupFortressCenter() {
         if(fortressCenter!=null) throw new IllegalStateException("Fortress center already set");
+        this.setCenterToast.hide();
+        this.setCenterToast = null;
         fortressCenter = posAppropriateForCenter;
         posAppropriateForCenter = null;
         final ServerboundFortressCenterSetPacket serverboundFortressCenterSetPacket = new ServerboundFortressCenterSetPacket(fortressCenter);

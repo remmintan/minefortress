@@ -5,6 +5,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.tutorial.TutorialManager;
+import net.minecraft.client.tutorial.TutorialStep;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
@@ -35,6 +37,8 @@ public abstract class FortressInteractionManagerMixin {
 
     private static final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
 
+    private TutorialStep oldStep;
+
     @Shadow
     @Final
     private MinecraftClient client;
@@ -59,10 +63,7 @@ public abstract class FortressInteractionManagerMixin {
         }
     }
 
-    private void unsetFortressMode() {
-        client.mouse.lockCursor();
-        client.gameRenderer.setRenderHand(true);
-    }
+
 
     @Inject(method = "setGameMode", at = @At("RETURN"))
     public void setGameMode(GameMode gameMode, CallbackInfo ci) {
@@ -163,6 +164,14 @@ public abstract class FortressInteractionManagerMixin {
     private void setFortressMode() {
         client.mouse.unlockCursor();
         client.gameRenderer.setRenderHand(false);
+
+        final TutorialManager tutorialManager = client.getTutorialManager();
+        tutorialManager.setStep(TutorialStep.NONE);
+    }
+
+    private void unsetFortressMode() {
+        client.mouse.lockCursor();
+        client.gameRenderer.setRenderHand(true);
     }
 
 }
