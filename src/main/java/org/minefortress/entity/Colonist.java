@@ -35,6 +35,7 @@ import org.minefortress.entity.ai.controls.MLGControl;
 import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
+import org.minefortress.entity.ai.goal.ReturnToFireGoal;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
@@ -55,6 +56,7 @@ public class Colonist extends PassiveEntity {
     private ColonistExecuteTaskGoal executeTaskGoal;
 
     private UUID masterPlayerId;
+    private BlockPos fortressCenter;
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
         super(entityType, world);
@@ -76,11 +78,20 @@ public class Colonist extends PassiveEntity {
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
         this.masterPlayerId = entityNbt.getUuid("playerId");
+        int centerX = entityNbt.getInt("centerX");
+        int centerY = entityNbt.getInt("centerY");
+        int centerZ = entityNbt.getInt("centerZ");
+        this.fortressCenter = new BlockPos(centerX, centerY, centerZ);
+
         final ServerPlayerEntity player = getServer().getPlayerManager().getPlayer(this.masterPlayerId);
         if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
             fortressServerPlayer.getFortressServerManager().addColonist();
         }
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+    }
+
+    public BlockPos getFortressCenter() {
+        return fortressCenter;
     }
 
     @Override
@@ -174,7 +185,7 @@ public class Colonist extends PassiveEntity {
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 7.0D)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2F)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 64f)
-                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 3f)
+                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 0f)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED, 100f)
                 .add(EntityAttributes.GENERIC_LUCK, 1024f);
     }
@@ -186,7 +197,6 @@ public class Colonist extends PassiveEntity {
         return new ColonistNavigation(this, p_21480_);
     }
 
-
     @Override
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
@@ -194,8 +204,9 @@ public class Colonist extends PassiveEntity {
         this.goalSelector.add(3, new MeleeAttackGoal(this, 1.5, true));
         executeTaskGoal  = new ColonistExecuteTaskGoal(this);
         this.goalSelector.add(6, executeTaskGoal);
-        this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0D));
-        this.goalSelector.add(8, new LookAroundGoal(this));
+        this.goalSelector.add(7, new ReturnToFireGoal(this));
+        this.goalSelector.add(8, new WanderAroundFarGoal(this, 1.0D));
+        this.goalSelector.add(9, new LookAroundGoal(this));
 
         this.targetSelector.add(1, new RevengeGoal(this).setGroupRevenge());
     }
@@ -356,5 +367,25 @@ public class Colonist extends PassiveEntity {
     @Override
     public boolean isPushedByFluids() {
         return !this.isHasTask();
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        nbt.putUuid("playerId", this.masterPlayerId);
+        if(this.fortressCenter != null) {
+            nbt.putInt("fortressCenterX", this.fortressCenter.getX());
+            nbt.putInt("fortressCenterY", this.fortressCenter.getY());
+            nbt.putInt("fortressCenterZ", this.fortressCenter.getZ());
+        }
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        this.masterPlayerId = nbt.getUuid("playerId");
+        if(nbt.contains("fortressCenterX")) {
+            this.fortressCenter = new BlockPos(nbt.getInt("fortressCenterX"), nbt.getInt("fortressCenterY"), nbt.getInt("fortressCenterZ"));
+        }
     }
 }

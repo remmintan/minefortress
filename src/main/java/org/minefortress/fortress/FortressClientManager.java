@@ -1,9 +1,8 @@
 package org.minefortress.fortress;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundFortressCenterSetPacket;
@@ -11,7 +10,7 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.tasks.BuildingManager;
 
-public final class FortressClientManager {
+public final class FortressClientManager extends AbstractFortressManager {
 
     private boolean initialized = false;
 
@@ -36,24 +35,21 @@ public final class FortressClientManager {
         if(!initialized) return;
         if(isFortressInitializationNeeded()) {
             final BlockPos hoveredBlockPos = fortressClient.getHoveredBlockPos();
-            if(hoveredBlockPos!=null) {
+            if(hoveredBlockPos!=null && !hoveredBlockPos.equals(BlockPos.ORIGIN)) {
                 if(hoveredBlockPos.equals(oldPosAppropriateForCenter)) return;
 
-                final BlockPos cursor = hoveredBlockPos.mutableCopy();
+                BlockPos cursor = hoveredBlockPos;
                 while (!BuildingManager.canPlaceBlock(client.world, cursor))
-                    cursor.up();
+                    cursor = cursor.up();
 
-                while (BuildingManager.canPlaceBlock(client.world, cursor.toImmutable().down()))
-                    cursor.down();
+                while (BuildingManager.canPlaceBlock(client.world, cursor.down()))
+                    cursor = cursor.down();
 
                 posAppropriateForCenter = cursor.toImmutable();
             }
         }
     }
 
-    public BlockState getStateForCampCenter() {
-        return Blocks.CAMPFIRE.getDefaultState();
-    }
 
     public BlockPos getPosAppropriateForCenter() {
         return posAppropriateForCenter;
@@ -73,6 +69,16 @@ public final class FortressClientManager {
         posAppropriateForCenter = null;
         final ServerboundFortressCenterSetPacket serverboundFortressCenterSetPacket = new ServerboundFortressCenterSetPacket(fortressCenter);
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_CENTER, serverboundFortressCenterSetPacket);
+
+        final MinecraftClient client = MinecraftClient.getInstance();
+        final ClientWorld world = client.world;
+        final WorldRenderer worldRenderer = client.worldRenderer;
+
+
+        if(worldRenderer!=null) {
+            worldRenderer.scheduleBlockRenders(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ());
+            worldRenderer.scheduleTerrainUpdate();
+        }
     }
 
     public void updateRenderer(WorldRenderer worldRenderer) {

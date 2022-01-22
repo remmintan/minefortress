@@ -23,12 +23,11 @@
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
     "renderer.FortressWorldSliceMixin",
-    "world.FortressClientWorldMixin"
-  ],
-  "server": [
+    "world.FortressClientWorldMixin",
     "entity.FortressServerPlayerEntityMixin",
     "world.FortressServerWorldMixin"
   ],
+  "server": [],
   "injectors": {
     "defaultRequire": 1
   }

@@ -54,14 +54,15 @@ public class FortressHud {
         final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
         renderWatermarks(p, font, scaledWidth, scaledHeight);
-        renderHints(p, scaledHeight, font);
+
 
         if(!fortressManager.isFortressInitializationNeeded()) {
+            renderHints(p, scaledHeight, font);
             this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
         } else {
-            DrawableHelper.drawStringWithShadow(p, font, "Choose where to place your Fortress", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
-            DrawableHelper.drawStringWithShadow(p, font, "right click - set fortress center", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "Choose where to place your Fortress", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "right click - set fortress center", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
         }
     }
 

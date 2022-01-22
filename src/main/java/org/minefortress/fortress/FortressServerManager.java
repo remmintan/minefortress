@@ -8,17 +8,18 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 
 import java.util.UUID;
 
-public final class FortressServerManager {
+public final class FortressServerManager extends AbstractFortressManager {
 
     private static final int DEFAULT_COLONIST_COUNT = 5;
 
-    private boolean needSync = false;
+    private boolean needSync = true;
 
     private BlockPos fortressCenter = null;
     private int colonistsCount = 0;
@@ -44,17 +45,21 @@ public final class FortressServerManager {
         if(!(world instanceof ServerWorld serverWorld))
             throw new IllegalArgumentException("World must be a server world");
 
+        world.setBlockState(fortressCenter, getStateForCampCenter(), 3);
+        world.emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
+
         final NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putUuid("playerId", player.getUuid());
+        nbtCompound.putInt("centerX", fortressCenter.getX());
+        nbtCompound.putInt("centerY", fortressCenter.getY());
+        nbtCompound.putInt("centerZ", fortressCenter.getZ());
 
-        for (int i = 0; i < DEFAULT_COLONIST_COUNT; i++) {
-            EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
-            Iterable<BlockPos> spawnPlaces = BlockPos.iterateRandomly(world.random, DEFAULT_COLONIST_COUNT, fortressCenter, 3);
-            for(BlockPos spawnPlace : spawnPlaces) {
-                int spawnY = world.getTopY(Heightmap.Type.WORLD_SURFACE, spawnPlace.getX(), spawnPlace.getZ());
-                BlockPos spawnPos = new BlockPos(spawnPlace.getX(), spawnY, spawnPlace.getZ());
-                colonistType.spawn(serverWorld, nbtCompound, null, player, spawnPos, SpawnReason.MOB_SUMMONED, true, false);
-            }
+        EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
+        Iterable<BlockPos> spawnPlaces = BlockPos.iterateRandomly(world.random, DEFAULT_COLONIST_COUNT, fortressCenter, 3);
+        for(BlockPos spawnPlace : spawnPlaces) {
+            int spawnY = world.getTopY(Heightmap.Type.WORLD_SURFACE, spawnPlace.getX(), spawnPlace.getZ());
+            BlockPos spawnPos = new BlockPos(spawnPlace.getX(), spawnY, spawnPlace.getZ());
+            colonistType.spawn(serverWorld, nbtCompound, null, player, spawnPos, SpawnReason.MOB_SUMMONED, true, false);
         }
 
         this.scheduleSync();
