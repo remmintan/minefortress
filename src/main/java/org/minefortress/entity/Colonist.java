@@ -383,6 +383,7 @@ public class Colonist extends PassiveEntity {
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
+        if(nbt == null) return;
         this.masterPlayerId = nbt.getUuid("playerId");
         if(nbt.contains("fortressCenterX")) {
             this.fortressCenter = new BlockPos(nbt.getInt("fortressCenterX"), nbt.getInt("fortressCenterY"), nbt.getInt("fortressCenterZ"));

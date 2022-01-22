@@ -10,7 +10,7 @@ import java.util.Random;
 public class ReturnToFireGoal extends Goal {
 
     private final Random random = new Random();
-    private static final int HOME_RADIUS = 5;
+    private static final int HOME_RADIUS = 4;
     private final Colonist colonist;
 
     public ReturnToFireGoal(Colonist colonist) {
