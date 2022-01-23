@@ -24,10 +24,6 @@ public final class FortressServerManager extends AbstractFortressManager {
     private BlockPos fortressCenter = null;
     private int colonistsCount = 0;
 
-    public FortressServerManager(UUID playerId) {
-        if(playerId == null) throw new IllegalArgumentException("Player ID cannot be null");
-    }
-
     public void addColonist() {
         colonistsCount++;
         scheduleSync();

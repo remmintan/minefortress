@@ -38,7 +38,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method="<init>", at=@At("RETURN"))
     public void init(MinecraftServer server, ServerWorld world, GameProfile profile, CallbackInfo ci) {
-        fortressServerManager = new FortressServerManager(this.getUuid());
+        fortressServerManager = new FortressServerManager();
     }
 
     @Inject(method="tick", at=@At("TAIL"))
@@ -76,5 +76,12 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         }
 
         ci.cancel();
+    }
+
+    @Inject(method = "copyFrom", at = @At("TAIL"))
+    public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
+        if(oldPlayer instanceof FortressServerPlayerEntity fortressServerPlayer) {
+            this.fortressServerManager = fortressServerPlayer.getFortressServerManager();
+        }
     }
 }
