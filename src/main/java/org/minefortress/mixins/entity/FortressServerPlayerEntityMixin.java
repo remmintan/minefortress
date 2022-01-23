@@ -69,8 +69,8 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         final GameMode gameMode = this.interactionManager.getGameMode();
         if(gameMode != ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) return;
 
-        if(target instanceof LivingEntity livingEntity) {
-            final int id = livingEntity.getId();
+        if(target instanceof Colonist colonist) {
+            final int id = colonist.getId();
             final ClientboundFollowColonistPacket packet = new ClientboundFollowColonistPacket(id);
             FortressServerNetworkHelper.send((ServerPlayerEntity) (Object)this, FortressChannelNames.FORTRESS_FOLLOW_COLONIST, packet);
         }

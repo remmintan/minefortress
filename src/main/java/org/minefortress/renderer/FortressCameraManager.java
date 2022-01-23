@@ -12,6 +12,8 @@ import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.RaycastContext;
+import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.interfaces.FortressMinecraftClient;
 
 public class FortressCameraManager {
 
@@ -23,39 +25,18 @@ public class FortressCameraManager {
     private boolean yRotDirty = false;
     private Float moveDistance = null;
 
-    private LivingEntity followingEntity = null;
-    private Vec3d followingEntityDelta = null;
-
     public FortressCameraManager(MinecraftClient minecraft) {
         this.minecraft = minecraft;
-    }
-
-    public void setFollowEntity(LivingEntity entity) {
-        this.followingEntity = entity;
-        final Vec3d entityPos = entity.getPos();
-        final Vec3d playerPos = minecraft.player.getPos();
-
-        followingEntityDelta = entityPos.subtract(playerPos);
-    }
-
-    public boolean isFollowingEntity() {
-        return followingEntity != null;
-    }
-
-    public void stopFollowingEntity() {
-        this.followingEntity = null;
     }
 
     public void updateCameraPosition() {
         ClientPlayerEntity player = this.minecraft.player;
         if(player != null) {
-            if(isFollowingEntity()) {
-                if(followingEntity.isAlive()) {
-                    final Vec3d newPlayerPos = followingEntity.getPos().subtract(followingEntityDelta);
-                    player.setPosition(newPlayerPos);
-                } else {
-                    stopFollowingEntity();
-                }
+            final FortressMinecraftClient minecraft = (FortressMinecraftClient) this.minecraft;
+            final FortressClientManager fortressClientManager = minecraft.getFortressClientManager();
+
+            if(fortressClientManager.isSelectingColonist()) {
+                player.setPosition(fortressClientManager.getProperCameraPosition());
             }
             updateCameraFromInput(player);
         }

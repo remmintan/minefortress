@@ -6,7 +6,9 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -25,6 +27,31 @@ public final class FortressClientManager extends AbstractFortressManager {
     private BlockPos posAppropriateForCenter;
     private BlockPos oldPosAppropriateForCenter;
 
+    private Colonist selectedColonist;
+    private Vec3d selectedColonistDelta;
+
+    public void select(Colonist colonist) {
+        this.selectedColonist = colonist;
+        final Vec3d entityPos = colonist.getPos();
+        final Vec3d playerPos = MinecraftClient.getInstance().player.getPos();
+
+        selectedColonistDelta = entityPos.subtract(playerPos);
+    }
+
+    public boolean isSelectingColonist() {
+        return selectedColonist != null;
+    }
+
+    public void stopSelectingColonist() {
+        this.selectedColonist = null;
+        this.selectedColonistDelta = null;
+    }
+
+    public Vec3d getProperCameraPosition() {
+        if(!isSelectingColonist()) throw new IllegalStateException("No colonist selected");
+        return this.selectedColonist.getPos().subtract(selectedColonistDelta);
+    }
+
     public int getColonistsCount() {
         return colonistsCount;
     }
@@ -36,6 +63,8 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public void tick(FortressMinecraftClient fortressClient) {
+        if(isSelectingColonist() && selectedColonist.isDead()) stopSelectingColonist();
+
         final MinecraftClient client = (MinecraftClient) fortressClient;
         if(
                 client.world == null ||

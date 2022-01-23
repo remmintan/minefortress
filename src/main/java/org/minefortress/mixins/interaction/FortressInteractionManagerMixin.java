@@ -79,10 +79,9 @@ public abstract class FortressInteractionManagerMixin {
             final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
             final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
             final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
-            final FortressCameraManager cameraManager = fortressClient.getCameraManager();
 
-            if(cameraManager.isFollowingEntity()){
-                cameraManager.stopFollowingEntity();
+            if(fortressManager.isSelectingColonist()){
+                fortressManager.stopSelectingColonist();
                 cir.setReturnValue(false);
                 return;
             }

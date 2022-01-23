@@ -172,11 +172,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public FortressCameraManager getCameraManager() {
-        return fortressCameraManager;
-    }
-
-    @Override
     public BlockPos getHoveredBlockPos() {
         final HitResult hitResult = this.crosshairTarget;
         if(hitResult instanceof BlockHitResult) {

@@ -5,6 +5,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketByteBuf;
+import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressClientPacket;
 
@@ -27,10 +28,10 @@ public class ClientboundFollowColonistPacket implements FortressClientPacket {
             if(world == null) throw new NullPointerException("Client world is null");
             final Entity entity = world.getEntityById(entityId);
             if(entity == null) throw new NullPointerException("Entity with id " + entityId + " does not exist!");
-            if(entity instanceof LivingEntity livingEntity) {
-                fortressMinecraftClient.getCameraManager().setFollowEntity(livingEntity);
+            if(entity instanceof Colonist livingEntity) {
+                fortressMinecraftClient.getFortressClientManager().select(livingEntity);
             } else {
-                throw new IllegalArgumentException("Entity with id " + entityId + " is not a living entity!");
+                throw new IllegalArgumentException("Entity with id " + entityId + " is not a Colonist!");
             }
         }
     }
