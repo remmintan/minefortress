@@ -1,5 +1,7 @@
 package org.minefortress.mixins.network;
 
+import com.chocohead.mm.api.ClassTinkerers;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.MessageType;
@@ -18,6 +20,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -26,11 +29,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.swing.border.CompoundBorder;
-
 import static org.minefortress.MineFortressConstants.PICK_DISTANCE;
+import static org.minefortress.MineFortressConstants.PICK_DISTANCE_FLOAT;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class FortressServerPlayNetworkHandlerMixin {
@@ -63,6 +66,14 @@ public class FortressServerPlayNetworkHandlerMixin {
             this.player.networkHandler.sendPacket(new BlockUpdateS2CPacket(serverWorld, blockPos.offset(direction)));
             ci.cancel();
         }
+    }
+
+    @Redirect(method = "onPlayerInteractEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;squaredDistanceTo(Lnet/minecraft/entity/Entity;)D"))
+    public double playerInteractEntitySquareDistance(ServerPlayerEntity instance, Entity entity) {
+        final double realDistance = instance.squaredDistanceTo(entity);
+        if(instance.interactionManager.getGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) return realDistance;
+        if(Math.sqrt(realDistance) < PICK_DISTANCE) return 1;
+        return realDistance;
     }
 
     private static boolean canPlace(ServerPlayerEntity player, ItemStack stack) {

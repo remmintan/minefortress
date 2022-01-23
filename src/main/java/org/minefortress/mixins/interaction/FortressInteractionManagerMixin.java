@@ -37,8 +37,6 @@ public abstract class FortressInteractionManagerMixin {
 
     private static final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
 
-    private TutorialStep oldStep;
-
     @Shadow
     @Final
     private MinecraftClient client;
@@ -140,6 +138,12 @@ public abstract class FortressInteractionManagerMixin {
     public void getReachDistance(CallbackInfoReturnable<Float> cir) {
         if(getCurrentGameMode()==FORTRESS)
             cir.setReturnValue(PICK_DISTANCE_FLOAT);
+    }
+
+    @Inject(method = "hasExtendedReach", at = @At("HEAD"), cancellable = true)
+    public void hasExtendedReach(CallbackInfoReturnable<Boolean> cir) {
+        if(getCurrentGameMode()==FORTRESS)
+            cir.setReturnValue(false);
     }
 
     @Inject(method = "isFlyingLocked", at = @At("HEAD"), cancellable = true)
