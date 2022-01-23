@@ -20,6 +20,7 @@ import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -78,6 +79,14 @@ public abstract class FortressInteractionManagerMixin {
             final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
             final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
             final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+            final FortressCameraManager cameraManager = fortressClient.getCameraManager();
+
+            if(cameraManager.isFollowingEntity()){
+                cameraManager.stopFollowingEntity();
+                cir.setReturnValue(false);
+                return;
+            }
+
             if(fortressManager.isFortressInitializationNeeded()) {
                 cir.setReturnValue(true);
                 return;

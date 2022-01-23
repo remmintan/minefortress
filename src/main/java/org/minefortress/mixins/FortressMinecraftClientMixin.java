@@ -20,7 +20,7 @@ import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.renderer.CameraManager;
+import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.FortressHud;
 import org.minefortress.selections.SelectionManager;
@@ -29,14 +29,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftClient.class)
 public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecutor<Runnable> implements FortressMinecraftClient {
 
     private SelectionManager selectionManager;
-    private CameraManager cameraManager;
+    private FortressCameraManager fortressCameraManager;
     private FortressHud fortressHud;
     private BlueprintMetadataManager blueprintMetadataManager;
     private FortressClientManager fortressClientManager;
@@ -64,7 +63,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Inject(method = "<init>", at = @At("RETURN"))
     public void constructor(RunArgs args, CallbackInfo ci) {
         this.selectionManager = new SelectionManager((MinecraftClient)(Object)this);
-        this.cameraManager = new CameraManager((MinecraftClient)(Object)this);
+        this.fortressCameraManager = new FortressCameraManager((MinecraftClient)(Object)this);
         this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
         this.blueprintMetadataManager = new BlueprintMetadataManager((MinecraftClient)(Object)this);
         this.fortressClientManager = new FortressClientManager();
@@ -106,13 +105,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
         if(isFortressGamemode() && !middleMouseButtonIsDown) {
             if(player != null) {
-                this.cameraManager.updateCameraPosition();
+                this.fortressCameraManager.updateCameraPosition();
             }
         }
 
         if (isNotFortressGamemode() || middleMouseButtonIsDown) {
             if(player != null) {
-                this.cameraManager.setRot(player.getPitch(), player.getYaw());
+                this.fortressCameraManager.setRot(player.getPitch(), player.getYaw());
             }
         }
     }
@@ -170,6 +169,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public FortressClientManager getFortressClientManager() {
         return fortressClientManager;
+    }
+
+    @Override
+    public FortressCameraManager getCameraManager() {
+        return fortressCameraManager;
     }
 
     @Override

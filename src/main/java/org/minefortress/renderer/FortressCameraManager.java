@@ -4,6 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Quaternion;
@@ -11,7 +13,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.RaycastContext;
 
-public class CameraManager {
+public class FortressCameraManager {
 
     private final MinecraftClient minecraft;
 
@@ -19,47 +21,77 @@ public class CameraManager {
     private float neededYRot = 125f;
 
     private boolean yRotDirty = false;
-
     private Float moveDistance = null;
 
-    public CameraManager(MinecraftClient minecraft) {
+    private LivingEntity followingEntity = null;
+    private Vec3d followingEntityDelta = null;
+
+    public FortressCameraManager(MinecraftClient minecraft) {
         this.minecraft = minecraft;
+    }
+
+    public void setFollowEntity(LivingEntity entity) {
+        this.followingEntity = entity;
+        final Vec3d entityPos = entity.getPos();
+        final Vec3d playerPos = minecraft.player.getPos();
+
+        followingEntityDelta = entityPos.subtract(playerPos);
+    }
+
+    public boolean isFollowingEntity() {
+        return followingEntity != null;
+    }
+
+    public void stopFollowingEntity() {
+        this.followingEntity = null;
     }
 
     public void updateCameraPosition() {
         ClientPlayerEntity player = this.minecraft.player;
         if(player != null) {
-            Input playerInput = player.input;
-
-            if(this.minecraft.options.keySprint.isPressed()) {
-                float speed = 30f * minecraft.getLastFrameDuration() / 16f;
-                float deltaAngleY = playerInput.pressingLeft == playerInput.pressingRight ? 0.0F : playerInput.pressingLeft ? 1.0F : -1.0F;
-
-                if(deltaAngleY != 0) {
-                    if(moveDistance == null) {
-                        calculateMoveDistance(player);
-                    }
-                    neededYRot += deltaAngleY * speed;
-                    this.yRotDirty = true;
+            if(isFollowingEntity()) {
+                if(followingEntity.isAlive()) {
+                    final Vec3d newPlayerPos = followingEntity.getPos().subtract(followingEntityDelta);
+                    player.setPosition(newPlayerPos);
                 } else {
-                    resetMoveDistance();
+                    stopFollowingEntity();
                 }
+            }
+            updateCameraFromInput(player);
+        }
+    }
 
-                float deltaAngleX = playerInput.pressingForward == playerInput.pressingBack ? 0.0F : playerInput.pressingForward ? 1.0F : -1.0F;
-                neededXRot += deltaAngleX * speed * 2;
-                if(neededXRot > 89) {
-                    neededXRot = 89;
+    private void updateCameraFromInput(ClientPlayerEntity player) {
+        Input playerInput = player.input;
+
+        if(this.minecraft.options.keySprint.isPressed()) {
+            float speed = 30f * minecraft.getLastFrameDuration() / 16f;
+            float deltaAngleY = playerInput.pressingLeft == playerInput.pressingRight ? 0.0F : playerInput.pressingLeft ? 1.0F : -1.0F;
+
+            if(deltaAngleY != 0) {
+                if(moveDistance == null) {
+                    calculateMoveDistance(player);
                 }
-                if(neededXRot < 0) {
-                    neededXRot = 0;
-                }
+                neededYRot += deltaAngleY * speed;
+                this.yRotDirty = true;
             } else {
                 resetMoveDistance();
             }
 
-            updateXRotation(player);
-            updateYRotation(player);
+            float deltaAngleX = playerInput.pressingForward == playerInput.pressingBack ? 0.0F : playerInput.pressingForward ? 1.0F : -1.0F;
+            neededXRot += deltaAngleX * speed * 2;
+            if(neededXRot > 89) {
+                neededXRot = 89;
+            }
+            if(neededXRot < 0) {
+                neededXRot = 0;
+            }
+        } else {
+            resetMoveDistance();
         }
+
+        updateXRotation(player);
+        updateYRotation(player);
     }
 
     public void setRot(float x, float y) {
