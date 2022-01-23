@@ -19,6 +19,8 @@ public abstract class FortressCreateWorldScreenMixin extends Screen {
 
     @Shadow private CyclingButtonWidget<Difficulty> difficultyButton;
 
+    @Shadow private boolean cheatsEnabled;
+
     protected FortressCreateWorldScreenMixin(Text title) {
         super(title);
     }
@@ -26,8 +28,9 @@ public abstract class FortressCreateWorldScreenMixin extends Screen {
     @Inject(method = "tweakDefaultsTo", at = @At("TAIL"))
     private void tweakDefaultsTo(CreateWorldScreen.Mode mode, CallbackInfo ci) {
         if(mode == CreateWorldScreen.Mode.DEBUG) {
+            this.cheatsEnabled = true;
             enableCheatsButton.setValue(true);
-            difficultyButton.setValue(Difficulty.NORMAL);
+            difficultyButton.setValue(Difficulty.PEACEFUL);
         }
     }
 
