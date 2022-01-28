@@ -13,9 +13,8 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
-import org.minefortress.blueprints.BlueprintMetadata;
-import org.minefortress.blueprints.BlueprintMetadataManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
+import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 
 import java.util.List;
 
@@ -30,15 +29,10 @@ public final class BlueprintsScreen extends Screen {
     private int x;
     private int y;
 
-    private BlueprintGroup selectedGroup = BlueprintGroup.MAIN;
-    private BlueprintMetadataManager blueprintMetadataManager;
-
     private boolean isScrolling = false;
     private float scrollPosition = 0;
 
-    private BlueprintMetadata focusedBlueprint;
-
-    private boolean hasScrollbar = false;
+    private BlueprintScreenHandler handler;
 
     public BlueprintsScreen() {
         super(new LiteralText("Blueprints"));
@@ -52,7 +46,7 @@ public final class BlueprintsScreen extends Screen {
             }
 
             if(this.isClickInScrollbar(mouseX, mouseY)) {
-                this.isScrolling = this.hasScrollbar();
+                this.isScrolling = this.handler.isNeedScrollbar();
                 return true;
             }
         }
@@ -60,10 +54,9 @@ public final class BlueprintsScreen extends Screen {
         if(super.mouseClicked(mouseX, mouseY, button)) return true;
 
         if(button == 0) {
-            if(focusedBlueprint != null) {
+            if(this.handler.hasFocusedSlot()) {
                 if(this.client != null) this.client.setScreen(null);
-                // TODO implement proper selection
-                blueprintMetadataManager.selectFirst();
+                this.handler.clickOnFocusedSlot();
                 return true;
             }
         }
@@ -90,7 +83,7 @@ public final class BlueprintsScreen extends Screen {
             this.isScrolling = false;
             for (BlueprintGroup blueprintGroup: BlueprintGroup.values()) {
                 if (this.isClickInTab(blueprintGroup, mouseX, mouseY)) {
-                    this.selectedGroup = blueprintGroup;
+                    this.handler.selectGroup(blueprintGroup);
                     return true;
                 }
             }
@@ -100,13 +93,13 @@ public final class BlueprintsScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        if (!this.hasScrollbar()) {
+        if (!this.handler.isNeedScrollbar()) {
             return false;
         }
-        int i = (blueprintMetadataManager.getAllBlueprint().size() + 9 - 1) / 9 - 5;
+        int i = (this.handler.getSelectedGroupSize() + 9 - 1) / 9 - 5;
         this.scrollPosition = (float)((double)this.scrollPosition - amount / (double)i);
         this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
-//        ((CreativeInventoryScreen.CreativeScreenHandler)this.handler).scrollItems(this.scrollPosition);
+        this.handler.scroll(scrollPosition);
         return true;
     }
 
@@ -147,9 +140,7 @@ public final class BlueprintsScreen extends Screen {
                 this.x = (this.width - backgroundWidth) / 2;
                 this.y = (this.height - backgroundHeight) / 2;
 
-                if(this.client instanceof FortressMinecraftClient fortressClient) {
-                    this.blueprintMetadataManager = fortressClient.getBlueprintMetadataManager();
-                }
+                this.handler = new BlueprintScreenHandler(this.client);
             } else {
                 this.client.setScreen(null);
             }
@@ -170,25 +161,24 @@ public final class BlueprintsScreen extends Screen {
         matrixStack.push();
         matrixStack.translate(screenX, screenY, 0.0);
         RenderSystem.applyModelViewMatrix();
-        this.focusedBlueprint = null;
+        this.handler.focusOnSlot(null);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        final List<BlueprintMetadata> allBlueprints = this.blueprintMetadataManager.getAllBlueprint();
-        final int blueprintsAmount = allBlueprints.size();
-        this.hasScrollbar = blueprintsAmount > 9 * 5;
-        for (int i = 0; i < blueprintsAmount; i++) {
+
+        final List<BlueprintSlot> currentSlots = this.handler.getCurrentSlots();
+        final int currentSlotsSize = currentSlots.size();
+        for (int i = 0; i < currentSlotsSize; i++) {
             int slotColumn = i % 9;
             int slotRow = i / 9;
 
             int slotX = slotColumn * 18 + 9;
             int slotY = slotRow * 18 + 18;
 
-            final BlueprintMetadata blueprintMetadata = allBlueprints.get(i);
-            this.drawSlot(matrices, blueprintMetadata, slotX, slotY);
-
+            final BlueprintSlot blueprintSlot = currentSlots.get(i);
+            this.drawSlot(blueprintSlot, slotX, slotY);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
-            this.focusedBlueprint = blueprintMetadata;
+            this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(matrices, slotX, slotY, this.getZOffset());
         }
 
@@ -219,13 +209,14 @@ public final class BlueprintsScreen extends Screen {
     }
 
     private void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        if (this.selectedGroup != null) {
+        final BlueprintGroup selectedGroup = this.handler.getSelectedGroup();
+        if (selectedGroup != null) {
             RenderSystem.disableBlend();
-            this.textRenderer.draw(matrices, this.selectedGroup.getNameText(), 8.0f, 6.0f, 0x404040);
+            this.textRenderer.draw(matrices, selectedGroup.getNameText(), 8.0f, 6.0f, 0x404040);
         }
     }
 
-    private void drawSlot(MatrixStack matrices, BlueprintMetadata metadata, int slotX, int slotY) {
+    private void drawSlot(BlueprintSlot slot, int slotX, int slotY) {
         ItemStack itemStack = new ItemStack(Items.DIRT);
         String string = null;
         this.setZOffset(100);
@@ -249,10 +240,12 @@ public final class BlueprintsScreen extends Screen {
 
     private void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        final BlueprintGroup selectedGroup = this.handler.getSelectedGroup();
         for (BlueprintGroup bg : BlueprintGroup.values()) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderTexture(0, INVENTORY_TABS_TEXTURE);
-            if (bg == selectedGroup) continue;
+
+            if (selectedGroup == bg) continue;
             this.renderTabIcon(matrices, bg);
         }
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -266,19 +259,15 @@ public final class BlueprintsScreen extends Screen {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, INVENTORY_TABS_TEXTURE);
 
-        this.drawTexture(matrices, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
+        this.drawTexture(matrices, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 232 + (this.handler.isNeedScrollbar() ? 0 : 12), 0, 12, 15);
 
         if(selectedGroup != null)
             this.renderTabIcon(matrices, selectedGroup);
     }
 
 
-    public boolean hasScrollbar() {
-        return hasScrollbar;
-    }
-
     private void renderTabIcon(MatrixStack matrices, BlueprintGroup group) {
-        boolean isSelectedGroup = group == selectedGroup;
+        boolean isSelectedGroup = group == this.handler.getSelectedGroup();
         int columnNumber = group.ordinal() % 7;
         int texX = columnNumber * 28;
         int texY = 0;
@@ -329,8 +318,8 @@ public final class BlueprintsScreen extends Screen {
     }
 
     private void drawMouseoverTooltip(MatrixStack matrices, int x, int y) {
-        if (this.focusedBlueprint != null) {
-            this.renderTooltip(matrices, new LiteralText(focusedBlueprint.getName()), x, y);
+        if (this.handler.hasFocusedSlot()) {
+            this.renderTooltip(matrices, this.handler.getFocusedSlotName(), x, y);
         }
     }
 
