@@ -7,7 +7,8 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public enum BlueprintGroup {
-    MAIN(true, Items.DIRT, "Main");
+    MAIN(true, Items.GOLD_BLOCK, "Main"),
+    DECORATION(true, Items.CHORUS_FLOWER, "Decoration");
 
     private final boolean topRow;
     private ItemStack icon;

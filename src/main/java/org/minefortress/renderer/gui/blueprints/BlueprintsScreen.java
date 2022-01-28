@@ -9,7 +9,6 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
@@ -30,7 +29,7 @@ public final class BlueprintsScreen extends Screen {
     private int x;
     private int y;
 
-    private BlueprintGroup selectedGroup;
+    private BlueprintGroup selectedGroup = BlueprintGroup.MAIN;
     private BlueprintMetadataManager blueprintMetadataManager;
     private int scrollPosition = 0;
 
