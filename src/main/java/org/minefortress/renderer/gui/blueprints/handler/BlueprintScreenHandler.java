@@ -1,6 +1,7 @@
 package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.minefortress.blueprints.BlueprintMetadata;
 import org.minefortress.blueprints.BlueprintMetadataManager;
@@ -35,6 +36,7 @@ public final class BlueprintScreenHandler {
     public void selectGroup(BlueprintGroup group){
         if(group == null) throw new IllegalArgumentException("Group cannot be null");
         this.selectedGroup = group;
+        this.scroll(0f);
     }
 
     public BlueprintGroup getSelectedGroup() {
@@ -45,7 +47,23 @@ public final class BlueprintScreenHandler {
         if(scrollPosition == scroll) return;
         final List<BlueprintMetadata> allBlueprint = getMetadataManager().getAllBlueprint();
         this.totalSize = allBlueprint.size();
-        currentSlots = new ArrayList<>();
+        this.currentSlots = new ArrayList<>();
+
+        int totalRows = (this.totalSize + 9 - 1) / 9 - 5;
+        int skippedRows = (int)((double)(scrollPosition * (float)totalRows) + 0.5);
+        if (skippedRows < 0) {
+            skippedRows = 0;
+        }
+        for (int row = 0; row < 5; ++row) {
+            for (int column = 0; column < 9; ++column) {
+                int m = column + (row + skippedRows) * 9;
+                if (m >= 0 && m < this.totalSize) {
+                    final BlueprintMetadata blueprintMetadata = allBlueprint.get(m);
+                    this.currentSlots.add(new BlueprintSlot(blueprintMetadata));
+                }
+            }
+        }
+
         this.needScrollbar = this.totalSize > 9 * 5;
         this.scroll = scrollPosition;
     }

@@ -71,7 +71,7 @@ public final class BlueprintsScreen extends Screen {
             int maxScroll = minScroll + 112;
             this.scrollPosition = ((float)mouseY - (float)minScroll - 7.5f) / ((float)(maxScroll - minScroll) - 15.0f);
             this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
-//            ((CreativeInventoryScreen.CreativeScreenHandler)this.handler).scrollItems(this.scrollPosition);
+            this.handler.scroll(scrollPosition);
             return true;
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
@@ -84,6 +84,7 @@ public final class BlueprintsScreen extends Screen {
             for (BlueprintGroup blueprintGroup: BlueprintGroup.values()) {
                 if (this.isClickInTab(blueprintGroup, mouseX, mouseY)) {
                     this.handler.selectGroup(blueprintGroup);
+                    this.scrollPosition = 0;
                     return true;
                 }
             }

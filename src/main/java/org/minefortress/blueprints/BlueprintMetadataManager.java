@@ -63,9 +63,9 @@ public class BlueprintMetadataManager {
 
     public List<BlueprintMetadata> getAllBlueprint() {
         final ArrayList<BlueprintMetadata> blueprintMetadata = new ArrayList<>(STRUCTURES);
-        final BlueprintMetadata first = blueprintMetadata.get(0);
-        for (int i = 0; i < 100; i++) {
-            blueprintMetadata.add(first);
+        for (int i = 12; i < 100; i++) {
+            final BlueprintMetadata temp = new BlueprintMetadata("Small House "+i, "village/plains/houses/plains_small_house_1", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS));
+            blueprintMetadata.add(temp);
         }
         return blueprintMetadata;
     }
