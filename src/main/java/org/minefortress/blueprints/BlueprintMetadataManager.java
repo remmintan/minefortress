@@ -60,4 +60,8 @@ public class BlueprintMetadataManager {
         return null;
     }
 
+    public List<BlueprintMetadata> getAllBlueprint() {
+        return STRUCTURES;
+    }
+
 }

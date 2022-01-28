@@ -10,6 +10,7 @@ import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.widget.FortressBlueprintsButtonWidget;
 import org.minefortress.renderer.gui.widget.FortressItemButtonWidget;
 import org.minefortress.renderer.gui.widget.FortressSelectionVisibilityButtonWidget;
@@ -56,7 +57,8 @@ public class ToolsGui extends FortressGuiScreen {
                     if(fortressClient.getBlueprintManager().hasSelectedBlueprint()) {
                         fortressClient.getBlueprintManager().clearStructure();
                     } else {
-                        fortressClient.getBlueprintMetadataManager().selectFirst();
+                        this.client.setScreen(new BlueprintsScreen());
+//                        fortressClient.getBlueprintMetadataManager().selectFirst();
                     }
                 },
                 (button, matrices, mouseX, mouseY) -> {
