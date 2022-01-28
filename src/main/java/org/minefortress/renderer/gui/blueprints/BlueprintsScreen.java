@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.BlueprintMetadata;
 import org.minefortress.blueprints.BlueprintMetadataManager;
@@ -31,7 +32,9 @@ public final class BlueprintsScreen extends Screen {
 
     private BlueprintGroup selectedGroup = BlueprintGroup.MAIN;
     private BlueprintMetadataManager blueprintMetadataManager;
-    private int scrollPosition = 0;
+
+    private boolean isScrolling = false;
+    private float scrollPosition = 0;
 
     private BlueprintMetadata focusedBlueprint;
 
@@ -39,6 +42,99 @@ public final class BlueprintsScreen extends Screen {
 
     public BlueprintsScreen() {
         super(new LiteralText("Blueprints"));
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if(button == 0) {
+            for(BlueprintGroup group : BlueprintGroup.values()) {
+                if(isClickInTab(group, mouseX, mouseY)) return true;
+            }
+
+            if(this.isClickInScrollbar(mouseX, mouseY)) {
+                this.isScrolling = this.hasScrollbar();
+                return true;
+            }
+        }
+
+        if(super.mouseClicked(mouseX, mouseY, button)) return true;
+
+        if(button == 0) {
+            if(focusedBlueprint != null) {
+                if(this.client != null) this.client.setScreen(null);
+                // TODO implement proper selection
+                blueprintMetadataManager.selectFirst();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (this.isScrolling) {
+            int minScroll = this.y + 18;
+            int maxScroll = minScroll + 112;
+            this.scrollPosition = ((float)mouseY - (float)minScroll - 7.5f) / ((float)(maxScroll - minScroll) - 15.0f);
+            this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
+//            ((CreativeInventoryScreen.CreativeScreenHandler)this.handler).scrollItems(this.scrollPosition);
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            this.isScrolling = false;
+            for (BlueprintGroup blueprintGroup: BlueprintGroup.values()) {
+                if (this.isClickInTab(blueprintGroup, mouseX, mouseY)) {
+                    this.selectedGroup = blueprintGroup;
+                    return true;
+                }
+            }
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        if (!this.hasScrollbar()) {
+            return false;
+        }
+        int i = (blueprintMetadataManager.getAllBlueprint().size() + 9 - 1) / 9 - 5;
+        this.scrollPosition = (float)((double)this.scrollPosition - amount / (double)i);
+        this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
+//        ((CreativeInventoryScreen.CreativeScreenHandler)this.handler).scrollItems(this.scrollPosition);
+        return true;
+    }
+
+    private boolean isClickInTab(BlueprintGroup group, double mouseX, double mouseY) {
+        mouseX -= this.x;
+        mouseY -= this.y;
+
+        int columnNumber = group.ordinal();
+        int x = 28 * columnNumber;
+        int y = 0;
+        if (columnNumber > 0) x += columnNumber;
+
+        if (group.isTopRow()) {
+            y -= 32;
+        } else {
+            y += this.backgroundHeight;
+        }
+        return mouseX >= (double)x && mouseX <= (double)(x + 28) && mouseY >= (double)y && mouseY <= (double)(y + 32);
+    }
+
+    private boolean isClickInScrollbar(double mouseX, double mouseY) {
+        int i = this.x;
+        int j = this.y;
+        int k = i + 175;
+        int l = j + 18;
+        int m = k + 14;
+        int n = l + 112;
+        return mouseX >= (double)k && mouseY >= (double)l && mouseX < (double)m && mouseY < (double)n;
     }
 
     @Override

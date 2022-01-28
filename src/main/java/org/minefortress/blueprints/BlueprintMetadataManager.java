@@ -4,6 +4,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +62,12 @@ public class BlueprintMetadataManager {
     }
 
     public List<BlueprintMetadata> getAllBlueprint() {
-        return STRUCTURES;
+        final ArrayList<BlueprintMetadata> blueprintMetadata = new ArrayList<>(STRUCTURES);
+        final BlueprintMetadata first = blueprintMetadata.get(0);
+        for (int i = 0; i < 100; i++) {
+            blueprintMetadata.add(first);
+        }
+        return blueprintMetadata;
     }
 
 }
