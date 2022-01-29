@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.BlueprintBlockDataManager;
 import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.renderer.FortressCameraManager;
@@ -42,6 +43,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private BlueprintMetadataManager blueprintMetadataManager;
     private FortressClientManager fortressClientManager;
     private BlueprintBlockDataManager blockDataManager;
+    private BlueprintRenderer blueprintRenderer;
 
     @Shadow
     @Final
@@ -73,6 +75,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.blueprintMetadataManager = new BlueprintMetadataManager((MinecraftClient)(Object)this);
         this.fortressClientManager = new FortressClientManager();
         this.blockDataManager = new BlueprintBlockDataManager(this::getServer);
+        this.blueprintRenderer = new BlueprintRenderer((MinecraftClient)(Object)this);
     }
 
     @Override
@@ -190,5 +193,10 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public BlueprintBlockDataManager getBlueprintBlockDataManager() {
         return blockDataManager;
+    }
+
+    @Override
+    public BlueprintRenderer getBlueprintRenderer() {
+        return blueprintRenderer;
     }
 }

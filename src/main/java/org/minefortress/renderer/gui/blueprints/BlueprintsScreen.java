@@ -10,9 +10,13 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
+import org.minefortress.blueprints.BlueprintMetadata;
+import org.minefortress.blueprints.renderer.BlueprintRenderer;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 
@@ -25,6 +29,8 @@ public final class BlueprintsScreen extends Screen {
 
     private final int backgroundWidth = 195;
     private final int backgroundHeight = 136;
+
+    private BlueprintRenderer blueprintRenderer;
 
     private int x;
     private int y;
@@ -55,7 +61,10 @@ public final class BlueprintsScreen extends Screen {
 
         if(button == 0) {
             if(this.handler.hasFocusedSlot()) {
-                if(this.client != null) this.client.setScreen(null);
+                if(this.client != null){
+                    this.client.setScreen(null);
+                    ((FortressMinecraftClient)this.client).getBlueprintMetadataManager().selectFirst();
+                }
                 this.handler.clickOnFocusedSlot();
                 return true;
             }
@@ -142,6 +151,7 @@ public final class BlueprintsScreen extends Screen {
                 this.y = (this.height - backgroundHeight) / 2;
 
                 this.handler = new BlueprintScreenHandler(this.client);
+                this.blueprintRenderer = new BlueprintRenderer(this.client);
             } else {
                 this.client.setScreen(null);
             }
@@ -176,7 +186,7 @@ public final class BlueprintsScreen extends Screen {
             int slotY = slotRow * 18 + 18;
 
             final BlueprintSlot blueprintSlot = currentSlots.get(i);
-            this.drawSlot(blueprintSlot, slotX, slotY);
+            this.drawSlot(blueprintSlot, slotX, slotY, matrices);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
             this.handler.focusOnSlot(blueprintSlot);
@@ -217,16 +227,21 @@ public final class BlueprintsScreen extends Screen {
         }
     }
 
-    private void drawSlot(BlueprintSlot slot, int slotX, int slotY) {
+    private void drawSlot(BlueprintSlot slot, int slotX, int slotY, MatrixStack matrices) {
         ItemStack itemStack = new ItemStack(Items.DIRT);
-        String string = null;
         this.setZOffset(100);
         this.itemRenderer.zOffset = 100.0f;
 
         RenderSystem.enableDepthTest();
-        if(this.client != null)
-            this.itemRenderer.renderInGuiWithOverrides(this.client.player, itemStack, slotX, slotY, slotX + slotY * this.backgroundWidth);
-        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, slotX, slotY, string);
+        if(this.client != null){
+            final BlueprintMetadata metadata = slot.getMetadata();
+            if(metadata.getName().equals("Small House 1")) {
+                this.blueprintRenderer.renderBlueprint(metadata.getFile(), BlockRotation.NONE, matrices);
+            } else {
+                this.itemRenderer.renderInGuiWithOverrides(this.client.player, itemStack, slotX, slotY, slotX + slotY * this.backgroundWidth);
+            }
+        }
+//        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, slotX, slotY, string);
 
         this.itemRenderer.zOffset = 0.0f;
         this.setZOffset(0);

@@ -10,8 +10,10 @@ import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.renderer.CameraTools;
 
 public final class BlueprintRenderer {
 
@@ -31,13 +33,22 @@ public final class BlueprintRenderer {
         final BuiltBlueprint builtBlueprint = blueprintsModelBuilder.getOrBuildBlueprint(fileName, rotation);
         this.client.getProfiler().pop();
         this.client.getProfiler().push("blueprint_render_model");
-        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices);
-        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices);
-        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices);
+
+        final Matrix4f projectionMatrix4f = CameraTools.getProjectionMatrix4f(this.client);
+
+        matrices.push();
+        matrices.translate(100, 100, 150);
+        matrices.scale(16, 16, 16);
+
+        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f);
+        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f);
+        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f);
+
+        matrices.pop();
         this.client.getProfiler().pop();
     }
 
-    private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices) {
+    private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices, Matrix4f projectionMatrix) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
 
         renderLayer.startDrawing();
@@ -54,9 +65,9 @@ public final class BlueprintRenderer {
         if (shader.modelViewMat != null) {
             shader.modelViewMat.set(matrices.peek().getModel());
         }
-//        if (shader.projectionMat != null) {
-//            shader.projectionMat.set(matrix4f);
-//        }
+        if (shader.projectionMat != null) {
+            shader.projectionMat.set(projectionMatrix);
+        }
         if (shader.colorModulator != null) {
             shader.colorModulator.set(new Vec3f(1F, 1.0F, 1F));
         }

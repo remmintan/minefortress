@@ -7,6 +7,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.interfaces.FortressGameRenderer;
 
 import java.nio.FloatBuffer;
@@ -76,14 +77,20 @@ public class CameraTools {
         return modelViewBuffer;
     }
 
-    private static FloatBuffer getProjectionMatrix(MinecraftClient minecraft) {
-        final GameRenderer gameRenderer = minecraft.gameRenderer;
-        double fov = ((FortressGameRenderer)gameRenderer).getFov(1.0f, true);
-        Matrix4f projectionMatrix = gameRenderer.getBasicProjectionMatrix(fov).copy();
+    private  static FloatBuffer getProjectionMatrix(MinecraftClient minecraft) {
+        Matrix4f projectionMatrix = getProjectionMatrix4f(minecraft);
         FloatBuffer projectionBuffer = FloatBuffer.allocate(16);
         projectionMatrix.writeColumnMajor(projectionBuffer);
         projectionBuffer.rewind();
         return projectionBuffer;
+    }
+
+    @NotNull
+    public static Matrix4f getProjectionMatrix4f(MinecraftClient minecraft) {
+        final GameRenderer gameRenderer = minecraft.gameRenderer;
+        double fov = ((FortressGameRenderer)gameRenderer).getFov(1.0f, true);
+        Matrix4f projectionMatrix = gameRenderer.getBasicProjectionMatrix(fov).copy();
+        return projectionMatrix;
     }
 
 }

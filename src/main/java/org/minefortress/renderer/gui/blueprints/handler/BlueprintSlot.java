@@ -18,7 +18,7 @@ public class BlueprintSlot {
         return tooltipText;
     }
 
-    BlueprintMetadata getMetadata() {
+    public BlueprintMetadata getMetadata() {
         return metadata;
     }
 
