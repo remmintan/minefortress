@@ -15,6 +15,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -117,6 +118,7 @@ public class BlueprintBlockDataManager {
             this.automaticLayer = automaticLayer;
         }
 
+        @NotNull
         public Map<BlockPos, BlockState> getBlueprintData() {
             return blueprintData;
         }

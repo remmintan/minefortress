@@ -10,12 +10,14 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.BlueprintBlockDataManager;
 import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
@@ -39,6 +41,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private FortressHud fortressHud;
     private BlueprintMetadataManager blueprintMetadataManager;
     private FortressClientManager fortressClientManager;
+    private BlueprintBlockDataManager blockDataManager;
 
     @Shadow
     @Final
@@ -56,6 +59,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Shadow @Nullable public HitResult crosshairTarget;
 
+    @Shadow public abstract @Nullable IntegratedServer getServer();
+
     public FortressMinecraftClientMixin(String string) {
         super(string);
     }
@@ -67,6 +72,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
         this.blueprintMetadataManager = new BlueprintMetadataManager((MinecraftClient)(Object)this);
         this.fortressClientManager = new FortressClientManager();
+        this.blockDataManager = new BlueprintBlockDataManager(this::getServer);
     }
 
     @Override
@@ -179,5 +185,10 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         } else {
             return null;
         }
+    }
+
+    @Override
+    public BlueprintBlockDataManager getBlueprintBlockDataManager() {
+        return blockDataManager;
     }
 }

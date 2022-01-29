@@ -19,6 +19,7 @@ import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundBlueprintTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -42,7 +43,7 @@ public class BlueprintManager {
 
     public BlueprintManager(MinecraftClient client) {
         this.client = client;
-        this.blockDataManager = new BlueprintBlockDataManager(client::getServer);
+        this.blockDataManager = ((FortressMinecraftClient)client).getBlueprintBlockDataManager();
     }
 
     public void buildStructure(ChunkBuilder chunkBuilder) {
