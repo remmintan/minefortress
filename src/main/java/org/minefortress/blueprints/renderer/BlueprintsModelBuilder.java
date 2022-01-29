@@ -9,7 +9,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BlueprintsModelBuilder {
+class BlueprintsModelBuilder {
 
     private final BlockBufferBuilderStorage blockBufferBuilders;
     private final BlueprintBlockDataManager blockDataManager;

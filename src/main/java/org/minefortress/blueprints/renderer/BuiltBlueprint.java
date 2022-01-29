@@ -130,6 +130,10 @@ public class BuiltBlueprint {
         return vertexBuffers.get(layer);
     }
 
+    public boolean hasLayer(RenderLayer layer) {
+        return this.buffersUploaded() && nonEmptyLayers.contains(layer);
+    }
+
     private MinecraftClient getClient() {
         return MinecraftClient.getInstance();
     }
