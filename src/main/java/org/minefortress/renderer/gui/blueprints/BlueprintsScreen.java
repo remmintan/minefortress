@@ -236,7 +236,7 @@ public final class BlueprintsScreen extends Screen {
         if(this.client != null){
             final BlueprintMetadata metadata = slot.getMetadata();
             if(metadata.getName().equals("Small House 1")) {
-                this.blueprintRenderer.renderBlueprint(metadata.getFile(), BlockRotation.NONE, matrices);
+                this.blueprintRenderer.renderBlueprint(metadata.getFile(), BlockRotation.NONE);
             } else {
                 this.itemRenderer.renderInGuiWithOverrides(this.client.player, itemStack, slotX, slotY, slotX + slotY * this.backgroundWidth);
             }
@@ -303,7 +303,7 @@ public final class BlueprintsScreen extends Screen {
             texY += 32;
         }
         this.drawTexture(matrices, x, y, texX, texY, 28, 32);
-        this.itemRenderer.zOffset = 100.0f;
+        this.itemRenderer.zOffset = 0.0f;
         int yIconDelta = topRow ? 1 : -1;
         ItemStack icon = group.getIcon();
         this.itemRenderer.renderInGuiWithOverrides(icon, x += 6, y += 8 + yIconDelta);

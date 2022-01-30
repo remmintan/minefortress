@@ -4,14 +4,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Shader;
-import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.*;
+import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
+import org.apache.commons.lang3.builder.Diff;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
 
@@ -28,27 +27,28 @@ public final class BlueprintRenderer {
         this.client = client;
     }
 
-    public void renderBlueprint(String fileName, BlockRotation rotation, MatrixStack matrices) {
+    public void renderBlueprint(String fileName, BlockRotation rotation) {
         this.client.getProfiler().push("blueprint_build_model");
         final BuiltBlueprint builtBlueprint = blueprintsModelBuilder.getOrBuildBlueprint(fileName, rotation);
         this.client.getProfiler().pop();
         this.client.getProfiler().push("blueprint_render_model");
 
-        final Matrix4f projectionMatrix4f = CameraTools.getProjectionMatrix4f(this.client);
+        final MatrixStack matrices = new MatrixStack();
 
-        matrices.push();
-        matrices.translate(100, 100, 150);
-        matrices.scale(16, 16, 16);
+        matrices.scale(0.1f, 0.2f, 0.1f);
 
-        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f);
-        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f);
-        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f);
+        matrices.translate(0f, 0 ,-7f);
+        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-45f));
+        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(45f));
 
-        matrices.pop();
+        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices);
+        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices);
+        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices);
+
         this.client.getProfiler().pop();
     }
 
-    private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices, Matrix4f projectionMatrix) {
+    private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
 
         renderLayer.startDrawing();
@@ -64,9 +64,6 @@ public final class BlueprintRenderer {
         }
         if (shader.modelViewMat != null) {
             shader.modelViewMat.set(matrices.peek().getModel());
-        }
-        if (shader.projectionMat != null) {
-            shader.projectionMat.set(projectionMatrix);
         }
         if (shader.colorModulator != null) {
             shader.colorModulator.set(new Vec3f(1F, 1.0F, 1F));
@@ -96,7 +93,7 @@ public final class BlueprintRenderer {
             final VertexBuffer vertexBuffer = builtBlueprint.getBuffer(renderLayer);
 
             if (chunkOffset != null) {
-                chunkOffset.set(1f, 1f, 1f);
+                chunkOffset.set(Vec3f.ZERO);
                 chunkOffset.upload();
             }
 
