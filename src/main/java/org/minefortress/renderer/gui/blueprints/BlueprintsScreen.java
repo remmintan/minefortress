@@ -186,7 +186,7 @@ public final class BlueprintsScreen extends Screen {
             int slotY = slotRow * 18 + 18;
 
             final BlueprintSlot blueprintSlot = currentSlots.get(i);
-            this.drawSlot(blueprintSlot, slotX, slotY, matrices);
+            this.drawSlot(blueprintSlot, slotX, slotY, slotColumn, slotRow);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
             this.handler.focusOnSlot(blueprintSlot);
@@ -227,7 +227,7 @@ public final class BlueprintsScreen extends Screen {
         }
     }
 
-    private void drawSlot(BlueprintSlot slot, int slotX, int slotY, MatrixStack matrices) {
+    private void drawSlot(BlueprintSlot slot, int slotX, int slotY, int slotColumn, int slotRow) {
         ItemStack itemStack = new ItemStack(Items.DIRT);
         this.setZOffset(100);
         this.itemRenderer.zOffset = 100.0f;
@@ -235,8 +235,8 @@ public final class BlueprintsScreen extends Screen {
         RenderSystem.enableDepthTest();
         if(this.client != null){
             final BlueprintMetadata metadata = slot.getMetadata();
-            if(metadata.getName().equals("Small House 1")) {
-                this.blueprintRenderer.renderBlueprint(metadata.getFile(), BlockRotation.NONE);
+            if(metadata.getName().equals("Small House 13")) {
+                this.blueprintRenderer.renderBlueprint(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow);
             } else {
                 this.itemRenderer.renderInGuiWithOverrides(this.client.player, itemStack, slotX, slotY, slotX + slotY * this.backgroundWidth);
             }

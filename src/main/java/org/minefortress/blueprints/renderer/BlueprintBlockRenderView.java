@@ -18,6 +18,8 @@ import java.util.Map;
 
 class BlueprintBlockRenderView implements BlockRenderView {
 
+    private static final float LIGHT_LEVEL = 14f;
+
     private final Map<BlockPos, BlockState> blueprintData;
 
     public BlueprintBlockRenderView(Map<BlockPos, BlockState> blueprintData) {
@@ -26,7 +28,17 @@ class BlueprintBlockRenderView implements BlockRenderView {
 
     @Override
     public float getBrightness(Direction direction, boolean shaded) {
-        return this.getMaxLightLevel();
+        return LIGHT_LEVEL * getMultiplyerFromDirection(direction);
+    }
+
+    private float getMultiplyerFromDirection(Direction direction) {
+        return switch (direction) {
+            case NORTH -> 0.5f;
+            case SOUTH -> 1f;
+            case EAST -> 1f;
+            case WEST -> 0.5f;
+            default -> 1f;
+        };
     }
 
     @Override
@@ -36,12 +48,12 @@ class BlueprintBlockRenderView implements BlockRenderView {
 
     @Override
     public int getLightLevel(LightType type, BlockPos pos) {
-        return this.getMaxLightLevel();
+        return (int)LIGHT_LEVEL;
     }
 
     @Override
     public int getBaseLightLevel(BlockPos pos, int ambientDarkness) {
-        return this.getMaxLightLevel();
+        return (int)LIGHT_LEVEL;
     }
 
     @Override

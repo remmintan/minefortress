@@ -9,6 +9,7 @@ import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 import org.apache.commons.lang3.builder.Diff;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -27,28 +28,66 @@ public final class BlueprintRenderer {
         this.client = client;
     }
 
-    public void renderBlueprint(String fileName, BlockRotation rotation) {
+    public void renderBlueprint(String fileName, BlockRotation blockRotation, int slotColumn, int slotRow) {
+        DiffuseLighting.enableGuiDepthLighting();
+
         this.client.getProfiler().push("blueprint_build_model");
-        final BuiltBlueprint builtBlueprint = blueprintsModelBuilder.getOrBuildBlueprint(fileName, rotation);
+        final BuiltBlueprint builtBlueprint = blueprintsModelBuilder.getOrBuildBlueprint(fileName, blockRotation);
         this.client.getProfiler().pop();
         this.client.getProfiler().push("blueprint_render_model");
 
+        final float defaultDownscale = 0.0000067f;
+        final float defaultYOffset = 20.5f;
+        final float defaultXOffset = 49.5f;
+        final float defaultZOffset = 8900f;
+
+        final float defaultSlotDelta = 11f;
+
+
+        final Matrix4f projectionMatrix4f = CameraTools.getProjectionMatrix4f(this.client, 1f).copy();
         final MatrixStack matrices = new MatrixStack();
 
-        matrices.scale(0.1f, 0.2f, 0.1f);
 
-        matrices.translate(0f, 0 ,-7f);
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-45f));
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(45f));
+        float downscale = defaultDownscale;
+        matrices.scale(downscale, downscale, downscale);
+        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180f));
 
-        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices);
-        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices);
-        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices);
+
+        float y = defaultYOffset - defaultSlotDelta * slotRow;
+        float x = defaultXOffset - defaultSlotDelta * slotColumn;
+
+        final Vec3f moveVector = new Vec3f(x, y, defaultZOffset);
+
+        rotateBlueprint(matrices, moveVector, -45f, -30f);
+        matrices.translate(moveVector.getX(), moveVector.getY(), moveVector.getZ());
+
+        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f);
+        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f);
+        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f);
+
 
         this.client.getProfiler().pop();
     }
 
-    private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices) {
+    private void rotateBlueprint(MatrixStack matrices, Vec3f moveVector, float yawRotation, float pitchRotation) {
+        final Vec3f yawSceneRotationAxis = Vec3f.POSITIVE_Y;
+        final Vec3f yawMoveRotationAxis = Vec3f.NEGATIVE_Y;
+        final Quaternion yawSceneRotation = yawSceneRotationAxis.getDegreesQuaternion(yawRotation);
+        final Quaternion yawMoveRotation = yawMoveRotationAxis.getDegreesQuaternion(yawRotation);
+        matrices.multiply(yawSceneRotation);
+        moveVector.rotate(yawMoveRotation);
+
+        final Vec3f pitchSceneRotationAxis = Vec3f.POSITIVE_X.copy();
+        final Vec3f pitchMoveRotationAxis = Vec3f.NEGATIVE_X.copy();
+        pitchSceneRotationAxis.rotate(yawMoveRotation);
+        pitchMoveRotationAxis.rotate(yawMoveRotation);
+        final Quaternion pitchSceneRotation = pitchSceneRotationAxis.getDegreesQuaternion(pitchRotation);
+        final Quaternion pitchMoveRotation = pitchMoveRotationAxis.getDegreesQuaternion(pitchRotation);
+        matrices.multiply(pitchSceneRotation);
+        moveVector.rotate(pitchMoveRotation);
+    }
+
+    private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices, Matrix4f matrix4f) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
 
         renderLayer.startDrawing();
@@ -64,6 +103,9 @@ public final class BlueprintRenderer {
         }
         if (shader.modelViewMat != null) {
             shader.modelViewMat.set(matrices.peek().getModel());
+        }
+        if (shader.projectionMat != null) {
+            shader.projectionMat.set(matrix4f);
         }
         if (shader.colorModulator != null) {
             shader.colorModulator.set(new Vec3f(1F, 1.0F, 1F));
