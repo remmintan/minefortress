@@ -26,9 +26,13 @@ public final class BlueprintsScreen extends Screen {
 
     private static final Identifier INVENTORY_TABS_TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
     private static final String BACKGROUND_TEXTURE = "textures/gui/container/creative_inventory/tab_items.png";
+    private static final Identifier BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE = new Identifier("textures/gui/recipe_book.png");
 
     private final int backgroundWidth = 195;
     private final int backgroundHeight = 136;
+
+    private final int previewWidth = 120;
+    private final int previewOffset = 4;
 
     private BlueprintRenderer blueprintRenderer;
 
@@ -147,7 +151,7 @@ public final class BlueprintsScreen extends Screen {
             final ClientPlayerInteractionManager interactionManager = this.client.interactionManager;
             if(interactionManager != null && interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
                 super.init();
-                this.x = (this.width - backgroundWidth) / 2;
+                this.x = (this.width - backgroundWidth - previewWidth - previewOffset) / 2;
                 this.y = (this.height - backgroundHeight) / 2;
 
                 this.handler = new BlueprintScreenHandler(this.client);
@@ -191,6 +195,8 @@ public final class BlueprintsScreen extends Screen {
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(matrices, slotX, slotY, this.getZOffset());
+
+            this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
         }
 
         this.drawForeground(matrices, mouseX, mouseY);
@@ -237,7 +243,6 @@ public final class BlueprintsScreen extends Screen {
             final BlueprintMetadata metadata = slot.getMetadata();
             this.blueprintRenderer.renderBlueprint(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow);
         }
-//        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, slotX, slotY, string);
 
         this.itemRenderer.zOffset = 0.0f;
         this.setZOffset(0);
@@ -275,6 +280,13 @@ public final class BlueprintsScreen extends Screen {
 
         if(selectedGroup != null)
             this.renderTabIcon(matrices, selectedGroup);
+
+
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE);
+
+        this.drawTexture(matrices, this.x + this.backgroundWidth + this.previewOffset, this.y, 15, 23, this.previewWidth, this.backgroundHeight);
+
     }
 
 

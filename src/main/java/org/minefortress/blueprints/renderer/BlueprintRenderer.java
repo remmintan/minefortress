@@ -23,41 +23,65 @@ public final class BlueprintRenderer {
         this.client = client;
     }
 
-    public void renderBlueprint(String fileName, BlockRotation blockRotation, int slotColumn, int slotRow) {
-        DiffuseLighting.enableGuiDepthLighting();
-
-        this.client.getProfiler().push("blueprint_build_model");
-        final BuiltBlueprint builtBlueprint = blueprintsModelBuilder.getOrBuildBlueprint(fileName, blockRotation);
-        this.client.getProfiler().pop();
-        this.client.getProfiler().push("blueprint_render_model");
-
-        // calculating matrix
-        final MatrixStack matrices = RenderSystem.getModelViewStack();
-        final Matrix4f projectionMatrix4f = RenderSystem.getProjectionMatrix();
+    public void renderBlueprintPreview(String fileName, BlockRotation blockRotation) {
+        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
 
         final Vec3i size = builtBlueprint.getSize();
+        final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
 
+        final float scale = 80f / biggestSideSize;
+        final float scaleFactor = 2f / scale;
+        final float x = 130f * scaleFactor;
+        final float y = -60f * scaleFactor;
+        final float z = 30f * scaleFactor;
+
+        renderBlueprint(builtBlueprint, scale, x, y, z);
+    }
+
+    public void renderBlueprint(String fileName, BlockRotation blockRotation, int slotColumn, int slotRow) {
+        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
+
+        final Vec3i size = builtBlueprint.getSize();
         final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
 
         final float scale = 1.6f * 7 / biggestSideSize;
         final float scaleFactor = 2f/scale;
         final float x = 8.5f * scaleFactor + 11.25f * slotColumn * scaleFactor / 1.25f;
         final float y = -17f * scaleFactor - 11.25f * slotRow  * scaleFactor / 1.25f;
-        final Vec3f cameraMove = new Vec3f(x, y, 22f*scaleFactor);
+        final float z = 22f * scaleFactor;
+
+        renderBlueprint(builtBlueprint, scale, x, y, z);
+    }
+
+    private void renderBlueprint(BuiltBlueprint builtBlueprint, float scale, float x, float y, float z) {
+        this.client.getProfiler().push("blueprint_render_model");
+        DiffuseLighting.enableGuiDepthLighting();
+
+        // calculating matrix
+        final MatrixStack matrices = RenderSystem.getModelViewStack();
+        final Matrix4f projectionMatrix4f = RenderSystem.getProjectionMatrix();
+
+        final Vec3f cameraMove = new Vec3f(x, y, z);
         matrices.push();
 
         rotateScene(matrices, cameraMove);
         matrices.scale(scale, -scale, scale);
         matrices.translate(cameraMove.getX(), cameraMove.getY(), cameraMove.getZ());
 
-
         this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f);
         this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f);
         this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f);
 
         matrices.pop();
-
         this.client.getProfiler().pop();
+    }
+
+    private BuiltBlueprint getBuiltBlueprint(String fileName, BlockRotation blockRotation) {
+        this.client.getProfiler().push("blueprint_build_model");
+        final BuiltBlueprint builtBlueprint = blueprintsModelBuilder.getOrBuildBlueprint(fileName, blockRotation);
+        this.client.getProfiler().pop();
+
+        return builtBlueprint;
     }
 
     private void rotateScene(MatrixStack matrices, Vec3f cameraMove) {
