@@ -5,15 +5,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
-import org.apache.commons.lang3.builder.Diff;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.renderer.CameraTools;
 
 public final class BlueprintRenderer {
 
@@ -36,55 +33,54 @@ public final class BlueprintRenderer {
         this.client.getProfiler().pop();
         this.client.getProfiler().push("blueprint_render_model");
 
-        final float defaultDownscale = 0.0000067f;
-        final float defaultYOffset = 20.5f;
-        final float defaultXOffset = 49.5f;
-        final float defaultZOffset = 8900f;
+        // calculating matrix
+        final MatrixStack matrices = RenderSystem.getModelViewStack();
+        final Matrix4f projectionMatrix4f = RenderSystem.getProjectionMatrix();
 
-        final float defaultSlotDelta = 11f;
+        final float scale = 1.6f;
+        final float scaleFactor = 2f/scale;
+        final float x = 8.5f * scaleFactor + 11.25f * slotColumn;
+        final float y = -17f * scaleFactor - 11.25f * slotRow;
+        final Vec3f cameraMove = new Vec3f(x, y, 22f*scaleFactor);
+        matrices.push();
 
+        rotateScene(matrices, cameraMove);
+        matrices.scale(scale, -scale, scale);
+        matrices.translate(cameraMove.getX(), cameraMove.getY(), cameraMove.getZ());
 
-        final Matrix4f projectionMatrix4f = CameraTools.getProjectionMatrix4f(this.client, 1f).copy();
-        final MatrixStack matrices = new MatrixStack();
-
-
-        float downscale = defaultDownscale;
-        matrices.scale(downscale, downscale, downscale);
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180f));
-
-
-        float y = defaultYOffset - defaultSlotDelta * slotRow;
-        float x = defaultXOffset - defaultSlotDelta * slotColumn;
-
-        final Vec3f moveVector = new Vec3f(x, y, defaultZOffset);
-
-        rotateBlueprint(matrices, moveVector, -45f, -30f);
-        matrices.translate(moveVector.getX(), moveVector.getY(), moveVector.getZ());
 
         this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f);
         this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f);
         this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f);
 
+        matrices.pop();
 
         this.client.getProfiler().pop();
     }
 
-    private void rotateBlueprint(MatrixStack matrices, Vec3f moveVector, float yawRotation, float pitchRotation) {
+    private void rotateScene(MatrixStack matrices, Vec3f cameraMove) {
+        final float yaw = 135f;
+        final float pitch = -30f;
+
+        // calculating rotations
         final Vec3f yawSceneRotationAxis = Vec3f.POSITIVE_Y;
         final Vec3f yawMoveRotationAxis = Vec3f.NEGATIVE_Y;
-        final Quaternion yawSceneRotation = yawSceneRotationAxis.getDegreesQuaternion(yawRotation);
-        final Quaternion yawMoveRotation = yawMoveRotationAxis.getDegreesQuaternion(yawRotation);
-        matrices.multiply(yawSceneRotation);
-        moveVector.rotate(yawMoveRotation);
+        final Quaternion yawSceneRotation = yawSceneRotationAxis.getDegreesQuaternion(yaw);
+        final Quaternion yawMoveRotation = yawMoveRotationAxis.getDegreesQuaternion(yaw);
 
         final Vec3f pitchSceneRotationAxis = Vec3f.POSITIVE_X.copy();
-        final Vec3f pitchMoveRotationAxis = Vec3f.NEGATIVE_X.copy();
+        final Vec3f pitchMoveRotationAxis = Vec3f.POSITIVE_X.copy();
         pitchSceneRotationAxis.rotate(yawMoveRotation);
         pitchMoveRotationAxis.rotate(yawMoveRotation);
-        final Quaternion pitchSceneRotation = pitchSceneRotationAxis.getDegreesQuaternion(pitchRotation);
-        final Quaternion pitchMoveRotation = pitchMoveRotationAxis.getDegreesQuaternion(pitchRotation);
+        final Quaternion pitchSceneRotation = pitchSceneRotationAxis.getDegreesQuaternion(pitch);
+        final Quaternion pitchMoveRotation = pitchMoveRotationAxis.getDegreesQuaternion(pitch);
+
+        // rotating camera
+        cameraMove.rotate(yawMoveRotation);
+        cameraMove.rotate(pitchMoveRotation);
+
+        matrices.multiply(yawSceneRotation);
         matrices.multiply(pitchSceneRotation);
-        moveVector.rotate(pitchMoveRotation);
     }
 
     private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices, Matrix4f matrix4f) {

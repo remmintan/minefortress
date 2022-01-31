@@ -235,11 +235,7 @@ public final class BlueprintsScreen extends Screen {
         RenderSystem.enableDepthTest();
         if(this.client != null){
             final BlueprintMetadata metadata = slot.getMetadata();
-            if(metadata.getName().equals("Small House 13")) {
-                this.blueprintRenderer.renderBlueprint(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow);
-            } else {
-                this.itemRenderer.renderInGuiWithOverrides(this.client.player, itemStack, slotX, slotY, slotX + slotY * this.backgroundWidth);
-            }
+            this.blueprintRenderer.renderBlueprint(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow);
         }
 //        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, slotX, slotY, string);
 
