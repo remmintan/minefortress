@@ -43,7 +43,6 @@ public final class BlueprintScreenHandler {
     }
 
     public void scroll(float scrollPosition) {
-        if(scrollPosition == scroll) return;
         final List<BlueprintMetadata> allBlueprint = getMetadataManager().getAllBlueprint(selectedGroup);
         this.totalSize = allBlueprint.size();
         this.currentSlots = new ArrayList<>();
