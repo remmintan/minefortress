@@ -1,7 +1,6 @@
 package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.minefortress.blueprints.BlueprintMetadata;
 import org.minefortress.blueprints.BlueprintMetadataManager;
@@ -16,7 +15,7 @@ public final class BlueprintScreenHandler {
     private final MinecraftClient client;
     private final FortressMinecraftClient fortressClient;
 
-    private BlueprintGroup selectedGroup = BlueprintGroup.MAIN;
+    private BlueprintGroup selectedGroup = BlueprintGroup.LIVING_HOUSES;
 
     private float scroll = -1f;
     private List<BlueprintSlot> currentSlots;
@@ -45,7 +44,7 @@ public final class BlueprintScreenHandler {
 
     public void scroll(float scrollPosition) {
         if(scrollPosition == scroll) return;
-        final List<BlueprintMetadata> allBlueprint = getMetadataManager().getAllBlueprint();
+        final List<BlueprintMetadata> allBlueprint = getMetadataManager().getAllBlueprint(selectedGroup);
         this.totalSize = allBlueprint.size();
         this.currentSlots = new ArrayList<>();
 
@@ -86,7 +85,7 @@ public final class BlueprintScreenHandler {
 
     public void clickOnFocusedSlot() {
         if(focusedSlot == null) return;
-        // TODO: do something
+        getMetadataManager().select(focusedSlot.getMetadata());
     }
 
     public int getSelectedGroupSize() {

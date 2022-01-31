@@ -7,12 +7,12 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public enum BlueprintGroup {
-    MAIN(true, Items.GOLD_BLOCK, "Main"),
-    DECORATION(true, Items.CHORUS_FLOWER, "Decoration");
+    LIVING_HOUSES(true, Items.OAK_PLANKS, "Houses"),
+    DECORATION(true, Items.ROSE_BUSH, "Decoration");
 
     private final boolean topRow;
-    private ItemStack icon;
-    private Text nameText;
+    private final ItemStack icon;
+    private final Text nameText;
 
     BlueprintGroup(boolean topRow, Item item, String name) {
         this.topRow = topRow;
