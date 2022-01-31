@@ -93,7 +93,7 @@ public class CameraTools {
     }
 
     @NotNull
-    public static Matrix4f getProjectionMatrix4f(MinecraftClient minecraft, double fov) {
+    private static Matrix4f getProjectionMatrix4f(MinecraftClient minecraft, double fov) {
         final GameRenderer gameRenderer = minecraft.gameRenderer;
         return gameRenderer.getBasicProjectionMatrix(fov).copy();
     }
