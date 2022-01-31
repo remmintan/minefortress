@@ -14,6 +14,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
 import org.minefortress.blueprints.BlueprintBlockDataManager;
 
@@ -39,15 +40,33 @@ public class BuiltBlueprint {
             .collect(Collectors.toMap(Function.identity(), it -> new VertexBuffer()));
 
     private final BlockRenderView blueprintData;
+    private final Vec3i size;
 
     public BuiltBlueprint(BlueprintBlockDataManager.BlueprintBlockData blockData) {
         if(blockData == null) throw new IllegalArgumentException("Block data cannot be null");
         this.blueprintData = new BlueprintBlockRenderView(blockData.getBlueprintData());
+        this.size = blockData.getSize();
     }
 
     public void build(BlockBufferBuilderStorage blockBufferBuilders) {
         render(blockBufferBuilders);
         uploadBuffers(blockBufferBuilders);
+    }
+
+    public boolean buffersUploaded() {
+        return uploadsFuture.isDone();
+    }
+
+    public VertexBuffer getBuffer(RenderLayer layer) {
+        return vertexBuffers.get(layer);
+    }
+
+    public boolean hasLayer(RenderLayer layer) {
+        return this.buffersUploaded() && nonEmptyLayers.contains(layer);
+    }
+
+    public Vec3i getSize() {
+        return size;
     }
 
     private void uploadBuffers(BlockBufferBuilderStorage blockBufferBuilders) {
@@ -64,9 +83,6 @@ public class BuiltBlueprint {
         uploadsFuture = Util.combine(uploadFutures);
     }
 
-    public boolean buffersUploaded() {
-        return uploadsFuture.isDone();
-    }
 
     private void render(BlockBufferBuilderStorage blockBufferBuilders) {
         BlockPos minPos = BlockPos.ORIGIN;
@@ -126,13 +142,6 @@ public class BuiltBlueprint {
             beginBufferBuilding(bufferBuilder);
     }
 
-    public VertexBuffer getBuffer(RenderLayer layer) {
-        return vertexBuffers.get(layer);
-    }
-
-    public boolean hasLayer(RenderLayer layer) {
-        return this.buffersUploaded() && nonEmptyLayers.contains(layer);
-    }
 
     private MinecraftClient getClient() {
         return MinecraftClient.getInstance();

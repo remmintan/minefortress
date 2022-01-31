@@ -7,9 +7,7 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.*;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
 public final class BlueprintRenderer {
@@ -37,10 +35,14 @@ public final class BlueprintRenderer {
         final MatrixStack matrices = RenderSystem.getModelViewStack();
         final Matrix4f projectionMatrix4f = RenderSystem.getProjectionMatrix();
 
-        final float scale = 1.6f;
+        final Vec3i size = builtBlueprint.getSize();
+
+        final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
+
+        final float scale = 1.6f * 7 / biggestSideSize;
         final float scaleFactor = 2f/scale;
-        final float x = 8.5f * scaleFactor + 11.25f * slotColumn;
-        final float y = -17f * scaleFactor - 11.25f * slotRow;
+        final float x = 8.5f * scaleFactor + 11.25f * slotColumn * scaleFactor / 1.25f;
+        final float y = -17f * scaleFactor - 11.25f * slotRow  * scaleFactor / 1.25f;
         final Vec3f cameraMove = new Vec3f(x, y, 22f*scaleFactor);
         matrices.push();
 
