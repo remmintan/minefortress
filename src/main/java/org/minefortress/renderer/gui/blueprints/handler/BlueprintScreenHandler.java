@@ -12,12 +12,10 @@ import java.util.List;
 
 public final class BlueprintScreenHandler {
 
-    private final MinecraftClient client;
     private final FortressMinecraftClient fortressClient;
 
     private BlueprintGroup selectedGroup = BlueprintGroup.LIVING_HOUSES;
 
-    private float scroll = -1f;
     private List<BlueprintSlot> currentSlots;
     private boolean needScrollbar = false;
     private int totalSize = 0;
@@ -25,7 +23,6 @@ public final class BlueprintScreenHandler {
     private BlueprintSlot focusedSlot;
 
     public BlueprintScreenHandler(MinecraftClient client){
-        this.client = client;
         if(!(client instanceof FortressMinecraftClient))
             throw new IllegalArgumentException("Client must be an instance of FortressMinecraftClient");
         this.fortressClient = (FortressMinecraftClient)client;
@@ -63,7 +60,6 @@ public final class BlueprintScreenHandler {
         }
 
         this.needScrollbar = this.totalSize > 9 * 5;
-        this.scroll = scrollPosition;
     }
 
     public void focusOnSlot(BlueprintSlot slot) {
