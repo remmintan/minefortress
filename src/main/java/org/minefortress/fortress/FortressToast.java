@@ -26,7 +26,7 @@ public class FortressToast implements Toast {
 
     @Override
     public Visibility draw(MatrixStack matrices, ToastManager manager, long startTime) {
-        final TextRenderer textRenderer = manager.getGame().textRenderer;
+        final TextRenderer textRenderer = manager.getClient().textRenderer;
 
         RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -46,7 +46,7 @@ public class FortressToast implements Toast {
 
     private void renderItem(ToastManager manager) {
         RenderSystem.enableBlend();
-        final ItemRenderer itemRenderer = manager.getGame().getItemRenderer();
+        final ItemRenderer itemRenderer = manager.getClient().getItemRenderer();
         itemRenderer.renderInGui(itemStack, 6, 6);
         RenderSystem.enableBlend();
     }

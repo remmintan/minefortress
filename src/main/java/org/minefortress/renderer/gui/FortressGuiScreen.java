@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 
 abstract class FortressGuiScreen extends DrawableHelper {
 
-
-
     protected final MinecraftClient client;
     protected final ItemRenderer itemRenderer;
     protected final TextRenderer textRenderer;
@@ -81,7 +79,7 @@ abstract class FortressGuiScreen extends DrawableHelper {
         BufferBuilder bufferBuilder = tessellator.getBuffer();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        Matrix4f matrix4f = matrices.peek().getModel();
+        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         Screen.fillGradient(matrix4f, bufferBuilder, l - 3, tooltipComponent - 4, l + k + 3, tooltipComponent - 3, 400, -267386864, -267386864);
         Screen.fillGradient(matrix4f, bufferBuilder, l - 3, tooltipComponent + m + 3, l + k + 3, tooltipComponent + m + 4, 400, -267386864, -267386864);
         Screen.fillGradient(matrix4f, bufferBuilder, l - 3, tooltipComponent - 3, l + k + 3, tooltipComponent + m + 3, 400, -267386864, -267386864);
@@ -112,7 +110,7 @@ abstract class FortressGuiScreen extends DrawableHelper {
         r = tooltipComponent;
         for (s = 0; s < components.size(); ++s) {
             tooltipComponent2 = components.get(s);
-            tooltipComponent2.drawItems(this.textRenderer, l, r, matrices, this.itemRenderer, 400, this.client.getTextureManager());
+            tooltipComponent2.drawItems(this.textRenderer, l, r, matrices, this.itemRenderer, 400);
             r += tooltipComponent2.getHeight() + (s == 0 ? 2 : 0);
         }
         this.itemRenderer.zOffset = f;

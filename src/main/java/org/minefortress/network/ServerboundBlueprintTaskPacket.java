@@ -48,7 +48,7 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final ServerWorld serverWorld = player.getServerWorld();
+        final ServerWorld serverWorld = player.getWorld();
         if(serverWorld instanceof final FortressServerWorld fortressWorld) {
             final ServerBlueprintManager blueprintManager = fortressWorld.getBlueprintManager();
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation);

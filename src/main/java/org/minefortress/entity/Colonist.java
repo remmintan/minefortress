@@ -303,8 +303,7 @@ public class Colonist extends PassiveEntity {
             Box aabb = Box.of(legsPos, getWidth(), 1.0E-6D, getWidth());
             BiPredicate<BlockState, BlockPos> collide = (p_20129_, p_20130_) -> !p_20129_.isAir();
             return this.world
-                    .getBlockCollisions(this, aabb, collide)
-                    .findAny().isPresent();
+                    .getBlockCollisions(this, aabb).iterator().hasNext();
         }
     }
 
@@ -314,7 +313,7 @@ public class Colonist extends PassiveEntity {
         } else {
             Box legsBox = Box.of(this.getPos(), getWidth()/1.4, 0.5, getWidth()/1.4);
             Box aboveTheHeadBox = legsBox.offset(0, 2.5, 0);
-            return this.world.getBlockCollisions(this, aboveTheHeadBox).count() >0;
+            return this.world.getBlockCollisions(this, aboveTheHeadBox).iterator().hasNext();
         }
     }
 
@@ -324,9 +323,7 @@ public class Colonist extends PassiveEntity {
         } else {
             Box aabb = Box.of(this.getEyePos(), (double)getWidth(), 1.0E-6D, (double)getWidth());
             return this.world
-                    .getBlockCollisions(this, aabb, (p_20129_, p_20130_) -> !p_20129_.isAir())
-                    .findAny()
-                    .isPresent();
+                    .getBlockCollisions(this, aabb).iterator().hasNext();
         }
     }
 

@@ -23,9 +23,7 @@
     "client": [
       "org.minefortress.MineFortressClient"
     ],
-    "server": [
-      "org.minefortress.MineFortressServer"
-    ],
+    "server": [],
     "mm:early_risers": [
       "org.minefortress.earlyriser.GameModeEarlyRiser"
     ]
@@ -37,7 +35,7 @@
   "depends": {
     "fabricloader": ">=0.11.3",
     "fabric": ">=0.44.0",
-    "minecraft": "1.17.1",
+    "minecraft": "1.18.1",
     "java": ">=16",
     "mm": ">=2.3"
   },

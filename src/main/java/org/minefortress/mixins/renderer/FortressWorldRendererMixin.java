@@ -63,11 +63,11 @@ public abstract class FortressWorldRendererMixin  {
     }
 
     @Inject(method = "setupTerrain", at = @At("TAIL"))
-    public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, int frame, boolean spectator, CallbackInfo ci) {
+    public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
         if(blueprintManager.hasSelectedBlueprint()) {
-            blueprintManager.buildStructure(this.chunkBuilder);
+            blueprintManager.buildStructure();
         }
     }
 

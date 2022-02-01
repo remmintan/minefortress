@@ -18,6 +18,9 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.renderer.BlueprintRenderer;
+import org.minefortress.blueprints.renderer.BlueprintsModelBuilder;
+import org.minefortress.blueprints.renderer.BuiltBlueprint;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundBlueprintTaskPacket;
@@ -35,35 +38,24 @@ public class BlueprintManager {
 
     private final MinecraftClient client;
     private final BlueprintBlockDataManager blockDataManager;
+    private final BlueprintsModelBuilder blueprintsBuilder;
 
     private BlueprintMetadata selectedStructure;
-    private final Map<String, BlueprintRenderInfo> blueprintInfos = new HashMap<>();
     private BlockPos blueprintBuildPos = null;
     private boolean cantBuild = false;
 
     public BlueprintManager(MinecraftClient client) {
         this.client = client;
-        this.blockDataManager = ((FortressMinecraftClient)client).getBlueprintBlockDataManager();
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
+        this.blockDataManager = fortressClient.getBlueprintBlockDataManager();
+        this.blueprintsBuilder = fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder();
     }
 
-    public void buildStructure(ChunkBuilder chunkBuilder) {
-        final String selectedStructureId = selectedStructure.getId();
+    public void buildStructure() {
         final String file = selectedStructure.getFile();
-        if(!blueprintInfos.containsKey(selectedStructureId)) {
-            final BlockRotation rotation = selectedStructure.getRotation();
+        final BlockRotation rotation = selectedStructure.getRotation();
+        this.blueprintsBuilder.buildBlueprint(file, rotation);
 
-            final BlueprintBlockDataManager.BlueprintBlockData blueprintBlockData = blockDataManager
-                    .getBlockData(file, rotation, false);
-
-            final BlueprintRenderInfo blueprintRenderInfo = BlueprintRenderInfo.create(blueprintBlockData, client.world, chunkBuilder);
-            blueprintInfos.put(selectedStructureId, blueprintRenderInfo);
-        }
-
-        if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
-            final BlockPos blockPos = blockHitResult.getBlockPos();
-            if(blockPos != null)
-                this.blueprintInfos.get(selectedStructureId).rebuild(blockPos);
-        }
     }
 
     public void tick() {
@@ -121,7 +113,7 @@ public class BlueprintManager {
 
     public void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
         int k;
-        RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+        RenderSystem.assertOnRenderThread();
         renderLayer.startDrawing();
         this.client.getProfiler().push("filterempty");
         this.client.getProfiler().swap(() -> "render_" + renderLayer);
@@ -133,7 +125,7 @@ public class BlueprintManager {
             shader.addSampler("Sampler" + i, k);
         }
         if (shader.modelViewMat != null) {
-            shader.modelViewMat.set(matrices.peek().getModel());
+            shader.modelViewMat.set(matrices.peek().getPositionMatrix());
         }
         if (shader.projectionMat != null) {
             shader.projectionMat.set(matrix4f);
@@ -161,8 +153,8 @@ public class BlueprintManager {
         GlUniform i = shader.chunkOffset;
         k = 0;
 
-        final ChunkBuilder.BuiltChunk chunk = getBuiltChunk();
-        if(chunk != null && !chunk.getData().isEmpty(renderLayer) && blueprintBuildPos != null) {
+        final BuiltBlueprint chunk = getBuiltBlueprint();
+        if(chunk != null && chunk.buffersUploaded() && chunk.hasLayer(renderLayer) && blueprintBuildPos != null) {
             VertexBuffer vertexBuffer = chunk.getBuffer(renderLayer);
             if (i != null) {
                 i.set((float)((double)blueprintBuildPos.getX() - d), (float)((double)blueprintBuildPos.getY() - e), (float)((double)blueprintBuildPos.getZ() - f));
@@ -185,8 +177,8 @@ public class BlueprintManager {
     }
 
     @Nullable
-    private ChunkBuilder.BuiltChunk getBuiltChunk() {
-        return this.blueprintInfos.get(this.selectedStructure.getId()).getBuiltChunk();
+    private BuiltBlueprint getBuiltBlueprint() {
+        return this.blueprintsBuilder.getOrBuildBlueprint(this.selectedStructure.getFile(), this.selectedStructure.getRotation());
     }
 
 

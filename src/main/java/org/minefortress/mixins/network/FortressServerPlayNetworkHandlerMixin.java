@@ -44,7 +44,7 @@ public class FortressServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onPlayerInteractBlock", at = @At(value = "INVOKE", target="Lnet/minecraft/server/network/ServerPlayerEntity;updateLastActionTime()V", shift = At.Shift.AFTER), cancellable = true)
     public void onPlayerInteractBlock(PlayerInteractBlockC2SPacket packet, CallbackInfo ci) {
-        ServerWorld serverWorld = this.player.getServerWorld();
+        ServerWorld serverWorld = this.player.getWorld();
         Hand hand = packet.getHand();
         ItemStack itemStack = this.player.getStackInHand(hand);
         BlockHitResult blockHitResult = packet.getBlockHitResult();

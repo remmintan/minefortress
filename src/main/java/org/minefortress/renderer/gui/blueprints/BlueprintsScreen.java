@@ -155,7 +155,7 @@ public final class BlueprintsScreen extends Screen {
                 this.y = (this.height - backgroundHeight) / 2;
 
                 this.handler = new BlueprintScreenHandler(this.client);
-                this.blueprintRenderer = new BlueprintRenderer(this.client);
+                this.blueprintRenderer = ((FortressMinecraftClient)this.client).getBlueprintRenderer();
             } else {
                 this.client.setScreen(null);
             }
@@ -221,7 +221,7 @@ public final class BlueprintsScreen extends Screen {
     }
 
     @Override
-    public boolean isPauseScreen() {
+    public boolean shouldPause() {
         return false;
     }
 

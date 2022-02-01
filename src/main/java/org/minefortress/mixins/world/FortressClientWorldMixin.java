@@ -32,7 +32,7 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
 
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void constructorHead(ClientPlayNetworkHandler networkHandler, ClientWorld.Properties properties, RegistryKey registryRef, DimensionType dimensionType, int loadDistance, Supplier profiler, WorldRenderer worldRenderer, boolean debugWorld, long seed, CallbackInfo ci) {
+    public void constructorHead(ClientPlayNetworkHandler netHandler, ClientWorld.Properties properties, RegistryKey registryRef, DimensionType dimensionType, int loadDistance, int simulationDistance, Supplier profiler, WorldRenderer worldRenderer, boolean debugWorld, long seed, CallbackInfo ci) {
         tasksHolder = new ClientTasksHolder((ClientWorld) (Object)this, worldRenderer);
         blueprintManager = new BlueprintManager(MinecraftClient.getInstance());
     }

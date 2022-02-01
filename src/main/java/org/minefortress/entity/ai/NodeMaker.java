@@ -81,7 +81,7 @@ public class NodeMaker extends LandPathNodeMaker {
             stepUp = MathHelper.floor(Math.max(1.0F, this.entity.stepHeight));
         }
 
-        double currentNodeFloor = this.method_37003(new BlockPos(currentNode.x, currentNode.y, currentNode.z));
+        double currentNodeFloor = this.getFeetY(new BlockPos(currentNode.x, currentNode.y, currentNode.z));
         PathNode node = this.findAcceptedNode(currentNode.x, currentNode.y, currentNode.z + 1, stepUp, currentNodeFloor, Direction.SOUTH, currentType);
         if (this.isValidAdjacentSuccessor(node, currentNode)) {
             neighbors[i++] = node;
@@ -129,7 +129,7 @@ public class NodeMaker extends LandPathNodeMaker {
         final int stepUpCost = Math.max(MAX_SET_UP - stepUp, 0) * 8;
         PathNode node = null;
         BlockPos.Mutable cursor = new BlockPos.Mutable();
-        double d0 = this.method_37003(cursor.set(x, y, z));
+        double d0 = this.getFeetY(cursor.set(x, y, z));
         double maxDelta = wallClimbMode ? MAX_SET_UP : 1.125;
         if (d0 - floorLevel > maxDelta) {
             return null;

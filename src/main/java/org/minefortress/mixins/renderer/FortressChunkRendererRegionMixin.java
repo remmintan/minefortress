@@ -4,10 +4,10 @@ import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.chunk.ChunkRendererRegion;
+import net.minecraft.client.render.chunk.RenderedChunk;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.ClickType;
@@ -29,7 +29,7 @@ public abstract class FortressChunkRendererRegionMixin {
     @Shadow protected abstract int getIndex(BlockPos pos);
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(World world, int chunkX, int chunkZ, WorldChunk[][] chunks, BlockPos startPos, BlockPos endPos, CallbackInfo ci) {
+    public void init(World world, int chunkX, int chunkZ, RenderedChunk[][] chunks, CallbackInfo ci) {
         final MinecraftClient client = MinecraftClient.getInstance();
         if(client.interactionManager == null || client.interactionManager.getCurrentGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS"))
             return;

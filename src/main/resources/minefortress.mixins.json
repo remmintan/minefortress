@@ -22,7 +22,6 @@
     "renderer.FortressGameRendererMixin",
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
-    "renderer.FortressWorldSliceMixin",
     "world.FortressClientWorldMixin",
     "entity.FortressServerPlayerEntityMixin",
     "world.FortressServerWorldMixin"
