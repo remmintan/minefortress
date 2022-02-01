@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -45,7 +46,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         world.emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
 
         final NbtCompound nbtCompound = new NbtCompound();
-        nbtCompound.putUuid("playerId", player.getUuid());
+        nbtCompound.putUuid("fortressUUID", ((FortressServerPlayerEntity)player).getFortressUuid());
         nbtCompound.putInt("centerX", fortressCenter.getX());
         nbtCompound.putInt("centerY", fortressCenter.getY());
         nbtCompound.putInt("centerZ", fortressCenter.getZ());

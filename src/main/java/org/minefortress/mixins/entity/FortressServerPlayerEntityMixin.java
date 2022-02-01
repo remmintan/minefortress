@@ -26,8 +26,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.UUID;
+
 @Mixin(ServerPlayerEntity.class)
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
+
+    private UUID fortressUUID = UUID.randomUUID();
 
     @Shadow @Final public ServerPlayerInteractionManager interactionManager;
     private FortressServerManager fortressServerManager;
@@ -48,6 +52,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
+        nbt.putUuid("fortressUuid", fortressUUID);
         final NbtCompound fortressManagerTag = new NbtCompound();
         fortressServerManager.writeToNbt(fortressManagerTag);
         nbt.put("FortressManager", fortressManagerTag);
@@ -55,6 +60,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
+        fortressUUID = nbt.getUuid("fortressUuid");
         final NbtCompound fortressManagerTag = nbt.getCompound("FortressManager");
         fortressServerManager.readFromNbt(fortressManagerTag);
     }
@@ -83,5 +89,10 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         if(oldPlayer instanceof FortressServerPlayerEntity fortressServerPlayer) {
             this.fortressServerManager = fortressServerPlayer.getFortressServerManager();
         }
+    }
+
+    @Override
+    public UUID getFortressUuid() {
+        return fortressUUID;
     }
 }

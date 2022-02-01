@@ -18,6 +18,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
@@ -43,6 +44,7 @@ import org.minefortress.tasks.block.info.TaskBlockInfo;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 public class Colonist extends PassiveEntity {
 
@@ -77,17 +79,29 @@ public class Colonist extends PassiveEntity {
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
-        this.masterPlayerId = entityNbt.getUuid("playerId");
+        this.masterPlayerId = entityNbt.getUuid("fortressUUID");
         int centerX = entityNbt.getInt("centerX");
         int centerY = entityNbt.getInt("centerY");
         int centerZ = entityNbt.getInt("centerZ");
         this.fortressCenter = new BlockPos(centerX, centerY, centerZ);
 
-        final ServerPlayerEntity player = getServer().getPlayerManager().getPlayer(this.masterPlayerId);
-        if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
-            fortressServerPlayer.getFortressServerManager().addColonist();
-        }
+        this.doActionOnMasterPlayer(player -> player.getFortressServerManager().addColonist());
+
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+    }
+
+    private void doActionOnMasterPlayer(Consumer<FortressServerPlayerEntity> playerConsumer) {
+        final MinecraftServer server = getServer();
+        if(server == null || masterPlayerId == null) return;
+        server
+                .getPlayerManager()
+                .getPlayerList()
+                .stream()
+                .filter(p -> p instanceof FortressServerPlayerEntity)
+                .map(p -> (FortressServerPlayerEntity) p)
+                .filter(p -> p.getFortressUuid().equals(masterPlayerId))
+                .findFirst()
+                .ifPresent(playerConsumer);
     }
 
     public BlockPos getFortressCenter() {
@@ -243,12 +257,7 @@ public class Colonist extends PassiveEntity {
         if(this.executeTaskGoal != null) {
             this.executeTaskGoal.returnTask();
         }
-        if(this.masterPlayerId != null) {
-            final ServerPlayerEntity player = getServer().getPlayerManager().getPlayer(this.masterPlayerId);
-            if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
-                fortressServerPlayer.getFortressServerManager().removeColonist();
-            }
-        }
+        this.doActionOnMasterPlayer(p -> p.getFortressServerManager().removeColonist());
     }
 
     @Override

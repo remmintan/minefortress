@@ -91,7 +91,7 @@ public class FortressServerPlayNetworkHandlerMixin {
             if(stack.getNbt() == null) stack.setNbt(new NbtCompound());
             if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
                 final NbtCompound nbt = stack.getNbt();
-                nbt.putUuid("playerId", player.getUuid());
+                nbt.putUuid("fortressUUID", fortressServerPlayer.getFortressUuid());
 
                 final FortressServerManager fortressManager = fortressServerPlayer.getFortressServerManager();
                 final BlockPos fortressCenter = fortressManager.getFortressCenter();
