@@ -21,16 +21,19 @@ public abstract class FortressCreateWorldScreenMixin extends Screen {
 
     @Shadow private boolean cheatsEnabled;
 
+    @Shadow private Difficulty currentDifficulty;
+
     protected FortressCreateWorldScreenMixin(Text title) {
         super(title);
     }
 
-    @Inject(method = "tweakDefaultsTo", at = @At("TAIL"))
+    @Inject(method = "tweakDefaultsTo", at = @At(value = "TAIL"))
     private void tweakDefaultsTo(CreateWorldScreen.Mode mode, CallbackInfo ci) {
         if(mode == CreateWorldScreen.Mode.DEBUG) {
             this.cheatsEnabled = true;
             enableCheatsButton.setValue(true);
             difficultyButton.setValue(Difficulty.PEACEFUL);
+            this.currentDifficulty = Difficulty.PEACEFUL;
         }
     }
 
