@@ -31,6 +31,8 @@ import static org.minefortress.MineFortressConstants.PICK_DISTANCE;
 @Mixin(GameRenderer.class)
 public abstract class FortressGameRendererMixin implements FortressGameRenderer {
 
+    private final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+
     @Shadow
     public abstract Camera getCamera();
 
@@ -89,7 +91,8 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;"))
     public Vec3d updateTargetedEntityGetRotation(Entity instance, float tickDelta) {
-        if(instance instanceof ClientPlayerEntity player) {
+        final ClientPlayerInteractionManager interactionManager = MinecraftClient.getInstance().interactionManager;
+        if(interactionManager != null && interactionManager.getCurrentGameMode() == FORTRESS && instance instanceof ClientPlayerEntity player) {
             return CameraTools.getMouseBasedViewVector(MinecraftClient.getInstance(), player.getPitch(), player.getYaw());
         } else {
             return instance.getRotationVec(tickDelta);
@@ -101,7 +104,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         final double realDistance = instance.squaredDistanceTo(vec);
 
         final ClientPlayerInteractionManager interactionManager = MinecraftClient.getInstance().interactionManager;
-        if(interactionManager != null && interactionManager.getCurrentGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) return realDistance;
+        if(interactionManager != null && interactionManager.getCurrentGameMode() != FORTRESS) return realDistance;
         if(realDistance > PICK_DISTANCE * PICK_DISTANCE) {
             return realDistance;
         } else {
