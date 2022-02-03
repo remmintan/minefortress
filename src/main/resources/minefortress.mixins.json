@@ -8,6 +8,7 @@
     "FortressMinecraftClientMixin",
     "entity.FortressClientPlayerEntityMixin",
     "entity.FortressMobMixin",
+    "entity.FortressServerPlayerEntityMixin",
     "entity.FortressSlimeEntityMixin",
     "interaction.FortressGameModeMixin",
     "interaction.FortressInteractionManagerMixin",
@@ -23,8 +24,8 @@
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
     "world.FortressClientWorldMixin",
-    "entity.FortressServerPlayerEntityMixin",
-    "world.FortressServerWorldMixin"
+    "world.FortressServerWorldMixin",
+    "network.FortressClientPlayNetworkHandlerMixin"
   ],
   "server": [],
   "injectors": {
