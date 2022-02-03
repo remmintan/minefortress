@@ -4,8 +4,7 @@
   "package": "org.minefortress.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "FortressServerMixin",
-    "network.FortressClientPlayNetworkHandlerMixin"
+    "FortressServerMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",
@@ -27,7 +26,8 @@
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
     "world.FortressClientWorldMixin",
-    "world.FortressServerWorldMixin"
+    "world.FortressServerWorldMixin",
+    "network.FortressClientPlayNetworkHandlerMixin"
   ],
   "server": [],
   "injectors": {
