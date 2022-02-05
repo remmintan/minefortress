@@ -15,6 +15,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.BlueprintMetadata;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 
@@ -58,7 +59,7 @@ public final class BlueprintsScreen extends Screen {
                 this.y = (this.height - backgroundHeight) / 2;
 
                 this.handler = new BlueprintScreenHandler(this.client);
-                this.blueprintRenderer = new BlueprintRenderer(this.client);
+                this.blueprintRenderer = ((FortressMinecraftClient)this.client).getBlueprintRenderer();
             } else {
                 this.client.setScreen(null);
             }
