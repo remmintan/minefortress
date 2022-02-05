@@ -12,5 +12,6 @@ public class FortressChannelNames {
     public static final String FORTRESS_MANAGER_SYNC = "fortress_manager_sync";
     public static final String FORTRESS_SET_CENTER = "fortress_set_center";
     public static final String FORTRESS_FOLLOW_COLONIST = "fortress_follow_colonist";
+    public static final String FORTRESS_EDIT_BLUEPRINT = "fortress_edit_blueprint";
 
 }

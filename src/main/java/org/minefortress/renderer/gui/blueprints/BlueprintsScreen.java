@@ -8,7 +8,6 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
@@ -16,7 +15,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.BlueprintMetadata;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 
@@ -27,6 +25,7 @@ public final class BlueprintsScreen extends Screen {
     private static final Identifier INVENTORY_TABS_TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
     private static final String BACKGROUND_TEXTURE = "textures/gui/container/creative_inventory/tab_items.png";
     private static final Identifier BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE = new Identifier("textures/gui/recipe_book.png");
+    private static final LiteralText EDIT_BLUEPRINT_TEXT = new LiteralText("right click to edit");
 
     private final int backgroundWidth = 195;
     private final int backgroundHeight = 136;
@@ -49,6 +48,24 @@ public final class BlueprintsScreen extends Screen {
     }
 
     @Override
+    protected void init() {
+        if(this.client != null) {
+            this.client.keyboard.setRepeatEvents(true);
+            final ClientPlayerInteractionManager interactionManager = this.client.interactionManager;
+            if(interactionManager != null && interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+                super.init();
+                this.x = (this.width - backgroundWidth - previewWidth - previewOffset) / 2;
+                this.y = (this.height - backgroundHeight) / 2;
+
+                this.handler = new BlueprintScreenHandler(this.client);
+                this.blueprintRenderer = new BlueprintRenderer(this.client);
+            } else {
+                this.client.setScreen(null);
+            }
+        }
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if(button == 0) {
             for(BlueprintGroup group : BlueprintGroup.values()) {
@@ -63,14 +80,14 @@ public final class BlueprintsScreen extends Screen {
 
         if(super.mouseClicked(mouseX, mouseY, button)) return true;
 
-        if(button == 0) {
+        if(button == 0 || button == 1) {
             if(this.handler.hasFocusedSlot()) {
+                if(button == 1) return true;
+
                 if(this.client != null){
                     this.client.setScreen(null);
-                    ((FortressMinecraftClient)this.client).getBlueprintMetadataManager().selectFirst();
                 }
                 this.handler.clickOnFocusedSlot();
-                return true;
             }
         }
 
@@ -102,6 +119,16 @@ public final class BlueprintsScreen extends Screen {
                 }
             }
         }
+
+        if(button == 1) {
+            if(this.handler.hasFocusedSlot()) {
+                if(client != null) {
+                    this.client.setScreen(null);
+                }
+                this.handler.sendEditPacket();
+            }
+        }
+
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
@@ -115,51 +142,6 @@ public final class BlueprintsScreen extends Screen {
         this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
         this.handler.scroll(scrollPosition);
         return true;
-    }
-
-    private boolean isClickInTab(BlueprintGroup group, double mouseX, double mouseY) {
-        mouseX -= this.x;
-        mouseY -= this.y;
-
-        int columnNumber = group.ordinal();
-        int x = 28 * columnNumber;
-        int y = 0;
-        if (columnNumber > 0) x += columnNumber;
-
-        if (group.isTopRow()) {
-            y -= 32;
-        } else {
-            y += this.backgroundHeight;
-        }
-        return mouseX >= (double)x && mouseX <= (double)(x + 28) && mouseY >= (double)y && mouseY <= (double)(y + 32);
-    }
-
-    private boolean isClickInScrollbar(double mouseX, double mouseY) {
-        int i = this.x;
-        int j = this.y;
-        int k = i + 175;
-        int l = j + 18;
-        int m = k + 14;
-        int n = l + 112;
-        return mouseX >= (double)k && mouseY >= (double)l && mouseX < (double)m && mouseY < (double)n;
-    }
-
-    @Override
-    protected void init() {
-        if(this.client != null) {
-            this.client.keyboard.setRepeatEvents(true);
-            final ClientPlayerInteractionManager interactionManager = this.client.interactionManager;
-            if(interactionManager != null && interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
-                super.init();
-                this.x = (this.width - backgroundWidth - previewWidth - previewOffset) / 2;
-                this.y = (this.height - backgroundHeight) / 2;
-
-                this.handler = new BlueprintScreenHandler(this.client);
-                this.blueprintRenderer = new BlueprintRenderer(this.client);
-            } else {
-                this.client.setScreen(null);
-            }
-        }
     }
 
     @Override
@@ -190,7 +172,7 @@ public final class BlueprintsScreen extends Screen {
             int slotY = slotRow * 18 + 18;
 
             final BlueprintSlot blueprintSlot = currentSlots.get(i);
-            this.drawSlot(blueprintSlot, slotX, slotY, slotColumn, slotRow);
+            this.drawSlot(blueprintSlot, slotColumn, slotRow);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
             this.handler.focusOnSlot(blueprintSlot);
@@ -199,7 +181,15 @@ public final class BlueprintsScreen extends Screen {
             this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
         }
 
-        this.drawForeground(matrices, mouseX, mouseY);
+        this.drawForeground(matrices);
+        if(this.handler.hasFocusedSlot())
+            this.textRenderer.draw(
+                    matrices,
+                    EDIT_BLUEPRINT_TEXT,
+                    this.backgroundWidth + this.previewOffset + 3,
+                    this.backgroundHeight - this.textRenderer.fontHeight - 3,
+                    0xFFFFFF
+            );
 
         matrixStack.pop();
         RenderSystem.applyModelViewMatrix();
@@ -213,6 +203,45 @@ public final class BlueprintsScreen extends Screen {
         this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    @Override
+    public void removed() {
+        super.removed();
+        if(this.client!=null)
+            this.client.keyboard.setRepeatEvents(false);
+    }
+
+    private boolean isClickInTab(BlueprintGroup group, double mouseX, double mouseY) {
+        mouseX -= this.x;
+        mouseY -= this.y;
+
+        int columnNumber = group.ordinal();
+        int x = 28 * columnNumber;
+        int y = 0;
+        if (columnNumber > 0) x += columnNumber;
+
+        if (group.isTopRow()) {
+            y -= 32;
+        } else {
+            y += this.backgroundHeight;
+        }
+        return mouseX >= (double)x && mouseX <= (double)(x + 28) && mouseY >= (double)y && mouseY <= (double)(y + 32);
+    }
+
+    private boolean isClickInScrollbar(double mouseX, double mouseY) {
+        int i = this.x;
+        int j = this.y;
+        int k = i + 175;
+        int l = j + 18;
+        int m = k + 14;
+        int n = l + 112;
+        return mouseX >= (double)k && mouseY >= (double)l && mouseX < (double)m && mouseY < (double)n;
+    }
+
     private boolean isPointOverSlot(int slotX, int slotY, int mouseX, int mouseY) {
         int screenX = this.x;
         int screenY = this.y;
@@ -220,12 +249,9 @@ public final class BlueprintsScreen extends Screen {
         return mouseX >= screenX + slotX && mouseX < screenX + slotX + 18 && mouseY >= screenY + slotY && mouseY < screenY + slotY + 18;
     }
 
-    @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
 
-    private void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+
+    private void drawForeground(MatrixStack matrices) {
         final BlueprintGroup selectedGroup = this.handler.getSelectedGroup();
         if (selectedGroup != null) {
             RenderSystem.disableBlend();
@@ -233,8 +259,7 @@ public final class BlueprintsScreen extends Screen {
         }
     }
 
-    private void drawSlot(BlueprintSlot slot, int slotX, int slotY, int slotColumn, int slotRow) {
-        ItemStack itemStack = new ItemStack(Items.DIRT);
+    private void drawSlot(BlueprintSlot slot, int slotColumn, int slotRow) {
         this.setZOffset(100);
         this.itemRenderer.zOffset = 100.0f;
 
@@ -248,12 +273,7 @@ public final class BlueprintsScreen extends Screen {
         this.setZOffset(0);
     }
 
-    @Override
-    public void removed() {
-        super.removed();
-        if(this.client!=null)
-            this.client.keyboard.setRepeatEvents(false);
-    }
+
 
     private void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);

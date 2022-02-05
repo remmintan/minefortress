@@ -5,6 +5,9 @@ import net.minecraft.text.Text;
 import org.minefortress.blueprints.BlueprintMetadata;
 import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.ServerboundEditBlueprintPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.ArrayList;
@@ -60,6 +63,12 @@ public final class BlueprintScreenHandler {
         }
 
         this.needScrollbar = this.totalSize > 9 * 5;
+    }
+
+    public void sendEditPacket() {
+        final String file = this.focusedSlot.getMetadata().getFile();
+        final ServerboundEditBlueprintPacket packet = new ServerboundEditBlueprintPacket(file);
+        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
     }
 
     public void focusOnSlot(BlueprintSlot slot) {
