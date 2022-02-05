@@ -67,7 +67,7 @@ public abstract class FortressWorldRendererMixin  {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
         if(blueprintManager.hasSelectedBlueprint()) {
-            blueprintManager.buildStructure(this.chunkBuilder);
+            blueprintManager.buildStructure();
         }
     }
 

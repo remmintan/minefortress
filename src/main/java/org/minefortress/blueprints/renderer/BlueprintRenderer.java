@@ -174,4 +174,7 @@ public final class BlueprintRenderer {
         renderLayer.endDrawing();
     }
 
+    public BlueprintsModelBuilder getBlueprintsModelBuilder() {
+        return blueprintsModelBuilder;
+    }
 }
