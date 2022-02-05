@@ -1,10 +1,15 @@
 package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.pathing.EntityNavigation;
+import net.minecraft.entity.ai.pathing.Path;
+import net.minecraft.entity.ai.pathing.PathNodeMaker;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.NodeMaker;
 
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.Random;
 
 public class ReturnToFireGoal extends Goal {
@@ -30,8 +35,19 @@ public class ReturnToFireGoal extends Goal {
     public void start() {
         super.start();
         final BlockPos fortressCenter = colonist.getFortressCenter().toImmutable();
-        final BlockPos goal = BlockPos.iterateRandomly(random, 1, fortressCenter, HOME_RADIUS-1).iterator().next();
-        this.colonist.getNavigation().startMovingTo(goal.getX(), goal.getY(), goal.getZ(), 1.0D);
+        final Iterator<BlockPos> iterator = BlockPos.iterateRandomly(random, 2, fortressCenter, HOME_RADIUS - 1).iterator();
+        BlockPos goal = iterator.next();
+        if(goal.equals(fortressCenter)) {
+            goal = iterator.next();
+        }
+
+        final EntityNavigation navigation = colonist.getNavigation();
+        final NodeMaker nodeMaker = (NodeMaker)navigation.getNodeMaker();
+
+        nodeMaker.setWallClimbMode(true);
+        final Path path = navigation.findPathTo(goal, 1);
+        nodeMaker.setWallClimbMode(false);
+        this.colonist.getNavigation().startMovingAlong(path, 1.0D);
     }
 
     @Override
