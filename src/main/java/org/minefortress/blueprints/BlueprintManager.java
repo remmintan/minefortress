@@ -90,7 +90,7 @@ public class BlueprintManager {
     private BlockPos getSelectedPos() {
         if(client.crosshairTarget instanceof final BlockHitResult crosshairTarget) {
             final BlockPos originalPos = crosshairTarget.getBlockPos();
-            if (client.world != null && client.world.getBlockState(originalPos).isAir()) return null;
+            if (client.world != null && originalPos != null && client.world.getBlockState(originalPos).isAir()) return null;
             if(originalPos != null) return moveToStructureSize(originalPos);
         }
         return null;
