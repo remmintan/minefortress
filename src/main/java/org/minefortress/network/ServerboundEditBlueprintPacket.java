@@ -3,6 +3,7 @@ package org.minefortress.network;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.minefortress.interfaces.FortressServer;
 import org.minefortress.network.interfaces.FortressServerPacket;
 
 public class ServerboundEditBlueprintPacket implements FortressServerPacket {
@@ -24,6 +25,7 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-
+        final FortressServer fortressServer = (FortressServer) server;
+        player.moveToWorld(fortressServer.getBlueprintsWorld().getServerWorld());
     }
 }

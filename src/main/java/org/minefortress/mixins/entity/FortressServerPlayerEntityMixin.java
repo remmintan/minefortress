@@ -11,8 +11,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
+import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -25,6 +28,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.UUID;
 
@@ -95,4 +99,15 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     public UUID getFortressUuid() {
         return fortressUUID;
     }
+
+    @Inject(method="getTeleportTarget", at=@At("HEAD"), cancellable = true)
+    public void getTeleportTarget(ServerWorld destination, CallbackInfoReturnable<TeleportTarget> cir) {
+        if(destination.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
+            final Vec3d position = new Vec3d(0, 80, 0);
+            final Vec3d velocity = new Vec3d(0, 0, 0);
+            final TeleportTarget teleportTarget = new TeleportTarget(position, velocity, 0, 45);
+            cir.setReturnValue(teleportTarget);
+        }
+    }
+    
 }
