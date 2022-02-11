@@ -4,6 +4,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import org.minefortress.interfaces.FortressServer;
 import org.minefortress.tasks.BlueprintTask;
 
 import java.util.UUID;
@@ -13,8 +14,8 @@ public class ServerBlueprintManager {
     private final BlueprintBlockDataManager blockDataManager;
 
 
-    public ServerBlueprintManager(final MinecraftServer server) {
-        this.blockDataManager = new BlueprintBlockDataManager(() -> server);
+    public ServerBlueprintManager(MinecraftServer server) {
+        this.blockDataManager = ((FortressServer) server).getBlueprintBlockDataManager();
     }
 
     public BlueprintTask createTask(UUID taskId, String structureFile, BlockPos startPos, BlockRotation rotation) {

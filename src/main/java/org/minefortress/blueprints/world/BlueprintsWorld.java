@@ -1,16 +1,19 @@
 package org.minefortress.blueprints.world;
 
 import com.mojang.serialization.Lifecycle;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.resource.DataPackSettings;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
@@ -23,6 +26,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.HorizontalVoronoiBiomeAccessType;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.level.LevelInfo;
@@ -69,30 +73,31 @@ public class BlueprintsWorld {
             0.0f
     );
 
-    private FortressServerWorld serverWorld;
+    private FortressServerWorld world;
     private final MinecraftServer server;
+    private Map<BlockPos, BlockState> preparedBlueprintData;
 
     public BlueprintsWorld(MinecraftServer server) {
         this.server = server;
     }
 
-    public ServerWorld getServerWorld() {
-        if(serverWorld == null) {
+    public ServerWorld getWorld() {
+        if(world == null) {
             create();
         }
 
-        return serverWorld;
+        return world;
     }
 
     public void tick(BooleanSupplier shouldKeepTicking) {
-        if(serverWorld != null) {
-            serverWorld.tick(shouldKeepTicking);
+        if(world != null) {
+            world.tick(shouldKeepTicking);
         }
     }
 
     public void sendToDimension(PlayerManager playerManager) {
-        if(serverWorld != null) {
-            playerManager.sendToDimension(new WorldTimeUpdateS2CPacket(serverWorld.getTime(), serverWorld.getTimeOfDay(), serverWorld.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)), serverWorld.getRegistryKey());
+        if(world != null) {
+            playerManager.sendToDimension(new WorldTimeUpdateS2CPacket(world.getTime(), world.getTimeOfDay(), world.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)), world.getRegistryKey());
         }
     }
 
@@ -132,7 +137,7 @@ public class BlueprintsWorld {
 
         final LevelProperties levelProperties = new LevelProperties(EDIT_BLUEPRINT_LEVEL, generatorOptions, Lifecycle.stable());
 
-        serverWorld = new FortressServerWorld(
+        world = new FortressServerWorld(
                 server,
                 executor,
                 fortressSession,
@@ -155,12 +160,24 @@ public class BlueprintsWorld {
         final List<FlatChunkGeneratorLayer> flatChunkGeneratorLayers = Arrays.asList(
                 new FlatChunkGeneratorLayer(1, Blocks.BEDROCK),
                 new FlatChunkGeneratorLayer(14, Blocks.DIRT),
-                new FlatChunkGeneratorLayer(1, Blocks.GRASS)
+                new FlatChunkGeneratorLayer(1, Blocks.GRASS_BLOCK)
         );
 
         return FlatChunkGeneratorConfig
                 .getDefaultConfig(biomeRegistry)
                 .withLayers(flatChunkGeneratorLayers, structuresConfig);
+    }
+
+    public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData) {
+        this.preparedBlueprintData = blueprintData;
+    }
+
+    public void putBlueprintInAWorld(ServerPlayerEntity player) {
+        for(Map.Entry<BlockPos, BlockState> e : preparedBlueprintData.entrySet()) {
+            final BlockPos pos = e.getKey().up(16);
+            world.setBlockState(pos, e.getValue());
+            world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
+        }
     }
 
 }

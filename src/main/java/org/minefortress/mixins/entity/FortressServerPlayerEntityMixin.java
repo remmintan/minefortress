@@ -3,7 +3,6 @@ package org.minefortress.mixins.entity;
 import com.chocohead.mm.api.ClassTinkerers;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -36,6 +35,11 @@ import java.util.UUID;
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
 
     private UUID fortressUUID = UUID.randomUUID();
+
+    private Vec3d persistedPos;
+    private Vec3d persistedVelocity;
+    private float persistedYaw;
+    private float persistedPitch;
 
     @Shadow @Final public ServerPlayerInteractionManager interactionManager;
     private FortressServerManager fortressServerManager;
@@ -103,9 +107,21 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Inject(method="getTeleportTarget", at=@At("HEAD"), cancellable = true)
     public void getTeleportTarget(ServerWorld destination, CallbackInfoReturnable<TeleportTarget> cir) {
         if(destination.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
-            final Vec3d position = new Vec3d(0, 80, 0);
+            this.persistedPos = this.getPos();
+            this.persistedVelocity = this.getVelocity();
+            this.persistedPitch = this.getPitch();
+            this.persistedYaw = this.getYaw();
+
+            final Vec3d position = new Vec3d(-1, 17, -1);
             final Vec3d velocity = new Vec3d(0, 0, 0);
-            final TeleportTarget teleportTarget = new TeleportTarget(position, velocity, 0, 45);
+            final TeleportTarget teleportTarget = new TeleportTarget(position, velocity, -45, 0);
+            cir.setReturnValue(teleportTarget);
+        }
+
+        if(this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY && destination.getRegistryKey() == World.OVERWORLD) {
+            final Vec3d position = this.persistedPos;
+            final Vec3d velocity = this.persistedVelocity;
+            final TeleportTarget teleportTarget = new TeleportTarget(position, velocity, this.persistedPitch, this.persistedYaw);
             cir.setReturnValue(teleportTarget);
         }
     }

@@ -4,7 +4,8 @@
   "package": "org.minefortress.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "FortressServerMixin"
+    "FortressServerMixin",
+    "network.FortressClientPlayNetworkHandlerMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",

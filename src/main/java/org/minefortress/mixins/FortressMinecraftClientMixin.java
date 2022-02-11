@@ -4,11 +4,13 @@ import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.RunArgs;
+import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.hit.BlockHitResult;
@@ -21,11 +23,13 @@ import org.minefortress.blueprints.BlueprintBlockDataManager;
 import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.blueprints.BlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
+import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.FortressHud;
+import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.selections.SelectionManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -62,6 +66,14 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Shadow @Nullable public HitResult crosshairTarget;
 
     @Shadow public abstract @Nullable IntegratedServer getServer();
+
+    @Shadow public abstract boolean isIntegratedServerRunning();
+
+    @Shadow private @Nullable IntegratedServer server;
+
+    @Shadow @Final private SoundManager soundManager;
+
+    @Shadow public abstract void setScreen(@Nullable Screen screen);
 
     public FortressMinecraftClientMixin(String string) {
         super(string);
@@ -139,7 +151,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
-    public void setScreen(Screen screen, CallbackInfo ci) {
+    public void setScreenMix(Screen screen, CallbackInfo ci) {
         if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
             if(this.options.keySprint.isPressed() && screen instanceof InventoryScreen) {
                 ci.cancel();
@@ -198,5 +210,19 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public BlueprintRenderer getBlueprintRenderer() {
         return blueprintRenderer;
+    }
+
+    @Inject(method = "openPauseMenu", at = @At("HEAD"), cancellable = true)
+    public void openPauseMenu(boolean pause, CallbackInfo ci) {
+        if(this.world != null && this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
+            final boolean localServer = this.isIntegratedServerRunning() && !this.server.isRemote();
+            if (localServer) {
+                this.setScreen(new BlueprintsPauseScreen(!pause));
+                this.soundManager.pauseAll();
+            } else {
+                this.setScreen(new BlueprintsPauseScreen(true));
+            }
+            ci.cancel();
+        }
     }
 }

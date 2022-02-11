@@ -14,6 +14,7 @@ import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.level.storage.LevelStorage;
+import org.minefortress.blueprints.BlueprintBlockDataManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.interfaces.FortressServer;
 import org.spongepowered.asm.mixin.Final;
@@ -39,6 +40,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Shadow protected abstract boolean shouldKeepTicking();
 
     private BlueprintsWorld blueprintsWorld;
+    private BlueprintBlockDataManager blueprintBlockDataManager;
 
     public FortressServerMixin(String string) {
         super(string);
@@ -47,6 +49,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     public void init(Thread serverThread, DynamicRegistryManager.Impl registryManager, LevelStorage.Session session, SaveProperties saveProperties, ResourcePackManager dataPackManager, Proxy proxy, DataFixer dataFixer, ServerResourceManager serverResourceManager, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepo, UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory, CallbackInfo ci) {
         blueprintsWorld = new BlueprintsWorld((MinecraftServer) (Object)this);
+        this.blueprintBlockDataManager = new BlueprintBlockDataManager(() -> (MinecraftServer) (Object)this);
     }
 
     @Inject(method = "tickWorlds", at = @At(value="INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", ordinal = 1, shift = At.Shift.BEFORE))
@@ -72,7 +75,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Inject(method = "runOneTask", at = @At(value = "TAIL", shift = At.Shift.BEFORE), cancellable = true)
     public void executeOneTask(CallbackInfoReturnable<Boolean> cir) {
         if(this.shouldKeepTicking()) {
-            final boolean executed = blueprintsWorld.getServerWorld().getChunkManager().executeQueuedTasks();
+            final boolean executed = blueprintsWorld.getWorld().getChunkManager().executeQueuedTasks();
             if(executed) {
                 cir.setReturnValue(true);
             }
@@ -87,5 +90,10 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Override
     public WorldGenerationProgressListener getWorldGenerationProgressListener() {
         return this.worldGenerationProgressListenerFactory.create(11);
+    }
+
+    @Override
+    public BlueprintBlockDataManager getBlueprintBlockDataManager() {
+        return blueprintBlockDataManager;
     }
 }
