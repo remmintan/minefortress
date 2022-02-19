@@ -30,17 +30,18 @@ public class BlueprintsPauseScreen extends Screen {
     }
 
     private void initWidgets() {
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20, new LiteralText("Save blueprint"), button -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20, new LiteralText("Back to game"), button -> {
+            closeMenu();
+        }));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, new LiteralText("Save blueprint"), button -> {
             sendSave(true);
             closeMenu();
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, new LiteralText("Discard Blueprint"), button -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 72 - 16, 204, 20, new LiteralText("Discard Blueprint"), button -> {
             sendSave(false);
             closeMenu();
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 72 - 16, 204, 20, new LiteralText("Back to game"), button -> {
-            closeMenu();
-        }));
+
     }
 
     private void sendSave(boolean shouldSave) {

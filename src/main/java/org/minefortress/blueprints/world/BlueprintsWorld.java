@@ -172,12 +172,34 @@ public class BlueprintsWorld {
         this.preparedBlueprintData = blueprintData;
     }
 
-    public void putBlueprintInAWorld(ServerPlayerEntity player) {
-        for(Map.Entry<BlockPos, BlockState> e : preparedBlueprintData.entrySet()) {
-            final BlockPos pos = e.getKey().up(16);
-            world.setBlockState(pos, e.getValue());
-            world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
-        }
+    public void putBlueprintInAWorld(final ServerPlayerEntity player) {
+        final BlockState borderBlockState = Blocks.RED_WOOL.getDefaultState();
+        BlockPos.iterate(new BlockPos(-1, 15, -1), new BlockPos(16, 15, 16)).forEach(pos -> {
+            if(pos.getZ() == -1 || pos.getZ() == 16 || pos.getX() == -1 || pos.getX() == 16) {
+                world.setBlockState(pos, borderBlockState);
+                world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
+            }
+        });
+
+        BlockPos
+                .iterate(new BlockPos(BlockPos.ZERO), new BlockPos(15, 32, 15))
+                .forEach(pos -> {
+                    BlockState blockState;
+                    if(preparedBlueprintData.containsKey(pos.down(16))) {
+                        blockState = preparedBlueprintData.get(pos.down(16));
+                    } else if(pos.getY() >= 16) {
+                        blockState = Blocks.AIR.getDefaultState();
+                    } else if(pos.getY() == 0) {
+                        blockState = Blocks.BEDROCK.getDefaultState();
+                    } else if(pos.getY() > 0 && pos.getZ() < 14) {
+                        blockState = Blocks.DIRT.getDefaultState();
+                    } else {
+                        blockState = Blocks.GRASS_BLOCK.getDefaultState();
+                    }
+
+                    world.setBlockState(pos, blockState);
+                    world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
+                });
     }
 
 }
