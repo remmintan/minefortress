@@ -16,6 +16,9 @@ import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressItems;
 
 public class MineFortressMod implements ModInitializer {
+
+    public static final String MOD_ID = "minefortress";
+
     @Override
     public void onInitialize() {
         // blocks

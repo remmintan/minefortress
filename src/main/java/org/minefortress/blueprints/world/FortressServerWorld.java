@@ -1,8 +1,11 @@
 package org.minefortress.blueprints.world;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
@@ -19,6 +22,10 @@ public class FortressServerWorld extends ServerWorld {
 
     private final LevelProperties levelProperties;
     private WorldBorder blueprintsWorldBorder;
+
+    private boolean saveModeEnabled = false;
+
+    private String fileName;
 
     public FortressServerWorld(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, LevelProperties properties, RegistryKey<World> worldKey, DimensionType dimensionType, WorldGenerationProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long seed, List<Spawner> spawners, boolean shouldTickTime) {
         super(server, workerExecutor, session, properties, worldKey, dimensionType, worldGenerationProgressListener, chunkGenerator, debugWorld, seed, spawners, shouldTickTime);
@@ -48,5 +55,31 @@ public class FortressServerWorld extends ServerWorld {
             blueprintsWorldBorder = new WorldBorder();
         }
         return blueprintsWorldBorder;
+    }
+
+    @Override
+    public BlockState getBlockState(BlockPos pos) {
+        final BlockState blockState = super.getBlockState(pos);
+        if(saveModeEnabled) {
+            if(pos.getY() > 0 && pos.getY() < 15 && blockState == Blocks.DIRT.getDefaultState()) return Blocks.AIR.getDefaultState();
+            if(pos.getY() == 15 && (blockState == Blocks.GRASS_BLOCK.getDefaultState() || blockState == Blocks.DIRT.getDefaultState())) return Blocks.AIR.getDefaultState();
+        }
+        return blockState;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void enableSaveStructureMode() {
+        saveModeEnabled = true;
+    }
+
+    public void disableSaveStructureMode() {
+        saveModeEnabled = false;
     }
 }

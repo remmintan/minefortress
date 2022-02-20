@@ -10,14 +10,17 @@ import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.Structure;
+import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import org.minefortress.MineFortressMod;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -33,12 +36,12 @@ public class BlueprintBlockDataManager {
     }
 
     public BlueprintBlockData getBlockData(String fileName, BlockRotation rotation, boolean separateLayers) {
-        String key = fileName + ":" + rotation.name() + ":" + separateLayers;
+        String key = getKey(fileName, rotation, separateLayers);
         if (!blueprints.containsKey(key)) {
             final Structure structure = serverSupplier
                     .get()
                     .getStructureManager()
-                    .getStructure(new Identifier(fileName))
+                    .getStructure(getId(fileName))
                     .orElseThrow(() -> new IllegalArgumentException("Blueprint file not found: " + fileName));
 
             final StructurePlacementData placementData = new StructurePlacementData().setRotation(rotation);
@@ -98,6 +101,20 @@ public class BlueprintBlockDataManager {
         }
 
         return blueprints.get(key);
+    }
+
+    public void invalidateBlueprint(String fileName) {
+        new HashSet<>(blueprints.keySet()).stream().filter(key -> key.startsWith(fileName)).forEach(blueprints::remove);
+    }
+
+    @NotNull
+    private Identifier getId(String fileName) {
+        return new Identifier(MineFortressMod.MOD_ID, fileName);
+    }
+
+    @NotNull
+    private String getKey(String fileName, BlockRotation rotation, boolean separateLayers) {
+        return fileName + ":" + rotation.name() + ":" + separateLayers;
     }
 
     public static class BlueprintBlockData {

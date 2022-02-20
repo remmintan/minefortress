@@ -81,7 +81,7 @@ public class BlueprintsWorld {
         this.server = server;
     }
 
-    public ServerWorld getWorld() {
+    public FortressServerWorld getWorld() {
         if(world == null) {
             create();
         }
@@ -168,8 +168,9 @@ public class BlueprintsWorld {
                 .withLayers(flatChunkGeneratorLayers, structuresConfig);
     }
 
-    public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData) {
+    public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName) {
         this.preparedBlueprintData = blueprintData;
+        getWorld().setFileName(blueprintFileName);
     }
 
     public void putBlueprintInAWorld(final ServerPlayerEntity player) {
@@ -191,7 +192,7 @@ public class BlueprintsWorld {
                         blockState = Blocks.AIR.getDefaultState();
                     } else if(pos.getY() == 0) {
                         blockState = Blocks.BEDROCK.getDefaultState();
-                    } else if(pos.getY() > 0 && pos.getZ() < 14) {
+                    } else if(pos.getY() > 0 && pos.getY() < 14) {
                         blockState = Blocks.DIRT.getDefaultState();
                     } else {
                         blockState = Blocks.GRASS_BLOCK.getDefaultState();

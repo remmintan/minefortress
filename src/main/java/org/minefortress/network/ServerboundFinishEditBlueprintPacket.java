@@ -1,10 +1,21 @@
 package org.minefortress.network;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.structure.Structure;
+import net.minecraft.structure.StructureManager;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.minefortress.MineFortressMod;
+import org.minefortress.blueprints.world.FortressServerWorld;
+import org.minefortress.interfaces.FortressServer;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.interfaces.FortressServerPacket;
 
 public class ServerboundFinishEditBlueprintPacket implements FortressServerPacket {
@@ -26,7 +37,60 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
+        if(shouldSave) {
+            updateBlueprint(server, player);
+        }
+
         final ServerWorld world = server.getWorld(World.OVERWORLD);
         player.moveToWorld(world);
+    }
+
+    private void updateBlueprint(MinecraftServer server, ServerPlayerEntity player) {
+        final FortressServerWorld fortressServerWorld = (FortressServerWorld) player.world;
+
+        final String fileName = fortressServerWorld.getFileName();
+        final Identifier updatedStructureIdentifier = new Identifier(MineFortressMod.MOD_ID, fileName);
+        final StructureManager structureManager = server.getStructureManager();
+        final Structure structureToUpdate = structureManager.getStructureOrBlank(updatedStructureIdentifier);
+        fortressServerWorld.enableSaveStructureMode();
+
+        final BlockPos start = new BlockPos(0, 16, 0);
+        final BlockPos end = new BlockPos(16, 32, 16);
+        final Iterable<BlockPos> allPositions = BlockPos.iterate(start, end);
+
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int maxZ = Integer.MIN_VALUE;
+
+        for(BlockPos pos : allPositions) {
+            final BlockState blockState = fortressServerWorld.getBlockState(pos);
+            if(blockState.getBlock() != Blocks.AIR) {
+                minX = Math.min(minX, pos.getX());
+                minY = Math.min(minY, pos.getY());
+                minZ = Math.min(minZ, pos.getZ());
+
+                maxX = Math.max(maxX, pos.getX());
+                maxY = Math.max(maxY, pos.getY());
+                maxZ = Math.max(maxZ, pos.getZ());
+            }
+        }
+
+        final BlockPos min = new BlockPos(minX, minY, minZ);
+        final BlockPos max = new BlockPos(maxX, maxY, maxZ);
+        final BlockPos dimensions = max.subtract(min);
+
+        structureToUpdate.saveFromWorld(fortressServerWorld, min, dimensions, true, Blocks.AIR);
+        fortressServerWorld.disableSaveStructureMode();
+        structureManager.saveStructure(updatedStructureIdentifier);
+
+        final FortressServer fortressServer = (FortressServer) server;
+        fortressServer.getBlueprintBlockDataManager().invalidateBlueprint(fileName);
+
+        final ClientboundInvalidateBlueprintPacket packet = new ClientboundInvalidateBlueprintPacket(fileName);
+        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_INVALIDATE_BLUEPRINT, packet);
     }
 }

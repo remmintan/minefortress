@@ -7,7 +7,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.event.GameEvent;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.network.interfaces.FortressServerPacket;
@@ -16,19 +15,19 @@ import java.util.Map;
 
 public class ServerboundEditBlueprintPacket implements FortressServerPacket {
 
-    private final String blueprintFilePath;
+    private final String blueprintFileName;
 
-    public ServerboundEditBlueprintPacket(String blueprintFilePath) {
-        this.blueprintFilePath = blueprintFilePath;
+    public ServerboundEditBlueprintPacket(String blueprintFileName) {
+        this.blueprintFileName = blueprintFileName;
     }
 
     public ServerboundEditBlueprintPacket(PacketByteBuf buf) {
-        this.blueprintFilePath = buf.readString();
+        this.blueprintFileName = buf.readString();
     }
 
     @Override
     public void write(PacketByteBuf buf) {
-        buf.writeString(this.blueprintFilePath);
+        buf.writeString(this.blueprintFileName);
     }
 
     @Override
@@ -39,10 +38,10 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
 
         final Map<BlockPos, BlockState> blueprintData = fortressServer
                 .getBlueprintBlockDataManager()
-                .getBlockData(blueprintFilePath, BlockRotation.NONE, false)
+                .getBlockData(blueprintFileName, BlockRotation.NONE, false)
                 .getBlueprintData();
 
-        blueprintsWorld.prepareBlueprint(blueprintData);
+        blueprintsWorld.prepareBlueprint(blueprintData, blueprintFileName);
         blueprintsWorld.putBlueprintInAWorld(player);
         player.moveToWorld(world);
     }

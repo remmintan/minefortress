@@ -8,6 +8,7 @@ import org.minefortress.blueprints.BlueprintBlockDataManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class BlueprintsModelBuilder {
@@ -41,6 +42,10 @@ public class BlueprintsModelBuilder {
     @NotNull
     private String getKey(String fileName, BlockRotation rotation) {
         return fileName + rotation.name();
+    }
+
+    public void invalidateBlueprint(final String fileName) {
+        new HashSet<>(builtBlueprints.keySet()).stream().filter(key -> key.startsWith(fileName)).forEach(builtBlueprints::remove);
     }
 
 }
