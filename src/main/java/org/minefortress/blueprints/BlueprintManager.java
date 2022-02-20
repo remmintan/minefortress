@@ -9,7 +9,6 @@ import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.hit.BlockHitResult;
@@ -27,7 +26,10 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.tasks.BuildingManager;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BlueprintManager {
@@ -153,7 +155,7 @@ public class BlueprintManager {
         k = 0;
 
         final BuiltBlueprint chunk = getBuiltChunk();
-        if(chunk != null && !chunk.hasLayer(renderLayer) && blueprintBuildPos != null) {
+        if(chunk != null && chunk.hasLayer(renderLayer) && blueprintBuildPos != null) {
             VertexBuffer vertexBuffer = chunk.getBuffer(renderLayer);
             if (i != null) {
                 i.set((float)((double)blueprintBuildPos.getX() - d), (float)((double)blueprintBuildPos.getY() - e), (float)((double)blueprintBuildPos.getZ() - f));
