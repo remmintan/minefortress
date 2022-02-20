@@ -68,7 +68,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
 
         for(BlockPos pos : allPositions) {
             final BlockState blockState = fortressServerWorld.getBlockState(pos);
-            if(blockState.getBlock() != Blocks.AIR) {
+            if(!blockState.isAir()) {
                 minX = Math.min(minX, pos.getX());
                 minY = Math.min(minY, pos.getY());
                 minZ = Math.min(minZ, pos.getZ());
@@ -81,7 +81,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
 
         final BlockPos min = new BlockPos(minX, minY, minZ);
         final BlockPos max = new BlockPos(maxX, maxY, maxZ);
-        final BlockPos dimensions = max.subtract(min);
+        final BlockPos dimensions = max.subtract(min).add(1, 1, 1);
 
         structureToUpdate.saveFromWorld(fortressServerWorld, min, dimensions, true, Blocks.AIR);
         fortressServerWorld.disableSaveStructureMode();
