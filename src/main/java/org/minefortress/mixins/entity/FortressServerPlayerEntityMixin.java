@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
+import net.minecraft.server.network.SpawnLocating;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -21,14 +22,17 @@ import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.ClientboundFollowColonistPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.minefortress.utils.FortressSpawnLocating;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Mixin(ServerPlayerEntity.class)
@@ -42,6 +46,10 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     private float persistedPitch;
 
     @Shadow @Final public ServerPlayerInteractionManager interactionManager;
+
+    @Shadow protected abstract void moveToSpawn(ServerWorld world);
+
+    @Shadow @Final public MinecraftServer server;
     private FortressServerManager fortressServerManager;
 
     public FortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
@@ -123,6 +131,16 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
             final Vec3d velocity = this.persistedVelocity;
             final TeleportTarget teleportTarget = new TeleportTarget(position, velocity, this.persistedYaw, this.persistedPitch);
             cir.setReturnValue(teleportTarget);
+        }
+    }
+
+    @Redirect(method = "moveToSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/SpawnLocating;findOverworldSpawn(Lnet/minecraft/server/world/ServerWorld;IIZ)Lnet/minecraft/util/math/BlockPos;"))
+    public BlockPos moveToSpawnFindOverworldSpawn(ServerWorld world, int x, int z, boolean validSpawnNeeded) {
+        final BlockPos actualSpawn = FortressSpawnLocating.findOverworldSpawn(world, x, z, validSpawnNeeded);
+        if(this.server.getDefaultGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")){
+            return actualSpawn.up(20);
+        } else {
+            return actualSpawn;
         }
     }
     
