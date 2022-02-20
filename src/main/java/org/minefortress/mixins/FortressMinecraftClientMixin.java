@@ -129,7 +129,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             }
         }
 
-        if (isNotFortressGamemode() || middleMouseButtonIsDown) {
+        if ((isNotFortressGamemode() || middleMouseButtonIsDown) && this.world!=null && this.world.getRegistryKey() != BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
             if(player != null) {
                 this.fortressCameraManager.setRot(player.getPitch(), player.getYaw());
             }
