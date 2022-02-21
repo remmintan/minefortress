@@ -10,6 +10,7 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
+import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.tasks.ClientTasksHolder;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,6 +26,7 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
 
     private ClientTasksHolder tasksHolder;
     private ClientBlueprintManager clientBlueprintManager;
+    private BlueprintRenderer blueprintRenderer;
 
     protected FortressClientWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, DimensionType dimensionType, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
         super(properties, registryRef, dimensionType, profiler, isClient, debugWorld, seed);
@@ -32,9 +34,10 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
 
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void constructorHead(ClientPlayNetworkHandler networkHandler, ClientWorld.Properties properties, RegistryKey registryRef, DimensionType dimensionType, int loadDistance, Supplier profiler, WorldRenderer worldRenderer, boolean debugWorld, long seed, CallbackInfo ci) {
+    public void constructor(ClientPlayNetworkHandler networkHandler, ClientWorld.Properties properties, RegistryKey registryRef, DimensionType dimensionType, int loadDistance, Supplier profiler, WorldRenderer worldRenderer, boolean debugWorld, long seed, CallbackInfo ci) {
         tasksHolder = new ClientTasksHolder((ClientWorld) (Object)this, worldRenderer);
         clientBlueprintManager = new ClientBlueprintManager(MinecraftClient.getInstance());
+        blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), MinecraftClient.getInstance());
     }
 
     @Override
@@ -52,6 +55,11 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
         if(shouldKeepTicking.getAsBoolean()) {
             clientBlueprintManager.tick();
         }
+    }
+
+    @Override
+    public BlueprintRenderer getBlueprintRenderer() {
+        return blueprintRenderer;
     }
 
 }

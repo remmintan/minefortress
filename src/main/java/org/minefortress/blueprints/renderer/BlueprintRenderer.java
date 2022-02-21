@@ -9,6 +9,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -21,16 +22,12 @@ public final class BlueprintRenderer {
     private final BlueprintsModelBuilder blueprintsModelBuilder;
     private final MinecraftClient client;
 
-    public BlueprintRenderer(MinecraftClient client) {
-        if(client instanceof FortressMinecraftClient fortressClient) {
-            blueprintsModelBuilder  = new BlueprintsModelBuilder(
-                    client.getBufferBuilders(),
-                    fortressClient.getBlueprintManager().getBlockDataManager()
-            );
-            this.client = client;
-        } else {
-            throw new IllegalArgumentException("Client must be an instance of FortressMinecraftClient");
-        }
+    public BlueprintRenderer(ClientBlueprintBlockDataManager blockDataManager, MinecraftClient client) {
+        blueprintsModelBuilder  = new BlueprintsModelBuilder(
+                client.getBufferBuilders(),
+                blockDataManager
+        );
+        this.client = client;
     }
 
     public void prepareBlueprintForRender() {

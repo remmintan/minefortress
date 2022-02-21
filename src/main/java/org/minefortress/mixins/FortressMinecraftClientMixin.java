@@ -19,7 +19,6 @@ import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
@@ -41,8 +40,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private SelectionManager selectionManager;
     private FortressCameraManager fortressCameraManager;
     private FortressHud fortressHud;
+
     private FortressClientManager fortressClientManager;
-    private BlueprintRenderer blueprintRenderer;
 
     @Shadow
     @Final
@@ -80,7 +79,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.fortressCameraManager = new FortressCameraManager((MinecraftClient)(Object)this);
         this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
         this.fortressClientManager = new FortressClientManager();
-        this.blueprintRenderer = new BlueprintRenderer((MinecraftClient)(Object)this);
     }
 
     @Override
@@ -187,11 +185,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         } else {
             return null;
         }
-    }
-
-    @Override
-    public BlueprintRenderer getBlueprintRenderer() {
-        return blueprintRenderer;
     }
 
     @Inject(method = "openPauseMenu", at = @At("HEAD"), cancellable = true)
