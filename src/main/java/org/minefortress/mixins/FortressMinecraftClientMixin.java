@@ -18,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
@@ -165,7 +165,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public BlueprintManager getBlueprintManager() {
+    public ClientBlueprintManager getBlueprintManager() {
         final ClientWorld world = this.world;
         if(world != null) {
             return ((FortressClientWorld) world).getBlueprintManager();

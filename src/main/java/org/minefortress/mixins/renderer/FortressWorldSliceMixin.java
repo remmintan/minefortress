@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.GameMode;
-import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.ClickType;
@@ -37,8 +37,8 @@ public abstract class FortressWorldSliceMixin {
             return;
         }
 
-        final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
-        if (!blueprintManager.hasSelectedBlueprint()) {
+        final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+        if (!clientBlueprintManager.hasSelectedBlueprint()) {
             addSelectionToChunk(states, section, fortressClient);
         }
     }

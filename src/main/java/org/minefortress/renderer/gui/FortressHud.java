@@ -6,7 +6,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -71,9 +71,9 @@ public class FortressHud {
     }
 
     private void renderHints(MatrixStack p, int scaledHeight, TextRenderer font) {
-        final BlueprintManager blueprintManager = getBlueprintManager();
-        if(blueprintManager.hasSelectedBlueprint()) {
-            final String selectedBlueprintName = blueprintManager.getSelectedStructure().getName();
+        final ClientBlueprintManager clientBlueprintManager = getBlueprintManager();
+        if(clientBlueprintManager.hasSelectedBlueprint()) {
+            final String selectedBlueprintName = clientBlueprintManager.getSelectedStructure().getName();
             renderInfoText(p, font, "Blueprint: " + selectedBlueprintName);
 
             DrawableHelper.drawStringWithShadow(p, font, "hold ctrl - keep blueprint", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
@@ -86,7 +86,7 @@ public class FortressHud {
         renderSelectTypeName(p, font, scaledHeight);
     }
 
-    private BlueprintManager getBlueprintManager() {
+    private ClientBlueprintManager getBlueprintManager() {
         final FortressMinecraftClient client = getFortressClient();
         return client.getBlueprintManager();
     }

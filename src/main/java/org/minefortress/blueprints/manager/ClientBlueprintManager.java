@@ -1,7 +1,8 @@
-package org.minefortress.blueprints;
+package org.minefortress.blueprints.manager;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -10,9 +11,11 @@ import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
 import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundBlueprintTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.minefortress.tasks.BuildingManager;
 
 import java.util.List;
@@ -21,16 +24,17 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class BlueprintManager {
+public class ClientBlueprintManager {
 
     private final MinecraftClient client;
     private final ClientBlueprintBlockDataManager blockDataManager = new ClientBlueprintBlockDataManager();
+    private final BlueprintMetadataManager blueprintMetadataManager = new BlueprintMetadataManager();
 
     private BlueprintMetadata selectedStructure;
     private BlockPos blueprintBuildPos = null;
     private boolean cantBuild = false;
 
-    public BlueprintManager(MinecraftClient client) {
+    public ClientBlueprintManager(MinecraftClient client) {
         this.client = client;
     }
 
@@ -96,8 +100,18 @@ public class BlueprintManager {
         return selectedStructure != null;
     }
 
-    public void selectStructure(BlueprintMetadata blueprintMetadata) {
+    public void select(BlueprintMetadata blueprintMetadata) {
         this.selectedStructure = blueprintMetadata;
+        this.blueprintMetadataManager.select(blueprintMetadata);
+    }
+
+    public void selectNext() {
+        if(!this.hasSelectedBlueprint()) return;
+        this.selectedStructure = blueprintMetadataManager.selectNext();
+    }
+
+    public List<BlueprintMetadata> getAllBlueprints(BlueprintGroup group) {
+        return this.blueprintMetadataManager.getAllForGroup(group);
     }
 
     public void buildCurrentStructure() {
@@ -152,4 +166,19 @@ public class BlueprintManager {
     public ClientBlueprintBlockDataManager getBlockDataManager() {
         return blockDataManager;
     }
+
+    public void add(BlueprintGroup group, String name, String file, NbtCompound tag) {
+        final BlueprintMetadata metadata = this.blueprintMetadataManager.add(group, name, file);
+        blockDataManager.setBlueprint(metadata.getFile(), tag);
+        blockDataManager.invalidateBlueprint(metadata.getFile());
+    }
+
+    public void update(String fileName, NbtCompound tag) {
+        blockDataManager.setBlueprint(fileName, tag);
+        blockDataManager.invalidateBlueprint(fileName);
+        if(client instanceof FortressMinecraftClient fortressClient) {
+            fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().invalidateBlueprint(fileName);
+        }
+    }
+
 }

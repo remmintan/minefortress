@@ -1,6 +1,7 @@
 package org.minefortress.blueprints.data;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.Structure;
 import net.minecraft.util.BlockRotation;
@@ -10,23 +11,45 @@ import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager{
 
     private final MinecraftServer server;
+    private final Map<String, NbtCompound> updatedStructures = new HashMap<>();
 
     public ServerBlueprintBlockDataManager(MinecraftServer server) {
         this.server = server;
     }
 
+    public NbtCompound getStructureNbt(String fileName) {
+        NbtCompound compound = new NbtCompound();
+        getStructure(fileName).writeNbt(compound);
+        return compound;
+    }
+
+    public void update(String fileName, NbtCompound tag) {
+        updatedStructures.put(fileName, tag);
+        invalidateBlueprint(fileName);
+    }
+
     @Override
     protected Structure getStructure(String blueprintFileName) {
-        final Identifier id = getId(blueprintFileName);
-        return server
-                .getStructureManager()
-                .getStructure(id)
-                .orElseThrow(() -> new IllegalArgumentException("Blueprint file not found: " + blueprintFileName));
+        if(updatedStructures.containsKey(blueprintFileName)) {
+            final NbtCompound structureTag = updatedStructures.get(blueprintFileName);
+            final Structure structure = new Structure();
+            structure.readNbt(structureTag);
+            return structure;
+        } else {
+            final Identifier id = getId(blueprintFileName);
+            return server
+                    .getStructureManager()
+                    .getStructure(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Blueprint file not found: " + blueprintFileName));
+        }
+
+
     }
 
     @Override

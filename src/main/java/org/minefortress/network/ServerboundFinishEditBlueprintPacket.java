@@ -2,6 +2,7 @@ package org.minefortress.network;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -13,10 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.world.FortressServerWorld;
-import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.interfaces.FortressServerPacket;
 
 public class ServerboundFinishEditBlueprintPacket implements FortressServerPacket {
@@ -88,10 +86,9 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
         fortressServerWorld.disableSaveStructureMode();
 
         if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
-            fortressServerPlayer.getServerBlueprintManager().getBlockDataManager().invalidateBlueprint(fileName);
-
-            final ClientboundInvalidateBlueprintPacket packet = new ClientboundInvalidateBlueprintPacket(fileName);
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_INVALIDATE_BLUEPRINT, packet);
+            final NbtCompound updatedStructure = new NbtCompound();
+            structureToUpdate.writeNbt(updatedStructure);
+            fortressServerPlayer.getServerBlueprintManager().update(fileName, player, updatedStructure);
         }
 
 

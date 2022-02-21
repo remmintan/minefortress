@@ -12,7 +12,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
-import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressGameRenderer;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -63,8 +63,8 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                     return;
                 }
 
-                final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
-                if(blueprintManager.hasSelectedBlueprint()) {
+                final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+                if(clientBlueprintManager.hasSelectedBlueprint()) {
                     resetSelection(selectionManager);
                     return;
                 }

@@ -1,12 +1,6 @@
-package org.minefortress.blueprints;
+package org.minefortress.blueprints.manager;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BlueprintMetadata {
 

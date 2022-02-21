@@ -2,8 +2,7 @@ package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
-import org.minefortress.blueprints.BlueprintMetadata;
-import org.minefortress.blueprints.BlueprintMetadataManager;
+import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundEditBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -43,7 +42,7 @@ public final class BlueprintScreenHandler {
     }
 
     public void scroll(float scrollPosition) {
-        final List<BlueprintMetadata> allBlueprint = getMetadataManager().getAllBlueprint(selectedGroup);
+        final List<BlueprintMetadata> allBlueprint = fortressClient.getBlueprintManager().getAllBlueprints(selectedGroup);
         this.totalSize = allBlueprint.size();
         this.currentSlots = new ArrayList<>();
 
@@ -89,7 +88,7 @@ public final class BlueprintScreenHandler {
 
     public void clickOnFocusedSlot() {
         if(focusedSlot == null) return;
-        getMetadataManager().select(focusedSlot.getMetadata());
+        fortressClient.getBlueprintManager().select(focusedSlot.getMetadata());
     }
 
     public int getSelectedGroupSize() {
@@ -98,10 +97,6 @@ public final class BlueprintScreenHandler {
 
     public Text getFocusedSlotName() {
         return this.focusedSlot.getTooltipText();
-    }
-
-    private BlueprintMetadataManager getMetadataManager() {
-        return fortressClient.getBlueprintMetadataManager();
     }
 
 

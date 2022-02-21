@@ -13,7 +13,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
-import org.minefortress.blueprints.BlueprintMetadata;
+import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;

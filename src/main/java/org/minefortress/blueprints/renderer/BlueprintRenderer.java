@@ -9,8 +9,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.BlueprintManager;
-import org.minefortress.blueprints.BlueprintMetadata;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
+import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
 public final class BlueprintRenderer {
@@ -34,9 +34,9 @@ public final class BlueprintRenderer {
     }
 
     public void prepareBlueprintForRender() {
-        final BlueprintManager blueprintManager = getBlueprintManager();
-        if(blueprintManager.hasSelectedBlueprint()) {
-            final BlueprintMetadata selectedStructure = blueprintManager.getSelectedStructure();
+        final ClientBlueprintManager clientBlueprintManager = getBlueprintManager();
+        if(clientBlueprintManager.hasSelectedBlueprint()) {
+            final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
             final BlockRotation blockRotation = selectedStructure.getRotation();
             final String fileName = selectedStructure.getFile();
             blueprintsModelBuilder.buildBlueprint(fileName, blockRotation);
@@ -283,7 +283,7 @@ public final class BlueprintRenderer {
 
 
 
-    private BlueprintManager getBlueprintManager() {
+    private ClientBlueprintManager getBlueprintManager() {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         return fortressClient.getBlueprintManager();
     }

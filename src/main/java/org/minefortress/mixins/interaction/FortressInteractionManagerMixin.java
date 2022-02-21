@@ -16,11 +16,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
-import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -77,7 +75,7 @@ public abstract class FortressInteractionManagerMixin {
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if(getCurrentGameMode() == FORTRESS) {
             final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-            final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+            final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
             final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
             if(fortressManager.isSelectingColonist()){
@@ -90,8 +88,8 @@ public abstract class FortressInteractionManagerMixin {
                 cir.setReturnValue(true);
                 return;
             }
-            if(blueprintManager.hasSelectedBlueprint()) {
-               blueprintManager.clearStructure();
+            if(clientBlueprintManager.hasSelectedBlueprint()) {
+               clientBlueprintManager.clearStructure();
             } else {
                 fortressClient.getSelectionManager().selectBlock(pos);
                 cir.setReturnValue(true);
@@ -112,7 +110,7 @@ public abstract class FortressInteractionManagerMixin {
             BlockPos blockPos = hitResult.getBlockPos();
             if(world.getWorldBorder().contains(blockPos)) {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-                final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
+                final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
                 final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
                 if(fortressManager.isFortressInitializationNeeded()) {
                     fortressManager.setupFortressCenter();
@@ -120,8 +118,8 @@ public abstract class FortressInteractionManagerMixin {
                     return;
                 }
 
-                if(blueprintManager.hasSelectedBlueprint()) {
-                    blueprintManager.buildCurrentStructure();
+                if(clientBlueprintManager.hasSelectedBlueprint()) {
+                    clientBlueprintManager.buildCurrentStructure();
                     cir.setReturnValue(ActionResult.SUCCESS);
                     return;
                 }

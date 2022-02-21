@@ -11,7 +11,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.RaycastContext;
-import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
 import org.minefortress.selections.SelectionManager;
@@ -59,9 +59,9 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
         if(client.interactionManager != null && client.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
             if(client.options.keySprint.isPressed()) {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-                final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
-                if(blueprintManager.hasSelectedBlueprint()) {
-                    blueprintManager.rotateSelectedStructureCounterClockwise();
+                final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+                if(clientBlueprintManager.hasSelectedBlueprint()) {
+                    clientBlueprintManager.rotateSelectedStructureCounterClockwise();
                 } else {
                     final SelectionManager selectionManager = fortressClient.getSelectionManager();
                     selectionManager.moveSelectionDown();

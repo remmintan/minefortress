@@ -2,7 +2,7 @@ package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import org.minefortress.blueprints.BlueprintMetadata;
+import org.minefortress.blueprints.manager.BlueprintMetadata;
 
 public class BlueprintSlot {
 
