@@ -6,7 +6,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.blueprints.ServerBlueprintManager;
+import org.minefortress.blueprints.manager.ServerBlueprintManager;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.tasks.BlueprintTask;
@@ -48,11 +49,12 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final ServerWorld serverWorld = player.getServerWorld();
-        if(serverWorld instanceof final FortressServerWorld fortressWorld) {
-            final ServerBlueprintManager blueprintManager = fortressWorld.getBlueprintManager();
+        if(player instanceof final FortressServerPlayerEntity fortressServerPlayer) {
+            final ServerBlueprintManager blueprintManager = fortressServerPlayer.getServerBlueprintManager();
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation);
-            fortressWorld.getTaskManager().addTask(task);
+            final ServerWorld serverWorld = player.getServerWorld();
+            if(serverWorld instanceof FortressServerWorld fortressWorld)
+                fortressWorld.getTaskManager().addTask(task);
         }
     }
 }

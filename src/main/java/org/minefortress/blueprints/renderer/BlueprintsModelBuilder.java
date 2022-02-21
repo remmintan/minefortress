@@ -4,8 +4,8 @@ import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.util.BlockRotation;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.blueprints.BlueprintBlockDataManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,13 +14,13 @@ import java.util.Map;
 public class BlueprintsModelBuilder {
 
     private final BlockBufferBuilderStorage blockBufferBuilders;
-    private final BlueprintBlockDataManager blockDataManager;
+    private final ClientBlueprintBlockDataManager blockDataManager;
 
     private final Map<String, BuiltBlueprint> builtBlueprints = new HashMap<>();
 
-    public BlueprintsModelBuilder(BufferBuilderStorage bufferBuilders, FortressMinecraftClient client) {
+    public BlueprintsModelBuilder(BufferBuilderStorage bufferBuilders, ClientBlueprintBlockDataManager blockDataManager) {
         this.blockBufferBuilders = bufferBuilders.getBlockBufferBuilders();
-        this.blockDataManager = client.getBlueprintBlockDataManager();
+        this.blockDataManager = blockDataManager;
     }
 
     public BuiltBlueprint getOrBuildBlueprint(String fileName, BlockRotation rotation) {
@@ -32,7 +32,7 @@ public class BlueprintsModelBuilder {
     public void buildBlueprint(String fileName, BlockRotation rotation) {
         String key = getKey(fileName, rotation);
         if(!this.builtBlueprints.containsKey(key)) {
-            final BlueprintBlockDataManager.BlueprintBlockData blockData = this.blockDataManager.getBlockData(fileName, rotation, false);
+            final BlueprintBlockData blockData = this.blockDataManager.getBlockData(fileName, rotation);
             final BuiltBlueprint builtBlueprint = new BuiltBlueprint(blockData);
             builtBlueprint.build(this.blockBufferBuilders);
             this.builtBlueprints.put(key, builtBlueprint);

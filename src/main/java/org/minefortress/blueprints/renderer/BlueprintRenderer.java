@@ -8,20 +8,117 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.BlueprintManager;
+import org.minefortress.blueprints.BlueprintMetadata;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
 public final class BlueprintRenderer {
+
+    private static final Vec3f WRONG_PLACEMENT_COLOR = new Vec3f(1.0F, 0.5F, 0.5F);
+    private static final Vec3f CORRECT_PLACEMENT_COLOR = new Vec3f(1F, 1.0F, 1F);
 
     private final BlueprintsModelBuilder blueprintsModelBuilder;
     private final MinecraftClient client;
 
     public BlueprintRenderer(MinecraftClient client) {
-        blueprintsModelBuilder  = new BlueprintsModelBuilder(
-                client.getBufferBuilders(),
-                (FortressMinecraftClient) client
-        );
-        this.client = client;
+        if(client instanceof FortressMinecraftClient fortressClient) {
+            blueprintsModelBuilder  = new BlueprintsModelBuilder(
+                    client.getBufferBuilders(),
+                    fortressClient.getBlueprintManager().getBlockDataManager()
+            );
+            this.client = client;
+        } else {
+            throw new IllegalArgumentException("Client must be an instance of FortressMinecraftClient");
+        }
     }
+
+    public void prepareBlueprintForRender() {
+        final BlueprintManager blueprintManager = getBlueprintManager();
+        if(blueprintManager.hasSelectedBlueprint()) {
+            final BlueprintMetadata selectedStructure = blueprintManager.getSelectedStructure();
+            final BlockRotation blockRotation = selectedStructure.getRotation();
+            final String fileName = selectedStructure.getFile();
+            blueprintsModelBuilder.buildBlueprint(fileName, blockRotation);
+        }
+    }
+
+
+    public void renderSelectedBlueprint(MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
+        if(!getBlueprintManager().hasSelectedBlueprint()) return;
+        renderLayer(RenderLayer.getSolid() ,matrices, d, e, f, matrix4f);
+        renderLayer(RenderLayer.getCutout() ,matrices, d, e, f, matrix4f);
+        renderLayer(RenderLayer.getCutoutMipped() ,matrices, d, e, f, matrix4f);
+    }
+
+    private void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
+        int k;
+        RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+        renderLayer.startDrawing();
+        this.client.getProfiler().push("filterempty");
+        this.client.getProfiler().swap(() -> "render_" + renderLayer);
+        VertexFormat h = renderLayer.getVertexFormat();
+        Shader shader = RenderSystem.getShader();
+        BufferRenderer.unbindAll();
+        for (int i = 0; i < 12; ++i) {
+            k = RenderSystem.getShaderTexture(i);
+            shader.addSampler("Sampler" + i, k);
+        }
+        if (shader.modelViewMat != null) {
+            shader.modelViewMat.set(matrices.peek().getModel());
+        }
+        if (shader.projectionMat != null) {
+            shader.projectionMat.set(matrix4f);
+        }
+        if (shader.colorModulator != null) {
+            shader.colorModulator.set(getBlueprintManager().isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR);
+        }
+        if (shader.fogStart != null) {
+            shader.fogStart.set(RenderSystem.getShaderFogStart());
+        }
+        if (shader.fogEnd != null) {
+            shader.fogEnd.set(RenderSystem.getShaderFogEnd());
+        }
+        if (shader.fogColor != null) {
+            shader.fogColor.set(RenderSystem.getShaderFogColor());
+        }
+        if (shader.textureMat != null) {
+            shader.textureMat.set(RenderSystem.getTextureMatrix());
+        }
+        if (shader.gameTime != null) {
+            shader.gameTime.set(RenderSystem.getShaderGameTime());
+        }
+        RenderSystem.setupShaderLights(shader);
+        shader.bind();
+        GlUniform i = shader.chunkOffset;
+        k = 0;
+
+        final BuiltBlueprint chunk = getBuiltChunk();
+        final BlockPos blueprintBuildPos = getBlueprintManager().getBlueprintBuildPos();
+        if(chunk != null && chunk.hasLayer(renderLayer) && blueprintBuildPos != null) {
+            VertexBuffer vertexBuffer = chunk.getBuffer(renderLayer);
+            if (i != null) {
+                i.set((float)((double)blueprintBuildPos.getX() - d), (float)((double)blueprintBuildPos.getY() - e), (float)((double)blueprintBuildPos.getZ() - f));
+                i.upload();
+            }
+            vertexBuffer.drawVertices();
+            k = 1;
+        }
+        if (i != null) {
+            i.set(Vec3f.ZERO);
+        }
+        shader.unbind();
+        if (k != 0) {
+            h.endDrawing();
+        }
+        VertexBuffer.unbind();
+        VertexBuffer.unbindVertexArray();
+        this.client.getProfiler().pop();
+        renderLayer.endDrawing();
+    }
+
+
+
 
     public void renderBlueprintPreview(String fileName, BlockRotation blockRotation) {
         final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
@@ -35,10 +132,10 @@ public final class BlueprintRenderer {
         final float y = -60f * scaleFactor;
         final float z = 30f * scaleFactor;
 
-        renderBlueprint(builtBlueprint, scale, x, y, z);
+        renderBlueprintInGui(builtBlueprint, scale, x, y, z);
     }
 
-    public void renderBlueprint(String fileName, BlockRotation blockRotation, int slotColumn, int slotRow) {
+    public void renderBlueprintInGui(String fileName, BlockRotation blockRotation, int slotColumn, int slotRow) {
         final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
 
         final Vec3i size = builtBlueprint.getSize();
@@ -50,10 +147,14 @@ public final class BlueprintRenderer {
         final float y = -17f * scaleFactor - 11.25f * slotRow  * scaleFactor / 1.25f;
         final float z = 22f * scaleFactor;
 
-        renderBlueprint(builtBlueprint, scale, x, y, z);
+        renderBlueprintInGui(builtBlueprint, scale, x, y, z);
     }
 
-    private void renderBlueprint(BuiltBlueprint builtBlueprint, float scale, float x, float y, float z) {
+    public BlueprintsModelBuilder getBlueprintsModelBuilder() {
+        return blueprintsModelBuilder;
+    }
+
+    private void renderBlueprintInGui(BuiltBlueprint builtBlueprint, float scale, float x, float y, float z) {
         this.client.getProfiler().push("blueprint_render_model");
         DiffuseLighting.enableGuiDepthLighting();
 
@@ -74,6 +175,12 @@ public final class BlueprintRenderer {
 
         matrices.pop();
         this.client.getProfiler().pop();
+    }
+
+    @Nullable
+    private BuiltBlueprint getBuiltChunk() {
+        final BlueprintMetadata selectedStructure = getBlueprintManager().getSelectedStructure();
+        return this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getFile(), selectedStructure.getRotation());
     }
 
     private BuiltBlueprint getBuiltBlueprint(String fileName, BlockRotation blockRotation) {
@@ -174,7 +281,10 @@ public final class BlueprintRenderer {
         renderLayer.endDrawing();
     }
 
-    public BlueprintsModelBuilder getBlueprintsModelBuilder() {
-        return blueprintsModelBuilder;
+
+
+    private BlueprintManager getBlueprintManager() {
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        return fortressClient.getBlueprintManager();
     }
 }

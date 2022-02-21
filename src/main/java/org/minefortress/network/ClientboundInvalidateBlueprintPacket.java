@@ -25,7 +25,7 @@ public class ClientboundInvalidateBlueprintPacket implements FortressClientPacke
     @Override
     public void handle(MinecraftClient client) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
-        fortressClient.getBlueprintBlockDataManager().invalidateBlueprint(fileName);
+        fortressClient.getBlueprintManager().getBlockDataManager().invalidateBlueprint(fileName);
         fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().invalidateBlueprint(fileName);
     }
 }

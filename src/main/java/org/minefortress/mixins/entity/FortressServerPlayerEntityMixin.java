@@ -8,13 +8,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
-import net.minecraft.server.network.SpawnLocating;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
+import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
@@ -32,7 +32,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Mixin(ServerPlayerEntity.class)
@@ -51,6 +50,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Shadow @Final public MinecraftServer server;
     private FortressServerManager fortressServerManager;
+    private ServerBlueprintManager serverBlueprintManager;
 
     public FortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
@@ -59,6 +59,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Inject(method="<init>", at=@At("RETURN"))
     public void init(MinecraftServer server, ServerWorld world, GameProfile profile, CallbackInfo ci) {
         fortressServerManager = new FortressServerManager();
+        serverBlueprintManager = new ServerBlueprintManager(server);
     }
 
     @Inject(method="tick", at=@At("TAIL"))
@@ -84,6 +85,11 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Override
     public FortressServerManager getFortressServerManager() {
         return fortressServerManager;
+    }
+
+    @Override
+    public ServerBlueprintManager getServerBlueprintManager() {
+        return serverBlueprintManager;
     }
 
     @Inject(method = "attack", at = @At("HEAD"), cancellable = true)

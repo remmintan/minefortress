@@ -16,7 +16,8 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
-import org.minefortress.blueprints.BlueprintBlockDataManager;
+import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.BlueprintDataLayer;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -42,9 +43,10 @@ public class BuiltBlueprint {
     private final BlockRenderView blueprintData;
     private final Vec3i size;
 
-    public BuiltBlueprint(BlueprintBlockDataManager.BlueprintBlockData blockData) {
+    public BuiltBlueprint(BlueprintBlockData blockData) {
         if(blockData == null) throw new IllegalArgumentException("Block data cannot be null");
-        this.blueprintData = new BlueprintBlockRenderView(blockData.getBlueprintData());
+        if(!blockData.hasLayer(BlueprintDataLayer.GENERAL)) throw new IllegalArgumentException("Block data must have a general layer");
+        this.blueprintData = new BlueprintBlockRenderView(blockData.getLayer(BlueprintDataLayer.GENERAL));
         this.size = blockData.getSize();
     }
 

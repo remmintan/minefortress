@@ -12,16 +12,12 @@ public class BlueprintMetadata {
 
     private final String name;
     private final String file;
-    private final int roofHeight;
-    private final List<Block> roofBlocks = new ArrayList<>();
 
     private BlockRotation rotation = BlockRotation.NONE;
 
-    public BlueprintMetadata(String name, String file, int roofHeight, List<Block> roofBlocks) {
+    public BlueprintMetadata(String name, String file) {
         this.name = name;
         this.file = file;
-        this.roofHeight = roofHeight;
-        this.roofBlocks.addAll(roofBlocks);
     }
 
     public String getName() {
@@ -46,12 +42,6 @@ public class BlueprintMetadata {
 
     public BlockRotation getRotation() {
         return rotation;
-    }
-
-    public boolean isPartOfAutomaticLayer(BlockPos pos, BlockState state) {
-        if(pos.getY() < this.roofHeight) return false;
-        final Block block = state.getBlock();
-        return roofBlocks.contains(block);
     }
 
 }

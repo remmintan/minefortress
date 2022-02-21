@@ -65,10 +65,7 @@ public abstract class FortressWorldRendererMixin  {
     @Inject(method = "setupTerrain", at = @At("TAIL"))
     public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, int frame, boolean spectator, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
-        if(blueprintManager.hasSelectedBlueprint()) {
-            blueprintManager.buildStructure();
-        }
+        fortressClient.getBlueprintRenderer().prepareBlueprintForRender();
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
@@ -79,15 +76,7 @@ public abstract class FortressWorldRendererMixin  {
         this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        final BlueprintManager blueprintManager = fortressClient.getBlueprintManager();
-
-        if(blueprintManager.hasSelectedBlueprint()) {
-            blueprintManager.renderLayer(RenderLayer.getSolid(), matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
-            blueprintManager.renderLayer(RenderLayer.getCutout(), matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
-            blueprintManager.renderLayer(RenderLayer.getCutoutMipped(), matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
-
-//            blueprintManager.renderBlockEntities(immediate, matrices, cameraPos, this.blockEntityRenderDispatcher, tickDelta);
-        }
+        fortressClient.getBlueprintRenderer().renderSelectedBlueprint(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
 
         SelectionManager selectionManager = fortressClient.getSelectionManager();
         Iterator<BlockPos> currentSelection = selectionManager.getCurrentSelection();

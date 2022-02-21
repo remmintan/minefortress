@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.world.FortressServerWorld;
 import org.minefortress.interfaces.FortressServer;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.interfaces.FortressServerPacket;
@@ -85,12 +86,14 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
 
         structureToUpdate.saveFromWorld(fortressServerWorld, min, dimensions, true, Blocks.AIR);
         fortressServerWorld.disableSaveStructureMode();
-        structureManager.saveStructure(updatedStructureIdentifier);
 
-        final FortressServer fortressServer = (FortressServer) server;
-        fortressServer.getBlueprintBlockDataManager().invalidateBlueprint(fileName);
+        if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
+            fortressServerPlayer.getServerBlueprintManager().getBlockDataManager().invalidateBlueprint(fileName);
 
-        final ClientboundInvalidateBlueprintPacket packet = new ClientboundInvalidateBlueprintPacket(fileName);
-        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_INVALIDATE_BLUEPRINT, packet);
+            final ClientboundInvalidateBlueprintPacket packet = new ClientboundInvalidateBlueprintPacket(fileName);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_INVALIDATE_BLUEPRINT, packet);
+        }
+
+
     }
 }

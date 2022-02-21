@@ -4,11 +4,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.interfaces.FortressServer;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
 
 import java.util.Map;
@@ -32,17 +33,20 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final FortressServer fortressServer = (FortressServer) server;
-        final BlueprintsWorld blueprintsWorld = fortressServer.getBlueprintsWorld();
-        final ServerWorld world = blueprintsWorld.getWorld();
+        if(server instanceof FortressServer fortressServer) {
+            final BlueprintsWorld blueprintsWorld = fortressServer.getBlueprintsWorld();
 
-        final Map<BlockPos, BlockState> blueprintData = fortressServer
-                .getBlueprintBlockDataManager()
-                .getBlockData(blueprintFileName, BlockRotation.NONE, false)
-                .getBlueprintData();
+            if(player instanceof FortressServerPlayerEntity fortressPlayer) {
+                final Map<BlockPos, BlockState> blueprintData = fortressPlayer
+                        .getServerBlueprintManager()
+                        .getBlockDataManager()
+                        .getBlockData(blueprintFileName, BlockRotation.NONE)
+                        .getLayer(BlueprintDataLayer.GENERAL);
 
-        blueprintsWorld.prepareBlueprint(blueprintData, blueprintFileName);
-        blueprintsWorld.putBlueprintInAWorld(player);
-        player.moveToWorld(world);
+                blueprintsWorld.prepareBlueprint(blueprintData, blueprintFileName);
+                blueprintsWorld.putBlueprintInAWorld(player);
+                player.moveToWorld(blueprintsWorld.getWorld());
+            }
+        }
     }
 }

@@ -121,7 +121,7 @@ public abstract class FortressInteractionManagerMixin {
                 }
 
                 if(blueprintManager.hasSelectedBlueprint()) {
-                    blueprintManager.buildCurrentStructure(blockPos);
+                    blueprintManager.buildCurrentStructure();
                     cir.setReturnValue(ActionResult.SUCCESS);
                     return;
                 }

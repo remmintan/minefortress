@@ -73,7 +73,7 @@ public class FortressHud {
     private void renderHints(MatrixStack p, int scaledHeight, TextRenderer font) {
         final BlueprintManager blueprintManager = getBlueprintManager();
         if(blueprintManager.hasSelectedBlueprint()) {
-            final String selectedBlueprintName = blueprintManager.getSelectedStructureName();
+            final String selectedBlueprintName = blueprintManager.getSelectedStructure().getName();
             renderInfoText(p, font, "Blueprint: " + selectedBlueprintName);
 
             DrawableHelper.drawStringWithShadow(p, font, "hold ctrl - keep blueprint", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);

@@ -1,26 +1,15 @@
 package org.minefortress.blueprints;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.GlUniform;
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Shader;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.BlockRotation;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.renderer.BlueprintsModelBuilder;
-import org.minefortress.blueprints.renderer.BuiltBlueprint;
+import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.BlueprintDataLayer;
+import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
 import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundBlueprintTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -34,12 +23,8 @@ import java.util.stream.Collectors;
 
 public class BlueprintManager {
 
-    private static final Vec3f WRONG_PLACEMENT_COLOR = new Vec3f(1.0F, 0.5F, 0.5F);
-    private static final Vec3f CORRECT_PLACEMENT_COLOR = new Vec3f(1F, 1.0F, 1F);
-
     private final MinecraftClient client;
-    private final BlueprintBlockDataManager blockDataManager;
-    private final BlueprintsModelBuilder blueprintsModelBuilder;
+    private final ClientBlueprintBlockDataManager blockDataManager = new ClientBlueprintBlockDataManager();
 
     private BlueprintMetadata selectedStructure;
     private BlockPos blueprintBuildPos = null;
@@ -47,15 +32,10 @@ public class BlueprintManager {
 
     public BlueprintManager(MinecraftClient client) {
         this.client = client;
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
-        this.blockDataManager = fortressClient.getBlueprintBlockDataManager();
-        this.blueprintsModelBuilder = fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder();
     }
 
-    public void buildStructure() {
-        final String file = selectedStructure.getFile();
-        final BlockRotation rotation = selectedStructure.getRotation();
-        this.blueprintsModelBuilder.buildBlueprint(file, rotation);
+    public BlockPos getBlueprintBuildPos() {
+        return blueprintBuildPos;
     }
 
     public void tick() {
@@ -66,9 +46,9 @@ public class BlueprintManager {
     }
 
     private void checkCantBuild() {
-        final BlueprintBlockDataManager.BlueprintBlockData blockData = blockDataManager
-                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation(), false);
-        final Set<BlockPos> blueprintDataPositions = blockData.getBlueprintData().keySet();
+        final BlueprintBlockData blockData = blockDataManager
+                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
+        final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL).keySet();
         final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
                 .filter(blockPos -> !(blockData.isStandsOnGrass() && blockPos.getY() == 0))
                 .map(pos -> pos.add(blueprintBuildPos))
@@ -102,8 +82,8 @@ public class BlueprintManager {
         if(selectedStructure == null) return pos;
 
         final boolean posSolid = !BuildingManager.doesNotHaveCollisions(client.world, pos);
-        final BlueprintBlockDataManager.BlueprintBlockData blockData = blockDataManager
-                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation(), false);
+        final BlueprintBlockData blockData = blockDataManager
+                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
         final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
         BlockPos movedPos = pos.subtract(halfSize);
@@ -111,77 +91,6 @@ public class BlueprintManager {
         movedPos = posSolid? movedPos.up():movedPos;
         return movedPos;
     }
-
-    public void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
-        int k;
-        RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-        renderLayer.startDrawing();
-        this.client.getProfiler().push("filterempty");
-        this.client.getProfiler().swap(() -> "render_" + renderLayer);
-        VertexFormat h = renderLayer.getVertexFormat();
-        Shader shader = RenderSystem.getShader();
-        BufferRenderer.unbindAll();
-        for (int i = 0; i < 12; ++i) {
-            k = RenderSystem.getShaderTexture(i);
-            shader.addSampler("Sampler" + i, k);
-        }
-        if (shader.modelViewMat != null) {
-            shader.modelViewMat.set(matrices.peek().getModel());
-        }
-        if (shader.projectionMat != null) {
-            shader.projectionMat.set(matrix4f);
-        }
-        if (shader.colorModulator != null) {
-            shader.colorModulator.set(cantBuild ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR);
-        }
-        if (shader.fogStart != null) {
-            shader.fogStart.set(RenderSystem.getShaderFogStart());
-        }
-        if (shader.fogEnd != null) {
-            shader.fogEnd.set(RenderSystem.getShaderFogEnd());
-        }
-        if (shader.fogColor != null) {
-            shader.fogColor.set(RenderSystem.getShaderFogColor());
-        }
-        if (shader.textureMat != null) {
-            shader.textureMat.set(RenderSystem.getTextureMatrix());
-        }
-        if (shader.gameTime != null) {
-            shader.gameTime.set(RenderSystem.getShaderGameTime());
-        }
-        RenderSystem.setupShaderLights(shader);
-        shader.bind();
-        GlUniform i = shader.chunkOffset;
-        k = 0;
-
-        final BuiltBlueprint chunk = getBuiltChunk();
-        if(chunk != null && chunk.hasLayer(renderLayer) && blueprintBuildPos != null) {
-            VertexBuffer vertexBuffer = chunk.getBuffer(renderLayer);
-            if (i != null) {
-                i.set((float)((double)blueprintBuildPos.getX() - d), (float)((double)blueprintBuildPos.getY() - e), (float)((double)blueprintBuildPos.getZ() - f));
-                i.upload();
-            }
-            vertexBuffer.drawVertices();
-            k = 1;
-        }
-        if (i != null) {
-            i.set(Vec3f.ZERO);
-        }
-        shader.unbind();
-        if (k != 0) {
-            h.endDrawing();
-        }
-        VertexBuffer.unbind();
-        VertexBuffer.unbindVertexArray();
-        this.client.getProfiler().pop();
-        renderLayer.endDrawing();
-    }
-
-    @Nullable
-    private BuiltBlueprint getBuiltChunk() {
-        return this.blueprintsModelBuilder.getOrBuildBlueprint(this.selectedStructure.getFile(), this.selectedStructure.getRotation());
-    }
-
 
     public boolean hasSelectedBlueprint() {
         return selectedStructure != null;
@@ -191,7 +100,7 @@ public class BlueprintManager {
         this.selectedStructure = blueprintMetadata;
     }
 
-    public void buildCurrentStructure(BlockPos clickPos) {
+    public void buildCurrentStructure() {
         if(selectedStructure == null) throw new IllegalStateException("No blueprint selected");
         if(blueprintBuildPos == null) throw new IllegalStateException("No blueprint build position");
 
@@ -201,8 +110,8 @@ public class BlueprintManager {
         final FortressClientWorld world = (FortressClientWorld) client.world;
         if(world != null) {
             final Map<BlockPos, BlockState> structureData = blockDataManager
-                    .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation(), false)
-                    .getBlueprintData();
+                    .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation())
+                    .getLayer(BlueprintDataLayer.GENERAL);
             final List<BlockPos> blocks = structureData
                     .keySet()
                     .stream()
@@ -222,8 +131,8 @@ public class BlueprintManager {
         this.selectedStructure = null;
     }
 
-    public String getSelectedStructureName() {
-        return this.selectedStructure != null ? this.selectedStructure.getName() : "";
+    public BlueprintMetadata getSelectedStructure() {
+        return selectedStructure;
     }
 
     public void rotateSelectedStructureClockwise() {
@@ -236,4 +145,11 @@ public class BlueprintManager {
         this.selectedStructure.rotateLeft();
     }
 
+    public boolean isCantBuild() {
+        return cantBuild;
+    }
+
+    public ClientBlueprintBlockDataManager getBlockDataManager() {
+        return blockDataManager;
+    }
 }

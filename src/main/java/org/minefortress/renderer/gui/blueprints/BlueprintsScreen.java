@@ -267,7 +267,7 @@ public final class BlueprintsScreen extends Screen {
         RenderSystem.enableDepthTest();
         if(this.client != null){
             final BlueprintMetadata metadata = slot.getMetadata();
-            this.blueprintRenderer.renderBlueprint(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow);
+            this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow);
         }
 
         this.itemRenderer.zOffset = 0.0f;

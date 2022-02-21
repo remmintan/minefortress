@@ -18,9 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.BlueprintBlockDataManager;
 import org.minefortress.blueprints.BlueprintManager;
-import org.minefortress.blueprints.BlueprintMetadataManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
@@ -43,9 +41,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private SelectionManager selectionManager;
     private FortressCameraManager fortressCameraManager;
     private FortressHud fortressHud;
-    private BlueprintMetadataManager blueprintMetadataManager;
     private FortressClientManager fortressClientManager;
-    private BlueprintBlockDataManager blockDataManager;
     private BlueprintRenderer blueprintRenderer;
 
     @Shadow
@@ -83,21 +79,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.selectionManager = new SelectionManager((MinecraftClient)(Object)this);
         this.fortressCameraManager = new FortressCameraManager((MinecraftClient)(Object)this);
         this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
-        this.blueprintMetadataManager = new BlueprintMetadataManager((MinecraftClient)(Object)this);
         this.fortressClientManager = new FortressClientManager();
-        this.blockDataManager = new BlueprintBlockDataManager(this::getServer);
         this.blueprintRenderer = new BlueprintRenderer((MinecraftClient)(Object)this);
     }
 
     @Override
     public SelectionManager getSelectionManager() {
         return selectionManager;
-    }
-
-
-    @Override
-    public BlueprintMetadataManager getBlueprintMetadataManager() {
-        return blueprintMetadataManager;
     }
 
     @Override
@@ -199,11 +187,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         } else {
             return null;
         }
-    }
-
-    @Override
-    public BlueprintBlockDataManager getBlueprintBlockDataManager() {
-        return blockDataManager;
     }
 
     @Override

@@ -1,11 +1,13 @@
 package org.minefortress.blueprints;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
@@ -18,7 +20,7 @@ public class BlueprintMetadataManager {
         entry(
             BlueprintGroup.LIVING_HOUSES,
             Arrays.asList(
-                    new BlueprintMetadata("Small House 1", "house", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS))
+                    new BlueprintMetadata("Small House 1", "house")
 //                    new BlueprintMetadata("Small House 2", "village/plains/houses/plains_small_house_2", 4, Collections.singletonList(Blocks.OAK_PLANKS)),
 //                    new BlueprintMetadata("Small House 3", "village/plains/houses/plains_small_house_3", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
 //                    new BlueprintMetadata("Small House 4", "village/plains/houses/plains_small_house_4", 4, Arrays.asList(Blocks.OAK_STAIRS, Blocks.OAK_PLANKS)),
