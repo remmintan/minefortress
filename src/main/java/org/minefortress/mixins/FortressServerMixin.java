@@ -71,12 +71,17 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
 
     @Inject(method = "runOneTask", at = @At(value = "TAIL", shift = At.Shift.BEFORE), cancellable = true)
     public void executeOneTask(CallbackInfoReturnable<Boolean> cir) {
-        if(this.shouldKeepTicking()) {
+        if(this.shouldKeepTicking() && blueprintsWorld.hasWorld()) {
             final boolean executed = blueprintsWorld.getWorld().getChunkManager().executeQueuedTasks();
             if(executed) {
                 cir.setReturnValue(true);
             }
         }
+    }
+
+    @Inject(method="shutdown", at=@At("TAIL"))
+    public void shutdown(CallbackInfo ci) {
+        getBlueprintsWorld().closeSession();
     }
 
     @Override

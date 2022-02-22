@@ -9,7 +9,6 @@ import net.minecraft.resource.DataPackSettings;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -32,6 +31,7 @@ import net.minecraft.world.gen.chunk.*;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
+import org.apache.logging.log4j.LogManager;
 import org.minefortress.interfaces.FortressServer;
 
 import java.io.File;
@@ -42,8 +42,8 @@ import java.util.function.BooleanSupplier;
 
 public class BlueprintsWorld {
 
-    private static final String MOD_DIR = "MinefortressData";
-    private static final String WORLD_DIR = "blueprints";
+    private static final String MOD_DIR = "minefortress";
+    private static final String WORLD_DIR_PREFIX = "blueprints";
     private static final GameRules EDIT_BLUEPRINT_RULES = Util.make(new GameRules(), gameRules -> {
         gameRules.get(GameRules.DO_MOB_SPAWNING).set(false, null);
         gameRules.get(GameRules.DO_WEATHER_CYCLE).set(false, null);
@@ -77,6 +77,8 @@ public class BlueprintsWorld {
     private final MinecraftServer server;
     private Map<BlockPos, BlockState> preparedBlueprintData;
 
+    private LevelStorage.Session fortressSession = null;
+
     public BlueprintsWorld(MinecraftServer server) {
         this.server = server;
     }
@@ -107,9 +109,8 @@ public class BlueprintsWorld {
         final File runDirectory = MinecraftClient.getInstance().runDirectory;
 
         final LevelStorage fortressLevelStorage = LevelStorage.create(runDirectory.toPath().resolve(MOD_DIR));
-        LevelStorage.Session fortressSession = null;
         try {
-            fortressSession = fortressLevelStorage.createSession(WORLD_DIR);
+            fortressSession = fortressLevelStorage.createSession(WORLD_DIR_PREFIX+UUID.randomUUID());
         }catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -201,6 +202,20 @@ public class BlueprintsWorld {
                     world.setBlockState(pos, blockState);
                     world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
                 });
+    }
+
+    public void closeSession() {
+        if(fortressSession != null) {
+            try {
+                fortressSession.close();
+            }catch (IOException e) {
+                LogManager.getLogger().error("Failed to unlock level {}", this.fortressSession.getDirectoryName(), e);
+            }
+        }
+    }
+
+    public boolean hasWorld() {
+        return world != null;
     }
 
 }
