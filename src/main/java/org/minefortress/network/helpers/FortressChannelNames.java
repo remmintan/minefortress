@@ -16,5 +16,6 @@ public class FortressChannelNames {
     public static final String FORTRESS_SAVE_EDIT_BLUEPRINT = "fortress_save_edit_blueprint";
     public static final String FORTRESS_ADD_BLUEPRINT = "fortress_add_blueprint";
     public static final String FORTRESS_UPDATE_BLUEPRINT = "fortress_update_blueprint";
+    public static final String FORTRESS_RESET_BLUEPRINT = "fortress_reset_blueprint";
 
 }

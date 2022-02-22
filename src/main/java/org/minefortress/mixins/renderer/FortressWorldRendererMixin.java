@@ -7,8 +7,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -42,9 +40,6 @@ public abstract class FortressWorldRendererMixin  {
     @Shadow @Final private BufferBuilderStorage bufferBuilders;
 
     @Shadow private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
-
-    @Shadow private ChunkBuilder chunkBuilder;
-    @Shadow @Final private BlockEntityRenderDispatcher blockEntityRenderDispatcher;
     private MineFortressEntityRenderer entityRenderer;
 
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -59,8 +54,8 @@ public abstract class FortressWorldRendererMixin  {
 
     @Inject(method = "setupTerrain", at = @At("TAIL"))
     public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, int frame, boolean spectator, CallbackInfo ci) {
-        final FortressClientWorld world = (FortressClientWorld) this.world;
-        world.getBlueprintRenderer().prepareBlueprintForRender();
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        fortressClient.getBlueprintRenderer().prepareBlueprintForRender();
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
@@ -70,10 +65,10 @@ public abstract class FortressWorldRendererMixin  {
         final VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
         this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
 
-        final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
-        fortressWorld.getBlueprintRenderer().renderSelectedBlueprint(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
+
 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        fortressClient.getBlueprintRenderer().renderSelectedBlueprint(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
         SelectionManager selectionManager = fortressClient.getSelectionManager();
         Iterator<BlockPos> currentSelection = selectionManager.getCurrentSelection();
         VertexConsumer vertexconsumer2 = immediate.getBuffer(RenderLayer.getLines());

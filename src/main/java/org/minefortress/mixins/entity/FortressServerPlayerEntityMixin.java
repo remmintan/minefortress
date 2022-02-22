@@ -45,9 +45,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     private float persistedPitch;
 
     @Shadow @Final public ServerPlayerInteractionManager interactionManager;
-
-    @Shadow protected abstract void moveToSpawn(ServerWorld world);
-
     @Shadow @Final public MinecraftServer server;
     private FortressServerManager fortressServerManager;
     private ServerBlueprintManager serverBlueprintManager;
@@ -65,6 +62,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Inject(method="tick", at=@At("TAIL"))
     public void tick(CallbackInfo ci) {
         fortressServerManager.tick((ServerPlayerEntity)(Object)this);
+        serverBlueprintManager.tick((ServerPlayerEntity)(Object)this);
     }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))

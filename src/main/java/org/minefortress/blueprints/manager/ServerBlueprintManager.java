@@ -11,6 +11,7 @@ import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.ServerBlueprintBlockDataManager;
 import org.minefortress.network.ClientboundAddBlueprintPacket;
 import org.minefortress.network.ClientboundEditBlueprintPacket;
+import org.minefortress.network.ClientboundResetBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
@@ -45,6 +46,9 @@ public class ServerBlueprintManager {
 
     public void tick(ServerPlayerEntity player) {
         if(!initialized) {
+            final ClientboundResetBlueprintPacket resetpacket = new ClientboundResetBlueprintPacket();
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESET_BLUEPRINT, resetpacket);
+
             for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : PREDEFINED_BLUEPRINTS.entrySet()) {
                 for(BlueprintMetadata blueprintMetadata : entry.getValue()) {
                     final NbtCompound structureNbt = blockDataManager.getStructureNbt(blueprintMetadata.getFile());

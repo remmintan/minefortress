@@ -176,8 +176,17 @@ public class ClientBlueprintManager {
     public void update(String fileName, NbtCompound tag) {
         blockDataManager.setBlueprint(fileName, tag);
         blockDataManager.invalidateBlueprint(fileName);
-        if(client.world instanceof FortressClientWorld fortressWorld) {
-            fortressWorld.getBlueprintRenderer().getBlueprintsModelBuilder().invalidateBlueprint(fileName);
+        if(client instanceof FortressMinecraftClient fortressClient) {
+            fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().invalidateBlueprint(fileName);
+        }
+    }
+
+    public void reset() {
+        this.clearStructure();
+        this.blueprintMetadataManager.reset();
+        this.blockDataManager.reset();
+        if(client instanceof FortressMinecraftClient fortressClient) {
+            fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().reset();
         }
     }
 

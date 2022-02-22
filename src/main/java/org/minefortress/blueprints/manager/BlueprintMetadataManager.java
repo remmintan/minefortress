@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 public final class BlueprintMetadataManager {
 
 
-    private static final Map<BlueprintGroup, List<BlueprintMetadata>> blueprintsMap = new HashMap<>();
+    private final Map<BlueprintGroup, List<BlueprintMetadata>> blueprintsMap = new HashMap<>();
     private int index = 0;
 
     public void select(BlueprintMetadata metadata) {
@@ -44,6 +44,11 @@ public final class BlueprintMetadataManager {
         final BlueprintMetadata metadata = new BlueprintMetadata(name, file);
         blueprintsMap.computeIfAbsent(group, k -> new ArrayList<>()).add(metadata);
         return metadata;
+    }
+
+    public void reset() {
+        this.blueprintsMap.clear();
+        this.index = 0;
     }
 
     private boolean isContainsBlueprint(String name, String file) {

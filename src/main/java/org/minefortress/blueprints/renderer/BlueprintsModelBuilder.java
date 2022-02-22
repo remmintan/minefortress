@@ -48,4 +48,8 @@ public class BlueprintsModelBuilder {
         new HashSet<>(builtBlueprints.keySet()).stream().filter(key -> key.startsWith(fileName)).forEach(builtBlueprints::remove);
     }
 
+    public void reset() {
+        this.builtBlueprints.clear();
+    }
+
 }

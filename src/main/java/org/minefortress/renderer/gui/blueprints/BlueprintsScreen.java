@@ -60,7 +60,7 @@ public final class BlueprintsScreen extends Screen {
                 this.y = (this.height - backgroundHeight) / 2;
 
                 this.handler = new BlueprintScreenHandler(this.client);
-                this.blueprintRenderer = ((FortressClientWorld)this.client.world).getBlueprintRenderer();
+                this.blueprintRenderer = ((FortressMinecraftClient)this.client).getBlueprintRenderer();
             } else {
                 this.client.setScreen(null);
             }

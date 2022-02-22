@@ -50,5 +50,6 @@ public class MineFortressClient implements ClientModInitializer {
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_FOLLOW_COLONIST, ClientboundFollowColonistPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_ADD_BLUEPRINT, ClientboundAddBlueprintPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, ClientboundEditBlueprintPacket::new);
+        FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_RESET_BLUEPRINT, ClientboundResetBlueprintPacket::new);
     }
 }

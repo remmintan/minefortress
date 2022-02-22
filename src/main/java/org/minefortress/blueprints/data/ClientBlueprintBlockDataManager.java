@@ -50,4 +50,10 @@ public final class ClientBlueprintBlockDataManager extends AbstractBlueprintBloc
     public void removeBlueprint(String blueprintFileName) {
         blueprintTags.remove(blueprintFileName);
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        blueprintTags.clear();
+    }
 }

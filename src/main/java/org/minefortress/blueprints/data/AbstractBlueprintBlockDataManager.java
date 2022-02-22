@@ -10,11 +10,10 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.MineFortressMod;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 
 abstract class AbstractBlueprintBlockDataManager {
 
-    private Map<String, BlueprintBlockData> blueprints;
+    private final Map<String, BlueprintBlockData> blueprints = new HashMap<>();
 
     public BlueprintBlockData getBlockData(String blueprintFileName, BlockRotation rotation) {
         final String key = getKey(blueprintFileName, rotation);
@@ -91,5 +90,9 @@ abstract class AbstractBlueprintBlockDataManager {
             }
         }
         return inf;
+    }
+
+    protected void reset() {
+        this.blueprints.clear();
     }
 }

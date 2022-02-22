@@ -13,6 +13,7 @@ public interface FortressMinecraftClient {
     FortressHud getFortressHud();
 
     ClientBlueprintManager getBlueprintManager();
+    BlueprintRenderer getBlueprintRenderer();
 
     FortressClientManager getFortressClientManager();
 
