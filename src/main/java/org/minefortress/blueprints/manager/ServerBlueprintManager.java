@@ -10,7 +10,7 @@ import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.ServerBlueprintBlockDataManager;
 import org.minefortress.network.ClientboundAddBlueprintPacket;
-import org.minefortress.network.ClientboundEditBlueprintPacket;
+import org.minefortress.network.ClientboundUpdateBlueprintPacket;
 import org.minefortress.network.ClientboundResetBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -39,6 +39,7 @@ public class ServerBlueprintManager {
     private boolean initialized = false;
 
     private final ServerBlueprintBlockDataManager blockDataManager;
+    private final Queue<ClientboundUpdateBlueprintPacket> scheduledEdits = new ArrayDeque<>();
 
     public ServerBlueprintManager(MinecraftServer server) {
         this.blockDataManager = new ServerBlueprintBlockDataManager(server);
@@ -46,6 +47,7 @@ public class ServerBlueprintManager {
 
     public void tick(ServerPlayerEntity player) {
         if(!initialized) {
+            scheduledEdits.clear();
             final ClientboundResetBlueprintPacket resetpacket = new ClientboundResetBlueprintPacket();
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESET_BLUEPRINT, resetpacket);
 
@@ -59,12 +61,17 @@ public class ServerBlueprintManager {
 
             initialized = true;
         }
+
+        if(!scheduledEdits.isEmpty()) {
+            final ClientboundUpdateBlueprintPacket packet = scheduledEdits.remove();
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, packet);
+        }
     }
 
-    public void update(String fileName, ServerPlayerEntity player, NbtCompound updatedStructure) {
+    public void update(String fileName, NbtCompound updatedStructure) {
         blockDataManager.update(fileName, updatedStructure);
-        final ClientboundEditBlueprintPacket packet = new ClientboundEditBlueprintPacket(fileName, updatedStructure);
-        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
+        final ClientboundUpdateBlueprintPacket packet = new ClientboundUpdateBlueprintPacket(fileName, updatedStructure);
+        scheduledEdits.add(packet);
     }
 
     public ServerBlueprintBlockDataManager getBlockDataManager() {

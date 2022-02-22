@@ -6,17 +6,17 @@ import net.minecraft.network.PacketByteBuf;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressClientPacket;
 
-public class ClientboundEditBlueprintPacket implements FortressClientPacket {
+public class ClientboundUpdateBlueprintPacket implements FortressClientPacket {
 
     private final String file;
     private final NbtCompound tag;
 
-    public ClientboundEditBlueprintPacket(String file, NbtCompound tag) {
+    public ClientboundUpdateBlueprintPacket(String file, NbtCompound tag) {
         this.file = file;
         this.tag = tag;
     }
 
-    public ClientboundEditBlueprintPacket(PacketByteBuf buf) {
+    public ClientboundUpdateBlueprintPacket(PacketByteBuf buf) {
         file = buf.readString();
         tag = buf.readNbt();
     }
