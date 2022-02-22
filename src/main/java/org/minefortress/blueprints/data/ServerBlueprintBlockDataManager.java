@@ -1,8 +1,10 @@
 package org.minefortress.blueprints.data;
 
+import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.Structure;
 import net.minecraft.util.BlockRotation;
@@ -112,6 +114,31 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     @NotNull
     private Identifier getId(String fileName) {
         return new Identifier(MineFortressMod.MOD_ID, fileName);
+    }
+
+    public void writeBlockDataManager(NbtCompound tag) {
+        if(updatedStructures.isEmpty()) return;
+        final NbtList nbtElements = new NbtList();
+        for(Map.Entry<String, NbtCompound> entry : updatedStructures.entrySet()) {
+            final NbtCompound mapEntry = new NbtCompound();
+            mapEntry.putString("fileName", entry.getKey());
+            mapEntry.put("structure", entry.getValue());
+            nbtElements.add(mapEntry);
+        }
+
+        tag.put("updatedStructures", nbtElements);
+    }
+
+    public void readBlockDataManager(NbtCompound tag) {
+        if(!tag.contains("updatedStructures")) return;
+        updatedStructures.clear();
+        final NbtList nbtElements = tag.getList("updatedStructures", NbtType.COMPOUND);
+        for (int i = 0; i < nbtElements.size(); i++) {
+            final NbtCompound mapEntry = nbtElements.getCompound(i);
+            final String fileName = mapEntry.getString("fileName");
+            final NbtCompound structure = mapEntry.getCompound("structure");
+            updatedStructures.put(fileName, structure);
+        }
     }
 
 }

@@ -88,4 +88,12 @@ public class ServerBlueprintManager {
         final Map<BlockPos, BlockState> entityLayer = serverStructureInfo.getLayer(BlueprintDataLayer.ENTITY);
         return new BlueprintTask(taskId, startPos, endPos, manualLayer, automatic, entityLayer);
     }
+
+    public void writeToNbt(NbtCompound compound) {
+        blockDataManager.writeBlockDataManager(compound);
+    }
+
+    public void readFromNbt(NbtCompound compound) {
+        blockDataManager.readBlockDataManager(compound);
+    }
 }
