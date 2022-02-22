@@ -1,5 +1,6 @@
 package org.minefortress.blueprints.manager;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -82,6 +83,9 @@ public class ServerBlueprintManager {
         final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation);
         final Vec3i size = serverStructureInfo.getSize();
         final BlockPos endPos = startPos.add(new Vec3i(size.getX(), size.getY(), size.getZ()));
-        return new BlueprintTask(taskId, startPos, endPos, serverStructureInfo.getLayer(BlueprintDataLayer.MANUAL), Collections.emptyMap(), Collections.emptyMap());
+        final Map<BlockPos, BlockState> manualLayer = serverStructureInfo.getLayer(BlueprintDataLayer.MANUAL);
+        final Map<BlockPos, BlockState> automatic = serverStructureInfo.getLayer(BlueprintDataLayer.AUTOMATIC);
+        final Map<BlockPos, BlockState> entityLayer = serverStructureInfo.getLayer(BlueprintDataLayer.ENTITY);
+        return new BlueprintTask(taskId, startPos, endPos, manualLayer, automatic, entityLayer);
     }
 }

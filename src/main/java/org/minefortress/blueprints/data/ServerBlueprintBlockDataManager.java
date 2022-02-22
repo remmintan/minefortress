@@ -1,5 +1,6 @@
 package org.minefortress.blueprints.data;
 
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -13,6 +14,7 @@ import org.minefortress.MineFortressMod;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager{
 
@@ -63,11 +65,47 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         final Map<BlockPos, BlockState> structureData = getStrcutureData(structure, rotation, pivot);
         final boolean standsOnGrass = isStandsOnGrass(structureData);
 
+        final Map<BlockPos, BlockState> structureEntityData = structureData.entrySet()
+            .stream()
+            .filter(entry -> entry.getValue().getBlock() instanceof BlockEntityProvider)
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        final Map<BlockPos, BlockState> allBlocksWithoutEntities = structureData.entrySet()
+            .stream()
+            .filter(entry -> !(entry.getValue().getBlock() instanceof BlockEntityProvider))
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        final Map<BlockPos, BlockState> manualData = new HashMap<>();
+        final Map<BlockPos, BlockState> automaticData = new HashMap<>();
+
+        for(int x = 0; x < size.getX(); x++) {
+            for (int z = 0; z < size.getZ(); z++) {
+                boolean isManual = true;
+                for (int y = 0; y < size.getY(); y++) {
+                    final BlockPos pos = new BlockPos(x, y, z);
+                    boolean contains = allBlocksWithoutEntities.containsKey(pos);
+                    if(!contains) {
+                        isManual = false;
+                        continue;
+                    }
+
+                    final BlockState state = allBlocksWithoutEntities.get(pos);
+                    if(isManual) {
+                        manualData.put(pos, state);
+                    } else {
+                        automaticData.put(pos, state);
+                    }
+                }
+            }
+        }
+
         return BlueprintBlockData
                 .withBlueprintSize(size)
                 .setStandsOnGrass(standsOnGrass)
                 .setLayer(BlueprintDataLayer.GENERAL, structureData)
-                .setLayer(BlueprintDataLayer.MANUAL, structureData)
+                .setLayer(BlueprintDataLayer.MANUAL, manualData)
+                .setLayer(BlueprintDataLayer.AUTOMATIC, automaticData)
+                .setLayer(BlueprintDataLayer.ENTITY, structureEntityData)
                 .build();
     }
 
