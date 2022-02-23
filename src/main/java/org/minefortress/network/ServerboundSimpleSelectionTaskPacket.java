@@ -92,7 +92,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         UUID id = this.getId();
         TaskType taskType = this.getTaskType();
-        TaskManager taskManager = ((FortressServerWorld)player.getServerWorld()).getTaskManager();
+        TaskManager taskManager = ((FortressServerWorld)player.getWorld()).getTaskManager();
         BlockPos startingBlock = this.getStart();
         BlockPos endingBlock = this.getEnd();
         HitResult hitResult = this.getHitResult();

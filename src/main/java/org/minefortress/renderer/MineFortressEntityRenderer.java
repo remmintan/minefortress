@@ -47,7 +47,7 @@ public class MineFortressEntityRenderer {
                 poseStack.multiply(this.cameraOrientation);
                 float verticalDistanceMultiplier = (float) (Math.abs(this.camera.getPos().y - pos.y) / 10);
                 poseStack.scale(-0.075F * verticalDistanceMultiplier, -0.075F * verticalDistanceMultiplier, 0.075F * verticalDistanceMultiplier);
-                final Matrix4f matrix = poseStack.peek().getModel();
+                final Matrix4f matrix = poseStack.peek().getPositionMatrix();
 
                 float backgroundOpacity = MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25F);
                 int backgroundAlpha = (int)(backgroundOpacity * 255.0F) << 24;

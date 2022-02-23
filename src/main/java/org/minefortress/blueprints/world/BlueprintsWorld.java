@@ -22,7 +22,6 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.HorizontalVoronoiBiomeAccessType;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.event.GameEvent;
@@ -67,7 +66,6 @@ public class BlueprintsWorld {
             0,
             32,
             16,
-            HorizontalVoronoiBiomeAccessType.INSTANCE,
             BlockTags.INFINIBURN_OVERWORLD.getId(),
             BLUEPRINTS_WORLD_ID,
             0.0f
@@ -120,9 +118,7 @@ public class BlueprintsWorld {
         final Registry<ChunkGeneratorSettings> chunkGeneratorSettingsRegistry = dynamicRegistryManager.get(Registry.CHUNK_GENERATOR_SETTINGS_KEY);
 
         final SimpleRegistry<DimensionOptions> dimensionOptions = DimensionType.createDefaultDimensionOptions(
-                dimensionTypeRegistry,
-                biomeRegistry,
-                chunkGeneratorSettingsRegistry,
+                dynamicRegistryManager,
                 0L
         );
 

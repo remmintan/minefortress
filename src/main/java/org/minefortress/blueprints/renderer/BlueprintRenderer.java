@@ -50,7 +50,7 @@ public final class BlueprintRenderer {
 
     private void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
         int k;
-        RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+        RenderSystem.assertOnRenderThread(RenderSystem::isOnRenderThread);
         renderLayer.startDrawing();
         this.client.getProfiler().push("filterempty");
         this.client.getProfiler().swap(() -> "render_" + renderLayer);
@@ -62,7 +62,7 @@ public final class BlueprintRenderer {
             shader.addSampler("Sampler" + i, k);
         }
         if (shader.modelViewMat != null) {
-            shader.modelViewMat.set(matrices.peek().getModel());
+            shader.modelViewMat.set(matrices.peek().getPositionMatrix());
         }
         if (shader.projectionMat != null) {
             shader.projectionMat.set(matrix4f);
@@ -228,7 +228,7 @@ public final class BlueprintRenderer {
             shader.addSampler("Sampler" + i, k);
         }
         if (shader.modelViewMat != null) {
-            shader.modelViewMat.set(matrices.peek().getModel());
+            shader.modelViewMat.set(matrices.peek().getPositionMatrix());
         }
         if (shader.projectionMat != null) {
             shader.projectionMat.set(matrix4f);

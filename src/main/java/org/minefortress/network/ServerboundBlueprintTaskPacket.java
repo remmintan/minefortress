@@ -52,7 +52,7 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
         if(player instanceof final FortressServerPlayerEntity fortressServerPlayer) {
             final ServerBlueprintManager blueprintManager = fortressServerPlayer.getServerBlueprintManager();
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation);
-            final ServerWorld serverWorld = player.getServerWorld();
+            final ServerWorld serverWorld = player.getWorld();
             if(serverWorld instanceof FortressServerWorld fortressWorld)
                 fortressWorld.getTaskManager().addTask(task);
         }

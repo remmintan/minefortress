@@ -13,7 +13,4 @@ accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode
 accessible  field   net/minecraft/structure/Structure   blockInfoLists  Ljava/util/List;
 accessible  class   net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
 accessible  field   net/minecraft/client/render/chunk/ChunkBuilder   buffers  Lnet/minecraft/client/render/chunk/BlockBufferBuilderStorage;
-mutable field net/minecraft/client/render/chunk/ChunkRendererRegion sizeX I
-mutable field net/minecraft/client/render/chunk/ChunkRendererRegion sizeY I
-mutable field net/minecraft/client/render/chunk/ChunkRendererRegion sizeZ I
-mutable field   net/minecraft/client/render/chunk/ChunkRendererRegion blockStates     [Lnet/minecraft/block/BlockState;
+accessible  class   net/minecraft/client/render/chunk/RenderedChunk
