@@ -143,9 +143,9 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         }
     }
 
-    @Redirect(method = "moveToSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/SpawnLocating;findOverworldSpawn(Lnet/minecraft/server/world/ServerWorld;IIZ)Lnet/minecraft/util/math/BlockPos;"))
-    public BlockPos moveToSpawnFindOverworldSpawn(ServerWorld world, int x, int z, boolean validSpawnNeeded) {
-        final BlockPos actualSpawn = FortressSpawnLocating.findOverworldSpawn(world, x, z, validSpawnNeeded);
+    @Redirect(method = "moveToSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/SpawnLocating;findOverworldSpawn(Lnet/minecraft/server/world/ServerWorld;II)Lnet/minecraft/util/math/BlockPos;"))
+    public BlockPos moveToSpawnFindOverworldSpawn(ServerWorld world, int x, int z) {
+        final BlockPos actualSpawn = FortressSpawnLocating.findOverworldSpawn(world, x, z);
         if(actualSpawn != null && this.server.getDefaultGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")){
             return actualSpawn.up(20);
         } else {

@@ -112,7 +112,7 @@ abstract class FortressGuiScreen extends DrawableHelper {
         r = tooltipComponent;
         for (s = 0; s < components.size(); ++s) {
             tooltipComponent2 = components.get(s);
-            tooltipComponent2.drawItems(this.textRenderer, l, r, matrices, this.itemRenderer, 400, this.client.getTextureManager());
+            tooltipComponent2.drawItems(this.textRenderer, l, r, matrices, this.itemRenderer, 400);
             r += tooltipComponent2.getHeight() + (s == 0 ? 2 : 0);
         }
         this.itemRenderer.zOffset = f;

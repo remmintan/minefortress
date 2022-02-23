@@ -50,7 +50,7 @@ public final class BlueprintRenderer {
 
     private void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
         int k;
-        RenderSystem.assertOnRenderThread(RenderSystem::isOnRenderThread);
+        RenderSystem.assertOnRenderThread();
         renderLayer.startDrawing();
         this.client.getProfiler().push("filterempty");
         this.client.getProfiler().swap(() -> "render_" + renderLayer);
@@ -214,7 +214,7 @@ public final class BlueprintRenderer {
     }
 
     private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices, Matrix4f matrix4f) {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+        RenderSystem.assertOnRenderThread();
 
         renderLayer.startDrawing();
 

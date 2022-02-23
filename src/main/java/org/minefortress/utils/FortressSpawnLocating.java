@@ -6,8 +6,8 @@ import net.minecraft.util.math.BlockPos;
 
 public class FortressSpawnLocating extends SpawnLocating {
 
-    public static BlockPos findOverworldSpawn(ServerWorld world, int x, int z, boolean validSpawnNeeded) {
-        return SpawnLocating.findOverworldSpawn(world, x, z, validSpawnNeeded);
+    public static BlockPos findOverworldSpawn(ServerWorld world, int x, int z) {
+        return SpawnLocating.findOverworldSpawn(world, x, z);
     }
 
 }
