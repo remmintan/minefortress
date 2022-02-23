@@ -10,9 +10,8 @@ import org.minefortress.tasks.BuildingManager;
 import org.minefortress.registries.FortressBlocks;
 import org.minefortress.entity.Colonist;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public class ScaffoldsControl extends ActionControl {
 
@@ -20,8 +19,16 @@ public class ScaffoldsControl extends ActionControl {
     private static final BlockItem SCAFFOLD_ITEM = (BlockItem) Items.OAK_PLANKS;
     private static final Block SCAFFOLD_BLOCK = FortressBlocks.SCAFFOLD_OAK_PLANKS;
 
+    private final List<BlockTask> blockTasks = new ArrayList<>();
+
     public ScaffoldsControl(Colonist colonist) {
         this.colonist = colonist;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        blockTasks.removeIf(BlockTask::execute);
     }
 
     @Override
@@ -37,13 +44,16 @@ public class ScaffoldsControl extends ActionControl {
             colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, placePosition);
 
             if(!colonist.isHasTask()){
-                CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS).execute(() -> {
-                    final World level = colonist.world;
-                    if(level.getBlockState(placePosition).isOf(SCAFFOLD_BLOCK)) {
-                        level.removeBlock(placePosition, false);
-                        level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, placePosition);
+                final BlockTask blockTask = new BlockTask(
+                    () -> {
+                        final World level = colonist.world;
+                        if (level.getBlockState(placePosition).isOf(SCAFFOLD_BLOCK)) {
+                            level.removeBlock(placePosition, false);
+                            level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, placePosition);
+                        }
                     }
-                });
+                );
+                blockTasks.add(blockTask);
             }
 
             return placePosition;
@@ -60,6 +70,27 @@ public class ScaffoldsControl extends ActionControl {
                 level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, result);
             }
         }
+    }
+
+    private static class BlockTask {
+
+        private static final int MAX_TICKS = 25;
+        private int ticks = 0;
+
+        private final Runnable action;
+
+        private BlockTask(Runnable action) {
+            this.action = action;
+        }
+
+        public boolean execute() {
+            if(++ticks > MAX_TICKS) {
+                action.run();
+                return true;
+            }
+            return false;
+        }
+
     }
 
 }
