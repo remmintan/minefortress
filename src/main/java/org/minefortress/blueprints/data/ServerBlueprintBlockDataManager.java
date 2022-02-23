@@ -69,12 +69,12 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
         final Map<BlockPos, BlockState> structureEntityData = structureData.entrySet()
             .stream()
-            .filter(entry -> entry.getValue().getBlock() instanceof BlockEntityProvider)
+            .filter(entry -> entry.getValue().getBlock() instanceof BlockEntityProvider || !entry.getValue().getFluidState().isEmpty())
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
         final Map<BlockPos, BlockState> allBlocksWithoutEntities = structureData.entrySet()
             .stream()
-            .filter(entry -> !(entry.getValue().getBlock() instanceof BlockEntityProvider))
+            .filter(entry -> !(entry.getValue().getBlock() instanceof BlockEntityProvider) && entry.getValue().getFluidState().isEmpty())
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
         final Map<BlockPos, BlockState> manualData = new HashMap<>();
