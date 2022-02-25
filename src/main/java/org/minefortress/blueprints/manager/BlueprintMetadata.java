@@ -6,12 +6,20 @@ public class BlueprintMetadata {
 
     private final String name;
     private final String file;
+    private final int floorLevel;
 
     private BlockRotation rotation = BlockRotation.NONE;
 
     public BlueprintMetadata(String name, String file) {
         this.name = name;
         this.file = file;
+        this.floorLevel = 0;
+    }
+
+    public BlueprintMetadata(String name, String file, int floorLevel) {
+        this.name = name;
+        this.file = file;
+        this.floorLevel = floorLevel;
     }
 
     public String getName() {
@@ -24,6 +32,10 @@ public class BlueprintMetadata {
 
     public String getId() {
         return file +"-"+rotation.name();
+    }
+
+    public int getFloorLevel() {
+        return floorLevel;
     }
 
     public void rotateRight() {
