@@ -150,7 +150,7 @@ public class ServerBlueprintManager {
             for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : PREDEFINED_BLUEPRINTS.entrySet()) {
                 for(BlueprintMetadata blueprintMetadata : entry.getValue()) {
                     final NbtCompound structureNbt = blockDataManager.getStructureNbt(blueprintMetadata.getFile());
-                    final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(entry.getKey(), blueprintMetadata.getName(), blueprintMetadata.getFile(), structureNbt);
+                    final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(entry.getKey(), blueprintMetadata.getName(), blueprintMetadata.getFile(), structureNbt, blueprintMetadata.getFloorLevel());
                     FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
                 }
             }

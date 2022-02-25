@@ -167,8 +167,8 @@ public class ClientBlueprintManager {
         return blockDataManager;
     }
 
-    public void add(BlueprintGroup group, String name, String file, NbtCompound tag) {
-        final BlueprintMetadata metadata = this.blueprintMetadataManager.add(group, name, file);
+    public void add(BlueprintGroup group, String name, String file, int floorLevel, NbtCompound tag) {
+        final BlueprintMetadata metadata = this.blueprintMetadataManager.add(group, name, file, floorLevel);
         blockDataManager.setBlueprint(metadata.getFile(), tag);
         blockDataManager.invalidateBlueprint(metadata.getFile());
     }
