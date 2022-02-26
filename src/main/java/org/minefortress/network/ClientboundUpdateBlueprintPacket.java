@@ -9,28 +9,32 @@ import org.minefortress.network.interfaces.FortressClientPacket;
 public class ClientboundUpdateBlueprintPacket implements FortressClientPacket {
 
     private final String file;
+    private final int newFloorLevel;
     private final NbtCompound tag;
 
-    public ClientboundUpdateBlueprintPacket(String file, NbtCompound tag) {
+    public ClientboundUpdateBlueprintPacket(String file, int newFloorLevel, NbtCompound tag) {
         this.file = file;
+        this.newFloorLevel = newFloorLevel;
         this.tag = tag;
     }
 
     public ClientboundUpdateBlueprintPacket(PacketByteBuf buf) {
         file = buf.readString();
+        newFloorLevel = buf.readInt();
         tag = buf.readNbt();
     }
 
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getBlueprintManager().update(file, tag);
+            fortressClient.getBlueprintManager().update(file, tag, newFloorLevel);
         }
     }
 
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeString(file);
+        buf.writeInt(newFloorLevel);
         buf.writeNbt(tag);
     }
 }

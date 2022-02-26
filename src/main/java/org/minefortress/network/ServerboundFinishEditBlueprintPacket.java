@@ -48,12 +48,13 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
         final FortressServerWorld fortressServerWorld = (FortressServerWorld) player.world;
 
         final String fileName = fortressServerWorld.getFileName();
+
         final Identifier updatedStructureIdentifier = new Identifier(MineFortressMod.MOD_ID, fileName);
         final StructureManager structureManager = server.getStructureManager();
         final Structure structureToUpdate = structureManager.getStructureOrBlank(updatedStructureIdentifier);
         fortressServerWorld.enableSaveStructureMode();
 
-        final BlockPos start = new BlockPos(0, 16, 0);
+        final BlockPos start = new BlockPos(0, 1, 0);
         final BlockPos end = new BlockPos(16, 32, 16);
         final Iterable<BlockPos> allPositions = BlockPos.iterate(start, end);
 
@@ -67,7 +68,8 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
 
         for(BlockPos pos : allPositions) {
             final BlockState blockState = fortressServerWorld.getBlockState(pos);
-            if(!blockState.isAir()) {
+            final int y = pos.getY();
+            if(isStateWasChanged(blockState, y)) {
                 minX = Math.min(minX, pos.getX());
                 minY = Math.min(minY, pos.getY());
                 minZ = Math.min(minZ, pos.getZ());
@@ -82,15 +84,23 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
         final BlockPos max = new BlockPos(maxX, maxY, maxZ);
         final BlockPos dimensions = max.subtract(min).add(1, 1, 1);
 
-        structureToUpdate.saveFromWorld(fortressServerWorld, min, dimensions, true, Blocks.AIR);
+        structureToUpdate.saveFromWorld(fortressServerWorld, min, dimensions, true, Blocks.VOID_AIR);
         fortressServerWorld.disableSaveStructureMode();
+
+        final int newFloorLevel = 16 - min.getY();
 
         if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
             final NbtCompound updatedStructure = new NbtCompound();
             structureToUpdate.writeNbt(updatedStructure);
-            fortressServerPlayer.getServerBlueprintManager().update(fileName, updatedStructure);
+            fortressServerPlayer.getServerBlueprintManager().update(fileName, updatedStructure, newFloorLevel);
         }
 
 
+    }
+
+    private boolean isStateWasChanged(BlockState blockState, int y) {
+        if(y > 15) return !blockState.isAir();
+        if(y == 15) return !blockState.isOf(Blocks.GRASS_BLOCK);
+        return !blockState.isOf(Blocks.DIRT);
     }
 }

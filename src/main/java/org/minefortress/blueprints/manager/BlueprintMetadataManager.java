@@ -51,6 +51,13 @@ public final class BlueprintMetadataManager {
         this.index = 0;
     }
 
+    public void update(String fileName, int newFloorLevel) {
+        flatBlueprints()
+                .stream()
+                .filter(b -> b.getFile().equals(fileName))
+                .forEach(b -> b.setFloorLevel(newFloorLevel));
+    }
+
     private boolean isContainsBlueprint(String name, String file) {
         return flatBlueprints().stream().anyMatch(b -> b.getName().equals(name) && b.getFile().equals(file));
     }
