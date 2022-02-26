@@ -190,8 +190,8 @@ public class BlueprintsWorld {
                 .iterate(new BlockPos(BlockPos.ZERO), new BlockPos(15, 32, 15))
                 .forEach(pos -> {
                     BlockState blockState;
-                    if(preparedBlueprintData.containsKey(pos.down(defaultFloorLevel + getWorld().getFloorLevel()))) {
-                        blockState = preparedBlueprintData.get(pos.down(defaultFloorLevel));
+                    if(preparedBlueprintData.containsKey(pos.down(defaultFloorLevel - getWorld().getFloorLevel()))) {
+                        blockState = preparedBlueprintData.get(pos.down(defaultFloorLevel - getWorld().getFloorLevel()));
                     } else if(pos.getY() >= defaultFloorLevel) {
                         blockState = Blocks.AIR.getDefaultState();
                     } else if(pos.getY() == 0) {

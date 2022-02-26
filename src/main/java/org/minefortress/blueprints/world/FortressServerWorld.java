@@ -62,8 +62,7 @@ public class FortressServerWorld extends ServerWorld {
     public BlockState getBlockState(BlockPos pos) {
         final BlockState blockState = super.getBlockState(pos);
         if(saveModeEnabled) {
-            if(pos.getY() > 0 && pos.getY() < 15 && blockState == Blocks.DIRT.getDefaultState()) return Blocks.VOID_AIR.getDefaultState();
-            if(pos.getY() == 15 && (blockState == Blocks.GRASS_BLOCK.getDefaultState() || blockState == Blocks.DIRT.getDefaultState())) return Blocks.VOID_AIR.getDefaultState();
+            if(pos.getY() > 0 && pos.getY() <= 15 && (blockState == Blocks.GRASS_BLOCK.getDefaultState() || blockState == Blocks.DIRT.getDefaultState())) return Blocks.VOID_AIR.getDefaultState();
         }
         return blockState;
     }
