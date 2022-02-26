@@ -55,7 +55,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
         fortressServerWorld.enableSaveStructureMode();
 
         final BlockPos start = new BlockPos(0, 1, 0);
-        final BlockPos end = new BlockPos(16, 32, 16);
+        final BlockPos end = new BlockPos(15, 32, 15);
         final Iterable<BlockPos> allPositions = BlockPos.iterate(start, end);
 
         int minX = Integer.MAX_VALUE;
@@ -99,6 +99,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
     }
 
     private boolean isStateWasChanged(BlockState blockState, int y) {
+        if(blockState.isOf(Blocks.VOID_AIR)) return false;
         if(y > 15) return !blockState.isAir();
         if(y == 15) return !blockState.isOf(Blocks.GRASS_BLOCK);
         return !blockState.isOf(Blocks.DIRT);
