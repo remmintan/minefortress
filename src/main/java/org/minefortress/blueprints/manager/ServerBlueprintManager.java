@@ -16,7 +16,10 @@ import org.minefortress.network.ClientboundResetBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
+import org.minefortress.selections.SelectionType;
 import org.minefortress.tasks.BlueprintTask;
+import org.minefortress.tasks.SimpleSelectionTask;
+import org.minefortress.tasks.TaskType;
 
 import java.util.*;
 
@@ -179,14 +182,24 @@ public class ServerBlueprintManager {
         return blockDataManager;
     }
 
-    public BlueprintTask createTask(UUID taskId, String structureFile, BlockPos startPos, BlockRotation rotation) {
+    public BlueprintTask createTask(UUID taskId, String structureFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
         final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation);
         final Vec3i size = serverStructureInfo.getSize();
+        startPos = startPos.down(floorLevel);
         final BlockPos endPos = startPos.add(new Vec3i(size.getX(), size.getY(), size.getZ()));
         final Map<BlockPos, BlockState> manualLayer = serverStructureInfo.getLayer(BlueprintDataLayer.MANUAL);
         final Map<BlockPos, BlockState> automatic = serverStructureInfo.getLayer(BlueprintDataLayer.AUTOMATIC);
         final Map<BlockPos, BlockState> entityLayer = serverStructureInfo.getLayer(BlueprintDataLayer.ENTITY);
-        return new BlueprintTask(taskId, startPos, endPos, manualLayer, automatic, entityLayer);
+        return new BlueprintTask(taskId, startPos, endPos, manualLayer, automatic, entityLayer, floorLevel);
+    }
+
+    public SimpleSelectionTask createDigTask(BlockPos startPos, int floorLevel, String structureFile, BlockRotation rotation) {
+        final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation);
+        final Vec3i size = serverStructureInfo.getSize();
+        startPos = startPos.down(floorLevel);
+        final BlockPos endPos = startPos.add(new Vec3i(size.getX(), floorLevel, size.getZ()));
+
+        return new SimpleSelectionTask(UUID.randomUUID(), TaskType.REMOVE, startPos, endPos, null, SelectionType.SQUARES);
     }
 
     public void writeToNbt(NbtCompound compound) {

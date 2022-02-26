@@ -11,6 +11,8 @@ import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.tasks.BlueprintTask;
+import org.minefortress.tasks.SimpleSelectionTask;
+import org.minefortress.tasks.TaskType;
 
 import java.util.UUID;
 
@@ -21,13 +23,15 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
     private final String blueprintFile;
     private final BlockPos startPos;
     private final BlockRotation rotation;
+    private final int floorLevel;
 
-    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintId, String blueprintFile, BlockPos startPos, BlockRotation rotation) {
+    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintId, String blueprintFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
         this.taskId = taskId;
         this.blueprintId = blueprintId;
         this.blueprintFile = blueprintFile;
         this.startPos = startPos;
         this.rotation = rotation;
+        this.floorLevel = floorLevel;
     }
 
     public ServerboundBlueprintTaskPacket(PacketByteBuf buf) {
@@ -36,6 +40,7 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
         this.blueprintFile = buf.readString();
         this.startPos = buf.readBlockPos();
         this.rotation = buf.readEnumConstant(BlockRotation.class);
+        this.floorLevel = buf.readInt();
     }
 
     @Override
@@ -45,16 +50,28 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
         buf.writeString(blueprintFile);
         buf.writeBlockPos(startPos);
         buf.writeEnumConstant(rotation);
+        buf.writeInt(floorLevel);
     }
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         if(player instanceof final FortressServerPlayerEntity fortressServerPlayer) {
             final ServerBlueprintManager blueprintManager = fortressServerPlayer.getServerBlueprintManager();
-            final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation);
+            final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation, floorLevel);
             final ServerWorld serverWorld = player.getWorld();
-            if(serverWorld instanceof FortressServerWorld fortressWorld)
-                fortressWorld.getTaskManager().addTask(task);
+
+            if (serverWorld instanceof FortressServerWorld fortressWorld) {
+                Runnable executeBuildTask = () -> fortressWorld.getTaskManager().addTask(task);
+                if (floorLevel > 0) {
+                    final SimpleSelectionTask digTask = blueprintManager.createDigTask(startPos, floorLevel, blueprintFile, rotation);
+                    digTask.addFinishListener(executeBuildTask);
+
+                    fortressWorld.getTaskManager().addTask(digTask);
+                } else {
+                    executeBuildTask.run();
+                }
+
+            }
         }
     }
 }

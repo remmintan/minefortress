@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
@@ -22,12 +21,22 @@ public class BlueprintTask extends AbstractTask {
     private final Map<BlockPos, BlockState> blueprintData;
     private final Map<BlockPos, BlockState> blueprintEntityData;
     private final Map<BlockPos, BlockState> blueprintAutomaticData;
+    private final float floorLevel;
 
-    public BlueprintTask(UUID id, BlockPos startingPos, BlockPos endingPos, Map<BlockPos, BlockState> blueprintData, Map<BlockPos, BlockState> blueprintEntityData, Map<BlockPos, BlockState> blueprintAutomaticData) {
+    public BlueprintTask(
+            UUID id,
+            BlockPos startingPos,
+            BlockPos endingPos,
+            Map<BlockPos, BlockState> blueprintData,
+            Map<BlockPos, BlockState> blueprintEntityData,
+            Map<BlockPos, BlockState> blueprintAutomaticData,
+            int floorLevel
+    ) {
         super(id, TaskType.BUILD, startingPos, endingPos);
         this.blueprintData = blueprintData;
         this.blueprintEntityData = blueprintEntityData;
         this.blueprintAutomaticData = blueprintAutomaticData;
+        this.floorLevel = floorLevel;
     }
 
     @Override
@@ -45,7 +54,7 @@ public class BlueprintTask extends AbstractTask {
 
         List<TaskBlockInfo> blockInfos = new ArrayList<>();
         for (BlockPos pos : allPositionsInPart) {
-            final BlockState state = blueprintData.getOrDefault(pos.subtract(start).add(delta), Blocks.AIR.getDefaultState());
+            final BlockState state = blueprintData.getOrDefault(pos.subtract(start).add(delta), pos.getY()<floorLevel?Blocks.DIRT.getDefaultState():Blocks.AIR.getDefaultState());
             if(state.isAir()) continue;
             final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(getItemFromState(state), pos.toImmutable(), state);
             blockInfos.add(blockStateTaskBlockInfo);

@@ -135,7 +135,7 @@ public class ClientBlueprintManager {
                     .collect(Collectors.toList());
             world.getClientTasksHolder().addTask(taskId, blocks);
         }
-        final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket = new ServerboundBlueprintTaskPacket(taskId, selectedStructure.getId(), selectedStructure.getFile(), blueprintBuildPos, selectedStructure.getRotation());
+        final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket = new ServerboundBlueprintTaskPacket(taskId, selectedStructure.getId(), selectedStructure.getFile(), blueprintBuildPos, selectedStructure.getRotation(), getSelectedStructure().getFloorLevel());
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
 
         if(!client.options.keySprint.isPressed()) {
