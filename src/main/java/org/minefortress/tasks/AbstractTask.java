@@ -11,9 +11,7 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.tasks.interfaces.Task;
 import org.minefortress.utils.PathUtils;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class AbstractTask implements Task {
 
@@ -29,6 +27,8 @@ public abstract class AbstractTask implements Task {
 
     protected int totalParts;
     private int completedParts;
+
+    private final List<Runnable> taskFinishListeners = new ArrayList<>();
 
     protected AbstractTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock) {
         this.id = id;
@@ -90,7 +90,13 @@ public abstract class AbstractTask implements Task {
             if(randomPlayer != null) {
                 FortressServerNetworkHelper.send(randomPlayer, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
             }
+
+            taskFinishListeners.forEach(Runnable::run);
         }
+    }
+
+    public void addFinishListener(Runnable listener) {
+        taskFinishListeners.add(listener);
     }
 
     protected int getCompletedParts() {
