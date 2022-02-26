@@ -67,8 +67,9 @@ public final class BlueprintRenderer {
         if (shader.projectionMat != null) {
             shader.projectionMat.set(matrix4f);
         }
+        final ClientBlueprintManager blueprintManager = getBlueprintManager();
         if (shader.colorModulator != null) {
-            shader.colorModulator.set(getBlueprintManager().isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR);
+            shader.colorModulator.set(blueprintManager.isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR);
         }
         if (shader.fogStart != null) {
             shader.fogStart.set(RenderSystem.getShaderFogStart());
@@ -91,7 +92,8 @@ public final class BlueprintRenderer {
         k = 0;
 
         final BuiltBlueprint chunk = getBuiltChunk();
-        final BlockPos blueprintBuildPos = getBlueprintManager().getBlueprintBuildPos();
+        final int floorLevel = blueprintManager.getSelectedStructure().getFloorLevel();
+        final BlockPos blueprintBuildPos = blueprintManager.getBlueprintBuildPos().down(floorLevel);
         if(chunk != null && chunk.hasLayer(renderLayer) && blueprintBuildPos != null) {
             VertexBuffer vertexBuffer = chunk.getBuffer(renderLayer);
             if (i != null) {
