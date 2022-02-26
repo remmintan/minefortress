@@ -51,7 +51,6 @@ abstract class AbstractBlueprintBlockDataManager {
 
         return blockInfos
                 .stream()
-                .filter(info -> info.state.getBlock() != Blocks.AIR)
                 .map(AbstractBlueprintBlockDataManager::convertJigsawBlock)
                 .collect(Collectors.toMap(
                         inf -> Structure.transform(placementData, inf.pos.add(BlockPos.ORIGIN)),
