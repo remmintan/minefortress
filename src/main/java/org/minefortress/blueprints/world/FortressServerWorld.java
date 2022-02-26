@@ -26,6 +26,7 @@ public class FortressServerWorld extends ServerWorld {
     private boolean saveModeEnabled = false;
 
     private String fileName;
+    private int floorLevel;
 
     public FortressServerWorld(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, LevelProperties properties, RegistryKey<World> worldKey, DimensionType dimensionType, WorldGenerationProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long seed, List<Spawner> spawners, boolean shouldTickTime) {
         super(server, workerExecutor, session, properties, worldKey, dimensionType, worldGenerationProgressListener, chunkGenerator, debugWorld, seed, spawners, shouldTickTime);
@@ -73,6 +74,14 @@ public class FortressServerWorld extends ServerWorld {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public int getFloorLevel() {
+        return floorLevel;
+    }
+
+    public void setFloorLevel(int floorLevel) {
+        this.floorLevel = floorLevel;
     }
 
     public void enableSaveStructureMode() {

@@ -65,8 +65,10 @@ public final class BlueprintScreenHandler {
     }
 
     public void sendEditPacket() {
-        final String file = this.focusedSlot.getMetadata().getFile();
-        final ServerboundEditBlueprintPacket packet = new ServerboundEditBlueprintPacket(file);
+        final BlueprintMetadata metadata = this.focusedSlot.getMetadata();
+        final String file = metadata.getFile();
+        final int floorLevel = metadata.getFloorLevel();
+        final ServerboundEditBlueprintPacket packet = new ServerboundEditBlueprintPacket(file, floorLevel);
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
     }
 

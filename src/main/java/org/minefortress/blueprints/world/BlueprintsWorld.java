@@ -165,9 +165,11 @@ public class BlueprintsWorld {
                 .withLayers(flatChunkGeneratorLayers, structuresConfig);
     }
 
-    public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName) {
+    public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel) {
         this.preparedBlueprintData = blueprintData;
-        getWorld().setFileName(blueprintFileName);
+        final FortressServerWorld world = getWorld();
+        world.setFileName(blueprintFileName);
+        world.setFloorLevel(floorLevel);
     }
 
     public void putBlueprintInAWorld(final ServerPlayerEntity player) {
@@ -179,17 +181,18 @@ public class BlueprintsWorld {
             }
         });
 
+        final int defaultFloorLevel = 16;
         BlockPos
                 .iterate(new BlockPos(BlockPos.ZERO), new BlockPos(15, 32, 15))
                 .forEach(pos -> {
                     BlockState blockState;
-                    if(preparedBlueprintData.containsKey(pos.down(16))) {
-                        blockState = preparedBlueprintData.get(pos.down(16));
-                    } else if(pos.getY() >= 16) {
+                    if(preparedBlueprintData.containsKey(pos.down(defaultFloorLevel + getWorld().getFloorLevel()))) {
+                        blockState = preparedBlueprintData.get(pos.down(defaultFloorLevel));
+                    } else if(pos.getY() >= defaultFloorLevel) {
                         blockState = Blocks.AIR.getDefaultState();
                     } else if(pos.getY() == 0) {
                         blockState = Blocks.BEDROCK.getDefaultState();
-                    } else if(pos.getY() > 0 && pos.getY() < 14) {
+                    } else if(pos.getY() > 0 && pos.getY() < defaultFloorLevel - 2) {
                         blockState = Blocks.DIRT.getDefaultState();
                     } else {
                         blockState = Blocks.GRASS_BLOCK.getDefaultState();
