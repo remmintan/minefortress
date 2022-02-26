@@ -6,7 +6,7 @@ public class BlueprintMetadata {
 
     private final String name;
     private final String file;
-    private final int floorLevel;
+    private int floorLevel;
 
     private BlockRotation rotation = BlockRotation.NONE;
 
@@ -36,6 +36,10 @@ public class BlueprintMetadata {
 
     public int getFloorLevel() {
         return floorLevel;
+    }
+
+    public void setFloorLevel(int floorLevel) {
+        this.floorLevel = floorLevel;
     }
 
     public void rotateRight() {

@@ -173,7 +173,9 @@ public class ClientBlueprintManager {
         blockDataManager.invalidateBlueprint(metadata.getFile());
     }
 
-    public void update(String fileName, NbtCompound tag) {
+    public void update(String fileName, NbtCompound tag, int newFloorLevel) {
+        blueprintMetadataManager.update(fileName,newFloorLevel);
+
         blockDataManager.setBlueprint(fileName, tag);
         blockDataManager.invalidateBlueprint(fileName);
         if(client instanceof FortressMinecraftClient fortressClient) {
