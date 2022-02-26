@@ -65,7 +65,6 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         size = new Vec3i(biggerSide, size.getY(), biggerSide);
 
         final Map<BlockPos, BlockState> structureData = getStrcutureData(structure, rotation, pivot);
-        final boolean standsOnGrass = isStandsOnGrass(structureData);
 
         final Map<BlockPos, BlockState> structureEntityData = structureData.entrySet()
             .stream()
@@ -103,7 +102,6 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
         return BlueprintBlockData
                 .withBlueprintSize(size)
-                .setStandsOnGrass(standsOnGrass)
                 .setLayer(BlueprintDataLayer.GENERAL, structureData)
                 .setLayer(BlueprintDataLayer.MANUAL, manualData)
                 .setLayer(BlueprintDataLayer.AUTOMATIC, automaticData)

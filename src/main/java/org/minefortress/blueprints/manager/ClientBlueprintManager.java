@@ -53,20 +53,23 @@ public class ClientBlueprintManager {
         final BlueprintBlockData blockData = blockDataManager
                 .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
         final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL).keySet();
+        final int floorLevel = selectedStructure.getFloorLevel();
+
         final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
-                .filter(blockPos -> !(blockData.isStandsOnGrass() && blockPos.getY() == 0))
-                .map(pos -> pos.add(blueprintBuildPos))
+                .filter(blockPos -> blockPos.getY() >= floorLevel)
+                .map(pos -> pos.add(blueprintBuildPos.down(floorLevel)))
                 .anyMatch(pos -> !BuildingManager.canPlaceBlock(client.world, pos));
 
         final boolean blueprintPartInTheAir = blueprintDataPositions.stream()
                 .filter(blockPos -> {
-                    if (blockData.isStandsOnGrass()) {
-                        return blockPos.getY() == 1 && !blueprintDataPositions.contains(blockPos.down());
+                    final int y = blockPos.getY();
+                    if (y<floorLevel) {
+                        return !blueprintDataPositions.contains(blockPos);
                     } else {
-                        return blockPos.getY() == 0;
+                        return true;
                     }
                 })
-                .map(pos -> pos.add(blueprintBuildPos))
+                .map(pos -> pos.add(blueprintBuildPos.down(floorLevel)))
                 .anyMatch(pos -> BuildingManager.canPlaceBlock(client.world, pos.down()));
 
         cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
@@ -91,7 +94,6 @@ public class ClientBlueprintManager {
         final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
         BlockPos movedPos = pos.subtract(halfSize);
-        movedPos = blockData.isStandsOnGrass() ? movedPos.down() : movedPos;
         movedPos = posSolid? movedPos.up():movedPos;
         return movedPos;
     }

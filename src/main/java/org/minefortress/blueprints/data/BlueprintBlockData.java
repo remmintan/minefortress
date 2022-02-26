@@ -11,7 +11,6 @@ import java.util.Map;
 public final class BlueprintBlockData {
 
     private final Vec3i size;
-    private boolean standsOnGrass = false;
 
     private final Map<BlueprintDataLayer, Map<BlockPos, BlockState>> layers = new HashMap<>();
 
@@ -31,10 +30,6 @@ public final class BlueprintBlockData {
         return size;
     }
 
-    public boolean isStandsOnGrass() {
-        return standsOnGrass;
-    }
-
     static Builder withBlueprintSize(Vec3i blueprintSize) {
         return new Builder(blueprintSize);
     }
@@ -45,11 +40,6 @@ public final class BlueprintBlockData {
 
         private Builder(Vec3i blueprintSize) {
             instance = new BlueprintBlockData(blueprintSize);
-        }
-
-        Builder setStandsOnGrass(boolean standsOnGrass) {
-            instance.standsOnGrass = standsOnGrass;
-            return this;
         }
 
         Builder setLayer(BlueprintDataLayer layer, Map<BlockPos, BlockState> layerData) {

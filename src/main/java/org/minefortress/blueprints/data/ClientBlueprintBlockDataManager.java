@@ -33,11 +33,8 @@ public final class ClientBlueprintBlockDataManager extends AbstractBlueprintBloc
         size = new Vec3i(biggerSide, size.getY(), biggerSide);
 
         final Map<BlockPos, BlockState> structureData = getStrcutureData(structure, rotation, pivot);
-        final boolean standsOnGrass = isStandsOnGrass(structureData);
-
         return BlueprintBlockData
                 .withBlueprintSize(size)
-                .setStandsOnGrass(standsOnGrass)
                 .setLayer(BlueprintDataLayer.GENERAL, structureData).build();
     }
 
