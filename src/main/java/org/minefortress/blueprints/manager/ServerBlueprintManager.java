@@ -11,16 +11,14 @@ import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.ServerBlueprintBlockDataManager;
 import org.minefortress.network.ClientboundAddBlueprintPacket;
-import org.minefortress.network.ClientboundUpdateBlueprintPacket;
 import org.minefortress.network.ClientboundResetBlueprintPacket;
+import org.minefortress.network.ClientboundUpdateBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
-import org.minefortress.selections.SelectionType;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
-import org.minefortress.tasks.TaskType;
 
 import java.util.*;
 

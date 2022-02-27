@@ -62,13 +62,6 @@ abstract class AbstractBlueprintBlockDataManager {
                 ));
     }
 
-    protected boolean isStandsOnGrass(Map<BlockPos, BlockState> structureData) {
-        return structureData.entrySet().stream().filter(entry -> entry.getKey().getY() == 0).allMatch(entry -> {
-            final Block block = entry.getValue().getBlock();
-            return block == Blocks.DIRT || block == Blocks.GRASS_BLOCK;
-        });
-    }
-
     @NotNull
     private String getKey(String fileName, BlockRotation rotation) {
         return fileName + ":" + rotation.name();

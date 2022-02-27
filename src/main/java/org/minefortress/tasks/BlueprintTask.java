@@ -54,7 +54,7 @@ public class BlueprintTask extends AbstractTask {
 
         List<TaskBlockInfo> blockInfos = new ArrayList<>();
         for (BlockPos pos : allPositionsInPart) {
-            final BlockState state = blueprintData.getOrDefault(pos.subtract(start).add(delta), pos.getY()<floorLevel?Blocks.DIRT.getDefaultState():Blocks.AIR.getDefaultState());
+            final BlockState state = blueprintData.getOrDefault(pos.subtract(start).add(delta), pos.subtract(start).add(delta).getY()<floorLevel?Blocks.DIRT.getDefaultState():Blocks.AIR.getDefaultState());
             if(state.isAir()) continue;
             final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(getItemFromState(state), pos.toImmutable(), state);
             blockInfos.add(blockStateTaskBlockInfo);
