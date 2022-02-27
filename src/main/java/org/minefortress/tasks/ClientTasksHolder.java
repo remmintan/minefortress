@@ -35,7 +35,6 @@ public class ClientTasksHolder {
     public void cancelTask() {
         if(tasksStack.empty()) return;
         final UUID lastTaskId = tasksStack.pop();
-        final ClientConnection connection = MinecraftClient.getInstance().getNetworkHandler().getConnection();
         subtasksMap.entrySet().stream().filter(it -> it.getValue().equals(lastTaskId)).map(Map.Entry::getKey).forEach(it -> {
             removeTask(it);
             FortressClientNetworkHelper.send(FortressChannelNames.CANCEL_TASK, new ServerboundCancelTaskPacket(it));

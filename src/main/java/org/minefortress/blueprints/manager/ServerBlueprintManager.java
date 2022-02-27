@@ -17,6 +17,7 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.minefortress.selections.SelectionType;
+import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
 import org.minefortress.tasks.TaskType;
@@ -193,13 +194,13 @@ public class ServerBlueprintManager {
         return new BlueprintTask(taskId, startPos, endPos, manualLayer, automatic, entityLayer, floorLevel);
     }
 
-    public SimpleSelectionTask createDigTask(BlockPos startPos, int floorLevel, String structureFile, BlockRotation rotation) {
+    public SimpleSelectionTask createDigTask(UUID uuid, BlockPos startPos, int floorLevel, String structureFile, BlockRotation rotation) {
         final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
         final BlockPos endPos = startPos.add(new Vec3i(size.getX(), floorLevel, size.getZ()));
 
-        return new SimpleSelectionTask(UUID.randomUUID(), TaskType.REMOVE, startPos, endPos, null, SelectionType.SQUARES);
+        return new BlueprintDigTask(uuid, startPos, endPos);
     }
 
     public void writeToNbt(NbtCompound compound) {
