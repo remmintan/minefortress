@@ -14,6 +14,8 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
+import java.util.Optional;
+
 public final class BlueprintRenderer {
 
     private static final Vec3f WRONG_PLACEMENT_COLOR = new Vec3f(1.0F, 0.5F, 0.5F);
@@ -93,8 +95,9 @@ public final class BlueprintRenderer {
 
         final BuiltBlueprint chunk = getBuiltChunk();
         final int floorLevel = blueprintManager.getSelectedStructure().getFloorLevel();
-        final BlockPos blueprintBuildPos = blueprintManager.getBlueprintBuildPos().down(floorLevel);
-        if(chunk != null && chunk.hasLayer(renderLayer) && blueprintBuildPos != null) {
+        final Optional<BlockPos> blueprintBuildPosOpt = Optional.ofNullable(blueprintManager.getBlueprintBuildPos()).map(o -> o.down(floorLevel));
+        if(chunk != null && chunk.hasLayer(renderLayer) && blueprintBuildPosOpt.isPresent()) {
+            BlockPos blueprintBuildPos = blueprintBuildPosOpt.get();
             VertexBuffer vertexBuffer = chunk.getBuffer(renderLayer);
             if (i != null) {
                 i.set((float)((double)blueprintBuildPos.getX() - d), (float)((double)blueprintBuildPos.getY() - e), (float)((double)blueprintBuildPos.getZ() - f));
