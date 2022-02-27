@@ -88,11 +88,15 @@ public abstract class AbstractTask implements Task {
         if(parts.isEmpty() && totalParts <= completedParts) {
             ServerPlayerEntity randomPlayer = world.getRandomAlivePlayer();
             if(randomPlayer != null) {
-                FortressServerNetworkHelper.send(randomPlayer, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
+                sendFinishTaskNotificationToPlayer(randomPlayer);
             }
 
             taskFinishListeners.forEach(Runnable::run);
         }
+    }
+
+    protected void sendFinishTaskNotificationToPlayer(ServerPlayerEntity randomPlayer) {
+        FortressServerNetworkHelper.send(randomPlayer, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
     }
 
     public void addFinishListener(Runnable listener) {
