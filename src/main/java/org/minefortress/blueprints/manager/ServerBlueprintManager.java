@@ -184,7 +184,7 @@ public class ServerBlueprintManager {
     }
 
     public BlueprintTask createTask(UUID taskId, String structureFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
-        final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation);
+        final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation, floorLevel);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
         final BlockPos endPos = startPos.add(new Vec3i(size.getX(), size.getY(), size.getZ()));
@@ -198,7 +198,7 @@ public class ServerBlueprintManager {
         final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
-        final BlockPos endPos = startPos.add(new Vec3i(size.getX(), floorLevel, size.getZ()));
+        final BlockPos endPos = startPos.add(new Vec3i(size.getX(), size.getY(), size.getZ()));
 
         return new BlueprintDigTask(uuid, startPos, endPos);
     }

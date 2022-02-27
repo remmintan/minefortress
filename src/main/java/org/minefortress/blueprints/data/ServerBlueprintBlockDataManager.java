@@ -57,7 +57,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     }
 
     @Override
-    protected BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation) {
+    protected BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation, int floorLevel) {
         Vec3i size = structure.getRotatedSize(rotation);
         final int biggerSide = Math.max(size.getX(), size.getZ());
         final BlockPos pivot = BlockPos.ORIGIN.add(biggerSide / 2, 0, biggerSide / 2);
@@ -74,6 +74,11 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         final Map<BlockPos, BlockState> allBlocksWithoutEntities = structureData.entrySet()
             .stream()
             .filter(entry -> !(entry.getValue().getBlock() instanceof BlockEntityProvider) && entry.getValue().getFluidState().isEmpty())
+            .filter(entry -> {
+                final BlockPos pos = entry.getKey();
+                final BlockState state = entry.getValue();
+                return pos.getY() < floorLevel || !state.isAir();
+            })
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
         final Map<BlockPos, BlockState> manualData = new HashMap<>();

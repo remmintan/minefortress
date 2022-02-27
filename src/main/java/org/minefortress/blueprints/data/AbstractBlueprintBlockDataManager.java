@@ -24,10 +24,14 @@ abstract class AbstractBlueprintBlockDataManager {
     private final Map<String, BlueprintBlockData> blueprints = new HashMap<>();
 
     public BlueprintBlockData getBlockData(String blueprintFileName, BlockRotation rotation) {
+        return getBlockData(blueprintFileName, rotation, 0);
+    }
+
+    public BlueprintBlockData getBlockData(String blueprintFileName, BlockRotation rotation, int floorLevel) {
         final String key = getKey(blueprintFileName, rotation);
         if(!blueprints.containsKey(key)) {
             final Structure structure = getStructure(blueprintFileName);
-            final BlueprintBlockData blueprintBlockData = buildBlueprint(structure, rotation);
+            final BlueprintBlockData blueprintBlockData = buildBlueprint(structure, rotation, floorLevel);
             blueprints.put(key, blueprintBlockData);
         }
 
@@ -39,7 +43,7 @@ abstract class AbstractBlueprintBlockDataManager {
     }
 
     protected abstract Structure getStructure(String blueprintFileName);
-    protected abstract BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation);
+    protected abstract BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation, int floorLevel);
 
     @NotNull
     protected Map<BlockPos, BlockState> getStrcutureData(Structure structure, BlockRotation rotation, BlockPos pivot) {
