@@ -126,13 +126,17 @@ public class ClientBlueprintManager {
         UUID taskId = UUID.randomUUID();
         final FortressClientWorld world = (FortressClientWorld) client.world;
         if(world != null) {
-            final Map<BlockPos, BlockState> structureData = blockDataManager
-                    .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation())
+            final BlueprintBlockData blockData = blockDataManager
+                    .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
+            final Map<BlockPos, BlockState> structureData = blockData
                     .getLayer(BlueprintDataLayer.GENERAL);
+            final int floorLevel = selectedStructure.getFloorLevel();
             final List<BlockPos> blocks = structureData
-                    .keySet()
+                    .entrySet()
                     .stream()
-                    .map(it -> it.add(blueprintBuildPos))
+                    .filter(entry -> !entry.getValue().isAir())
+                    .map(Map.Entry::getKey)
+                    .map(it -> it.add(blueprintBuildPos.down(floorLevel)))
                     .collect(Collectors.toList());
             world.getClientTasksHolder().addTask(taskId, blocks);
         }
