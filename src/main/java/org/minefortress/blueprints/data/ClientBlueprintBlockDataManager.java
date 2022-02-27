@@ -25,7 +25,7 @@ public final class ClientBlueprintBlockDataManager extends AbstractBlueprintBloc
     }
 
     @Override
-    protected BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation) {
+    protected BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation, int floorLevel) {
         Vec3i size = structure.getRotatedSize(rotation);
         final int biggerSide = Math.max(size.getX(), size.getZ());
         final BlockPos pivot = BlockPos.ORIGIN.add(biggerSide / 2, 0, biggerSide / 2);
