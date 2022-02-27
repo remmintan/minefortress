@@ -52,7 +52,12 @@ public class ClientBlueprintManager {
     private void checkCantBuild() {
         final BlueprintBlockData blockData = blockDataManager
                 .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
-        final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL).keySet();
+        final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL)
+                .entrySet()
+                .stream()
+                .filter(entry -> !entry.getValue().isAir())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
         final int floorLevel = selectedStructure.getFloorLevel();
 
         final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
@@ -63,11 +68,7 @@ public class ClientBlueprintManager {
         final boolean blueprintPartInTheAir = blueprintDataPositions.stream()
                 .filter(blockPos -> {
                     final int y = blockPos.getY();
-                    if (y<floorLevel) {
-                        return !blueprintDataPositions.contains(blockPos);
-                    } else {
-                        return true;
-                    }
+                    return y<=floorLevel;
                 })
                 .map(pos -> pos.add(blueprintBuildPos.down(floorLevel)))
                 .anyMatch(pos -> BuildingManager.canPlaceBlock(client.world, pos.down()));
