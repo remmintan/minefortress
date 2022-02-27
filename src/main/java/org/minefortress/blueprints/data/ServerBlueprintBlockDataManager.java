@@ -90,16 +90,16 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
                 for (int y = 0; y < size.getY(); y++) {
                     final BlockPos pos = new BlockPos(x, y, z);
                     boolean contains = allBlocksWithoutEntities.containsKey(pos);
-                    if(!contains) {
+                    if(!contains && y >= floorLevel) {
                         isManual = false;
                         continue;
                     }
 
-                    final BlockState state = allBlocksWithoutEntities.get(pos);
                     if(isManual) {
-                        manualData.put(pos, state);
+                        if(contains)
+                            manualData.put(pos, allBlocksWithoutEntities.get(pos));
                     } else {
-                        automaticData.put(pos, state);
+                        automaticData.put(pos, allBlocksWithoutEntities.get(pos));
                     }
                 }
             }
