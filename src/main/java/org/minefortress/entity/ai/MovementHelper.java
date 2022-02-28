@@ -13,6 +13,9 @@ public class MovementHelper {
     private BlockPos workGoal;
 
     private boolean cantFindPath;
+
+    private int attemptsToCalcPath = 0;
+
     private BlockPos lastPos;
     private int stuckOnSamePosition = 0;
 
@@ -26,17 +29,23 @@ public class MovementHelper {
         this.workGoal = null;
         this.cantFindPath = false;
         this.stuckOnSamePosition = 0;
+        this.colonist.setAllowToPlaceBlockFromFarAway(false);
     }
 
     public void set(BlockPos goal) {
         this.workGoal = goal;
         this.cantFindPath = false;
         this.stuckOnSamePosition = 0;
+        this.colonist.setAllowToPlaceBlockFromFarAway(false);
     }
 
     public boolean hasReachedWorkGoal() {
+        final boolean withinDistance =
+                this.workGoal.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE)
+                || this.colonist.isAllowToPlaceBlockFromFarAway();
+
         return
-                this.workGoal.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE) &&
+                withinDistance &&
                 this.navigation.isIdle() &&
                 colonist.fallDistance<=1;
     }
@@ -56,12 +65,18 @@ public class MovementHelper {
         final NodeMaker nodeEvaluator = (NodeMaker) navigation.getNodeMaker();
 
         nodeEvaluator.setWallClimbMode(true);
-        final Path path = navigation.findPathTo(workGoal, 1);
+        final Path path = navigation.findPathTo(workGoal, 3);
         nodeEvaluator.setWallClimbMode(false);
-
 
         if(path != null && (path.reachesTarget() || navigation.getCurrentPath() == null || !navigation.getCurrentPath().equals(path))) {
             navigation.startMovingAlong(path, 1.75f);
+        }
+
+        if (path == null) {
+            attemptsToCalcPath++;
+            if(attemptsToCalcPath > 10) {
+                this.colonist.setAllowToPlaceBlockFromFarAway(true);
+            }
         }
     }
 

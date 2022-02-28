@@ -48,7 +48,7 @@ import java.util.function.Consumer;
 
 public class Colonist extends PassiveEntity {
 
-    public static final float WORK_REACH_DISTANCE = 3f;
+    public static final float WORK_REACH_DISTANCE = 4f;
 
     private final DigControl digControl;
     private final PlaceControl placeControl;
@@ -59,6 +59,8 @@ public class Colonist extends PassiveEntity {
 
     private UUID masterPlayerId;
     private BlockPos fortressCenter;
+
+    private boolean allowToPlaceBlockFromFarAway = false;
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
         super(entityType, world);
@@ -397,5 +399,13 @@ public class Colonist extends PassiveEntity {
         if(nbt.contains("fortressCenterX")) {
             this.fortressCenter = new BlockPos(nbt.getInt("fortressCenterX"), nbt.getInt("fortressCenterY"), nbt.getInt("fortressCenterZ"));
         }
+    }
+
+    public boolean isAllowToPlaceBlockFromFarAway() {
+        return allowToPlaceBlockFromFarAway;
+    }
+
+    public void setAllowToPlaceBlockFromFarAway(boolean allowToPlaceBlockFromFarAway) {
+        this.allowToPlaceBlockFromFarAway = allowToPlaceBlockFromFarAway;
     }
 }
