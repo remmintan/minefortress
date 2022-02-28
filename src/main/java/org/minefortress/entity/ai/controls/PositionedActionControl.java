@@ -33,8 +33,8 @@ abstract class PositionedActionControl  {
         this.item = null;
     }
 
-    protected boolean canReachTheGoal(Entity entity) {
-        return goal.isWithinDistance(entity.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE);
+    protected boolean canReachTheGoal(Colonist colonsit) {
+        return goal.isWithinDistance(colonsit.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE) || colonsit.isAllowToPlaceBlockFromFarAway();
     }
 
 }

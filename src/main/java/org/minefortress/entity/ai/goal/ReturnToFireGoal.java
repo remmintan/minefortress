@@ -4,8 +4,10 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.NodeMaker;
+import org.minefortress.interfaces.FortressServerWorld;
 
 import java.util.EnumSet;
 import java.util.Random;
@@ -26,8 +28,14 @@ public class ReturnToFireGoal extends Goal {
     @Override
     public boolean canStart() {
         final BlockPos fortressCenter = colonist.getFortressCenter();
-        return fortressCenter != null &&
+        return doesNotHaveAnyOtherTask() &&
+                fortressCenter != null &&
                 colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()) > Math.pow(HOME_OUTER_RADIUS, 2);
+    }
+
+    @Override
+    public boolean canStop() {
+        return true;
     }
 
     @Override
@@ -51,12 +59,18 @@ public class ReturnToFireGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return !this.colonist.getNavigation().isIdle();
+        return !this.colonist.getNavigation().isIdle() && doesNotHaveAnyOtherTask();
     }
 
     @Override
     public void stop() {
         super.stop();
         this.colonist.getNavigation().stop();
+    }
+
+    private boolean doesNotHaveAnyOtherTask() {
+        final World world = colonist.getEntityWorld();
+        final FortressServerWorld fortressWorld = (FortressServerWorld) world;
+        return !fortressWorld.getTaskManager().hasTask();
     }
 }
