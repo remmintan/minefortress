@@ -3,6 +3,7 @@ package org.minefortress.blueprints.data;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
@@ -98,6 +99,9 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
                     if(isManual) {
                         if(contains)
                             manualData.put(pos, allBlocksWithoutEntities.get(pos));
+                        else if(structureEntityData.containsKey(pos)) {
+                            manualData.put(pos, Blocks.AIR.getDefaultState());
+                        }
                     } else {
                         automaticData.put(pos, allBlocksWithoutEntities.get(pos));
                     }
