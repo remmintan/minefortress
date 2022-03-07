@@ -28,7 +28,7 @@ public class BecomePatronScreen extends Screen {
     private final Screen parent;
     private final String featureText;
 
-    private static final String BECOME_A_PATRON_TEXT = "%s is only available to our Patrons. Only two cups of coffee (4€) a month and you get access to unlimited %s and many more rewards:\n- Unlimited blueprints editing\n- More slots to add your own blueprints\n - Custom exclusive blueprints available only for patrons\n- 'Silver' Discord rank\n- Access to Patron only Discord chat\nAnd even more rewards on other tires...\n\nBecome a Patron today!";
+    private static final String BECOME_A_PATRON_TEXT = "%s is only available to our Patrons. Only two cups of coffee (4€) a month and you get access to %s and many more rewards:\n- Unlimited blueprints editing\n- More slots to add your own blueprints\n - Custom exclusive blueprints available only for patrons\n- 'Silver' Discord rank\n- Access to Patron only Discord chat\nAnd even more rewards on other tires...\n\nBecome a Patron today!";
 
     private List<Text> preparedTextParts;
 

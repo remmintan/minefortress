@@ -28,6 +28,7 @@ public final class BlueprintsScreen extends Screen {
     private static final String BACKGROUND_TEXTURE = "textures/gui/container/creative_inventory/tab_items.png";
     private static final Identifier BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE = new Identifier("textures/gui/recipe_book.png");
     private static final LiteralText EDIT_BLUEPRINT_TEXT = new LiteralText("right click to edit");
+    private static final LiteralText ONLY_PATRON_EDIT_TEXT = new LiteralText("only patrons can edit this blueprint");
 
     private final int backgroundWidth = 195;
     private final int backgroundHeight = 136;
@@ -127,7 +128,7 @@ public final class BlueprintsScreen extends Screen {
                 if(client != null) {
                     this.client.setScreen(null);
                 }
-                this.handler.sendEditPacket();
+                this.handler.sendEditPacket(this);
             }
         }
 
@@ -184,14 +185,17 @@ public final class BlueprintsScreen extends Screen {
         }
 
         this.drawForeground(matrices);
-        if(this.handler.hasFocusedSlot())
+        if(this.handler.hasFocusedSlot()){
+            final BlueprintMetadata focusedSlotMetadata = this.handler.getFocusedSlotMetadata();
+            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
             this.textRenderer.draw(
                     matrices,
-                    EDIT_BLUEPRINT_TEXT,
+                    (fortressClient!=null && fortressClient.isSupporter()) || !focusedSlotMetadata.isPremium() ? EDIT_BLUEPRINT_TEXT : ONLY_PATRON_EDIT_TEXT,
                     this.backgroundWidth + this.previewOffset + 3,
                     this.backgroundHeight - this.textRenderer.fontHeight - 3,
                     0xFFFFFF
             );
+        }
 
         matrixStack.pop();
         RenderSystem.applyModelViewMatrix();
