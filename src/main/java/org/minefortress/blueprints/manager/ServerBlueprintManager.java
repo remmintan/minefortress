@@ -41,17 +41,17 @@ public class ServerBlueprintManager {
                             //small_house_5.nbt
                             new BlueprintMetadata("Small House 5", "small_house_5", 1),
                             //small_house_6.nbt
-                            new BlueprintMetadata("Small House 6", "small_house_6"),
+                            new BlueprintMetadata("Small House 6", "small_house_6", true),
                             //small_house_7.nbt
-                            new BlueprintMetadata("Small House 7", "small_house_7"),
+                            new BlueprintMetadata("Small House 7", "small_house_7", true),
                             //small_house_8.nbt
-                            new BlueprintMetadata("Small House 8", "small_house_8", 2),
+                            new BlueprintMetadata("Small House 8", "small_house_8", 2, true),
                             //medium_house_1.nbt
-                            new BlueprintMetadata("Medium House 1", "medium_house_1", 1),
+                            new BlueprintMetadata("Medium House 1", "medium_house_1", 1, true),
                             //medium_house_2.nbt
-                            new BlueprintMetadata("Medium House 2", "medium_house_2"),
+                            new BlueprintMetadata("Medium House 2", "medium_house_2", true),
                             //big_house_1.nbt
-                            new BlueprintMetadata("Big House 1", "big_house_1", 1)
+                            new BlueprintMetadata("Big House 1", "big_house_1", 1, true)
                     )
             ),
             entry(
@@ -87,11 +87,11 @@ public class ServerBlueprintManager {
                             //library_1.nbt
                             new BlueprintMetadata("Library 1", "library_1"),
                             //library_2.nbt
-                            new BlueprintMetadata("Library 2", "library_2", 1),
+                            new BlueprintMetadata("Library 2", "library_2", 1, true),
                             //temple_3.nbt
-                            new BlueprintMetadata("Temple 3", "temple_3"),
+                            new BlueprintMetadata("Temple 3", "temple_3", true),
                             //temple_4.nbt
-                            new BlueprintMetadata("Temple 4", "temple_4")
+                            new BlueprintMetadata("Temple 4", "temple_4", true)
                     )
             ),
             entry(
@@ -100,17 +100,17 @@ public class ServerBlueprintManager {
                             //animal_pen_1.nbt
                             new BlueprintMetadata("Animal Pen 1", "animal_pen_1", 1),
                             //animal_pen_2.nbt
-                            new BlueprintMetadata("Animal Pen 2", "animal_pen_2", 1),
+                            new BlueprintMetadata("Animal Pen 2", "animal_pen_2", 1, true),
                             //animal_pen_3.nbt
-                            new BlueprintMetadata("Animal Pen 3", "animal_pen_3", 1),
+                            new BlueprintMetadata("Animal Pen 3", "animal_pen_3", 1, true),
                             //small_farm_1.nbt
                             new BlueprintMetadata("Small Farm 1", "small_farm_1"),
                             //large_farm_1.nbt
-                            new BlueprintMetadata("Large Farm 1", "large_farm_1"),
+                            new BlueprintMetadata("Large Farm 1", "large_farm_1", true),
                             //stable_1.nbt
-                            new BlueprintMetadata("Stable 1", "stable_1", 1),
+                            new BlueprintMetadata("Stable 1", "stable_1", 1, true),
                             //stable_2.nbt
-                            new BlueprintMetadata("Stable 2", "stable_2", 1)
+                            new BlueprintMetadata("Stable 2", "stable_2", 1, true)
                     )
             ),
             entry(
@@ -119,17 +119,17 @@ public class ServerBlueprintManager {
                             //accessory_1.nbt
                             new BlueprintMetadata("Accessory 1", "accessory_1"),
                             //fountain_01.nbt
-                            new BlueprintMetadata("Fountain 01", "fountain_01", 1),
+                            new BlueprintMetadata("Fountain 01", "fountain_01", 1, true),
                             //meeting_point_1.nbt
-                            new BlueprintMetadata("Meeting Point 1", "meeting_point_1", 1),
+                            new BlueprintMetadata("Meeting Point 1", "meeting_point_1", 1, true),
                             //meeting_point_2.nbt
-                            new BlueprintMetadata("Meeting Point 2", "meeting_point_2", 1),
+                            new BlueprintMetadata("Meeting Point 2", "meeting_point_2", 1, true),
                             //meeting_point_3.nbt
-                            new BlueprintMetadata("Meeting Point 3", "meeting_point_3", 1),
+                            new BlueprintMetadata("Meeting Point 3", "meeting_point_3", 1, true),
                             //meeting_point_4.nbt
-                            new BlueprintMetadata("Meeting Point 4", "meeting_point_4", 1),
+                            new BlueprintMetadata("Meeting Point 4", "meeting_point_4", 1, true),
                             //meeting_point_5.nbt
-                            new BlueprintMetadata("Meeting Point 5", "meeting_point_5", 1)
+                            new BlueprintMetadata("Meeting Point 5", "meeting_point_5", 1, true)
                     )
             )
     );
@@ -156,7 +156,7 @@ public class ServerBlueprintManager {
                     final String file = blueprintMetadata.getFile();
                     final int floorLevel = updatedFloorLevel.containsKey(file)?updatedFloorLevel.get(file):blueprintMetadata.getFloorLevel();
                     final NbtCompound structureNbt = blockDataManager.getStructureNbt(file);
-                    final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(entry.getKey(), blueprintMetadata.getName(), file, structureNbt, floorLevel);
+                    final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(entry.getKey(), blueprintMetadata.getName(), file, structureNbt, floorLevel, blueprintMetadata.isPremium());
                     FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
                 }
             }

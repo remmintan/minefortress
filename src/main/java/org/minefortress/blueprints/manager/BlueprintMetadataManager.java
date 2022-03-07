@@ -36,12 +36,12 @@ public final class BlueprintMetadataManager {
         return blueprintsMap.getOrDefault(group, Collections.emptyList());
     }
 
-    public BlueprintMetadata add(BlueprintGroup group, String name, String file, int floorLevel) {
+    public BlueprintMetadata add(BlueprintGroup group, String name, String file, int floorLevel, boolean premium) {
         if (isContainsBlueprint(name, file)) {
             throw new IllegalArgumentException("Blueprint with name " + name + " and file " + file + " already exists");
         }
 
-        final BlueprintMetadata metadata = new BlueprintMetadata(name, file, floorLevel);
+        final BlueprintMetadata metadata = new BlueprintMetadata(name, file, floorLevel, premium);
         blueprintsMap.computeIfAbsent(group, k -> new ArrayList<>()).add(metadata);
         return metadata;
     }
