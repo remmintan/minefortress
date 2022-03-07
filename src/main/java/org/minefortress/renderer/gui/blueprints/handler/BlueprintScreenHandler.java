@@ -1,12 +1,14 @@
 package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundEditBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.renderer.gui.BecomePatronScreen;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.List;
 
 public final class BlueprintScreenHandler {
 
+    private final MinecraftClient client;
     private final FortressMinecraftClient fortressClient;
 
     private BlueprintGroup selectedGroup = BlueprintGroup.LIVING_HOUSES;
@@ -27,6 +30,7 @@ public final class BlueprintScreenHandler {
     public BlueprintScreenHandler(MinecraftClient client){
         if(!(client instanceof FortressMinecraftClient))
             throw new IllegalArgumentException("Client must be an instance of FortressMinecraftClient");
+        this.client = client;
         this.fortressClient = (FortressMinecraftClient)client;
         this.scroll(0f);
     }
@@ -64,12 +68,16 @@ public final class BlueprintScreenHandler {
         this.needScrollbar = this.totalSize > 9 * 5;
     }
 
-    public void sendEditPacket() {
+    public void sendEditPacket(Screen parentScreen) {
         final BlueprintMetadata metadata = this.focusedSlot.getMetadata();
-        final String file = metadata.getFile();
-        final int floorLevel = metadata.getFloorLevel();
-        final ServerboundEditBlueprintPacket packet = new ServerboundEditBlueprintPacket(file, floorLevel);
-        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
+        if(fortressClient.isSupporter() || !metadata.isPremium()) {
+            final String file = metadata.getFile();
+            final int floorLevel = metadata.getFloorLevel();
+            final ServerboundEditBlueprintPacket packet = new ServerboundEditBlueprintPacket(file, floorLevel);
+            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
+        } else {
+            this.client.setScreen(new BecomePatronScreen(parentScreen, "Editing this blueprint"));
+        }
     }
 
     public void focusOnSlot(BlueprintSlot slot) {
@@ -101,6 +109,8 @@ public final class BlueprintScreenHandler {
         return this.focusedSlot.getTooltipText();
     }
 
-
+    public BlueprintMetadata getFocusedSlotMetadata() {
+        return this.focusedSlot.getMetadata();
+    }
 
 }
