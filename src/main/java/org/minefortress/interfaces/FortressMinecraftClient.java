@@ -21,4 +21,6 @@ public interface FortressMinecraftClient {
     boolean isFortressGamemode();
     BlockPos getHoveredBlockPos();
 
+    boolean isSupporter();
+
 }

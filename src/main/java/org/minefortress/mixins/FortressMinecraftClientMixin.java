@@ -209,4 +209,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return this.clientBlueprintManager;
     }
 
+    @Override
+    public boolean isSupporter() {
+        return false;
+    }
 }
