@@ -19,8 +19,8 @@ public class BecomePatronScreen extends Screen {
     private static final Identifier BACKGROUND_TEXTURE_IDENTIFIER = new Identifier("textures/gui/demo_background.png");
     private static final String JOIN_LINK = "https://www.patreon.com/join/minefortress?utm_source=in_game_button&utm_medium=screen&utm_campaign=in_game_button";
 
-    private static final int BACKGROUND_WIDTH = 195;
-    private static final int BACKGROUND_HEIGHT = 136;
+    private static final int BACKGROUND_WIDTH = 248;
+    private static final int BACKGROUND_HEIGHT = 166;
 
     private int x;
     private int y;
@@ -28,7 +28,7 @@ public class BecomePatronScreen extends Screen {
     private final Screen parent;
     private final String featureText;
 
-    private static final String BECOME_A_PATRON_TEXT = "%s is only available to our Patrons. Only two cups of coffee (4€) a month and you get access to %s and many more rewards:\n- Unlimited blueprints editing\n- More slots to add your own blueprints\n - Custom exclusive blueprints available only for patrons\n- 'Silver' Discord rank\n- Access to Patron only Discord chat\nAnd even more rewards on other tires...\n\nBecome a Patron today!";
+    private static final String BECOME_A_PATRON_TEXT = "%s is only available to our Patrons. Only two cups of coffee (4€) a month and you get access to %s and get:\n- Unlimited blueprints editing\n- 'Silver' Discord rank\n- Access to Patron only Discord channels\n";
 
     private List<Text> preparedTextParts;
 
@@ -47,7 +47,7 @@ public class BecomePatronScreen extends Screen {
         super.init();
 
         this.x = this.width / 2 - BACKGROUND_WIDTH / 2;
-        this.y = this.height / 2 - BACKGROUND_HEIGHT / 2;
+        this.y = this.height / 2 - BACKGROUND_HEIGHT / 2 - 25;
 
         final int buttonX = this.width / 2 - 102;
         final int buttonY = this.y + BACKGROUND_HEIGHT + 5;
@@ -74,7 +74,7 @@ public class BecomePatronScreen extends Screen {
         BecomePatronScreen.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, this.y + 5, 0xFFFFFF);
         int i = 0;
         for (Text preparedTextPart : this.preparedTextParts) {
-            BecomePatronScreen.drawTextWithShadow(matrices, this.textRenderer, preparedTextPart, this.x+5, this.y + i++*(2*textRenderer.fontHeight), 0xFFFFFF);
+            BecomePatronScreen.drawTextWithShadow(matrices, this.textRenderer, preparedTextPart, this.x+5, (int)(this.y +5 + textRenderer.fontHeight +5 + i++*(1.5*textRenderer.fontHeight)), 0xFFFFFF);
         }
 
         super.render(matrices, mouseX, mouseY, delta);
@@ -107,7 +107,7 @@ public class BecomePatronScreen extends Screen {
             for (String part : line.split(" ")) {
                 stringBuilder.append(part).append(" ");
                 final int lastPartLength = part.length();
-                if (this.textRenderer.getWidth(stringBuilder.toString()) > BACKGROUND_WIDTH + 10) {
+                if (this.textRenderer.getWidth(stringBuilder.toString()) > (BACKGROUND_WIDTH - 10)) {
                     stringBuilder.delete(stringBuilder.length() - lastPartLength - 1, stringBuilder.length());
                     this.preparedTextParts.add(new LiteralText(stringBuilder.toString()));
                     stringBuilder.delete(0, stringBuilder.length());
