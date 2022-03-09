@@ -41,11 +41,11 @@ public class ServerBlueprintManager {
                             //small_house_5.nbt
                             new BlueprintMetadata("Small House 5", "small_house_5", 1),
                             //small_house_6.nbt
-                            new BlueprintMetadata("Small House 6", "small_house_6", true),
+                            new BlueprintMetadata("Small House 6", "small_house_6"),
                             //small_house_7.nbt
-                            new BlueprintMetadata("Small House 7", "small_house_7", true),
+                            new BlueprintMetadata("Small House 7", "small_house_7"),
                             //small_house_8.nbt
-                            new BlueprintMetadata("Small House 8", "small_house_8", 2, true),
+                            new BlueprintMetadata("Small House 8", "small_house_8", 2),
                             //medium_house_1.nbt
                             new BlueprintMetadata("Medium House 1", "medium_house_1", 1, true),
                             //medium_house_2.nbt
@@ -104,7 +104,7 @@ public class ServerBlueprintManager {
                             //animal_pen_3.nbt
                             new BlueprintMetadata("Animal Pen 3", "animal_pen_3", 1, true),
                             //small_farm_1.nbt
-                            new BlueprintMetadata("Small Farm 1", "small_farm_1"),
+                            new BlueprintMetadata("Small Farm 1", "small_farm_1", true),
                             //large_farm_1.nbt
                             new BlueprintMetadata("Large Farm 1", "large_farm_1", true),
                             //stable_1.nbt
