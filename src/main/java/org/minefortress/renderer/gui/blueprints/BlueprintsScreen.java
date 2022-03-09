@@ -8,6 +8,7 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
@@ -15,7 +16,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
-import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
@@ -28,7 +28,6 @@ public final class BlueprintsScreen extends Screen {
     private static final String BACKGROUND_TEXTURE = "textures/gui/container/creative_inventory/tab_items.png";
     private static final Identifier BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE = new Identifier("textures/gui/recipe_book.png");
     private static final LiteralText EDIT_BLUEPRINT_TEXT = new LiteralText("right click to edit");
-    private static final LiteralText ONLY_PATRON_EDIT_TEXT = new LiteralText("only patrons can edit this blueprint");
 
     private final int backgroundWidth = 195;
     private final int backgroundHeight = 136;
@@ -186,11 +185,9 @@ public final class BlueprintsScreen extends Screen {
 
         this.drawForeground(matrices);
         if(this.handler.hasFocusedSlot()){
-            final BlueprintMetadata focusedSlotMetadata = this.handler.getFocusedSlotMetadata();
-            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
             this.textRenderer.draw(
                     matrices,
-                    (fortressClient!=null && fortressClient.isSupporter()) || !focusedSlotMetadata.isPremium() ? EDIT_BLUEPRINT_TEXT : ONLY_PATRON_EDIT_TEXT,
+                    EDIT_BLUEPRINT_TEXT,
                     this.backgroundWidth + this.previewOffset + 3,
                     this.backgroundHeight - this.textRenderer.fontHeight - 3,
                     0xFFFFFF
@@ -269,10 +266,26 @@ public final class BlueprintsScreen extends Screen {
         this.setZOffset(100);
         this.itemRenderer.zOffset = 100.0f;
 
+        final float scaleParameter = 2f;
+
         RenderSystem.enableDepthTest();
+        final BlueprintMetadata metadata = slot.getMetadata();
         if(this.client != null){
-            final BlueprintMetadata metadata = slot.getMetadata();
             this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow);
+        }
+
+        if(client instanceof FortressMinecraftClient fortressClient){
+            if(metadata.isPremium() && !fortressClient.isSupporter()){
+                final MatrixStack matrices = RenderSystem.getModelViewStack();
+                matrices.push();
+                matrices.scale(1/scaleParameter, 1/scaleParameter, 1/scaleParameter);
+                RenderSystem.applyModelViewMatrix();
+                int slotX = slotColumn * 18 + 9 + 10;
+                int slotY = slotRow * 18 + 18 + 10;
+                this.itemRenderer.renderInGui(new ItemStack(Items.GOLD_INGOT), (int)(slotX*scaleParameter), (int)(slotY*scaleParameter));
+                matrices.pop();
+                RenderSystem.applyModelViewMatrix();
+            }
         }
 
         this.itemRenderer.zOffset = 0.0f;
