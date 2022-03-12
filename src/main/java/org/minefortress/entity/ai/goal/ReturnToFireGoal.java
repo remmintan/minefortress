@@ -5,8 +5,10 @@ import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.NodeMaker;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerWorld;
 
 import java.util.EnumSet;
@@ -15,8 +17,6 @@ import java.util.Random;
 public class ReturnToFireGoal extends Goal {
 
     private final Random random = new Random();
-    private static final int HOME_INNER_RADIUS = 2;
-    private static final int HOME_OUTER_RADIUS = 4;
     private final Colonist colonist;
 
     public ReturnToFireGoal(Colonist colonist) {
@@ -30,12 +30,25 @@ public class ReturnToFireGoal extends Goal {
         final BlockPos fortressCenter = colonist.getFortressCenter();
         return doesNotHaveAnyOtherTask() &&
                 fortressCenter != null &&
-                colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()) > Math.pow(HOME_OUTER_RADIUS, 2);
+                colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()) > Math.pow(getHomeOuterRadius(), 2);
     }
 
     @Override
     public boolean canStop() {
         return true;
+    }
+    
+    private int getHomeOuterRadius() {
+        return Math.max(getColonistsCount(), 5) * 4 / 5;
+    }
+
+    @NotNull
+    private Integer getColonistsCount() {
+        return colonist.getFortressServerManager().map(FortressServerManager::getColonistsCount).orElse(5);
+    }
+
+    private int getHomeInnerRadius() {
+        return Math.max(getColonistsCount(), 5) * 2 / 5;
     }
 
     @Override
@@ -43,8 +56,8 @@ public class ReturnToFireGoal extends Goal {
         super.start();
         final BlockPos fortressCenter = colonist.getFortressCenter().toImmutable();
 
-        final int x = random.nextInt(HOME_OUTER_RADIUS - HOME_INNER_RADIUS) + HOME_INNER_RADIUS * (random.nextBoolean()?1:-1);
-        final int z = random.nextInt(HOME_OUTER_RADIUS - HOME_INNER_RADIUS) + HOME_INNER_RADIUS * (random.nextBoolean()?1:-1);
+        final int x = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
+        final int z = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
 
         BlockPos goal = new BlockPos(fortressCenter.getX() + x, fortressCenter.getY(), fortressCenter.getZ() + z);
 

@@ -93,6 +93,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.scheduleSync();
     }
 
+    public int getColonistsCount() {
+        return colonistsCount;
+    }
+
     public BlockPos getFortressCenter() {
         return fortressCenter;
     }
