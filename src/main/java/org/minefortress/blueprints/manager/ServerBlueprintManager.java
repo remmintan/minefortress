@@ -214,9 +214,11 @@ public class ServerBlueprintManager {
     public void readFromNbt(NbtCompound compound) {
         blockDataManager.readBlockDataManager(compound);
 
-        final NbtCompound floorLevel = compound.getCompound("floorLevel");
-        for(String key : floorLevel.getKeys()) {
-            updatedFloorLevel.put(key, floorLevel.getInt(key));
+        if(compound.contains("floorLevel")) {
+            final NbtCompound floorLevel = compound.getCompound("floorLevel");
+            for(String key : floorLevel.getKeys()) {
+                updatedFloorLevel.put(key, floorLevel.getInt(key));
+            }
         }
     }
 }
