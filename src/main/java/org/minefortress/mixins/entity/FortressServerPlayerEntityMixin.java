@@ -77,10 +77,13 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        fortressUUID = nbt.getUuid("fortressUuid");
-        final NbtCompound fortressManagerTag = nbt.getCompound("FortressManager");
-        fortressServerManager.readFromNbt(fortressManagerTag);
-
+        if(nbt.contains("fortressUuid")) {
+            fortressUUID = nbt.getUuid("fortressUuid");
+        }
+        if(nbt.contains("FortressManager")) {
+            final NbtCompound fortressManagerTag = nbt.getCompound("FortressManager");
+            fortressServerManager.readFromNbt(fortressManagerTag);
+        }
         serverBlueprintManager.readFromNbt(nbt);
     }
 
