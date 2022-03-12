@@ -29,6 +29,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.ColonistNavigation;
 import org.minefortress.entity.ai.controls.DigControl;
@@ -37,11 +38,13 @@ import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
 import org.minefortress.entity.ai.goal.ReturnToFireGoal;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -94,16 +97,25 @@ public class Colonist extends PassiveEntity {
 
     private void doActionOnMasterPlayer(Consumer<FortressServerPlayerEntity> playerConsumer) {
         final MinecraftServer server = getServer();
-        if(server == null || masterPlayerId == null) return;
-        server
+        getMasterPlayer(server)
+                .ifPresent(playerConsumer);
+    }
+
+    @NotNull
+    private Optional<FortressServerPlayerEntity> getMasterPlayer(MinecraftServer server) {
+        if(server == null || masterPlayerId == null) return Optional.empty();
+        return server
                 .getPlayerManager()
                 .getPlayerList()
                 .stream()
                 .filter(p -> p instanceof FortressServerPlayerEntity)
                 .map(p -> (FortressServerPlayerEntity) p)
                 .filter(p -> p.getFortressUuid().equals(masterPlayerId))
-                .findFirst()
-                .ifPresent(playerConsumer);
+                .findFirst();
+    }
+
+    public Optional<FortressServerManager> getFortressServerManager() {
+        return getMasterPlayer(this.getServer()).map(FortressServerPlayerEntity::getFortressServerManager);
     }
 
     public BlockPos getFortressCenter() {
