@@ -83,7 +83,7 @@ public abstract class AbstractTask implements Task {
     }
 
     @Override
-    public void finishPart(ServerWorld world) {
+    public void finishPart(ServerWorld world, TaskPart part) {
         completedParts++;
         if(parts.isEmpty() && totalParts <= completedParts) {
             ServerPlayerEntity randomPlayer = world.getRandomAlivePlayer();
