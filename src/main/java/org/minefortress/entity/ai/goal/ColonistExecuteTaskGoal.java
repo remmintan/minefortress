@@ -119,7 +119,7 @@ public class ColonistExecuteTaskGoal extends Goal {
         this.colonist.resetControls();
 
         if(this.task != null) {
-            this.task.finishPart(world);
+            this.task.finishPart(world, this.part);
         }
 
         this.nextBlock = null;

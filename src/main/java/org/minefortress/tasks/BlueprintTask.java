@@ -63,7 +63,7 @@ public class BlueprintTask extends AbstractTask {
     }
 
     @Override
-    public void finishPart(ServerWorld world) {
+    public void finishPart(ServerWorld world, TaskPart part) {
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
             blueprintEntityData.forEach((pos, state) -> {
                 world.setBlockState(pos.add(startingBlock), state, 3);
@@ -75,7 +75,7 @@ public class BlueprintTask extends AbstractTask {
 
 
         }
-        super.finishPart(world);
+        super.finishPart(world, part);
     }
 
     private Item getItemFromState(BlockState state) {
