@@ -69,7 +69,11 @@ public class WallsSelection extends Selection {
     protected List<BlockPos> getSelection(int upDelta, ArrayList<Pair<BlockPos, BlockPos>> cornerPairs) {
         return cornerPairs
                 .stream()
-                .map(p -> BlockPos.iterate(p.getFirst(), p.getSecond().up(upDelta)))
+                .map(p -> {
+                    final BlockPos start = p.getFirst();
+                    final BlockPos end = p.getSecond();
+                    return BlockPos.iterate(start, new BlockPos(end.getX(), start.getY()+upDelta, end.getZ()));
+                })
                 .flatMap(WallsSelection::iterableToList)
                 .toList();
     }
@@ -77,7 +81,7 @@ public class WallsSelection extends Selection {
     private ArrayList<Pair<BlockPos, BlockPos>> getCornerPairs() {
         ArrayList<Pair<BlockPos, BlockPos>> cornerPairs = new ArrayList<>();
         if(corners.size() == 1) {
-            cornerPairs.add(Pair.of(corners.get(0), corners.get(0).up(upDelta)));
+            cornerPairs.add(Pair.of(corners.get(0), corners.get(0)));
         } else {
             for (int i = 0; i < corners.size() - 1; i++) {
                 BlockPos thisCorner = corners.get(i);
