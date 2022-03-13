@@ -11,7 +11,9 @@ public class TaskManager {
 
     public void addTask(Task task) {
         task.prepareTask();
-        tasks.add(task);
+        if(task.hasAvailableParts()) {
+            tasks.add(task);
+        }
     }
 
     public boolean hasTask() {
