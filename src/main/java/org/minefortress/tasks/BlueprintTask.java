@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
+import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
@@ -63,7 +64,7 @@ public class BlueprintTask extends AbstractTask {
     }
 
     @Override
-    public void finishPart(ServerWorld world, TaskPart part) {
+    public void finishPart(ServerWorld world, TaskPart part, Colonist colonist) {
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
             blueprintEntityData.forEach((pos, state) -> {
                 world.setBlockState(pos.add(startingBlock), state, 3);
@@ -75,7 +76,7 @@ public class BlueprintTask extends AbstractTask {
 
 
         }
-        super.finishPart(world, part);
+        super.finishPart(world, part, colonist);
     }
 
     private Item getItemFromState(BlockState state) {
