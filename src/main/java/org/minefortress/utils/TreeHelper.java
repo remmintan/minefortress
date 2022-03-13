@@ -85,7 +85,7 @@ public class TreeHelper {
                 neighbors.add(pos);
             } else if(isLeaves(block)) {
                 final double distanceToRoot = Math.sqrt(Math.pow(pos.getX() - root.getX(), 2) + Math.pow(pos.getZ() - root.getZ(), 2));
-                if(distanceToRoot <= 6) {
+                if(distanceToRoot <= 3) {
                     leavesBlocks.add(pos);
                     neighbors.add(pos);
                 }
