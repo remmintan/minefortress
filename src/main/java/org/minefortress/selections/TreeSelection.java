@@ -12,6 +12,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.minefortress.utils.TreeBlocks;
 
 import java.util.*;
 
@@ -127,11 +128,13 @@ public class TreeSelection extends Selection {
     private void updateTreeData(ClientWorld world) {
         this.selectedTreeBlocks.clear();
         for(BlockPos root: new ArrayList<>(treeRoots)) {
-            final List<BlockPos> treeBlocks = getTreeBlocks(root, world);
+            final Optional<TreeBlocks> treeBlocks = getTreeBlocks(root, world);
             if(treeBlocks.isEmpty()){
                 treeRoots.remove(root);
             } else {
-                this.selectedTreeBlocks.addAll(treeBlocks);
+                final TreeBlocks tree = treeBlocks.get();
+                this.selectedTreeBlocks.addAll(tree.getTreeBlocks());
+                this.selectedTreeBlocks.addAll(tree.getLeavesBlocks());
             }
         }
     }
@@ -143,7 +146,7 @@ public class TreeSelection extends Selection {
         do {
             cursor = cursor.down();
             cursorState = world.getBlockState(cursor);
-        } while(!isLog(cursorState.getBlock()));
+        } while(isLog(cursorState.getBlock()));
 
         if(cursorState.isAir()) return Optional.empty();
         return Optional.of(cursor.up());
