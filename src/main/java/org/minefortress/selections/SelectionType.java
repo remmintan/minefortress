@@ -9,7 +9,8 @@ public enum SelectionType {
     WALLS_EVERY_SECOND(WallsEverySecond::new, "Chess Walls", "CW"),
     LADDER(LadderSelection::new, "Ladder X Direction", "LX"),
     LADDER_Z_DIRECTION(LadderSelectionZDirection::new, "Ladder Z Direction", "LZ"),
-    TREE(TreeSelection::new, "Trees", "TR"),;
+    TREE(TreeSelection::new, "Trees", "TR"),
+    ROADS(RoadsSelection::new, "Roads", "RO"),;
 
     private final Supplier<Selection> selectionGenerator;
     private final String name;

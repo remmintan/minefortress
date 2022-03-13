@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 public class WallsSelection extends Selection {
 
-    private final List<BlockPos> corners = new ArrayList<>();
+    protected final List<BlockPos> corners = new ArrayList<>();
     private ClickType clickType;
     protected int upDelta;
 
