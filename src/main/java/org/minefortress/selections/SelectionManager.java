@@ -128,7 +128,10 @@ public class SelectionManager implements FortressWorldRenderer {
         this.upSelectionDelta = 0;
         resetSelection();
 
-        SelectionType[] types = SelectionType.values();
+        SelectionType[] types = Arrays
+                .stream(SelectionType.values())
+                .filter(type -> type != SelectionType.TREE)
+                .toArray(SelectionType[]::new);
         if(++selectionTypeIndex >= types.length) {
             selectionTypeIndex = 0;
         }
@@ -194,6 +197,7 @@ public class SelectionManager implements FortressWorldRenderer {
         return selection != null ? selection.getSelectionLabelsPosition() : Collections.emptyList();
     }
 
-
-
+    public int getSelectionTypeIndex() {
+        return selectionTypeIndex;
+    }
 }
