@@ -23,6 +23,8 @@ public class ToolsGui extends FortressGuiScreen {
 
     private final FortressItemButtonWidget selectionType;
     private final FortressItemButtonWidget blueprints;
+    private final FortressItemButtonWidget treeCutter;
+    private final FortressItemButtonWidget roadsBuilder;
     private final ButtonWidget questionButton;
     private final ButtonWidget selectionVisibilityButton;
 
@@ -67,6 +69,30 @@ public class ToolsGui extends FortressGuiScreen {
                     } else {
                         ToolsGui.super.renderTooltip(matrices, new LiteralText("Blueprints"), mouseX, mouseY);
                     }
+                },
+                Text.of("")
+        );
+
+        this.treeCutter = new FortressItemButtonWidget(
+                0,
+                0,
+                Items.DIAMOND_AXE,
+                itemRenderer,
+                btn -> {fortressClient.getSelectionManager().setSelectionType(SelectionType.TREE);},
+                (button, matrices, mouseX, mouseY) -> {
+                    ToolsGui.super.renderTooltip(matrices, new LiteralText("Cut the trees"), mouseX, mouseY);
+                },
+                Text.of("")
+        );
+
+        this.roadsBuilder = new FortressItemButtonWidget(
+                0,
+                0,
+                Items.DIAMOND_SHOVEL,
+                itemRenderer,
+                btn -> {fortressClient.getSelectionManager().setSelectionType(SelectionType.SQUARES);},
+                (button, matrices, mouseX, mouseY) -> {
+                    ToolsGui.super.renderTooltip(matrices, new LiteralText("Build the roads"), mouseX, mouseY);
                 },
                 Text.of("")
         );
@@ -126,8 +152,16 @@ public class ToolsGui extends FortressGuiScreen {
                 btn.render(p, (int)mouseX, (int)mouseY, delta);
             }
 
+            this.treeCutter.x = screenWidth - 25;
+            this.treeCutter.y = 55;
+            this.treeCutter.render(p, (int)mouseX, (int)mouseY, delta);
+
+            this.roadsBuilder.x = screenWidth - 25;
+            this.roadsBuilder.y = 80;
+            this.roadsBuilder.render(p, (int)mouseX, (int)mouseY, delta);
+
             this.questionButton.x = screenWidth - 25;
-            this.questionButton.y = 55;
+            this.questionButton.y = 130;
             this.questionButton.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
@@ -135,7 +169,7 @@ public class ToolsGui extends FortressGuiScreen {
         this.blueprints.render(p, (int)mouseX, (int)mouseY, delta);
 
         this.selectionVisibilityButton.x = screenWidth - 25;
-        this.selectionVisibilityButton.y = 80;
+        this.selectionVisibilityButton.y = 105;
         this.selectionVisibilityButton.render(p, (int)mouseX, (int)mouseY, delta);
 
     }
