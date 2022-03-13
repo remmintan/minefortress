@@ -153,7 +153,7 @@ public class SelectionManager implements FortressWorldRenderer {
         final ClientWorld level = client.world;
         if(level == null || level.getDimension().equals(FortressDimensionTypeMixin.getNether()) || level.getDimension().equals(FortressDimensionTypeMixin.getEnd())) return;
 
-        if(blockState == null && click == ClickType.BUILD) {
+        if((blockState == null || selection instanceof TreeSelection) && click == ClickType.BUILD) {
             resetSelection();
             return;
         } else {
