@@ -3,6 +3,8 @@ package org.minefortress.tasks;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.event.GameEvent;
+import org.minefortress.entity.Colonist;
 import org.minefortress.network.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -45,9 +47,14 @@ public class CutTreesTask implements Task {
 
     @Override
     public TaskPart getNextPart(ServerWorld level) {
-        final BlockPos root = treeRoots.remove();
-        final TaskBlockInfo rootBlockInfo = new DigTaskBlockInfo( root);
-        return new TaskPart(Pair.of(root, root), Collections.singletonList(rootBlockInfo), this);
+        if(!treeRoots.isEmpty()) {
+            final BlockPos root = treeRoots.remove();
+            final TaskBlockInfo rootBlockInfo = new DigTaskBlockInfo( root);
+            return new TaskPart(Pair.of(root, root), Collections.singletonList(rootBlockInfo), this);
+        } else {
+            return null;
+        }
+
     }
 
     @Override
@@ -57,17 +64,19 @@ public class CutTreesTask implements Task {
     }
 
     @Override
-    public void finishPart(ServerWorld level, TaskPart part) {
+    public void finishPart(ServerWorld level, TaskPart part, Colonist colonist) {
         if(part != null && part.getStartAndEnd() != null && part.getStartAndEnd().getFirst() != null) {
             final BlockPos root = part.getStartAndEnd().getFirst();
-            final Optional<TreeBlocks> treeBlocks = TreeHelper.getTreeBlocks(root, level);
+            final Optional<TreeBlocks> treeBlocks = TreeHelper.getTreeBlocks(root.up(), level);
             if(treeBlocks.isPresent()) {
                 final TreeBlocks tree = treeBlocks.get();
                 tree.getTreeBlocks().forEach(blockPos -> {
-                    level.removeBlock(blockPos, false);
+                    level.breakBlock(blockPos, false, colonist);
+                    level.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
                 });
                 tree.getLeavesBlocks().forEach(blockPos -> {
-                    level.removeBlock(blockPos, false);
+                    level.breakBlock(blockPos, false, colonist);
+                    level.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
                 });
             }
         }

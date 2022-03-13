@@ -3,6 +3,7 @@ package org.minefortress.tasks.interfaces;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.TaskPart;
 import org.minefortress.tasks.TaskType;
 
@@ -17,6 +18,6 @@ public interface Task {
     boolean hasAvailableParts();
     TaskPart getNextPart(ServerWorld level);
     void returnPart(Pair<BlockPos, BlockPos> partStartAndEnd);
-    void finishPart(ServerWorld level, TaskPart part);
+    void finishPart(ServerWorld level, TaskPart part, Colonist colonist);
 
 }
