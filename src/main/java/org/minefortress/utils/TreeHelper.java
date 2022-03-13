@@ -2,20 +2,24 @@ package org.minefortress.utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class TreeHelper {
 
-    public static int checkIfTree(BlockPos treeRoot, World world) {
+    public static Optional<TreeInfo> checkIfTree(BlockPos treeRoot, World world) {
         int logCount = 0;
         int leavesCount = 0;
-        for (int i = 0; i < 29; i++) {
+
+        BlockPos highestLeaf = BlockPos.ORIGIN;
+
+        for (int i = 0; i < 32; i++) {
             BlockPos layerStart = new BlockPos(treeRoot.getX() - 2, treeRoot.getY() + i, treeRoot.getZ() - 2);
             BlockPos layerEnd = new BlockPos(treeRoot.getX() + 2, treeRoot.getY() + i, treeRoot.getZ() + 2);
 
@@ -31,6 +35,7 @@ public class TreeHelper {
                 if(isLeaves(block)){
                     leavesCount++;
                     layerIsEmpty = false;
+                    if(pos.getY() > highestLeaf.getY()) highestLeaf = pos.toImmutable();
                 }
             }
 
@@ -39,9 +44,9 @@ public class TreeHelper {
             }
         }
 
-        if(logCount == 0 || leavesCount < 9) return 0;
+        if(logCount == 0 || leavesCount < 9) return Optional.empty();
 
-        return logCount;
+        return Optional.of(new TreeInfo(logCount, highestLeaf));
     }
 
     public static boolean isLog(Block block) {
@@ -49,39 +54,65 @@ public class TreeHelper {
     }
 
     public static boolean isLeaves(Block block) {
-        return BlockTags.LEAVES.contains(block);
+        return BlockTags.LEAVES.contains(block) || block instanceof LeavesBlock;
     }
 
-    public static List<BlockPos> getTreeBlocks(BlockPos root, World world) {
-        final int logsCount = checkIfTree(root, world);
-        if(logsCount > 0) {
+    public static Optional<TreeBlocks> getTreeBlocks(BlockPos root, World world) {
+        final Optional<TreeInfo> treeInfoOpt = checkIfTree(root, world);
+        if(treeInfoOpt.isPresent()) {
             Block rootBlock = world.getBlockState(root).getBlock();
             final ArrayList<BlockPos> treeBlocks = new ArrayList<>();
-            updateTreeDataForOneTree(world, treeBlocks, root, rootBlock);
-            return treeBlocks;
+            final ArrayList<BlockPos> leavesBlocks = new ArrayList<>();
+            updateTreeDataForOneTree(world, treeBlocks, leavesBlocks, root, rootBlock, root);
+            return Optional.of(new TreeBlocks(treeBlocks, leavesBlocks));
         } else {
-            return Collections.emptyList();
+            return Optional.empty();
         }
     }
 
-    private static void updateTreeDataForOneTree(World world, List<BlockPos> treeBlocks, BlockPos root, Block rootBlock) {
+    private static void updateTreeDataForOneTree(World world, List<BlockPos> treeBlocks, List<BlockPos> leavesBlocks, BlockPos cursor, Block rootBlock, BlockPos root) {
         if(!isLog(rootBlock)) return;
-        BlockPos areaStart = new BlockPos(root.getX() - 1, root.getY(), root.getZ() - 1);
-        BlockPos areaEnd = new BlockPos(root.getX() + 1, root.getY() + 1, root.getZ() + 1);
+        BlockPos areaStart = new BlockPos(cursor.getX() - 1, cursor.getY(), cursor.getZ() - 1);
+        BlockPos areaEnd = new BlockPos(cursor.getX() + 1, cursor.getY() + 1, cursor.getZ() + 1);
         List<BlockPos> neighbors = new ArrayList<>();
         for(BlockPos pos: BlockPos.iterate(areaStart, areaEnd)) {
             pos = pos.toImmutable();
-            if(treeBlocks.contains(pos)) continue;
+            if(treeBlocks.contains(pos) || leavesBlocks.contains(pos)) continue;
             final BlockState blockState = world.getBlockState(pos);
             final Block block = blockState.getBlock();
             if(rootBlock.equals(block)) {
                 treeBlocks.add(pos);
                 neighbors.add(pos);
+            } else if(isLeaves(block)) {
+                final double distanceToRoot = Math.sqrt(Math.pow(pos.getX() - root.getX(), 2) + Math.pow(pos.getZ() - root.getZ(), 2));
+                if(distanceToRoot <= 6) {
+                    leavesBlocks.add(pos);
+                    neighbors.add(pos);
+                }
             }
         }
 
         for (BlockPos neighbor : neighbors) {
-            updateTreeDataForOneTree(world, treeBlocks, neighbor, rootBlock);
+            updateTreeDataForOneTree(world, treeBlocks, leavesBlocks, neighbor, rootBlock, root);
+        }
+    }
+
+    static class TreeInfo {
+        private final int logsCount;
+        private final BlockPos highestLeaf;
+
+        public TreeInfo(int logsCount, BlockPos highestLeaf) {
+            this.logsCount = logsCount;
+            this.highestLeaf = highestLeaf;
+        }
+
+
+        public int getLogsCount() {
+            return logsCount;
+        }
+
+        public BlockPos getHighestLeaf() {
+            return highestLeaf;
         }
     }
 
