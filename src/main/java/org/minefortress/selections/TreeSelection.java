@@ -11,7 +11,12 @@ import net.minecraft.item.Item;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.network.ServerboundCutTreesTaskPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.tasks.TaskType;
+import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.TreeBlocks;
 
 import java.util.*;
@@ -46,6 +51,15 @@ public class TreeSelection extends Selection {
             start = pickedBlock;
             return false;
         } else {
+            if(!treeRoots.isEmpty()) {
+                this.selectedTreeBlocks.remove(start);
+                final UUID newTaskId = UUID.randomUUID();
+                final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(mainHandItem);
+                ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelection(), blockStateFromItem, TaskType.REMOVE);
+                final ServerboundCutTreesTaskPacket packet = new ServerboundCutTreesTaskPacket(newTaskId, Collections.unmodifiableList(treeRoots));
+                FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_CUT_TREES_TASK, packet);
+            }
+
             return true;
         }
     }
