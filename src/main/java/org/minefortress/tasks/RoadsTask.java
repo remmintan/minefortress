@@ -110,7 +110,7 @@ public class RoadsTask implements Task {
         if(i != -1){
             final ArrayList<BlockPos> partBlocks = new ArrayList<>();
             for (int j = i; j < blocks.size(); j++) {
-                if(j - i > 9) break;
+                if(j - i > 10) break;
                 partBlocks.add(blocks.get(j));
             }
             final TaskPart taskPart = createTaskPart(partBlocks);
