@@ -131,6 +131,7 @@ public class SelectionManager implements FortressWorldRenderer {
         SelectionType[] types = Arrays
                 .stream(SelectionType.values())
                 .filter(type -> type != SelectionType.TREE)
+                .filter(type -> type != SelectionType.ROADS)
                 .toArray(SelectionType[]::new);
         if(++selectionTypeIndex >= types.length) {
             selectionTypeIndex = 0;

@@ -11,10 +11,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
-import org.minefortress.renderer.gui.widget.FortressBlueprintsButtonWidget;
-import org.minefortress.renderer.gui.widget.FortressItemButtonWidget;
-import org.minefortress.renderer.gui.widget.FortressSelectionVisibilityButtonWidget;
-import org.minefortress.renderer.gui.widget.FortressTreeCutterButtonWidget;
+import org.minefortress.renderer.gui.widget.*;
 import org.minefortress.selections.SelectionType;
 
 import java.util.ArrayList;
@@ -97,14 +94,24 @@ public class ToolsGui extends FortressGuiScreen {
                 Text.of("")
         );
 
-        this.roadsBuilder = new FortressItemButtonWidget(
+        this.roadsBuilder = new FortressRoadsButtonWidget(
                 0,
                 0,
                 Items.DIAMOND_SHOVEL,
                 itemRenderer,
-                btn -> {fortressClient.getSelectionManager().setSelectionType(SelectionType.SQUARES);},
+                btn -> {
+                    if(roadsSelected(fortressClient)) {
+                        fortressClient.getSelectionManager().setSelectionType(SelectionType.SQUARES);
+                    } else {
+                        fortressClient.getSelectionManager().setSelectionType(SelectionType.ROADS);
+                    }
+                },
                 (button, matrices, mouseX, mouseY) -> {
-                    ToolsGui.super.renderTooltip(matrices, new LiteralText("Build the roads"), mouseX, mouseY);
+                    if(roadsSelected(fortressClient)) {
+                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
+                    } else {
+                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Build roads"), mouseX, mouseY);
+                    }
                 },
                 Text.of("")
         );
@@ -133,6 +140,7 @@ public class ToolsGui extends FortressGuiScreen {
         final SelectionType[] values = Arrays
                 .stream(SelectionType.values())
                 .filter(type -> type != SelectionType.TREE)
+                .filter(type -> type != SelectionType.ROADS)
                 .toArray(SelectionType[]::new);
 
         for(final SelectionType type : values) {
@@ -157,7 +165,7 @@ public class ToolsGui extends FortressGuiScreen {
     void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
 
-        if(!blueprintSelected(fortressClient) && !treeCutterSelected(fortressClient)) {
+        if(!blueprintSelected(fortressClient) && !treeCutterSelected(fortressClient) && !roadsSelected(fortressClient)) {
             this.selectionType.setPos(screenWidth - 25, 5);
             this.selectionType.render(p, (int)mouseX, (int)mouseY, delta);
 
@@ -169,23 +177,24 @@ public class ToolsGui extends FortressGuiScreen {
                 btn.render(p, (int)mouseX, (int)mouseY, delta);
             }
 
-            this.roadsBuilder.x = screenWidth - 25;
-            this.roadsBuilder.y = 80;
-            this.roadsBuilder.render(p, (int)mouseX, (int)mouseY, delta);
-
             this.questionButton.x = screenWidth - 25;
             this.questionButton.y = 130;
             this.questionButton.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
-        if(!treeCutterSelected(fortressClient)) {
+        if(!treeCutterSelected(fortressClient) && !roadsSelected(fortressClient)) {
             this.blueprints.setPos(screenWidth - 25, 30);
             this.blueprints.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
-        if(!blueprintSelected(fortressClient)) {
+        if(!blueprintSelected(fortressClient) && !roadsSelected(fortressClient)) {
             this.treeCutter.setPos(screenWidth - 25, 55);
             this.treeCutter.render(p, (int)mouseX, (int)mouseY, delta);
+        }
+
+        if(!blueprintSelected(fortressClient) && !treeCutterSelected(fortressClient)) {
+            this.roadsBuilder.setPos(screenWidth - 25, 80);
+            this.roadsBuilder.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
         this.selectionVisibilityButton.x = screenWidth - 25;
@@ -235,5 +244,9 @@ public class ToolsGui extends FortressGuiScreen {
 
     private boolean treeCutterSelected(FortressMinecraftClient fortressClient) {
         return fortressClient.getSelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
+    }
+
+    private boolean roadsSelected(FortressMinecraftClient fortressClient) {
+        return fortressClient.getSelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
     }
 }
