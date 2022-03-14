@@ -29,7 +29,7 @@ public class WallsSelection extends Selection {
     private ClickType clickType;
     protected int upDelta;
 
-    private Iterable<BlockPos> selection;
+    protected List<BlockPos> selection;
     private List<Pair<Vec3i, Vec3i>> selectionSizes;
 
     @Override
