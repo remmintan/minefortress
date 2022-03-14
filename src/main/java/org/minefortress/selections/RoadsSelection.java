@@ -3,6 +3,7 @@ package org.minefortress.selections;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.world.ClientWorld;
@@ -10,11 +11,14 @@ import net.minecraft.item.Item;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.network.ServerboundRoadsTaskPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.tasks.TaskType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class RoadsSelection extends WallsSelection{
 
@@ -26,7 +30,15 @@ public class RoadsSelection extends WallsSelection{
             corners.add(pickedBlock.toImmutable());
             return false;
         } else {
+            final UUID digTaskId = UUID.randomUUID();
+            final UUID placeTaskId = UUID.randomUUID();
 
+            final ClientTasksHolder tasksHolder = ((FortressClientWorld) level).getClientTasksHolder();
+            tasksHolder.addTask(digTaskId, getSelection(), Blocks.DIRT.getDefaultState(), TaskType.REMOVE);
+            tasksHolder.addTask(placeTaskId, getSelection(), Blocks.GRASS_BLOCK.getDefaultState(), TaskType.BUILD);
+
+            final ServerboundRoadsTaskPacket packet = new ServerboundRoadsTaskPacket(digTaskId, placeTaskId, selection);
+            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_ROADS_TASK, packet);
             return true;
         }
     }
