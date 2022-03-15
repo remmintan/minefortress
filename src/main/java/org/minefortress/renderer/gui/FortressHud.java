@@ -65,6 +65,7 @@ public class FortressHud {
             DrawableHelper.drawStringWithShadow(p, font, "esc - to save changes", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
         } else {
             renderHints(p, scaledHeight, font);
+            renderSelectTypeName(p, font, scaledHeight);
             this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
         }
@@ -85,7 +86,21 @@ public class FortressHud {
             return;
         }
 
-        renderSelectTypeName(p, font, scaledHeight);
+        if(selectionManager.isSelecting()) {
+            if(selectionManager.getClickType() == ClickType.REMOVE) {
+                DrawableHelper.drawStringWithShadow(p, font, "left click - confirm task", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
+                DrawableHelper.drawStringWithShadow(p, font, "right click - cancel", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+            } else {
+                DrawableHelper.drawStringWithShadow(p, font, "left click - cancel", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
+                DrawableHelper.drawStringWithShadow(p, font, "right click - confirm task", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+            }
+
+            DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - move up", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - move down", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+        } else {
+            DrawableHelper.drawStringWithShadow(p, font, "left click - dig", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "right click - build", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+        }
     }
 
     private ClientBlueprintManager getBlueprintManager() {
@@ -123,23 +138,6 @@ public class FortressHud {
         String name = selectionManager.getCurrentSelectionType().getName();
         String selectionText = "Selection type: " + name;
         renderInfoText(p, font, selectionText);
-
-        if(selectionManager.isSelecting()) {
-            if(selectionManager.getClickType() == ClickType.REMOVE) {
-                DrawableHelper.drawStringWithShadow(p, font, "left click - confirm task", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
-                DrawableHelper.drawStringWithShadow(p, font, "right click - cancel", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
-            } else {
-                DrawableHelper.drawStringWithShadow(p, font, "left click - cancel", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
-                DrawableHelper.drawStringWithShadow(p, font, "right click - confirm task", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
-            }
-
-            DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - move up", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
-            DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - move down", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
-        } else {
-            DrawableHelper.drawStringWithShadow(p, font, "left click - dig", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
-            DrawableHelper.drawStringWithShadow(p, font, "right click - build", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
-        }
-
     }
 
     private void renderInfoText(MatrixStack p, TextRenderer font, String selectionText) {
