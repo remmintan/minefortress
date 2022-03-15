@@ -36,7 +36,7 @@ public class ServerboundCutTreesTaskPacket implements FortressServerPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        TaskManager taskManager = ((FortressServerWorld)player.getServerWorld()).getTaskManager();
+        TaskManager taskManager = ((FortressServerWorld)player.getWorld()).getTaskManager();
         final CutTreesTask cutTreesTask = new CutTreesTask(uuid, treeRoots);
         taskManager.addTask(cutTreesTask);
     }

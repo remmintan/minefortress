@@ -13,4 +13,9 @@ accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode
 accessible  field   net/minecraft/structure/Structure   blockInfoLists  Ljava/util/List;
 accessible  class   net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
 accessible  field   net/minecraft/client/render/chunk/ChunkBuilder   buffers  Lnet/minecraft/client/render/chunk/BlockBufferBuilderStorage;
+accessible  field    net/minecraft/entity/player/HungerManager   foodLevel   I
+accessible  field    net/minecraft/entity/player/HungerManager   foodTickTimer   I
+accessible  field    net/minecraft/entity/player/HungerManager   prevFoodLevel   I
+accessible  field    net/minecraft/entity/player/HungerManager  foodSaturationLevel  F
+accessible  field    net/minecraft/entity/player/HungerManager  exhaustion  F
 accessible  class   net/minecraft/client/render/chunk/RenderedChunk

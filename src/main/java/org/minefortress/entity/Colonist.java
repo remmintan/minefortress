@@ -1,13 +1,11 @@
 package org.minefortress.entity;
 
-import com.mojang.serialization.Dynamic;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -19,16 +17,16 @@ import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.entity.player.HungerConstants;
+import net.minecraft.entity.player.HungerManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -45,6 +43,7 @@ import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
 import org.minefortress.entity.ai.goal.ReturnToFireGoal;
+import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -52,7 +51,6 @@ import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiPredicate;
@@ -61,6 +59,7 @@ import java.util.function.Consumer;
 public class Colonist extends PassiveEntity {
 
     private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
     public static final float WORK_REACH_DISTANCE = 4f;
 
     private final DigControl digControl;
@@ -74,6 +73,8 @@ public class Colonist extends PassiveEntity {
     private BlockPos fortressCenter;
 
     private boolean allowToPlaceBlockFromFarAway = false;
+
+    private final ColonistHungerManager hungerManager = new ColonistHungerManager();
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
         super(entityType, world);
@@ -91,6 +92,7 @@ public class Colonist extends PassiveEntity {
         }
 
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
+        this.dataTracker.startTracking(CURRENT_FOOD_LEVEL, HungerConstants.FULL_FOOD_LEVEL);
     }
 
     @Override
@@ -295,6 +297,12 @@ public class Colonist extends PassiveEntity {
     @Override
     protected void mobTick() {
         super.mobTick();
+
+        this.hungerManager.update(this);
+
+        if(this.getCurrentFoodLevel() != this.hungerManager.getFoodLevel()) {
+            this.updateCurrentFoodLevel();
+        }
     }
 
     @Override
@@ -421,6 +429,10 @@ public class Colonist extends PassiveEntity {
             nbt.putInt("fortressCenterY", this.fortressCenter.getY());
             nbt.putInt("fortressCenterZ", this.fortressCenter.getZ());
         }
+
+        final NbtCompound hunger = new NbtCompound();
+        this.hungerManager.writeNbt(hunger);
+        nbt.put("hunger", hunger);
     }
 
     @Override
@@ -431,6 +443,9 @@ public class Colonist extends PassiveEntity {
         this.masterPlayerId = nbt.getUuid("playerId");
         if(nbt.contains("fortressCenterX")) {
             this.fortressCenter = new BlockPos(nbt.getInt("fortressCenterX"), nbt.getInt("fortressCenterY"), nbt.getInt("fortressCenterZ"));
+        }
+        if(nbt.contains("hunger")) {
+            this.hungerManager.readNbt(nbt.getCompound("hunger"));
         }
     }
 
@@ -448,5 +463,13 @@ public class Colonist extends PassiveEntity {
 
     public String getCurrentTaskDesc() {
         return this.dataTracker.get(CURRENT_TASK_DECRIPTION);
+    }
+
+    public void updateCurrentFoodLevel() {
+        this.dataTracker.set(CURRENT_FOOD_LEVEL, this.hungerManager.getFoodLevel());
+    }
+
+    public int getCurrentFoodLevel() {
+        return this.dataTracker.get(CURRENT_FOOD_LEVEL);
     }
 }

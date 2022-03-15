@@ -86,7 +86,7 @@ public class FortressHud {
             return;
         }
 
-        if(selectionManager.isSelecting()) {
+        if(selectionManager != null && selectionManager.isSelecting()) {
             if(selectionManager.getClickType() == ClickType.REMOVE) {
                 DrawableHelper.drawStringWithShadow(p, font, "left click - confirm task", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
                 DrawableHelper.drawStringWithShadow(p, font, "right click - cancel", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
