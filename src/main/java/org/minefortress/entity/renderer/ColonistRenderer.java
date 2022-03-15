@@ -1,12 +1,17 @@
 package org.minefortress.entity.renderer;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.interfaces.FortressMinecraftClient;
 
 public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityModel<Colonist>> {
 
@@ -27,6 +32,12 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
 
     @Override
     protected boolean hasLabel(Colonist p_115333_) {
-        return false;
+        return p_115333_.hasCustomName();
+    }
+
+    @Override
+    public void render(Colonist mobEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
+        super.render(mobEntity, f, g, matrixStack, vertexConsumerProvider, i);
+
     }
 }

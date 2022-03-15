@@ -42,6 +42,10 @@ public final class FortressClientManager extends AbstractFortressManager {
         return selectedColonist != null;
     }
 
+    public Colonist getSelectedColonist() {
+        return selectedColonist;
+    }
+
     public void stopSelectingColonist() {
         this.selectedColonist = null;
         this.selectedColonistDelta = null;
