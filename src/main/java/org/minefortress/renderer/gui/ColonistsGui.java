@@ -44,10 +44,10 @@ public class ColonistsGui extends FortressGuiScreen{
         final boolean colonsitsCountHovered = renderColonistsCount(matrices, font, screenWidth, screenHeight, mouseX, mouseY);
 
         if(fortressManager.isSelectingColonist()){
-            final int colonistWinX = 5;
-            final int colonistWinY = 25;
+            final int colonistWinX = 0;
+            final int colonistWinY = screenHeight - 85;
             final int width = 120;
-            final int height = 125;
+            final int height = 85;
             DrawableHelper.fillGradient(matrices, colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, 100);
 
             final String name = "<Pawn Name>";

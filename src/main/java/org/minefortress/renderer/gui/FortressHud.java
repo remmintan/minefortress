@@ -71,6 +71,8 @@ public class FortressHud {
     }
 
     private void renderHints(MatrixStack p, int scaledHeight, TextRenderer font) {
+        if(getFortressClient().getFortressClientManager().isSelectingColonist()) return;
+
         final ClientBlueprintManager clientBlueprintManager = getBlueprintManager();
         if(clientBlueprintManager.hasSelectedBlueprint()) {
             final String selectedBlueprintName = clientBlueprintManager.getSelectedStructure().getName();
