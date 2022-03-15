@@ -12,6 +12,9 @@ import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.SlimeEntity;
@@ -57,6 +60,7 @@ import java.util.function.Consumer;
 
 public class Colonist extends PassiveEntity {
 
+    private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     public static final float WORK_REACH_DISTANCE = 4f;
 
     private final DigControl digControl;
@@ -85,6 +89,8 @@ public class Colonist extends PassiveEntity {
             scaffoldsControl = null;
             mlgControl = null;
         }
+
+        this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
     }
 
     @Override
@@ -232,8 +238,6 @@ public class Colonist extends PassiveEntity {
                 .add(EntityAttributes.GENERIC_LUCK, 1024f);
     }
 
-
-
     @Override
     protected EntityNavigation createNavigation(World p_21480_) {
         return new ColonistNavigation(this, p_21480_);
@@ -286,6 +290,11 @@ public class Colonist extends PassiveEntity {
             this.executeTaskGoal.returnTask();
         }
         this.doActionOnMasterPlayer(p -> p.getFortressServerManager().removeColonist());
+    }
+
+    @Override
+    protected void mobTick() {
+        super.mobTick();
     }
 
     @Override
@@ -431,5 +440,13 @@ public class Colonist extends PassiveEntity {
 
     public void setAllowToPlaceBlockFromFarAway(boolean allowToPlaceBlockFromFarAway) {
         this.allowToPlaceBlockFromFarAway = allowToPlaceBlockFromFarAway;
+    }
+
+    public void setCurrentTaskDesc(String currentTaskDesc) {
+        this.dataTracker.set(CURRENT_TASK_DECRIPTION, currentTaskDesc);
+    }
+
+    public String getCurrentTaskDesc() {
+        return this.dataTracker.get(CURRENT_TASK_DECRIPTION);
     }
 }

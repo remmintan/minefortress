@@ -66,6 +66,20 @@ public class ColonistExecuteTaskGoal extends Goal {
         part = task.getNextPart(world);
         currentPartBlocksIterator = part.getIterator();
 
+        if(task instanceof SimpleSelectionTask) {
+            if(task.getTaskType() == TaskType.REMOVE) {
+                colonist.setCurrentTaskDesc("Digging");
+            } else {
+                colonist.setCurrentTaskDesc("Building");
+            }
+        } else if(task instanceof BlueprintTask) {
+            colonist.setCurrentTaskDesc("Building blueprint");
+        } else if(task instanceof CutTreesTask) {
+            colonist.setCurrentTaskDesc("Falling trees");
+        } else if(task instanceof RoadsTask) {
+            colonist.setCurrentTaskDesc("Building roads");
+        }
+
         if(!task.hasAvailableParts())
             manager.removeTask();
 
