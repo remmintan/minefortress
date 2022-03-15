@@ -16,9 +16,12 @@ import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
+
+import java.util.Optional;
 
 public class ColonistsGui extends FortressGuiScreen{
 
@@ -44,14 +47,16 @@ public class ColonistsGui extends FortressGuiScreen{
         final boolean colonsitsCountHovered = renderColonistsCount(matrices, font, screenWidth, screenHeight, mouseX, mouseY);
 
         if(fortressManager.isSelectingColonist()){
+            final Colonist selectedColonist = fortressManager.getSelectedColonist();
+
             final int colonistWinX = 0;
             final int colonistWinY = screenHeight - 85;
             final int width = 120;
             final int height = 85;
             DrawableHelper.fillGradient(matrices, colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, 100);
 
-            final String name = "<Pawn Name>";
-            final String healthString = "10/10";
+            final String name = Optional.ofNullable(selectedColonist.getCustomName()).map(Text::asString).orElse("");
+            final String healthString = String.format("%.0f/%.0f", selectedColonist.getHealth(), selectedColonist.getMaxHealth());
             final String hungerString = "10/10";
             final String professionString = "Miner - 1 LVL";
             final String tasksString = "Wondering around...";

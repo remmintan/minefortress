@@ -1,11 +1,13 @@
 package org.minefortress.entity;
 
+import com.mojang.serialization.Dynamic;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -22,6 +24,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -38,12 +42,14 @@ import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
 import org.minefortress.entity.ai.goal.ReturnToFireGoal;
+import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiPredicate;
@@ -92,7 +98,15 @@ public class Colonist extends PassiveEntity {
 
         this.doActionOnMasterPlayer(player -> player.getFortressServerManager().addColonist());
 
+        setCustomNameIfNeeded();
+
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+    }
+
+    private void setCustomNameIfNeeded() {
+        if(!this.hasCustomName()) {
+            this.setCustomName(new LiteralText(ColonistNameGenerator.generateRandomName()));
+        }
     }
 
     private void doActionOnMasterPlayer(Consumer<FortressServerPlayerEntity> playerConsumer) {
@@ -403,6 +417,7 @@ public class Colonist extends PassiveEntity {
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
+        this.setCustomNameIfNeeded();
         if(nbt == null) return;
         this.masterPlayerId = nbt.getUuid("playerId");
         if(nbt.contains("fortressCenterX")) {
