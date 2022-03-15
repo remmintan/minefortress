@@ -17,3 +17,8 @@ mutable field net/minecraft/client/render/chunk/ChunkRendererRegion sizeX I
 mutable field net/minecraft/client/render/chunk/ChunkRendererRegion sizeY I
 mutable field net/minecraft/client/render/chunk/ChunkRendererRegion sizeZ I
 mutable field   net/minecraft/client/render/chunk/ChunkRendererRegion blockStates     [Lnet/minecraft/block/BlockState;
+accessible  field    net/minecraft/entity/player/HungerManager   foodLevel   I
+accessible  field    net/minecraft/entity/player/HungerManager   foodTickTimer   I
+accessible  field    net/minecraft/entity/player/HungerManager   prevFoodLevel   I
+accessible  field    net/minecraft/entity/player/HungerManager  foodSaturationLevel  F
+accessible  field    net/minecraft/entity/player/HungerManager  exhaustion  F

@@ -11,6 +11,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
@@ -57,7 +58,7 @@ public class ColonistsGui extends FortressGuiScreen{
 
             final String name = Optional.ofNullable(selectedColonist.getCustomName()).map(Text::asString).orElse("");
             final String healthString = String.format("%.0f/%.0f", selectedColonist.getHealth(), selectedColonist.getMaxHealth());
-            final String hungerString = "10/10";
+            final String hungerString = String.format("%d/%d", selectedColonist.getCurrentFoodLevel(), HungerConstants.FULL_FOOD_LEVEL);
             final String professionString = "Miner - 1 LVL";
             final String tasksString = selectedColonist.getCurrentTaskDesc();
 
