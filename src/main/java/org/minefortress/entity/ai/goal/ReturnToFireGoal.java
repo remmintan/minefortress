@@ -68,6 +68,8 @@ public class ReturnToFireGoal extends Goal {
         final Path path = navigation.findPathTo(goal, 1);
         nodeMaker.setWallClimbMode(false);
         this.colonist.getNavigation().startMovingAlong(path, 1.0D);
+
+        this.colonist.setCurrentTaskDesc("Wondering around");
     }
 
     @Override

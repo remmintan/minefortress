@@ -59,7 +59,7 @@ public class ColonistsGui extends FortressGuiScreen{
             final String healthString = String.format("%.0f/%.0f", selectedColonist.getHealth(), selectedColonist.getMaxHealth());
             final String hungerString = "10/10";
             final String professionString = "Miner - 1 LVL";
-            final String tasksString = "Wondering around...";
+            final String tasksString = selectedColonist.getCurrentTaskDesc();
 
             Screen.drawCenteredText(matrices, font, name, colonistWinX + width / 2, colonistWinY + 5, 0xFFFFFF);
 
