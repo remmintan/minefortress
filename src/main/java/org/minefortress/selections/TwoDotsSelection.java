@@ -6,6 +6,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -50,8 +51,9 @@ public class TwoDotsSelection extends Selection {
         if (this.selectionStart == null) {
             this.selectionStart = pickedBlock;
             this.clickType = click;
+            return false;
         } else {
-            if(click == this.clickType && connection != null) {
+            if(pickedBlock == null && hitResult instanceof BlockHitResult && click == this.clickType && connection != null) {
                 UUID newTaskId = UUID.randomUUID();
                 TaskType taskType = mapClickTypeToTaskType(clickType);
                 final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
@@ -67,11 +69,8 @@ public class TwoDotsSelection extends Selection {
 
                 FortressClientNetworkHelper.send(FortressChannelNames.NEW_SELECTION_TASK, packet);
             }
-
             return true;
         }
-
-        return false;
     }
 
     protected SelectionType getSelectionType() {
