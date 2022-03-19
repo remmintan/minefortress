@@ -3,6 +3,7 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
@@ -46,7 +47,9 @@ public class SleepOnTheBedGoal extends Goal {
         if(colonist.getNavigation().isIdle()) {
             if(hasReachedTheBed()) {
                 if(!colonist.isSleeping()) {
-                    colonist.sleep(this.bedInfo.getPos());
+                    final BlockPos bedPos = this.bedInfo.getPos();
+                    if(BlockTags.BEDS.contains(colonist.world.getBlockState(bedPos).getBlock()))
+                        colonist.sleep(bedPos);
                 }
             } else {
                 moveToBed();
