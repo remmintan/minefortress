@@ -9,12 +9,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 
-import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class FortressServerManager extends AbstractFortressManager {
 
@@ -23,16 +25,44 @@ public final class FortressServerManager extends AbstractFortressManager {
     private boolean needSync = true;
 
     private BlockPos fortressCenter = null;
-    private int colonistsCount = 0;
+    private final Set<Colonist> colonists = new HashSet<>();
+    private final Set<FortressBulding> buildings = new HashSet<>();
 
-    public void addColonist() {
-        colonistsCount++;
+    private int maxX = Integer.MIN_VALUE;
+    private int maxZ = Integer.MIN_VALUE;
+    private int minX = Integer.MAX_VALUE;
+    private int minZ = Integer.MAX_VALUE;
+
+    public void addBuilding(FortressBulding building) {
+        final BlockPos start = building.getStart();
+        final BlockPos end = building.getEnd();
+        if(start.getX() < minX) minX = start.getX();
+        if(start.getZ() < minZ) minZ = start.getZ();
+        if(end.getX() > maxX) maxX = end.getX();
+        if(end.getZ() > maxZ) maxZ = end.getZ();
+        buildings.add(building);
+    }
+
+    public void addColonist(Colonist colonist) {
+        colonists.add(colonist);
         scheduleSync();
     }
 
-    public void removeColonist() {
-        colonistsCount--;
-        scheduleSync();
+    public void tick(ServerPlayerEntity player) {
+        tickFortress();
+        if(!needSync) return;
+        final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter);
+        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
+        needSync = false;
+    }
+
+    public void tickFortress() {
+        if(colonists.removeIf(colonist -> !colonist.isAlive()))
+            scheduleSync();
+
+        for (FortressBulding building : buildings) {
+            building.tick();
+        }
     }
 
     public void setupCenter(BlockPos fortressCenter, World world, ServerPlayerEntity player) {
@@ -62,39 +92,64 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.scheduleSync();
     }
 
-    public void tick(ServerPlayerEntity player) {
-        if(!needSync) return;
-        final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonistsCount, fortressCenter);
-        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
-        needSync = false;
-    }
 
     private void scheduleSync() {
         needSync = true;
     }
 
     public void writeToNbt(NbtCompound tag) {
-        tag.putInt("colonistsCount", colonistsCount);
         if(fortressCenter != null) {
             tag.putInt("centerX", fortressCenter.getX());
             tag.putInt("centerY", fortressCenter.getY());
             tag.putInt("centerZ", fortressCenter.getZ());
         }
+
+        tag.putInt("minX", minX);
+        tag.putInt("minZ", minZ);
+        tag.putInt("maxX", maxX);
+        tag.putInt("maxZ", maxZ);
+
+        if(!buildings.isEmpty()) {
+            int i = 0;
+            final NbtCompound buildingsTag = new NbtCompound();
+            for (FortressBulding building : this.buildings) {
+                final NbtCompound buildingTag = new NbtCompound();
+                building.writeToNbt(buildingTag);
+                buildingsTag.put("building" + i++, buildingTag);
+            }
+            tag.put("buildings", buildingsTag);
+        }
+
     }
 
     public void readFromNbt(NbtCompound tag) {
-        colonistsCount = tag.getInt("colonistsCount");
         final int centerX = tag.getInt("centerX");
         final int centerY = tag.getInt("centerY");
         final int centerZ = tag.getInt("centerZ");
         if(centerX != 0 || centerY != 0 || centerZ != 0) {
             fortressCenter = new BlockPos(centerX, centerY, centerZ);
         }
+
+        if(tag.contains("minX")) minX = tag.getInt("minX");
+        if(tag.contains("minZ")) minZ = tag.getInt("minZ");
+        if(tag.contains("maxX")) maxX = tag.getInt("maxX");
+        if(tag.contains("maxZ")) maxZ = tag.getInt("maxZ");
+
+        if(tag.contains("buildings")) {
+            final NbtCompound buildingsTag = tag.getCompound("buildings");
+            int i = 0;
+            while(buildingsTag.contains("building" + i)) {
+                final NbtCompound buildingTag = buildingsTag.getCompound("building" + i++);
+                FortressBulding building = new FortressBulding(buildingTag);
+                buildings.add(building);
+            }
+        }
+
         this.scheduleSync();
     }
 
     public int getColonistsCount() {
-        return colonistsCount;
+        return colonists.size();
     }
 
     public BlockPos getFortressCenter() {
