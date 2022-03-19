@@ -69,7 +69,7 @@ public class ReturnToFireGoal extends Goal {
         nodeMaker.setWallClimbMode(false);
         this.colonist.getNavigation().startMovingAlong(path, 1.0D);
 
-        this.colonist.setCurrentTaskDesc("Wondering around");
+        this.colonist.setCurrentTaskDesc("Wandering around");
     }
 
     @Override
