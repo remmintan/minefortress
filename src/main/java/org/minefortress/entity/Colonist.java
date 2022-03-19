@@ -118,7 +118,7 @@ public class Colonist extends PassiveEntity {
         }
     }
 
-    private void doActionOnMasterPlayer(Consumer<FortressServerPlayerEntity> playerConsumer) {
+    public void doActionOnMasterPlayer(Consumer<FortressServerPlayerEntity> playerConsumer) {
         final MinecraftServer server = getServer();
         final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer(server);
         if(masterPlayer.isPresent()) {
