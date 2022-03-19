@@ -4,10 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FortressBulding {
@@ -54,6 +51,10 @@ public class FortressBulding {
     }
 
     public void tick() {}
+
+    public Optional<FortressBedInfo> getFreeBed() {
+        return beds.stream().filter(b -> !b.isOccupied()).findFirst();
+    }
 
     public void writeToNbt(NbtCompound tag) {
         tag.putLong("start", start.asLong());

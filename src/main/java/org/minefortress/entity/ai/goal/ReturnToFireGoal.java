@@ -69,12 +69,12 @@ public class ReturnToFireGoal extends Goal {
         nodeMaker.setWallClimbMode(false);
         this.colonist.getNavigation().startMovingAlong(path, 1.0D);
 
-        this.colonist.setCurrentTaskDesc("Wandering around");
+        this.colonist.setCurrentTaskDesc("Staying near campfire");
     }
 
     @Override
     public boolean shouldContinue() {
-        return !this.colonist.getNavigation().isIdle() && doesNotHaveAnyOtherTask();
+        return doesNotHaveAnyOtherTask() && !this.colonist.getNavigation().isIdle();
     }
 
     @Override
