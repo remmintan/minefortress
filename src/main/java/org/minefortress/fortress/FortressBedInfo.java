@@ -1,7 +1,5 @@
 package org.minefortress.fortress;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 
 public class FortressBedInfo {
@@ -12,11 +10,6 @@ public class FortressBedInfo {
     public FortressBedInfo(BlockPos pos) {
         this.pos = pos;
         this.occupied = false;
-    }
-
-    public FortressBedInfo(BlockPos pos, boolean occupied) {
-        this.pos = pos;
-        this.occupied = occupied;
     }
 
     public BlockPos getPos() {
@@ -36,6 +29,6 @@ public class FortressBedInfo {
     }
 
     public static FortressBedInfo fromLong(long l) {
-        return new FortressBedInfo(BlockPos.fromLong(l >> 1), (l & 1) == 1);
+        return new FortressBedInfo(BlockPos.fromLong(l >> 1));
     }
 }

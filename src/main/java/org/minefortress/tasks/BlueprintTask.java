@@ -48,7 +48,7 @@ public class BlueprintTask extends AbstractTask {
 
         Set<FortressBedInfo> allBeds = new HashSet<>();
 
-        for (Map.Entry<BlockPos, BlockState> entry : blueprintEntityData.entrySet()) {
+        for (Map.Entry<BlockPos, BlockState> entry : blueprintAutomaticData.entrySet()) {
             BlockState state = entry.getValue();
             if (BlockTags.BEDS.contains(state.getBlock())) {
                 final BedPart bedPart = state.get(BedBlock.PART);

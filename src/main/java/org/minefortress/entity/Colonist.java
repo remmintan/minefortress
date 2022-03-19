@@ -257,7 +257,7 @@ public class Colonist extends PassiveEntity {
         executeTaskGoal  = new ColonistExecuteTaskGoal(this);
         this.goalSelector.add(6, executeTaskGoal);
         this.goalSelector.add(7, new WanderAroundTheFortressGoal(this));
-        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
+        this.goalSelector.add(7, new SleepOnTheBedGoal(this));
         this.goalSelector.add(8, new ReturnToFireGoal(this));
         this.goalSelector.add(9, new WanderAroundFarGoal(this, 1.0D));
         this.goalSelector.add(10, new LookAroundGoal(this));
