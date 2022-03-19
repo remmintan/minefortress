@@ -49,6 +49,7 @@ import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
@@ -493,5 +494,12 @@ public class Colonist extends PassiveEntity {
 
     public UUID getMasterPlayerId() {
         return masterPlayerId;
+    }
+
+    public boolean doesNotHaveAnyOtherTask() {
+        if(hasTask) return false;
+        final World world = this.getEntityWorld();
+        final FortressServerWorld fortressWorld = (FortressServerWorld) world;
+        return !fortressWorld.getTaskManager().hasTask();
     }
 }
