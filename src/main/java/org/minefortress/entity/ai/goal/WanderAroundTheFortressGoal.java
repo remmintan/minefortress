@@ -5,9 +5,11 @@ import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.NodeMaker;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.interfaces.FortressServerWorld;
 
 import java.util.Optional;
 
@@ -21,7 +23,7 @@ public class WanderAroundTheFortressGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if(!isDay()) return false;
+        if(!isDay() || !colonist.doesNotHaveAnyOtherTask()) return false;
         final Optional<FortressServerManager> fortressManagerOpt = colonist.getFortressServerManager();
         if (fortressManagerOpt.isPresent()) {
             final FortressServerManager fortressManager = fortressManagerOpt.get();
@@ -52,7 +54,7 @@ public class WanderAroundTheFortressGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return isDay() && !this.colonist.getNavigation().isIdle();
+        return isDay() && !this.colonist.getNavigation().isIdle() && colonist.doesNotHaveAnyOtherTask();
     }
 
     @Override
