@@ -43,6 +43,8 @@ import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
 import org.minefortress.entity.ai.goal.ReturnToFireGoal;
+import org.minefortress.entity.ai.goal.SleepOnTheBedGoal;
+import org.minefortress.entity.ai.goal.WanderAroundTheFortressGoal;
 import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fortress.FortressServerManager;
@@ -124,7 +126,6 @@ public class Colonist extends PassiveEntity {
         } else {
             masterPlayerActionQueue.add(playerConsumer);
         }
-
     }
 
     @NotNull
@@ -254,9 +255,11 @@ public class Colonist extends PassiveEntity {
         this.goalSelector.add(3, new MeleeAttackGoal(this, 1.5, true));
         executeTaskGoal  = new ColonistExecuteTaskGoal(this);
         this.goalSelector.add(6, executeTaskGoal);
-        this.goalSelector.add(7, new ReturnToFireGoal(this));
-        this.goalSelector.add(8, new WanderAroundFarGoal(this, 1.0D));
-        this.goalSelector.add(9, new LookAroundGoal(this));
+        this.goalSelector.add(7, new WanderAroundTheFortressGoal(this));
+        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
+        this.goalSelector.add(8, new ReturnToFireGoal(this));
+        this.goalSelector.add(9, new WanderAroundFarGoal(this, 1.0D));
+        this.goalSelector.add(10, new LookAroundGoal(this));
 
         this.targetSelector.add(1, new RevengeGoal(this).setGroupRevenge());
     }

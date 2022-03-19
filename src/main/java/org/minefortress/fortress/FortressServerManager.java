@@ -17,6 +17,8 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 
 import java.util.HashSet;
+import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 public final class FortressServerManager extends AbstractFortressManager {
@@ -44,6 +46,14 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(end.getX() > maxX) maxX = end.getX();
         if(end.getZ() > maxZ) maxZ = end.getZ();
         buildings.add(building);
+    }
+
+    public Optional<FortressBedInfo> getFreeBed(){
+        for(FortressBulding building : buildings){
+            final Optional<FortressBedInfo> freeBed = building.getFreeBed();
+            if(freeBed.isPresent()) return freeBed;
+        }
+        return Optional.empty();
     }
 
     public void addColonist(Colonist colonist) {
@@ -170,5 +180,14 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public BlockPos getFortressCenter() {
         return fortressCenter;
+    }
+
+    public Optional<BlockPos> randomSurfacePos(ServerWorld world){
+        if(minX == Integer.MAX_VALUE) return Optional.empty();
+
+        int x = world.random.nextInt(maxX - minX) + minX;
+        int z = world.random.nextInt(maxZ - minZ) + minZ;
+        int y = world.getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
+        return Optional.of(new BlockPos(x, y, z));
     }
 }
