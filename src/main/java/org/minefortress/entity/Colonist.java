@@ -50,9 +50,7 @@ import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
@@ -75,6 +73,7 @@ public class Colonist extends PassiveEntity {
     private boolean allowToPlaceBlockFromFarAway = false;
 
     private final ColonistHungerManager hungerManager = new ColonistHungerManager();
+    private final Queue<Consumer<FortressServerPlayerEntity>> masterPlayerActionQueue = new ArrayDeque<>();
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
         super(entityType, world);
@@ -119,8 +118,13 @@ public class Colonist extends PassiveEntity {
 
     private void doActionOnMasterPlayer(Consumer<FortressServerPlayerEntity> playerConsumer) {
         final MinecraftServer server = getServer();
-        getMasterPlayer(server)
-                .ifPresent(playerConsumer);
+        final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer(server);
+        if(masterPlayer.isPresent()) {
+            playerConsumer.accept(masterPlayer.get());
+        } else {
+            masterPlayerActionQueue.add(playerConsumer);
+        }
+
     }
 
     @NotNull
@@ -170,8 +174,6 @@ public class Colonist extends PassiveEntity {
             setStackInHand(Hand.MAIN_HAND, new ItemStack(item));
         }
     }
-
-
 
     @Override
     public void setAttacking(boolean aggressive) {
@@ -296,6 +298,15 @@ public class Colonist extends PassiveEntity {
     @Override
     protected void mobTick() {
         super.mobTick();
+
+        if(!this.masterPlayerActionQueue.isEmpty()) {
+            final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer(this.getServer());
+            if(masterPlayer.isPresent()) {
+                final FortressServerPlayerEntity fortressServerPlayerEntity = masterPlayer.get();
+                masterPlayerActionQueue.forEach(action -> action.accept(fortressServerPlayerEntity));
+                masterPlayerActionQueue.clear();
+            }
+        }
 
         this.hungerManager.update(this);
 
