@@ -36,6 +36,7 @@ public class SleepOnTheBedGoal extends Goal {
         if(freeBed.isPresent()) {
             bedInfo = freeBed.get();
             bedInfo.setOccupied(true);
+            colonist.setCurrentTaskDesc("Going to sleep");
             moveToBed();
         }
     }
@@ -44,7 +45,9 @@ public class SleepOnTheBedGoal extends Goal {
     public void tick() {
         if(colonist.getNavigation().isIdle()) {
             if(hasReachedTheBed()) {
-                ///TODO: Sleep
+                if(!colonist.isSleeping()) {
+                    colonist.sleep(this.bedInfo.getPos());
+                }
             } else {
                 moveToBed();
             }
@@ -80,6 +83,9 @@ public class SleepOnTheBedGoal extends Goal {
         colonist.getNavigation().stop();
         this.bedInfo.setOccupied(false);
         this.bedInfo = null;
+        if(colonist.isSleeping()) {
+            colonist.wakeUp();
+        }
     }
 
     @NotNull
