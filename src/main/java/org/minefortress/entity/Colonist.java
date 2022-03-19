@@ -104,15 +104,15 @@ public class Colonist extends PassiveEntity {
         this.fortressCenter = new BlockPos(centerX, centerY, centerZ);
 
         this.doActionOnMasterPlayer(player -> player.getFortressServerManager().addColonist(this));
+        this.doActionOnMasterPlayer(this::setCustomNameIfNeeded);
 
-        setCustomNameIfNeeded();
 
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
 
-    private void setCustomNameIfNeeded() {
+    private void setCustomNameIfNeeded(FortressServerPlayerEntity player) {
         if(!this.hasCustomName()) {
-            this.setCustomName(new LiteralText(ColonistNameGenerator.generateRandomName()));
+            this.setCustomName(new LiteralText(player.getFortressServerManager().getNameGenerator().generateRandomName()));
         }
     }
 
@@ -448,7 +448,6 @@ public class Colonist extends PassiveEntity {
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.setCustomNameIfNeeded();
         if(nbt == null) return;
         this.masterPlayerId = nbt.getUuid("playerId");
         if(nbt.contains("fortressCenterX")) {
@@ -458,6 +457,7 @@ public class Colonist extends PassiveEntity {
             this.hungerManager.readNbt(nbt.getCompound("hunger"));
         }
         if(masterPlayerId != null) {
+            doActionOnMasterPlayer(this::setCustomNameIfNeeded);
             doActionOnMasterPlayer(masterPlayer -> {
                masterPlayer.getFortressServerManager().addColonist(this);
             });

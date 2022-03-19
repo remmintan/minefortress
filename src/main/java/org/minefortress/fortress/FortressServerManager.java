@@ -10,6 +10,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -27,6 +28,8 @@ public final class FortressServerManager extends AbstractFortressManager {
     private BlockPos fortressCenter = null;
     private final Set<Colonist> colonists = new HashSet<>();
     private final Set<FortressBulding> buildings = new HashSet<>();
+
+    private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
 
     private int maxX = Integer.MIN_VALUE;
     private int maxZ = Integer.MIN_VALUE;
@@ -120,6 +123,10 @@ public final class FortressServerManager extends AbstractFortressManager {
             tag.put("buildings", buildingsTag);
         }
 
+        final NbtCompound nameGeneratorTag = new NbtCompound();
+        this.nameGenerator.write(nameGeneratorTag);
+        tag.put("nameGenerator", nameGeneratorTag);
+
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -145,7 +152,16 @@ public final class FortressServerManager extends AbstractFortressManager {
             }
         }
 
+        if(tag.contains("nameGenerator")) {
+            final NbtCompound nameGeneratorTag = tag.getCompound("nameGenerator");
+            this.nameGenerator = new ColonistNameGenerator(nameGeneratorTag);
+        }
+
         this.scheduleSync();
+    }
+
+    public ColonistNameGenerator getNameGenerator() {
+        return nameGenerator;
     }
 
     public int getColonistsCount() {

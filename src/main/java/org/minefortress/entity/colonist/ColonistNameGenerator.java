@@ -1,5 +1,8 @@
 package org.minefortress.entity.colonist;
 
+import net.minecraft.nbt.NbtCompound;
+import org.apache.logging.log4j.util.Strings;
+
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
@@ -89,17 +92,36 @@ public class ColonistNameGenerator {
             "Joe"
     );
 
-    private static final Queue<String> mandatoryNames = new ArrayDeque<>();
+    private final Queue<String> mandatoryNames;
 
-    static {
-        mandatoryNames.add("Jèff");
+    public ColonistNameGenerator() {
+        mandatoryNames = new ArrayDeque<>();
+        mandatoryNames.addAll(Arrays.asList("Jèff", "Bryan"));
     }
 
-    public static String generateRandomName() {
+    public ColonistNameGenerator(NbtCompound nbtCompound) {
+        if(nbtCompound.contains("mandatoryNames")) {
+            final String mandatoryNamesString = nbtCompound.getString("mandatoryNames");
+            if(Strings.isNotBlank(mandatoryNamesString)) {
+                final String[] mandatoryNames = mandatoryNamesString.split(",");
+                this.mandatoryNames = new ArrayDeque<>(Arrays.asList(mandatoryNames));
+                return;
+            }
+        }
+        mandatoryNames = new ArrayDeque<>();
+    }
+
+    public String generateRandomName() {
         if(!mandatoryNames.isEmpty()) {
             return mandatoryNames.remove();
         } else {
             return randomNames.get((int) (Math.random() * randomNames.size()));
+        }
+    }
+
+    public void write(NbtCompound compound) {
+        if(!mandatoryNames.isEmpty()) {
+            compound.putString("mandatoryNames", String.join(",", mandatoryNames));
         }
     }
 
