@@ -104,7 +104,7 @@ public class Colonist extends PassiveEntity {
         int centerZ = entityNbt.getInt("centerZ");
         this.fortressCenter = new BlockPos(centerX, centerY, centerZ);
 
-        this.doActionOnMasterPlayer(player -> player.getFortressServerManager().addColonist());
+        this.doActionOnMasterPlayer(player -> player.getFortressServerManager().addColonist(this));
 
         setCustomNameIfNeeded();
 
@@ -291,7 +291,6 @@ public class Colonist extends PassiveEntity {
         if(this.executeTaskGoal != null) {
             this.executeTaskGoal.returnTask();
         }
-        this.doActionOnMasterPlayer(p -> p.getFortressServerManager().removeColonist());
     }
 
     @Override
@@ -450,6 +449,11 @@ public class Colonist extends PassiveEntity {
         if(nbt.contains("hunger")) {
             this.hungerManager.readNbt(nbt.getCompound("hunger"));
         }
+        if(masterPlayerId != null) {
+            doActionOnMasterPlayer(masterPlayer -> {
+               masterPlayer.getFortressServerManager().addColonist(this);
+            });
+        }
     }
 
     public boolean isAllowToPlaceBlockFromFarAway() {
@@ -474,5 +478,9 @@ public class Colonist extends PassiveEntity {
 
     public int getCurrentFoodLevel() {
         return this.dataTracker.get(CURRENT_FOOD_LEVEL);
+    }
+
+    public UUID getMasterPlayerId() {
+        return masterPlayerId;
     }
 }

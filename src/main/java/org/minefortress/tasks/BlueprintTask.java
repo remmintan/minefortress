@@ -1,21 +1,26 @@
 package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.enums.BedPart;
 import net.minecraft.item.Item;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.FortressBedInfo;
+import org.minefortress.fortress.FortressBulding;
+import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class BlueprintTask extends AbstractTask {
 
@@ -23,6 +28,8 @@ public class BlueprintTask extends AbstractTask {
     private final Map<BlockPos, BlockState> blueprintEntityData;
     private final Map<BlockPos, BlockState> blueprintAutomaticData;
     private final float floorLevel;
+
+    private final Set<FortressBedInfo> beds;
 
     public BlueprintTask(
             UUID id,
@@ -38,6 +45,20 @@ public class BlueprintTask extends AbstractTask {
         this.blueprintEntityData = blueprintEntityData;
         this.blueprintAutomaticData = blueprintAutomaticData;
         this.floorLevel = floorLevel;
+
+        Set<FortressBedInfo> allBeds = new HashSet<>();
+
+        for (Map.Entry<BlockPos, BlockState> entry : blueprintEntityData.entrySet()) {
+            BlockState state = entry.getValue();
+            if (BlockTags.BEDS.contains(state.getBlock())) {
+                final BedPart bedPart = state.get(BedBlock.PART);
+                if (bedPart == BedPart.FOOT) {
+                    allBeds.add(new FortressBedInfo(entry.getKey()));
+                }
+            }
+        }
+
+        this.beds = Collections.unmodifiableSet(allBeds);
     }
 
     @Override
@@ -66,15 +87,22 @@ public class BlueprintTask extends AbstractTask {
     @Override
     public void finishPart(ServerWorld world, TaskPart part, Colonist colonist) {
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
-            blueprintEntityData.forEach((pos, state) -> {
-                world.setBlockState(pos.add(startingBlock), state, 3);
-            });
+            blueprintEntityData.forEach((pos, state) -> world.setBlockState(pos.add(startingBlock), state, 3));
 
             if(blueprintAutomaticData != null)
                 blueprintAutomaticData
                         .forEach((pos, state) -> world.setBlockState(pos.add(startingBlock), state, 3));
 
 
+            final UUID masterPlayerId = colonist.getMasterPlayerId();
+            if(masterPlayerId != null) {
+                final ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(masterPlayerId);
+                if(player instanceof FortressServerPlayerEntity fortressPlayer) {
+                    final FortressServerManager fortressServerManager = fortressPlayer.getFortressServerManager();
+                    final FortressBulding fortressBulding = new FortressBulding(startingBlock, endingBlock, beds);
+                    fortressServerManager.addBuilding(fortressBulding);
+                }
+            }
         }
         super.finishPart(world, part, colonist);
     }
