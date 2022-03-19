@@ -22,7 +22,7 @@ public class ReturnToFireGoal extends Goal {
     public ReturnToFireGoal(Colonist colonist) {
         super();
         this.colonist = colonist;
-        this.setControls(EnumSet.of(Goal.Control.MOVE));
+        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK,Goal.Control.JUMP));
     }
 
     @Override

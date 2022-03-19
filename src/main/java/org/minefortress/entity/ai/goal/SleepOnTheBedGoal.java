@@ -19,9 +19,7 @@ public class SleepOnTheBedGoal extends Goal {
 
     public SleepOnTheBedGoal(Colonist colonist) {
         this.colonist = colonist;
-        this.setControls(EnumSet.of(Goal.Control.MOVE));
-        this.setControls(EnumSet.of(Goal.Control.LOOK));
-        this.setControls(EnumSet.of(Goal.Control.JUMP));
+        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK,Goal.Control.JUMP));
     }
 
     @Override
@@ -74,7 +72,7 @@ public class SleepOnTheBedGoal extends Goal {
 
     @Override
     public boolean canStop() {
-        return true;
+        return false;
     }
 
     @Override
