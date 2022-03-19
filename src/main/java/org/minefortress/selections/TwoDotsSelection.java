@@ -53,7 +53,7 @@ public class TwoDotsSelection extends Selection {
             this.clickType = click;
             return false;
         } else {
-            if(pickedBlock == null && hitResult instanceof BlockHitResult && click == this.clickType && connection != null) {
+            if(pickedBlock != null && hitResult instanceof BlockHitResult && click == this.clickType && connection != null) {
                 UUID newTaskId = UUID.randomUUID();
                 TaskType taskType = mapClickTypeToTaskType(clickType);
                 final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
