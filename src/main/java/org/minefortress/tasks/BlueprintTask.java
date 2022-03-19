@@ -94,15 +94,11 @@ public class BlueprintTask extends AbstractTask {
                         .forEach((pos, state) -> world.setBlockState(pos.add(startingBlock), state, 3));
 
 
-            final UUID masterPlayerId = colonist.getMasterPlayerId();
-            if(masterPlayerId != null) {
-                final ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(masterPlayerId);
-                if(player instanceof FortressServerPlayerEntity fortressPlayer) {
-                    final FortressServerManager fortressServerManager = fortressPlayer.getFortressServerManager();
-                    final FortressBulding fortressBulding = new FortressBulding(startingBlock, endingBlock, beds);
-                    fortressServerManager.addBuilding(fortressBulding);
-                }
-            }
+            colonist.doActionOnMasterPlayer(player -> {
+                final FortressServerManager fortressServerManager = player.getFortressServerManager();
+                final FortressBulding fortressBulding = new FortressBulding(startingBlock, endingBlock, beds);
+                fortressServerManager.addBuilding(fortressBulding);
+            });
         }
         super.finishPart(world, part, colonist);
     }

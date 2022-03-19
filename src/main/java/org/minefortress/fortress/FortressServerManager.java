@@ -94,6 +94,11 @@ public final class FortressServerManager extends AbstractFortressManager {
         nbtCompound.putInt("centerY", fortressCenter.getY());
         nbtCompound.putInt("centerZ", fortressCenter.getZ());
 
+        if(minX > fortressCenter.getX()-10) minX = fortressCenter.getX()-10;
+        if(minZ > fortressCenter.getZ()-10) minZ = fortressCenter.getZ()-10;
+        if(maxX < fortressCenter.getX()+10) maxX = fortressCenter.getX()+10;
+        if(maxZ < fortressCenter.getZ()+10) maxZ = fortressCenter.getZ()+10;
+
         EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
         Iterable<BlockPos> spawnPlaces = BlockPos.iterateRandomly(world.random, DEFAULT_COLONIST_COUNT, fortressCenter, 3);
         for(BlockPos spawnPlace : spawnPlaces) {
