@@ -327,7 +327,7 @@ public class Colonist extends PassiveEntity {
             }
         }
 
-        if(isHalfInWall() || isEyesInTheWall()) {
+        if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping()) {
             this.getJumpControl().setActive();
             if(getScaffoldsControl() != null && world.getBlockState(getBlockPos().down()).isAir())
                 getScaffoldsControl().needAction();

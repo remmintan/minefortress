@@ -52,7 +52,7 @@ public class BlueprintTask extends AbstractTask {
             BlockState state = entry.getValue();
             if (BlockTags.BEDS.contains(state.getBlock())) {
                 final BedPart bedPart = state.get(BedBlock.PART);
-                if (bedPart == BedPart.FOOT) {
+                if (bedPart == BedPart.HEAD) {
                     allBeds.add(new FortressBedInfo(entry.getKey().add(startingBlock)));
                 }
             }
