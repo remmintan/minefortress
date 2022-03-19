@@ -211,6 +211,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Override
     public boolean isSupporter() {
-        return false;
+        return true;
     }
 }
