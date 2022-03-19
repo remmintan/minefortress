@@ -3,13 +3,13 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
-import net.minecraft.entity.ai.pathing.PathNodeMaker;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressBedInfo;
 import org.minefortress.fortress.FortressServerManager;
 
+import java.util.EnumSet;
 import java.util.Optional;
 
 public class SleepOnTheBedGoal extends Goal {
@@ -19,6 +19,9 @@ public class SleepOnTheBedGoal extends Goal {
 
     public SleepOnTheBedGoal(Colonist colonist) {
         this.colonist = colonist;
+        this.setControls(EnumSet.of(Goal.Control.MOVE));
+        this.setControls(EnumSet.of(Goal.Control.LOOK));
+        this.setControls(EnumSet.of(Goal.Control.JUMP));
     }
 
     @Override
@@ -77,6 +80,7 @@ public class SleepOnTheBedGoal extends Goal {
     @Override
     public void stop() {
         colonist.getNavigation().stop();
+        this.bedInfo.setOccupied(false);
         this.bedInfo = null;
     }
 
