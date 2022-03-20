@@ -44,6 +44,7 @@ public class SleepOnTheBedGoal extends Goal {
 
     @Override
     public void tick() {
+        if(bedInfo == null) return;
         if(colonist.getNavigation().isIdle()) {
             if(hasReachedTheBed()) {
                 if(!colonist.isSleeping()) {
@@ -62,6 +63,7 @@ public class SleepOnTheBedGoal extends Goal {
         final BlockPos pos = bedInfo.getPos();
         final EntityNavigation navigation = colonist.getNavigation();
         final Path pathTo = navigation.findPathTo(pos, 1);
+
         navigation.startMovingAlong(pathTo, 1.5);
     }
 
