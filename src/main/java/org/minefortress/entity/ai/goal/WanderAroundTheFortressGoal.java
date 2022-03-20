@@ -49,6 +49,9 @@ public class WanderAroundTheFortressGoal extends Goal {
                 final Path path = navigation.findPathTo(goal, 3);
                 nodeMaker.setWallClimbMode(false);
                 navigation.startMovingAlong(path, 1.0D);
+                if(colonist.isSleeping()) {
+                    colonist.wakeUp();
+                }
             }
         }
     }

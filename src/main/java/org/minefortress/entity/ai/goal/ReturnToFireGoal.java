@@ -75,6 +75,9 @@ public class ReturnToFireGoal extends Goal {
         nodeMaker.setWallClimbMode(false);
         this.colonist.getNavigation().startMovingAlong(path, 1.0D);
 
+        if(colonist.isSleeping()) {
+            colonist.wakeUp();
+        }
         this.colonist.setCurrentTaskDesc("Staying near campfire");
     }
 

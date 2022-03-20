@@ -83,6 +83,9 @@ public class ColonistExecuteTaskGoal extends Goal {
         if(!task.hasAvailableParts())
             manager.removeTask();
 
+        if(colonist.isSleeping()) {
+            colonist.wakeUp();
+        }
         moveToNextBlock();
     }
 
