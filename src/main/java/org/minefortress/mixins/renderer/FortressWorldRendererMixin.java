@@ -10,8 +10,11 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.FortressRenderLayer;
@@ -65,8 +68,6 @@ public abstract class FortressWorldRendererMixin  {
         final VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
         this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
 
-
-
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         fortressClient.getBlueprintRenderer().renderSelectedBlueprint(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
         SelectionManager selectionManager = fortressClient.getSelectionManager();
@@ -106,6 +107,24 @@ public abstract class FortressWorldRendererMixin  {
                     Vec3i selectionStart = selectionSize.getSecond();
                     Vector4f clickColors = selectionManager.getClickColors();
                     drawShapeOutline(matrices, noDepthBuffer, generalSelectionBox, selectionStart.getX() - cameraPos.x, selectionStart.getY() - cameraPos.y, selectionStart.getZ() -  cameraPos.z, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());
+                }
+            }
+        } else {
+            final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
+            final HitResult crosshairTarget = client.crosshairTarget;
+            if(crosshairTarget instanceof BlockHitResult bhr) {
+                BlockPos pos = bhr.getBlockPos();
+                if(pos != null && !world.getBlockState(pos).isAir()) {
+                    final List<BlockPos> buildingSelection = fortressClientManager.getBuildingSelection(pos);
+                    for(BlockPos sel: buildingSelection) {
+                        if(this.world.getWorldBorder().contains(sel)) {
+                            final BlockState blockState = this.world.getBlockState(sel);
+                            if(!blockState.isAir()) {
+                                this.drawBlockOutline(matrices, vertexconsumer2, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, sel, blockState);
+                            }
+                        }
+                    }
+
                 }
             }
         }

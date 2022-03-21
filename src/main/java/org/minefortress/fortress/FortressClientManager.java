@@ -2,6 +2,7 @@ package org.minefortress.fortress;
 
 import com.chocohead.mm.api.ClassTinkerers;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
@@ -17,7 +18,12 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.tasks.BuildingManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public final class FortressClientManager extends AbstractFortressManager {
 
@@ -139,7 +145,6 @@ public final class FortressClientManager extends AbstractFortressManager {
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_CENTER, serverboundFortressCenterSetPacket);
 
         final MinecraftClient client = MinecraftClient.getInstance();
-        final ClientWorld world = client.world;
         final WorldRenderer worldRenderer = client.worldRenderer;
 
 
@@ -159,5 +164,26 @@ public final class FortressClientManager extends AbstractFortressManager {
             worldRenderer.scheduleBlockRenders(start.getX(), start.getY(), start.getZ(), end.getX(), end.getY(), end.getZ());
             worldRenderer.scheduleTerrainUpdate();
         }
+    }
+
+    public List<BlockPos> getBuildingSelection(BlockPos pos) {
+        for(Pair<BlockPos, BlockPos> building : buildings){
+            final BlockPos start = building.getFirst();
+            final BlockPos end = building.getSecond();
+            if(isPosBetween(pos, start, end)){
+                return StreamSupport
+                        .stream(BlockPos.iterate(start, end).spliterator(), false)
+                        .map(BlockPos::toImmutable)
+                        .collect(Collectors.toList());
+            }
+        }
+
+        return Collections.emptyList();
+    }
+
+    private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
+        return pos.getX() >= start.getX() && pos.getX() <= end.getX() &&
+                pos.getY() >= start.getY() && pos.getY() <= end.getY() &&
+                pos.getZ() >= start.getZ() && pos.getZ() <= end.getZ();
     }
 }
