@@ -176,6 +176,7 @@ public final class FortressServerManager extends AbstractFortressManager {
                 final NbtCompound buildingTag = buildingsTag.getCompound("building" + i++);
                 FortressBulding building = new FortressBulding(buildingTag);
                 buildings.add(building);
+                this.scheduleSyncBuildings();
             }
         }
 
