@@ -1,6 +1,7 @@
 package org.minefortress.fortress;
 
 import com.chocohead.mm.api.ClassTinkerers;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
@@ -14,6 +15,9 @@ import org.minefortress.network.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.tasks.BuildingManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class FortressClientManager extends AbstractFortressManager {
 
@@ -30,12 +34,18 @@ public final class FortressClientManager extends AbstractFortressManager {
     private Colonist selectedColonist;
     private Vec3d selectedColonistDelta;
 
+    private List<Pair<BlockPos, BlockPos>> buildings = new ArrayList<>();
+
     public void select(Colonist colonist) {
         this.selectedColonist = colonist;
         final Vec3d entityPos = colonist.getPos();
         final Vec3d playerPos = MinecraftClient.getInstance().player.getPos();
 
         selectedColonistDelta = entityPos.subtract(playerPos);
+    }
+
+    public void updateBuildings(List<Pair<BlockPos, BlockPos>> buildings) {
+        this.buildings = buildings;
     }
 
     public boolean isSelectingColonist() {
