@@ -19,5 +19,6 @@ public class FortressChannelNames {
     public static final String FORTRESS_RESET_BLUEPRINT = "fortress_reset_blueprint";
     public static final String FORTRESS_CUT_TREES_TASK = "fortress_cut_trees_task";
     public static final String FORTRESS_ROADS_TASK = "fortress_roads_task";
+    public static final String FORTRESS_BUILDINGS_SYNC = "fortress_buildings_sync";
 
 }

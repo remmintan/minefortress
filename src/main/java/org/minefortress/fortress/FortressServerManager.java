@@ -9,17 +9,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.network.ClientboundSyncBuildingsPacket;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 
 public final class FortressServerManager extends AbstractFortressManager {
@@ -34,6 +33,8 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
 
+    private boolean needSyncBuildings = false;
+
     private int maxX = Integer.MIN_VALUE;
     private int maxZ = Integer.MIN_VALUE;
     private int minX = Integer.MAX_VALUE;
@@ -47,6 +48,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(end.getX() > maxX) maxX = end.getX();
         if(end.getZ() > maxZ) maxZ = end.getZ();
         buildings.add(building);
+        this.scheduleSyncBuildings();
     }
 
     public Optional<FortressBedInfo> getFreeBed(){
@@ -67,6 +69,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(!needSync) return;
         final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
+        if (needSyncBuildings) {
+            final ClientboundSyncBuildingsPacket syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
+        }
         needSync = false;
     }
 
@@ -114,6 +120,11 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private void scheduleSync() {
         needSync = true;
+    }
+
+    private void scheduleSyncBuildings() {
+        needSyncBuildings = true;
+        this.scheduleSync();
     }
 
     public void writeToNbt(NbtCompound tag) {
