@@ -157,6 +157,7 @@ public class FortressHud {
 
     public void onClick(double mouseX, double mouseY) {
         this.toolsGui.onClick(mouseX, mouseY);
+        this.colonistsGui.onClick(mouseX, mouseY);
     }
 
     private TextRenderer getTextRenderer() {
