@@ -23,6 +23,22 @@ public class ProfessionsLayer {
 
     private boolean initialized = false;
 
+    private ProfessionWidget root;
+
+    public ProfessionsLayer() {
+        root = new ProfessionWidget();
+
+        final ProfessionWidget child1 = new ProfessionWidget();
+        final ProfessionWidget child2 = new ProfessionWidget();
+        child1.setParent(root);
+        child2.setParent(root);
+
+        root.addChild(child1);
+        root.addChild(child2);
+
+        ProfessionsPositioner.arrangeForTree(root);
+    }
+
     public void render(MatrixStack matrices) {
         this.init();
         matrices.push();
@@ -42,7 +58,8 @@ public class ProfessionsLayer {
             }
         }
 
-
+        this.root.renderLines(matrices, originX, originY, true);
+        this.root.renderLines(matrices, originX, originY, false);
 
         maskAfter(matrices);
         matrices.pop();
