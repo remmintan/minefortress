@@ -15,6 +15,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.tasks.BuildingManager;
 
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public final class FortressClientManager extends AbstractFortressManager {
+
+    private final ClientProfessionManager professionManager = new ClientProfessionManager();
 
     private boolean initialized = false;
 
@@ -179,6 +182,10 @@ public final class FortressClientManager extends AbstractFortressManager {
         }
 
         return Collections.emptyList();
+    }
+
+    public ClientProfessionManager getProfessionManager() {
+        return professionManager;
     }
 
     private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
