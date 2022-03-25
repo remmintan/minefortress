@@ -42,8 +42,6 @@ public class ProfessionsLayer {
     public void render(MatrixStack matrices) {
         this.init();
         matrices.push();
-        matrices.translate(0.0, 0.0, 950.0);
-
         maskBefore(matrices);
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -60,6 +58,7 @@ public class ProfessionsLayer {
 
         this.root.renderLines(matrices, originX, originY, true);
         this.root.renderLines(matrices, originX, originY, false);
+        this.root.renderWidgets(matrices, originX, originY);
 
         maskAfter(matrices);
         matrices.pop();
@@ -75,6 +74,7 @@ public class ProfessionsLayer {
     }
 
     private void maskBefore(MatrixStack matrices) {
+        matrices.translate(0.0, 0.0, 950.0);
         RenderSystem.enableDepthTest();
         RenderSystem.colorMask(false, false, false, false);
         AdvancementTab.fill(matrices, 4680, 2260, -4680, -2260, 0xff000000);

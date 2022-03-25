@@ -1,13 +1,25 @@
 package org.minefortress.renderer.gui.professions;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.advancement.AdvancementFrame;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProfessionWidget extends DrawableHelper {
+
+    private static final Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/advancements/widgets.png");
 
     private ProfessionWidget parent;
     private final List<ProfessionWidget> children = new ArrayList<>();
@@ -41,6 +53,32 @@ public class ProfessionWidget extends DrawableHelper {
         for (ProfessionWidget child : this.children) {
             child.renderLines(matrices, x, y, bl);
         }
+    }
+
+    public void renderWidgets(MatrixStack matrices, int x, int y){
+        AdvancementObtainedStatus status = AdvancementObtainedStatus.OBTAINED;
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
+        this.drawTexture(matrices, x + this.x + 3, y + this.y, AdvancementFrame.TASK.getTextureV(), 128 + status.getSpriteIndex() * 26, 26, 26);
+
+        getItemRenderer().renderInGui(new ItemStack(Items.WOODEN_AXE), x + this.x + 8, y + this.y + 5);
+        getTextRenderer().draw(matrices, "0", x + this.x + 8, y + this.y + 5, 0xFFFFFF);
+
+        for (ProfessionWidget advancementWidget : this.children) {
+            advancementWidget.renderWidgets(matrices, x, y);
+        }
+    }
+
+    private ItemRenderer getItemRenderer() {
+        return getInstance().getItemRenderer();
+    }
+
+    private TextRenderer getTextRenderer() {
+        return getInstance().textRenderer;
+    }
+
+    private MinecraftClient getInstance() {
+        return MinecraftClient.getInstance();
     }
 
     public void setParent(ProfessionWidget parent) {
