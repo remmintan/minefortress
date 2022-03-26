@@ -192,4 +192,11 @@ public class ProfessionWidget extends DrawableHelper {
         }
     }
 
+    int getX() {
+        return x;
+    }
+
+    int getY() {
+        return y;
+    }
 }

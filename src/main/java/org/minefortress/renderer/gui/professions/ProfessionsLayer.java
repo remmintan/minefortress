@@ -43,6 +43,16 @@ public class ProfessionsLayer {
         ProfessionWidget root = createProfessionsTree(professionManager);
 
         ProfessionsPositioner.arrangeForTree(root);
+        for(ProfessionWidget widget:widgets) {
+            final int x = widget.getX();
+            final int y = widget.getY();
+            this.minPanX = Math.min(this.minPanX, x);
+            this.maxPanX = Math.max(this.maxPanX, x + 28);
+            this.minPanY = Math.min(this.minPanY, y);
+            this.maxPanY = Math.max(this.maxPanY, y + 27);
+        }
+
+        this.maxPanX += 40;
         this.root = root;
     }
 
