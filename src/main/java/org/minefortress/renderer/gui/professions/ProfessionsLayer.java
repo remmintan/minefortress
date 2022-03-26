@@ -11,6 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ClientProfessionManager;
+import org.minefortress.professions.Profession;
+
+import java.util.List;
 
 public class ProfessionsLayer {
 
@@ -91,114 +94,26 @@ public class ProfessionsLayer {
         }
     }
 
-    /**
-     * colonist -> miner1, lumberjack1, forester, crafter
-     * miner1 -> miner2
-     * lumberjack1 -> lumberjack2
-     * forester -> hunter, fisherman, farmer
-     * crafter -> leather_worker1
-     * miner2 -> miner3
-     * lumberjack2 -> lumberjack3
-     * hunter -> warrior1, archer1, knight1
-     * farmer -> baker, shepherd
-     * leather_worker1 -> leather_worker2, blacksmith, weaver
-     * warrior1 -> warrior2
-     * archer1 -> archer2
-     * knight1 -> knight2
-     * shepherd -> stableman, butcher
-     * blacksmith -> armorer
-     * weaver -> tailor
-     * butcher -> cook
-     */
     @NotNull
     private ProfessionWidget createProfessionsTree(ClientProfessionManager professionManager) {
-        ProfessionWidget root = new ProfessionWidget(professionManager.getProfession("colonist"));
+        final Profession rootProfession = professionManager.getRootProfession();
+        final ProfessionWidget rootWidget = new ProfessionWidget(rootProfession);
 
-        // colonist -> miner1, lumberjack1, forester, crafter
-        final ProfessionWidget miner1 = new ProfessionWidget(professionManager.getProfession("miner1"));
-        final ProfessionWidget lumberjack1 = new ProfessionWidget(professionManager.getProfession("lumberjack1"));
-        final ProfessionWidget forester = new ProfessionWidget(professionManager.getProfession("forester"));
-        final ProfessionWidget crafter = new ProfessionWidget(professionManager.getProfession("crafter"));
-        addChildren(root, miner1, lumberjack1, forester, crafter);
+        createTreeNode(rootWidget, rootProfession);
 
-        // miner1 -> miner2
-        final ProfessionWidget miner2 = new ProfessionWidget(professionManager.getProfession("miner2"));
-        addChildren(miner1, miner2);
-
-        // lumberjack1 -> lumberjack2
-        final ProfessionWidget lumberjack2 = new ProfessionWidget(professionManager.getProfession("lumberjack2"));
-        addChildren(lumberjack1, lumberjack2);
-
-        // forester -> hunter, fisherman, farmer
-        final ProfessionWidget hunter = new ProfessionWidget(professionManager.getProfession("hunter"));
-        final ProfessionWidget fisherman = new ProfessionWidget(professionManager.getProfession("fisherman"));
-        final ProfessionWidget farmer = new ProfessionWidget(professionManager.getProfession("farmer"));
-        addChildren(forester, hunter, fisherman, farmer);
-
-        // crafter -> leather_worker1
-        final ProfessionWidget leather_worker1 = new ProfessionWidget(professionManager.getProfession("leather_worker1"));
-        addChildren(crafter, leather_worker1);
-
-        // miner2 -> miner3
-        final ProfessionWidget miner3 = new ProfessionWidget(professionManager.getProfession("miner3"));
-        addChildren(miner2, miner3);
-
-        // lumberjack2 -> lumberjack3
-        final ProfessionWidget lumberjack3 = new ProfessionWidget(professionManager.getProfession("lumberjack3"));
-        addChildren(lumberjack2, lumberjack3);
-
-        // hunter -> warrior1, archer1, knight1
-        final ProfessionWidget warrior1 = new ProfessionWidget(professionManager.getProfession("warrior1"));
-        final ProfessionWidget archer1 = new ProfessionWidget(professionManager.getProfession("archer1"));
-        final ProfessionWidget knight1 = new ProfessionWidget(professionManager.getProfession("knight1"));
-        addChildren(hunter, warrior1, archer1, knight1);
-
-        // farmer -> baker, shepherd
-        final ProfessionWidget baker = new ProfessionWidget(professionManager.getProfession("baker"));
-        final ProfessionWidget shepherd = new ProfessionWidget(professionManager.getProfession("shepherd"));
-        addChildren(farmer, baker, shepherd);
-
-        // leather_worker1 -> leather_worker2, blacksmith, weaver
-        final ProfessionWidget leather_worker2 = new ProfessionWidget(professionManager.getProfession("leather_worker2"));
-        final ProfessionWidget blacksmith = new ProfessionWidget(professionManager.getProfession("blacksmith"));
-        final ProfessionWidget weaver = new ProfessionWidget(professionManager.getProfession("weaver"));
-        addChildren(leather_worker1, leather_worker2, blacksmith, weaver);
-
-        // warrior1 -> warrior2
-        final ProfessionWidget warrior2 = new ProfessionWidget(professionManager.getProfession("warrior2"));
-        addChildren(warrior1, warrior2);
-
-        // archer1 -> archer2
-        final ProfessionWidget archer2 = new ProfessionWidget(professionManager.getProfession("archer2"));
-        addChildren(archer1, archer2);
-
-        // knight1 -> knight2
-        final ProfessionWidget knight2 = new ProfessionWidget(professionManager.getProfession("knight2"));
-        addChildren(knight1, knight2);
-
-        // shepherd -> stableman, butcher
-        final ProfessionWidget stableman = new ProfessionWidget(professionManager.getProfession("stableman"));
-        final ProfessionWidget butcher = new ProfessionWidget(professionManager.getProfession("butcher"));
-        addChildren(shepherd, stableman, butcher);
-
-        // blacksmith -> armorer
-        final ProfessionWidget armorer = new ProfessionWidget(professionManager.getProfession("armorer"));
-        addChildren(blacksmith, armorer);
-
-        // weaver -> tailor
-        final ProfessionWidget tailor = new ProfessionWidget(professionManager.getProfession("tailor"));
-        addChildren(weaver, tailor);
-
-        // butcher -> cook
-        final ProfessionWidget cook = new ProfessionWidget(professionManager.getProfession("cook"));
-        addChildren(butcher, cook);
-        return root;
+        return rootWidget;
     }
 
-    private void addChildren(ProfessionWidget root, ProfessionWidget... children) {
-        for(ProfessionWidget child : children) {
-            child.setParent(root);
-            root.addChild(child);
+    private void createTreeNode(ProfessionWidget parentWidget, Profession parent) {
+        final List<Profession> children = parent.getChildren();
+
+        for(Profession child:children) {
+            final ProfessionWidget childWidget = new ProfessionWidget(child);
+
+            childWidget.setParent(parentWidget);
+            parentWidget.addChild(childWidget);
+
+            createTreeNode(childWidget, child);
         }
     }
 
