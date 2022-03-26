@@ -1,7 +1,6 @@
 package org.minefortress.renderer.gui.professions;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -19,14 +18,11 @@ public class ProfessionsScreen extends Screen {
 
     private final ProfessionsLayer professionsLayer;
 
+    private boolean movingLayer = false;
+
     public ProfessionsScreen(FortressMinecraftClient client) {
         super(new LiteralText("Professions"));
         this.professionsLayer = new ProfessionsLayer(client);
-    }
-
-    @Override
-    protected void init() {
-
     }
 
     @Override
@@ -36,6 +32,20 @@ public class ProfessionsScreen extends Screen {
         this.renderBackground(matrices);
         this.drawProfessionsTree(matrices, mouseX, mouseY, screenX, screenY);
         this.drawWindowAndTitle(matrices, screenX, screenY);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (button != 0) {
+            this.movingLayer = false;
+            return false;
+        }
+        if (!this.movingLayer) {
+            this.movingLayer = true;
+        } else {
+            this.professionsLayer.move(deltaX, deltaY);
+        }
+        return true;
     }
 
     private void drawProfessionsTree(MatrixStack matrices, int mouseX, int mouseY, int screenX, int screenY) {
