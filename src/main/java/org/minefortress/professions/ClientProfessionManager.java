@@ -46,12 +46,133 @@ public class ClientProfessionManager {
             entry("knight2", new Profession("Knight - LVL2", Items.DIAMOND_HORSE_ARMOR))
     );
 
+    private final Profession root;
+
+    public ClientProfessionManager() {
+        this.root = this.createProfessionTree();
+    }
+
+    public Profession getRootProfession() {
+        return this.root;
+    }
+
     public static AdvancementObtainedStatus getStatus(Profession profession) {
         return AdvancementObtainedStatus.OBTAINED;
     }
 
-    public Profession getProfession(String name) {
+    private Profession getProfession(String name) {
         return professions.get(name);
+    }
+
+    /**
+     * colonist -> miner1, lumberjack1, forester, crafter
+     * miner1 -> miner2
+     * lumberjack1 -> lumberjack2
+     * forester -> hunter, fisherman, farmer
+     * crafter -> leather_worker1
+     * miner2 -> miner3
+     * lumberjack2 -> lumberjack3
+     * hunter -> warrior1, archer1, knight1
+     * farmer -> baker, shepherd
+     * leather_worker1 -> leather_worker2, blacksmith, weaver
+     * warrior1 -> warrior2
+     * archer1 -> archer2
+     * knight1 -> knight2
+     * shepherd -> stableman, butcher
+     * blacksmith -> armorer
+     * weaver -> tailor
+     * butcher -> cook
+     */
+    private Profession createProfessionTree() {
+        Profession colonist = getProfession("colonist");
+
+        // colonist -> miner1, lumberjack1, forester, crafter
+        Profession miner1 = getProfession("miner1");
+        Profession lumberjack1 = getProfession("lumberjack1");
+        Profession forester = getProfession("forester");
+        Profession crafter = getProfession("crafter");
+        addChildren(colonist, miner1, lumberjack1, forester, crafter);
+
+        // miner1 -> miner2
+        Profession miner2 = getProfession("miner2");
+        addChildren(miner1, miner2);
+
+        // lumberjack1 -> lumberjack2
+        Profession lumberjack2 = getProfession("lumberjack2");
+        addChildren(lumberjack1, lumberjack2);
+
+        // forester -> hunter, fisherman, farmer
+        Profession hunter = getProfession("hunter");
+        Profession fisherman = getProfession("fisherman");
+        Profession farmer = getProfession("farmer");
+        addChildren(forester, hunter, fisherman, farmer);
+
+        // crafter -> leather_worker1
+        Profession leather_worker1 = getProfession("leather_worker1");
+        addChildren(crafter, leather_worker1);
+
+        // miner2 -> miner3
+        Profession miner3 = getProfession("miner3");
+        addChildren(miner2, miner3);
+
+        // lumberjack2 -> lumberjack3
+        Profession lumberjack3 = getProfession("lumberjack3");
+        addChildren(lumberjack2, lumberjack3);
+
+        // hunter -> warrior1, archer1, knight1
+        Profession warrior1 = getProfession("warrior1");
+        Profession archer1 = getProfession("archer1");
+        Profession knight1 = getProfession("knight1");
+        addChildren(hunter, warrior1, archer1, knight1);
+
+        // farmer -> baker, shepherd
+        Profession baker = getProfession("baker");
+        Profession shepherd = getProfession("shepherd");
+        addChildren(farmer, baker, shepherd);
+
+        // leather_worker1 -> leather_worker2, blacksmith, weaver
+        Profession leather_worker2 = getProfession("leather_worker2");
+        Profession blacksmith = getProfession("blacksmith");
+        Profession weaver = getProfession("weaver");
+        addChildren(leather_worker1, leather_worker2, blacksmith, weaver);
+
+        // warrior1 -> warrior2
+        Profession warrior2 = getProfession("warrior2");
+        addChildren(warrior1, warrior2);
+
+        // archer1 -> archer2
+        Profession archer2 = getProfession("archer2");
+        addChildren(archer1, archer2);
+
+        // knight1 -> knight2
+        Profession knight2 = getProfession("knight2");
+        addChildren(knight1, knight2);
+
+        // shepherd -> stableman, butcher
+        Profession stableman = getProfession("stableman");
+        Profession butcher = getProfession("butcher");
+        addChildren(shepherd, stableman, butcher);
+
+        // blacksmith -> armorer
+        Profession armorer = getProfession("armorer");
+        addChildren(blacksmith, armorer);
+
+        // weaver -> tailor
+        Profession tailor = getProfession("tailor");
+        addChildren(weaver, tailor);
+
+        // butcher -> cook
+        Profession cook = getProfession("cook");
+        addChildren(butcher, cook);
+
+        return colonist;
+    }
+
+    private void addChildren(Profession parent, Profession... children) {
+        for (Profession child : children) {
+            parent.addChild(child);
+            child.setParent(parent);
+        }
     }
 
 }

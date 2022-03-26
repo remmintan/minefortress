@@ -4,12 +4,19 @@ import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class Profession {
 
     private final String title;
     private final ItemStack icon;
     private int amount = 0;
     private AdvancementFrame type = AdvancementFrame.TASK;
+
+    private Profession parent;
+    private final List<Profession> children = new ArrayList<>();
 
     public Profession(String title, Item icon) {
         this.title = title;
@@ -34,5 +41,19 @@ public class Profession {
 
     public AdvancementFrame getType() {
         return type;
+    }
+
+    public void setParent(Profession profession) {
+        if(this.parent != null)
+            throw new IllegalStateException("Profession already has a parent");
+        this.parent = profession;
+    }
+
+    public void addChild(Profession profession) {
+        this.children.add(profession);
+    }
+
+    public List<Profession> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 }
