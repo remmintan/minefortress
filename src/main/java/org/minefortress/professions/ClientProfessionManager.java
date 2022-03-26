@@ -24,8 +24,9 @@ public class ClientProfessionManager {
             entry("hunter", new Profession("Hunter", Items.BOW)),
             entry("fisherman", new Profession("Fisherman", Items.FISHING_ROD)),
             entry("farmer", new Profession("Farmer", Items.WHEAT)),
-            entry("stableman", new Profession("Stableman", Items.LEAD)),
+            entry("baker", new Profession("Baker", Items.BREAD)),
             entry("shepherd", new Profession("Shepherd", Items.CARROT_ON_A_STICK)),
+            entry("stableman", new Profession("Stableman", Items.LEAD)),
             entry("butcher", new Profession("Butcher", Items.BEEF)),
             entry("cook", new Profession("Cook", Items.COOKED_BEEF)),
             // craft / smith
@@ -45,7 +46,7 @@ public class ClientProfessionManager {
             entry("knight2", new Profession("Knight - LVL2", Items.DIAMOND_HORSE_ARMOR))
     );
 
-    public AdvancementObtainedStatus getStatus(Profession profession) {
+    public static AdvancementObtainedStatus getStatus(Profession profession) {
         return AdvancementObtainedStatus.OBTAINED;
     }
 

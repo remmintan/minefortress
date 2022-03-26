@@ -13,6 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import org.minefortress.professions.ClientProfessionManager;
+import org.minefortress.professions.Profession;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +25,14 @@ public class ProfessionWidget extends DrawableHelper {
 
     private ProfessionWidget parent;
     private final List<ProfessionWidget> children = new ArrayList<>();
+    private final Profession profession;
 
     private int x = 0;
     private int y = 0;
+
+    public ProfessionWidget(Profession profession) {
+        this.profession = profession;
+    }
 
     public void renderLines(MatrixStack matrices, int x, int y, boolean bl) {
         if (this.parent != null) {
@@ -56,13 +63,14 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     public void renderWidgets(MatrixStack matrices, int x, int y){
-        AdvancementObtainedStatus status = AdvancementObtainedStatus.OBTAINED;
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
-        this.drawTexture(matrices, x + this.x + 3, y + this.y, AdvancementFrame.TASK.getTextureV(), 128 + status.getSpriteIndex() * 26, 26, 26);
+        final int v = 128 + ClientProfessionManager.getStatus(profession).getSpriteIndex() * 26;
+        final int u = profession.getType().getTextureV();
+        this.drawTexture(matrices, x + this.x + 3, y + this.y, u, v, 26, 26);
 
-        getItemRenderer().renderInGui(new ItemStack(Items.WOODEN_AXE), x + this.x + 8, y + this.y + 5);
-        getTextRenderer().draw(matrices, "0", x + this.x + 8, y + this.y + 5, 0xFFFFFF);
+        getItemRenderer().renderInGui(profession.getIcon(), x + this.x + 8, y + this.y + 5);
+        getTextRenderer().draw(matrices, ""+profession.getAmount(), x + this.x + 8, y + this.y + 5, 0xFFFFFF);
 
         for (ProfessionWidget advancementWidget : this.children) {
             advancementWidget.renderWidgets(matrices, x, y);
