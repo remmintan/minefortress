@@ -65,6 +65,15 @@ public class ProfessionsLayer {
         matrices.pop();
     }
 
+    public void move(double offsetX, double offsetY) {
+        if (this.maxPanX - this.minPanX > 234) {
+            this.originX = MathHelper.clamp(this.originX + offsetX, (double)(-(this.maxPanX - 234)), 0.0);
+        }
+        if (this.maxPanY - this.minPanY > 113) {
+            this.originY = MathHelper.clamp(this.originY + offsetY, (double)(-(this.maxPanY - 113)), 0.0);
+        }
+    }
+
     private void maskAfter(MatrixStack matrices) {
         RenderSystem.depthFunc(GL11.GL_GEQUAL);
         matrices.translate(0.0, 0.0, -950.0);
