@@ -3,17 +3,29 @@ package org.minefortress.professions;
 import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.LiteralText;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Profession {
 
     private final String title;
     private final ItemStack icon;
     private int amount = 0;
-    private AdvancementFrame type = AdvancementFrame.TASK;
+    private final AdvancementFrame type = AdvancementFrame.TASK;
+    private final List<LiteralText> description = Collections.unmodifiableList(
+            Stream.of(
+                "Test description",
+                "Test description",
+                "Test description"
+            )
+            .map(LiteralText::new)
+            .collect(Collectors.toList())
+    );
 
     private Profession parent;
     private final List<Profession> children = new ArrayList<>();
@@ -55,5 +67,9 @@ public class Profession {
 
     public List<Profession> getChildren() {
         return Collections.unmodifiableList(children);
+    }
+
+    public List<LiteralText> getDescription() {
+        return description;
     }
 }

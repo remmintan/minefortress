@@ -32,6 +32,7 @@ public class ProfessionsScreen extends Screen {
         this.renderBackground(matrices);
         this.drawProfessionsTree(matrices, mouseX, mouseY, screenX, screenY);
         this.drawWindowAndTitle(matrices, screenX, screenY);
+        this.drawWidgetTooltip(matrices, mouseX, mouseY, screenX, screenY);
     }
 
     @Override
@@ -67,6 +68,19 @@ public class ProfessionsScreen extends Screen {
         RenderSystem.setShaderTexture(0, WINDOW_TEXTURE);
         this.drawTexture(matrices, screenX, screenY, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         this.textRenderer.draw(matrices, this.title, (float)(screenX + 8), (float)(screenY + 6), 0x404040);
+    }
+
+    private void drawWidgetTooltip(MatrixStack matrices, int mouseX, int mouseY, int screenX, int screenY) {
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        MatrixStack matrixStack = RenderSystem.getModelViewStack();
+        matrixStack.push();
+        matrixStack.translate(screenX + 9, screenY + 18, 400.0);
+        RenderSystem.applyModelViewMatrix();
+        RenderSystem.enableDepthTest();
+        this.professionsLayer.drawWidgetTooltip(matrices, mouseX - screenX - 9, mouseY - screenX - 18, screenX, screenY, width);
+        RenderSystem.disableDepthTest();
+        matrixStack.pop();
+        RenderSystem.applyModelViewMatrix();
     }
 
 }
