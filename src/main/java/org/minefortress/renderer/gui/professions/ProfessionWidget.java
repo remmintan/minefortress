@@ -4,9 +4,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.OrderedText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.minefortress.professions.ClientProfessionManager;
@@ -26,8 +29,17 @@ public class ProfessionWidget extends DrawableHelper {
     private int x = 0;
     private int y = 0;
 
+    private final int width;
+    private final MinecraftClient client;
+
     public ProfessionWidget(Profession profession) {
         this.profession = profession;
+        client = MinecraftClient.getInstance();
+        int maxTextLength = 29 + client.textRenderer.getWidth(profession.getTitle());
+        for(LiteralText text : this.profession.getDescription()) {
+            maxTextLength = Math.max(maxTextLength, client.textRenderer.getWidth(text));
+        }
+        this.width = maxTextLength + 8;
     }
 
     public void renderLines(MatrixStack matrices, int x, int y, boolean bl) {
@@ -85,11 +97,11 @@ public class ProfessionWidget extends DrawableHelper {
         return MinecraftClient.getInstance();
     }
 
-    public void setParent(ProfessionWidget parent) {
+    void setParent(ProfessionWidget parent) {
         this.parent = parent;
     }
 
-    public void addChild(ProfessionWidget child) {
+    void addChild(ProfessionWidget child) {
         children.add(child);
     }
 
@@ -100,6 +112,84 @@ public class ProfessionWidget extends DrawableHelper {
     void setPos(int column, float row){
         this.x = MathHelper.floor(column * 28.0f);
         this.y = MathHelper.floor(row * 27.0f);
+    }
+
+    boolean shouldRender(int originX, int originY, int mouseX, int mouseY) {
+        int i = originX + this.x;
+        int j = i + 26;
+        int k = originY + this.y;
+        int l = k + 26;
+        return mouseX >= i && mouseX <= j && mouseY >= k && mouseY <= l;
+    }
+
+    public void drawTooltip(MatrixStack matrices, int originX, int originY, float alpha, int x, int y, int screenWidth) {
+        AdvancementObtainedStatus status = AdvancementObtainedStatus.OBTAINED;
+        AdvancementObtainedStatus status2 = AdvancementObtainedStatus.OBTAINED;
+        AdvancementObtainedStatus status3 = AdvancementObtainedStatus.OBTAINED;
+        int j = MathHelper.floor((float)this.width);
+        int k = this.width - j;
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.enableBlend();
+        int l = originY + this.y;
+        boolean bl = x + originX + this.x + this.width + 26 >= screenWidth;
+        int m = bl ? originX + this.x - this.width + 26 + 6 : originX + this.x;
+
+        final String title = this.profession.getTitle();
+        final List<LiteralText> description = this.profession.getDescription();
+
+        int n = 32 + description.size() * this.client.textRenderer.fontHeight;
+        boolean bl2 = 113 - originY - this.y - 26 <= 6 + description.size() * client.textRenderer.fontHeight;
+        if (!description.isEmpty()) {
+            if (bl2) {
+                this.method_2324(matrices, m, l + 26 - n, this.width, n, 10, 200, 26, 0, 52);
+            } else {
+                this.method_2324(matrices, m, l, this.width, n, 10, 200, 26, 0, 52);
+            }
+        }
+        this.drawTexture(matrices, m, l, 0, status.getSpriteIndex() * 26, j, 26);
+        this.drawTexture(matrices, m + j, l, 200 - k, status2.getSpriteIndex() * 26, k, 26);
+        this.drawTexture(matrices, originX + this.x + 3, originY + this.y, this.profession.getType().getTextureV(), 128 + status3.getSpriteIndex() * 26, 26, 26);
+        if (bl) {
+            this.client.textRenderer.drawWithShadow(matrices, title, (float)(m + 5), (float)(originY + this.y + 9), -1);
+        } else {
+            this.client.textRenderer.drawWithShadow(matrices, title, (float)(originX + this.x + 32), (float)(originY + this.y + 9), -1);
+        }
+        if (bl2) {
+            for (int o = 0; o < description.size(); ++o) {
+                this.client.textRenderer.draw(matrices, description.get(o), (float)(m + 5), (float)(l + 26 - n + 7 + o * this.client.textRenderer.fontHeight), -5592406);
+            }
+        } else {
+            for (int o = 0; o < description.size(); ++o) {
+                this.client.textRenderer.draw(matrices, description.get(o), (float)(m + 5), (float)(originY + this.y + 9 + 17 + o * this.client.textRenderer.fontHeight), -5592406);
+            }
+        }
+        this.client.getItemRenderer().renderInGui(this.profession.getIcon(), originX + this.x + 8, originY + this.y + 5);
+    }
+
+    protected void method_2324(MatrixStack matrices, int x, int y, int i, int j, int k, int l, int m, int n, int o) {
+        this.drawTexture(matrices, x, y, n, o, k, k);
+        this.method_2321(matrices, x + k, y, i - k - k, k, n + k, o, l - k - k, m);
+        this.drawTexture(matrices, x + i - k, y, n + l - k, o, k, k);
+        this.drawTexture(matrices, x, y + j - k, n, o + m - k, k, k);
+        this.method_2321(matrices, x + k, y + j - k, i - k - k, k, n + k, o + m - k, l - k - k, m);
+        this.drawTexture(matrices, x + i - k, y + j - k, n + l - k, o + m - k, k, k);
+        this.method_2321(matrices, x, y + k, k, j - k - k, n, o + k, l, m - k - k);
+        this.method_2321(matrices, x + k, y + k, i - k - k, j - k - k, n + k, o + k, l - k - k, m - k - k);
+        this.method_2321(matrices, x + i - k, y + k, k, j - k - k, n + l - k, o + k, l, m - k - k);
+    }
+
+    protected void method_2321(MatrixStack matrices, int x, int y, int i, int j, int k, int l, int m, int n) {
+        for (int o = 0; o < i; o += m) {
+            int p = x + o;
+            int q = Math.min(m, i - o);
+            for (int r = 0; r < j; r += n) {
+                int s = y + r;
+                int t = Math.min(n, j - r);
+                this.drawTexture(matrices, p, s, k, l, q, t);
+            }
+        }
     }
 
 }

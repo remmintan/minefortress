@@ -3,6 +3,7 @@ package org.minefortress.renderer.gui.professions;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
+import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -13,11 +14,17 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.Profession;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class ProfessionsLayer {
 
     private static final Identifier LAYER_BACKGROUND = new Identifier("textures/gui/advancements/backgrounds/stone.png");
+    private final static int LAYER_WIDTH = 234;
+    private final static int LAYER_HEIGHT = 113;
+
+    private final ProfessionWidget root;
+    private final List<ProfessionWidget> widgets = new LinkedList<>();
 
     private int minPanX = Integer.MAX_VALUE;
     private int minPanY = Integer.MAX_VALUE;
@@ -26,10 +33,9 @@ public class ProfessionsLayer {
 
     private double originX;
     private double originY;
-
     private boolean initialized = false;
 
-    private final ProfessionWidget root;
+    private float alpha;
 
 
     public ProfessionsLayer(FortressMinecraftClient client) {
@@ -66,11 +72,11 @@ public class ProfessionsLayer {
     }
 
     public void move(double offsetX, double offsetY) {
-        if (this.maxPanX - this.minPanX > 234) {
-            this.originX = MathHelper.clamp(this.originX + offsetX, (double)(-(this.maxPanX - 234)), 0.0);
+        if (this.maxPanX - this.minPanX > LAYER_WIDTH) {
+            this.originX = MathHelper.clamp(this.originX + offsetX, (double)(-(this.maxPanX - LAYER_WIDTH)), 0.0);
         }
-        if (this.maxPanY - this.minPanY > 113) {
-            this.originY = MathHelper.clamp(this.originY + offsetY, (double)(-(this.maxPanY - 113)), 0.0);
+        if (this.maxPanY - this.minPanY > LAYER_HEIGHT) {
+            this.originY = MathHelper.clamp(this.originY + offsetY, (double)(-(this.maxPanY - LAYER_HEIGHT)), 0.0);
         }
     }
 
@@ -91,7 +97,7 @@ public class ProfessionsLayer {
         RenderSystem.colorMask(true, true, true, true);
         matrices.translate(0.0, 0.0, -950.0);
         RenderSystem.depthFunc(GL11.GL_GEQUAL);
-        AdvancementTab.fill(matrices, 234, 113, 0, 0, 0xff000000);
+        AdvancementTab.fill(matrices, LAYER_WIDTH, LAYER_HEIGHT, 0, 0, 0xff000000);
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
     }
 
@@ -115,7 +121,7 @@ public class ProfessionsLayer {
 
     private void createTreeNode(ProfessionWidget parentWidget, Profession parent) {
         final List<Profession> children = parent.getChildren();
-
+        this.widgets.add(parentWidget);
         for(Profession child:children) {
             final ProfessionWidget childWidget = new ProfessionWidget(child);
 
@@ -124,6 +130,27 @@ public class ProfessionsLayer {
 
             createTreeNode(childWidget, child);
         }
+    }
+
+    public void drawWidgetTooltip(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int screenWidth) {
+        matrices.push();
+        matrices.translate(0.0, 0.0, -200.0);
+        AdvancementTab.fill(matrices, 0, 0, LAYER_WIDTH, LAYER_HEIGHT, MathHelper.floor(this.alpha * 255.0f) << 24);
+
+        int oX = MathHelper.floor(this.originX);
+        int oY = MathHelper.floor(this.originY);
+        boolean bl = false;
+        if (mouseX > 0 && mouseX < LAYER_WIDTH && mouseY > 0 && mouseY < LAYER_HEIGHT) {
+            for (ProfessionWidget advancementWidget : this.widgets) {
+                if (!advancementWidget.shouldRender(oX, oY, mouseX, mouseY)) continue;
+                bl = true;
+                advancementWidget.drawTooltip(matrices, oX, oY, this.alpha, x, y, screenWidth);
+                break;
+            }
+        }
+        matrices.pop();
+
+        this.alpha = bl ? MathHelper.clamp(this.alpha + 0.02f, 0.0f, 0.3f) : MathHelper.clamp(this.alpha - 0.04f, 0.0f, 1.0f);
     }
 
 }
