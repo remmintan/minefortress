@@ -35,7 +35,7 @@ public class ColonistsGui extends FortressGuiScreen{
                 0,
                 Items.CRAFTING_TABLE,
                 itemRenderer,
-                btn -> client.setScreen(new ProfessionsScreen()),
+                btn -> client.setScreen(new ProfessionsScreen(getFortressClient())),
                 (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Manage professions"), mouseX, mouseY),
                 Text.of("")
         );
@@ -130,8 +130,12 @@ public class ColonistsGui extends FortressGuiScreen{
     }
 
     private FortressClientManager getFortressClientManager() {
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final FortressMinecraftClient fortressClient = getFortressClient();
         return fortressClient.getFortressClientManager();
+    }
+
+    private FortressMinecraftClient getFortressClient() {
+        return (FortressMinecraftClient) this.client;
     }
 
     @Override

@@ -1,12 +1,14 @@
 package org.minefortress.renderer.gui.professions;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
+import org.minefortress.interfaces.FortressMinecraftClient;
 
 public class ProfessionsScreen extends Screen {
 
@@ -15,10 +17,11 @@ public class ProfessionsScreen extends Screen {
     private static final int WINDOW_WIDTH = 252;
     private static final int WINDOW_HEIGHT = 140;
 
-    private final ProfessionsLayer professionsLayer = new ProfessionsLayer();
+    private final ProfessionsLayer professionsLayer;
 
-    public ProfessionsScreen() {
+    public ProfessionsScreen(FortressMinecraftClient client) {
         super(new LiteralText("Professions"));
+        this.professionsLayer = new ProfessionsLayer(client);
     }
 
     @Override
