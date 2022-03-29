@@ -17,7 +17,7 @@ import org.minefortress.professions.Profession;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ProfessionsLayer {
+public class ProfessionsLayer extends DrawableHelper {
 
     private static final Identifier LAYER_BACKGROUND = new Identifier("textures/gui/advancements/backgrounds/stone.png");
     private final static int LAYER_WIDTH = 234;
@@ -47,9 +47,9 @@ public class ProfessionsLayer {
             final int x = widget.getX();
             final int y = widget.getY();
             this.minPanX = Math.min(this.minPanX, x);
-            this.maxPanX = Math.max(this.maxPanX, x + 28);
+            this.maxPanX = Math.max(this.maxPanX, x + (int)ProfessionWidget.PROFESSION_WIDGET_WIDTH);
             this.minPanY = Math.min(this.minPanY, y);
-            this.maxPanY = Math.max(this.maxPanY, y + 27);
+            this.maxPanY = Math.max(this.maxPanY, y + (int)ProfessionWidget.PROFESSION_WIDGET_HEIGHT);
         }
 
         this.maxPanX += 40;
@@ -69,7 +69,7 @@ public class ProfessionsLayer {
         int startY = originY % 16;
         for (int x = -1; x <= 15; ++x) {
             for (int y = -1; y <= 8; ++y) {
-                DrawableHelper.drawTexture(matrices, startX + 16 * x, startY + 16 * y, 0.0f, 0.0f, 16, 16, 16, 16);
+                ProfessionsLayer.drawTexture(matrices, startX + 16 * x, startY + 16 * y, 0.0f, 0.0f, 16, 16, 16, 16);
             }
         }
 
@@ -150,6 +150,7 @@ public class ProfessionsLayer {
         int oX = MathHelper.floor(this.originX);
         int oY = MathHelper.floor(this.originY);
         boolean bl = false;
+        mouseY = mouseY + 35;
         if (mouseX > 0 && mouseX < LAYER_WIDTH && mouseY > 0 && mouseY < LAYER_HEIGHT) {
             for (ProfessionWidget advancementWidget : this.widgets) {
                 if (!advancementWidget.shouldRender(oX, oY, mouseX, mouseY)) continue;
