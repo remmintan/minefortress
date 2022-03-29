@@ -20,6 +20,8 @@ import java.util.List;
 
 public class ProfessionWidget extends DrawableHelper {
 
+    public static final float PROFESSION_WIDGET_WIDTH = 28f;
+    public static final float PROFESSION_WIDGET_HEIGHT = 35f;
     private static final Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/advancements/widgets.png");
 
     private ProfessionWidget parent;
@@ -78,7 +80,10 @@ public class ProfessionWidget extends DrawableHelper {
         this.drawTexture(matrices, x + this.x + 3, y + this.y, u, v, 26, 26);
 
         getItemRenderer().renderInGui(profession.getIcon(), x + this.x + 8, y + this.y + 5);
-        getTextRenderer().draw(matrices, ""+profession.getAmount(), x + this.x + 8, y + this.y + 5, 0xFFFFFF);
+        matrices.push();
+        matrices.translate(0.0, 0.0, 200.0);
+        getTextRenderer().draw(matrices, ""+profession.getAmount(), x + this.x + 6, y + this.y + 4, 0xFFFFFF);
+        matrices.pop();
 
         for (ProfessionWidget advancementWidget : this.children) {
             advancementWidget.renderWidgets(matrices, x, y);
@@ -110,8 +115,8 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     void setPos(int column, float row){
-        this.x = MathHelper.floor(column * 28.0f);
-        this.y = MathHelper.floor(row * 27.0f);
+        this.x = MathHelper.floor(column * PROFESSION_WIDGET_WIDTH);
+        this.y = MathHelper.floor(row * PROFESSION_WIDGET_HEIGHT);
     }
 
     boolean shouldRender(int originX, int originY, int mouseX, int mouseY) {
@@ -151,8 +156,12 @@ public class ProfessionWidget extends DrawableHelper {
         this.drawTexture(matrices, m, l, 0, status.getSpriteIndex() * 26, j, 26);
         this.drawTexture(matrices, m + j, l, 200 - k, status2.getSpriteIndex() * 26, k, 26);
         this.drawTexture(matrices, originX + this.x + 3, originY + this.y, this.profession.getType().getTextureV(), 128 + status3.getSpriteIndex() * 26, 26, 26);
+        matrices.push();
+        matrices.translate(0.0, 0.0, 200.0);
+        getTextRenderer().draw(matrices, ""+profession.getAmount(), m + 6, originY + this.y + 4, 0xFFFFFFFF);
+        matrices.pop();
         if (bl) {
-            this.client.textRenderer.drawWithShadow(matrices, title, (float)(m + 5), (float)(originY + this.y + 9), -1);
+            this.client.textRenderer.drawWithShadow(matrices, title, (float)(m + 5), (float)(originY + this.y + 9), 0xffffffff);
         } else {
             this.client.textRenderer.drawWithShadow(matrices, title, (float)(originX + this.x + 32), (float)(originY + this.y + 9), -1);
         }
