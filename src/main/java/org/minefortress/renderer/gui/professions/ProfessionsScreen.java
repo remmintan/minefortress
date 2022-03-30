@@ -83,4 +83,8 @@ public class ProfessionsScreen extends Screen {
         RenderSystem.applyModelViewMatrix();
     }
 
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
 }
