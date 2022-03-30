@@ -153,7 +153,7 @@ public class ProfessionsLayer extends DrawableHelper {
         int oX = MathHelper.floor(this.originX);
         int oY = MathHelper.floor(this.originY);
         boolean bl = false;
-        mouseY = mouseY + 35;
+        mouseY = mouseY + 55;
         if (mouseX > 0 && mouseX < LAYER_WIDTH && mouseY > 0 && mouseY < LAYER_HEIGHT) {
             for (ProfessionWidget advancementWidget : this.widgets) {
                 if (!advancementWidget.shouldRender(oX, oY, mouseX, mouseY)) continue;
