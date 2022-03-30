@@ -3,7 +3,6 @@ package org.minefortress.renderer.gui.professions;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
-import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -52,7 +51,11 @@ public class ProfessionsLayer extends DrawableHelper {
             this.maxPanY = Math.max(this.maxPanY, y + (int)ProfessionWidget.PROFESSION_WIDGET_HEIGHT);
         }
 
-        this.maxPanX += 40;
+        final int paxExpand = 40;
+        this.maxPanX += paxExpand;
+//        this.minPanX += paxExpand;
+        this.maxPanY += paxExpand;
+//        this.minPanY += paxExpand;
         this.root = root;
     }
 
@@ -83,10 +86,10 @@ public class ProfessionsLayer extends DrawableHelper {
 
     public void move(double offsetX, double offsetY) {
         if (this.maxPanX - this.minPanX > LAYER_WIDTH) {
-            this.originX = MathHelper.clamp(this.originX + offsetX, (double)(-(this.maxPanX - LAYER_WIDTH)), 0.0);
+            this.originX = MathHelper.clamp(this.originX + offsetX, (double)(-(this.maxPanX - LAYER_WIDTH)), 40.0);
         }
         if (this.maxPanY - this.minPanY > LAYER_HEIGHT) {
-            this.originY = MathHelper.clamp(this.originY + offsetY, (double)(-(this.maxPanY - LAYER_HEIGHT)), 0.0);
+            this.originY = MathHelper.clamp(this.originY + offsetY, (double)(-(this.maxPanY - LAYER_HEIGHT)), 40.0);
         }
     }
 

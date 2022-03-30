@@ -20,7 +20,7 @@ import java.util.List;
 
 public class ProfessionWidget extends DrawableHelper {
 
-    public static final float PROFESSION_WIDGET_WIDTH = 28f;
+    public static final float PROFESSION_WIDGET_WIDTH = 64f;
     public static final float PROFESSION_WIDGET_HEIGHT = 35f;
     private static final Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/advancements/widgets.png");
 
@@ -47,7 +47,7 @@ public class ProfessionWidget extends DrawableHelper {
     public void renderLines(MatrixStack matrices, int x, int y, boolean bl) {
         if (this.parent != null) {
             int i = x + this.parent.x + 13;
-            int j = x + this.parent.x + 26 + 4;
+            int j = x + this.parent.x + 26 + 22;
             int k = y + this.parent.y + 13;
             int l = x + this.x + 13;
             int m = y + this.y + 13;
@@ -84,6 +84,10 @@ public class ProfessionWidget extends DrawableHelper {
         matrices.translate(0.0, 0.0, 200.0);
         getTextRenderer().draw(matrices, ""+profession.getAmount(), x + this.x + 6, y + this.y + 4, 0xFFFFFF);
         matrices.pop();
+        final String title = profession.getTitle().contains("-") ? profession.getTitle().split("-")[0] : profession.getTitle();
+        final String trimmedTitle = getTextRenderer().trimToWidth(title, (int) (PROFESSION_WIDGET_WIDTH - 4));
+        final int titleWidth = getTextRenderer().getWidth(trimmedTitle);
+        getTextRenderer().draw(matrices, trimmedTitle, x + this.x + 4f  - titleWidth/2f + 13f  , y + this.y + 27, 0xFFFFFF);
 
         for (ProfessionWidget advancementWidget : this.children) {
             advancementWidget.renderWidgets(matrices, x, y);
