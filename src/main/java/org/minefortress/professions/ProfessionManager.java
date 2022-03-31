@@ -1,9 +1,15 @@
 package org.minefortress.professions;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
 import net.minecraft.item.Items;
+import org.apache.logging.log4j.util.Strings;
+import org.minefortress.fortress.AbstractFortressManager;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 import static java.util.Map.entry;
 
@@ -26,7 +32,8 @@ public class ProfessionManager {
                             "Miner - LVL1",
                             Items.STONE_PICKAXE,
                             "Can work in mine and quarry.\nCan use stone shovel and pickaxe.",
-                            "Build 'Wooden Miner's house' to unlock"
+                            "Build 'Wooden Miner's house' to unlock",
+                            "miner_wooden"
                     )
             ),
             entry(
@@ -35,7 +42,8 @@ public class ProfessionManager {
                             "Miner - LVL2",
                             Items.IRON_PICKAXE,
                             "Can work in mine and quarry.\nCan use iron shovel and pickaxe.",
-                            "Build 'Stone Miner's house' to unlock"
+                            "Build 'Stone Miner's house' to unlock",
+                            "miner_stone"
                     )
             ),
             entry(
@@ -44,7 +52,8 @@ public class ProfessionManager {
                             "Miner - LVL3",
                             Items.DIAMOND_PICKAXE,
                             "Can work in mine and quarry.\nCan use diamond shovel and pickaxe.",
-                            "Build 'Miners' guild house' to unlock"
+                            "Build 'Miners' guild house' to unlock",
+                            "miners_guild"
                     )
             ),
             // fall trees
@@ -54,7 +63,8 @@ public class ProfessionManager {
                             "Lumberjack - LVL1",
                             Items.STONE_AXE,
                             "Can fall tall trees.\nCan use stone axe.\nCollects saplings.",
-                            "Build 'Wooden Lumberjack's house' to unlock"
+                            "Build 'Wooden Lumberjack's house' to unlock",
+                            "lumberjack_wooden"
                     )
             ),
             entry(
@@ -63,7 +73,8 @@ public class ProfessionManager {
                             "Lumberjack - LVL2",
                             Items.IRON_AXE,
                             "Can fall tall trees.\nCan use iron axe.\nCan plant saplings.",
-                            ""
+                            "Build 'Stone Lumberjack's house' to unlock",
+                            "lumberjack_stone"
                     )
             ),
             entry(
@@ -72,7 +83,8 @@ public class ProfessionManager {
                             "Lumberjack - LVL3",
                             Items.DIAMOND_AXE,
                             "Can fall tall trees.\nCan use diamond axe.\nCan plant saplings.",
-                            "Build 'Lumberjack's guild house' to unlock"
+                            "Build 'Lumberjack's guild house' to unlock",
+                            "lumberjack_guild"
                     )
             ),
             // food / defence
@@ -82,7 +94,8 @@ public class ProfessionManager {
                             "Forester",
                             Items.APPLE,
                             "Hunts animals\nCollects seeds\nGet's and cooks on fire some basic food.\nCan collect and plant saplings.",
-                            "Build 'Forester's house' to unlock"
+                            "Build 'Forester's house' to unlock",
+                            "forester"
                     )
             ),
             entry(
@@ -91,7 +104,8 @@ public class ProfessionManager {
                             "Hunter",
                             Items.BOW,
                             "Can use bow.\nDefends village from monsters.\nHunts monsters.\nCan work at night",
-                            "Build 'Shooting gallery' to unlock"
+                            "Build 'Shooting gallery' to unlock",
+                            "shooting_gallery"
                     )
             ),
             entry(
@@ -100,7 +114,8 @@ public class ProfessionManager {
                             "Fisherman",
                             Items.FISHING_ROD,
                             "Catches fish in ponds\nCooks fish",
-                            "Build 'Fishing hut' to unlock"
+                            "Build 'Fishing hut' to unlock",
+                            "fisher"
                     )
             ),
             entry(
@@ -109,7 +124,8 @@ public class ProfessionManager {
                             "Farmer",
                             Items.WHEAT,
                             "Plants any kind of seeds including wheat, watermelon and pumpkin",
-                            "Build 'Farm' to unlock"
+                            "Build 'Farm' to unlock",
+                            "farmer"
                     )
             ),
             entry(
@@ -118,7 +134,8 @@ public class ProfessionManager {
                             "Baker",
                             Items.BREAD,
                             "Bakes bread, cakes and other food",
-                            "Build 'Bakery' to unlock"
+                            "Build 'Bakery' to unlock",
+                            "backer"
                     )
             ),
             entry(
@@ -127,7 +144,8 @@ public class ProfessionManager {
                             "Shepherd",
                             Items.CARROT_ON_A_STICK,
                             "Brings pigs, sheeps and cows to the village.\nProvides milks, wool and meat",
-                            "Build 'Stable' to unlock"
+                            "Build 'Animal Pen' to unlock",
+                            "shepherd"
                     )
             ),
             entry(
@@ -135,8 +153,9 @@ public class ProfessionManager {
                     new Profession(
                             "Stableman",
                             Items.LEAD,
+                            "",
                             "Will be available in 1.5-alpha",
-                            ""
+                            "_"
                     )
             ),
             entry(
@@ -144,8 +163,9 @@ public class ProfessionManager {
                     new Profession(
                             "Butcher",
                             Items.BEEF,
+                            "",
                             "Will be available in 1.5-alpha",
-                            ""
+                            "_"
                     )
             ),
             entry(
@@ -153,8 +173,9 @@ public class ProfessionManager {
                     new Profession(
                             "Cook",
                             Items.COOKED_BEEF,
+                            "",
                             "Will be available in 1.5-alpha",
-                            ""
+                            "_"
                     )
             ),
             // craft / smith
@@ -164,16 +185,18 @@ public class ProfessionManager {
                             "Crafter",
                             Items.CRAFTING_TABLE,
                             "Can craft any item that doesn't need smelting.\nCan't use redstone or nether blocks/items",
-                            "Build crafting table to unlock"
-                    )
+                            "Build crafting table to unlock",
+                            "_"
+                    ).setBlockRequirement(Blocks.CRAFTING_TABLE)
             ),
             entry(
                     "leather_worker1",
                     new Profession(
                             "Leather Worker - LVL1",
                             Items.LEATHER,
+                            "",
                             "Will be available in future releases",
-                            ""
+                            "_"
                     )
             ),
             entry(
@@ -181,8 +204,9 @@ public class ProfessionManager {
                     new Profession(
                             "Leather Worker - LVL2",
                             Items.LEATHER_HORSE_ARMOR,
+                            "",
                             "Will be available in future releases",
-                            ""
+                            "_"
                     )
             ),
             entry(
@@ -190,8 +214,9 @@ public class ProfessionManager {
                     new Profession(
                             "Blacksmith",
                             Items.IRON_INGOT,
+                            "",
                             "Will be available in future releases",
-                            ""
+                            "_"
                     )
             ),
             entry(
@@ -199,8 +224,9 @@ public class ProfessionManager {
                     new Profession(
                             "Armorer",
                             Items.IRON_CHESTPLATE,
+                            "",
                             "Will be available in future releases",
-                            ""
+                            "_"
                     )
             ),
             entry(
@@ -208,8 +234,9 @@ public class ProfessionManager {
                     new Profession(
                             "Weaver",
                             Items.STRING,
+                            "",
                             "Will be available in future releases",
-                            ""
+                            "_"
                     )
             ),
             entry(
@@ -217,8 +244,9 @@ public class ProfessionManager {
                     new Profession(
                             "Tailor",
                             Items.WHITE_BANNER,
+                            "",
                             "Will be available in future releases",
-                            ""
+                            "_"
                     )
             ),
             // combat
@@ -227,8 +255,9 @@ public class ProfessionManager {
                     new Profession(
                             "Warrior - LVL1",
                             Items.STONE_SWORD,
+                            "",
                             "Will be available in future releases",
-                            ""
+                            "_"
                     )
             ),
             entry(
@@ -236,8 +265,9 @@ public class ProfessionManager {
                     new Profession(
                             "Warrior - LVL2",
                             Items.IRON_SWORD,
+                            "",
                             "Will be available in future releases",
-                            ""
+                            "_"
                     )
             ),
             entry(
@@ -246,7 +276,8 @@ public class ProfessionManager {
                             "Archer",
                             Items.BOW,
                             "Will be available in future releases",
-                            ""
+                            "",
+                            "_"
                     )
             ),
             entry(
@@ -255,7 +286,8 @@ public class ProfessionManager {
                             "Archer - LVL2",
                             Items.CROSSBOW,
                             "Will be available in future releases",
-                            ""
+                            "",
+                            "_"
                     )
             ),
             entry(
@@ -264,7 +296,8 @@ public class ProfessionManager {
                             "Knight - LVL1",
                             Items.IRON_HORSE_ARMOR,
                             "Will be available in future releases",
-                            ""
+                            "",
+                            "_"
                     )
             ),
             entry(
@@ -273,15 +306,18 @@ public class ProfessionManager {
                             "Knight - LVL2",
                             Items.DIAMOND_HORSE_ARMOR,
                             "Will be available in future releases",
-                            ""
+                            "",
+                            "_"
                     )
             )
     );
 
     private final Profession root;
+    private final Supplier<AbstractFortressManager> fortressManagerSupplier;
 
-    public ProfessionManager() {
+    public ProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
         this.root = this.createProfessionTree();
+        this.fortressManagerSupplier = fortressManagerSupplier;
     }
 
     public Profession getRootProfession() {
@@ -289,7 +325,26 @@ public class ProfessionManager {
     }
 
     public boolean isRequirementsFulfilled(Profession profession) {
-        return true;
+        final String buildingRequirement = profession.getBuildingRequirement();
+        if(Objects.isNull(buildingRequirement) || Strings.isBlank(buildingRequirement)) {
+            return true;
+        }
+
+        final Profession parent = profession.getParent();
+        if(Objects.nonNull(parent)) {
+            final boolean parentUnlocked = this.isRequirementsFulfilled(parent);
+            if(!parentUnlocked) {
+                return false;
+            }
+        }
+
+
+        boolean satisfied = fortressManagerSupplier.get().hasRequiredBuilding(buildingRequirement);
+        final Block blockRequirement = profession.getBlockRequirement();
+        if(Objects.nonNull(blockRequirement)) {
+            // todo
+        }
+        return satisfied;
     }
 
     private Profession getProfession(String name) {

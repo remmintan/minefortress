@@ -41,7 +41,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private List<EssentialBuildingInfo> buildings = new ArrayList<>();
 
     public FortressClientManager() {
-        professionManager = new ProfessionManager();
+        professionManager = new ProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
     }
 
     public void select(Colonist colonist) {
