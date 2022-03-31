@@ -208,4 +208,9 @@ public final class FortressServerManager extends AbstractFortressManager {
         int y = world.getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
         return Optional.of(new BlockPos(x, y, z));
     }
+
+    @Override
+    public boolean hasRequiredBuilding(String requirementId) {
+        return buildings.stream().anyMatch(b -> b.getRequirementId().equals(requirementId));
+    }
 }
