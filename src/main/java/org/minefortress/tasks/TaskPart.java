@@ -11,13 +11,13 @@ import java.util.List;
 public class TaskPart {
 
     private final Pair<BlockPos, BlockPos> startAndEnd;
-    private final List<TaskBlockInfo> iterator;
+    private final List<TaskBlockInfo> blocks;
     private final Task task;
 
 
-    public TaskPart(final Pair<BlockPos, BlockPos> startAndEnd, List<TaskBlockInfo> iterator, Task task) {
+    public TaskPart(final Pair<BlockPos, BlockPos> startAndEnd, List<TaskBlockInfo> blocks, Task task) {
         this.startAndEnd = startAndEnd;
-        this.iterator = iterator;
+        this.blocks = blocks;
         this.task = task;
     }
 
@@ -26,7 +26,11 @@ public class TaskPart {
     }
 
     public Iterator<TaskBlockInfo> getIterator() {
-        return iterator.iterator();
+        return blocks.iterator();
+    }
+
+    public List<TaskBlockInfo> getBlocks() {
+        return blocks;
     }
 
     public Task getTask() {

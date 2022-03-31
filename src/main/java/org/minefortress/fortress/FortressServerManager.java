@@ -1,11 +1,17 @@
 package org.minefortress.fortress;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
@@ -14,26 +20,26 @@ import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.ClientboundSyncBuildingsPacket;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
+import org.minefortress.network.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public final class FortressServerManager extends AbstractFortressManager {
 
     private static final int DEFAULT_COLONIST_COUNT = 5;
 
     private boolean needSync = true;
+    private boolean needSyncBuildings = false;
+    private boolean needSyncSpecialBlocks = false;
 
     private BlockPos fortressCenter = null;
     private final Set<Colonist> colonists = new HashSet<>();
     private final Set<FortressBulding> buildings = new HashSet<>();
+    private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
 
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
-
-    private boolean needSyncBuildings = false;
 
     private int maxX = Integer.MIN_VALUE;
     private int maxZ = Integer.MIN_VALUE;
@@ -65,24 +71,46 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void tick(ServerPlayerEntity player) {
-        tickFortress();
+        tickFortress(player.world);
         if(!needSync) return;
         final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
             final ClientboundSyncBuildingsPacket syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
+            needSyncBuildings = false;
+        }
+        if(needSyncSpecialBlocks){
+            final ClientboundSyncSpecialBlocksPacket syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, packet);
+            needSyncSpecialBlocks = false;
         }
         needSync = false;
     }
 
-    public void tickFortress() {
+    public void tickFortress(World world) {
         if(colonists.removeIf(colonist -> !colonist.isAlive()))
             scheduleSync();
 
         for (FortressBulding building : buildings) {
             building.tick();
         }
+
+        if(!specialBlocks.isEmpty()) {
+            boolean needSync = false;
+            for(Map.Entry<Block, List<BlockPos>> entry : new HashSet<>(specialBlocks.entrySet())) {
+                final Block block = entry.getKey();
+                final List<BlockPos> positions = entry.getValue();
+                needSync = positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
+                if (positions.isEmpty()) {
+                    specialBlocks.remove(block);
+                }
+            }
+            if(needSync) {
+                scheduleSyncSpecialBlocks();
+            }
+        }
+
     }
 
     public void setupCenter(BlockPos fortressCenter, World world, ServerPlayerEntity player) {
@@ -127,6 +155,11 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.scheduleSync();
     }
 
+    private void scheduleSyncSpecialBlocks() {
+        needSyncSpecialBlocks = true;
+        this.scheduleSync();
+    }
+
     public void writeToNbt(NbtCompound tag) {
         if(fortressCenter != null) {
             tag.putInt("centerX", fortressCenter.getX());
@@ -153,6 +186,19 @@ public final class FortressServerManager extends AbstractFortressManager {
         final NbtCompound nameGeneratorTag = new NbtCompound();
         this.nameGenerator.write(nameGeneratorTag);
         tag.put("nameGenerator", nameGeneratorTag);
+
+        if(!specialBlocks.isEmpty()) {
+            final NbtCompound specialBlocksTag = new NbtCompound();
+            for (Map.Entry<Block, List<BlockPos>> specialBlock : this.specialBlocks.entrySet()) {
+                final String blockId = Registry.BLOCK.getId(specialBlock.getKey()).toString();
+                final NbtList posList = new NbtList();
+                for (BlockPos pos : specialBlock.getValue()) {
+                    posList.add(NbtHelper.fromBlockPos(pos));
+                }
+                specialBlocksTag.put(blockId, posList);
+            }
+            tag.put("specialBlocks", specialBlocksTag);
+        }
 
     }
 
@@ -185,6 +231,20 @@ public final class FortressServerManager extends AbstractFortressManager {
             this.nameGenerator = new ColonistNameGenerator(nameGeneratorTag);
         }
 
+        if (tag.contains("specialBlocks")) {
+            final NbtCompound specialBlocksTag = tag.getCompound("specialBlocks");
+            for (String blockId : specialBlocksTag.getKeys()) {
+                final Block block = Registry.BLOCK.get(new Identifier(blockId));
+                final NbtList posList = specialBlocksTag.getList(blockId, 0);
+                final List<BlockPos> posList2 = new ArrayList<>();
+                for (int j = 0; j < posList.size(); j++) {
+                    posList2.add(NbtHelper.toBlockPos(posList.getCompound(j)));
+                }
+                this.specialBlocks.put(block, posList2);
+            }
+            this.scheduleSyncSpecialBlocks();
+        }
+
         this.scheduleSync();
     }
 
@@ -212,5 +272,14 @@ public final class FortressServerManager extends AbstractFortressManager {
     @Override
     public boolean hasRequiredBuilding(String requirementId) {
         return buildings.stream().anyMatch(b -> b.getRequirementId().equals(requirementId));
+    }
+
+    public boolean isBlockSpecial(Block block) {
+        return block.equals(Blocks.CRAFTING_TABLE);
+    }
+
+    public void addSpecialBlocks(Block block, List<BlockPos> blockPos) {
+        specialBlocks.put(block, blockPos);
+        scheduleSyncSpecialBlocks();
     }
 }

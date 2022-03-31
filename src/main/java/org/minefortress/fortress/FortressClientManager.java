@@ -1,6 +1,7 @@
 package org.minefortress.fortress;
 
 import com.chocohead.mm.api.ClassTinkerers;
+import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
@@ -15,9 +16,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ProfessionManager;
 import org.minefortress.tasks.BuildingManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -39,6 +38,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private Vec3d selectedColonistDelta;
 
     private List<EssentialBuildingInfo> buildings = new ArrayList<>();
+    private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
 
     public FortressClientManager() {
         professionManager = new ProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
@@ -54,6 +54,10 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public void updateBuildings(List<EssentialBuildingInfo> buildings) {
         this.buildings = buildings;
+    }
+
+    public void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks) {
+        this.specialBlocks = specialBlocks;
     }
 
     public boolean isSelectingColonist() {
