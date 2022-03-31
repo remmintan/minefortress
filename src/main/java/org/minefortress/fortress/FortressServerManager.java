@@ -274,12 +274,17 @@ public final class FortressServerManager extends AbstractFortressManager {
         return buildings.stream().anyMatch(b -> b.getRequirementId().equals(requirementId));
     }
 
+    @Override
+    public boolean hasRequiredBlock(Block block) {
+        return this.specialBlocks.containsKey(block);
+    }
+
     public boolean isBlockSpecial(Block block) {
         return block.equals(Blocks.CRAFTING_TABLE);
     }
 
     public void addSpecialBlocks(Block block, List<BlockPos> blockPos) {
-        specialBlocks.put(block, blockPos);
+        specialBlocks.computeIfAbsent(block, k -> new ArrayList<>()).addAll(blockPos);
         scheduleSyncSpecialBlocks();
     }
 }
