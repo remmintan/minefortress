@@ -200,6 +200,11 @@ public final class FortressClientManager extends AbstractFortressManager {
         return this.specialBlocks.containsKey(block);
     }
 
+    @Override
+    public int getTotalColonistsCount() {
+        return colonistsCount;
+    }
+
     private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
         return pos.getX() >= start.getX() && pos.getX() <= end.getX() &&
                 pos.getY() >= start.getY() && pos.getY() <= end.getY() &&
