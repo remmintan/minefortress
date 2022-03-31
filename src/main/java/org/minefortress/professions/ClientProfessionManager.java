@@ -10,40 +10,272 @@ import static java.util.Map.entry;
 public class ClientProfessionManager {
 
     public final Map<String, Profession> professions = Map.ofEntries(
-            entry("colonist", new Profession("Colonist", Items.PLAYER_HEAD)),
+            entry(
+                    "colonist",
+                    new Profession(
+                            "Colonist",
+                            Items.PLAYER_HEAD,
+                            "Can do any type of work, but is not very good at it.\nCan use only wooden tools.\nCan't fall tall trees\nCan't provide any food.",
+                            ""
+                    )
+            ),
             // dig
-            entry("miner1", new Profession("Miner - LVL1", Items.STONE_PICKAXE)),
-            entry("miner2", new Profession("Miner - LVL2", Items.IRON_PICKAXE)),
-            entry("miner3", new Profession("Miner - LVL3", Items.DIAMOND_PICKAXE)),
+            entry(
+                    "miner1",
+                    new Profession(
+                            "Miner - LVL1",
+                            Items.STONE_PICKAXE,
+                            "Can work in mine and quarry.\nCan use stone shovel and pickaxe.",
+                            "Build 'Wooden Miner's house' to unlock"
+                    )
+            ),
+            entry(
+                    "miner2",
+                    new Profession(
+                            "Miner - LVL2",
+                            Items.IRON_PICKAXE,
+                            "Can work in mine and quarry.\nCan use iron shovel and pickaxe.",
+                            "Build 'Stone Miner's house' to unlock"
+                    )
+            ),
+            entry(
+                    "miner3",
+                    new Profession(
+                            "Miner - LVL3",
+                            Items.DIAMOND_PICKAXE,
+                            "Can work in mine and quarry.\nCan use diamond shovel and pickaxe.",
+                            "Build 'Miners' guild house' to unlock"
+                    )
+            ),
             // fall trees
-            entry("lumberjack1", new Profession("Lumberjack - LVL1", Items.STONE_AXE)),
-            entry("lumberjack2", new Profession("Lumberjack - LVL2", Items.IRON_AXE)),
-            entry("lumberjack3", new Profession("Lumberjack - LVL3", Items.DIAMOND_AXE)),
+            entry(
+                    "lumberjack1",
+                    new Profession(
+                            "Lumberjack - LVL1",
+                            Items.STONE_AXE,
+                            "Can fall tall trees.\nCan use stone axe.\nCollects saplings.",
+                            "Build 'Wooden Lumberjack's house' to unlock"
+                    )
+            ),
+            entry(
+                    "lumberjack2",
+                    new Profession(
+                            "Lumberjack - LVL2",
+                            Items.IRON_AXE,
+                            "Can fall tall trees.\nCan use iron axe.\nCan plant saplings.",
+                            ""
+                    )
+            ),
+            entry(
+                    "lumberjack3",
+                    new Profession(
+                            "Lumberjack - LVL3",
+                            Items.DIAMOND_AXE,
+                            "Can fall tall trees.\nCan use diamond axe.\nCan plant saplings.",
+                            "Build 'Lumberjack's guild house' to unlock"
+                    )
+            ),
             // food / defence
-            entry("forester", new Profession("Forester", Items.APPLE)),
-            entry("hunter", new Profession("Hunter", Items.BOW)),
-            entry("fisherman", new Profession("Fisherman", Items.FISHING_ROD)),
-            entry("farmer", new Profession("Farmer", Items.WHEAT)),
-            entry("baker", new Profession("Baker", Items.BREAD)),
-            entry("shepherd", new Profession("Shepherd", Items.CARROT_ON_A_STICK)),
-            entry("stableman", new Profession("Stableman", Items.LEAD)),
-            entry("butcher", new Profession("Butcher", Items.BEEF)),
-            entry("cook", new Profession("Cook", Items.COOKED_BEEF)),
+            entry(
+                    "forester",
+                    new Profession(
+                            "Forester",
+                            Items.APPLE,
+                            "Hunts animals\nCollects seeds\nGet's and cooks on fire some basic food.\nCan collect and plant saplings.",
+                            "Build 'Forester's house' to unlock"
+                    )
+            ),
+            entry(
+                    "hunter",
+                    new Profession(
+                            "Hunter",
+                            Items.BOW,
+                            "Can use bow.\nDefends village from monsters.\nHunts monsters.\nCan work at night",
+                            "Build 'Shooting gallery' to unlock"
+                    )
+            ),
+            entry(
+                    "fisherman",
+                    new Profession(
+                            "Fisherman",
+                            Items.FISHING_ROD,
+                            "Catches fish in ponds\nCooks fish",
+                            "Build 'Fishing hut' to unlock"
+                    )
+            ),
+            entry(
+                    "farmer",
+                    new Profession(
+                            "Farmer",
+                            Items.WHEAT,
+                            "Plants any kind of seeds including wheat, watermelon and pumpkin",
+                            "Build 'Farm' to unlock"
+                    )
+            ),
+            entry(
+                    "baker",
+                    new Profession(
+                            "Baker",
+                            Items.BREAD,
+                            "Bakes bread, cakes and other food",
+                            "Build 'Bakery' to unlock"
+                    )
+            ),
+            entry(
+                    "shepherd",
+                    new Profession(
+                            "Shepherd",
+                            Items.CARROT_ON_A_STICK,
+                            "Brings pigs, sheeps and cows to the village.\nProvides milks, wool and meat",
+                            "Build 'Stable' to unlock"
+                    )
+            ),
+            entry(
+                    "stableman",
+                    new Profession(
+                            "Stableman",
+                            Items.LEAD,
+                            "Will be available in 1.5-alpha",
+                            ""
+                    )
+            ),
+            entry(
+                    "butcher",
+                    new Profession(
+                            "Butcher",
+                            Items.BEEF,
+                            "Will be available in 1.5-alpha",
+                            ""
+                    )
+            ),
+            entry(
+                    "cook",
+                    new Profession(
+                            "Cook",
+                            Items.COOKED_BEEF,
+                            "Will be available in 1.5-alpha",
+                            ""
+                    )
+            ),
             // craft / smith
-            entry("crafter", new Profession("Crafter", Items.CRAFTING_TABLE)),
-            entry("leather_worker1", new Profession("Leather Worker - LVL1", Items.LEATHER)),
-            entry("leather_worker2", new Profession("Leather Worker - LVL2", Items.LEATHER_HORSE_ARMOR)),
-            entry("blacksmith", new Profession("Blacksmith", Items.IRON_INGOT)),
-            entry("armorer", new Profession("Armorer", Items.IRON_CHESTPLATE)),
-            entry("weaver", new Profession("Weaver", Items.STRING)),
-            entry("tailor", new Profession("Tailor", Items.WHITE_BANNER)),
+            entry(
+                    "crafter",
+                    new Profession(
+                            "Crafter",
+                            Items.CRAFTING_TABLE,
+                            "Can craft any item that doesn't need smelting.\nCan't use redstone or nether blocks/items",
+                            "Build crafting table to unlock"
+                    )
+            ),
+            entry(
+                    "leather_worker1",
+                    new Profession(
+                            "Leather Worker - LVL1",
+                            Items.LEATHER,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "leather_worker2",
+                    new Profession(
+                            "Leather Worker - LVL2",
+                            Items.LEATHER_HORSE_ARMOR,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "blacksmith",
+                    new Profession(
+                            "Blacksmith",
+                            Items.IRON_INGOT,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "armorer",
+                    new Profession(
+                            "Armorer",
+                            Items.IRON_CHESTPLATE,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "weaver",
+                    new Profession(
+                            "Weaver",
+                            Items.STRING,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "tailor",
+                    new Profession(
+                            "Tailor",
+                            Items.WHITE_BANNER,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
             // combat
-            entry("warrior1", new Profession("Warrior - LVL1", Items.STONE_SWORD)),
-            entry("warrior2", new Profession("Warrior - LVL2", Items.IRON_SWORD)),
-            entry("archer1", new Profession("Archer", Items.BOW)),
-            entry("archer2", new Profession("Archer - LVL2", Items.CROSSBOW)),
-            entry("knight1", new Profession("Knight - LVL1", Items.IRON_HORSE_ARMOR)),
-            entry("knight2", new Profession("Knight - LVL2", Items.DIAMOND_HORSE_ARMOR))
+            entry(
+                    "warrior1",
+                    new Profession(
+                            "Warrior - LVL1",
+                            Items.STONE_SWORD,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "warrior2",
+                    new Profession(
+                            "Warrior - LVL2",
+                            Items.IRON_SWORD,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "archer1",
+                    new Profession(
+                            "Archer",
+                            Items.BOW,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "archer2",
+                    new Profession(
+                            "Archer - LVL2",
+                            Items.CROSSBOW,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "knight1",
+                    new Profession(
+                            "Knight - LVL1",
+                            Items.IRON_HORSE_ARMOR,
+                            "Will be available in future releases",
+                            ""
+                    )
+            ),
+            entry(
+                    "knight2",
+                    new Profession(
+                            "Knight - LVL2",
+                            Items.DIAMOND_HORSE_ARMOR,
+                            "Will be available in future releases",
+                            ""
+                    )
+            )
     );
 
     private final Profession root;
