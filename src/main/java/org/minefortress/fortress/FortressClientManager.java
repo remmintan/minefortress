@@ -1,7 +1,6 @@
 package org.minefortress.fortress;
 
 import com.chocohead.mm.api.ClassTinkerers;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
