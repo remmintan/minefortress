@@ -1,7 +1,11 @@
 package org.minefortress.renderer.gui.professions;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.professions.Profession;
+import org.minefortress.professions.ProfessionManager;
 
 import java.util.List;
 
@@ -20,6 +24,8 @@ public class ProfessionsPositioner {
     private float posX;
 
     public ProfessionsPositioner(ProfessionWidget widget, ProfessionsPositioner parent, ProfessionsPositioner previousSibling, int childrenSize, int depth) {
+        if(!widget.isUnlocked())
+            throw new IllegalArgumentException("Can't position locked profession");
         this.professionWidget = widget;
         this.parent = parent;
         this.previousSibling = previousSibling;
@@ -35,8 +41,15 @@ public class ProfessionsPositioner {
     }
 
     private ProfessionsPositioner findChildrenRecursively(ProfessionWidget profession, ProfessionsPositioner lastChild) {
-        lastChild = new ProfessionsPositioner(profession, this, lastChild, this.children.size() + 1, this.depth + 1);
-        this.children.add(lastChild);
+        if(profession.isUnlocked()) {
+            lastChild = new ProfessionsPositioner(profession, this, lastChild, this.children.size() + 1, this.depth + 1);
+            this.children.add(lastChild);
+        } else {
+            for(ProfessionWidget widget : profession.getChildren()) {
+                lastChild = this.findChildrenRecursively(widget, lastChild);
+            }
+        }
+
         return lastChild;
     }
 
@@ -183,6 +196,7 @@ public class ProfessionsPositioner {
     }
 
     static void arrangeForTree(ProfessionWidget root) {
+        if(!root.isUnlocked()) throw new IllegalArgumentException("Cannot arrange for tree on locked profession");
         ProfessionsPositioner professionPositioner = new ProfessionsPositioner(root, null, null, 1, 0);
         professionPositioner.calculateRecursively();
         float f = professionPositioner.findMinRowRecursively(0.0f, 0, professionPositioner.row);

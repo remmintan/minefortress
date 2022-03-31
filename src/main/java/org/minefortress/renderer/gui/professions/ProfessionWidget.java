@@ -218,7 +218,7 @@ public class ProfessionWidget extends DrawableHelper {
         return y;
     }
 
-    private boolean isUnlocked() {
+    public boolean isUnlocked() {
         return this.professionManager.isRequirementsFulfilled(this.profession);
     }
 }
