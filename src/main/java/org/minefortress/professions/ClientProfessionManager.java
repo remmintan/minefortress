@@ -288,8 +288,8 @@ public class ClientProfessionManager {
         return this.root;
     }
 
-    public static AdvancementObtainedStatus getStatus(Profession profession) {
-        return AdvancementObtainedStatus.OBTAINED;
+    public boolean isRequirementsFulfilled(Profession profession) {
+        return true;
     }
 
     private Profession getProfession(String name) {

@@ -125,23 +125,23 @@ public class ProfessionsLayer extends DrawableHelper {
     @NotNull
     private ProfessionWidget createProfessionsTree(ClientProfessionManager professionManager) {
         final Profession rootProfession = professionManager.getRootProfession();
-        final ProfessionWidget rootWidget = new ProfessionWidget(rootProfession);
+        final ProfessionWidget rootWidget = new ProfessionWidget(rootProfession, professionManager);
 
-        createTreeNode(rootWidget, rootProfession);
+        createTreeNode(rootWidget, rootProfession, professionManager);
 
         return rootWidget;
     }
 
-    private void createTreeNode(ProfessionWidget parentWidget, Profession parent) {
+    private void createTreeNode(ProfessionWidget parentWidget, Profession parent, ClientProfessionManager professionManager) {
         final List<Profession> children = parent.getChildren();
         this.widgets.add(parentWidget);
         for(Profession child:children) {
-            final ProfessionWidget childWidget = new ProfessionWidget(child);
+            final ProfessionWidget childWidget = new ProfessionWidget(child, professionManager);
 
             childWidget.setParent(parentWidget);
             parentWidget.addChild(childWidget);
 
-            createTreeNode(childWidget, child);
+            createTreeNode(childWidget, child, professionManager);
         }
     }
 

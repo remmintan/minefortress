@@ -27,6 +27,7 @@ public class ProfessionWidget extends DrawableHelper {
     private ProfessionWidget parent;
     private final List<ProfessionWidget> children = new ArrayList<>();
     private final Profession profession;
+    private final ClientProfessionManager clientProfessionManager;
 
     private int x = 0;
     private int y = 0;
@@ -34,8 +35,9 @@ public class ProfessionWidget extends DrawableHelper {
     private final int width;
     private final MinecraftClient client;
 
-    public ProfessionWidget(Profession profession) {
+    public ProfessionWidget(Profession profession, ClientProfessionManager clientProfessionManager) {
         this.profession = profession;
+        this.clientProfessionManager = clientProfessionManager;
         client = MinecraftClient.getInstance();
         int maxTextLength = 29 + client.textRenderer.getWidth(profession.getTitle());
         for(Text text : this.profession.getUnlockedDescription()) {
@@ -67,15 +69,19 @@ public class ProfessionWidget extends DrawableHelper {
                 this.drawVerticalLine(matrices, j, m, k, n);
             }
         }
+        if(!isUnlocked()) return;
         for (ProfessionWidget child : this.children) {
             child.renderLines(matrices, x, y, bl);
         }
     }
 
     public void renderWidgets(MatrixStack matrices, int x, int y){
+        final boolean unlocked = isUnlocked();
+
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
-        final int v = 128 + ClientProfessionManager.getStatus(profession).getSpriteIndex() * 26;
+        AdvancementObtainedStatus status = unlocked ? AdvancementObtainedStatus.OBTAINED : AdvancementObtainedStatus.UNOBTAINED;
+        final int v = 128 + status.getSpriteIndex() * 26;
         final int u = profession.getType().getTextureV();
         this.drawTexture(matrices, x + this.x + 3, y + this.y, u, v, 26, 26);
 
@@ -89,6 +95,7 @@ public class ProfessionWidget extends DrawableHelper {
         final int titleWidth = getTextRenderer().getWidth(trimmedTitle);
         getTextRenderer().draw(matrices, trimmedTitle, x + this.x + 4f  - titleWidth/2f + 13f  , y + this.y + 27, 0xFFFFFF);
 
+        if(!unlocked) return;
         for (ProfessionWidget advancementWidget : this.children) {
             advancementWidget.renderWidgets(matrices, x, y);
         }
@@ -132,9 +139,8 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     public void drawTooltip(MatrixStack matrices, int originX, int originY, float alpha, int x, int y, int screenWidth) {
-        AdvancementObtainedStatus status = AdvancementObtainedStatus.OBTAINED;
-        AdvancementObtainedStatus status2 = AdvancementObtainedStatus.OBTAINED;
-        AdvancementObtainedStatus status3 = AdvancementObtainedStatus.OBTAINED;
+        final boolean unlocked = isUnlocked();
+        AdvancementObtainedStatus status = unlocked?AdvancementObtainedStatus.OBTAINED:AdvancementObtainedStatus.UNOBTAINED;
         int j = MathHelper.floor((float)this.width);
         int k = this.width - j;
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -146,7 +152,7 @@ public class ProfessionWidget extends DrawableHelper {
         int m = bl ? originX + this.x - this.width + 26 + 6 : originX + this.x;
 
         final String title = this.profession.getTitle();
-        final List<Text> description = this.profession.getUnlockedDescription();
+        final List<Text> description = unlocked? this.profession.getUnlockedDescription(): this.profession.getLockedDescription();
 
         int n = 32 + description.size() * this.client.textRenderer.fontHeight;
         boolean bl2 = 113 - originY - this.y - 26 <= 6 + description.size() * client.textRenderer.fontHeight;
@@ -158,8 +164,8 @@ public class ProfessionWidget extends DrawableHelper {
             }
         }
         this.drawTexture(matrices, m, l, 0, status.getSpriteIndex() * 26, j, 26);
-        this.drawTexture(matrices, m + j, l, 200 - k, status2.getSpriteIndex() * 26, k, 26);
-        this.drawTexture(matrices, originX + this.x + 3, originY + this.y, this.profession.getType().getTextureV(), 128 + status3.getSpriteIndex() * 26, 26, 26);
+        this.drawTexture(matrices, m + j, l, 200 - k, status.getSpriteIndex() * 26, k, 26);
+        this.drawTexture(matrices, originX + this.x + 3, originY + this.y, this.profession.getType().getTextureV(), 128 + status.getSpriteIndex() * 26, 26, 26);
         matrices.push();
         matrices.translate(0.0, 0.0, 200.0);
         getTextRenderer().draw(matrices, ""+profession.getAmount(), m + 6, originY + this.y + 4, 0xFFFFFFFF);
@@ -211,5 +217,9 @@ public class ProfessionWidget extends DrawableHelper {
 
     int getY() {
         return y;
+    }
+
+    private boolean isUnlocked() {
+        return this.clientProfessionManager.isRequirementsFulfilled(this.profession);
     }
 }
