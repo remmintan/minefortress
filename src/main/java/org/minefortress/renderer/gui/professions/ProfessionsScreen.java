@@ -33,6 +33,9 @@ public class ProfessionsScreen extends Screen {
         this.drawProfessionsTree(matrices, mouseX, mouseY, screenX, screenY);
         this.drawWindowAndTitle(matrices, screenX, screenY);
         this.drawWidgetTooltip(matrices, mouseX, mouseY, screenX, screenY);
+
+        this.textRenderer.draw(matrices, "left click on profession - add pawn to profession", this.width + 2, this.height - 10, 0xffffff);
+        this.textRenderer.draw(matrices, "right click on profession - remove pawn from profession", this.width + 2, this.height - 10 + this.textRenderer.fontHeight + 2, 0xffffff);
     }
 
     @Override
