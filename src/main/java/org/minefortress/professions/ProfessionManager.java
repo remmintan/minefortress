@@ -7,7 +7,7 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-public class ClientProfessionManager {
+public class ProfessionManager {
 
     public final Map<String, Profession> professions = Map.ofEntries(
             entry(
@@ -280,7 +280,7 @@ public class ClientProfessionManager {
 
     private final Profession root;
 
-    public ClientProfessionManager() {
+    public ProfessionManager() {
         this.root = this.createProfessionTree();
     }
 

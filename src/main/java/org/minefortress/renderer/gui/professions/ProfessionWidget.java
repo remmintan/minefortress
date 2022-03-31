@@ -8,11 +8,10 @@ import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import org.minefortress.professions.ClientProfessionManager;
+import org.minefortress.professions.ProfessionManager;
 import org.minefortress.professions.Profession;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class ProfessionWidget extends DrawableHelper {
     private ProfessionWidget parent;
     private final List<ProfessionWidget> children = new ArrayList<>();
     private final Profession profession;
-    private final ClientProfessionManager clientProfessionManager;
+    private final ProfessionManager professionManager;
 
     private int x = 0;
     private int y = 0;
@@ -35,9 +34,9 @@ public class ProfessionWidget extends DrawableHelper {
     private final int width;
     private final MinecraftClient client;
 
-    public ProfessionWidget(Profession profession, ClientProfessionManager clientProfessionManager) {
+    public ProfessionWidget(Profession profession, ProfessionManager professionManager) {
         this.profession = profession;
-        this.clientProfessionManager = clientProfessionManager;
+        this.professionManager = professionManager;
         client = MinecraftClient.getInstance();
         int maxTextLength = 29 + client.textRenderer.getWidth(profession.getTitle());
         for(Text text : this.profession.getUnlockedDescription()) {
@@ -220,6 +219,6 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     private boolean isUnlocked() {
-        return this.clientProfessionManager.isRequirementsFulfilled(this.profession);
+        return this.professionManager.isRequirementsFulfilled(this.profession);
     }
 }

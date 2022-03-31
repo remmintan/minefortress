@@ -10,7 +10,7 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.ClientProfessionManager;
+import org.minefortress.professions.ProfessionManager;
 import org.minefortress.professions.Profession;
 
 import java.util.LinkedList;
@@ -38,7 +38,7 @@ public class ProfessionsLayer extends DrawableHelper {
 
 
     public ProfessionsLayer(FortressMinecraftClient client) {
-        final ClientProfessionManager professionManager = client.getFortressClientManager().getProfessionManager();
+        final ProfessionManager professionManager = client.getFortressClientManager().getProfessionManager();
         ProfessionWidget root = createProfessionsTree(professionManager);
 
         ProfessionsPositioner.arrangeForTree(root);
@@ -123,7 +123,7 @@ public class ProfessionsLayer extends DrawableHelper {
     }
 
     @NotNull
-    private ProfessionWidget createProfessionsTree(ClientProfessionManager professionManager) {
+    private ProfessionWidget createProfessionsTree(ProfessionManager professionManager) {
         final Profession rootProfession = professionManager.getRootProfession();
         final ProfessionWidget rootWidget = new ProfessionWidget(rootProfession, professionManager);
 
@@ -132,7 +132,7 @@ public class ProfessionsLayer extends DrawableHelper {
         return rootWidget;
     }
 
-    private void createTreeNode(ProfessionWidget parentWidget, Profession parent, ClientProfessionManager professionManager) {
+    private void createTreeNode(ProfessionWidget parentWidget, Profession parent, ProfessionManager professionManager) {
         final List<Profession> children = parent.getChildren();
         this.widgets.add(parentWidget);
         for(Profession child:children) {

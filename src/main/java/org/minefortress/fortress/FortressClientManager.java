@@ -2,10 +2,8 @@ package org.minefortress.fortress;
 
 import com.chocohead.mm.api.ClassTinkerers;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -15,20 +13,18 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.professions.ClientProfessionManager;
+import org.minefortress.professions.ProfessionManager;
 import org.minefortress.tasks.BuildingManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public final class FortressClientManager extends AbstractFortressManager {
 
-    private final ClientProfessionManager professionManager = new ClientProfessionManager();
+    private final ProfessionManager professionManager = new ProfessionManager();
 
     private boolean initialized = false;
 
@@ -184,7 +180,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         return Collections.emptyList();
     }
 
-    public ClientProfessionManager getProfessionManager() {
+    public ProfessionManager getProfessionManager() {
         return professionManager;
     }
 
