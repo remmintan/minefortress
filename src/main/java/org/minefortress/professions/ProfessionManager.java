@@ -2,7 +2,6 @@ package org.minefortress.professions;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
 import net.minecraft.item.Items;
 import org.apache.logging.log4j.util.Strings;
 import org.minefortress.fortress.AbstractFortressManager;
@@ -460,6 +459,12 @@ public class ProfessionManager {
             parent.addChild(child);
             child.setParent(parent);
         }
+    }
+
+    public int getFreeColonists() {
+        final int totalColonists = fortressManagerSupplier.get().getTotalColonistsCount();
+        final int totalWorkers = professions.values().stream().mapToInt(Profession::getAmount).sum();
+        return totalColonists - totalWorkers;
     }
 
 }

@@ -287,4 +287,9 @@ public final class FortressServerManager extends AbstractFortressManager {
         specialBlocks.computeIfAbsent(block, k -> new ArrayList<>()).addAll(blockPos);
         scheduleSyncSpecialBlocks();
     }
+
+    @Override
+    public int getTotalColonistsCount() {
+        return this.colonists.size();
+    }
 }

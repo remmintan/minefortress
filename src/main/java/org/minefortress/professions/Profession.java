@@ -84,7 +84,7 @@ public class Profession {
         return lockedDescription;
     }
 
-    Profession getParent() {
+    public Profession getParent() {
         return parent;
     }
 

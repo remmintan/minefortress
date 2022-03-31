@@ -12,4 +12,6 @@ public abstract class AbstractFortressManager {
     public abstract boolean hasRequiredBuilding(String requirementId);
     public abstract boolean hasRequiredBlock(Block block);
 
+    public abstract int getTotalColonistsCount();
+
 }

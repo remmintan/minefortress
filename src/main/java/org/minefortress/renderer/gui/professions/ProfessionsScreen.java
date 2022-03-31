@@ -7,7 +7,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.professions.ProfessionManager;
 
 public class ProfessionsScreen extends Screen {
 
@@ -17,12 +19,16 @@ public class ProfessionsScreen extends Screen {
     private static final int WINDOW_HEIGHT = 140;
 
     private final ProfessionsLayer professionsLayer;
+    private final FortressClientManager fortressManager;
+    private final ProfessionManager professionManager;
 
     private boolean movingLayer = false;
 
     public ProfessionsScreen(FortressMinecraftClient client) {
         super(new LiteralText("Professions"));
         this.professionsLayer = new ProfessionsLayer(client);
+        this.fortressManager = client.getFortressClientManager();
+        this.professionManager = client.getFortressClientManager().getProfessionManager();
     }
 
     @Override
@@ -33,6 +39,10 @@ public class ProfessionsScreen extends Screen {
         this.drawProfessionsTree(matrices, mouseX, mouseY, screenX, screenY);
         this.drawWindowAndTitle(matrices, screenX, screenY);
         this.drawWidgetTooltip(matrices, mouseX, mouseY, screenX, screenY);
+
+        final String availableColonistsText = String.format("Available colonists: %d/%d", professionManager.getFreeColonists(), fortressManager.getTotalColonistsCount());
+
+        this.textRenderer.draw(matrices, availableColonistsText, screenX + 9, screenY + 18, 0xFFFFFF);
 
         this.textRenderer.draw(matrices, "left click on profession - add pawn to profession", this.width + 2, this.height - 10, 0xffffff);
         this.textRenderer.draw(matrices, "right click on profession - remove pawn from profession", this.width + 2, this.height - 10 + this.textRenderer.fontHeight + 2, 0xffffff);
