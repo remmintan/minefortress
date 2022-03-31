@@ -31,105 +31,105 @@ public class ServerBlueprintManager {
                     BlueprintGroup.LIVING_HOUSES,
                     Arrays.asList(
                             //small_house_1.nbt
-                            new BlueprintMetadata("Small House 1", "small_house_1", "house"),
+                            new BlueprintMetadata("Small House 1", "small_house_1").setRequirementId("house"),
                             //small_house_2.nbt
-                            new BlueprintMetadata("Small House 2", "small_house_2", "house"),
+                            new BlueprintMetadata("Small House 2", "small_house_2").setRequirementId("house"),
                             //small_house_3.nbt
-                            new BlueprintMetadata("Small House 3", "small_house_3", "house"),
+                            new BlueprintMetadata("Small House 3", "small_house_3").setRequirementId("house"),
                             //small_house_4.nbt
-                            new BlueprintMetadata("Small House 4", "small_house_4", "house"),
+                            new BlueprintMetadata("Small House 4", "small_house_4").setRequirementId("house"),
                             //small_house_5.nbt
-                            new BlueprintMetadata("Small House 5", "small_house_5", "house", 1),
+                            new BlueprintMetadata("Small House 5", "small_house_5", 1).setRequirementId("house"),
                             //small_house_6.nbt
-                            new BlueprintMetadata("Small House 6", "small_house_6", "house"),
+                            new BlueprintMetadata("Small House 6", "small_house_6").setRequirementId("house"),
                             //small_house_7.nbt
-                            new BlueprintMetadata("Small House 7", "small_house_7", "house"),
+                            new BlueprintMetadata("Small House 7", "small_house_7").setRequirementId("house"),
                             //small_house_8.nbt
-                            new BlueprintMetadata("Small House 8", "small_house_8", "house", 2),
+                            new BlueprintMetadata("Small House 8", "small_house_8", 2).setRequirementId("house"),
                             //medium_house_1.nbt
-                            new BlueprintMetadata("Medium House 1", "medium_house_1", "house", 1, true),
+                            new BlueprintMetadata("Medium House 1", "medium_house_1", 1, true).setRequirementId("house"),
                             //medium_house_2.nbt
-                            new BlueprintMetadata("Medium House 2", "medium_house_2", "house", true),
+                            new BlueprintMetadata("Medium House 2", "medium_house_2", true).setRequirementId("house"),
                             //big_house_1.nbt
-                            new BlueprintMetadata("Big House 1", "big_house_1", "house", 1, true)
+                            new BlueprintMetadata("Big House 1", "big_house_1", 1, true).setRequirementId("house")
                     )
             ),
             entry(
                     BlueprintGroup.WORKSHOPS,
                     Arrays.asList(
                             //armorer_house_1.nbt
-                            new BlueprintMetadata("Armorer House 1", "armorer_house_1", "armorer"),
+                            new BlueprintMetadata("Armorer House 1", "armorer_house_1").setRequirementId("armorer"),
                             //butcher_shop_1.nbt
-                            new BlueprintMetadata("Butcher Shop 1", "butcher_shop_1", "butcher"),
+                            new BlueprintMetadata("Butcher Shop 1", "butcher_shop_1").setRequirementId("butcher"),
                             //butcher_shop_2.nbt
-                            new BlueprintMetadata("Butcher Shop 2", "butcher_shop_2", "butcher", 1),
+                            new BlueprintMetadata("Butcher Shop 2", "butcher_shop_2", 1).setRequirementId("butcher"),
                             //cartographer_1.nbt
-                            new BlueprintMetadata("Cartographer 1", "cartographer_1", "cartographer", 1),
+                            new BlueprintMetadata("Cartographer 1", "cartographer_1", 1).setRequirementId("cartographer"),
                             //fisher_cottage_1.nbt
-                            new BlueprintMetadata("Fisher Cottage 1", "fisher_cottage_1", "fisher", 2),
+                            new BlueprintMetadata("Fisher Cottage 1", "fisher_cottage_1", 2).setRequirementId("fisher"),
                             //fletcher_house_1.nbt
-                            new BlueprintMetadata("Fletcher House 1", "fletcher_house_1", "fletcher", 1),
+                            new BlueprintMetadata("Fletcher House 1", "fletcher_house_1", 1).setRequirementId("fletcher"),
                             //masons_house_1.nbt
-                            new BlueprintMetadata("Masons House 1", "masons_house_1", "masons"),
+                            new BlueprintMetadata("Masons House 1", "masons_house_1").setRequirementId("masons"),
                             //shepherds_house_1.nbt
-                            new BlueprintMetadata("Shepherds House 1", "shepherds_house_1", "shepherd", 1),
+                            new BlueprintMetadata("Shepherds House 1", "shepherds_house_1", 1).setRequirementId("shepherd"),
                             //tannery_1.nbt
-                            new BlueprintMetadata("Tannery 1", "tannery_1", "tanner"),
+                            new BlueprintMetadata("Tannery 1", "tannery_1").setRequirementId("tanner"),
                             //tool_smith_1.nbt
-                            new BlueprintMetadata("Tool Smith 1", "tool_smith_1", "crafter"),
+                            new BlueprintMetadata("Tool Smith 1", "tool_smith_1").setRequirementId("crafter"),
                             //weaponsmith_1.nbt
-                            new BlueprintMetadata("Weaponsmith 1", "weaponsmith_1", "blacksmith")
+                            new BlueprintMetadata("Weaponsmith 1", "weaponsmith_1").setRequirementId("blacksmith")
                     )
             ),
             entry(
                     BlueprintGroup.SOCIAL_BUOLDINGS,
                     Arrays.asList(
                             //library_1.nbt
-                            new BlueprintMetadata("Library 1", "library_1", "social"),
+                            new BlueprintMetadata("Library 1", "library_1").setRequirementId("social"),
                             //library_2.nbt
-                            new BlueprintMetadata("Library 2", "library_2", "social", 1, true),
+                            new BlueprintMetadata("Library 2", "library_2", 1, true).setRequirementId("social"),
                             //temple_3.nbt
-                            new BlueprintMetadata("Temple 3", "temple_3", "social", true),
+                            new BlueprintMetadata("Temple 3", "temple_3", true).setRequirementId("social"),
                             //temple_4.nbt
-                            new BlueprintMetadata("Temple 4", "temple_4", "social", true)
+                            new BlueprintMetadata("Temple 4", "temple_4", true).setRequirementId("social")
                     )
             ),
             entry(
                     BlueprintGroup.FARMS,
                     Arrays.asList(
                             //animal_pen_1.nbt
-                            new BlueprintMetadata("Animal Pen 1", "animal_pen_1", "shepherd", 1),
+                            new BlueprintMetadata("Animal Pen 1", "animal_pen_1", 1).setRequirementId("shepherd"),
                             //animal_pen_2.nbt
-                            new BlueprintMetadata("Animal Pen 2", "animal_pen_2", "shepherd", 1, true),
+                            new BlueprintMetadata("Animal Pen 2", "animal_pen_2", 1, true).setRequirementId("shepherd"),
                             //animal_pen_3.nbt
-                            new BlueprintMetadata("Animal Pen 3", "animal_pen_3", "shepherd", 1, true),
+                            new BlueprintMetadata("Animal Pen 3", "animal_pen_3", 1, true).setRequirementId("shepherd"),
                             //small_farm_1.nbt
-                            new BlueprintMetadata("Small Farm 1", "small_farm_1", "farmer", true),
+                            new BlueprintMetadata("Small Farm 1", "small_farm_1", true).setRequirementId("farmer"),
                             //large_farm_1.nbt
-                            new BlueprintMetadata("Large Farm 1", "large_farm_1", "farmer", true),
+                            new BlueprintMetadata("Large Farm 1", "large_farm_1", true).setRequirementId("farmer"),
                             //stable_1.nbt
-                            new BlueprintMetadata("Stable 1", "stable_1", "stableman", 1, true),
+                            new BlueprintMetadata("Stable 1", "stable_1", 1, true).setRequirementId("stableman"),
                             //stable_2.nbt
-                            new BlueprintMetadata("Stable 2", "stable_2", "stableman", 1, true)
+                            new BlueprintMetadata("Stable 2", "stable_2", 1, true).setRequirementId("stableman")
                     )
             ),
             entry(
                     BlueprintGroup.DECORATION,
                     Arrays.asList(
                             //accessory_1.nbt
-                            new BlueprintMetadata("Accessory 1", "accessory_1", "decor"),
+                            new BlueprintMetadata("Accessory 1", "accessory_1").setRequirementId("decor"),
                             //fountain_01.nbt
-                            new BlueprintMetadata("Fountain 01", "fountain_01", "decor", 1, true),
+                            new BlueprintMetadata("Fountain 01", "fountain_01", 1, true).setRequirementId("decor"),
                             //meeting_point_1.nbt
-                            new BlueprintMetadata("Meeting Point 1", "meeting_point_1", "decor", 1, true),
+                            new BlueprintMetadata("Meeting Point 1", "meeting_point_1", 1, true).setRequirementId("decor"),
                             //meeting_point_2.nbt
-                            new BlueprintMetadata("Meeting Point 2", "meeting_point_2", "decor", 1, true),
+                            new BlueprintMetadata("Meeting Point 2", "meeting_point_2", 1, true).setRequirementId("decor"),
                             //meeting_point_3.nbt
-                            new BlueprintMetadata("Meeting Point 3", "meeting_point_3", "decor", 1, true),
+                            new BlueprintMetadata("Meeting Point 3", "meeting_point_3", 1, true).setRequirementId("decor"),
                             //meeting_point_4.nbt
-                            new BlueprintMetadata("Meeting Point 4", "meeting_point_4", "decor", 1, true),
+                            new BlueprintMetadata("Meeting Point 4", "meeting_point_4", 1, true).setRequirementId("decor"),
                             //meeting_point_5.nbt
-                            new BlueprintMetadata("Meeting Point 5", "meeting_point_5", "decor", 1, true)
+                            new BlueprintMetadata("Meeting Point 5", "meeting_point_5", 1, true).setRequirementId("decor")
                     )
             )
     );
