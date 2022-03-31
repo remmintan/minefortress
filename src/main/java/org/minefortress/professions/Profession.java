@@ -4,12 +4,12 @@ import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import org.minefortress.utils.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Profession {
 
@@ -17,22 +17,17 @@ public class Profession {
     private final ItemStack icon;
     private int amount = 0;
     private final AdvancementFrame type = AdvancementFrame.TASK;
-    private final List<LiteralText> description = Collections.unmodifiableList(
-            Stream.of(
-                "Test description",
-                "Test description",
-                "Test description"
-            )
-            .map(LiteralText::new)
-            .collect(Collectors.toList())
-    );
+    private final List<Text> unlockedDescription;
+    private final List<Text> lockedDescription;
 
     private Profession parent;
     private final List<Profession> children = new ArrayList<>();
 
-    public Profession(String title, Item icon) {
+    public Profession(String title, Item icon, String unlockedDescription, String lockedDescription) {
         this.title = title;
         this.icon = new ItemStack(icon);
+        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, 40);
+        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, 40);
     }
 
     public String getTitle() {
@@ -69,7 +64,15 @@ public class Profession {
         return Collections.unmodifiableList(children);
     }
 
-    public List<LiteralText> getDescription() {
-        return description;
+    public List<Text> getUnlockedDescription() {
+        return unlockedDescription;
+    }
+
+    public List<Text> getLockedDescription() {
+        return lockedDescription;
+    }
+
+     Profession parent() {
+        return parent;
     }
 }

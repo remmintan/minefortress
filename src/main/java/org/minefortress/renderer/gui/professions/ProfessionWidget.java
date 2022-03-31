@@ -9,7 +9,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.minefortress.professions.ClientProfessionManager;
@@ -38,7 +38,7 @@ public class ProfessionWidget extends DrawableHelper {
         this.profession = profession;
         client = MinecraftClient.getInstance();
         int maxTextLength = 29 + client.textRenderer.getWidth(profession.getTitle());
-        for(LiteralText text : this.profession.getDescription()) {
+        for(Text text : this.profession.getUnlockedDescription()) {
             maxTextLength = Math.max(maxTextLength, client.textRenderer.getWidth(text));
         }
         this.width = maxTextLength + 8;
@@ -146,7 +146,7 @@ public class ProfessionWidget extends DrawableHelper {
         int m = bl ? originX + this.x - this.width + 26 + 6 : originX + this.x;
 
         final String title = this.profession.getTitle();
-        final List<LiteralText> description = this.profession.getDescription();
+        final List<Text> description = this.profession.getUnlockedDescription();
 
         int n = 32 + description.size() * this.client.textRenderer.fontHeight;
         boolean bl2 = 113 - originY - this.y - 26 <= 6 + description.size() * client.textRenderer.fontHeight;
