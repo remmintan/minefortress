@@ -75,4 +75,7 @@ public class FortressBulding {
         tag.putString("requirementId", requirementId);
     }
 
+    public String getRequirementId() {
+        return requirementId;
+    }
 }

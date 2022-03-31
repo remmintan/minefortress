@@ -24,7 +24,7 @@ import java.util.stream.StreamSupport;
 
 public final class FortressClientManager extends AbstractFortressManager {
 
-    private final ProfessionManager professionManager = new ProfessionManager();
+    private final ProfessionManager professionManager;
 
     private boolean initialized = false;
 
@@ -39,7 +39,11 @@ public final class FortressClientManager extends AbstractFortressManager {
     private Colonist selectedColonist;
     private Vec3d selectedColonistDelta;
 
-    private List<Pair<BlockPos, BlockPos>> buildings = new ArrayList<>();
+    private List<EssentialBuildingInfo> buildings = new ArrayList<>();
+
+    public FortressClientManager() {
+        professionManager = new ProfessionManager();
+    }
 
     public void select(Colonist colonist) {
         this.selectedColonist = colonist;
@@ -49,7 +53,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         selectedColonistDelta = entityPos.subtract(playerPos);
     }
 
-    public void updateBuildings(List<Pair<BlockPos, BlockPos>> buildings) {
+    public void updateBuildings(List<EssentialBuildingInfo> buildings) {
         this.buildings = buildings;
     }
 
@@ -166,9 +170,9 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public List<BlockPos> getBuildingSelection(BlockPos pos) {
-        for(Pair<BlockPos, BlockPos> building : buildings){
-            final BlockPos start = building.getFirst();
-            final BlockPos end = building.getSecond();
+        for(EssentialBuildingInfo building : buildings){
+            final BlockPos start = building.getStart();
+            final BlockPos end = building.getEnd();
             if(isPosBetween(pos, start, end)){
                 return StreamSupport
                         .stream(BlockPos.iterate(start, end).spliterator(), false)
@@ -182,6 +186,10 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public ProfessionManager getProfessionManager() {
         return professionManager;
+    }
+
+    public boolean hasRequiredBuilding(String requirementId) {
+        return buildings.stream().anyMatch(b -> b.getRequirementId().equals(requirementId));
     }
 
     private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
