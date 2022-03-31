@@ -12,11 +12,13 @@ public class FortressBulding {
     private final BlockPos start;
     private final BlockPos end;
     private final Set<FortressBedInfo> beds;
+    private final String requirementId;
 
-    public FortressBulding(BlockPos start, BlockPos end, Set<FortressBedInfo> bedPositions) {
+    public FortressBulding(BlockPos start, BlockPos end, Set<FortressBedInfo> bedPositions, String requirementId) {
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.beds = Collections.unmodifiableSet(bedPositions);
+        this.requirementId = requirementId;
     }
 
     public FortressBulding(NbtCompound tag) {
@@ -32,14 +34,19 @@ public class FortressBulding {
 
         if(tag.contains("beds")) {
             final long[] beds = tag.getLongArray("beds");
-            final HashSet<FortressBedInfo> unassigned = new HashSet<>();
+            final HashSet<FortressBedInfo> bedsInfo = new HashSet<>();
             for (long bed : beds) {
-                unassigned.add(FortressBedInfo.fromLong(bed));
+                bedsInfo.add(FortressBedInfo.fromLong(bed));
             }
-            this.beds = Collections.unmodifiableSet(unassigned);
+            this.beds = Collections.unmodifiableSet(bedsInfo);
         } else {
             throw new IllegalArgumentException("Tag does not contain beds");
         }
+
+        if(tag.contains("requirementId"))
+            this.requirementId = tag.getString("requirementId");
+        else
+            this.requirementId = "<old>";
     }
 
     public BlockPos getStart() {
@@ -65,6 +72,7 @@ public class FortressBulding {
                 .map(FortressBedInfo::asLong)
                 .collect(Collectors.toList());
         tag.putLongArray("beds", beds);
+        tag.putString("requirementId", requirementId);
     }
 
 }

@@ -28,6 +28,7 @@ public class BlueprintTask extends AbstractTask {
     private final Map<BlockPos, BlockState> blueprintEntityData;
     private final Map<BlockPos, BlockState> blueprintAutomaticData;
     private final float floorLevel;
+    private final String requirementId;
 
     private final Set<FortressBedInfo> beds;
 
@@ -38,7 +39,8 @@ public class BlueprintTask extends AbstractTask {
             Map<BlockPos, BlockState> blueprintData,
             Map<BlockPos, BlockState> blueprintEntityData,
             Map<BlockPos, BlockState> blueprintAutomaticData,
-            int floorLevel
+            int floorLevel,
+            String requirementId
     ) {
         super(id, TaskType.BUILD, startingPos, endingPos);
         this.blueprintData = blueprintData;
@@ -59,6 +61,7 @@ public class BlueprintTask extends AbstractTask {
         }
 
         this.beds = Collections.unmodifiableSet(allBeds);
+        this.requirementId = requirementId;
     }
 
     @Override
@@ -96,7 +99,7 @@ public class BlueprintTask extends AbstractTask {
 
             colonist.doActionOnMasterPlayer(player -> {
                 final FortressServerManager fortressServerManager = player.getFortressServerManager();
-                final FortressBulding fortressBulding = new FortressBulding(startingBlock, endingBlock, beds);
+                final FortressBulding fortressBulding = new FortressBulding(startingBlock, endingBlock, beds, requirementId);
                 fortressServerManager.addBuilding(fortressBulding);
             });
         }
