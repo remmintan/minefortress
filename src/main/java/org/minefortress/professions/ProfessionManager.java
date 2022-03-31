@@ -338,11 +338,11 @@ public class ProfessionManager {
             }
         }
 
-
-        boolean satisfied = fortressManagerSupplier.get().hasRequiredBuilding(buildingRequirement);
+        final AbstractFortressManager fortressManager = fortressManagerSupplier.get();
+        boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement);
         final Block blockRequirement = profession.getBlockRequirement();
         if(Objects.nonNull(blockRequirement)) {
-            // todo
+            satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement);
         }
         return satisfied;
     }

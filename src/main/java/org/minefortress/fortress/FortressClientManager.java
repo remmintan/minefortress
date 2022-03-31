@@ -195,6 +195,11 @@ public final class FortressClientManager extends AbstractFortressManager {
         return buildings.stream().anyMatch(b -> b.getRequirementId().equals(requirementId));
     }
 
+    @Override
+    public boolean hasRequiredBlock(Block block) {
+        return this.specialBlocks.containsKey(block);
+    }
+
     private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
         return pos.getX() >= start.getX() && pos.getX() <= end.getX() &&
                 pos.getY() >= start.getY() && pos.getY() <= end.getY() &&

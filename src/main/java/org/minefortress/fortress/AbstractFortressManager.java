@@ -1,5 +1,6 @@
 package org.minefortress.fortress;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 
@@ -9,5 +10,6 @@ public abstract class AbstractFortressManager {
         return Blocks.CAMPFIRE.getDefaultState();
     }
     public abstract boolean hasRequiredBuilding(String requirementId);
+    public abstract boolean hasRequiredBlock(Block block);
 
 }
