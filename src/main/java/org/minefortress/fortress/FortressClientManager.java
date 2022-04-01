@@ -13,6 +13,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.ProfessionManager;
 import org.minefortress.tasks.BuildingManager;
 
@@ -22,7 +23,7 @@ import java.util.stream.StreamSupport;
 
 public final class FortressClientManager extends AbstractFortressManager {
 
-    private final ProfessionManager professionManager;
+    private final ClientProfessionManager professionManager;
 
     private boolean initialized = false;
 
@@ -41,7 +42,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
 
     public FortressClientManager() {
-        professionManager = new ProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
+        professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
     }
 
     public void select(Colonist colonist) {
@@ -187,7 +188,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         return Collections.emptyList();
     }
 
-    public ProfessionManager getProfessionManager() {
+    public ClientProfessionManager getProfessionManager() {
         return professionManager;
     }
 
