@@ -78,6 +78,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public void tick(ServerPlayerEntity player) {
         tickFortress(player.world);
+        serverProfessionManager.tick(player);
         if(!needSync) return;
         final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
