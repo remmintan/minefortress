@@ -5,6 +5,7 @@ import org.minefortress.network.ServerboundChangeProfessionStatePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class ClientProfessionManager extends ProfessionManager {
@@ -31,4 +32,14 @@ public class ClientProfessionManager extends ProfessionManager {
                 new ServerboundChangeProfessionStatePacket(professionId, change);
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
     }
+
+    public void updateProfessions(List<ProfessionEssentialInfo> info) {
+        for(ProfessionEssentialInfo professionEssentialInfo : info) {
+            final Profession profession = getProfession(professionEssentialInfo.getId());
+            if(profession != null) {
+                profession.setAmount(professionEssentialInfo.getAmount());
+            }
+        }
+    }
+
 }

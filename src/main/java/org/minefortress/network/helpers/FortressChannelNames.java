@@ -22,5 +22,6 @@ public class FortressChannelNames {
     public static final String FORTRESS_BUILDINGS_SYNC = "fortress_buildings_sync";
     public static final String FORTRESS_SPECIAL_BLOCKS_SYNC = "fortress_blocks_sync";
     public static final String FORTRESS_PROFESSION_STATE_CHANGE = "fortress_profession_state_change";
+    public static final String FORTRESS_PROFESSION_SYNC = "fortress_profession_sync";
 
 }
