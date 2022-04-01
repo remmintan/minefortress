@@ -1,5 +1,6 @@
 package org.minefortress.professions;
 
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.network.ClientboundProfessionSyncPacket;
@@ -48,4 +49,18 @@ public class ServerProfessionManager extends ProfessionManager{
     public void scheduleSync() {
         needsUpdate = true;
     }
+
+    public void writeToNbt(NbtCompound tag){
+        professions.forEach((key, value) -> tag.put(key, value.toNbt()));
+    }
+
+    public void readFromNbt(NbtCompound tag){
+        for(String key : tag.getKeys()){
+            final Profession profession = super.getProfession(key);
+            if(profession == null) continue;
+            profession.readNbt(tag.getCompound(key));
+            scheduleSync();
+        }
+    }
+
 }
