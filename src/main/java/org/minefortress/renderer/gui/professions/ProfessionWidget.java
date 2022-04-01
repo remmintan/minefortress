@@ -229,4 +229,14 @@ public class ProfessionWidget extends DrawableHelper {
     public boolean isUnlocked() {
         return this.professionManager.isRequirementsFulfilled(this.profession);
     }
+
+    public void onClick(int button) {
+        if(button == 0) {
+            professionManager.findIdFromProfession(this.profession)
+                            .ifPresent(professionManager::increaseAmount);
+        } else if(button == 1) {
+            professionManager.findIdFromProfession(this.profession)
+                            .ifPresent(professionManager::decreaseAmount);
+        }
+    }
 }

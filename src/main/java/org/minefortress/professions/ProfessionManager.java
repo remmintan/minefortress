@@ -8,11 +8,12 @@ import org.minefortress.fortress.AbstractFortressManager;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Map.entry;
 
-public class ProfessionManager {
+public abstract class ProfessionManager {
 
     public final Map<String, Profession> professions = Map.ofEntries(
             entry(
@@ -346,7 +347,7 @@ public class ProfessionManager {
         return satisfied;
     }
 
-    private Profession getProfession(String name) {
+    public Profession getProfession(String name) {
         return professions.get(name);
     }
 
@@ -467,4 +468,10 @@ public class ProfessionManager {
         return totalColonists - totalWorkers;
     }
 
+    public Optional<String> findIdFromProfession(Profession profession) {
+        return professions.entrySet().stream().filter(entry -> entry.getValue() == profession).map(Map.Entry::getKey).findFirst();
+    }
+
+    public abstract void increaseAmount(String professionId);
+    public abstract void decreaseAmount(String professionId);
 }
