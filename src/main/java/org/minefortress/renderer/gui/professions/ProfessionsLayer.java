@@ -8,7 +8,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.opengl.GL11;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ProfessionManager;
 import org.minefortress.professions.Profession;
@@ -19,8 +18,8 @@ import java.util.List;
 public class ProfessionsLayer extends DrawableHelper {
 
     private static final Identifier LAYER_BACKGROUND = new Identifier("textures/gui/advancements/backgrounds/stone.png");
-    private final static int LAYER_WIDTH = 234;
-    private final static int LAYER_HEIGHT = 113;
+    private int layerWidth = 234;
+    private int layerHeight = 113;
 
     private final ProfessionWidget root;
     private final List<ProfessionWidget> widgets = new LinkedList<>();
@@ -35,6 +34,7 @@ public class ProfessionsLayer extends DrawableHelper {
     private boolean initialized = false;
 
     private float alpha;
+    private final int panExpand = 100;
 
 
     public ProfessionsLayer(FortressMinecraftClient client) {
@@ -51,18 +51,20 @@ public class ProfessionsLayer extends DrawableHelper {
             this.maxPanY = Math.max(this.maxPanY, y + (int)ProfessionWidget.PROFESSION_WIDGET_HEIGHT);
         }
 
-        final int paxExpand = 100;
-        this.maxPanX += paxExpand;
-//        this.minPanX += paxExpand;
-        this.maxPanY += paxExpand;
-//        this.minPanY += paxExpand;
+
+        this.maxPanX += panExpand;
+        this.maxPanY += panExpand;
         this.root = root;
+    }
+
+    public void setLayerSizes(int width, int height) {
+        this.layerWidth = width;
+        this.layerHeight = height;
     }
 
     public void render(MatrixStack matrices) {
         this.init();
         matrices.push();
-        maskBefore(matrices);
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, LAYER_BACKGROUND);
@@ -70,8 +72,8 @@ public class ProfessionsLayer extends DrawableHelper {
         int originY = MathHelper.floor(this.originY);
         int startX = originX % 16;
         int startY = originY % 16;
-        for (int x = -1; x <= 15; ++x) {
-            for (int y = -1; y <= 8; ++y) {
+        for (int x = -1; x <= 29; ++x) {
+            for (int y = -1; y <= 15; ++y) {
                 ProfessionsLayer.drawTexture(matrices, startX + 16 * x, startY + 16 * y, 0.0f, 0.0f, 16, 16, 16, 16);
             }
         }
@@ -80,44 +82,23 @@ public class ProfessionsLayer extends DrawableHelper {
         this.root.renderLines(matrices, originX, originY, false);
         this.root.renderWidgets(matrices, originX, originY);
 
-        maskAfter(matrices);
         matrices.pop();
     }
 
     public void move(double offsetX, double offsetY) {
-        if (this.maxPanX - this.minPanX > LAYER_WIDTH) {
-            this.originX = MathHelper.clamp(this.originX + offsetX, (double)(-(this.maxPanX - LAYER_WIDTH)), 100);
+        if ((this.maxPanX - this.minPanX + panExpand) > layerWidth) {
+            this.originX = MathHelper.clamp(this.originX + offsetX, -(this.maxPanX - layerWidth), panExpand);
         }
-        if (this.maxPanY - this.minPanY > LAYER_HEIGHT) {
-            this.originY = MathHelper.clamp(this.originY + offsetY, (double)(-(this.maxPanY - LAYER_HEIGHT)), 100);
+        if ((this.maxPanY - this.minPanY + panExpand) > layerHeight) {
+            this.originY = MathHelper.clamp(this.originY + offsetY, -(this.maxPanY - layerHeight), panExpand);
         }
     }
 
-    private void maskAfter(MatrixStack matrices) {
-        RenderSystem.depthFunc(GL11.GL_GEQUAL);
-        matrices.translate(0.0, 0.0, -950.0);
-        RenderSystem.colorMask(false, false, false, false);
-        AdvancementTab.fill(matrices, 4680, 2260, -4680, -2260, -16777216);
-        RenderSystem.colorMask(true, true, true, true);
-        RenderSystem.depthFunc(GL11.GL_LEQUAL);
-    }
-
-    private void maskBefore(MatrixStack matrices) {
-        matrices.translate(0.0, 0.0, 950.0);
-        RenderSystem.enableDepthTest();
-        RenderSystem.colorMask(false, false, false, false);
-        AdvancementTab.fill(matrices, 4680, 2260, -4680, -2260, 0xff000000);
-        RenderSystem.colorMask(true, true, true, true);
-        matrices.translate(0.0, 0.0, -950.0);
-        RenderSystem.depthFunc(GL11.GL_GEQUAL);
-        AdvancementTab.fill(matrices, LAYER_WIDTH, LAYER_HEIGHT, 0, 0, 0xff000000);
-        RenderSystem.depthFunc(GL11.GL_LEQUAL);
-    }
 
     private void init() {
         if (!this.initialized) {
-            this.originX = 117 - (double)(this.maxPanX + this.minPanX) / 2;
-            this.originY = 56 - (double)(this.maxPanY + this.minPanY) / 2;
+            this.originX = this.layerWidth/2f - (double)(this.maxPanX + this.minPanX - panExpand) / 2;
+            this.originY = this.layerHeight/2f - (double)(this.maxPanY + this.minPanY - panExpand) / 2;
             this.initialized = true;
         }
     }
@@ -148,13 +129,12 @@ public class ProfessionsLayer extends DrawableHelper {
     public void drawWidgetTooltip(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int screenWidth) {
         matrices.push();
         matrices.translate(0.0, 0.0, -200.0);
-        AdvancementTab.fill(matrices, 0, 0, LAYER_WIDTH, LAYER_HEIGHT, MathHelper.floor(this.alpha * 255.0f) << 24);
+        AdvancementTab.fill(matrices, 0, 0, layerWidth, layerHeight, MathHelper.floor(this.alpha * 255.0f) << 24);
 
         int oX = MathHelper.floor(this.originX);
         int oY = MathHelper.floor(this.originY);
         boolean bl = false;
-        mouseY = mouseY + 35;
-        if (mouseX > 0 && mouseX < LAYER_WIDTH && mouseY > 0 && mouseY < LAYER_HEIGHT) {
+        if (mouseX > 0 && mouseX < layerWidth && mouseY > 0 && mouseY < layerHeight) {
             for (ProfessionWidget advancementWidget : this.widgets) {
                 if (!advancementWidget.shouldRender(oX, oY, mouseX, mouseY)) continue;
                 bl = true;
@@ -170,8 +150,7 @@ public class ProfessionsLayer extends DrawableHelper {
     public void onClick(double mouseX, double mouseY, int button) {
         int oX = MathHelper.floor(this.originX);
         int oY = MathHelper.floor(this.originY);
-        mouseY = mouseY + 55;
-        if (mouseX > 0 && mouseX < LAYER_WIDTH && mouseY > 0 && mouseY < LAYER_HEIGHT) {
+        if (mouseX > 0 && mouseX < layerWidth && mouseY > 0 && mouseY < layerHeight) {
             for (ProfessionWidget professionWidget : this.widgets) {
                 if (!professionWidget.shouldRender(oX, oY, (int)mouseX, (int)mouseY)) continue;
                 professionWidget.onClick(button);
