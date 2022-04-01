@@ -30,15 +30,15 @@ public class Profession {
     public Profession(String title, Item icon, String unlockedDescription, String lockedDescription) {
         this.title = title;
         this.icon = new ItemStack(icon);
-        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, 40);
-        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, 40);
+        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, 200);
+        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, 200);
         this.buildingRequirement = null;
     }
     public Profession(String title, Item icon, String unlockedDescription, String lockedDescription, String buildingRequirement) {
         this.title = title;
         this.icon = new ItemStack(icon);
-        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, 40);
-        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, 40);
+        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, 200);
+        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, 200);
         this.buildingRequirement = buildingRequirement;
     }
 
