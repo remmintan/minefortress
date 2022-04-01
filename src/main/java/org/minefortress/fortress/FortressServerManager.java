@@ -207,6 +207,10 @@ public final class FortressServerManager extends AbstractFortressManager {
             tag.put("specialBlocks", specialBlocksTag);
         }
 
+        NbtCompound professionTag = new NbtCompound();
+        serverProfessionManager.writeToNbt(professionTag);
+        tag.put("profession", professionTag);
+
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -250,6 +254,11 @@ public final class FortressServerManager extends AbstractFortressManager {
                 this.specialBlocks.put(block, posList2);
             }
             this.scheduleSyncSpecialBlocks();
+        }
+
+        if (tag.contains("profession")) {
+            NbtCompound professionTag = tag.getCompound("profession");
+            serverProfessionManager.readFromNbt(professionTag);
         }
 
         this.scheduleSync();

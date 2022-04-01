@@ -4,7 +4,7 @@ import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.utils.GuiUtils;
@@ -101,5 +101,18 @@ public class Profession {
     @Nullable
     public Block getBlockRequirement() {
         return blockRequirement;
+    }
+
+    public NbtCompound toNbt() {
+        final NbtCompound nbtCompound = new NbtCompound();
+        nbtCompound.putInt("amount", amount);
+        return nbtCompound;
+    }
+
+    public void readNbt(NbtCompound nbtCompound) {
+        if(nbtCompound.contains("amount"))
+            amount = nbtCompound.getInt("amount");
+        else
+            amount = 0;
     }
 }
