@@ -51,7 +51,7 @@ public class ProfessionsLayer extends DrawableHelper {
             this.maxPanY = Math.max(this.maxPanY, y + (int)ProfessionWidget.PROFESSION_WIDGET_HEIGHT);
         }
 
-        final int paxExpand = 40;
+        final int paxExpand = 100;
         this.maxPanX += paxExpand;
 //        this.minPanX += paxExpand;
         this.maxPanY += paxExpand;
@@ -86,10 +86,10 @@ public class ProfessionsLayer extends DrawableHelper {
 
     public void move(double offsetX, double offsetY) {
         if (this.maxPanX - this.minPanX > LAYER_WIDTH) {
-            this.originX = MathHelper.clamp(this.originX + offsetX, (double)(-(this.maxPanX - LAYER_WIDTH)), 40.0);
+            this.originX = MathHelper.clamp(this.originX + offsetX, (double)(-(this.maxPanX - LAYER_WIDTH)), 100);
         }
         if (this.maxPanY - this.minPanY > LAYER_HEIGHT) {
-            this.originY = MathHelper.clamp(this.originY + offsetY, (double)(-(this.maxPanY - LAYER_HEIGHT)), 40.0);
+            this.originY = MathHelper.clamp(this.originY + offsetY, (double)(-(this.maxPanY - LAYER_HEIGHT)), 100);
         }
     }
 
@@ -153,7 +153,7 @@ public class ProfessionsLayer extends DrawableHelper {
         int oX = MathHelper.floor(this.originX);
         int oY = MathHelper.floor(this.originY);
         boolean bl = false;
-        mouseY = mouseY + 55;
+        mouseY = mouseY + 35;
         if (mouseX > 0 && mouseX < LAYER_WIDTH && mouseY > 0 && mouseY < LAYER_HEIGHT) {
             for (ProfessionWidget advancementWidget : this.widgets) {
                 if (!advancementWidget.shouldRender(oX, oY, mouseX, mouseY)) continue;

@@ -37,16 +37,19 @@ public class ProfessionsScreen extends Screen {
         int screenX = (this.width - WINDOW_WIDTH) / 2;
         int screenY = (this.height - WINDOW_HEIGHT) / 2;
         this.renderBackground(matrices);
+
+
         this.drawProfessionsTree(matrices, mouseX, mouseY, screenX, screenY);
         this.drawWindowAndTitle(matrices, screenX, screenY);
         this.drawWidgetTooltip(matrices, mouseX, mouseY, screenX, screenY);
 
+        matrices.push();
+        matrices.translate(0, 0, 951.0);
         final String availableColonistsText = String.format("Available colonists: %d/%d", professionManager.getFreeColonists(), fortressManager.getTotalColonistsCount());
-
         this.textRenderer.draw(matrices, availableColonistsText, screenX + 9, screenY + 18, 0xFFFFFF);
-
-        this.textRenderer.draw(matrices, "left click on profession - add pawn to profession", this.width + 2, this.height - 10, 0xffffff);
-        this.textRenderer.draw(matrices, "right click on profession - remove pawn from profession", this.width + 2, this.height - 10 + this.textRenderer.fontHeight + 2, 0xffffff);
+        this.textRenderer.draw(matrices, "left click on profession - add pawn to profession", 2, this.height - (2*this.textRenderer.fontHeight) - 2, 0xffffff);
+        this.textRenderer.draw(matrices, "right click on profession - remove pawn from profession", 2, this.height -  this.textRenderer.fontHeight - 2, 0xffffff);
+        matrices.pop();
     }
 
     @Override
@@ -82,7 +85,10 @@ public class ProfessionsScreen extends Screen {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, WINDOW_TEXTURE);
         this.drawTexture(matrices, screenX, screenY, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        matrices.push();
+        matrices.translate(0, 0, 951);
         this.textRenderer.draw(matrices, this.title, (float)(screenX + 8), (float)(screenY + 6), 0x404040);
+        matrices.pop();
     }
 
     private void drawWidgetTooltip(MatrixStack matrices, int mouseX, int mouseY, int screenX, int screenY) {

@@ -87,7 +87,8 @@ public class ProfessionWidget extends DrawableHelper {
         getItemRenderer().renderInGui(profession.getIcon(), x + this.x + 8, y + this.y + 5);
         matrices.push();
         matrices.translate(0.0, 0.0, 200.0);
-        getTextRenderer().draw(matrices, ""+ getAmount(), x + this.x + 6, y + this.y + 4, 0xFFFFFF);
+        if(unlocked)
+            getTextRenderer().draw(matrices, ""+ getAmount(), x + this.x + 6, y + this.y + 4, 0xFFFFFF);
         matrices.pop();
         final String title = profession.getTitle().contains("-") ? profession.getTitle().split("-")[0] : profession.getTitle();
         final String trimmedTitle = getTextRenderer().trimToWidth(title, (int) (PROFESSION_WIDGET_WIDTH - 4));
@@ -139,6 +140,7 @@ public class ProfessionWidget extends DrawableHelper {
 
     public void drawTooltip(MatrixStack matrices, int originX, int originY, float alpha, int x, int y, int screenWidth) {
         final boolean unlocked = isUnlocked();
+
         AdvancementObtainedStatus status = unlocked?AdvancementObtainedStatus.OBTAINED:AdvancementObtainedStatus.UNOBTAINED;
         int j = MathHelper.floor((float)this.width);
         int k = this.width - j;
@@ -167,7 +169,8 @@ public class ProfessionWidget extends DrawableHelper {
         this.drawTexture(matrices, originX + this.x + 3, originY + this.y, this.profession.getType().getTextureV(), 128 + status.getSpriteIndex() * 26, 26, 26);
         matrices.push();
         matrices.translate(0.0, 0.0, 200.0);
-        getTextRenderer().draw(matrices, ""+ getAmount(), m + 6, originY + this.y + 4, 0xFFFFFFFF);
+        if(unlocked)
+            getTextRenderer().draw(matrices, ""+ getAmount(), m + 6, originY + this.y + 4, 0xFFFFFFFF);
         matrices.pop();
         if (bl) {
             this.client.textRenderer.drawWithShadow(matrices, title, (float)(m + 5), (float)(originY + this.y + 9), 0xffffffff);
@@ -190,7 +193,7 @@ public class ProfessionWidget extends DrawableHelper {
         if(profession.getParent() == null) {
             return professionManager.getFreeColonists();
         } else {
-            return parent.getAmount();
+            return profession.getAmount();
         }
     }
 
@@ -238,5 +241,9 @@ public class ProfessionWidget extends DrawableHelper {
             professionManager.findIdFromProfession(this.profession)
                             .ifPresent(professionManager::decreaseAmount);
         }
+    }
+
+    public ProfessionWidget getParent() {
+        return parent;
     }
 }
