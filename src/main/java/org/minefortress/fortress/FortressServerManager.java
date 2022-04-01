@@ -4,9 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.*;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
@@ -246,7 +244,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             final NbtCompound specialBlocksTag = tag.getCompound("specialBlocks");
             for (String blockId : specialBlocksTag.getKeys()) {
                 final Block block = Registry.BLOCK.get(new Identifier(blockId));
-                final NbtList posList = specialBlocksTag.getList(blockId, 0);
+                final NbtList posList = specialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
                 final List<BlockPos> posList2 = new ArrayList<>();
                 for (int j = 0; j < posList.size(); j++) {
                     posList2.add(NbtHelper.toBlockPos(posList.getCompound(j)));
