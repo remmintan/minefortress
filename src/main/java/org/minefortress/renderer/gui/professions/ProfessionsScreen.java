@@ -23,6 +23,7 @@ public class ProfessionsScreen extends Screen {
     private final ProfessionManager professionManager;
 
     private boolean movingLayer = false;
+    private boolean startClick = false;
 
     public ProfessionsScreen(FortressMinecraftClient client) {
         super(new LiteralText("Professions"));
@@ -50,6 +51,7 @@ public class ProfessionsScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        this.startClick = false;
         if (button != 0) {
             this.movingLayer = false;
             return false;
@@ -99,5 +101,20 @@ public class ProfessionsScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        this.startClick = true;
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if(startClick) {
+            this.professionsLayer.onClick(mouseX, mouseY, button);
+        }
+
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 }

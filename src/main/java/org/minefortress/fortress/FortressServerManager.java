@@ -23,6 +23,7 @@ import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.*;
 
@@ -40,11 +41,16 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
 
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
+    private final ServerProfessionManager serverProfessionManager;
 
     private int maxX = Integer.MIN_VALUE;
     private int maxZ = Integer.MIN_VALUE;
     private int minX = Integer.MAX_VALUE;
     private int minZ = Integer.MAX_VALUE;
+
+    public FortressServerManager() {
+        serverProfessionManager = new ServerProfessionManager(() -> this);
+    }
 
     public void addBuilding(FortressBulding building) {
         final BlockPos start = building.getStart();
@@ -82,7 +88,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
         if(needSyncSpecialBlocks){
             final ClientboundSyncSpecialBlocksPacket syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks);
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, packet);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, syncBlocks);
             needSyncSpecialBlocks = false;
         }
         needSync = false;
@@ -291,5 +297,9 @@ public final class FortressServerManager extends AbstractFortressManager {
     @Override
     public int getTotalColonistsCount() {
         return this.colonists.size();
+    }
+
+    public ServerProfessionManager getServerProfessionManager() {
+        return serverProfessionManager;
     }
 }

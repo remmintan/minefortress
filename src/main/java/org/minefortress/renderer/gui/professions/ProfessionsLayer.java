@@ -167,4 +167,17 @@ public class ProfessionsLayer extends DrawableHelper {
         this.alpha = bl ? MathHelper.clamp(this.alpha + 0.02f, 0.0f, 0.3f) : MathHelper.clamp(this.alpha - 0.04f, 0.0f, 1.0f);
     }
 
+    public void onClick(double mouseX, double mouseY, int button) {
+        int oX = MathHelper.floor(this.originX);
+        int oY = MathHelper.floor(this.originY);
+        mouseY = mouseY + 55;
+        if (mouseX > 0 && mouseX < LAYER_WIDTH && mouseY > 0 && mouseY < LAYER_HEIGHT) {
+            for (ProfessionWidget professionWidget : this.widgets) {
+                if (!professionWidget.shouldRender(oX, oY, (int)mouseX, (int)mouseY)) continue;
+                professionWidget.onClick(button);
+                break;
+            }
+        }
+    }
+
 }
