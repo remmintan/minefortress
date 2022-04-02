@@ -30,7 +30,7 @@ public class ServerBlueprintManager {
             entry(
                     BlueprintGroup.LIVING_HOUSES,
                     Arrays.asList(
-                            //small_house_1.nbt
+                            //wooden_miner_house.nbt
                             new BlueprintMetadata("Small House 1", "small_house_1").setRequirementId("house"),
                             //small_house_2.nbt
                             new BlueprintMetadata("Small House 2", "small_house_2").setRequirementId("house"),
@@ -57,6 +57,7 @@ public class ServerBlueprintManager {
             entry(
                     BlueprintGroup.WORKSHOPS,
                     Arrays.asList(
+                            new BlueprintMetadata("Wooden Miner's House", "wooden_miner_house").setRequirementId("miner_wooden"),
                             //armorer_house_1.nbt
                             new BlueprintMetadata("Armorer House 1", "armorer_house_1").setRequirementId("armorer"),
                             //butcher_shop_1.nbt
