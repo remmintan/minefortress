@@ -15,6 +15,8 @@ import java.util.List;
 
 public class Profession {
 
+    private static final int MAX_WIDTH = 150;
+
     private final String title;
     private final ItemStack icon;
     private int amount = 0;
@@ -30,15 +32,15 @@ public class Profession {
     public Profession(String title, Item icon, String unlockedDescription, String lockedDescription) {
         this.title = title;
         this.icon = new ItemStack(icon);
-        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, 200);
-        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, 200);
+        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, MAX_WIDTH);
+        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, MAX_WIDTH);
         this.buildingRequirement = null;
     }
     public Profession(String title, Item icon, String unlockedDescription, String lockedDescription, String buildingRequirement) {
         this.title = title;
         this.icon = new ItemStack(icon);
-        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, 200);
-        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, 200);
+        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, MAX_WIDTH);
+        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, MAX_WIDTH);
         this.buildingRequirement = buildingRequirement;
     }
 
