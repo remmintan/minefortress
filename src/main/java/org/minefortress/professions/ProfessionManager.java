@@ -313,7 +313,7 @@ public abstract class ProfessionManager {
     );
 
     private final Profession root;
-    private final Supplier<AbstractFortressManager> fortressManagerSupplier;
+    protected final Supplier<AbstractFortressManager> fortressManagerSupplier;
 
     public ProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
         this.root = this.createProfessionTree();

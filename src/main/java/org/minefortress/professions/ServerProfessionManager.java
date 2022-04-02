@@ -2,12 +2,18 @@ package org.minefortress.professions;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.AbstractFortressManager;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.ClientboundProfessionSyncPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class ServerProfessionManager extends ProfessionManager{
 
@@ -39,10 +45,26 @@ public class ServerProfessionManager extends ProfessionManager{
     }
 
     public void tick(ServerPlayerEntity player) {
+        tickRemoveFromProfession();
         if(needsUpdate) {
             ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(this.professions);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             needsUpdate = false;
+        }
+    }
+
+    private void tickRemoveFromProfession() {
+        for(Map.Entry<String, Profession> entry : professions.entrySet()) {
+            final String professionId = entry.getKey();
+            final Profession profession = entry.getValue();
+            final List<Colonist> colonistsWithProfession = this.getColonistsWithProfession(professionId);
+            final int redundantProfCount = colonistsWithProfession.size() - profession.getAmount();
+            if(redundantProfCount <= 0) continue;
+
+            final List<Colonist> colonistsToRemove = colonistsWithProfession.stream()
+                    .limit(redundantProfCount)
+                    .collect(Collectors.toList());
+            colonistsToRemove.forEach(Colonist::resetProfession);
         }
     }
 
@@ -61,6 +83,38 @@ public class ServerProfessionManager extends ProfessionManager{
             profession.readNbt(tag.getCompound(key));
             scheduleSync();
         }
+    }
+
+    public Optional<String> getProfessionsWithAvailablePlaces() {
+        for(Map.Entry<String, Profession> entry : professions.entrySet()) {
+            final String professionId = entry.getKey();
+            final Profession profession = entry.getValue();
+            if(profession.getAmount() > 0) {
+                final long colonistsWithProfession = countColonistsWithProfession(professionId);
+                if(colonistsWithProfession < profession.getAmount()) {
+                    return Optional.of(professionId);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private long countColonistsWithProfession(String professionId) {
+        final FortressServerManager fortressServerManager = (FortressServerManager) super.fortressManagerSupplier.get();
+        return fortressServerManager
+                .getColonists()
+                .stream()
+                .filter(colonist -> colonist.getProfessionId().equals(professionId))
+                .count();
+    }
+
+    private List<Colonist> getColonistsWithProfession(String professionId) {
+        final FortressServerManager fortressServerManager = (FortressServerManager) super.fortressManagerSupplier.get();
+        return fortressServerManager
+                .getColonists()
+                .stream()
+                .filter(colonist -> colonist.getProfessionId().equals(professionId))
+                .collect(Collectors.toList());
     }
 
 }

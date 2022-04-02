@@ -49,6 +49,7 @@ import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.interfaces.FortressSlimeEntity;
+import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.*;
@@ -59,6 +60,9 @@ public class Colonist extends PassiveEntity {
 
     private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<String> PROFESSION_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
+    private static final String DEFAULT_PROFESSION_ID = "colonist";
+
     public static final float WORK_REACH_DISTANCE = 4f;
 
     private final DigControl digControl;
@@ -93,6 +97,7 @@ public class Colonist extends PassiveEntity {
 
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
         this.dataTracker.startTracking(CURRENT_FOOD_LEVEL, HungerConstants.FULL_FOOD_LEVEL);
+        this.dataTracker.startTracking(PROFESSION_ID, DEFAULT_PROFESSION_ID);
     }
 
     @Override
@@ -300,7 +305,7 @@ public class Colonist extends PassiveEntity {
     @Override
     protected void mobTick() {
         super.mobTick();
-
+        tickProfessionCheck();
         if(!this.masterPlayerActionQueue.isEmpty()) {
             final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer(this.getServer());
             if(masterPlayer.isPresent()) {
@@ -314,6 +319,18 @@ public class Colonist extends PassiveEntity {
 
         if(this.getCurrentFoodLevel() != this.hungerManager.getFoodLevel()) {
             this.updateCurrentFoodLevel();
+        }
+    }
+
+    private void tickProfessionCheck() {
+        final String professionId = this.dataTracker.get(PROFESSION_ID);
+        if(DEFAULT_PROFESSION_ID.equals(professionId)) {
+            this.doActionOnMasterPlayer(player -> {
+                final ServerProfessionManager manager = player.getFortressServerManager().getServerProfessionManager();
+                manager.getProfessionsWithAvailablePlaces().ifPresent(p -> {
+                    this.dataTracker.set(PROFESSION_ID, p);
+                });
+            });
         }
     }
 
@@ -448,6 +465,15 @@ public class Colonist extends PassiveEntity {
         final NbtCompound hunger = new NbtCompound();
         this.hungerManager.writeNbt(hunger);
         nbt.put("hunger", hunger);
+
+        final String professionId = this.getProfessionId();
+        if(!DEFAULT_PROFESSION_ID.equals(professionId)) {
+            nbt.putString("professionId", professionId);
+        }
+    }
+
+    public String getProfessionId() {
+        return this.dataTracker.get(PROFESSION_ID);
     }
 
     @Override
@@ -466,6 +492,11 @@ public class Colonist extends PassiveEntity {
             doActionOnMasterPlayer(masterPlayer -> {
                masterPlayer.getFortressServerManager().addColonist(this);
             });
+        }
+
+        if(nbt.contains("professionId")) {
+            final String professionId = nbt.getString("professionId");
+            this.setProfession(professionId);
         }
     }
 
@@ -503,4 +534,13 @@ public class Colonist extends PassiveEntity {
         final FortressServerWorld fortressWorld = (FortressServerWorld) world;
         return !fortressWorld.getTaskManager().hasTask();
     }
+
+    public void setProfession(String professionId) {
+        this.dataTracker.set(PROFESSION_ID, professionId);
+    }
+
+    public void resetProfession() {
+        this.dataTracker.set(PROFESSION_ID, DEFAULT_PROFESSION_ID);
+    }
+
 }
