@@ -165,6 +165,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.scheduleSync();
     }
 
+    public Set<Colonist> getColonists() {
+        return Collections.unmodifiableSet(colonists);
+    }
+
     public void writeToNbt(NbtCompound tag) {
         if(fortressCenter != null) {
             tag.putInt("centerX", fortressCenter.getX());
