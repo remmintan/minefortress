@@ -88,7 +88,8 @@ public class BlueprintTask extends AbstractTask {
     }
 
     @Override
-    public void finishPart(ServerWorld world, TaskPart part, Colonist colonist) {
+    public void finishPart(TaskPart part, Colonist colonist) {
+        final ServerWorld world = (ServerWorld) colonist.world;
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
             blueprintEntityData.forEach((pos, state) -> world.setBlockState(pos.add(startingBlock), state, 3));
 
@@ -103,7 +104,7 @@ public class BlueprintTask extends AbstractTask {
                 fortressServerManager.addBuilding(fortressBulding);
             });
         }
-        super.finishPart(world, part, colonist);
+        super.finishPart(part, colonist);
     }
 
     private Item getItemFromState(BlockState state) {

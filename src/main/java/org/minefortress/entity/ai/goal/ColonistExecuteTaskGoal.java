@@ -1,38 +1,27 @@
 package org.minefortress.entity.ai.goal;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.minefortress.entity.ai.controls.TaskControl;
 import org.minefortress.tasks.*;
 import org.minefortress.entity.ai.ColonistNavigation;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
-import org.minefortress.tasks.interfaces.Task;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class ColonistExecuteTaskGoal extends Goal {
 
     private final Colonist colonist;
     private final ServerWorld world;
-    private final TaskManager manager;
 
     private final MovementHelper movementHelper;
 
-    private Task task;
-    private TaskPart part;
-    private Iterator<TaskBlockInfo> currentPartBlocksIterator;
-
-    private TaskBlockInfo taskBlockInfo = null;
-    private BlockPos nextBlock =  null;
-
-    private final Cache<UUID, Object> returnedIds = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS).build();
+    private BlockPos workGoal =  null;
 
     @Override
     public boolean canStop() {
@@ -45,7 +34,6 @@ public class ColonistExecuteTaskGoal extends Goal {
         World level = this.colonist.world;
         if(level instanceof ServerWorld) {
             this.world = (ServerWorld) level;
-            this.manager = ((FortressServerWorld)world).getTaskManager();
         } else
             throw new IllegalStateException("AI should run on the server entities!");
 
@@ -55,34 +43,11 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        Set<UUID> returnedIds = this.returnedIds.asMap().keySet();
-        return manager.hasTask() && manager.nextTaskIdIsNotIn(returnedIds);
+        return getTaskControl().hasTask();
     }
 
     @Override
     public void start() {
-        colonist.setHasTask(true);
-        task = manager.getTask();
-        part = task.getNextPart(world);
-        currentPartBlocksIterator = part.getIterator();
-
-        if(task instanceof SimpleSelectionTask) {
-            if(task.getTaskType() == TaskType.REMOVE) {
-                colonist.setCurrentTaskDesc("Digging");
-            } else {
-                colonist.setCurrentTaskDesc("Building");
-            }
-        } else if(task instanceof BlueprintTask) {
-            colonist.setCurrentTaskDesc("Building blueprint");
-        } else if(task instanceof CutTreesTask) {
-            colonist.setCurrentTaskDesc("Falling trees");
-        } else if(task instanceof RoadsTask) {
-            colonist.setCurrentTaskDesc("Building roads");
-        }
-
-        if(!task.hasAvailableParts())
-            manager.removeTask();
-
         if(colonist.isSleeping()) {
             colonist.wakeUp();
         }
@@ -91,11 +56,11 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     @Override
     public void tick() {
-        if(this.nextBlock == null || manager.isCancelled(task.getId())) return;
+        if(this.workGoal == null || !getTaskControl().hasTask()) return;
 
         if(this.movementHelper.hasReachedWorkGoal()) {
-            boolean digSuccess = task.getTaskType() == TaskType.REMOVE && colonist.getDigControl().isDone();
-            boolean placeSuccess = task.getTaskType() == TaskType.BUILD && colonist.getPlaceControl().isDone();
+            boolean digSuccess = getTaskControl().is(TaskType.REMOVE) && colonist.getDigControl().isDone();
+            boolean placeSuccess = getTaskControl().is(TaskType.BUILD) && colonist.getPlaceControl().isDone();
             if(digSuccess || placeSuccess) {
                 moveToNextBlock();
             }
@@ -103,73 +68,61 @@ public class ColonistExecuteTaskGoal extends Goal {
 
         this.movementHelper.tick();
         if(this.movementHelper.isCantFindPath() || this.colonist.getPlaceControl().isCantPlaceUnderMyself()) {
-            returnTask();
+            getTaskControl().fail();
             this.colonist.resetControls();
-            this.task = null;
         }
-    }
-
-    public void returnTask() {
-        if(part == null) return;
-
-        manager.returnTask(part);
-        this.returnedIds.put(part.getTask().getId(), new Object());
-        part = null;
     }
 
     @Override
     public boolean shouldContinue() {
-        return this.task != null &&
+        return getTaskControl().hasTask() &&
             (
                 movementHelper.stillTryingToReachGoal() ||
-                nextBlock!=null ||
-                currentPartBlocksIterator.hasNext() ||
+                workGoal !=null ||
+                !getTaskControl().finished() ||
                 colonist.diggingOrPlacing()
-            ) &&
-                !manager.isCancelled(task.getId());
+            );
     }
 
     @Override
     public void stop() {
-        colonist.setHasTask(false);
+        getTaskControl().success();
         this.movementHelper.reset();
         this.colonist.resetControls();
-
-        if(this.task != null) {
-            this.task.finishPart(world, this.part, this.colonist);
-        }
-
-        this.nextBlock = null;
-        this.currentPartBlocksIterator = null;
-        this.task = null;
-        this.part = null;
+        this.workGoal = null;
     }
 
     private void moveToNextBlock() {
         this.movementHelper.reset();
-        this.nextBlock = null;
-        while (currentPartBlocksIterator.hasNext()) {
-            taskBlockInfo = currentPartBlocksIterator.next();
-            nextBlock = taskBlockInfo.getPos();
-            if(currentBlockInCorrectState()) break; // skipping air blocks
+        workGoal = null;
+        TaskBlockInfo taskBlockInfo = null;
+        while (!getTaskControl().finished()) {
+            taskBlockInfo = getTaskControl().getNextBlock();
+            if(taskBlockInfo == null) continue;
+            workGoal = taskBlockInfo.getPos();
+            if(blockInCorrectState(workGoal)) break; // skipping air blocks
         }
-        if(!currentBlockInCorrectState()){
-            this.nextBlock = null;
+        if(!blockInCorrectState(workGoal)){
+            this.workGoal = null;
         }
 
-        if(nextBlock == null) return;
-        movementHelper.set(this.nextBlock);
-        colonist.setGoal(this.taskBlockInfo);
+        if(workGoal == null || taskBlockInfo == null) return;
+        movementHelper.set(workGoal);
+        colonist.setGoal(taskBlockInfo);
     }
 
-    private boolean currentBlockInCorrectState() {
-        if(nextBlock == null) return false;
-        if(task.getTaskType() == TaskType.REMOVE) {
-            return BuildingManager.canRemoveBlock(world, nextBlock);
-        } else if(task.getTaskType() == TaskType.BUILD) {
-            return BuildingManager.canPlaceBlock(world, nextBlock);
+    private boolean blockInCorrectState(BlockPos pos) {
+        if(pos == null) return false;
+        if(getTaskControl().is(TaskType.REMOVE)) {
+            return BuildingManager.canRemoveBlock(world, pos);
+        } else if(getTaskControl().is(TaskType.BUILD)) {
+            return BuildingManager.canPlaceBlock(world, pos);
         } else {
             throw new IllegalStateException();
         }
+    }
+
+    private TaskControl getTaskControl() {
+        return this.colonist.getTaskControl();
     }
 }

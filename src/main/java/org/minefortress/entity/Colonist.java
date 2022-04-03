@@ -36,10 +36,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.ColonistNavigation;
-import org.minefortress.entity.ai.controls.DigControl;
-import org.minefortress.entity.ai.controls.MLGControl;
-import org.minefortress.entity.ai.controls.PlaceControl;
-import org.minefortress.entity.ai.controls.ScaffoldsControl;
+import org.minefortress.entity.ai.MovementHelper;
+import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
 import org.minefortress.entity.ai.goal.ReturnToFireGoal;
 import org.minefortress.entity.ai.goal.SleepOnTheBedGoal;
@@ -47,7 +45,6 @@ import org.minefortress.entity.ai.goal.WanderAroundTheFortressGoal;
 import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
@@ -68,15 +65,14 @@ public class Colonist extends PassiveEntity {
     private final DigControl digControl;
     private final PlaceControl placeControl;
     private final ScaffoldsControl scaffoldsControl;
+    private final TaskControl taskControl;
+    private final MovementHelper movementHelper;
     private final MLGControl mlgControl;
-
-    private ColonistExecuteTaskGoal executeTaskGoal;
 
     private UUID masterPlayerId;
     private BlockPos fortressCenter;
 
     private boolean allowToPlaceBlockFromFarAway = false;
-
     private final ColonistHungerManager hungerManager = new ColonistHungerManager();
     private final Queue<Consumer<FortressServerPlayerEntity>> masterPlayerActionQueue = new ArrayDeque<>();
 
@@ -88,11 +84,15 @@ public class Colonist extends PassiveEntity {
             placeControl = new PlaceControl(this);
             scaffoldsControl = new ScaffoldsControl(this);
             mlgControl = new MLGControl(this);
+            taskControl = new TaskControl(this);
+            movementHelper = new MovementHelper((ColonistNavigation) this.getNavigation(), this);
         } else {
             digControl = null;
             placeControl = null;
             scaffoldsControl = null;
             mlgControl = null;
+            taskControl = null;
+            movementHelper = null;
         }
 
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
@@ -155,17 +155,7 @@ public class Colonist extends PassiveEntity {
 
     @Override
     protected float getBaseMovementSpeedMultiplier() {
-        return this.isHasTask() ? 0.98f :  super.getBaseMovementSpeedMultiplier();
-    }
-
-    private boolean hasTask = false;
-
-    public boolean isHasTask() {
-        return hasTask;
-    }
-
-    public void setHasTask(boolean hasTask) {
-        this.hasTask = hasTask;
+        return this.taskControl.hasTask() ? 0.98f :  super.getBaseMovementSpeedMultiplier();
     }
 
     public void putItemInHand(Item item) {
@@ -257,8 +247,7 @@ public class Colonist extends PassiveEntity {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
         this.goalSelector.add(3, new MeleeAttackGoal(this, 1.5, true));
-        executeTaskGoal  = new ColonistExecuteTaskGoal(this);
-        this.goalSelector.add(6, executeTaskGoal);
+        this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
         this.goalSelector.add(7, new WanderAroundTheFortressGoal(this));
         this.goalSelector.add(7, new SleepOnTheBedGoal(this));
         this.goalSelector.add(8, new ReturnToFireGoal(this));
@@ -295,10 +284,10 @@ public class Colonist extends PassiveEntity {
     }
 
     @Override
-    public void remove(RemovalReason p_146876_) {
-        super.remove(p_146876_);
-        if(this.executeTaskGoal != null) {
-            this.executeTaskGoal.returnTask();
+    public void remove(RemovalReason reason) {
+        super.remove(reason);
+        if(this.taskControl.hasTask()) {
+            this.taskControl.fail();
         }
     }
 
@@ -351,7 +340,7 @@ public class Colonist extends PassiveEntity {
         }
 
         if(this.isTouchingWater() || this.isInLava()) {
-            if(!this.isHasTask())
+            if(!this.taskControl.hasTask())
                 getJumpControl().setActive();
             if(getMlgControl() != null) {
                 getMlgControl().clearResults();
@@ -424,6 +413,7 @@ public class Colonist extends PassiveEntity {
         digControl.reset();
         placeControl.reset();
         scaffoldsControl.clearResults();
+        taskControl.resetTask();
     }
 
     public boolean diggingOrPlacing() {
@@ -449,7 +439,7 @@ public class Colonist extends PassiveEntity {
 
     @Override
     public boolean isPushedByFluids() {
-        return !this.isHasTask();
+        return taskControl != null && !this.taskControl.hasTask();
     }
 
     @Override
@@ -524,23 +514,16 @@ public class Colonist extends PassiveEntity {
         return this.dataTracker.get(CURRENT_FOOD_LEVEL);
     }
 
-    public UUID getMasterPlayerId() {
-        return masterPlayerId;
-    }
-
-    public boolean doesNotHaveAnyOtherTask() {
-        if(hasTask) return false;
-        final World world = this.getEntityWorld();
-        final FortressServerWorld fortressWorld = (FortressServerWorld) world;
-        return !fortressWorld.getTaskManager().hasTask();
-    }
-
     public void setProfession(String professionId) {
         this.dataTracker.set(PROFESSION_ID, professionId);
     }
 
     public void resetProfession() {
         this.dataTracker.set(PROFESSION_ID, DEFAULT_PROFESSION_ID);
+    }
+
+    public TaskControl getTaskControl() {
+        return taskControl;
     }
 
 }

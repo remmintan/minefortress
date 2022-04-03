@@ -30,7 +30,7 @@ public class ReturnToFireGoal extends Goal {
         if(!isNight()) return false;
 
         final BlockPos fortressCenter = colonist.getFortressCenter();
-        return colonist.doesNotHaveAnyOtherTask() &&
+        return !colonist.getTaskControl().hasTask() &&
                 fortressCenter != null &&
                 colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()) > Math.pow(getHomeOuterRadius(), 2);
     }
@@ -83,7 +83,7 @@ public class ReturnToFireGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return isNight() && colonist.doesNotHaveAnyOtherTask() && !this.colonist.getNavigation().isIdle();
+        return isNight() && !colonist.getTaskControl().hasTask() && !this.colonist.getNavigation().isIdle();
     }
 
     @Override

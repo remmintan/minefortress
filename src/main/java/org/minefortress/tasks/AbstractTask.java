@@ -8,6 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.ClientboundTaskExecutedPacket;
@@ -92,8 +93,10 @@ public abstract class AbstractTask implements Task {
     }
 
     @Override
-    public void finishPart(ServerWorld world, TaskPart part, Colonist colonsit) {
+    public void finishPart(TaskPart part, Colonist colonsit) {
         completedParts++;
+
+        ServerWorld world = (ServerWorld) colonsit.world;
 
         if(this.taskType == TaskType.BUILD) {
             this.checkAndPutSpecialBlocksInPart(part, colonsit);
