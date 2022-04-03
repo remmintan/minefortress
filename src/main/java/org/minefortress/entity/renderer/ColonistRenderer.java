@@ -7,7 +7,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.PlayerModelPart;
 import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
@@ -18,7 +17,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.Vec3f;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
@@ -81,7 +82,6 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
             final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
             ColonistRenderer.renderRhombus(matrixStack, buffer, colonist, selecting);
         }
-
     }
 
     @Nullable
