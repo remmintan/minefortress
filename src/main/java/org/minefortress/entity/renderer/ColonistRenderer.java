@@ -7,15 +7,19 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.PlayerModelPart;
 import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
+import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -48,7 +52,7 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
 
 
     public ColonistRenderer(EntityRendererFactory.Context context) {
-        super(context, new BipedEntityModel<>(context.getPart(EntityModelLayers.PLAYER)), 0.5f);
+        super(context, new PlayerEntityModel<>(context.getPart(EntityModelLayers.PLAYER), false), 0.5f);
         BipedEntityModel<Colonist> innerArmor = new BipedEntityModel<>(context.getPart(EntityModelLayers.PLAYER_INNER_ARMOR));
         BipedEntityModel<Colonist> outerArmor = new BipedEntityModel<>(context.getPart(EntityModelLayers.PLAYER_OUTER_ARMOR));
 
@@ -61,21 +65,29 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
     }
 
     @Override
-    protected boolean hasLabel(Colonist p_115333_) {
-        return p_115333_.hasCustomName();
+    protected boolean hasLabel(Colonist colonist) {
+        return colonist.hasCustomName();
     }
 
     @Override
-    public void render(Colonist mobEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
-        super.render(mobEntity, f, g, matrixStack, vertexConsumerProvider, i);
+    public void render(Colonist colonist, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
+        setClothesVilibility(colonist);
+
+        super.render(colonist, f, g, matrixStack, vertexConsumerProvider, i);
         final MinecraftClient client = getClient();
-        final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == mobEntity;
-        final boolean selecting = getFortressClientManager().getSelectedColonist() == mobEntity;
+        final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == colonist;
+        final boolean selecting = getFortressClientManager().getSelectedColonist() == colonist;
         if(hovering || selecting) {
             final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-            ColonistRenderer.renderRhombus(matrixStack, buffer, mobEntity, selecting);
+            ColonistRenderer.renderRhombus(matrixStack, buffer, colonist, selecting);
         }
 
+    }
+
+    @Nullable
+    @Override
+    protected RenderLayer getRenderLayer(Colonist entity, boolean showBody, boolean translucent, boolean showOutline) {
+        return super.getRenderLayer(entity, showBody, translucent, showOutline);
     }
 
     private MinecraftClient getClient() {
@@ -88,6 +100,16 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
 
     private FortressClientManager getFortressClientManager() {
         return getFortressClient().getFortressClientManager();
+    }
+
+    private void setClothesVilibility(MobEntity colonist) {
+        final PlayerEntityModel colonistModel = (PlayerEntityModel)this.getModel();
+        colonistModel.hat.visible = true;
+        colonistModel.jacket.visible = !colonist.isSleeping();
+        colonistModel.leftPants.visible = !colonist.isSleeping();
+        colonistModel.rightPants.visible = !colonist.isSleeping();
+        colonistModel.leftSleeve.visible = !colonist.isSleeping();
+        colonistModel.rightSleeve.visible = !colonist.isSleeping();
     }
 
     private static void renderRhombus(MatrixStack matrices, VertexConsumer vertices, Entity entity, boolean selecting) {
@@ -109,32 +131,17 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
     }
 
     private Identifier convertProfessionToSkin(String professionId) {
-        switch(professionId) {
-            case "baker":
-                return BAKER;
-            case "blacksmith":
-                return BLACKSMITH;
-            case "butcher":
-                return BUTCHER;
-            case "crafter":
-                return CRAFTER;
-            case "farmer":
-                return FARMER;
-            case "fisherman":
-                return FISHERMAN;
-            case "hunter":
-                return HUNTER;
-            case "lumberjack1":
-            case "lumberjack2":
-            case "lumberjack3":
-                return LUMBERJACK;
-            case "miner1":
-            case "miner2":
-            case "miner3":
-                return MINER;
-            case "colonist":
-            default:
-                return STEVE;
-        }
+        return switch (professionId) {
+            case "baker" -> BAKER;
+            case "blacksmith" -> BLACKSMITH;
+            case "butcher" -> BUTCHER;
+            case "crafter" -> CRAFTER;
+            case "farmer" -> FARMER;
+            case "fisherman" -> FISHERMAN;
+            case "hunter" -> HUNTER;
+            case "lumberjack1", "lumberjack2", "lumberjack3" -> LUMBERJACK;
+            case "miner1", "miner2", "miner3" -> MINER;
+            default -> STEVE;
+        };
     }
 }
