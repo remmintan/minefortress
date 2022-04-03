@@ -4,7 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.interfaces.FortressServerWorld;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.tasks.CutTreesTask;
 import org.minefortress.tasks.TaskManager;
@@ -36,7 +36,7 @@ public class ServerboundCutTreesTaskPacket implements FortressServerPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        TaskManager taskManager = ((FortressServerWorld)player.getServerWorld()).getTaskManager();
+        TaskManager taskManager = ((FortressServerPlayerEntity)player).getTaskManager();
         final CutTreesTask cutTreesTask = new CutTreesTask(uuid, treeRoots);
         taskManager.addTask(cutTreesTask);
     }

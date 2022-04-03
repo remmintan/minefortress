@@ -3,7 +3,7 @@ package org.minefortress.network;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.interfaces.FortressServerWorld;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.tasks.TaskManager;
 
@@ -33,7 +33,7 @@ public class ServerboundCancelTaskPacket implements FortressServerPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         UUID id = this.getTaskId();
-        TaskManager taskManager = ((FortressServerWorld)player.getServerWorld()).getTaskManager();
+        TaskManager taskManager = ((FortressServerPlayerEntity)player).getTaskManager();
         taskManager.cancelTask(id);
     }
 }

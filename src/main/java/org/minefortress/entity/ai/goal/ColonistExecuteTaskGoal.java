@@ -9,7 +9,6 @@ import org.minefortress.tasks.*;
 import org.minefortress.entity.ai.ColonistNavigation;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.Colonist;
-import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.*;
