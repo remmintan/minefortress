@@ -78,6 +78,7 @@ public class TaskControl {
     }
 
     public void success() {
+        if(!hasTask()) return;
         this.task.finishPart(taskPart, colonist);
         this.resetTask();
     }
