@@ -24,6 +24,7 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class FortressServerManager extends AbstractFortressManager {
 
@@ -314,4 +315,9 @@ public final class FortressServerManager extends AbstractFortressManager {
     public ServerProfessionManager getServerProfessionManager() {
         return serverProfessionManager;
     }
+
+    public List<Colonist> getFreeColonists() {
+        return this.colonists.stream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
+    }
+
 }

@@ -22,6 +22,7 @@ import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.ClientboundFollowColonistPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.minefortress.tasks.TaskManager;
 import org.minefortress.utils.FortressSpawnLocating;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -48,6 +49,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Shadow @Final public MinecraftServer server;
     private FortressServerManager fortressServerManager;
     private ServerBlueprintManager serverBlueprintManager;
+    private final TaskManager taskManager = new TaskManager();
 
     public FortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
@@ -63,6 +65,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     public void tick(CallbackInfo ci) {
         fortressServerManager.tick((ServerPlayerEntity)(Object)this);
         serverBlueprintManager.tick((ServerPlayerEntity)(Object)this);
+        taskManager.tick(fortressServerManager, (ServerWorld) world);
     }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
