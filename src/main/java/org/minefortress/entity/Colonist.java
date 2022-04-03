@@ -58,6 +58,7 @@ public class Colonist extends PassiveEntity {
     private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<String> PROFESSION_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<Boolean> HAS_TASK = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final String DEFAULT_PROFESSION_ID = "colonist";
 
     public static final float WORK_REACH_DISTANCE = 4f;
@@ -98,6 +99,7 @@ public class Colonist extends PassiveEntity {
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
         this.dataTracker.startTracking(CURRENT_FOOD_LEVEL, HungerConstants.FULL_FOOD_LEVEL);
         this.dataTracker.startTracking(PROFESSION_ID, DEFAULT_PROFESSION_ID);
+        this.dataTracker.startTracking(HAS_TASK, false);
     }
 
     @Override
@@ -326,6 +328,9 @@ public class Colonist extends PassiveEntity {
     @Override
     public void tick() {
         super.tick();
+        if(this.taskControl != null) {
+            this.setHasTask(this.dataTracker.get(HAS_TASK));
+        }
         if(fallDistance > getSafeFallDistance()) {
             BlockPos currentHitPos = getBlockPos().down().down();
             if(!world.getBlockState(currentHitPos).isAir() && getMlgControl() != null) {
@@ -410,7 +415,6 @@ public class Colonist extends PassiveEntity {
         digControl.reset();
         placeControl.reset();
         scaffoldsControl.clearResults();
-        taskControl.resetTask();
     }
 
     public boolean diggingOrPlacing() {
@@ -436,7 +440,7 @@ public class Colonist extends PassiveEntity {
 
     @Override
     public boolean isPushedByFluids() {
-        return taskControl != null && !this.taskControl.hasTask();
+        return !this.hasTask();
     }
 
     @Override
@@ -521,6 +525,14 @@ public class Colonist extends PassiveEntity {
 
     public TaskControl getTaskControl() {
         return taskControl;
+    }
+
+    private void setHasTask(boolean hasTask) {
+        this.dataTracker.set(HAS_TASK, hasTask);
+    }
+
+    private boolean hasTask() {
+        return this.dataTracker.get(HAS_TASK);
     }
 
 }

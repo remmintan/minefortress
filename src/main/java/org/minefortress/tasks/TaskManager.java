@@ -17,39 +17,38 @@ public class TaskManager {
     private final Set<UUID> cancelledTasks = new HashSet<>();
 
     public void tick(FortressServerManager manager, ServerWorld world) {
-        while (this.hasTask()) {
-            final Task task = this.getTask();
-            final List<Colonist> freeColonists = manager.getFreeColonists();
-            if(freeColonists.isEmpty()) return;
-            final TaskType taskType = task.getTaskType();
-            if(taskType == TaskType.BUILD) {
-                final List<Colonist> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
+        if(!hasTask()) return;
+        final Task task = this.getTask();
+        final List<Colonist> freeColonists = manager.getFreeColonists();
+        if(freeColonists.isEmpty()) return;
+        final TaskType taskType = task.getTaskType();
+        if(taskType == TaskType.BUILD) {
+            final List<Colonist> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
 
-                boolean fullyCompleted = setPawnsToTask(world, task, completelyFreePawns);
-                if(fullyCompleted) continue;
+            boolean fullyCompleted = setPawnsToTask(world, task, completelyFreePawns);
+            if(fullyCompleted) return;
 
-                final List<Colonist> otherPawns = freeColonists
-                        .stream()
-                        .filter(c -> isBuilderProfession(c.getProfessionId()))
-                        .filter(c -> c.getTaskControl().canStartTask(task))
-                        .filter(c -> c.getTaskControl().isDoingEverydayTasks())
+            final List<Colonist> otherPawns = freeColonists
+                    .stream()
+                    .filter(c -> isBuilderProfession(c.getProfessionId()))
+                    .filter(c -> c.getTaskControl().canStartTask(task))
+                    .filter(c -> c.getTaskControl().isDoingEverydayTasks())
 
-                        .collect(Collectors.toList());
-                setPawnsToTask(world, task, otherPawns);
-            } else {
-                final List<String> professions = getProfessionIdFromTask(task);
-                final List<Colonist> professionals = freeColonists
-                        .stream()
-                        .filter(c -> professions.contains(c.getProfessionId()))
-                        .filter(c -> c.getTaskControl().canStartTask(task))
-                        .collect(Collectors.toList());
+                    .collect(Collectors.toList());
+            setPawnsToTask(world, task, otherPawns);
+        } else {
+            final List<String> professions = getProfessionIdFromTask(task);
+            final List<Colonist> professionals = freeColonists
+                    .stream()
+                    .filter(c -> professions.contains(c.getProfessionId()))
+                    .filter(c -> c.getTaskControl().canStartTask(task))
+                    .collect(Collectors.toList());
 
-                boolean fullyCompleted = setPawnsToTask(world, task, professionals);
-                if(fullyCompleted) continue;
+            boolean fullyCompleted = setPawnsToTask(world, task, professionals);
+            if(fullyCompleted) return;
 
-                final List<Colonist> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
-                setPawnsToTask(world, task, completelyFreePawns);
-            }
+            final List<Colonist> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
+            setPawnsToTask(world, task, completelyFreePawns);
         }
     }
 
