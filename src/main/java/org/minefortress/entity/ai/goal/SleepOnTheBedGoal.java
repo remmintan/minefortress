@@ -7,6 +7,8 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.ColonistNavigation;
+import org.minefortress.entity.ai.NodeMaker;
 import org.minefortress.fortress.FortressBedInfo;
 import org.minefortress.fortress.FortressServerManager;
 
@@ -62,7 +64,10 @@ public class SleepOnTheBedGoal extends Goal {
         if(bedInfo == null) return;
         final BlockPos pos = bedInfo.getPos();
         final EntityNavigation navigation = colonist.getNavigation();
+        final NodeMaker colonistNodeMaker = (NodeMaker) navigation.getNodeMaker();
+        colonistNodeMaker.setWallClimbMode(true);
         final Path pathTo = navigation.findPathTo(pos, 1);
+        colonistNodeMaker.setWallClimbMode(false);
 
         navigation.startMovingAlong(pathTo, 1.5);
     }
