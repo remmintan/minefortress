@@ -3,16 +3,13 @@ package org.minefortress.network;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.interfaces.FortressServerWorld;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
-import org.minefortress.tasks.TaskType;
 
 import java.util.UUID;
 
@@ -58,15 +55,14 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
         if(player instanceof final FortressServerPlayerEntity fortressServerPlayer) {
             final ServerBlueprintManager blueprintManager = fortressServerPlayer.getServerBlueprintManager();
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation, floorLevel);
-            final ServerWorld serverWorld = player.getWorld();
 
-            if (serverWorld instanceof FortressServerWorld fortressWorld) {
-                Runnable executeBuildTask = () -> fortressWorld.getTaskManager().addTask(task);
+            if (player instanceof FortressServerPlayerEntity fortressPlayer) {
+                Runnable executeBuildTask = () -> fortressPlayer.getTaskManager().addTask(task);
                 if (floorLevel > 0) {
                     final SimpleSelectionTask digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintFile, rotation);
                     digTask.addFinishListener(executeBuildTask);
 
-                    fortressWorld.getTaskManager().addTask(digTask);
+                    fortressPlayer.getTaskManager().addTask(digTask);
                 } else {
                     executeBuildTask.run();
                 }

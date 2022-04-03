@@ -4,12 +4,10 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.NodeMaker;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServerWorld;
 
 import java.util.EnumSet;
 import java.util.Random;

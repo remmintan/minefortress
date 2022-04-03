@@ -8,7 +8,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.interfaces.FortressServerWorld;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.selections.SelectionType;
 import org.minefortress.tasks.SimpleSelectionTask;
@@ -92,7 +92,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         UUID id = this.getId();
         TaskType taskType = this.getTaskType();
-        TaskManager taskManager = ((FortressServerWorld)player.getWorld()).getTaskManager();
+        TaskManager taskManager = ((FortressServerPlayerEntity) player).getTaskManager();
         BlockPos startingBlock = this.getStart();
         BlockPos endingBlock = this.getEnd();
         HitResult hitResult = this.getHitResult();
