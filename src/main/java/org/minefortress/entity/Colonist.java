@@ -345,7 +345,7 @@ public class Colonist extends PassiveEntity {
         }
 
         if(this.isTouchingWater() || this.isInLava()) {
-            if(!this.taskControl.hasTask())
+            if(!this.hasTask())
                 getJumpControl().setActive();
             if(getMlgControl() != null) {
                 getMlgControl().clearResults();
