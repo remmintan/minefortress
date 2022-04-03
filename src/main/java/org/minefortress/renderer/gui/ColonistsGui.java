@@ -15,6 +15,7 @@ import net.minecraft.text.Text;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.professions.Profession;
 import org.minefortress.renderer.gui.professions.ProfessionsScreen;
 import org.minefortress.renderer.gui.widget.FortressItemButtonWidget;
 
@@ -70,15 +71,21 @@ public class ColonistsGui extends FortressGuiScreen{
 
             final int colonistWinX = 0;
             final int colonistWinY = screenHeight - 85;
-            final int width = 120;
+            int width = 120;
             final int height = 85;
             DrawableHelper.fillGradient(matrices, colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, 100);
 
             final String name = Optional.ofNullable(selectedColonist.getCustomName()).map(Text::asString).orElse("");
             final String healthString = String.format("%.0f/%.0f", selectedColonist.getHealth(), selectedColonist.getMaxHealth());
             final String hungerString = String.format("%d/%d", selectedColonist.getCurrentFoodLevel(), HungerConstants.FULL_FOOD_LEVEL);
-            final String professionString = "Miner - 1 LVL";
-            final String tasksString = selectedColonist.getCurrentTaskDesc();
+            final String professionId = selectedColonist.getProfessionId();
+            final String professionName = Optional.ofNullable(fortressManager.getProfessionManager().getProfession(professionId)).map(Profession::getTitle).orElse("");
+            final String task = selectedColonist.getCurrentTaskDesc();
+
+            width = Math.max(width, font.getWidth(healthString));
+            width = Math.max(width, font.getWidth(hungerString));
+            width = Math.max(width, font.getWidth(professionName));
+            width = Math.max(width, font.getWidth(task));
 
             Screen.drawCenteredText(matrices, font, name, colonistWinX + width / 2, colonistWinY + 5, 0xFFFFFF);
 
@@ -88,15 +95,14 @@ public class ColonistsGui extends FortressGuiScreen{
             textRenderer.draw(matrices, healthString, heartIconX + 10, heartIconY + 2, 0xFFFFFF);
 
             int hungerIconX = colonistWinX + width/2 + 5;
-            int hungerIconY = heartIconY;
-            renderIcon(matrices, hungerIconX, hungerIconY, 8, 8, 52, 28);
-            textRenderer.draw(matrices, hungerString, hungerIconX + 10, hungerIconY + 2, 0xFFFFFF);
+            renderIcon(matrices, hungerIconX, heartIconY, 8, 8, 52, 28);
+            textRenderer.draw(matrices, hungerString, hungerIconX + 10, heartIconY + 2, 0xFFFFFF);
 
-            textRenderer.draw(matrices, "Profession:", colonistWinX + 5, hungerIconY + textRenderer.fontHeight + 5, 0xFFFFFF);
-            textRenderer.draw(matrices, professionString, colonistWinX + 5, hungerIconY + 2 * textRenderer.fontHeight + 5 , 0xFFFFFF);
+            textRenderer.draw(matrices, "Profession:", colonistWinX + 5, heartIconY + textRenderer.fontHeight + 5, 0xFFFFFF);
+            textRenderer.draw(matrices, professionName, colonistWinX + 5, heartIconY + 2 * textRenderer.fontHeight + 5 , 0xFFFFFF);
 
-            textRenderer.draw(matrices, "Task:", colonistWinX + 5, hungerIconY + 3 * textRenderer.fontHeight + 10, 0xFFFFFF);
-            textRenderer.draw(matrices, tasksString, colonistWinX + 5, hungerIconY + 4 * textRenderer.fontHeight + 10, 0xFFFFFF);
+            textRenderer.draw(matrices, "Task:", colonistWinX + 5, heartIconY + 3 * textRenderer.fontHeight + 10, 0xFFFFFF);
+            textRenderer.draw(matrices, task, colonistWinX + 5, heartIconY + 4 * textRenderer.fontHeight + 10, 0xFFFFFF);
         }
     }
 
