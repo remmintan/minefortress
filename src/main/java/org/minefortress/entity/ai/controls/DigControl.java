@@ -55,14 +55,34 @@ public class DigControl extends PositionedActionControl {
     private void putProperItemInHand() {
         final BlockState blockState = level.getBlockState(goal);
         Item item = null;
+        final String professionId = colonist.getProfessionId();
         if(blockState.isIn(BlockTags.PICKAXE_MINEABLE)) {
-            item = blockState.isIn(BlockTags.NEEDS_DIAMOND_TOOL) ? Items.DIAMOND_PICKAXE : Items.IRON_PICKAXE;
+            item = switch (professionId) {
+                case "miner1" -> Items.STONE_PICKAXE;
+                case "miner2" -> Items.IRON_PICKAXE;
+                case "miner3" -> Items.DIAMOND_PICKAXE;
+                default -> Items.WOODEN_PICKAXE;
+            };
         } else if (blockState.isIn(BlockTags.SHOVEL_MINEABLE)) {
-            item = blockState.isIn(BlockTags.NEEDS_DIAMOND_TOOL) ? Items.DIAMOND_SHOVEL : Items.IRON_SHOVEL;
+            item = switch (professionId) {
+                case "miner1" -> Items.STONE_SHOVEL;
+                case "miner2" -> Items.IRON_SHOVEL;
+                case "miner3" -> Items.DIAMOND_SHOVEL;
+                default -> Items.WOODEN_SHOVEL;
+            };
         } else if (blockState.isIn(BlockTags.AXE_MINEABLE)) {
-            item = blockState.isIn(BlockTags.NEEDS_DIAMOND_TOOL) ? Items.DIAMOND_AXE : Items.IRON_AXE;
+            item = switch (professionId) {
+                case "miner1", "lumberjack1" -> Items.STONE_AXE;
+                case "miner2", "lumberjack2" -> Items.IRON_AXE;
+                case "miner3", "lumberjack3" -> Items.DIAMOND_AXE;
+                default -> Items.WOODEN_AXE;
+            };
         } else if (blockState.isIn(BlockTags.HOE_MINEABLE)) {
-            item = blockState.isIn(BlockTags.NEEDS_DIAMOND_TOOL) ? Items.DIAMOND_HOE : Items.IRON_HOE;
+            if("farmer".equals(professionId)) {
+                item = Items.IRON_HOE;
+            } else {
+                item = Items.WOODEN_HOE;
+            }
         }
 
         colonist.putItemInHand(item);
