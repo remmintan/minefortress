@@ -3,6 +3,7 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
@@ -10,6 +11,7 @@ import org.minefortress.entity.ai.NodeMaker;
 import org.minefortress.fortress.FortressServerManager;
 
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Random;
 
 public class ReturnToFireGoal extends Goal {
@@ -25,7 +27,14 @@ public class ReturnToFireGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if(!isNight()) return false;
+        if(!isNight()) {
+            final Optional<FortressServerManager> fortressServerManager = colonist.getFortressServerManager();
+            if(fortressServerManager.isPresent()) {
+                final FortressServerManager serverManager = fortressServerManager.get();
+                final Optional<BlockPos> pos = serverManager.randomSurfacePos((ServerWorld) colonist.world);
+                if(pos.isPresent()) return false; // is day and have some surface positions
+            }
+        }
 
         final BlockPos fortressCenter = colonist.getFortressCenter();
         return !colonist.getTaskControl().hasTask() &&
