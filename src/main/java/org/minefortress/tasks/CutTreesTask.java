@@ -64,26 +64,27 @@ public class CutTreesTask implements Task {
     }
 
     @Override
-    public void finishPart(ServerWorld level, TaskPart part, Colonist colonist) {
+    public void finishPart(TaskPart part, Colonist colonist) {
+        final ServerWorld world = (ServerWorld) colonist.world;
         if(part != null && part.getStartAndEnd() != null && part.getStartAndEnd().getFirst() != null) {
             final BlockPos root = part.getStartAndEnd().getFirst();
-            final Optional<TreeBlocks> treeBlocks = TreeHelper.getTreeBlocks(root.up(), level);
+            final Optional<TreeBlocks> treeBlocks = TreeHelper.getTreeBlocks(root.up(), world);
             if(treeBlocks.isPresent()) {
                 final TreeBlocks tree = treeBlocks.get();
                 tree.getTreeBlocks().forEach(blockPos -> {
-                    level.breakBlock(blockPos, false, colonist);
-                    level.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
+                    world.breakBlock(blockPos, false, colonist);
+                    world.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
                 });
                 tree.getLeavesBlocks().forEach(blockPos -> {
-                    level.breakBlock(blockPos, false, colonist);
-                    level.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
+                    world.breakBlock(blockPos, false, colonist);
+                    world.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
                 });
             }
         }
 
         removedRoots++;
         if(treeRoots.isEmpty() && removedRoots <= totalRootCount) {
-            level.getPlayers().stream().findAny().ifPresent(player -> {
+            world.getPlayers().stream().findAny().ifPresent(player -> {
                 FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
             });
         }

@@ -25,7 +25,7 @@ public class SleepOnTheBedGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if(!isNight() || !colonist.doesNotHaveAnyOtherTask()) return false;
+        if(!isNight() || colonist.getTaskControl().hasTask()) return false;
 
         final Optional<FortressBedInfo> freeBedOptional = getFreeBed();
         return freeBedOptional.isPresent();
@@ -75,7 +75,7 @@ public class SleepOnTheBedGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return isNight() && bedInfo != null && colonist.doesNotHaveAnyOtherTask();
+        return isNight() && bedInfo != null && !colonist.getTaskControl().hasTask();
     }
 
     @Override

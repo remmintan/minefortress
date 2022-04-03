@@ -43,7 +43,7 @@ public class ScaffoldsControl extends ActionControl {
             colonist.world.setBlockState(placePosition, SCAFFOLD_BLOCK.getDefaultState(), 3);
             colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, placePosition);
 
-            if(!colonist.isHasTask()){
+            if(!colonist.getTaskControl().hasTask()){
                 final BlockTask blockTask = new BlockTask(
                     () -> {
                         final World level = colonist.world;

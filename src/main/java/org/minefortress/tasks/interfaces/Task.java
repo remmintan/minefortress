@@ -18,6 +18,6 @@ public interface Task {
     boolean hasAvailableParts();
     TaskPart getNextPart(ServerWorld level);
     void returnPart(Pair<BlockPos, BlockPos> partStartAndEnd);
-    void finishPart(ServerWorld level, TaskPart part, Colonist colonist);
+    void finishPart(TaskPart part, Colonist colonist);
 
 }

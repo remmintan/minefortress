@@ -119,10 +119,11 @@ public class RoadsTask implements Task {
     }
 
     @Override
-    public void finishPart(ServerWorld level, TaskPart part, Colonist colonist) {
+    public void finishPart(TaskPart part, Colonist colonist) {
+        final ServerWorld world = (ServerWorld) colonist.world;
         finishedParts++;
         if(taskParts.isEmpty() && finishedParts == totalParts){
-            level.getPlayers().stream().findAny().ifPresent(player -> {
+            world.getPlayers().stream().findAny().ifPresent(player -> {
                 FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
             });
             onComplete.run();

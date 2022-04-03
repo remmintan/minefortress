@@ -36,7 +36,7 @@ public class TaskManager {
         tasks.remove();
     }
 
-    public void returnTask(TaskPart taskPart) {
+    public void returnTaskPart(TaskPart taskPart) {
         Task task = taskPart.getTask();
         task.returnPart(taskPart.getStartAndEnd());
 
