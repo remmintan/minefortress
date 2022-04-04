@@ -30,6 +30,7 @@ public class CrafterDailyTask implements ProfessionDailyTask{
 
     @Override
     public void tick(Colonist colonist) {
+        if(this.tablePos == null) return;
         final MovementHelper movementHelper = colonist.getMovementHelper();
         if(movementHelper.hasReachedWorkGoal()) {
             if(workingTicks % 10 == 0) {
@@ -54,7 +55,7 @@ public class CrafterDailyTask implements ProfessionDailyTask{
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return colonist.world.isDay() && workingTicks < MAX_WORK_TIME;
+        return tablePos != null && colonist.world.isDay() && workingTicks < MAX_WORK_TIME;
     }
 
     private void setupTablePos(Colonist colonist) {
