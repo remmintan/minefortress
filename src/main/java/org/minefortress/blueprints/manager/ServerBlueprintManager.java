@@ -57,7 +57,14 @@ public class ServerBlueprintManager {
             entry(
                     BlueprintGroup.WORKSHOPS,
                     Arrays.asList(
-                            new BlueprintMetadata("Wooden Miner's House", "wooden_miner_house").setRequirementId("miner_wooden"),
+                            new BlueprintMetadata("Wooden Miner's House", "miner_house_wooden").setRequirementId("miner_wooden"),
+                            new BlueprintMetadata("Stone Miner's house", "miner_house_stone").setRequirementId("miner_stone"),
+                            new BlueprintMetadata("Miners' guild house", "miner_house_guild").setRequirementId("miners_guild"),
+
+                            new BlueprintMetadata("Wooden Lumberjack's house", "lumberjack_house_wooden").setRequirementId("lumberjack_wooden"),
+                            new BlueprintMetadata("Stone Lumberjack's house", "lumberjack_house_stone").setRequirementId("lumberjack_stone"),
+                            new BlueprintMetadata("Lumberjack's guild house", "lumberjack_house_guild").setRequirementId("lumberjack_guild"),
+
                             //armorer_house_1.nbt
                             new BlueprintMetadata("Armorer House 1", "armorer_house_1").setRequirementId("armorer"),
                             //butcher_shop_1.nbt
