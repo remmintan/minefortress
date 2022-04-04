@@ -18,8 +18,6 @@ public class ColonistExecuteTaskGoal extends Goal {
     private final Colonist colonist;
     private final ServerWorld world;
 
-    private final MovementHelper movementHelper;
-
     private BlockPos workGoal =  null;
 
     @Override
@@ -36,7 +34,6 @@ public class ColonistExecuteTaskGoal extends Goal {
         } else
             throw new IllegalStateException("AI should run on the server entities!");
 
-        this.movementHelper = new MovementHelper((ColonistNavigation) this.colonist.getNavigation(), this.colonist);
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Goal.Control.JUMP));
     }
 
@@ -57,7 +54,7 @@ public class ColonistExecuteTaskGoal extends Goal {
     public void tick() {
         if(this.workGoal == null || !getTaskControl().hasTask()) return;
 
-        if(this.movementHelper.hasReachedWorkGoal()) {
+        if(getMovementHelper().hasReachedWorkGoal()) {
             boolean digSuccess = getTaskControl().is(TaskType.REMOVE) && colonist.getDigControl().isDone();
             boolean placeSuccess = getTaskControl().is(TaskType.BUILD) && colonist.getPlaceControl().isDone();
             if(digSuccess || placeSuccess) {
@@ -65,8 +62,8 @@ public class ColonistExecuteTaskGoal extends Goal {
             }
         }
 
-        this.movementHelper.tick();
-        if(this.movementHelper.isCantFindPath() || this.colonist.getPlaceControl().isCantPlaceUnderMyself()) {
+        getMovementHelper().tick();
+        if(getMovementHelper().isCantFindPath() || this.colonist.getPlaceControl().isCantPlaceUnderMyself()) {
             getTaskControl().fail();
             this.colonist.resetControls();
         }
@@ -76,7 +73,7 @@ public class ColonistExecuteTaskGoal extends Goal {
     public boolean shouldContinue() {
         return getTaskControl().hasTask() &&
             (
-                movementHelper.stillTryingToReachGoal() ||
+                getMovementHelper().stillTryingToReachGoal() ||
                 workGoal !=null ||
                 !getTaskControl().finished() ||
                 colonist.diggingOrPlacing()
@@ -86,13 +83,13 @@ public class ColonistExecuteTaskGoal extends Goal {
     @Override
     public void stop() {
         getTaskControl().success();
-        this.movementHelper.reset();
+        getMovementHelper().reset();
         this.colonist.resetControls();
         this.workGoal = null;
     }
 
     private void moveToNextBlock() {
-        this.movementHelper.reset();
+        getMovementHelper().reset();
         workGoal = null;
         TaskBlockInfo taskBlockInfo = null;
         while (!getTaskControl().finished()) {
@@ -106,7 +103,7 @@ public class ColonistExecuteTaskGoal extends Goal {
         }
 
         if(workGoal == null || taskBlockInfo == null) return;
-        movementHelper.set(workGoal);
+        getMovementHelper().set(workGoal);
         colonist.setGoal(taskBlockInfo);
     }
 
@@ -123,5 +120,9 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     private TaskControl getTaskControl() {
         return this.colonist.getTaskControl();
+    }
+
+    private MovementHelper getMovementHelper() {
+        return this.colonist.getMovementHelper();
     }
 }

@@ -131,6 +131,11 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     boolean shouldRender(int originX, int originY, int mouseX, int mouseY) {
+        final Profession parent = profession.getParent();
+        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent)){
+            return false;
+        }
+
         int i = originX + this.x;
         int j = i + 26;
         int k = originY + this.y;
