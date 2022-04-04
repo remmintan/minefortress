@@ -94,7 +94,8 @@ public abstract class ProfessionManager {
                             "Forester",
                             Items.APPLE,
                             "Hunts animals\nCollects seeds\nGet's and cooks on fire some basic food.\nCan collect and plant saplings.",
-                            "Build 'Forester's house' to unlock",
+//                            "Build 'Forester's house' to unlock",
+                            "Will be available in 1.5-alpha",
                             "forester"
                     )
             ),
@@ -144,8 +145,9 @@ public abstract class ProfessionManager {
                             "Shepherd",
                             Items.CARROT_ON_A_STICK,
                             "Brings pigs, sheeps and cows to the village.\nProvides milks, wool and meat",
-                            "Build 'Animal Pen' to unlock",
-                            "shepherd"
+//                            "Build 'Animal Pen' to unlock",
+                            "Will be available in 1.5-alpha",
+                            "_"
                     )
             ),
             entry(

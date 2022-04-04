@@ -320,4 +320,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         return this.colonists.stream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
     }
 
+    public List<BlockPos> getSpecialBlocksByType(Block block) {
+        return specialBlocks.getOrDefault(block, Collections.emptyList());
+    }
+
 }

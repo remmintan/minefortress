@@ -38,10 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.ColonistNavigation;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
-import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
-import org.minefortress.entity.ai.goal.ReturnToFireGoal;
-import org.minefortress.entity.ai.goal.SleepOnTheBedGoal;
-import org.minefortress.entity.ai.goal.WanderAroundTheFortressGoal;
+import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -118,6 +115,10 @@ public class Colonist extends PassiveEntity {
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
 
+    public MovementHelper getMovementHelper() {
+        return movementHelper;
+    }
+
     private void setCustomNameIfNeeded(FortressServerPlayerEntity player) {
         if(!this.hasCustomName()) {
             this.setCustomName(new LiteralText(player.getFortressServerManager().getNameGenerator().generateRandomName()));
@@ -132,6 +133,11 @@ public class Colonist extends PassiveEntity {
         } else {
             masterPlayerActionQueue.add(playerConsumer);
         }
+    }
+
+    public Optional<FortressServerManager> getFortressManager() {
+        final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer(getServer());
+        return masterPlayer.map(FortressServerPlayerEntity::getFortressServerManager);
     }
 
     @NotNull
@@ -249,6 +255,7 @@ public class Colonist extends PassiveEntity {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
         this.goalSelector.add(3, new MeleeAttackGoal(this, 1.5, true));
+        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
         this.goalSelector.add(7, new WanderAroundTheFortressGoal(this));
         this.goalSelector.add(7, new SleepOnTheBedGoal(this));
@@ -436,6 +443,10 @@ public class Colonist extends PassiveEntity {
 
     public void lookAtGoal() {
         getLookControl().lookAt(this.goal.getX(), this.goal.getY(), this.goal.getZ());
+    }
+
+    public void lookAt(BlockPos pos) {
+        getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
