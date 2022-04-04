@@ -45,6 +45,16 @@ public class ServerProfessionManager extends ProfessionManager{
     }
 
     public void tick(ServerPlayerEntity player) {
+        for(Profession prof : professions.values()) {
+            if(prof.getAmount() > 0) {
+                final boolean unlocked = this.isRequirementsFulfilled(prof);
+                if(!unlocked) {
+                    prof.setAmount(0);
+                    this.scheduleSync();
+                }
+            }
+        }
+
         tickRemoveFromProfession();
         if(needsUpdate) {
             ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(this.professions);
