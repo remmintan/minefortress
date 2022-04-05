@@ -9,6 +9,7 @@ import net.minecraft.client.tutorial.TutorialManager;
 import net.minecraft.client.tutorial.TutorialStep;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -123,7 +124,8 @@ public abstract class FortressInteractionManagerMixin {
                     cir.setReturnValue(ActionResult.SUCCESS);
                     return;
                 }
-                Item item = player.getStackInHand(hand).getItem();
+                final ItemStack stackInHand = player.getStackInHand(hand);
+                Item item = stackInHand.getItem();
                 ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);
                 final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
                 if(blockStateFromItem != null) {
@@ -136,7 +138,12 @@ public abstract class FortressInteractionManagerMixin {
                     selectionManager.selectBlock(blockPos, null);
                     cir.setReturnValue(ActionResult.SUCCESS);
                 }
+
+                if(stackInHand.isEmpty()) {
+                    cir.setReturnValue(ActionResult.PASS);
+                }
             }
+
         }
     }
 
