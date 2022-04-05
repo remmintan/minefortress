@@ -27,8 +27,7 @@
     "renderer.FortressGameRendererMixin",
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
-    "world.FortressClientWorldMixin",
-    "world.FortressServerWorldMixin"
+    "world.FortressClientWorldMixin"
   ],
   "server": [],
   "injectors": {
