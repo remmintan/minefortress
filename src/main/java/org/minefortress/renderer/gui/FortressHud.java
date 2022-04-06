@@ -12,6 +12,7 @@ import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.ClickType;
 import org.minefortress.selections.SelectionManager;
+import org.minefortress.selections.SelectionType;
 
 public class FortressHud {
 
@@ -86,20 +87,43 @@ public class FortressHud {
             return;
         }
 
-        if(selectionManager != null && selectionManager.isSelecting()) {
-            if(selectionManager.getClickType() == ClickType.REMOVE) {
-                DrawableHelper.drawStringWithShadow(p, font, "left click - confirm task", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
-                DrawableHelper.drawStringWithShadow(p, font, "right click - cancel", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+        if(selectionManager != null) {
+            final SelectionType selectionType = selectionManager.getCurrentSelectionType();
+            if(selectionType == SelectionType.ROADS) {
+                if(selectionManager.isSelecting()) {
+                    DrawableHelper.drawStringWithShadow(p, font, "left click - cancel", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
+                    DrawableHelper.drawStringWithShadow(p, font, "right click - confirm task", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+                    DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - expand road", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+                    DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - shrink road", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+                } else {
+                    DrawableHelper.drawStringWithShadow(p, font, "put any block in your hand", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+                    DrawableHelper.drawStringWithShadow(p, font, "right click - start road", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+                }
+            } else if(selectionType == SelectionType.TREE) {
+                if(selectionManager.isSelecting()) {
+                    DrawableHelper.drawStringWithShadow(p, font, "left click - confirm task", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
+                    DrawableHelper.drawStringWithShadow(p, font, "right click - cancel", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+                } else {
+                    DrawableHelper.drawStringWithShadow(p, font, "left click - start tree", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+                    DrawableHelper.drawStringWithShadow(p, font, "selection", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+                }
             } else {
-                DrawableHelper.drawStringWithShadow(p, font, "left click - cancel", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
-                DrawableHelper.drawStringWithShadow(p, font, "right click - confirm task", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
-            }
+                if(selectionManager.isSelecting()) {
+                    if(selectionManager.getClickType() == ClickType.REMOVE) {
+                        DrawableHelper.drawStringWithShadow(p, font, "left click - confirm task", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
+                        DrawableHelper.drawStringWithShadow(p, font, "right click - cancel", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+                    } else {
+                        DrawableHelper.drawStringWithShadow(p, font, "left click - cancel", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
+                        DrawableHelper.drawStringWithShadow(p, font, "right click - confirm task", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+                    }
 
-            DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - move up", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
-            DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - move down", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
-        } else {
-            DrawableHelper.drawStringWithShadow(p, font, "left click - dig", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
-            DrawableHelper.drawStringWithShadow(p, font, "right click - build", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+                    DrawableHelper.drawStringWithShadow(p, font, "ctrl + E - move up", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+                    DrawableHelper.drawStringWithShadow(p, font, "ctrl + Q - move down", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+                } else {
+                    DrawableHelper.drawStringWithShadow(p, font, "left click - dig", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+                    DrawableHelper.drawStringWithShadow(p, font, "right click - build", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+                }
+            }
         }
     }
 
