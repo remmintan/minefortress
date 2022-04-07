@@ -33,7 +33,7 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos);
+            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode);
         }
     }
 

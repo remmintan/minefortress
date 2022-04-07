@@ -143,7 +143,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public boolean isFortressInitializationNeeded() {
-        return initialized && fortressCenter == null;
+        return initialized && fortressCenter == null && this.gamemode != FortressGamemode.NONE;
     }
 
     public void setupFortressCenter() {
