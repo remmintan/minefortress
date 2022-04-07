@@ -222,8 +222,8 @@ public final class FortressClientManager extends AbstractFortressManager {
         return this.initialized && this.gamemode == FortressGamemode.NONE;
     }
 
-    public FortressGamemode getGamemode() {
-        return gamemode;
+    public boolean isCreative() {
+        return this.gamemode == FortressGamemode.CREATIVE;
     }
 
     private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
