@@ -3,6 +3,7 @@ package org.minefortress.network;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.fortress.FortressGamemode;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressClientPacket;
 
@@ -10,10 +11,12 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
 
     private final int colonistsCount;
     private final BlockPos fortressPos;
+    private final FortressGamemode fortressGamemode;
 
-    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos) {
+    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode) {
         this.colonistsCount = colonistsCount;
         this.fortressPos = fortressPos;
+        this.fortressGamemode = fortressGamemode;
     }
 
     public ClientboundSyncFortressManagerPacket(PacketByteBuf buf) {
@@ -23,6 +26,8 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
             this.fortressPos = buf.readBlockPos();
         else
             this.fortressPos = null;
+
+        this.fortressGamemode = FortressGamemode.valueOf(buf.readString(100));
     }
 
     @Override
@@ -39,5 +44,7 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
         buf.writeBoolean(centerExists);
         if(centerExists)
             buf.writeBlockPos(fortressPos);
+
+        buf.writeString(fortressGamemode.name());
     }
 }

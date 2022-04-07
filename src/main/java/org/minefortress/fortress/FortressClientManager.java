@@ -11,6 +11,7 @@ import net.minecraft.world.GameMode;
 import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundFortressCenterSetPacket;
+import org.minefortress.network.ServerboundSetGamemodePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ClientProfessionManager;
@@ -40,6 +41,8 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private List<EssentialBuildingInfo> buildings = new ArrayList<>();
     private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
+
+    private FortressGamemode gamemode;
 
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
@@ -83,9 +86,10 @@ public final class FortressClientManager extends AbstractFortressManager {
         return colonistsCount;
     }
 
-    public void sync(int colonistsCount, BlockPos fortressCenter) {
+    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode) {
         this.colonistsCount = colonistsCount;
         this.fortressCenter = fortressCenter;
+        this.gamemode = gamemode;
         initialized = true;
     }
 
@@ -204,6 +208,18 @@ public final class FortressClientManager extends AbstractFortressManager {
     @Override
     public int getTotalColonistsCount() {
         return colonistsCount;
+    }
+
+    @Override
+    void setGamemode(FortressGamemode gamemode) {
+        if(gamemode == null) throw new IllegalArgumentException("Gamemode cannot be null");
+        if(gamemode == FortressGamemode.NONE) throw new IllegalArgumentException("Gamemode cannot be NONE");
+        final ServerboundSetGamemodePacket serverboundSetGamemodePacket = new ServerboundSetGamemodePacket(gamemode);
+        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_GAMEMODE, serverboundSetGamemodePacket);
+    }
+
+    public FortressGamemode getGamemode() {
+        return gamemode;
     }
 
     private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {

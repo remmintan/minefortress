@@ -47,6 +47,8 @@ public final class FortressServerManager extends AbstractFortressManager {
     private int minX = Integer.MAX_VALUE;
     private int minZ = Integer.MAX_VALUE;
 
+    private FortressGamemode gamemode = FortressGamemode.NONE;
+
     public FortressServerManager() {
         serverProfessionManager = new ServerProfessionManager(() -> this);
     }
@@ -79,7 +81,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         tickFortress(player.world);
         serverProfessionManager.tick(player);
         if(!needSync) return;
-        final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter);
+        final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
             final ClientboundSyncBuildingsPacket syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
@@ -214,6 +216,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         serverProfessionManager.writeToNbt(professionTag);
         tag.put("profession", professionTag);
 
+        tag.putString("gamemode", this.gamemode.name());
+
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -263,6 +267,13 @@ public final class FortressServerManager extends AbstractFortressManager {
             NbtCompound professionTag = tag.getCompound("profession");
             serverProfessionManager.readFromNbt(professionTag);
         }
+
+        if(tag.contains("gamemode")) {
+            final String gamemodeName = tag.getString("gamemode");
+            final FortressGamemode fortressGamemode = FortressGamemode.valueOf(gamemodeName);
+            this.setGamemode(fortressGamemode);
+        }
+
 
         this.scheduleSync();
     }
@@ -324,4 +335,9 @@ public final class FortressServerManager extends AbstractFortressManager {
         return specialBlocks.getOrDefault(block, Collections.emptyList());
     }
 
+    @Override
+    public void setGamemode(FortressGamemode gamemode) {
+        this.gamemode = gamemode;
+        this.scheduleSync();
+    }
 }
