@@ -36,6 +36,11 @@ public class ChooseModeScreen extends Screen {
         super.render(matrices, mouseX, mouseY, delta);
     }
 
+    @Override
+    public boolean shouldCloseOnEsc() {
+        return false;
+    }
+
     private void closeMenu() {
         this.client.setScreen(null);
     }
