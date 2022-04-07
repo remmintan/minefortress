@@ -211,11 +211,15 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     @Override
-    void setGamemode(FortressGamemode gamemode) {
+    public void setGamemode(FortressGamemode gamemode) {
         if(gamemode == null) throw new IllegalArgumentException("Gamemode cannot be null");
         if(gamemode == FortressGamemode.NONE) throw new IllegalArgumentException("Gamemode cannot be NONE");
         final ServerboundSetGamemodePacket serverboundSetGamemodePacket = new ServerboundSetGamemodePacket(gamemode);
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_GAMEMODE, serverboundSetGamemodePacket);
+    }
+
+    public boolean gamemodeNeedsInitialization() {
+        return this.initialized && this.gamemode == FortressGamemode.NONE;
     }
 
     public FortressGamemode getGamemode() {
