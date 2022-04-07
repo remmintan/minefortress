@@ -23,4 +23,7 @@ public interface FortressMinecraftClient {
 
     boolean isSupporter();
 
+    void setTicksSpeed(int ticksSpeed);
+    int getTicksSpeed();
+
 }
