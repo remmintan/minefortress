@@ -24,6 +24,7 @@ import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.FortressCameraManager;
+import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.renderer.gui.FortressHud;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.selections.SelectionManager;
@@ -71,6 +72,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Shadow @Final private SoundManager soundManager;
 
     @Shadow public abstract void setScreen(@Nullable Screen screen);
+
+    @Shadow @Nullable public Screen currentScreen;
 
     public FortressMinecraftClientMixin(String string) {
         super(string);
@@ -163,6 +166,9 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     public void tick(CallbackInfo ci) {
         this.fortressHud.tick();
         this.fortressClientManager.tick(this);
+        if(this.fortressClientManager.gamemodeNeedsInitialization() && !(this.currentScreen instanceof ChooseModeScreen)) {
+            this.setScreen(new ChooseModeScreen());
+        }
     }
 
     @Override
