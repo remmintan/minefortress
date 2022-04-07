@@ -6,6 +6,7 @@ import com.mojang.datafixers.DataFixer;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.server.*;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.UserCache;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
@@ -21,6 +22,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -39,6 +41,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Shadow protected abstract boolean shouldKeepTicking();
 
     private BlueprintsWorld blueprintsWorld;
+    private int ticksMultiplier = 1;
 
     public FortressServerMixin(String string) {
         super(string);
@@ -47,6 +50,24 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     public void init(Thread serverThread, DynamicRegistryManager.Impl registryManager, LevelStorage.Session session, SaveProperties saveProperties, ResourcePackManager dataPackManager, Proxy proxy, DataFixer dataFixer, ServerResourceManager serverResourceManager, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepo, UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory, CallbackInfo ci) {
         blueprintsWorld = new BlueprintsWorld((MinecraftServer) (Object)this);
+    }
+
+    @Redirect(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick(Ljava/util/function/BooleanSupplier;)V"))
+    public void runWorld(MinecraftServer instance, BooleanSupplier shouldKeepTicking) {
+        if(ticksMultiplier > 0) {
+            for (int i = 0; i < ticksMultiplier; i++) {
+                instance.tick(shouldKeepTicking);
+            }
+        } else {
+            instance.tick(shouldKeepTicking);
+        }
+    }
+
+    @Redirect(method = "tickWorlds", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tick(Ljava/util/function/BooleanSupplier;)V"))
+    public void tickWorld(ServerWorld instance, BooleanSupplier shouldKeepTicking) {
+        if(ticksMultiplier > 0) {
+            instance.tick(shouldKeepTicking);
+        }
     }
 
     @Inject(method = "tickWorlds", at = @At(value="INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", ordinal = 1, shift = At.Shift.BEFORE))
@@ -92,5 +113,10 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Override
     public WorldGenerationProgressListener getWorldGenerationProgressListener() {
         return this.worldGenerationProgressListenerFactory.create(11);
+    }
+
+    @Override
+    public void setTicksMultiplier(int multiplier) {
+        this.ticksMultiplier = Math.max(0, multiplier);
     }
 }
