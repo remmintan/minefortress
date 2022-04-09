@@ -73,7 +73,7 @@ public class ProfessionsLayer extends DrawableHelper {
         int startX = originX % 16;
         int startY = originY % 16;
         for (int x = -1; x <= 29; ++x) {
-            for (int y = -1; y <= 15; ++y) {
+            for (int y = -1; y <= 16; ++y) {
                 ProfessionsLayer.drawTexture(matrices, startX + 16 * x, startY + 16 * y, 0.0f, 0.0f, 16, 16, 16, 16);
             }
         }
