@@ -11,10 +11,10 @@ import org.minefortress.renderer.gui.widget.TimeButtonWidget;
 
 public class TimeGui extends FortressGuiScreen {
 
-    private final ButtonWidget pause;
-    private final ButtonWidget speed1;
-    private final ButtonWidget speed2;
-    private final ButtonWidget speed4;
+    private final TimeButtonWidget pause;
+    private final TimeButtonWidget speed1;
+    private final TimeButtonWidget speed2;
+    private final TimeButtonWidget speed4;
 
     private final FortressMinecraftClient fortressClient;
 
@@ -45,7 +45,7 @@ public class TimeGui extends FortressGuiScreen {
                 () -> this.fortressClient.getTicksSpeed() == 4
         );
         speed4 = new TimeButtonWidget(
-                0, 0, 0, 0,
+                0, 0, buttonWidth, buttonHeight,
                 new LiteralText("x4"),
                 b -> this.setSpeed(16),
                 () -> this.fortressClient.getTicksSpeed() == 16

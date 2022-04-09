@@ -13,8 +13,8 @@ public class TimeButtonWidget extends ButtonWidget {
     private static final Identifier SELECTOR_TEXTURE = new Identifier("textures/gui/server_selection.png");
     private static final int ARROW_SIZE = 16;
     private static final int ARROW_PADDING = 4;
-    private static final int ARROW_U = 16;
-    private static final int ARROW_V = 112;
+    private static final int ARROW_U = 96;
+    private static final int ARROW_V = 5;
 
     private final Supplier<Boolean> active;
 
