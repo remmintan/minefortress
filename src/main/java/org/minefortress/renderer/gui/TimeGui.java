@@ -6,20 +6,23 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.widget.TimeButtonWidget;
+
+import java.util.Optional;
 
 public class TimeGui extends FortressGuiScreen {
 
     private final TimeButtonWidget pause;
     private final TimeButtonWidget speed1;
     private final TimeButtonWidget speed2;
-    private final TimeButtonWidget speed4;
+//    private final TimeButtonWidget speed4;
 
     private final FortressMinecraftClient fortressClient;
 
     private static final int buttonWidth = 20;
-    private static int buttonHeight = 20;
+    private static final int buttonHeight = 20;
 
     TimeGui(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
@@ -28,52 +31,65 @@ public class TimeGui extends FortressGuiScreen {
 
         pause = new TimeButtonWidget(
                 0, 0, buttonWidth, buttonHeight,
-                new LiteralText("x0"),
+                new LiteralText("||"),
                 b -> this.setSpeed(0),
                 () -> this.fortressClient.getTicksSpeed() == 0
         );
         speed1 = new TimeButtonWidget(
                 0, 0, buttonWidth, buttonHeight,
-                new LiteralText("x1"),
+                new LiteralText(">"),
                 b -> this.setSpeed(1),
                 () -> this.fortressClient.getTicksSpeed() == 1
         );
         speed2 = new TimeButtonWidget(
                 0, 0, buttonWidth, buttonHeight,
-                new LiteralText("x2"),
-                b -> this.setSpeed(4),
-                () -> this.fortressClient.getTicksSpeed() == 4
-        );
-        speed4 = new TimeButtonWidget(
-                0, 0, buttonWidth, buttonHeight,
-                new LiteralText("x4"),
+                new LiteralText(">>"),
                 b -> this.setSpeed(16),
                 () -> this.fortressClient.getTicksSpeed() == 16
         );
+//        speed4 = new TimeButtonWidget(
+//                0, 0, buttonWidth, buttonHeight,
+//                new LiteralText("x4"),
+//                b -> this.setSpeed(64),
+//                () -> this.fortressClient.getTicksSpeed() == 64
+//        );
     }
 
     @Override
     void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
+        final int y = 15;
+
         this.pause.x = 5;
-        this.pause.y = 25;
+        this.pause.y = y;
         this.pause.render(p, (int)mouseX, (int)mouseY, delta);
 
         this.speed1.x = 5 + (5 + 20);
-        this.speed1.y = 25;
+        this.speed1.y = y;
         this.speed1.render(p, (int)mouseX, (int)mouseY, delta);
 
         this.speed2.x = 5 + (5 + 20) * 2;
-        this.speed2.y = 25;
+        this.speed2.y = y;
         this.speed2.render(p, (int)mouseX, (int)mouseY, delta);
 
-        this.speed4.x = 5 + (5 + 20) * 3;
-        this.speed4.y = 25;
-        this.speed4.render(p, (int)mouseX, (int)mouseY, delta);
+//        this.speed4.x = 5 + (5 + 20) * 3;
+//        this.speed4.y = y;
+//        this.speed4.render(p, (int)mouseX, (int)mouseY, delta);
+
+        long timeTicks = Optional.ofNullable(this.client.world).map(World::getTime).orElse(0L);
+
+        final int timeDays = (int) Math.floor(timeTicks / 24000.0);
+        timeTicks %= 24000L;
+        final int timeHours = (int) Math.floor(timeTicks / 1000.0);
+        timeTicks %= 1000L;
+        final int timeMinutes = (int) Math.floor(timeTicks / 16.66667);
+
+        final String timeText = String.format("Day: %d | %02d:%02d", timeDays, timeHours, timeMinutes);
+        TimeGui.drawStringWithShadow(p, font, timeText, screenWidth - font.getWidth(timeText) - 5, screenHeight - 15, 0xFFFFFF);
     }
 
     @Override
     boolean isHovered() {
-        return this.pause.isHovered() || this.speed1.isHovered() || this.speed2.isHovered() || this.speed4.isHovered();
+        return this.pause.isHovered() || this.speed1.isHovered() || this.speed2.isHovered();//this.speed4.isHovered();
     }
 
     @Override
@@ -88,8 +104,8 @@ public class TimeGui extends FortressGuiScreen {
         if(this.speed2.isHovered())
             this.speed2.onClick(mouseX, mouseY);
 
-        if(this.speed4.isHovered())
-            this.speed4.onClick(mouseX, mouseY);
+//        if(this.speed4.isHovered())
+//            this.speed4.onClick(mouseX, mouseY);
     }
 
     private void setSpeed(int speed) {
