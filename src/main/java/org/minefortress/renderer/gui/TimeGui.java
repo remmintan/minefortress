@@ -5,6 +5,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.text.LiteralText;
 import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -75,13 +76,14 @@ public class TimeGui extends FortressGuiScreen {
 //        this.speed4.y = y;
 //        this.speed4.render(p, (int)mouseX, (int)mouseY, delta);
 
-        long timeTicks = Optional.ofNullable(this.client.world).map(World::getTime).orElse(0L);
+        final Optional<ClientWorld> world = Optional.ofNullable(this.client.world);
+        final long timeTicks = world.map(World::getTime).orElse(0L) + 4000L;
+        long timeOfDayTicks = (world.map(World::getTimeOfDay).orElse(0L) + 4000L) % 24000L;
 
         final int timeDays = (int) Math.floor(timeTicks / 24000.0);
-        timeTicks %= 24000L;
-        final int timeHours = (int) Math.floor(timeTicks / 1000.0);
-        timeTicks %= 1000L;
-        final int timeMinutes = (int) Math.floor(timeTicks / 16.66667);
+        final int timeHours = (int) Math.floor(timeOfDayTicks / 1000.0);
+        timeOfDayTicks %= 1000L;
+        final int timeMinutes = (int) Math.floor(timeOfDayTicks / 16.66667);
 
         final String timeText = String.format("Day: %d | %02d:%02d", timeDays, timeHours, timeMinutes);
         TimeGui.drawStringWithShadow(p, font, timeText, screenWidth - font.getWidth(timeText) - 5, screenHeight - 15, 0xFFFFFF);
