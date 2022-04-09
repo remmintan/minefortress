@@ -57,6 +57,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
         if(ticksMultiplier > 0) {
             for (int i = 0; i < ticksMultiplier; i++) {
                 instance.tick(shouldKeepTicking);
+                if(i >= ticksMultiplier) break;
             }
         } else {
             instance.tick(shouldKeepTicking);
@@ -117,6 +118,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
 
     @Override
     public void setTicksMultiplier(int multiplier) {
-        this.ticksMultiplier = Math.max(0, multiplier)  * 32;
+        final int mul = Math.max(0, multiplier);
+        this.ticksMultiplier = mul>1? mul * 32:mul;
     }
 }
