@@ -117,6 +117,6 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
 
     @Override
     public void setTicksMultiplier(int multiplier) {
-        this.ticksMultiplier = Math.max(0, multiplier);
+        this.ticksMultiplier = Math.max(0, multiplier)  * 32;
     }
 }

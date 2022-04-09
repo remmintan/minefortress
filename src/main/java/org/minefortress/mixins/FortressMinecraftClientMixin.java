@@ -78,7 +78,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Shadow @Nullable public Screen currentScreen;
 
-    private int ticksSpeed;
+    private int ticksSpeed = 1;
 
     public FortressMinecraftClientMixin(String string) {
         super(string);
