@@ -10,6 +10,7 @@ import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -257,6 +258,14 @@ public class Colonist extends PassiveEntity {
             return true;
         else
             return super.isInvulnerable();
+    }
+
+    @Override
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        if(this.getFortressManager().map(AbstractFortressManager::isCreative).orElse(false))
+            return true;
+        else
+            return super.isInvulnerableTo(damageSource);
     }
 
     @Override
