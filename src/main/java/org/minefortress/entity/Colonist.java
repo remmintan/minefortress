@@ -40,6 +40,7 @@ import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.colonist.ColonistHungerManager;
+import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
@@ -248,6 +249,14 @@ public class Colonist extends PassiveEntity {
     @Override
     protected EntityNavigation createNavigation(World p_21480_) {
         return new ColonistNavigation(this, p_21480_);
+    }
+
+    @Override
+    public boolean isInvulnerable() {
+        if(this.getFortressManager().map(AbstractFortressManager::isCreative).orElse(false))
+            return true;
+        else
+            return super.isInvulnerable();
     }
 
     @Override
