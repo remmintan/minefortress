@@ -25,6 +25,7 @@ public class FortressHud {
 
    private final ColonistsGui colonistsGui;
    private final ToolsGui toolsGui;
+   private final TimeGui timeGui;
 
    private boolean isHovered = false;
 
@@ -32,6 +33,7 @@ public class FortressHud {
         this.client = client;
         this.colonistsGui = new ColonistsGui(client, client.getItemRenderer());
         this.toolsGui = new ToolsGui(client, client.getItemRenderer());
+        this.timeGui = new TimeGui(client, client.getItemRenderer());
     }
 
     private SelectionManager getSelectionManager() {
@@ -69,6 +71,7 @@ public class FortressHud {
             renderSelectTypeName(p, font, scaledHeight);
             this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+            this.timeGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
         }
     }
 
@@ -172,7 +175,7 @@ public class FortressHud {
         this.colonistsGui.tick();
         this.toolsGui.tick();
 
-        this.isHovered = this.colonistsGui.isHovered() || this.toolsGui.isHovered();
+        this.isHovered = this.colonistsGui.isHovered() || this.toolsGui.isHovered() || this.timeGui.isHovered();
     }
 
     public boolean isHovered() {
@@ -182,6 +185,7 @@ public class FortressHud {
     public void onClick(double mouseX, double mouseY) {
         this.toolsGui.onClick(mouseX, mouseY);
         this.colonistsGui.onClick(mouseX, mouseY);
+        this.timeGui.onClick(mouseX, mouseY);
     }
 
     private TextRenderer getTextRenderer() {
