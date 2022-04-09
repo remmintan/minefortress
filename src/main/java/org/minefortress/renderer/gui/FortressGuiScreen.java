@@ -31,7 +31,7 @@ abstract class FortressGuiScreen extends DrawableHelper {
         this.textRenderer = client.textRenderer;
     }
 
-    abstract void tick();
+    void tick() {}
     abstract void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta);
     abstract boolean isHovered();
     void onClick(double mouseX, double mouseY) {}
