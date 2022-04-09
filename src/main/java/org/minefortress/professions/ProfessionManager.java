@@ -327,6 +327,9 @@ public abstract class ProfessionManager {
     }
 
     public boolean isRequirementsFulfilled(Profession profession) {
+        if(fortressManagerSupplier.get().isCreative())
+            return true;
+
         final String buildingRequirement = profession.getBuildingRequirement();
         if(Objects.isNull(buildingRequirement) || Strings.isBlank(buildingRequirement)) {
             return true;

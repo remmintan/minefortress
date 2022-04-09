@@ -10,6 +10,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.AbstractFortressManager;
+
+import java.util.Optional;
 
 public class DigControl extends PositionedActionControl {
 
@@ -53,35 +56,54 @@ public class DigControl extends PositionedActionControl {
     }
 
     private void putProperItemInHand() {
+        final Boolean creative = colonist.getFortressManager().map(AbstractFortressManager::isCreative).orElse(false);
+
         final BlockState blockState = level.getBlockState(goal);
         Item item = null;
         final String professionId = colonist.getProfessionId();
         if(blockState.isIn(BlockTags.PICKAXE_MINEABLE)) {
-            item = switch (professionId) {
-                case "miner1" -> Items.STONE_PICKAXE;
-                case "miner2" -> Items.IRON_PICKAXE;
-                case "miner3" -> Items.DIAMOND_PICKAXE;
-                default -> Items.WOODEN_PICKAXE;
-            };
-        } else if (blockState.isIn(BlockTags.SHOVEL_MINEABLE)) {
-            item = switch (professionId) {
-                case "miner1" -> Items.STONE_SHOVEL;
-                case "miner2" -> Items.IRON_SHOVEL;
-                case "miner3" -> Items.DIAMOND_SHOVEL;
-                default -> Items.WOODEN_SHOVEL;
-            };
-        } else if (blockState.isIn(BlockTags.AXE_MINEABLE)) {
-            item = switch (professionId) {
-                case "miner1", "lumberjack1" -> Items.STONE_AXE;
-                case "miner2", "lumberjack2" -> Items.IRON_AXE;
-                case "miner3", "lumberjack3" -> Items.DIAMOND_AXE;
-                default -> Items.WOODEN_AXE;
-            };
-        } else if (blockState.isIn(BlockTags.HOE_MINEABLE)) {
-            if("farmer".equals(professionId)) {
-                item = Items.IRON_HOE;
+            if(creative) {
+                item = Items.DIAMOND_PICKAXE;
             } else {
-                item = Items.WOODEN_HOE;
+                item = switch (professionId) {
+                    case "miner1" -> Items.STONE_PICKAXE;
+                    case "miner2" -> Items.IRON_PICKAXE;
+                    case "miner3" -> Items.DIAMOND_PICKAXE;
+                    default -> Items.WOODEN_PICKAXE;
+                };
+            }
+
+        } else if (blockState.isIn(BlockTags.SHOVEL_MINEABLE)) {
+            if(creative) {
+                item = Items.DIAMOND_SHOVEL;
+            } else {
+                item = switch (professionId) {
+                    case "miner1" -> Items.STONE_SHOVEL;
+                    case "miner2" -> Items.IRON_SHOVEL;
+                    case "miner3" -> Items.DIAMOND_SHOVEL;
+                    default -> Items.WOODEN_SHOVEL;
+                };
+            }
+        } else if (blockState.isIn(BlockTags.AXE_MINEABLE)) {
+            if(creative) {
+                item = Items.DIAMOND_AXE;
+            } else {
+                item = switch (professionId) {
+                    case "miner1", "lumberjack1" -> Items.STONE_AXE;
+                    case "miner2", "lumberjack2" -> Items.IRON_AXE;
+                    case "miner3", "lumberjack3" -> Items.DIAMOND_AXE;
+                    default -> Items.WOODEN_AXE;
+                };
+            }
+        } else if (blockState.isIn(BlockTags.HOE_MINEABLE)) {
+            if(creative) {
+                item = Items.DIAMOND_HOE;
+            } else {
+                if("farmer".equals(professionId)) {
+                    item = Items.IRON_HOE;
+                } else {
+                    item = Items.WOODEN_HOE;
+                }
             }
         }
 
@@ -89,6 +111,12 @@ public class DigControl extends PositionedActionControl {
     }
 
     private float getDestroyProgress(BlockState p_60466_, Colonist p_60467_, StructureWorldAccess p_60468_, BlockPos p_60469_) {
+        final boolean creative = colonist
+                .getFortressManager()
+                .map(AbstractFortressManager::isCreative)
+                .orElse(false);
+        if(creative) return 1.0f;
+
         float f = p_60466_.getHardness(p_60468_, p_60469_);
         if (f == -1.0F) {
             return 0.0F;

@@ -340,4 +340,9 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.gamemode = gamemode;
         this.scheduleSync();
     }
+
+    @Override
+    public boolean isCreative() {
+        return gamemode == FortressGamemode.CREATIVE;
+    }
 }
