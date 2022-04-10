@@ -1,6 +1,8 @@
 package org.minefortress.entity.renderer;
 
+import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -20,10 +22,13 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
+import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+
+import java.util.Optional;
 
 public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityModel<Colonist>> {
 
@@ -48,7 +53,6 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
     private static final Identifier FISHERMAN = new Identifier("minefortress", "textures/skins/fisherman.png");
     private static final Identifier HUNTER = new Identifier("minefortress", "textures/skins/hunter.png");
     private static final Identifier LUMBERJACK = new Identifier("minefortress", "textures/skins/lumberjack.png");
-    private static final Identifier MEDIEVAL_UNDERWEAR = new Identifier("minefortress", "textures/skins/medieval_underwear.png");
     private static final Identifier MINER = new Identifier("minefortress", "textures/skins/miner.png");
 
 
@@ -73,14 +77,22 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
     @Override
     public void render(Colonist colonist, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         setClothesVilibility(colonist);
-
         super.render(colonist, f, g, matrixStack, vertexConsumerProvider, i);
+
         final MinecraftClient client = getClient();
-        final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == colonist;
-        final boolean selecting = getFortressClientManager().getSelectedColonist() == colonist;
-        if(hovering || selecting) {
-            final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-            ColonistRenderer.renderRhombus(matrixStack, buffer, colonist, selecting);
+        final GameMode currentGamemode = Optional
+                .ofNullable(client.interactionManager)
+                .map(ClientPlayerInteractionManager::getCurrentGameMode)
+                .orElse(GameMode.DEFAULT);
+
+        final GameMode fortress = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+        if(currentGamemode == fortress) {
+            final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == colonist;
+            final boolean selecting = getFortressClientManager().getSelectedColonist() == colonist;
+            if(hovering || selecting) {
+                final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
+                ColonistRenderer.renderRhombus(matrixStack, buffer, colonist, selecting);
+            }
         }
     }
 
