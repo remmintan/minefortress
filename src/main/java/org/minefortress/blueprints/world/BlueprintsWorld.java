@@ -185,6 +185,11 @@ public class BlueprintsWorld {
             }
         });
 
+        BlockPos.iterate(new BlockPos(16, 15, 16), new BlockPos(16, 31, 16)).forEach(pos -> {
+            world.setBlockState(pos, borderBlockState);
+            world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
+        });
+
         final int defaultFloorLevel = 16;
         BlockPos
                 .iterate(new BlockPos(BlockPos.ZERO), new BlockPos(15, 32, 15))
