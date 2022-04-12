@@ -44,6 +44,8 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
         lumberjack.png
         medieval_underwear.png
         miner.png
+        peasant.png
+        beggar.png
      */
     private static final Identifier BAKER = new Identifier("minefortress", "textures/skins/baker.png");
     private static final Identifier BLACKSMITH = new Identifier("minefortress", "textures/skins/blacksmith.png");
@@ -54,7 +56,8 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
     private static final Identifier HUNTER = new Identifier("minefortress", "textures/skins/hunter.png");
     private static final Identifier LUMBERJACK = new Identifier("minefortress", "textures/skins/lumberjack.png");
     private static final Identifier MINER = new Identifier("minefortress", "textures/skins/miner.png");
-
+    private static final Identifier PEASANT = new Identifier("minefortress", "textures/skins/peasant.png");
+    private static final Identifier BEGGAR = new Identifier("minefortress", "textures/skins/beggar.png");
 
     public ColonistRenderer(EntityRendererFactory.Context context) {
         super(context, new PlayerEntityModel<>(context.getPart(EntityModelLayers.PLAYER), false), 0.5f);
