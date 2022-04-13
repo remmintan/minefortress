@@ -60,8 +60,8 @@ public abstract class FortressWorldRendererMixin  {
     @Inject(method = "setupTerrain", at = @At("TAIL"))
     public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, int frame, boolean spectator, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        fortressClient.getBlueprintRenderer().prepareBlueprintForRender();
-        fortressClient.getCampfireRenderer().prepareCampfireForRender();
+        fortressClient.getBlueprintRenderer().prepareForRender();
+        fortressClient.getCampfireRenderer().prepareForRender();
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))

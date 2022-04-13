@@ -18,8 +18,8 @@ public class BlueprintsModelBuilder {
 
     private final Map<String, BuiltBlueprint> builtBlueprints = new HashMap<>();
 
-    public BlueprintsModelBuilder(BufferBuilderStorage bufferBuilders, ClientBlueprintBlockDataManager blockDataManager) {
-        this.blockBufferBuilders = bufferBuilders.getBlockBufferBuilders();
+    public BlueprintsModelBuilder(BlockBufferBuilderStorage blockBufferBuilders, ClientBlueprintBlockDataManager blockDataManager) {
+        this.blockBufferBuilders = blockBufferBuilders;
         this.blockDataManager = blockDataManager;
     }
 

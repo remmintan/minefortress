@@ -18,13 +18,14 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
 import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
+import org.minefortress.renderer.custom.BuiltModel;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class BuiltBlueprint {
+public class BuiltBlueprint implements BuiltModel {
 
     private final Set<RenderLayer> initializedLayers = new HashSet<>();
     private final Set<RenderLayer> nonEmptyLayers = new HashSet<>();
@@ -59,10 +60,12 @@ public class BuiltBlueprint {
         return uploadsFuture.isDone();
     }
 
+    @Override
     public VertexBuffer getBuffer(RenderLayer layer) {
         return vertexBuffers.get(layer);
     }
 
+    @Override
     public boolean hasLayer(RenderLayer layer) {
         return this.buffersUploaded() && nonEmptyLayers.contains(layer);
     }
