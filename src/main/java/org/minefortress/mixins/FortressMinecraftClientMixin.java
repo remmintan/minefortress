@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -47,6 +48,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private FortressHud fortressHud;
 
     private FortressClientManager fortressClientManager;
+
+    private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
 
     private ClientBlueprintManager clientBlueprintManager;
     private BlueprintRenderer blueprintRenderer;
@@ -97,7 +100,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
         clientBlueprintManager = new ClientBlueprintManager(client);
         blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), client);
-        campfireRenderer  = new CampfireRenderer(client);
+        campfireRenderer  = new CampfireRenderer(client, blockBufferBuilderStorage);
     }
 
     @Override

@@ -9,8 +9,8 @@ public class CampfireModelBuilder {
 
     private BuiltCampfire builtCampfire;
 
-    public CampfireModelBuilder(BufferBuilderStorage bufferBuilders) {
-        this.blockBufferBuilders = bufferBuilders.getBlockBufferBuilders();
+    public CampfireModelBuilder(BlockBufferBuilderStorage blockBuffersBuilders) {
+        this.blockBufferBuilders = blockBuffersBuilders;
     }
 
     public void build() {
