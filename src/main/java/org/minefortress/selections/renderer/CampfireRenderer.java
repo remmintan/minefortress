@@ -12,7 +12,7 @@ public final class CampfireRenderer extends AbstractCustomRenderer {
 
     private final CampfireModelBuilder campfireModelBuilder;
 
-    public CampfireRenderer(SelectionManager selectionManager, MinecraftClient client) {
+    public CampfireRenderer(MinecraftClient client) {
         super(client);
         this.campfireModelBuilder = new CampfireModelBuilder(client.getBufferBuilders());
     }
@@ -35,7 +35,7 @@ public final class CampfireRenderer extends AbstractCustomRenderer {
         return getClientManager().isFortressInitializationNeeded();
     }
 
-    public void prepareSelectionForRender() {
+    public void prepareCampfireForRender() {
         this.campfireModelBuilder.build();
     }
 
