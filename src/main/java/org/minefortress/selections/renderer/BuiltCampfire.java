@@ -9,6 +9,7 @@ import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Util;
+import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.renderer.custom.BuiltModel;
 
@@ -80,7 +81,17 @@ public class BuiltCampfire implements BuiltModel {
                     final BufferBuilder bufferBuilder = blockBufferBuilders.get(layer);
                     VertexBuffer vertexBuffer = vertexBuffers.get(layer);
 
-                    return vertexBuffer.submitUpload(bufferBuilder);
+                    return vertexBuffer
+                            .submitUpload(bufferBuilder)
+                            .whenComplete((r, t) -> {
+                               if(t != null) {
+                                   CrashReport crashReport = CrashReport.create(t, "Building campfire");
+                                   MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().addDetailsToCrashReport(crashReport));
+                                   return;
+                               }
+
+                               bufferBuilder.clear();
+                            });
                 })
                 .collect(Collectors.toList());
 

@@ -99,7 +99,7 @@ public abstract class AbstractCustomRenderer {
             offset.set(Vec3f.ZERO);
         }
         shader.unbind();
-        if(!notEmpty) {
+        if(notEmpty) {
             vertexFormat.endDrawing();
         }
 

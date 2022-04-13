@@ -1,6 +1,8 @@
 package org.minefortress.selections.renderer;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilderStorage;
+import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.renderer.custom.AbstractCustomRenderer;
 import org.minefortress.renderer.custom.BuiltModel;
@@ -12,9 +14,9 @@ public final class CampfireRenderer extends AbstractCustomRenderer {
 
     private final CampfireModelBuilder campfireModelBuilder;
 
-    public CampfireRenderer(MinecraftClient client) {
+    public CampfireRenderer(MinecraftClient client, BlockBufferBuilderStorage blockBufferBuilder) {
         super(client);
-        this.campfireModelBuilder = new CampfireModelBuilder(client.getBufferBuilders());
+        this.campfireModelBuilder = new CampfireModelBuilder(blockBufferBuilder);
     }
 
     @Override
