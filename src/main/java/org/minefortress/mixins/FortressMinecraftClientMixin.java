@@ -99,7 +99,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.fortressClientManager = new FortressClientManager();
 
         clientBlueprintManager = new ClientBlueprintManager(client);
-        blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), client);
+        blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), client, blockBufferBuilderStorage);
         campfireRenderer  = new CampfireRenderer(client, blockBufferBuilderStorage);
     }
 

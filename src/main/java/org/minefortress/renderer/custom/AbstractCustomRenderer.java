@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public abstract class AbstractCustomRenderer {
 
-    private final MinecraftClient client;
+    protected final MinecraftClient client;
 
     protected AbstractCustomRenderer(MinecraftClient client) {
         this.client = client;
@@ -54,6 +54,9 @@ public abstract class AbstractCustomRenderer {
         }
         if(shader.projectionMat != null) {
             shader.projectionMat.set(projectionMatrix);
+        }
+        if (shader.colorModulator != null) {
+            shader.colorModulator.set(getColorModulator());
         }
         if(shader.fogStart != null && shader.fogEnd != null && shader.fogColor != null) {
             shader.fogStart.set(RenderSystem.getShaderFogStart());
@@ -111,6 +114,11 @@ public abstract class AbstractCustomRenderer {
     protected abstract Optional<BlockPos> getRenderTargetPosition();
     protected abstract Optional<BuiltModel> getBuiltModel();
     protected abstract boolean shouldRender();
+    public abstract void prepareForRender();
+
+    protected Vec3f getColorModulator() {
+        return new Vec3f(1f, 1f, 1f);
+    }
 
     protected FortressClientManager getClientManager() {
         return ((FortressMinecraftClient) client).getFortressClientManager();

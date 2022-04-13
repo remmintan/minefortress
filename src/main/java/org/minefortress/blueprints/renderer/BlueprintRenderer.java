@@ -5,34 +5,38 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.renderer.custom.AbstractCustomRenderer;
+import org.minefortress.renderer.custom.BuiltModel;
 
 import java.util.Optional;
 
-public final class BlueprintRenderer {
+public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     private static final Vec3f WRONG_PLACEMENT_COLOR = new Vec3f(1.0F, 0.5F, 0.5F);
     private static final Vec3f CORRECT_PLACEMENT_COLOR = new Vec3f(1F, 1.0F, 1F);
 
     private final BlueprintsModelBuilder blueprintsModelBuilder;
-    private final MinecraftClient client;
 
-    public BlueprintRenderer(ClientBlueprintBlockDataManager blockDataManager, MinecraftClient client) {
+    public BlueprintRenderer(ClientBlueprintBlockDataManager blockDataManager, MinecraftClient client, BlockBufferBuilderStorage blockBufferBuilderStorage) {
+        super(client);
         blueprintsModelBuilder  = new BlueprintsModelBuilder(
-                client.getBufferBuilders(),
+                blockBufferBuilderStorage,
                 blockDataManager
         );
-        this.client = client;
     }
 
-    public void prepareBlueprintForRender() {
+    @Override
+    public void prepareForRender() {
         final ClientBlueprintManager clientBlueprintManager = getBlueprintManager();
         if(clientBlueprintManager.hasSelectedBlueprint()) {
             final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
@@ -42,84 +46,22 @@ public final class BlueprintRenderer {
         }
     }
 
-
-    public void render(MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
-        if(!getBlueprintManager().hasSelectedBlueprint()) return;
-        renderLayer(RenderLayer.getSolid() ,matrices, d, e, f, matrix4f);
-        renderLayer(RenderLayer.getCutout() ,matrices, d, e, f, matrix4f);
-        renderLayer(RenderLayer.getCutoutMipped() ,matrices, d, e, f, matrix4f);
+    @Override
+    protected boolean shouldRender() {
+        return getBlueprintManager().hasSelectedBlueprint();
     }
 
-    private void renderLayer(RenderLayer renderLayer, MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
-        int k;
-        RenderSystem.assertOnRenderThread();
-        renderLayer.startDrawing();
-        this.client.getProfiler().push("filterempty");
-        this.client.getProfiler().swap(() -> "render_" + renderLayer);
-        VertexFormat h = renderLayer.getVertexFormat();
-        Shader shader = RenderSystem.getShader();
-        BufferRenderer.unbindAll();
-        for (int i = 0; i < 12; ++i) {
-            k = RenderSystem.getShaderTexture(i);
-            shader.addSampler("Sampler" + i, k);
-        }
-        if (shader.modelViewMat != null) {
-            shader.modelViewMat.set(matrices.peek().getPositionMatrix());
-        }
-        if (shader.projectionMat != null) {
-            shader.projectionMat.set(matrix4f);
-        }
+    @Override
+    protected Vec3f getColorModulator() {
+        return getBlueprintManager().isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR;
+    }
+
+    @Override
+    protected Optional<BlockPos> getRenderTargetPosition() {
         final ClientBlueprintManager blueprintManager = getBlueprintManager();
-        if (shader.colorModulator != null) {
-            shader.colorModulator.set(blueprintManager.isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR);
-        }
-        if (shader.fogStart != null) {
-            shader.fogStart.set(RenderSystem.getShaderFogStart());
-        }
-        if (shader.fogEnd != null) {
-            shader.fogEnd.set(RenderSystem.getShaderFogEnd());
-        }
-        if (shader.fogColor != null) {
-            shader.fogColor.set(RenderSystem.getShaderFogColor());
-        }
-        if (shader.textureMat != null) {
-            shader.textureMat.set(RenderSystem.getTextureMatrix());
-        }
-        if (shader.gameTime != null) {
-            shader.gameTime.set(RenderSystem.getShaderGameTime());
-        }
-        RenderSystem.setupShaderLights(shader);
-        shader.bind();
-        GlUniform i = shader.chunkOffset;
-        k = 0;
-
-        final BuiltBlueprint chunk = getBuiltChunk();
         final int floorLevel = blueprintManager.getSelectedStructure().getFloorLevel();
-        final Optional<BlockPos> blueprintBuildPosOpt = Optional.ofNullable(blueprintManager.getBlueprintBuildPos()).map(o -> o.down(floorLevel));
-        if(chunk != null && chunk.hasLayer(renderLayer) && blueprintBuildPosOpt.isPresent()) {
-            BlockPos blueprintBuildPos = blueprintBuildPosOpt.get();
-            VertexBuffer vertexBuffer = chunk.getBuffer(renderLayer);
-            if (i != null) {
-                i.set((float)((double)blueprintBuildPos.getX() - d), (float)((double)blueprintBuildPos.getY() - e), (float)((double)blueprintBuildPos.getZ() - f));
-                i.upload();
-            }
-            vertexBuffer.drawVertices();
-            k = 1;
-        }
-        if (i != null) {
-            i.set(Vec3f.ZERO);
-        }
-        shader.unbind();
-        if (k != 0) {
-            h.endDrawing();
-        }
-        VertexBuffer.unbind();
-        VertexBuffer.unbindVertexArray();
-        this.client.getProfiler().pop();
-        renderLayer.endDrawing();
+        return Optional.ofNullable(blueprintManager.getBlueprintBuildPos()).map(o -> o.down(floorLevel));
     }
-
-
 
 
     public void renderBlueprintPreview(String fileName, BlockRotation blockRotation) {
@@ -157,7 +99,7 @@ public final class BlueprintRenderer {
     }
 
     private void renderBlueprintInGui(BuiltBlueprint builtBlueprint, float scale, float x, float y, float z) {
-        this.client.getProfiler().push("blueprint_render_model");
+        super.client.getProfiler().push("blueprint_render_model");
         DiffuseLighting.enableGuiDepthLighting();
 
         // calculating matrix
@@ -176,13 +118,14 @@ public final class BlueprintRenderer {
         this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f);
 
         matrices.pop();
-        this.client.getProfiler().pop();
+        super.client.getProfiler().pop();
     }
 
-    @Nullable
-    private BuiltBlueprint getBuiltChunk() {
+    @Override
+    protected Optional<BuiltModel> getBuiltModel() {
         final BlueprintMetadata selectedStructure = getBlueprintManager().getSelectedStructure();
-        return this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getFile(), selectedStructure.getRotation());
+        final BuiltBlueprint nullableBlueprint = this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getFile(), selectedStructure.getRotation());
+        return Optional.ofNullable(nullableBlueprint);
     }
 
     private BuiltBlueprint getBuiltBlueprint(String fileName, BlockRotation blockRotation) {
@@ -219,7 +162,7 @@ public final class BlueprintRenderer {
     }
 
     private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices, Matrix4f matrix4f) {
-        RenderSystem.assertOnRenderThread();
+        RenderSystem.assertThread(RenderSystem::isOnRenderThread);
 
         renderLayer.startDrawing();
 
@@ -233,7 +176,7 @@ public final class BlueprintRenderer {
             shader.addSampler("Sampler" + i, k);
         }
         if (shader.modelViewMat != null) {
-            shader.modelViewMat.set(matrices.peek().getPositionMatrix());
+            shader.modelViewMat.set(matrices.peek().getModel());
         }
         if (shader.projectionMat != null) {
             shader.projectionMat.set(matrix4f);

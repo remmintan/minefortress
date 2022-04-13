@@ -37,7 +37,8 @@ public final class CampfireRenderer extends AbstractCustomRenderer {
         return getClientManager().isFortressInitializationNeeded();
     }
 
-    public void prepareCampfireForRender() {
+    @Override
+    public void prepareForRender() {
         this.campfireModelBuilder.build();
     }
 
