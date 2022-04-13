@@ -36,16 +36,16 @@ public abstract class FortressChunkRendererRegionMixin {
 
         final FortressMinecraftClient fortressClient = getFortressClient();
         final SelectionManager selectionManager = fortressClient.getSelectionManager();
-        final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+//        final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
-        if(fortressManager.isFortressInitializationNeeded()) {
-            final BlockPos posAppropriateForCenter = fortressManager.getPosAppropriateForCenter();
-            if(posAppropriateForCenter != null && isBlockPosBetween(posAppropriateForCenter, startPos, endPos)) {
-                final int index = this.getIndex(posAppropriateForCenter);
-                this.blockStates[index] = fortressManager.getStateForCampCenter();
-            }
-            return;
-        }
+//        if(fortressManager.isFortressInitializationNeeded()) {
+//            final BlockPos posAppropriateForCenter = fortressManager.getPosAppropriateForCenter();
+//            if(posAppropriateForCenter != null && isBlockPosBetween(posAppropriateForCenter, startPos, endPos)) {
+//                final int index = this.getIndex(posAppropriateForCenter);
+//                this.blockStates[index] = fortressManager.getStateForCampCenter();
+//            }
+//            return;
+//        }
 
         if(selectionManager.getClickType() == ClickType.BUILD) {
             final Set<BlockPos> selectedBlocks = selectionManager.getSelectedBlocks();
