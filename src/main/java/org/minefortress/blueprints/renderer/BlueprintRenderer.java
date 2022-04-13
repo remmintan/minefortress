@@ -43,7 +43,7 @@ public final class BlueprintRenderer {
     }
 
 
-    public void renderSelectedBlueprint(MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
+    public void render(MatrixStack matrices, double d, double e, double f, Matrix4f matrix4f) {
         if(!getBlueprintManager().hasSelectedBlueprint()) return;
         renderLayer(RenderLayer.getSolid() ,matrices, d, e, f, matrix4f);
         renderLayer(RenderLayer.getCutout() ,matrices, d, e, f, matrix4f);

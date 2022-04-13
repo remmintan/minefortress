@@ -4,8 +4,10 @@ import net.minecraft.util.math.BlockPos;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.renderer.custom.AbstractCustomRenderer;
 import org.minefortress.renderer.gui.FortressHud;
 import org.minefortress.selections.SelectionManager;
+import org.minefortress.selections.renderer.CampfireRenderer;
 
 public interface FortressMinecraftClient {
 
@@ -14,6 +16,7 @@ public interface FortressMinecraftClient {
 
     ClientBlueprintManager getBlueprintManager();
     BlueprintRenderer getBlueprintRenderer();
+    CampfireRenderer getCampfireRenderer();
 
     FortressClientManager getFortressClientManager();
 

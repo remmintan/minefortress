@@ -61,6 +61,7 @@ public abstract class FortressWorldRendererMixin  {
     public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         fortressClient.getBlueprintRenderer().prepareBlueprintForRender();
+        fortressClient.getCampfireRenderer().prepareCampfireForRender();
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
@@ -71,7 +72,8 @@ public abstract class FortressWorldRendererMixin  {
         this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        fortressClient.getBlueprintRenderer().renderSelectedBlueprint(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
+        fortressClient.getBlueprintRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
+        fortressClient.getCampfireRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
         SelectionManager selectionManager = fortressClient.getSelectionManager();
         Iterator<BlockPos> currentSelection = selectionManager.getCurrentSelection();
         VertexConsumer vertexconsumer2 = immediate.getBuffer(RenderLayer.getLines());
