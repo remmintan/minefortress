@@ -64,7 +64,7 @@ public class RoadsSelection extends WallsSelection{
                     final BlockPos direction = flatEnd.subtract(start);
                     final int expandAmount = 1 + upDelta;
                     if(direction.getZ() == 0) {
-                        final int sign = isFirstCorner ? 0 : direction.getX() / Math.abs(direction.getX());
+                        final int sign = isFirstCorner && direction.getX()!=0 ? 0 : direction.getX() / Math.abs(direction.getX());
                         final BlockPos expandedStart = new BlockPos(start.getX() - sign * expandAmount, start.getY(), start.getZ() + expandAmount);
                         final BlockPos expandedEnd = new BlockPos(flatEnd.getX(), flatEnd.getY(), flatEnd.getZ() - expandAmount);
 
@@ -72,7 +72,7 @@ public class RoadsSelection extends WallsSelection{
                     }
 
                     if(direction.getX() == 0) {
-                        final int sign = isFirstCorner ? 0 : direction.getZ() / Math.abs(direction.getZ());
+                        final int sign = isFirstCorner && direction.getZ()!=0 ? 0 : direction.getZ() / Math.abs(direction.getZ());
                         final BlockPos expandedStart = new BlockPos(start.getX() + expandAmount, start.getY(), start.getZ() - sign * expandAmount);
                         final BlockPos expandedEnd = new BlockPos(flatEnd.getX() - expandAmount, flatEnd.getY(), flatEnd.getZ());
 
