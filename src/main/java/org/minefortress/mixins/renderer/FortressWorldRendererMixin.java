@@ -74,26 +74,11 @@ public abstract class FortressWorldRendererMixin  {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         fortressClient.getBlueprintRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
         fortressClient.getCampfireRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
-        SelectionManager selectionManager = fortressClient.getSelectionManager();
-        Iterator<BlockPos> currentSelection = selectionManager.getCurrentSelection();
-        VertexConsumer vertexconsumer2 = immediate.getBuffer(RenderLayer.getLines());
-        if(currentSelection.hasNext()) {
-            ClickType clickType = selectionManager.getClickType();
-            while(currentSelection.hasNext()) {
-                BlockPos sel = currentSelection.next();
-                BlockState blockstate = this.world.getBlockState(sel);
-                BlockState clickingBlockState = selectionManager.getClickingBlockState();
-                if(clickType == ClickType.BUILD) {
-                    if(!BuildingManager.canPlaceBlock(world, sel)) continue; // skipping all not air blocks on build
-                    if(clickingBlockState != null) {
-                        blockstate = clickingBlockState;
-                    }
-                }
 
-                if (this.world.getWorldBorder().contains(sel)) {
-                    this.drawBlockOutline(matrices, vertexconsumer2, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, sel, blockstate);
-                }
-            }
+        SelectionManager selectionManager = fortressClient.getSelectionManager();
+        VertexConsumer vertexconsumer2 = immediate.getBuffer(RenderLayer.getLines());
+        if(selectionManager.isSelecting()) {
+            ClickType clickType = selectionManager.getClickType();
 
             List<Pair<Vec3i, Vec3i>> selectionSizes = selectionManager.getSelectionSize();
             for(Pair<Vec3i, Vec3i> selectionSize : selectionSizes) {
@@ -109,7 +94,7 @@ public abstract class FortressWorldRendererMixin  {
                             selectionDimensions.getZ()
                     );
                     Vec3i selectionStart = selectionSize.getSecond();
-                    Vector4f clickColors = selectionManager.getClickColors();
+                    Vector4f clickColors = selectionManager.getClickColor();
                     drawShapeOutline(matrices, noDepthBuffer, generalSelectionBox, selectionStart.getX() - cameraPos.x, selectionStart.getY() - cameraPos.y, selectionStart.getZ() -  cameraPos.z, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());
                 }
             }
@@ -160,7 +145,7 @@ public abstract class FortressWorldRendererMixin  {
     }
 
     private void drawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState) {
-        final Vector4f clickColors = ((FortressMinecraftClient) client).getSelectionManager().getClickColors();
+        final Vector4f clickColors = ((FortressMinecraftClient) client).getSelectionManager().getClickColor();
         drawShapeOutline(matrices, vertexConsumer, blockState.getOutlineShape(this.world, blockPos, ShapeContext.of(entity)), (double)blockPos.getX() - d, (double)blockPos.getY() - e, (double)blockPos.getZ() - f, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());
     }
 

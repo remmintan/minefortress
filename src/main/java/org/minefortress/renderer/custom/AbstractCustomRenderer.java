@@ -15,6 +15,8 @@ import net.minecraft.util.math.Vec3f;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractCustomRenderer {
@@ -27,10 +29,14 @@ public abstract class AbstractCustomRenderer {
 
     public void render(MatrixStack matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {
         if(shouldRender()) {
-            renderLayer(RenderLayer.getSolid() ,matrices, cameraX, cameraY, cameraZ, projectionMatrix);
-            renderLayer(RenderLayer.getCutout() ,matrices, cameraX, cameraY, cameraZ, projectionMatrix);
-            renderLayer(RenderLayer.getCutoutMipped() ,matrices, cameraX, cameraY, cameraZ, projectionMatrix);
+            for(RenderLayer layer : getRenderLayers()) {
+                renderLayer(layer, matrices, cameraX, cameraY, cameraZ, projectionMatrix);
+            }
         }
+    }
+
+    protected List<RenderLayer> getRenderLayers() {
+        return Arrays.asList(RenderLayer.getSolid(), RenderLayer.getCutout(), RenderLayer.getCutoutMipped());
     }
 
     protected void renderLayer(RenderLayer layer, MatrixStack matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {

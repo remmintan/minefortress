@@ -111,7 +111,7 @@ public class SelectionManager implements FortressWorldRenderer {
         updateSelectedBlocks();
     }
 
-    public Vector4f getClickColors() {
+    public Vector4f getClickColor() {
         float green = this.clickType == ClickType.BUILD? (170f/255f) : 0.0f;
         return new Vector4f(0.0f, green, 0.0f, 0.5f);
     }
