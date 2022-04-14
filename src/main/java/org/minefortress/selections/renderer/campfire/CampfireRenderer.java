@@ -1,12 +1,10 @@
-package org.minefortress.selections.renderer;
+package org.minefortress.selections.renderer.campfire;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.renderer.custom.AbstractCustomRenderer;
 import org.minefortress.renderer.custom.BuiltModel;
-import org.minefortress.selections.SelectionManager;
 
 import java.util.Optional;
 
