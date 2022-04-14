@@ -32,7 +32,7 @@ import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.renderer.gui.FortressHud;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.selections.SelectionManager;
-import org.minefortress.selections.renderer.CampfireRenderer;
+import org.minefortress.selections.renderer.campfire.CampfireRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

@@ -1,4 +1,4 @@
-package org.minefortress.selections.renderer;
+package org.minefortress.selections.renderer.campfire;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
