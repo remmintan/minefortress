@@ -226,8 +226,6 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         renderLayer.endDrawing();
     }
 
-
-
     private ClientBlueprintManager getBlueprintManager() {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         return fortressClient.getBlueprintManager();
