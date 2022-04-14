@@ -7,6 +7,7 @@ import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.renderer.gui.FortressHud;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.selections.renderer.campfire.CampfireRenderer;
+import org.minefortress.selections.renderer.selection.SelectionRenderer;
 
 public interface FortressMinecraftClient {
 
@@ -16,6 +17,7 @@ public interface FortressMinecraftClient {
     ClientBlueprintManager getBlueprintManager();
     BlueprintRenderer getBlueprintRenderer();
     CampfireRenderer getCampfireRenderer();
+    SelectionRenderer getSelectionRenderer();
 
     FortressClientManager getFortressClientManager();
 

@@ -57,11 +57,9 @@ public class SelectionManager implements FortressWorldRenderer {
             BlockPos blockPos = blockHitResult.getBlockPos();
             if(!level.getBlockState(blockPos).isAir()) {
                 this.selectedBlocks.clear();
-                if(this.clickType == ClickType.BUILD && clickingBlockState != null) {
-                    Iterator<BlockPos> selectionIterator = this.getCurrentSelection();
-                    while (selectionIterator.hasNext()) {
-                        this.selectedBlocks.add(selectionIterator.next().toImmutable());
-                    }
+                Iterator<BlockPos> selectionIterator = this.getCurrentSelection();
+                while (selectionIterator.hasNext()) {
+                    this.selectedBlocks.add(selectionIterator.next().toImmutable());
                 }
             }
         }
