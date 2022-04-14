@@ -34,6 +34,7 @@ import org.minefortress.renderer.gui.FortressHud;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.selections.renderer.campfire.CampfireRenderer;
+import org.minefortress.selections.renderer.selection.SelectionRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -56,6 +57,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private ClientBlueprintManager clientBlueprintManager;
     private BlueprintRenderer blueprintRenderer;
     private CampfireRenderer campfireRenderer;
+    private SelectionRenderer selectionRenderer;
 
     @Shadow
     @Final
@@ -102,7 +104,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
         clientBlueprintManager = new ClientBlueprintManager(client);
         blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), client, blockBufferBuilderStorage);
-        campfireRenderer  = new CampfireRenderer(client, blockBufferBuilderStorage);
+        campfireRenderer = new CampfireRenderer(client, blockBufferBuilderStorage);
+        selectionRenderer = new SelectionRenderer(client, selectionBufferBuilder);
     }
 
     @Override
@@ -226,6 +229,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public CampfireRenderer getCampfireRenderer() {
         return campfireRenderer;
+    }
+
+    @Override
+    public SelectionRenderer getSelectionRenderer() {
+        return selectionRenderer;
     }
 
     @Override

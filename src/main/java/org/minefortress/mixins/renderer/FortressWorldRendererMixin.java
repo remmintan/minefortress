@@ -62,6 +62,7 @@ public abstract class FortressWorldRendererMixin  {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         fortressClient.getBlueprintRenderer().prepareForRender();
         fortressClient.getCampfireRenderer().prepareForRender();
+        fortressClient.getSelectionRenderer().prepareForRender();
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
@@ -74,6 +75,7 @@ public abstract class FortressWorldRendererMixin  {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         fortressClient.getBlueprintRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
         fortressClient.getCampfireRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
+        fortressClient.getSelectionRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
 
         SelectionManager selectionManager = fortressClient.getSelectionManager();
         VertexConsumer vertexconsumer2 = immediate.getBuffer(RenderLayer.getLines());

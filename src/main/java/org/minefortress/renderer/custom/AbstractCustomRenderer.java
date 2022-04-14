@@ -54,6 +54,14 @@ public abstract class AbstractCustomRenderer {
             textureReference = RenderSystem.getShaderTexture(i);
             shader.addSampler("Sampler" + i, textureReference);
         }
+
+        final GlUniform offset = shader.chunkOffset;
+
+        if(offset == null) {
+            matrices.push();
+            matrices.translate(-cameraX, -cameraY, -cameraZ);
+        }
+
         if(shader.modelViewMat != null) {
             final Matrix4f modelViewMatrix = matrices.peek().getModel();
             shader.modelViewMat.set(modelViewMatrix);
@@ -79,7 +87,6 @@ public abstract class AbstractCustomRenderer {
         RenderSystem.setupShaderLights(shader);
         shader.bind();
 
-        final GlUniform offset = shader.chunkOffset;
 
         final Optional<BlockPos> renderTargetPositionOpt = getRenderTargetPosition();
         final Optional<BuiltModel> builtModelOpt = getBuiltModel();
@@ -106,6 +113,8 @@ public abstract class AbstractCustomRenderer {
 
         if(offset != null) {
             offset.set(Vec3f.ZERO);
+        } else {
+            matrices.pop();
         }
         shader.unbind();
         if(notEmpty) {
@@ -115,6 +124,8 @@ public abstract class AbstractCustomRenderer {
         VertexBuffer.unbind();
         VertexBuffer.unbindVertexArray();
         layer.endDrawing();
+
+
     }
 
     protected abstract Optional<BlockPos> getRenderTargetPosition();

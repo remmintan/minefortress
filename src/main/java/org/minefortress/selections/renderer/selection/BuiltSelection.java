@@ -49,8 +49,8 @@ public class BuiltSelection implements BuiltModel {
             final Vector4f color = selection.getColor();
             final Set<BlockPos> positions = selection.getPositions();
             for (BlockPos pos : positions) {
-                if(clickType == ClickType.BUILD && BuildingManager.canRemoveBlock(getWorld(),pos)) continue;
-                if(clickType == ClickType.REMOVE && BuildingManager.canPlaceBlock(getWorld(),pos)) continue;
+                if(clickType == ClickType.BUILD && !BuildingManager.canPlaceBlock(getWorld(),pos)) continue;
+                if(clickType == ClickType.REMOVE && !BuildingManager.canRemoveBlock(getWorld(),pos)) continue;
 
                 matrices.push();
                 matrices.translate(pos.getX(), pos.getY(), pos.getZ());
@@ -60,6 +60,8 @@ public class BuiltSelection implements BuiltModel {
                 notEmpty = true;
             }
         }
+
+        bufferBuilder.end();
     }
 
     private void init(BufferBuilder bufferBuilder) {
