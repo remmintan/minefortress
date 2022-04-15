@@ -5,13 +5,13 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.selections.ClickType;
 
-import java.util.Set;
+import java.util.List;
 
 public interface FortressWorldRenderer {
 
     @Nullable
     BlockState getClickingBlock();
-    Set<BlockPos> getSelectedBlocks();
+    List<BlockPos> getSelectedBlocks();
     ClickType getClickType();
 
 }

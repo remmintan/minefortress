@@ -47,7 +47,7 @@ public class BuiltSelection implements BuiltModel {
             init(bufferBuilder);
             final ClickType clickType = selection.getClickType();
             final Vector4f color = selection.getColor();
-            final Set<BlockPos> positions = selection.getPositions();
+            final List<BlockPos> positions = selection.getPositions();
             for (BlockPos pos : positions) {
                 if(clickType == ClickType.BUILD && !BuildingManager.canPlaceBlock(getWorld(),pos)) continue;
                 if(clickType == ClickType.REMOVE && !BuildingManager.canRemoveBlock(getWorld(),pos)) continue;

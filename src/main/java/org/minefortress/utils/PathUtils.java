@@ -12,11 +12,11 @@ import java.util.List;
 
 public class PathUtils {
 
-    public static Iterable<BlockPos> getLadderSelection(BlockPos selectionStart, BlockPos selectionEnd, Direction.Axis axis) {
+    public static List<BlockPos> getLadderSelection(BlockPos selectionStart, BlockPos selectionEnd, Direction.Axis axis) {
         return getLadderSelection(selectionStart, selectionStart, selectionEnd, axis);
     }
 
-    public static Iterable<BlockPos> getLadderSelection(BlockPos globalStart, BlockPos selectionStart, BlockPos selectionEnd, Direction.Axis axis) {
+    public static List<BlockPos> getLadderSelection(BlockPos globalStart, BlockPos selectionStart, BlockPos selectionEnd, Direction.Axis axis) {
         List<BlockPos> blocks = new ArrayList<>();
 
         for(BlockPos pos: BlockPos.iterate(selectionStart, selectionEnd)) {

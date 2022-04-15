@@ -251,7 +251,7 @@ public class WallsSelection extends Selection {
     }
 
     @Override
-    public Iterable<BlockPos> getSelection() {
+    public List<BlockPos> getSelection() {
         return this.selection!=null?this.selection:Collections.emptyList();
     }
 

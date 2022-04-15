@@ -3,6 +3,9 @@ package org.minefortress.selections;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
+import java.util.List;
+import java.util.Set;
+
 import static org.minefortress.utils.PathUtils.findDeltaForAxis;
 import static org.minefortress.utils.PathUtils.getLadderSelection;
 
@@ -27,7 +30,7 @@ public class LadderSelection extends TwoDotsSelection{
     }
 
     @Override
-    public Iterable<BlockPos> getSelection() {
+    public List<BlockPos> getSelection() {
         return super.getSelection();
     }
 
@@ -37,7 +40,7 @@ public class LadderSelection extends TwoDotsSelection{
     }
 
     @Override
-    protected Iterable<BlockPos> getIterableForSelectionUpdate(BlockPos selectionStart, BlockPos selectionEnd) {
+    protected List<BlockPos> getIterableForSelectionUpdate(BlockPos selectionStart, BlockPos selectionEnd) {
         return getLadderSelection(selectionStart, selectionEnd, getAxis());
     }
 

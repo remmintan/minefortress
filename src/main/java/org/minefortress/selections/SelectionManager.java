@@ -6,9 +6,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
+import net.minecraft.world.dimension.DimensionType;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressWorldRenderer;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
@@ -27,9 +26,11 @@ public class SelectionManager implements FortressWorldRenderer {
     private BlockState clickingBlockState = null;
     private int upSelectionDelta = 0;
 
-    private final Set<BlockPos> selectedBlocks = new HashSet<>();
-
     private boolean selectionHidden = false;
+
+    public SelectionManager(MinecraftClient client) {
+        this.client = client;
+    }
 
     public void toggleSelectionVisibility() {
         this.selectionHidden = !this.selectionHidden;
@@ -45,28 +46,8 @@ public class SelectionManager implements FortressWorldRenderer {
     }
 
     @Override
-    public Set<BlockPos> getSelectedBlocks() {
-        return selectedBlocks;
-    }
-
-    private void updateSelectedBlocks() {
-        HitResult hitResult = client.crosshairTarget;
-        ClientWorld level = client.world;
-        if(hitResult != null && hitResult.getType() == HitResult.Type.BLOCK && level != null) {
-            BlockHitResult blockHitResult = (BlockHitResult) hitResult;
-            BlockPos blockPos = blockHitResult.getBlockPos();
-            if(!level.getBlockState(blockPos).isAir()) {
-                this.selectedBlocks.clear();
-                Iterator<BlockPos> selectionIterator = this.getCurrentSelection();
-                while (selectionIterator.hasNext()) {
-                    this.selectedBlocks.add(selectionIterator.next().toImmutable());
-                }
-            }
-        }
-    }
-
-    public SelectionManager(MinecraftClient client) {
-        this.client = client;
+    public List<BlockPos> getSelectedBlocks() {
+        return this.selection.getSelection();
     }
 
     public void selectBlock(BlockPos blockPos) {
@@ -78,22 +59,15 @@ public class SelectionManager implements FortressWorldRenderer {
     }
 
     public void moveSelectionUp() {
-//        if(this.clickType == ClickType.REMOVE && upSelectionDelta == 0) return;
         upSelectionDelta++;
     }
 
     public void moveSelectionDown() {
-//        if (clickType == ClickType.BUILD && upSelectionDelta == 0) return;
         upSelectionDelta--;
     }
 
-    public BlockState getClickingBlockState() {
-        return clickingBlockState;
-    }
-
     public void tickSelectionUpdate(BlockPos blockPos, Direction clickedFace) {
-        final ClientWorld level = client.world;
-        if(level == null || level.getDimension().equals(FortressDimensionTypeMixin.getNether()) || level.getDimension().equals(FortressDimensionTypeMixin.getEnd())) {
+        if(isNotOverworld()) {
             if(selection.isSelecting()) {
                 selection.reset();
             }
@@ -105,17 +79,11 @@ public class SelectionManager implements FortressWorldRenderer {
             this.selection.update(pickedPos, upSelectionDelta);
             this.selection.setRendererDirty(client.worldRenderer);
         }
-
-        updateSelectedBlocks();
     }
 
     public Vector4f getClickColor() {
         float green = this.clickType == ClickType.BUILD? (170f/255f) : 0.0f;
         return new Vector4f(0.0f, green, 0.0f, 0.5f);
-    }
-
-    public Iterator<BlockPos> getCurrentSelection() {
-        return this.selection.getSelection().iterator();
     }
 
     public List<Pair<Vec3i, Vec3i>> getSelectionSize() {
@@ -152,8 +120,7 @@ public class SelectionManager implements FortressWorldRenderer {
     }
 
     private void selectBlock(BlockPos blockPos, ClickType click, BlockState blockState) {
-        final ClientWorld level = client.world;
-        if(level == null || level.getDimension().equals(FortressDimensionTypeMixin.getNether()) || level.getDimension().equals(FortressDimensionTypeMixin.getEnd())) return;
+        if(isNotOverworld()) return;
 
         if((blockState == null || selection instanceof TreeSelection) && click == ClickType.BUILD) {
             resetSelection();
@@ -175,6 +142,17 @@ public class SelectionManager implements FortressWorldRenderer {
                 this.client.crosshairTarget
         );
         if(result) resetSelection();
+    }
+
+    private boolean isNotOverworld() {
+        final ClientWorld level = client.world;
+        if (level == null) {
+            return true;
+        } else {
+            final DimensionType dimension = level.getDimension();
+            return dimension.equals(FortressDimensionTypeMixin.getNether()) ||
+                    dimension.equals(FortressDimensionTypeMixin.getEnd());
+        }
     }
 
     public boolean isSelecting() {
