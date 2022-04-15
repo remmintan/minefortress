@@ -26,4 +26,10 @@ public class CampfireModelBuilder {
         return this.builtCampfire;
     }
 
+    public void close() {
+        if(this.builtCampfire != null) {
+            this.builtCampfire.close();
+        }
+    }
+
 }

@@ -9,7 +9,10 @@ import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BlueprintsModelBuilder {
 
@@ -45,10 +48,20 @@ public class BlueprintsModelBuilder {
     }
 
     public void invalidateBlueprint(final String fileName) {
-        new HashSet<>(builtBlueprints.keySet()).stream().filter(key -> key.startsWith(fileName)).forEach(builtBlueprints::remove);
+        final List<Map.Entry<String, BuiltBlueprint>> toRemove = builtBlueprints.entrySet()
+                .stream()
+                .filter(e -> e.getKey().startsWith(fileName))
+                .collect(Collectors.toList());
+        for(Map.Entry<String, BuiltBlueprint> entry : toRemove) {
+            String key = entry.getKey();
+            BuiltBlueprint blueprint = entry.getValue();
+            blueprint.close();
+            this.builtBlueprints.remove(key);
+        }
     }
 
     public void reset() {
+        this.builtBlueprints.values().forEach(BuiltBlueprint::close);
         this.builtBlueprints.clear();
     }
 

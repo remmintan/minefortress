@@ -52,6 +52,11 @@ public class BuiltCampfire implements BuiltModel {
         return vertexBuffers.get(layer);
     }
 
+    @Override
+    public void close() {
+        vertexBuffers.values().forEach(VertexBuffer::close);
+    }
+
 
     private void render(BlockBufferBuilderStorage blockBufferBuilders) {
         BlockPos pos = BlockPos.ORIGIN;

@@ -257,4 +257,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     public int getTicksSpeed() {
         return this.ticksSpeed;
     }
+
+    @Inject(method = "close", at = @At("HEAD"))
+    public void close(CallbackInfo ci) {
+        this.blueprintRenderer.close();
+        this.campfireRenderer.close();
+        this.selectionRenderer.close();
+    }
 }

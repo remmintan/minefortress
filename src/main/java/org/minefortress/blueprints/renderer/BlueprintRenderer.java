@@ -47,6 +47,11 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     }
 
     @Override
+    public void close() {
+        blueprintsModelBuilder.reset();
+    }
+
+    @Override
     protected boolean shouldRender() {
         return getBlueprintManager().hasSelectedBlueprint();
     }
