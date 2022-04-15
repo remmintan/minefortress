@@ -105,7 +105,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         clientBlueprintManager = new ClientBlueprintManager(client);
         blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), client, blockBufferBuilderStorage);
         campfireRenderer = new CampfireRenderer(client, blockBufferBuilderStorage);
-        selectionRenderer = new SelectionRenderer(client, selectionBufferBuilder);
+        selectionRenderer = new SelectionRenderer(client, selectionBufferBuilder, blockBufferBuilderStorage);
     }
 
     @Override
