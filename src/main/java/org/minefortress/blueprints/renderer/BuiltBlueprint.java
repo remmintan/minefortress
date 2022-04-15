@@ -66,6 +66,11 @@ public class BuiltBlueprint implements BuiltModel {
     }
 
     @Override
+    public void close() {
+        this.vertexBuffers.values().forEach(VertexBuffer::close);
+    }
+
+    @Override
     public boolean hasLayer(RenderLayer layer) {
         return this.buffersUploaded() && nonEmptyLayers.contains(layer);
     }

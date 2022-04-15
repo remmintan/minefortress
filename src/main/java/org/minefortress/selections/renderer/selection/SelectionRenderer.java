@@ -50,6 +50,11 @@ public class SelectionRenderer extends AbstractCustomRenderer {
     }
 
     @Override
+    public void close() {
+        selectionModelBuilder.close();
+    }
+
+    @Override
     protected List<RenderLayer> getRenderLayers() {
         return Collections.singletonList(RenderLayer.getLines());
     }

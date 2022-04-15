@@ -7,5 +7,6 @@ public interface BuiltModel {
 
     boolean hasLayer(RenderLayer layer);
     VertexBuffer getBuffer(RenderLayer layer);
+    void close();
 
 }

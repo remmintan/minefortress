@@ -100,6 +100,12 @@ public class BuiltSelection implements BuiltModel {
         }
     }
 
+    @Override
+    public void close() {
+        vertexBuffer.close();
+    }
+
+
     private ClientWorld getWorld() {
         return MinecraftClient.getInstance().world;
     }

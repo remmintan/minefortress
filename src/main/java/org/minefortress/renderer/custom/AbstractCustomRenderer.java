@@ -132,6 +132,7 @@ public abstract class AbstractCustomRenderer {
     protected abstract Optional<BuiltModel> getBuiltModel();
     protected abstract boolean shouldRender();
     public abstract void prepareForRender();
+    public abstract void close();
 
     protected Vec3f getColorModulator() {
         return new Vec3f(1f, 1f, 1f);

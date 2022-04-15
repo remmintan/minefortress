@@ -23,12 +23,22 @@ public class SelectionModelBuilder {
                 selectionManager.getClickColor(),
                 selectionManager.getSelectedBlocks());
 
+        if(this.builtSelection != null) {
+            this.builtSelection.close();
+        }
+
         this.builtSelection = new BuiltSelection(Collections.singletonList(activeSelectionInfo));
         this.builtSelection.build(bufferBuilder);
     }
 
     public BuiltSelection getBuiltSelection() {
         return this.builtSelection;
+    }
+
+    public void close() {
+        if(this.builtSelection != null) {
+            this.builtSelection.close();
+        }
     }
 
 }

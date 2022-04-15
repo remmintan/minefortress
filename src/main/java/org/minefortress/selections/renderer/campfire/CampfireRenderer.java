@@ -27,7 +27,10 @@ public final class CampfireRenderer extends AbstractCustomRenderer {
 
     @Override
     protected Optional<BuiltModel> getBuiltModel() {
-        return Optional.ofNullable(this.campfireModelBuilder.getOrBuildCampfire());
+        if(!shouldRender())
+            return Optional.empty();
+        else
+            return Optional.ofNullable(this.campfireModelBuilder.getOrBuildCampfire());
     }
 
     @Override
@@ -37,7 +40,13 @@ public final class CampfireRenderer extends AbstractCustomRenderer {
 
     @Override
     public void prepareForRender() {
-        this.campfireModelBuilder.build();
+        if(this.shouldRender())
+            this.campfireModelBuilder.build();
+    }
+
+    @Override
+    public void close() {
+        this.campfireModelBuilder.close();
     }
 
 }
