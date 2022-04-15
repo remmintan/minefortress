@@ -26,56 +26,34 @@ public abstract class FortressWorldSliceMixin {
 
     @Inject(method = "unpackBlockData", at = @At("TAIL"))
     public void unpackBlockData(BlockState[] states, ClonedChunkSection section, BlockBox box, CallbackInfo ci) {
-        final MinecraftClient client = MinecraftClient.getInstance();
-        if (client.interactionManager == null || client.interactionManager.getCurrentGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS"))
-            return;
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
-
-        final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
-        if(fortressClientManager.isFortressInitializationNeeded()) {
-            renderCampPositionOnChunck(states, section, fortressClientManager);
-            return;
-        }
-
-        final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
-        if (!clientBlueprintManager.hasSelectedBlueprint()) {
-            addSelectionToChunk(states, section, fortressClient);
-        }
+//        final MinecraftClient client = MinecraftClient.getInstance();
+//        if (client.interactionManager == null || client.interactionManager.getCurrentGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS"))
+//            return;
+//        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
+//
+//        final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+//        if (!clientBlueprintManager.hasSelectedBlueprint()) {
+//            addSelectionToChunk(states, section, fortressClient);
+//        }
     }
 
-    private void renderCampPositionOnChunck(BlockState[] states, ClonedChunkSection section, FortressClientManager fortressClientManager) {
-        final BlockPos posAppropriateForCenter = fortressClientManager.getPosAppropriateForCenter();
-        if(posAppropriateForCenter != null) {
-            final ChunkSectionPos sectionPos = section.getPosition();
-            BlockPos startPos = new BlockPos(sectionPos.getMinX(), sectionPos.getMinY(), sectionPos.getMinZ());
-            BlockPos endPos = new BlockPos(sectionPos.getMaxX(), sectionPos.getMaxY(), sectionPos.getMaxZ());
-
-            for (BlockPos blockPos : BlockPos.iterate(startPos, endPos)) {
-                if (blockPos.equals(posAppropriateForCenter)) {
-                    final int index = WorldSlice.getLocalBlockIndex(blockPos.getX()&15, blockPos.getY()&15, blockPos.getZ()&15);
-                    states[index] = fortressClientManager.getStateForCampCenter();
-                }
-            }
-        }
-    }
-
-    private void addSelectionToChunk(BlockState[] states, ClonedChunkSection section, FortressMinecraftClient fortressClient) {
-        final SelectionManager selectionManager = fortressClient.getSelectionManager();
-        if(selectionManager.getClickType() == ClickType.BUILD) {
-            final Set<BlockPos> selectedBlocks = selectionManager.getSelectedBlocks();
-            final BlockState state = selectionManager.getClickingBlock();
-
-            final ChunkSectionPos sectionPos = section.getPosition();
-            BlockPos startPos = new BlockPos(sectionPos.getMinX(), sectionPos.getMinY(), sectionPos.getMinZ());
-            BlockPos endPos = new BlockPos(sectionPos.getMaxX(), sectionPos.getMaxY(), sectionPos.getMaxZ());
-
-            for (BlockPos blockPos : BlockPos.iterate(startPos, endPos)) {
-                if (selectedBlocks.contains(blockPos)) {
-                    final int index = WorldSlice.getLocalBlockIndex(blockPos.getX()&15, blockPos.getY()&15, blockPos.getZ()&15);
-                    states[index] = state;
-                }
-            }
-        }
-    }
+//    private void addSelectionToChunk(BlockState[] states, ClonedChunkSection section, FortressMinecraftClient fortressClient) {
+//        final SelectionManager selectionManager = fortressClient.getSelectionManager();
+//        if(selectionManager.getClickType() == ClickType.BUILD) {
+//            final Set<BlockPos> selectedBlocks = selectionManager.getSelectedBlocks();
+//            final BlockState state = selectionManager.getClickingBlock();
+//
+//            final ChunkSectionPos sectionPos = section.getPosition();
+//            BlockPos startPos = new BlockPos(sectionPos.getMinX(), sectionPos.getMinY(), sectionPos.getMinZ());
+//            BlockPos endPos = new BlockPos(sectionPos.getMaxX(), sectionPos.getMaxY(), sectionPos.getMaxZ());
+//
+//            for (BlockPos blockPos : BlockPos.iterate(startPos, endPos)) {
+//                if (selectedBlocks.contains(blockPos)) {
+//                    final int index = WorldSlice.getLocalBlockIndex(blockPos.getX()&15, blockPos.getY()&15, blockPos.getZ()&15);
+//                    states[index] = state;
+//                }
+//            }
+//        }
+//    }
 
 }

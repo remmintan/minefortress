@@ -34,42 +34,20 @@ public abstract class FortressChunkRendererRegionMixin {
         if(client.interactionManager == null || client.interactionManager.getCurrentGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS"))
             return;
 
-        final FortressMinecraftClient fortressClient = getFortressClient();
-        final SelectionManager selectionManager = fortressClient.getSelectionManager();
-//        final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+//        final FortressMinecraftClient fortressClient = getFortressClient();
+//        final SelectionManager selectionManager = fortressClient.getSelectionManager();
 
-//        if(fortressManager.isFortressInitializationNeeded()) {
-//            final BlockPos posAppropriateForCenter = fortressManager.getPosAppropriateForCenter();
-//            if(posAppropriateForCenter != null && isBlockPosBetween(posAppropriateForCenter, startPos, endPos)) {
-//                final int index = this.getIndex(posAppropriateForCenter);
-//                this.blockStates[index] = fortressManager.getStateForCampCenter();
+//        if(selectionManager.getClickType() == ClickType.BUILD) {
+//            final Set<BlockPos> selectedBlocks = selectionManager.getSelectedBlocks();
+//            final BlockState state = selectionManager.getClickingBlock();
+//
+//            for (BlockPos blockPos : BlockPos.iterate(startPos, endPos)) {
+//                if (selectedBlocks.contains(blockPos)) {
+//                    final int index = this.getIndex(blockPos);
+//                    this.blockStates[index] = state;
+//                }
 //            }
-//            return;
 //        }
-
-        if(selectionManager.getClickType() == ClickType.BUILD) {
-            final Set<BlockPos> selectedBlocks = selectionManager.getSelectedBlocks();
-            final BlockState state = selectionManager.getClickingBlock();
-
-            for (BlockPos blockPos : BlockPos.iterate(startPos, endPos)) {
-                if (selectedBlocks.contains(blockPos)) {
-                    final int index = this.getIndex(blockPos);
-                    this.blockStates[index] = state;
-                }
-            }
-        }
-    }
-
-    private static boolean isBlockPosGreaterOrEqual(BlockPos pos, BlockPos pos2) {
-        return pos.getX() >= pos2.getX() && pos.getY() >= pos2.getY() && pos.getZ() >= pos2.getZ();
-    }
-
-    private static boolean isBlockPosLessOrEqual(BlockPos pos, BlockPos pos2) {
-        return pos.getX() <= pos2.getX() && pos.getY() <= pos2.getY() && pos.getZ() <= pos2.getZ();
-    }
-
-    private static boolean isBlockPosBetween(BlockPos pos, BlockPos pos2, BlockPos pos3) {
-        return isBlockPosGreaterOrEqual(pos, pos2) && isBlockPosLessOrEqual(pos, pos3);
     }
 
     private FortressMinecraftClient getFortressClient() {

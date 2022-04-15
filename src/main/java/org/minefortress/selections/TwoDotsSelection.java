@@ -20,13 +20,16 @@ import org.minefortress.utils.BlockUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class TwoDotsSelection extends Selection {
 
     protected BlockPos selectionStart;
     private BlockPos selectionEnd;
-    private Iterable<BlockPos> selection;
+    private List<BlockPos> selection;
     private ClickType clickType;
 
     @Override
@@ -83,8 +86,8 @@ public class TwoDotsSelection extends Selection {
         this.selection = getIterableForSelectionUpdate(this.selectionStart, this.selectionEnd);
     }
 
-    protected Iterable<BlockPos> getIterableForSelectionUpdate(BlockPos selectionStart, BlockPos selectionEnd) {
-        return BlockPos.iterate(selectionStart, selectionEnd);
+    protected List<BlockPos> getIterableForSelectionUpdate(BlockPos selectionStart, BlockPos selectionEnd) {
+        return StreamSupport.stream(BlockPos.iterate(selectionStart, selectionEnd).spliterator(), false).collect(Collectors.toList());
     }
 
     @Override
@@ -93,7 +96,7 @@ public class TwoDotsSelection extends Selection {
     }
 
     @Override
-    public Iterable<BlockPos> getSelection() {
+    public List<BlockPos> getSelection() {
         return this.selection != null?this.selection:Collections.emptyList();
     }
 

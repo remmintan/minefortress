@@ -29,7 +29,7 @@ public class TreeSelection extends Selection {
     private BlockPos end;
 
     private final List<BlockPos> treeRoots = new ArrayList<>();
-    private final Set<BlockPos> selectedTreeBlocks = new HashSet<>();
+    private final List<BlockPos> selectedTreeBlocks = new ArrayList<>();
 
     @Override
     public boolean isSelecting() {
@@ -78,7 +78,7 @@ public class TreeSelection extends Selection {
     }
 
     @Override
-    public Iterable<BlockPos> getSelection() {
+    public List<BlockPos> getSelection() {
         return selectedTreeBlocks;
     }
 

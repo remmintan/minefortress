@@ -12,6 +12,7 @@ import org.minefortress.tasks.TaskType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public abstract class Selection {
     public abstract boolean isSelecting();
@@ -35,7 +36,7 @@ public abstract class Selection {
 
     public abstract void setRendererDirty(WorldRenderer renderer);
 
-    public abstract Iterable<BlockPos> getSelection();
+    public abstract List<BlockPos> getSelection();
 
     public abstract void reset();
 

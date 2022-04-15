@@ -6,18 +6,18 @@ import net.minecraft.util.math.Vector4f;
 import org.minefortress.selections.ClickType;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 public class SelectionRenderInfo {
 
     private final ClickType clickType;
     private final Vector4f color;
-    private final Set<BlockPos> positions;
+    private final List<BlockPos> positions;
 
-    public SelectionRenderInfo(ClickType clickType, Vector4f color, Set<BlockPos> positions) {
+    public SelectionRenderInfo(ClickType clickType, Vector4f color, List<BlockPos> positions) {
         this.clickType = clickType;
         this.color = color;
-        this.positions = Collections.unmodifiableSet(positions);
+        this.positions = Collections.unmodifiableList(positions);
     }
 
     public ClickType getClickType() {
@@ -28,7 +28,7 @@ public class SelectionRenderInfo {
         return new Vector4f(color.getX(), color.getY(), color.getZ(), color.getW());
     }
 
-    public Set<BlockPos> getPositions() {
+    public List<BlockPos> getPositions() {
         return positions;
     }
 }
