@@ -2,18 +2,13 @@ package org.minefortress.tasks;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.network.ClientConnection;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.network.ServerboundCancelTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.network.ServerboundCancelTaskPacket;
 import org.minefortress.selections.ClientSelection;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientTasksHolder {
 
@@ -24,13 +19,8 @@ public class ClientTasksHolder {
 
     private final Stack<UUID> tasksStack = new Stack<>();
 
-    private final ClientWorld level;
-    private final WorldRenderer levelRenderer;
-
-    public ClientTasksHolder(ClientWorld level, WorldRenderer levelRenderer) {
-        this.level = level;
-        this.levelRenderer = levelRenderer;
-    }
+    private boolean selectionHidden = false;
+    private boolean needRebuild = false;
 
     public void cancelTask() {
         if(tasksStack.empty()) return;
@@ -70,49 +60,50 @@ public class ClientTasksHolder {
             removeTasks.put(uuid, newTask);
         } else {
             buildTasks.put(uuid, newTask);
-            updateRenderer(blocks, blockState);
-            compileBlocksToRender();
         }
 
         tasksStack.push(uuid);
+        this.setNeedRebuild(true);
     }
 
-    private void updateRenderer(Iterable<BlockPos> blocks, BlockState blockState) {
-        levelRenderer.scheduleTerrainUpdate();
-        blocks.forEach(it -> levelRenderer.scheduleBlockRerenderIfNeeded(it, level.getBlockState(it), blockState));
-    }
-
-    public Collection<ClientSelection> getAllRemoveTasks() {
+    public Set<ClientSelection> getAllRemoveTasks() {
         return new HashSet<>(removeTasks.values());
     }
 
-    private final Map<BlockPos, BlockState> blocksToRender = new ConcurrentHashMap<>();
-    private void compileBlocksToRender() {
-        blocksToRender.clear();
-        for(ClientSelection selection : buildTasks.values()) {
-            BlockState blockState = selection.getBuildingBlockState();
-            for(BlockPos pos: selection.getBlockPositions()) {
-                blocksToRender.put(pos.toImmutable(), blockState);
-            }
-        }
-    }
-
-    public Map<BlockPos, BlockState> getAllBuildTasks() {
-        return blocksToRender;
+    public Set<ClientSelection> getAllBuildTasks() {
+        return new HashSet<>(buildTasks.values());
     }
 
     public void removeTask(UUID uuid) {
         if(buildTasks.containsKey(uuid)) {
-            ClientSelection clientSelection = buildTasks.get(uuid);
-            updateRenderer(clientSelection.getBlockPositions(), clientSelection.getBuildingBlockState());
             buildTasks.remove(uuid);
-            compileBlocksToRender();
         } else {
             removeTasks.remove(uuid);
         }
 
         subtasksMap.remove(uuid);
         tasksStack.remove(uuid);
+
+        this.setNeedRebuild(true);
     }
 
+    public boolean isNeedRebuild() {
+        return needRebuild;
+    }
+
+    public void setNeedRebuild(boolean needRebuild) {
+        this.needRebuild = needRebuild;
+    }
+
+    public void toggleSelectionVisibility() {
+        this.selectionHidden = !this.selectionHidden;
+    }
+
+    public boolean isSelectionHidden() {
+        return selectionHidden;
+    }
+
+    public boolean isEmpty() {
+        return buildTasks.isEmpty() && removeTasks.isEmpty();
+    }
 }

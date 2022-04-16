@@ -26,20 +26,12 @@ public class SelectionManager implements FortressWorldRenderer {
     private BlockState clickingBlockState = null;
     private int upSelectionDelta = 0;
 
-    private boolean selectionHidden = false;
+
 
     private boolean needsUpdate = false;
 
     public SelectionManager(MinecraftClient client) {
         this.client = client;
-    }
-
-    public void toggleSelectionVisibility() {
-        this.selectionHidden = !this.selectionHidden;
-    }
-
-    public boolean isSelectionHidden() {
-        return selectionHidden;
     }
 
     @Override

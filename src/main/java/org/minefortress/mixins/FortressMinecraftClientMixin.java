@@ -1,6 +1,7 @@
 package org.minefortress.mixins;
 
 import com.chocohead.mm.api.ClassTinkerers;
+import com.google.common.base.Supplier;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.RunArgs;
@@ -24,6 +25,7 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundSetTickSpeedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -35,6 +37,8 @@ import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.selections.renderer.campfire.CampfireRenderer;
 import org.minefortress.selections.renderer.selection.SelectionRenderer;
+import org.minefortress.selections.renderer.tasks.TasksRenderer;
+import org.minefortress.tasks.ClientTasksHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -58,6 +62,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private BlueprintRenderer blueprintRenderer;
     private CampfireRenderer campfireRenderer;
     private SelectionRenderer selectionRenderer;
+    private TasksRenderer tasksRenderer;
 
     @Shadow
     @Final
@@ -106,6 +111,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), client, blockBufferBuilderStorage);
         campfireRenderer = new CampfireRenderer(client, blockBufferBuilderStorage);
         selectionRenderer = new SelectionRenderer(client, selectionBufferBuilder, blockBufferBuilderStorage);
+
+        final Supplier<ClientTasksHolder> clientTasksHolderSupplier = () -> {
+            final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
+            if(fortressWorld == null) return null;
+            return fortressWorld.getClientTasksHolder();
+        };
+        tasksRenderer = new TasksRenderer(client, selectionBufferBuilder, clientTasksHolderSupplier);
     }
 
     @Override
@@ -237,9 +249,16 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
+    public TasksRenderer getTasksRenderer() {
+        return tasksRenderer;
+    }
+
+    @Override
     public ClientBlueprintManager getBlueprintManager() {
         return this.clientBlueprintManager;
     }
+
+
 
     @Override
     public boolean isSupporter() {

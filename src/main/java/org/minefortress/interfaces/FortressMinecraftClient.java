@@ -8,6 +8,7 @@ import org.minefortress.renderer.gui.FortressHud;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.selections.renderer.campfire.CampfireRenderer;
 import org.minefortress.selections.renderer.selection.SelectionRenderer;
+import org.minefortress.selections.renderer.tasks.TasksRenderer;
 
 public interface FortressMinecraftClient {
 
@@ -18,6 +19,7 @@ public interface FortressMinecraftClient {
     BlueprintRenderer getBlueprintRenderer();
     CampfireRenderer getCampfireRenderer();
     SelectionRenderer getSelectionRenderer();
+    TasksRenderer getTasksRenderer();
 
     FortressClientManager getFortressClientManager();
 

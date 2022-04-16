@@ -9,14 +9,17 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.widget.*;
 import org.minefortress.selections.SelectionType;
+import org.minefortress.tasks.ClientTasksHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class ToolsGui extends FortressGuiScreen {
 
@@ -49,6 +52,8 @@ public class ToolsGui extends FortressGuiScreen {
                 Text.of("")
         );
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
+        final Optional<ClientTasksHolder> clientTasksHolderOpt = Optional.ofNullable((FortressClientWorld) client.world)
+                .map(FortressClientWorld::getClientTasksHolder);
         this.blueprints = new FortressBlueprintsButtonWidget(
                 0,
                 0,
@@ -120,7 +125,7 @@ public class ToolsGui extends FortressGuiScreen {
                 0,
                 0,
                 (button, matrices, mouseX, mouseY) -> {
-                    if (fortressClient.getSelectionManager().isSelectionHidden()) {
+                    if (clientTasksHolderOpt.isPresent() && clientTasksHolderOpt.get().isSelectionHidden()) {
                         ToolsGui.super.renderTooltip(matrices, new LiteralText("Show Tasks outline"), mouseX, mouseY);
                     } else {
                         ToolsGui.super.renderTooltip(matrices, new LiteralText("Hide Tasks outline"), mouseX, mouseY);
