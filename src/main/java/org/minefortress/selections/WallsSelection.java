@@ -3,7 +3,6 @@ package org.minefortress.selections;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.HitResult;
@@ -56,13 +55,13 @@ public class WallsSelection extends Selection {
         updateCorners(pickedBlock);
         ArrayList<Pair<BlockPos, BlockPos>> cornerPairs = getCornerPairs();
         this.selection = getSelection(upDelta, cornerPairs);
-        this.selectionSizes = getSelectionSizes(upDelta, cornerPairs);
+        this.selectionSizes = getSelectionDimensions(upDelta, cornerPairs);
     }
 
-    protected List<Pair<Vec3i, Vec3i>> getSelectionSizes(int upDelta, ArrayList<Pair<BlockPos, BlockPos>> cornerPairs) {
+    protected List<Pair<Vec3i, Vec3i>> getSelectionDimensions(int upDelta, ArrayList<Pair<BlockPos, BlockPos>> cornerPairs) {
         return cornerPairs
                 .stream()
-                .map(p -> Selection.getSelectionSize(p.getFirst(), p.getSecond().up(upDelta)))
+                .map(p -> Selection.getSelectionDimensions(p.getFirst(), p.getSecond().up(upDelta)))
                 .toList();
     }
 
@@ -259,7 +258,7 @@ public class WallsSelection extends Selection {
     }
 
     @Override
-    public List<Pair<Vec3i, Vec3i>> getSelectionSize() {
+    public List<Pair<Vec3i, Vec3i>> getSelectionDimensions() {
         return this.selectionSizes!=null?this.selectionSizes:Collections.emptyList();
     }
 

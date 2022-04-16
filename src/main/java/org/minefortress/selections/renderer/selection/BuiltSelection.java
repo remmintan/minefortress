@@ -1,5 +1,6 @@
 package org.minefortress.selections.renderer.selection;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -13,10 +14,8 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vector4f;
+import net.minecraft.util.math.*;
+import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.selections.ClickType;
 import org.minefortress.tasks.BuildingManager;
@@ -36,52 +35,73 @@ public class BuiltSelection implements BuiltModel {
     private final Map<RenderLayer, VertexBuffer> buffers = new HashMap<>();
     private CompletableFuture<List<Void>> upload;
 
-    private final List<SelectionRenderInfo> selections;
+    private final SelectionRenderInfo selection;
 
-    public BuiltSelection(List<SelectionRenderInfo> selections) {
-        this.selections = selections;
+    public BuiltSelection(SelectionRenderInfo selection) {
+        this.selection = selection;
 
         for(RenderLayer layer : RenderLayer.getBlockLayers()) {
             buffers.put(layer, new VertexBuffer());
         }
         buffers.put(RenderLayer.getLines(), new VertexBuffer());
+        buffers.put(FortressRenderLayer.getLinesNoDepth(), new VertexBuffer());
     }
 
-    public void build(BufferBuilder bufferBuilder, BlockBufferBuilderStorage blockBufferBuilderStorage) {
-        render(bufferBuilder, blockBufferBuilderStorage);
-        uploadBuffers(bufferBuilder, blockBufferBuilderStorage);
+    public void build(Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage) {
+        render(lineBufferBuilderStorage, blockBufferBuilderStorage);
+        uploadBuffers(lineBufferBuilderStorage, blockBufferBuilderStorage);
     }
 
-    private void render(BufferBuilder bufferBuilder, BlockBufferBuilderStorage blockBufferBuilderStorage) {
+    private void render(Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage) {
         final MatrixStack matrices = new MatrixStack();
 
-        for(SelectionRenderInfo selection : selections) {
-            init(RenderLayer.LINES, bufferBuilder);
-            final ClickType clickType = selection.getClickType();
-            final Vector4f color = selection.getColor();
-            final List<BlockPos> positions = selection.getPositions();
-            final BlockState blockState = selection.getBlockState();
-            selectionBlockRenderView.setBlockStateSupplier((blockPos) -> positions.contains(blockPos)?blockState: Blocks.AIR.getDefaultState());
-            for (BlockPos pos : positions) {
-                if(clickType == ClickType.BUILD && !BuildingManager.canPlaceBlock(getWorld(),pos)) continue;
-                if((clickType == ClickType.REMOVE || clickType == ClickType.ROADS) && !BuildingManager.canRemoveBlock(getWorld(),pos)) continue;
+        final RenderLayer lines = RenderLayer.getLines();
+        final BufferBuilder linesBufferBuilder = lineBufferBuilderStorage.get(lines);
+           init(lines, linesBufferBuilder);
+        final ClickType clickType = selection.getClickType();
+        final Vector4f color = selection.getColor();
+        final List<BlockPos> positions = selection.getPositions();
+        final BlockState blockState = selection.getBlockState();
+        selectionBlockRenderView.setBlockStateSupplier((blockPos) -> positions.contains(blockPos)?blockState: Blocks.AIR.getDefaultState());
+        for (BlockPos pos : positions) {
+            if(clickType == ClickType.BUILD && !BuildingManager.canPlaceBlock(getWorld(),pos)) continue;
+            if((clickType == ClickType.REMOVE || clickType == ClickType.ROADS) && !BuildingManager.canRemoveBlock(getWorld(),pos)) continue;
 
+            matrices.push();
+            matrices.translate(pos.getX(), pos.getY(), pos.getZ());
+            WorldRenderer.drawBox(matrices, linesBufferBuilder, BOX, color.getX(), color.getY(), color.getZ(), color.getW());
+            if(clickType == ClickType.BUILD || clickType == ClickType.ROADS) {
+                renderFluid(blockBufferBuilderStorage, pos, blockState);
+                renderBlock(blockBufferBuilderStorage, matrices, pos, blockState);
+            }
+            matrices.pop();
+
+            nonEmptyLayers.add(RenderLayer.getLines());
+        }
+
+        if(clickType == ClickType.REMOVE) {
+            final RenderLayer linesNoDepth = FortressRenderLayer.getLinesNoDepth();
+            final BufferBuilder linesNoDepthBufferBuilder = lineBufferBuilderStorage.get(linesNoDepth);
+            init(linesNoDepth, linesNoDepthBufferBuilder);
+
+            final List<Pair<Vec3i, Vec3i>> selectionDimensions = selection.getSelectionDimensions();
+            for (Pair<Vec3i, Vec3i> dimension : selectionDimensions) {
+                final Vec3i size = dimension.getFirst();
+                final Vec3i start = dimension.getSecond();
+
+                final Box sizeBox = new Box(0, 0, 0, size.getX(), size.getY(), size.getZ());
                 matrices.push();
-                matrices.translate(pos.getX(), pos.getY(), pos.getZ());
-                WorldRenderer.drawBox(matrices, bufferBuilder, BOX, color.getX(), color.getY(), color.getZ(), color.getW());
-                if(clickType == ClickType.BUILD || clickType == ClickType.ROADS) {
-                    renderFluid(blockBufferBuilderStorage, pos, blockState);
-                    renderBlock(blockBufferBuilderStorage, matrices, pos, blockState);
-                }
+                matrices.translate(start.getX(), start.getY(), start.getZ());
+                WorldRenderer.drawBox(matrices, linesNoDepthBufferBuilder, sizeBox, color.getX(), color.getY(), color.getZ(), color.getW());
                 matrices.pop();
 
-                nonEmptyLayers.add(RenderLayer.getLines());
+                nonEmptyLayers.add(FortressRenderLayer.getLinesNoDepth());
             }
         }
 
         for(RenderLayer initializedLayer : this.initializedLayers) {
-            if(initializedLayer == RenderLayer.LINES)
-                bufferBuilder.end();
+            if(initializedLayer == RenderLayer.getLines() || initializedLayer == FortressRenderLayer.getLinesNoDepth())
+                lineBufferBuilderStorage.get(initializedLayer).end();
             else
                 blockBufferBuilderStorage.get(initializedLayer).end();
         }
@@ -115,21 +135,21 @@ public class BuiltSelection implements BuiltModel {
 
     private void init(RenderLayer layer, BufferBuilder bufferBuilder) {
         if(initializedLayers.add(layer)){
-            if(layer == RenderLayer.LINES){
+            if(layer == RenderLayer.LINES || layer == FortressRenderLayer.LINES_NO_DEPTH) {
                 bufferBuilder.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
             } else {
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL);
             }
         }
-
     }
 
-    private void uploadBuffers(BufferBuilder bufferBuilder, BlockBufferBuilderStorage blockBufferBuilderStorage) {
+    private void uploadBuffers(Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage) {
         final List<CompletableFuture<Void>> uploads = initializedLayers
                 .stream()
                 .map(layer -> {
                     final VertexBuffer vertexBuffer = buffers.get(layer);
-                    if (layer == RenderLayer.LINES) {
+                    if (layer == RenderLayer.getLines() || layer == FortressRenderLayer.getLinesNoDepth()) {
+                        final BufferBuilder bufferBuilder = lineBufferBuilderStorage.get(layer);
                         return vertexBuffer
                                 .submitUpload(bufferBuilder)
                                 .whenComplete((r, t) -> {

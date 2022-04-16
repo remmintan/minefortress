@@ -80,8 +80,8 @@ public class SelectionManager implements FortressWorldRenderer {
         return new Vector4f(0.0f, green, 0.0f, 0.5f);
     }
 
-    public List<Pair<Vec3i, Vec3i>> getSelectionSize() {
-        return this.selection.getSelectionSize();
+    public List<Pair<Vec3i, Vec3i>> getSelectionDimensions() {
+        return this.selection.getSelectionDimensions();
     }
 
     public void toggleSelectionType() {
