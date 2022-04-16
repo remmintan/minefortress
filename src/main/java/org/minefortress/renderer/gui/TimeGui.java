@@ -77,8 +77,8 @@ public class TimeGui extends FortressGuiScreen {
 //        this.speed4.render(p, (int)mouseX, (int)mouseY, delta);
 
         final Optional<ClientWorld> world = Optional.ofNullable(this.client.world);
-        final long timeTicks = world.map(World::getTime).orElse(0L) + 4000L;
-        long timeOfDayTicks = (world.map(World::getTimeOfDay).orElse(0L) + 4000L) % 24000L;
+        final long timeTicks = world.map(World::getTime).orElse(0L) + 9000L;
+        long timeOfDayTicks = (world.map(World::getTimeOfDay).orElse(0L) + 9000L) % 24000L;
 
         final int timeDays = (int) Math.floor(timeTicks / 24000.0);
         final int timeHours = (int) Math.floor(timeOfDayTicks / 1000.0);
