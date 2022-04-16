@@ -128,7 +128,12 @@ public abstract class AbstractCustomRenderer {
 
     }
 
-    protected abstract Optional<BlockPos> getRenderTargetPosition();
+    protected Optional<BlockPos> getRenderTargetPosition() {
+        if(shouldRender()) {
+            return Optional.of(BlockPos.ORIGIN);
+        }
+        return Optional.empty();
+    }
     protected abstract Optional<BuiltModel> getBuiltModel();
     protected abstract boolean shouldRender();
     public abstract void prepareForRender();

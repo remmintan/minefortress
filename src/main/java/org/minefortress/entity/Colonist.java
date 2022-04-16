@@ -262,10 +262,12 @@ public class Colonist extends PassiveEntity {
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        if(this.getFortressManager().map(AbstractFortressManager::isCreative).orElse(false))
+        if(this.getFortressManager().map(AbstractFortressManager::isCreative).orElse(false)) {
+            if (damageSource.isOutOfWorld()) return false;
             return true;
-        else
+        } else {
             return super.isInvulnerableTo(damageSource);
+        }
     }
 
     @Override

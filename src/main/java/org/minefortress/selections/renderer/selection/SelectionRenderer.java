@@ -27,14 +27,6 @@ public class SelectionRenderer extends AbstractCustomRenderer {
     }
 
     @Override
-    protected Optional<BlockPos> getRenderTargetPosition() {
-        if(shouldRender()) {
-            return Optional.of(BlockPos.ORIGIN);
-        }
-        return Optional.empty();
-    }
-
-    @Override
     protected Optional<BuiltModel> getBuiltModel() {
         return Optional.ofNullable(selectionModelBuilder.getBuiltSelection());
     }
