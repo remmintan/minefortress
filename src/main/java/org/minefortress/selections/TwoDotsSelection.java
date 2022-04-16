@@ -87,7 +87,9 @@ public class TwoDotsSelection extends Selection {
     }
 
     protected List<BlockPos> getIterableForSelectionUpdate(BlockPos selectionStart, BlockPos selectionEnd) {
-        return StreamSupport.stream(BlockPos.iterate(selectionStart, selectionEnd).spliterator(), false).collect(Collectors.toList());
+        return StreamSupport.stream(BlockPos.iterate(selectionStart, selectionEnd).spliterator(), false)
+                .map(BlockPos::toImmutable)
+                .collect(Collectors.toList());
     }
 
     @Override
