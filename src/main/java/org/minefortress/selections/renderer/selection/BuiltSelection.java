@@ -2,6 +2,7 @@ package org.minefortress.selections.renderer.selection;
 
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.*;
@@ -59,6 +60,8 @@ public class BuiltSelection implements BuiltModel {
             final ClickType clickType = selection.getClickType();
             final Vector4f color = selection.getColor();
             final List<BlockPos> positions = selection.getPositions();
+            final BlockState blockState = selection.getBlockState();
+            selectionBlockRenderView.setBlockStateSupplier((blockPos) -> positions.contains(blockPos)?blockState: Blocks.AIR.getDefaultState());
             for (BlockPos pos : positions) {
                 if(clickType == ClickType.BUILD && !BuildingManager.canPlaceBlock(getWorld(),pos)) continue;
                 if(clickType == ClickType.REMOVE && !BuildingManager.canRemoveBlock(getWorld(),pos)) continue;
@@ -67,9 +70,6 @@ public class BuiltSelection implements BuiltModel {
                 matrices.translate(pos.getX(), pos.getY(), pos.getZ());
                 WorldRenderer.drawBox(matrices, bufferBuilder, BOX, color.getX(), color.getY(), color.getZ(), color.getW());
                 if(clickType == ClickType.BUILD) {
-                    final BlockState blockState = selection.getBlockState();
-                    selectionBlockRenderView.setBlockStateSupplier(() -> blockState);
-
                     renderFluid(blockBufferBuilderStorage, pos, blockState);
                     renderBlock(blockBufferBuilderStorage, matrices, pos, blockState);
                 }

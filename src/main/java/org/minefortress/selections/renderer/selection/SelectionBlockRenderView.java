@@ -4,19 +4,19 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.renderer.custom.AbstractCustomBlockRenderView;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class SelectionBlockRenderView extends AbstractCustomBlockRenderView {
 
-    private Supplier<BlockState> blockStateSupplier;
+    private Function<BlockPos, BlockState> blockStateSupplier;
 
-    public void setBlockStateSupplier(Supplier<BlockState> blockStateSupplier) {
+    public void setBlockStateSupplier(Function<BlockPos, BlockState> blockStateSupplier) {
         this.blockStateSupplier = blockStateSupplier;
     }
 
     @Override
     public BlockState getBlockState(BlockPos pos) {
-        return this.blockStateSupplier.get();
+        return this.blockStateSupplier.apply(pos);
     }
 
     @Override
