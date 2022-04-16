@@ -93,11 +93,6 @@ public class TwoDotsSelection extends Selection {
     }
 
     @Override
-    public void setRendererDirty(WorldRenderer renderer) {
-        makeBlocksDirty(selectionStart, selectionEnd, renderer);
-    }
-
-    @Override
     public List<BlockPos> getSelection() {
         return this.selection != null?this.selection:Collections.emptyList();
     }

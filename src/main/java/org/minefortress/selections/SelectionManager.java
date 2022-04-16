@@ -28,6 +28,8 @@ public class SelectionManager implements FortressWorldRenderer {
 
     private boolean selectionHidden = false;
 
+    private boolean needsUpdate = false;
+
     public SelectionManager(MinecraftClient client) {
         this.client = client;
     }
@@ -77,7 +79,7 @@ public class SelectionManager implements FortressWorldRenderer {
         BlockPos pickedPos = this.clickType == ClickType.BUILD? blockPos.offset(clickedFace) : blockPos;
         if(this.selection.needUpdate(pickedPos, upSelectionDelta)) {
             this.selection.update(pickedPos, upSelectionDelta);
-            this.selection.setRendererDirty(client.worldRenderer);
+            this.setNeedsUpdate(true);
         }
     }
 
@@ -160,7 +162,6 @@ public class SelectionManager implements FortressWorldRenderer {
     }
 
     public void resetSelection() {
-        selection.setRendererDirty(client.worldRenderer);
         selection.reset();
         this.clickType = null;
         this.upSelectionDelta = 0;
@@ -176,5 +177,13 @@ public class SelectionManager implements FortressWorldRenderer {
 
     public int getSelectionTypeIndex() {
         return selectionTypeIndex;
+    }
+
+    public boolean isNeedsUpdate() {
+        return needsUpdate;
+    }
+
+    public void setNeedsUpdate(boolean needsUpdate) {
+        this.needsUpdate = needsUpdate;
     }
 }

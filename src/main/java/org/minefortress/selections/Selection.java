@@ -34,8 +34,6 @@ public abstract class Selection {
             int upDelta
     );
 
-    public abstract void setRendererDirty(WorldRenderer renderer);
-
     public abstract List<BlockPos> getSelection();
 
     public abstract void reset();
@@ -57,22 +55,6 @@ public abstract class Selection {
         );
 
         return Pair.of(absDiff, selStart);
-    }
-
-    protected static void makeBlocksDirty(BlockPos start, BlockPos end, WorldRenderer renderer) {
-        if(start == null || end == null) return;
-
-        renderer.scheduleTerrainUpdate();
-
-        int minX = getMin(start, end, Direction.Axis.X);
-        int minY = getMin(start, end, Direction.Axis.Y);
-        int minZ = getMin(start, end, Direction.Axis.Z);
-
-        int maxX = getMax(start, end, Direction.Axis.X);
-        int maxY = getMax(start, end, Direction.Axis.Y);
-        int maxZ = getMax(start, end, Direction.Axis.Z);
-
-        renderer.scheduleBlockRenders(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     protected static TaskType mapClickTypeToTaskType(ClickType clickType) {

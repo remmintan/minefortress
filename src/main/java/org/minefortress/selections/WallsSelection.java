@@ -245,12 +245,6 @@ public class WallsSelection extends Selection {
     }
 
     @Override
-    public void setRendererDirty(final WorldRenderer renderer) {
-        getCornerPairs()
-                .forEach(p -> Selection.makeBlocksDirty(p.getFirst(), p.getSecond(), renderer));
-    }
-
-    @Override
     public List<BlockPos> getSelection() {
         return this.selection!=null?this.selection:Collections.emptyList();
     }

@@ -11,7 +11,6 @@ import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.selections.SelectionManager;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,8 +46,10 @@ public class SelectionRenderer extends AbstractCustomRenderer {
 
     @Override
     public void prepareForRender() {
-        if(shouldRender())
+        if(shouldRender() && selectionManager.isNeedsUpdate()) {
             selectionModelBuilder.build();
+            selectionManager.setNeedsUpdate(false);
+        }
     }
 
     @Override
