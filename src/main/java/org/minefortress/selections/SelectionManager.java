@@ -84,7 +84,7 @@ public class SelectionManager implements FortressWorldRenderer {
     }
 
     public Vector4f getClickColor() {
-        float green = this.clickType == ClickType.BUILD? (170f/255f) : 0.0f;
+        float green = (this.clickType == ClickType.BUILD || this.clickType == ClickType.ROADS)? (170f/255f) : 0.0f;
         return new Vector4f(0.0f, green, 0.0f, 0.5f);
     }
 
@@ -134,12 +134,15 @@ public class SelectionManager implements FortressWorldRenderer {
 
         Item mainHandItem = Optional.ofNullable(client.player).map(it -> it.getStackInHand(Hand.MAIN_HAND).getItem()).orElse(null);
 
+        if(selection instanceof RoadsSelection && clickType == ClickType.BUILD)
+            this.clickType = ClickType.ROADS;
+
         boolean result = this.selection.selectBlock(
                 client.world,
                 mainHandItem,
                 blockPos,
                 upSelectionDelta,
-                click,
+                this.clickType,
                 this.client.getNetworkHandler(),
                 this.client.crosshairTarget
         );
