@@ -85,7 +85,7 @@ public class TreeSelection extends Selection {
     }
 
     @Override
-    public List<Pair<Vec3i, Vec3i>> getSelectionSize() {
+    public List<Pair<Vec3i, Vec3i>> getSelectionDimensions() {
         return Collections.emptyList();
     }
 

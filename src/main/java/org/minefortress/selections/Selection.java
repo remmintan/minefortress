@@ -38,14 +38,13 @@ public abstract class Selection {
 
     public abstract void reset();
 
-    public abstract List<Pair<Vec3i, Vec3i>> getSelectionSize();
+    public abstract List<Pair<Vec3i, Vec3i>> getSelectionDimensions();
     
-    protected static Pair<Vec3i, Vec3i> getSelectionSize(BlockPos start, BlockPos end) {
+    protected static Pair<Vec3i, Vec3i> getSelectionDimensions(BlockPos start, BlockPos end) {
         if(end == null || start == null) return null;
         Vec3i diff = start.subtract(end);
         Vec3i absDiff = new Vec3i(Math.abs(diff.getX()), Math.abs(diff.getY()), Math.abs(diff.getZ()))
-                .add(1, 1, 1)
-                .multiply(16);
+                .add(1, 1, 1);
 
 
         Vec3i selStart = new Vec3i(

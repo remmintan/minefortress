@@ -3,7 +3,6 @@ package org.minefortress.selections;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.BlockHitResult;
@@ -20,7 +19,6 @@ import org.minefortress.utils.BlockUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -105,8 +103,8 @@ public class TwoDotsSelection extends Selection {
         this.selection = null;
     }
 
-    public List<Pair<Vec3i, Vec3i>> getSelectionSize() {
-        Pair<Vec3i, Vec3i> size = getSelectionSize(selectionStart, selectionEnd);
+    public List<Pair<Vec3i, Vec3i>> getSelectionDimensions() {
+        Pair<Vec3i, Vec3i> size = getSelectionDimensions(selectionStart, selectionEnd);
         return Collections.singletonList(size);
     }
 

@@ -4,7 +4,6 @@ import com.chocohead.mm.api.ClassTinkerers;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -17,14 +16,11 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.GameMode;
 import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.MineFortressEntityRenderer;
 import org.minefortress.selections.ClickType;
-import org.minefortress.selections.ClientSelection;
 import org.minefortress.selections.SelectionManager;
-import org.minefortress.tasks.BuildingManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,10 +28,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 @Mixin(WorldRenderer.class)
 public abstract class FortressWorldRendererMixin  {
@@ -68,9 +61,10 @@ public abstract class FortressWorldRendererMixin  {
 
     @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
     public void render(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
-        this.entityRenderer.prepare(this.world, camera);
         final Vec3d cameraPos = camera.getPos();
         final VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
+
+        this.entityRenderer.prepare(this.world, camera);
         this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
@@ -80,29 +74,8 @@ public abstract class FortressWorldRendererMixin  {
         fortressClient.getTasksRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
 
         SelectionManager selectionManager = fortressClient.getSelectionManager();
-        VertexConsumer vertexconsumer2 = immediate.getBuffer(RenderLayer.getLines());
-        if(selectionManager.isSelecting()) {
-            ClickType clickType = selectionManager.getClickType();
-
-            List<Pair<Vec3i, Vec3i>> selectionSizes = selectionManager.getSelectionSize();
-            for(Pair<Vec3i, Vec3i> selectionSize : selectionSizes) {
-                if(clickType == ClickType.REMOVE && selectionSize != null) {
-                    VertexConsumer noDepthBuffer = immediate.getBuffer(FortressRenderLayer.getLinesNoDepth());
-                    Vec3i selectionDimensions = selectionSize.getFirst();
-                    VoxelShape generalSelectionBox = Block.createCuboidShape(
-                            0,
-                            0,
-                            0,
-                            selectionDimensions.getX(),
-                            selectionDimensions.getY(),
-                            selectionDimensions.getZ()
-                    );
-                    Vec3i selectionStart = selectionSize.getSecond();
-                    Vector4f clickColors = selectionManager.getClickColor();
-                    drawShapeOutline(matrices, noDepthBuffer, generalSelectionBox, selectionStart.getX() - cameraPos.x, selectionStart.getY() - cameraPos.y, selectionStart.getZ() -  cameraPos.z, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());
-                }
-            }
-        } else {
+        VertexConsumer vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
+        if (!selectionManager.isSelecting()) {
             final GameMode currentGameMode = this.client.interactionManager.getCurrentGameMode();
             if(currentGameMode == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
                 final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
@@ -115,7 +88,7 @@ public abstract class FortressWorldRendererMixin  {
                             if(this.world.getWorldBorder().contains(sel)) {
                                 final BlockState blockState = this.world.getBlockState(sel);
                                 if(!blockState.isAir()) {
-                                    this.drawBlockOutline(matrices, vertexconsumer2, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, sel, blockState);
+                                    this.drawBlockOutline(matrices, vertexConsumer, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, sel, blockState);
                                 }
                             }
                         }
