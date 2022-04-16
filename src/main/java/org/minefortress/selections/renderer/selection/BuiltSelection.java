@@ -64,12 +64,12 @@ public class BuiltSelection implements BuiltModel {
             selectionBlockRenderView.setBlockStateSupplier((blockPos) -> positions.contains(blockPos)?blockState: Blocks.AIR.getDefaultState());
             for (BlockPos pos : positions) {
                 if(clickType == ClickType.BUILD && !BuildingManager.canPlaceBlock(getWorld(),pos)) continue;
-                if(clickType == ClickType.REMOVE && !BuildingManager.canRemoveBlock(getWorld(),pos)) continue;
+                if((clickType == ClickType.REMOVE || clickType == ClickType.ROADS) && !BuildingManager.canRemoveBlock(getWorld(),pos)) continue;
 
                 matrices.push();
                 matrices.translate(pos.getX(), pos.getY(), pos.getZ());
                 WorldRenderer.drawBox(matrices, bufferBuilder, BOX, color.getX(), color.getY(), color.getZ(), color.getW());
-                if(clickType == ClickType.BUILD) {
+                if(clickType == ClickType.BUILD || clickType == ClickType.ROADS) {
                     renderFluid(blockBufferBuilderStorage, pos, blockState);
                     renderBlock(blockBufferBuilderStorage, matrices, pos, blockState);
                 }

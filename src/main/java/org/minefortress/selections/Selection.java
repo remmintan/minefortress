@@ -59,7 +59,7 @@ public abstract class Selection {
 
     protected static TaskType mapClickTypeToTaskType(ClickType clickType) {
         return switch (clickType) {
-            case BUILD -> TaskType.BUILD;
+            case BUILD, ROADS -> TaskType.BUILD;
             case REMOVE -> TaskType.REMOVE;
         };
     }
