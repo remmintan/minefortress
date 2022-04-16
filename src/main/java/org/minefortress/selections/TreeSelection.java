@@ -73,11 +73,6 @@ public class TreeSelection extends Selection {
     }
 
     @Override
-    public void setRendererDirty(WorldRenderer renderer) {
-        renderer.scheduleTerrainUpdate();
-    }
-
-    @Override
     public List<BlockPos> getSelection() {
         return selectedTreeBlocks;
     }
