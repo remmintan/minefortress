@@ -29,10 +29,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     public BlueprintRenderer(ClientBlueprintBlockDataManager blockDataManager, MinecraftClient client, BlockBufferBuilderStorage blockBufferBuilderStorage) {
         super(client);
-        blueprintsModelBuilder  = new BlueprintsModelBuilder(
-                blockBufferBuilderStorage,
-                blockDataManager
-        );
+        blueprintsModelBuilder  = new BlueprintsModelBuilder(blockBufferBuilderStorage, blockDataManager);
     }
 
     @Override

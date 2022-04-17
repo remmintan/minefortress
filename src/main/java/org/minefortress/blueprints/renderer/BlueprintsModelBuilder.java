@@ -1,7 +1,8 @@
 package org.minefortress.blueprints.renderer;
 
-import net.minecraft.client.render.BufferBuilderStorage;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.BlockRotation;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.blueprints.data.BlueprintBlockData;
@@ -12,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BlueprintsModelBuilder {
 
@@ -22,7 +22,8 @@ public class BlueprintsModelBuilder {
     private final Map<String, BuiltBlueprint> builtBlueprints = new HashMap<>();
     private final HashSet<BuiltBlueprint> blueprintsToClose = new HashSet<>();
 
-    public BlueprintsModelBuilder(BlockBufferBuilderStorage blockBufferBuilders, ClientBlueprintBlockDataManager blockDataManager) {
+    public BlueprintsModelBuilder(BlockBufferBuilderStorage blockBufferBuilders,
+                                  ClientBlueprintBlockDataManager blockDataManager) {
         this.blockBufferBuilders = blockBufferBuilders;
         this.blockDataManager = blockDataManager;
     }
@@ -41,7 +42,7 @@ public class BlueprintsModelBuilder {
         String key = getKey(fileName, rotation);
         if(!this.builtBlueprints.containsKey(key)) {
             final BlueprintBlockData blockData = this.blockDataManager.getBlockData(fileName, rotation);
-            final BuiltBlueprint builtBlueprint = new BuiltBlueprint(blockData);
+            final BuiltBlueprint builtBlueprint = new BuiltBlueprint(blockData, (p, c) -> getWorld().getColor(getWorld().getSpawnPos(), c));
             builtBlueprint.build(this.blockBufferBuilders);
             this.builtBlueprints.put(key, builtBlueprint);
         }
@@ -68,6 +69,10 @@ public class BlueprintsModelBuilder {
     public void reset() {
         this.blueprintsToClose.addAll(this.builtBlueprints.values());
         this.builtBlueprints.clear();
+    }
+
+    public ClientWorld getWorld() {
+        return MinecraftClient.getInstance().world;
     }
 
 }
