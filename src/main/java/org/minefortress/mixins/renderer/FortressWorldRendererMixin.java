@@ -64,8 +64,10 @@ public abstract class FortressWorldRendererMixin  {
         final Vec3d cameraPos = camera.getPos();
         final VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
 
-        this.entityRenderer.prepare(this.world, camera);
-        this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
+        if(!client.options.hudHidden) {
+            this.entityRenderer.prepare(this.world, camera);
+            this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
+        }
 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         fortressClient.getBlueprintRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
