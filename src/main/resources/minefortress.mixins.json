@@ -5,8 +5,9 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "FortressServerMixin",
+    "entity.FortressItemEntityMixin",
     "network.FortressClientPlayNetworkHandlerMixin",
-    "entity.FortressItemEntityMixin"
+    "renderer.FortressFluidRendererMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",

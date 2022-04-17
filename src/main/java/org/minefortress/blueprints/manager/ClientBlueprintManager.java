@@ -195,7 +195,9 @@ public class ClientBlueprintManager {
         this.blueprintMetadataManager.reset();
         this.blockDataManager.reset();
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().reset();
+            try {
+                fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().reset();
+            }catch (Exception ignore) {}
         }
     }
 

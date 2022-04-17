@@ -53,7 +53,6 @@ public class SelectionRenderer extends AbstractCustomRenderer {
     @Override
     protected List<RenderLayer> getRenderLayers() {
         return Arrays.asList(
-                RenderLayer.getTranslucent(),
                 RenderLayer.getLines(),
                 RenderLayer.getSolid(),
                 RenderLayer.getCutoutMipped(),

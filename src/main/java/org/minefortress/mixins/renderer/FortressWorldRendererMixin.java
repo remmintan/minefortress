@@ -101,6 +101,22 @@ public abstract class FortressWorldRendererMixin  {
         }
     }
 
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal=13, target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", shift = At.Shift.AFTER))
+    public void renderTranslucent(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
+        renderTranslucent(matrices, camera, matrix4f);
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal=17, target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", shift = At.Shift.BY, by = -3))
+    public void renderTranslucentBuffer(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
+        renderTranslucent(matrices, camera, matrix4f);
+    }
+
+    private void renderTranslucent(MatrixStack matrices, Camera camera, Matrix4f matrix4f) {
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        fortressClient.getSelectionRenderer().renderTranslucent(matrices, camera.getPos().x, camera.getPos().y, camera.getPos().z, matrix4f);
+        fortressClient.getBlueprintRenderer().renderTranslucent(matrices, camera.getPos().x, camera.getPos().y, camera.getPos().z, matrix4f);
+    }
+
     private void drawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState) {
         final Vector4f clickColors = ((FortressMinecraftClient) client).getSelectionManager().getClickColor();
         drawShapeOutline(matrices, vertexConsumer, blockState.getOutlineShape(this.world, blockPos, ShapeContext.of(entity)), (double)blockPos.getX() - d, (double)blockPos.getY() - e, (double)blockPos.getZ() - f, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());

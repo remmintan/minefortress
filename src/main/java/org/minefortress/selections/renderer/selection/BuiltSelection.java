@@ -15,6 +15,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.selections.ClickType;
@@ -22,6 +23,7 @@ import org.minefortress.tasks.BuildingManager;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class BuiltSelection implements BuiltModel {
@@ -60,12 +62,13 @@ public class BuiltSelection implements BuiltModel {
            init(lines, linesBufferBuilder);
         final ClickType clickType = selection.getClickType();
         final Vector4f color = selection.getColor();
-        final List<BlockPos> positions = selection.getPositions();
+        final List<BlockPos> positions = selection.getPositions()
+                .stream()
+                .filter(getShouldRenderPosPredicate(clickType))
+                .collect(Collectors.toList());
         final BlockState blockState = selection.getBlockState();
         selectionBlockRenderView.setBlockStateSupplier((blockPos) -> positions.contains(blockPos)?blockState: Blocks.AIR.getDefaultState());
         for (BlockPos pos : positions) {
-            if(clickType == ClickType.BUILD && !BuildingManager.canPlaceBlock(getWorld(),pos)) continue;
-            if((clickType == ClickType.REMOVE || clickType == ClickType.ROADS) && !BuildingManager.canRemoveBlock(getWorld(),pos)) continue;
 
             matrices.push();
             matrices.translate(pos.getX(), pos.getY(), pos.getZ());
@@ -105,6 +108,14 @@ public class BuiltSelection implements BuiltModel {
             else
                 blockBufferBuilderStorage.get(initializedLayer).end();
         }
+    }
+
+    @NotNull
+    private Predicate<BlockPos> getShouldRenderPosPredicate(ClickType clickType) {
+        return pos ->
+                (clickType == ClickType.BUILD && BuildingManager.canPlaceBlock(getWorld(),pos))
+                        ||
+                ((clickType == ClickType.REMOVE || clickType == ClickType.ROADS) && !BuildingManager.canRemoveBlock(getWorld(),pos));
     }
 
     private void renderFluid(BlockBufferBuilderStorage blockBufferBuilderStorage, BlockPos pos, BlockState blockState) {

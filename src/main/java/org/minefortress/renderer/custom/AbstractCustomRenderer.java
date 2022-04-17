@@ -35,6 +35,12 @@ public abstract class AbstractCustomRenderer {
         }
     }
 
+    public void renderTranslucent(MatrixStack matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {
+        if(shouldRender()) {
+            renderLayer(RenderLayer.getTranslucent(), matrices, cameraX, cameraY, cameraZ, projectionMatrix);
+        }
+    }
+
     protected List<RenderLayer> getRenderLayers() {
         return Arrays.asList(RenderLayer.getSolid(), RenderLayer.getCutout(), RenderLayer.getCutoutMipped());
     }
@@ -124,8 +130,6 @@ public abstract class AbstractCustomRenderer {
         VertexBuffer.unbind();
         VertexBuffer.unbindVertexArray();
         layer.endDrawing();
-
-
     }
 
     protected Optional<BlockPos> getRenderTargetPosition() {

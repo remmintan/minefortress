@@ -121,6 +121,8 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f);
         this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f);
         this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f);
+        this.renderLayer(RenderLayer.getTranslucent(), builtBlueprint, matrices, projectionMatrix4f);
+
 
         matrices.pop();
         super.client.getProfiler().pop();
