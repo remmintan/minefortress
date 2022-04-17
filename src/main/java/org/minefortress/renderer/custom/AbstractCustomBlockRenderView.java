@@ -13,9 +13,16 @@ import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.level.ColorResolver;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiFunction;
+
 public abstract class AbstractCustomBlockRenderView implements BlockRenderView {
 
     private static final float LIGHT_LEVEL = 14f;
+    private final BiFunction<BlockState, ColorResolver, Integer> colorProvider;
+
+    public AbstractCustomBlockRenderView(BiFunction<BlockState, ColorResolver, Integer> colorProvider) {
+        this.colorProvider = colorProvider;
+    }
 
     @Override
     public float getBrightness(Direction direction, boolean shaded) {
@@ -49,7 +56,7 @@ public abstract class AbstractCustomBlockRenderView implements BlockRenderView {
 
     @Override
     public int getColor(BlockPos pos, ColorResolver colorResolver) {
-        return 0xffffff;
+        return colorProvider != null ? colorProvider.apply(this.getBlockState(pos), colorResolver) : 0xffffff;
     }
 
     @Nullable

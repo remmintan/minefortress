@@ -37,13 +37,9 @@ public abstract class FortressItemEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "getItemAge", at = @At("HEAD"), cancellable = true)
-    void getItemAge(CallbackInfoReturnable<Integer> cir) {
-        if(this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY){
-            cir.setReturnValue(6000);
-        } else {
-            cir.setReturnValue(this.itemAge);
-        }
+    @Inject(method = "tick", at =@At("RETURN"))
+    void tickReturn(CallbackInfo ci) {
+        this.discard();
     }
 
 }

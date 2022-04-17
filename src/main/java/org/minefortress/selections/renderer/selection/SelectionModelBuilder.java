@@ -15,7 +15,11 @@ public class SelectionModelBuilder {
 
     private BuiltSelection builtSelection;
 
-    public SelectionModelBuilder(Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage, SelectionManager selectionManager) {
+    public SelectionModelBuilder(
+            Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage,
+            BlockBufferBuilderStorage blockBufferBuilderStorage,
+            SelectionManager selectionManager
+    ) {
         this.lineBufferBuilderStorage = lineBufferBuilderStorage;
         this.blockBufferBuilderStorage = blockBufferBuilderStorage;
         this.selectionManager = selectionManager;
