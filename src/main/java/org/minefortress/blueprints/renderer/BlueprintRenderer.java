@@ -79,7 +79,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         final float scaleFactor = 2f / scale;
         final float x = 130f * scaleFactor;
         final float y = -60f * scaleFactor;
-        final float z = 30f * scaleFactor;
+        final float z = 45f * scaleFactor;
 
         renderBlueprintInGui(builtBlueprint, scale, x, y, z);
     }
