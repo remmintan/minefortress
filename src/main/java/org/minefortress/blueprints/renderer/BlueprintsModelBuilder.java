@@ -1,9 +1,11 @@
 package org.minefortress.blueprints.renderer;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
@@ -42,7 +44,7 @@ public class BlueprintsModelBuilder {
         String key = getKey(fileName, rotation);
         if(!this.builtBlueprints.containsKey(key)) {
             final BlueprintBlockData blockData = this.blockDataManager.getBlockData(fileName, rotation);
-            final BuiltBlueprint builtBlueprint = new BuiltBlueprint(blockData, (p, c) -> getWorld().getColor(getWorld().getSpawnPos(), c));
+            final BuiltBlueprint builtBlueprint = new BuiltBlueprint(blockData, (p, c) -> getWorld().getColor(getBlockPos(), c));
             builtBlueprint.build(this.blockBufferBuilders);
             this.builtBlueprints.put(key, builtBlueprint);
         }
@@ -73,6 +75,14 @@ public class BlueprintsModelBuilder {
 
     public ClientWorld getWorld() {
         return MinecraftClient.getInstance().world;
+    }
+
+    public ClientPlayerEntity getPlayer() {
+        return MinecraftClient.getInstance().player;
+    }
+
+    private BlockPos getBlockPos() {
+        return getPlayer()!=null? getPlayer().getBlockPos():getWorld().getSpawnPos();
     }
 
 }

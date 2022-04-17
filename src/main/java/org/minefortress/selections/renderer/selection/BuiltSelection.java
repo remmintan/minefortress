@@ -15,7 +15,6 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.math.*;
-import net.minecraft.world.level.ColorResolver;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.custom.BuiltModel;
@@ -24,7 +23,6 @@ import org.minefortress.tasks.BuildingManager;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -43,7 +41,7 @@ public class BuiltSelection implements BuiltModel {
 
     public BuiltSelection(SelectionRenderInfo selection) {
         this.selectionBlockRenderView = new SelectionBlockRenderView(
-                (p, c) -> getWorld().getColor(getWorld().getSpawnPos(), c)
+                (p, c) -> getWorld().getColor(getBlockPos(), c)
         );
         this.selection = selection;
 
@@ -52,6 +50,10 @@ public class BuiltSelection implements BuiltModel {
         }
         buffers.put(RenderLayer.getLines(), new VertexBuffer());
         buffers.put(FortressRenderLayer.getLinesNoDepth(), new VertexBuffer());
+    }
+
+    private BlockPos getBlockPos() {
+        return getClient().player!=null? getClient().player.getBlockPos():getWorld().getSpawnPos();
     }
 
     public void build(Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage) {
