@@ -1,6 +1,7 @@
 package org.minefortress.fortress;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 public final class FortressServerManager extends AbstractFortressManager {
 
+    private static final BlockState DEFAULT_STATE_ABOVE_CAMPFIRE = Blocks.BARRIER.getDefaultState();
     private static final int DEFAULT_COLONIST_COUNT = 5;
 
     private boolean needSync = true;
@@ -78,7 +80,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void tick(ServerPlayerEntity player) {
-        tickFortress(player.world);
+        tickFortress(player, player.world);
         serverProfessionManager.tick(player);
         if(!needSync) return;
         final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode);
@@ -96,7 +98,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         needSync = false;
     }
 
-    public void tickFortress(World world) {
+    public void tickFortress(ServerPlayerEntity player, World world) {
         if(colonists.removeIf(colonist -> !colonist.isAlive()))
             scheduleSync();
 
@@ -119,6 +121,19 @@ public final class FortressServerManager extends AbstractFortressManager {
             }
         }
 
+        if(this.fortressCenter != null) {
+            final BlockState blockState = world.getBlockState(this.fortressCenter);
+            if(blockState != Blocks.CAMPFIRE.getDefaultState()) {
+                world.setBlockState(fortressCenter, getStateForCampCenter(), 3);
+                world.emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
+            }
+            final BlockPos aboveTheCenter = this.fortressCenter.up();
+            final BlockState blockStateAbove = world.getBlockState(aboveTheCenter);
+            if(blockStateAbove != DEFAULT_STATE_ABOVE_CAMPFIRE) {
+                world.setBlockState(aboveTheCenter, DEFAULT_STATE_ABOVE_CAMPFIRE, 3);
+                world.emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
+            }
+        }
     }
 
     public void setupCenter(BlockPos fortressCenter, World world, ServerPlayerEntity player) {
