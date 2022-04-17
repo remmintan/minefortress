@@ -20,6 +20,7 @@ public class BlueprintsModelBuilder {
     private final ClientBlueprintBlockDataManager blockDataManager;
 
     private final Map<String, BuiltBlueprint> builtBlueprints = new HashMap<>();
+    private final HashSet<BuiltBlueprint> blueprintsToClose = new HashSet<>();
 
     public BlueprintsModelBuilder(BlockBufferBuilderStorage blockBufferBuilders, ClientBlueprintBlockDataManager blockDataManager) {
         this.blockBufferBuilders = blockBufferBuilders;
@@ -33,6 +34,10 @@ public class BlueprintsModelBuilder {
     }
 
     public void buildBlueprint(String fileName, BlockRotation rotation) {
+        for(BuiltBlueprint blueprint : this.blueprintsToClose) {
+            blueprint.close();
+        }
+
         String key = getKey(fileName, rotation);
         if(!this.builtBlueprints.containsKey(key)) {
             final BlueprintBlockData blockData = this.blockDataManager.getBlockData(fileName, rotation);
@@ -55,13 +60,13 @@ public class BlueprintsModelBuilder {
         for(Map.Entry<String, BuiltBlueprint> entry : toRemove) {
             String key = entry.getKey();
             BuiltBlueprint blueprint = entry.getValue();
-            blueprint.close();
+            this.blueprintsToClose.add(blueprint);
             this.builtBlueprints.remove(key);
         }
     }
 
     public void reset() {
-        this.builtBlueprints.values().forEach(BuiltBlueprint::close);
+        this.blueprintsToClose.addAll(this.builtBlueprints.values());
         this.builtBlueprints.clear();
     }
 
