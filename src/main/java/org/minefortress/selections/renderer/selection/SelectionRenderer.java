@@ -34,7 +34,7 @@ public class SelectionRenderer extends AbstractCustomRenderer {
 
     @Override
     protected boolean shouldRender() {
-        return selectionManager.isSelecting();
+        return !client.options.hudHidden && selectionManager.isSelecting();
     }
 
     @Override
@@ -53,6 +53,7 @@ public class SelectionRenderer extends AbstractCustomRenderer {
     @Override
     protected List<RenderLayer> getRenderLayers() {
         return Arrays.asList(
+                RenderLayer.getTranslucent(),
                 RenderLayer.getLines(),
                 RenderLayer.getSolid(),
                 RenderLayer.getCutoutMipped(),

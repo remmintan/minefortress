@@ -31,7 +31,7 @@ public class TasksRenderer extends AbstractCustomRenderer {
     @Override
     protected boolean shouldRender() {
         final ClientTasksHolder tasksHolder = getTasksHolder();
-        return !tasksHolder.isEmpty() && !tasksHolder.isSelectionHidden();
+        return !client.options.hudHidden && !tasksHolder.isEmpty() && !tasksHolder.isSelectionHidden();
     }
 
     @Override

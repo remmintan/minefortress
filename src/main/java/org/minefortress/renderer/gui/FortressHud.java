@@ -44,6 +44,7 @@ public class FortressHud {
     }
 
     public void render(MatrixStack p, float delta) {
+        if(isHudHidden()) return;
         final int scaledWidth = this.client.getWindow().getScaledWidth();
         final int scaledHeight = this.client.getWindow().getScaledHeight();
 
@@ -179,10 +180,12 @@ public class FortressHud {
     }
 
     public boolean isHovered() {
+        if(isHudHidden()) return false;
         return this.isHovered;
     }
 
     public void onClick(double mouseX, double mouseY) {
+        if(isHudHidden()) return;
         this.toolsGui.onClick(mouseX, mouseY);
         this.colonistsGui.onClick(mouseX, mouseY);
         this.timeGui.onClick(mouseX, mouseY);
@@ -190,6 +193,10 @@ public class FortressHud {
 
     private TextRenderer getTextRenderer() {
         return client.textRenderer;
+    }
+
+    private boolean isHudHidden() {
+        return client.options.hudHidden || client.options.debugEnabled;
     }
 
 }
