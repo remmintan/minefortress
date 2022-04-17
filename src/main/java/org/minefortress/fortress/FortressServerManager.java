@@ -308,10 +308,23 @@ public final class FortressServerManager extends AbstractFortressManager {
     public Optional<BlockPos> randomSurfacePos(ServerWorld world){
         if(minX == Integer.MAX_VALUE) return Optional.empty();
 
-        int x = world.random.nextInt(maxX - minX) + minX;
-        int z = world.random.nextInt(maxZ - minZ) + minZ;
-        int y = world.getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
-        return Optional.of(new BlockPos(x, y, z));
+        int tires = 0;
+        BlockPos fortressPos;
+        boolean isFluid, isFluidAbove;
+        do {
+            int x = world.random.nextInt(maxX - minX) + minX;
+            int z = world.random.nextInt(maxZ - minZ) + minZ;
+            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
+
+            fortressPos = new BlockPos(x, y, z);
+            isFluid = world.getBlockState(fortressPos).isOf(Blocks.WATER);
+            isFluidAbove = world.getBlockState(fortressPos.down()).isOf(Blocks.WATER);
+            tires++;
+        }while((isFluid || isFluidAbove) && tires < 10);
+
+        if(isFluid || isFluidAbove) return Optional.empty();
+
+        return Optional.of(fortressPos);
     }
 
     @Override

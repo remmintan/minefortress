@@ -46,7 +46,7 @@ public class WanderAroundTheFortressGoal extends Goal {
                 final EntityNavigation navigation = colonist.getNavigation();
                 final NodeMaker nodeMaker = (NodeMaker)navigation.getNodeMaker();
                 nodeMaker.setWallClimbMode(true);
-                final Path path = navigation.findPathTo(goal, 3);
+                final Path path = navigation.findPathTo(goal, 1);
                 nodeMaker.setWallClimbMode(false);
                 navigation.startMovingAlong(path, 1.0D);
                 if(colonist.isSleeping()) {
