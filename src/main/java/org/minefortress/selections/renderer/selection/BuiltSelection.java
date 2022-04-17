@@ -118,9 +118,8 @@ public class BuiltSelection implements BuiltModel {
     @NotNull
     private Predicate<BlockPos> getShouldRenderPosPredicate(ClickType clickType) {
         return pos ->
-                (clickType == ClickType.BUILD && BuildingManager.canPlaceBlock(getWorld(),pos))
-                        ||
-                ((clickType == ClickType.REMOVE || clickType == ClickType.ROADS) && !BuildingManager.canRemoveBlock(getWorld(),pos));
+                (clickType == ClickType.BUILD && BuildingManager.canPlaceBlock(getWorld(),pos)) ||
+                ((clickType == ClickType.REMOVE || clickType == ClickType.ROADS) && BuildingManager.canRemoveBlock(getWorld(),pos));
     }
 
     private void renderFluid(BlockBufferBuilderStorage blockBufferBuilderStorage, BlockPos pos, BlockState blockState) {
