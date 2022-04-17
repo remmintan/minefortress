@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
 
 public abstract class AbstractCustomBlockRenderView implements BlockRenderView {
 
-    private static final float LIGHT_LEVEL = 14f;
+    private static final float LIGHT_LEVEL = 15f;
     private final BiFunction<BlockState, ColorResolver, Integer> colorProvider;
 
     public AbstractCustomBlockRenderView(BiFunction<BlockState, ColorResolver, Integer> colorProvider) {
@@ -26,15 +26,12 @@ public abstract class AbstractCustomBlockRenderView implements BlockRenderView {
 
     @Override
     public float getBrightness(Direction direction, boolean shaded) {
-        return LIGHT_LEVEL * getMultiplyerFromDirection(direction);
+        return  getMultiplyerFromDirection(direction);
     }
 
     private float getMultiplyerFromDirection(Direction direction) {
         return switch (direction) {
-            case NORTH -> 0.5f;
-            case SOUTH -> 1f;
-            case EAST -> 1f;
-            case WEST -> 0.5f;
+            case SOUTH, WEST -> 0.5f;
             default -> 1f;
         };
     }
