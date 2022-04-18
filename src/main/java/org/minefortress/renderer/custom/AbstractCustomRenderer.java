@@ -46,7 +46,7 @@ public abstract class AbstractCustomRenderer {
     }
 
     protected void renderLayer(RenderLayer layer, MatrixStack matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+        RenderSystem.assertOnRenderThread();
 
         layer.startDrawing();
 
@@ -69,7 +69,7 @@ public abstract class AbstractCustomRenderer {
         }
 
         if(shader.modelViewMat != null) {
-            final Matrix4f modelViewMatrix = matrices.peek().getModel();
+            final Matrix4f modelViewMatrix = matrices.peek().getPositionMatrix();
             shader.modelViewMat.set(modelViewMatrix);
         }
         if(shader.projectionMat != null) {

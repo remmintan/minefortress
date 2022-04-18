@@ -91,7 +91,7 @@ public class BuiltCampfire implements BuiltModel {
                             .whenComplete((r, t) -> {
                                if(t != null) {
                                    CrashReport crashReport = CrashReport.create(t, "Building campfire");
-                                   MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().addDetailsToCrashReport(crashReport));
+                                   MinecraftClient.getInstance().setCrashReportSupplier(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashReport));
                                    return;
                                }
 

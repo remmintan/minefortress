@@ -166,7 +166,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     }
 
     private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices, Matrix4f matrix4f) {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+        RenderSystem.assertOnRenderThread();
 
         renderLayer.startDrawing();
 
@@ -180,7 +180,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
             shader.addSampler("Sampler" + i, k);
         }
         if (shader.modelViewMat != null) {
-            shader.modelViewMat.set(matrices.peek().getModel());
+            shader.modelViewMat.set(matrices.peek().getPositionMatrix());
         }
         if (shader.projectionMat != null) {
             shader.projectionMat.set(matrix4f);

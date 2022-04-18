@@ -103,7 +103,9 @@ public class BuiltTasks implements BuiltModel {
                     .whenComplete((aVoid, throwable) -> {
                         if (throwable != null) {
                             CrashReport crashReport = CrashReport.create(throwable, "Building tasks model");
-                            MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().addDetailsToCrashReport(crashReport));
+                            MinecraftClient
+                                    .getInstance()
+                                    .setCrashReportSupplier(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashReport));
                             return;
                         }
 
