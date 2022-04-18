@@ -22,7 +22,6 @@
     "interaction.FortressTutorialManagerMixin",
     "interfaces.FortressDimensionTypeMixin",
     "network.FortressServerPlayNetworkHandlerMixin",
-    "renderer.FortressChunkRendererRegionMixin",
     "renderer.FortressCreateWorldScreenMixin",
     "renderer.FortressCyclingButtonMixin",
     "renderer.FortressGameRendererMixin",
