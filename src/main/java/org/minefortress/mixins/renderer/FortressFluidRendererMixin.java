@@ -1,5 +1,6 @@
 package org.minefortress.mixins.renderer;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.FluidRenderer;
 import net.minecraft.fluid.FluidState;
@@ -19,7 +20,7 @@ public abstract class FortressFluidRendererMixin {
     private BlockPos fortressFluidPos = null;
 
     @Inject(method = "render", at = @At(value = "HEAD"))
-    public void renderHead(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, FluidState state, CallbackInfoReturnable<Boolean> cir) {
+    public void renderHead(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
         if(world instanceof SelectionBlockRenderView) {
             this.fortressFluid = true;
             this.fortressFluidPos = pos;
@@ -27,7 +28,7 @@ public abstract class FortressFluidRendererMixin {
     }
 
     @Inject(method = "render", at = @At(value = "RETURN"))
-    public void renderReturn(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, FluidState state, CallbackInfoReturnable<Boolean> cir) {
+    public void renderReturn(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
         this.fortressFluid = false;
         this.fortressFluidPos = null;
     }
