@@ -148,7 +148,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method="render", at=@At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;updateMouse()V"))
     public void render(boolean tick, CallbackInfo ci) {
-        final boolean middleMouseButtonIsDown = options.keyPickItem.isPressed();
+        final boolean middleMouseButtonIsDown = options.pickItemKey.isPressed();
         if(!isNotFortressGamemode()) { // is fortress
             if(middleMouseButtonIsDown) {
                 if(!mouse.isCursorLocked())
@@ -175,7 +175,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/TutorialManager;onInventoryOpened()V", shift = At.Shift.BEFORE))
     private void handleInputEvents(CallbackInfo ci) {
         if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
-            if(this.options.keySprint.isPressed()) {
+            if(this.options.sprintKey.isPressed()) {
                 if(this.getBlueprintManager().hasSelectedBlueprint()) {
                     this.getBlueprintManager().rotateSelectedStructureClockwise();
                 } else {
@@ -188,7 +188,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreenMix(Screen screen, CallbackInfo ci) {
         if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
-            if(this.options.keySprint.isPressed() && screen instanceof InventoryScreen) {
+            if(this.options.sprintKey.isPressed() && screen instanceof InventoryScreen) {
                 ci.cancel();
             }
         }

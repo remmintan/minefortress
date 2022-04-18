@@ -21,7 +21,7 @@ public class FortressKeyboardInputMixin extends Input {
     public void tick(boolean slowDown, CallbackInfo ci) {
         if(
             ((FortressMinecraftClient)MinecraftClient.getInstance()).isFortressGamemode() &&
-            this.settings.keySprint.isPressed()
+            this.settings.sprintKey.isPressed()
         ) {
             this.movementForward = 0.0f;
             this.movementSideways = 0.0f;

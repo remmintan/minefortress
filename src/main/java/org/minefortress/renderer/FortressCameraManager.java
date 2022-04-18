@@ -43,7 +43,7 @@ public class FortressCameraManager {
     private void updateCameraFromInput(ClientPlayerEntity player) {
         Input playerInput = player.input;
 
-        if(this.minecraft.options.keySprint.isPressed()) {
+        if(this.minecraft.options.sprintKey.isPressed()) {
             float speed = 30f * minecraft.getLastFrameDuration() / 16f;
             float deltaAngleY = playerInput.pressingLeft == playerInput.pressingRight ? 0.0F : playerInput.pressingLeft ? 1.0F : -1.0F;
 

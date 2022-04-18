@@ -36,7 +36,7 @@ public class MineFortressClient implements ClientModInitializer {
                 if(world != null) {
                     final ClientTasksHolder clientTasksHolder = ((FortressClientWorld) world).getClientTasksHolder();
 
-                    if(client.options.keySprint.isPressed()) {
+                    if(client.options.sprintKey.isPressed()) {
                         clientTasksHolder.cancelAllTasks();
                     } else {
                         clientTasksHolder.cancelTask();

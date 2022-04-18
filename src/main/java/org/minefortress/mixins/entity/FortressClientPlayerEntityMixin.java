@@ -40,7 +40,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     @Override
     public HitResult raycast(double maxDistance, float tickDelta, boolean includeFluids) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        if(fortressClient.isNotFortressGamemode() || this.client.options.keyPickItem.isPressed()){
+        if(fortressClient.isNotFortressGamemode() || this.client.options.pickItemKey.isPressed()){
             return super.raycast(maxDistance, tickDelta, includeFluids);
         }
 
@@ -57,7 +57,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
         if(client.interactionManager != null && client.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
-            if(client.options.keySprint.isPressed()) {
+            if(client.options.sprintKey.isPressed()) {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
                 final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
                 if(clientBlueprintManager.hasSelectedBlueprint()) {

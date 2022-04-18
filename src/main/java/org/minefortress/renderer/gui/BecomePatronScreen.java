@@ -81,8 +81,8 @@ public class BecomePatronScreen extends Screen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void close() {
+        super.close();
         this.closeScreen();
     }
 

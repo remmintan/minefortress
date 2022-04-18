@@ -143,7 +143,7 @@ public class ClientBlueprintManager {
         final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket = new ServerboundBlueprintTaskPacket(taskId, selectedStructure.getId(), selectedStructure.getFile(), blueprintBuildPos, selectedStructure.getRotation(), getSelectedStructure().getFloorLevel());
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
 
-        if(!client.options.keySprint.isPressed()) {
+        if(!client.options.sprintKey.isPressed()) {
             clearStructure();
         }
     }

@@ -10,11 +10,10 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.Spawner;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
-
+import net.minecraft.world.spawner.Spawner;
 import java.util.List;
 import java.util.concurrent.Executor;
 

@@ -32,7 +32,7 @@ public class FortressMouseMixin {
     }
 
     private boolean isMiddleMouseNotPressed() {
-        return !client.options.keyPickItem.isPressed();
+        return !client.options.pickItemKey.isPressed();
     }
 
     @Inject(method = "updateMouse", at = @At("HEAD"), cancellable = true)

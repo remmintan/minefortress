@@ -68,8 +68,8 @@ public class BecomePatronConfirmationScreen extends Screen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void close() {
+        super.close();
         this.closeScreen();
     }
 

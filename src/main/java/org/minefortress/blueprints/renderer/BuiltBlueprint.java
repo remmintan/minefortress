@@ -139,7 +139,7 @@ public class BuiltBlueprint implements BuiltModel {
         }
         if(nonEmptyLayers.contains(RenderLayer.getTranslucent())) {
             final BufferBuilder translucentBuilder = blockBufferBuilders.get(RenderLayer.getTranslucent());
-            translucentBuilder.setCameraPosition(-minPos.getX(), -minPos.getY(), -minPos.getZ());
+            translucentBuilder.sortFrom(-minPos.getX(), -minPos.getY(), -minPos.getZ());
             bufferState = translucentBuilder.popState();
         }
 

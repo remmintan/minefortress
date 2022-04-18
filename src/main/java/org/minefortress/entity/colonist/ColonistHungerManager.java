@@ -14,17 +14,17 @@ public class ColonistHungerManager extends HungerManager {
         this.prevFoodLevel = this.foodLevel;
         if (this.exhaustion > 4.0f) {
             this.exhaustion -= 4.0f;
-            if (this.foodSaturationLevel > 0.0f) {
-                this.foodSaturationLevel = Math.max(this.foodSaturationLevel - 1.0f, 0.0f);
+            if (this.saturationLevel > 0.0f) {
+                this.saturationLevel = Math.max(this.saturationLevel - 1.0f, 0.0f);
 //            } else if (difficulty != Difficulty.PEACEFUL) {
             } else {
                 this.foodLevel = Math.max(this.foodLevel - 1, 0);
             }
         }
-        if ((bl = livingEntity.world.getGameRules().getBoolean(GameRules.NATURAL_REGENERATION)) && this.foodSaturationLevel > 0.0f && this.foodLevel >= 20) {
+        if ((bl = livingEntity.world.getGameRules().getBoolean(GameRules.NATURAL_REGENERATION)) && this.saturationLevel > 0.0f && this.foodLevel >= 20) {
             ++this.foodTickTimer;
             if (this.foodTickTimer >= 10) {
-                float f = Math.min(this.foodSaturationLevel, 6.0f);
+                float f = Math.min(this.saturationLevel, 6.0f);
                 livingEntity.heal(f / 6.0f);
                 this.addExhaustion(f);
                 this.foodTickTimer = 0;

@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.resource.ResourcePackManager;
-import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.server.*;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.UserCache;
@@ -48,7 +47,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     }
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
-    public void init(Thread serverThread, DynamicRegistryManager.Impl registryManager, LevelStorage.Session session, SaveProperties saveProperties, ResourcePackManager dataPackManager, Proxy proxy, DataFixer dataFixer, ServerResourceManager serverResourceManager, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepo, UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory, CallbackInfo ci) {
+    public void init(Thread serverThread, DynamicRegistryManager.Impl registryManager, LevelStorage.Session session, SaveProperties saveProperties, ResourcePackManager dataPackManager, Proxy proxy, DataFixer dataFixer, DataPackContents serverResourceManager, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepo, UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory, CallbackInfo ci) {
         blueprintsWorld = new BlueprintsWorld((MinecraftServer) (Object)this);
     }
 
