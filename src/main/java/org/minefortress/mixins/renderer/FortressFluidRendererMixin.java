@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(FluidRenderer.class)
-public class FortressFluidRendererMixin {
+public abstract class FortressFluidRendererMixin {
 
     private boolean fortressFluid = false;
     private BlockPos fortressFluidPos = null;
