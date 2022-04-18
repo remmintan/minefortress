@@ -118,7 +118,7 @@ public class BuiltBlueprint implements BuiltModel {
                 final BufferBuilder bufferBuilder = blockBufferBuilders.get(fluidRenderLayer);
                 initLayer(fluidRenderLayer, bufferBuilder);
 
-                if(blockRenderManager.renderFluid(pos, blueprintData, bufferBuilder, fluidState))
+                if(blockRenderManager.renderFluid(pos, blueprintData, bufferBuilder, blockState, fluidState))
                     nonEmptyLayers.add(fluidRenderLayer);
 
             }

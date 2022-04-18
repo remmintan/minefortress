@@ -13,10 +13,7 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.DynamicRegistryManager;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.SimpleRegistry;
+import net.minecraft.util.registry.*;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -66,7 +63,7 @@ public class BlueprintsWorld {
             0,
             32,
             16,
-            BlockTags.INFINIBURN_OVERWORLD.getId(),
+            BlockTags.INFINIBURN_OVERWORLD,
             BLUEPRINTS_WORLD_ID,
             0.0f
     );
@@ -115,16 +112,15 @@ public class BlueprintsWorld {
 
         final Registry<Biome> biomeRegistry = dynamicRegistryManager.get(Registry.BIOME_KEY);
         final Registry<DimensionType> dimensionTypeRegistry = dynamicRegistryManager.get(Registry.DIMENSION_TYPE_KEY);
-        final Registry<ChunkGeneratorSettings> chunkGeneratorSettingsRegistry = dynamicRegistryManager.get(Registry.CHUNK_GENERATOR_SETTINGS_KEY);
 
-        final SimpleRegistry<DimensionOptions> dimensionOptions = DimensionType.createDefaultDimensionOptions(
+        final Registry<DimensionOptions> dimensionOptions = DimensionType.createDefaultDimensionOptions(
                 dynamicRegistryManager,
                 0L
         );
 
-        final ChunkGenerator chunkGenerator = new FlatChunkGenerator(getGeneratorConfig(biomeRegistry));
+        final ChunkGenerator chunkGenerator = new FlatChunkGenerator(dynamicRegistryManager.get(Registry.STRUCTURE_SET_KEY) ,getGeneratorConfig(biomeRegistry));
 
-        final SimpleRegistry<DimensionOptions> updatedDimensionOptions = GeneratorOptions.getRegistryWithReplacedOverworldGenerator(
+        final Registry<DimensionOptions> updatedDimensionOptions = GeneratorOptions.getRegistryWithReplacedOverworldGenerator(
                 dimensionTypeRegistry,
                 dimensionOptions,
                 chunkGenerator
@@ -133,14 +129,13 @@ public class BlueprintsWorld {
         final GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false, updatedDimensionOptions);
 
         final LevelProperties levelProperties = new LevelProperties(EDIT_BLUEPRINT_LEVEL, generatorOptions, Lifecycle.stable());
-
         world = new FortressServerWorld(
                 server,
                 executor,
                 fortressSession,
                 levelProperties,
                 BLUEPRINTS_WORLD_REGISTRY_KEY,
-                BLUEPRINT_DIMENSION_TYPE,
+                dimensionTypeRegistry.createEntry(BLUEPRINT_DIMENSION_TYPE),
                 ((FortressServer)server).getWorldGenerationProgressListener(),
                 chunkGenerator,
                 false,
@@ -152,7 +147,6 @@ public class BlueprintsWorld {
 
 
     public static FlatChunkGeneratorConfig getGeneratorConfig(Registry<Biome> biomeRegistry) {
-        final StructuresConfig structuresConfig = new StructuresConfig(Optional.empty(), Collections.emptyMap());
 
         final List<FlatChunkGeneratorLayer> flatChunkGeneratorLayers = Arrays.asList(
                 new FlatChunkGeneratorLayer(1, Blocks.BEDROCK),
@@ -160,9 +154,8 @@ public class BlueprintsWorld {
                 new FlatChunkGeneratorLayer(1, Blocks.GRASS_BLOCK)
         );
 
-        return FlatChunkGeneratorConfig
-                .getDefaultConfig(biomeRegistry)
-                .withLayers(flatChunkGeneratorLayers, structuresConfig);
+        return new FlatChunkGeneratorConfig(Optional.empty(), biomeRegistry)
+                .withLayers(flatChunkGeneratorLayers, Optional.empty());
     }
 
     public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel) {

@@ -99,7 +99,6 @@ public class RoadsSelection extends WallsSelection{
     }
 
     private boolean isAir(BlockState blockState) {
-        final Block block = blockState.getBlock();
-        return blockState.isAir() || BlockTags.FLOWERS.contains(block) || blockState.getMaterial().isReplaceable();
+        return blockState.isAir() || blockState.isIn(BlockTags.FLOWERS) || blockState.getMaterial().isReplaceable();
     }
 }

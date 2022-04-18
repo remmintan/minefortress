@@ -1,6 +1,5 @@
 package org.minefortress.utils;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.tag.BlockTags;
@@ -10,6 +9,7 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 public class TreeHelper {
 
@@ -27,12 +27,11 @@ public class TreeHelper {
 
             for(BlockPos pos : BlockPos.iterate(layerStart, layerEnd)) {
                 final BlockState blockState = world.getBlockState(pos);
-                final Block block = blockState.getBlock();
-                if(isLog(block)){
+                if(isLog(blockState)){
                     logCount++;
                     layerIsEmpty = false;
                 }
-                if(isLeaves(block)){
+                if(isLeaves(blockState)){
                     leavesCount++;
                     layerIsEmpty = false;
                     if(pos.getY() > highestLeaf.getY()) highestLeaf = pos.toImmutable();
@@ -49,29 +48,29 @@ public class TreeHelper {
         return Optional.of(new TreeInfo(logCount, highestLeaf));
     }
 
-    public static boolean isLog(Block block) {
-        return BlockTags.LOGS.contains(block);
+    public static boolean isLog(BlockState blockState) {
+        return blockState.isIn(BlockTags.LOGS);
     }
 
-    public static boolean isLeaves(Block block) {
-        return BlockTags.LEAVES.contains(block) || block instanceof LeavesBlock;
+    public static boolean isLeaves(BlockState blockState) {
+        return blockState.isIn(BlockTags.LEAVES)  || blockState.getBlock() instanceof LeavesBlock;
     }
 
     public static Optional<TreeBlocks> getTreeBlocks(BlockPos root, World world) {
         final Optional<TreeInfo> treeInfoOpt = checkIfTree(root, world);
         if(treeInfoOpt.isPresent()) {
-            Block rootBlock = world.getBlockState(root).getBlock();
+            BlockState rootBlockState = world.getBlockState(root);
             final ArrayList<BlockPos> treeBlocks = new ArrayList<>();
             final ArrayList<BlockPos> leavesBlocks = new ArrayList<>();
-            updateTreeDataForOneTree(world, treeBlocks, leavesBlocks, root, rootBlock, root);
+            updateTreeDataForOneTree(world, treeBlocks, leavesBlocks, root, rootBlockState, root);
             return Optional.of(new TreeBlocks(treeBlocks, leavesBlocks));
         } else {
             return Optional.empty();
         }
     }
 
-    private static void updateTreeDataForOneTree(World world, List<BlockPos> treeBlocks, List<BlockPos> leavesBlocks, BlockPos cursor, Block rootBlock, BlockPos root) {
-        if(!isLog(rootBlock)) return;
+    private static void updateTreeDataForOneTree(World world, List<BlockPos> treeBlocks, List<BlockPos> leavesBlocks, BlockPos cursor, BlockState rootBlockState, BlockPos root) {
+        if(!isLog(rootBlockState)) return;
         BlockPos areaStart = new BlockPos(cursor.getX() - 1, cursor.getY(), cursor.getZ() - 1);
         BlockPos areaEnd = new BlockPos(cursor.getX() + 1, cursor.getY() + 1, cursor.getZ() + 1);
         List<BlockPos> neighbors = new ArrayList<>();
@@ -79,11 +78,10 @@ public class TreeHelper {
             pos = pos.toImmutable();
             if(treeBlocks.contains(pos) || leavesBlocks.contains(pos)) continue;
             final BlockState blockState = world.getBlockState(pos);
-            final Block block = blockState.getBlock();
-            if(rootBlock.equals(block)) {
+            if(rootBlockState.equals(blockState)) {
                 treeBlocks.add(pos);
                 neighbors.add(pos);
-            } else if(isLeaves(block)) {
+            } else if(isLeaves(blockState)) {
                 final double distanceToRoot = Math.sqrt(Math.pow(pos.getX() - root.getX(), 2) + Math.pow(pos.getZ() - root.getZ(), 2));
                 if(distanceToRoot <= 3) {
                     leavesBlocks.add(pos);
@@ -93,7 +91,7 @@ public class TreeHelper {
         }
 
         for (BlockPos neighbor : neighbors) {
-            updateTreeDataForOneTree(world, treeBlocks, leavesBlocks, neighbor, rootBlock, root);
+            updateTreeDataForOneTree(world, treeBlocks, leavesBlocks, neighbor, rootBlockState, root);
         }
     }
 

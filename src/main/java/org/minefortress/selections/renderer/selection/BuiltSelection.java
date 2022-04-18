@@ -131,7 +131,7 @@ public class BuiltSelection implements BuiltModel {
             final BufferBuilder fluidBufferBuilder = blockBufferBuilderStorage.get(fluidRenderLayer);
             init(fluidRenderLayer, fluidBufferBuilder);
 
-            if(getBlockRenderManager().renderFluid(pos, selectionBlockRenderView, fluidBufferBuilder, fluidState))
+            if(getBlockRenderManager().renderFluid(pos, selectionBlockRenderView, fluidBufferBuilder, blockState, fluidState))
                 nonEmptyLayers.add(fluidRenderLayer);
         }
     }

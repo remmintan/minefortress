@@ -113,8 +113,7 @@ public class TreeSelection extends Selection {
             pos = pos.toImmutable();
             final BlockState blockState = world.getBlockState(pos);
             if(blockState.isAir()) continue;
-            final Block block = blockState.getBlock();
-            if(isLog(block)) {
+            if(isLog(blockState)) {
                 final Optional<BlockPos> rootDownFromLog = findRootDownFromLog(pos, world);
                 if(rootDownFromLog.isPresent()) {
                     treeRoots.add(rootDownFromLog.get());
@@ -122,7 +121,7 @@ public class TreeSelection extends Selection {
                 }
             }
 
-            if(blockState.isAir() || isLeaves(block)) {
+            if(blockState.isAir() || isLeaves(blockState)) {
                 final Optional<BlockPos> rootDownFromLeaves = findRootDownFromAirOrLeaves(pos, world);
                 if(rootDownFromLeaves.isPresent()) {
                     treeRoots.add(rootDownFromLeaves.get());
@@ -155,7 +154,7 @@ public class TreeSelection extends Selection {
         do {
             cursor = cursor.down();
             cursorState = world.getBlockState(cursor);
-        } while(isLog(cursorState.getBlock()));
+        } while(isLog(cursorState));
 
         if(cursorState.isAir()) return Optional.empty();
         return Optional.of(cursor.up());
@@ -168,9 +167,9 @@ public class TreeSelection extends Selection {
         do {
             cursor = cursor.down();
             cursorState = world.getBlockState(cursor);
-        } while(cursorState.isAir() || isLeaves(cursorState.getBlock()));
+        } while(cursorState.isAir() || isLeaves(cursorState));
 
-        if(isLog(cursorState.getBlock())) return findRootDownFromLog(cursor, world);
+        if(isLog(cursorState)) return findRootDownFromLog(cursor, world);
         return Optional.empty();
     }
 
@@ -181,9 +180,9 @@ public class TreeSelection extends Selection {
         do {
             cursor = cursor.up();
             cursorState = world.getBlockState(cursor);
-        } while(!isLog(cursorState.getBlock()) && !cursorState.isAir());
+        } while(!isLog(cursorState) && !cursorState.isAir());
 
-        if(isLog(cursorState.getBlock())) return Optional.of(cursor);
+        if(isLog(cursorState)) return Optional.of(cursor);
         return Optional.empty();
     }
 

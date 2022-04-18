@@ -51,7 +51,7 @@ public class SleepOnTheBedGoal extends Goal {
             if(hasReachedTheBed()) {
                 if(!colonist.isSleeping()) {
                     final BlockPos bedPos = this.bedInfo.getPos();
-                    if(BlockTags.BEDS.contains(colonist.world.getBlockState(bedPos).getBlock()))
+                    if(colonist.world.getBlockState(bedPos).isIn(BlockTags.BEDS))
                         colonist.sleep(bedPos);
                 }
             } else {

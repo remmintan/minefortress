@@ -16,6 +16,6 @@ accessible  field   net/minecraft/client/render/chunk/ChunkBuilder   buffers  Ln
 accessible  field    net/minecraft/entity/player/HungerManager   foodLevel   I
 accessible  field    net/minecraft/entity/player/HungerManager   foodTickTimer   I
 accessible  field    net/minecraft/entity/player/HungerManager   prevFoodLevel   I
-accessible  field    net/minecraft/entity/player/HungerManager  foodSaturationLevel  F
+accessible  field    net/minecraft/entity/player/HungerManager  saturationLevel  F
 accessible  field    net/minecraft/entity/player/HungerManager  exhaustion  F
 accessible  class   net/minecraft/client/render/chunk/RenderedChunk
