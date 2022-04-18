@@ -22,13 +22,11 @@
     "interaction.FortressTutorialManagerMixin",
     "interfaces.FortressDimensionTypeMixin",
     "network.FortressServerPlayNetworkHandlerMixin",
-    "renderer.FortressChunkRendererRegionMixin",
     "renderer.FortressCreateWorldScreenMixin",
     "renderer.FortressCyclingButtonMixin",
     "renderer.FortressGameRendererMixin",
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
-    "renderer.FortressWorldSliceMixin",
     "world.FortressClientWorldMixin"
   ],
   "server": [],
