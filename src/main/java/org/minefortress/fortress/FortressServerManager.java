@@ -99,8 +99,18 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void tickFortress(ServerPlayerEntity player, World world) {
-        if(colonists.removeIf(colonist -> !colonist.isAlive()))
+        final List<Colonist> deadColonists = colonists.stream()
+                .filter(colonist -> !colonist.isAlive())
+                .collect(Collectors.toList());
+
+        if(!deadColonists.isEmpty()) {
+            for(Colonist colonist : deadColonists) {
+                final String professionId = colonist.getProfessionId();
+                serverProfessionManager.decreaseAmount(professionId);
+                colonists.remove(colonist);
+            }
             scheduleSync();
+        }
 
         for (FortressBulding building : buildings) {
             building.tick();
