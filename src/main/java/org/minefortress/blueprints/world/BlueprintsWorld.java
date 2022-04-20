@@ -127,6 +127,7 @@ public class BlueprintsWorld {
         );
 
         final GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false, updatedDimensionOptions);
+        final RegistryEntry.Direct<DimensionType> dimensionTypeDirectRef = new RegistryEntry.Direct<>(BLUEPRINT_DIMENSION_TYPE);
 
         final LevelProperties levelProperties = new LevelProperties(EDIT_BLUEPRINT_LEVEL, generatorOptions, Lifecycle.stable());
         world = new FortressServerWorld(
@@ -135,7 +136,7 @@ public class BlueprintsWorld {
                 fortressSession,
                 levelProperties,
                 BLUEPRINTS_WORLD_REGISTRY_KEY,
-                dimensionTypeRegistry.createEntry(BLUEPRINT_DIMENSION_TYPE),
+                dimensionTypeDirectRef,
                 ((FortressServer)server).getWorldGenerationProgressListener(),
                 chunkGenerator,
                 false,
