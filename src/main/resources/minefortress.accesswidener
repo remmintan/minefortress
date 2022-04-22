@@ -23,3 +23,4 @@ accessible  field    net/minecraft/entity/player/HungerManager   prevFoodLevel  
 accessible  field    net/minecraft/entity/player/HungerManager  foodSaturationLevel  F
 accessible  field    net/minecraft/entity/player/HungerManager  exhaustion  F
 mutable field   net/minecraft/client/gui/screen/ingame/HandledScreen handler Lnet/minecraft/screen/ScreenHandler;
+accessible  method   net/minecraft/item/Item    isIn    (Lnet/minecraft/item/ItemGroup;)Z
