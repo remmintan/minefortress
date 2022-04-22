@@ -229,6 +229,10 @@ public final class FortressClientManager extends AbstractFortressManager {
         return this.gamemode == FortressGamemode.CREATIVE;
     }
 
+    public boolean isSurvival() {
+        return this.gamemode != null && this.gamemode == FortressGamemode.SURVIVAL;
+    }
+
     public ClientResourceManager getResourceManager() {
         return resourceManager;
     }
