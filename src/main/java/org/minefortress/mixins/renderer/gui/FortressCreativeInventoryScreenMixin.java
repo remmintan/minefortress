@@ -10,16 +10,21 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.search.SearchManager;
+import net.minecraft.client.search.SearchableContainer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.tag.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.FortressClientManager;
@@ -33,6 +38,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Locale;
+import java.util.Map;
 
 @Mixin(CreativeInventoryScreen.class)
 public abstract class FortressCreativeInventoryScreenMixin extends AbstractInventoryScreen<CreativeInventoryScreen.CreativeScreenHandler> {
@@ -51,6 +59,10 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     @Shadow private @Nullable Slot deleteItemSlot;
     @Shadow @Final private static Text DELETE_ITEM_SLOT_TEXT;
     @Shadow private boolean scrolling;
+    @Shadow @Final private Map<Identifier, Tag<Item>> searchResultTags;
+
+    @Shadow protected abstract void searchForTags(String id2);
+
     private static final GameMode FORTRESS_GAMEMODE = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
 
     public FortressCreativeInventoryScreenMixin(CreativeInventoryScreen.CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {
@@ -149,6 +161,43 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             if (itemGroup == ItemGroup.INVENTORY) {
                 InventoryScreen.drawEntity(this.x + 88, this.y + 45, 20, this.x + 88 - mouseX, this.y + 45 - 30 - mouseY, this.client.player);
             }
+
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "setSelectedTab", at = @At("HEAD"), cancellable = true)
+    public void setSelectedTab(ItemGroup group, CallbackInfo ci) {
+        if(isFortressGamemode() && isNotCreative()){
+            this.scrollPosition = 0.0f;
+            this.handler.scrollItems(0);
+
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "search", at = @At("HEAD"), cancellable = true)
+    public void search(CallbackInfo ci) {
+        if(isFortressGamemode() && isNotCreative()) {
+            this.searchResultTags.clear();
+            String string = this.searchBox.getText();
+            if (string.isEmpty()) {
+                for (Item item : Registry.ITEM) {
+                    item.appendStacks(ItemGroup.SEARCH, this.handler.itemList);
+                }
+            } else {
+                SearchableContainer<ItemStack> searchable;
+                if (string.startsWith("#")) {
+                    string = string.substring(1);
+                    searchable = this.client.getSearchableContainer(SearchManager.ITEM_TAG);
+                    this.searchForTags(string);
+                } else {
+                    searchable = this.client.getSearchableContainer(SearchManager.ITEM_TOOLTIP);
+                }
+                this.handler.itemList.addAll(searchable.findAll(string.toLowerCase(Locale.ROOT)));
+            }
+            this.scrollPosition = 0.0f;
+            this.handler.scrollItems(0.0f);
 
             ci.cancel();
         }
