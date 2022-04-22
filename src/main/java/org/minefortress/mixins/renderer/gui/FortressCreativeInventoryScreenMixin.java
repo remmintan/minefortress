@@ -28,6 +28,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.resources.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
 import org.spongepowered.asm.mixin.Final;
@@ -39,6 +40,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -62,6 +64,12 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     @Shadow @Final private Map<Identifier, Tag<Item>> searchResultTags;
 
     @Shadow protected abstract void searchForTags(String id2);
+
+    @Shadow protected abstract boolean isClickInTab(ItemGroup group, double mouseX, double mouseY);
+
+    @Shadow protected abstract void setSelectedTab(ItemGroup group);
+
+    @Shadow protected abstract boolean renderTabTooltipIfHovered(MatrixStack matrices, ItemGroup group, int mouseX, int mouseY);
 
     private static final GameMode FORTRESS_GAMEMODE = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
 
@@ -104,11 +112,11 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
                 double d = mouseX - (double)this.x;
                 double e = mouseY - (double)this.y;
                 this.scrolling = false;
-//            for (ItemGroup itemGroup : ItemGroup.GROUPS) {
-//                if (!this.isClickInTab(itemGroup, d, e)) continue;
-//                this.setSelectedTab(itemGroup);
-//                return true;
-//            }
+                for (ItemGroup itemGroup : getResourceManager().getGroups()) {
+                    if (!this.isClickInTab(itemGroup, d, e)) continue;
+                    this.setSelectedTab(itemGroup);
+                    cir.setReturnValue(true);
+                }
             }
             cir.setReturnValue(super.mouseReleased(mouseX, mouseY, button));
         }
@@ -119,9 +127,9 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         if(isFortressGamemode() && isNotCreative()) {
             this.renderBackground(matrices);
             super.render(matrices, mouseX, mouseY, delta);
-//        for (ItemGroup itemGroup : ItemGroup.GROUPS) {
-//            if (this.renderTabTooltipIfHovered(matrices, itemGroup, mouseX, mouseY)) break;
-//        }
+            for (ItemGroup itemGroup : getResourceManager().getGroups()) {
+                if (this.renderTabTooltipIfHovered(matrices, itemGroup, mouseX, mouseY)) break;
+            }
             if (this.deleteItemSlot != null && selectedTab == ItemGroup.INVENTORY.getIndex() && this.isPointWithinBounds(this.deleteItemSlot.x, this.deleteItemSlot.y, 16, 16, mouseX, mouseY)) {
                 this.renderTooltip(matrices, DELETE_ITEM_SLOT_TEXT, mouseX, mouseY);
             }
@@ -138,12 +146,12 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         if(isFortressGamemode() && isNotCreative()) {
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             ItemGroup itemGroup = ItemGroup.GROUPS[selectedTab];
-//        for (ItemGroup itemGroup2 : ItemGroup.GROUPS) {
-//            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-//            RenderSystem.setShaderTexture(0, TEXTURE);
-//            if (itemGroup2.getIndex() == selectedTab) continue;
-//            this.renderTabIcon(matrices, itemGroup2);
-//        }
+            for (ItemGroup itemGroup2 : getResourceManager().getGroups()) {
+                RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                RenderSystem.setShaderTexture(0, TEXTURE);
+                if (itemGroup2.getIndex() == selectedTab) continue;
+                this.renderTabIcon(matrices, itemGroup2);
+            }
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderTexture(0, new Identifier(TAB_TEXTURE_PREFIX + itemGroup.getTexture()));
             this.drawTexture(matrices, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
@@ -167,8 +175,16 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     }
 
     @Inject(method = "setSelectedTab", at = @At("HEAD"), cancellable = true)
-    public void setSelectedTab(ItemGroup group, CallbackInfo ci) {
+    public void setSelectedTabInj(ItemGroup group, CallbackInfo ci) {
         if(isFortressGamemode() && isNotCreative()){
+            selectedTab = group.getIndex();
+            this.cursorDragSlots.clear();
+
+            this.handler.itemList.clear();
+
+            final var stacks = getResourceManager().getStacks(group);
+            this.handler.itemList.addAll(stacks);
+
             this.scrollPosition = 0.0f;
             this.handler.scrollItems(0);
 
@@ -213,6 +229,10 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     private FortressClientManager getClientManager() {
         return ((FortressMinecraftClient) getClient()).getFortressClientManager();
+    }
+
+    private ClientResourceManager getResourceManager() {
+        return getClientManager().getResourceManager();
     }
 
 }
