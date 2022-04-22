@@ -5,10 +5,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.world.dimension.DimensionType;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressWorldRenderer;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
 
@@ -26,9 +28,8 @@ public class SelectionManager implements FortressWorldRenderer {
     private BlockState clickingBlockState = null;
     private int upSelectionDelta = 0;
 
-
-
     private boolean needsUpdate = false;
+    private boolean inCorrectState = true;
 
     public SelectionManager(MinecraftClient client) {
         this.client = client;
@@ -63,7 +64,7 @@ public class SelectionManager implements FortressWorldRenderer {
     public void tickSelectionUpdate(BlockPos blockPos, Direction clickedFace) {
         if(isNotOverworld()) {
             if(selection.isSelecting()) {
-                selection.reset();
+                this.resetSelection();
             }
             return;
         }
@@ -72,6 +73,22 @@ public class SelectionManager implements FortressWorldRenderer {
         if(this.selection.needUpdate(pickedPos, upSelectionDelta)) {
             this.selection.update(pickedPos, upSelectionDelta);
             this.setNeedsUpdate(true);
+
+            if(clickType == ClickType.BUILD && clickingBlockState != null) {
+                final var clientManager = ((FortressMinecraftClient) client).getFortressClientManager();
+                if(clientManager.isSurvival()){
+                    final var blocksAmount = this.selection.getSelection().size();
+                    final var item = clickingBlockState.getBlock().asItem();
+                    final var resourceManager = clientManager.getResourceManager();
+                    final var itemStack = new ItemStack(item, blocksAmount);
+                    inCorrectState = resourceManager.hasStacks(Collections.singletonList(itemStack));
+                } else {
+                    inCorrectState = true;
+                }
+            } else {
+                inCorrectState = true;
+            }
+
         }
     }
 
@@ -129,6 +146,11 @@ public class SelectionManager implements FortressWorldRenderer {
         if(selection instanceof RoadsSelection && clickType == ClickType.BUILD)
             this.clickType = ClickType.ROADS;
 
+        if(selection.isSelecting() && !this.inCorrectState) {
+            this.resetSelection();
+            return;
+        }
+
         boolean result = this.selection.selectBlock(
                 client.world,
                 mainHandItem,
@@ -160,6 +182,7 @@ public class SelectionManager implements FortressWorldRenderer {
         selection.reset();
         this.clickType = null;
         this.upSelectionDelta = 0;
+        this.inCorrectState = true;
     }
 
     public ClickType getClickType() {
@@ -180,5 +203,9 @@ public class SelectionManager implements FortressWorldRenderer {
 
     public void setNeedsUpdate(boolean needsUpdate) {
         this.needsUpdate = needsUpdate;
+    }
+
+    public boolean isInCorrectState() {
+        return inCorrectState;
     }
 }
