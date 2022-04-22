@@ -54,5 +54,6 @@ public class MineFortressClient implements ClientModInitializer {
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_BUILDINGS_SYNC, ClientboundSyncBuildingsPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, ClientboundSyncSpecialBlocksPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_SYNC, ClientboundProfessionSyncPacket::new);
+        FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_RESOURCES_SYNC, ClientboundSyncItemsPacket::new);
     }
 }

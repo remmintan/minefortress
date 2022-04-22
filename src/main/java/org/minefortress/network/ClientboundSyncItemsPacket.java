@@ -4,9 +4,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressClientPacket;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ClientboundSyncItemsPacket implements FortressClientPacket {
 
@@ -30,7 +33,11 @@ public class ClientboundSyncItemsPacket implements FortressClientPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        // TODO: handle
+        final var fortressClientManager = ((FortressMinecraftClient) client).getFortressClientManager();
+        final var resourceManager = fortressClientManager.getResourceManager();
+        for (ItemInfo info : itemInfo) {
+            resourceManager.setItemAmount(info.item(), info.amount());
+        }
     }
 
     @Override
