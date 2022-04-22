@@ -9,6 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.resources.ClientResourceManager;
+import org.minefortress.fortress.resources.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.ServerboundSetGamemodePacket;
@@ -25,6 +27,7 @@ import java.util.stream.StreamSupport;
 public final class FortressClientManager extends AbstractFortressManager {
 
     private final ClientProfessionManager professionManager;
+    private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
 
     private boolean initialized = false;
 
@@ -224,6 +227,10 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public boolean isCreative() {
         return this.gamemode == FortressGamemode.CREATIVE;
+    }
+
+    public ClientResourceManager getResourceManager() {
+        return resourceManager;
     }
 
     private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
