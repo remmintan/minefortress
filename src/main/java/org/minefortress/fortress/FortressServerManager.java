@@ -16,6 +16,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
+import org.minefortress.fortress.resources.ServerResourceManager;
+import org.minefortress.fortress.resources.ServerResourceManagerImpl;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.ClientboundSyncBuildingsPacket;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
@@ -43,6 +45,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
     private final ServerProfessionManager serverProfessionManager;
+    private final ServerResourceManager serverResourceManager = new ServerResourceManagerImpl();
 
     private int maxX = Integer.MIN_VALUE;
     private int maxZ = Integer.MIN_VALUE;
@@ -82,6 +85,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     public void tick(ServerPlayerEntity player) {
         tickFortress(player, player.world);
         serverProfessionManager.tick(player);
+        serverResourceManager.tick(player);
         if(!needSync) return;
         final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
@@ -243,6 +247,8 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         tag.putString("gamemode", this.gamemode.name());
 
+
+        this.serverResourceManager.write(tag);
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -299,6 +305,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             this.setGamemode(fortressGamemode);
         }
 
+        this.serverResourceManager.read(tag);
 
         this.scheduleSync();
     }
@@ -382,5 +389,13 @@ public final class FortressServerManager extends AbstractFortressManager {
     @Override
     public boolean isCreative() {
         return gamemode == FortressGamemode.CREATIVE;
+    }
+
+    public boolean isSurvival() {
+        return gamemode != null && gamemode == FortressGamemode.SURVIVAL;
+    }
+
+    public ServerResourceManager getServerResourceManager() {
+        return serverResourceManager;
     }
 }

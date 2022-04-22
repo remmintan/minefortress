@@ -1,6 +1,7 @@
 package org.minefortress.fortress.resources;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -17,10 +18,14 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     private final ItemStacksManager resources = new ItemStacksManager();
     private final Map<UUID, ItemStacksManager> reservedResources = new HashMap<>();
 
+    public ServerResourceManagerImpl() {
+        resources.getStack(Items.OAK_PLANKS).increaseBy(12);
+    }
+
     @Override
-    public void addItem(Item item) {
+    public void addItem(Item item, int amount) {
         final var stack = resources.getStack(item);
-        stack.increase();
+        stack.increaseBy(amount);
 
         synchronizer.syncItem(item, stack.getAmount());
     }
@@ -105,6 +110,9 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
                 this.resources.getStack(item).increaseBy(amount);
             }
         }
+
+
+        this.syncAll();
     }
 
     @Override
@@ -132,9 +140,18 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
         return reservedResources.computeIfAbsent(taskId, k -> new ItemStacksManager());
     }
 
+    private void syncAll() {
+        this.synchronizer.reset();
+        this.synchronizer.syncAll(resources.getAll());
+    }
+
     private static class Synchronizer {
 
         private final List<ItemInfo> infosToSync = new ArrayList<>();
+
+        void reset() {
+            this.infosToSync.clear();
+        }
 
         void sync(ServerPlayerEntity player) {
             if(infosToSync.isEmpty()) return;

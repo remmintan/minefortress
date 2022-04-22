@@ -1,8 +1,13 @@
 package org.minefortress.entity.ai.controls;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.loot.context.LootContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Hand;
@@ -11,7 +16,10 @@ import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.AbstractFortressManager;
+import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.ServerResourceManager;
 
+import java.util.List;
 import java.util.Optional;
 
 public class DigControl extends PositionedActionControl {
@@ -44,6 +52,20 @@ public class DigControl extends PositionedActionControl {
             this.destroyProgress = 0f;
             level.breakBlock(this.goal, false, this.colonist);
             level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, goal);
+            colonist.doActionOnMasterPlayer(p -> {
+                final var fortressServerManager = p.getFortressServerManager();
+                if(fortressServerManager.isSurvival()) {
+                    final var serverResourceManager = fortressServerManager.getServerResourceManager();
+                    final var blockState = level.getBlockState(goal);
+                    final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(goal, blockState) : null;
+                    final var drop = Block.getDroppedStacks(blockState, level, goal, blockEntity);
+                    for (ItemStack itemStack : drop) {
+                        final var item = itemStack.getItem();
+                        final var count = itemStack.getCount();
+                        serverResourceManager.addItem(item, count);
+                    }
+                }
+            });
             return true;
         } else {
             this.destroyProgress += this.getDestroyProgress(level.getBlockState(goal), colonist, level, goal);
