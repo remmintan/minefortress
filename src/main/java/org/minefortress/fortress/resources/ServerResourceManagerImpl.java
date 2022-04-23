@@ -20,6 +20,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
     public ServerResourceManagerImpl() {
         resources.getStack(Items.OAK_PLANKS).increaseBy(12);
+        this.syncAll();
     }
 
     @Override
