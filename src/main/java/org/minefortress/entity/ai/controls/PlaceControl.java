@@ -1,13 +1,12 @@
 package org.minefortress.entity.ai.controls;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.item.*;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.tasks.BuildingManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 
@@ -66,6 +65,7 @@ public class PlaceControl extends PositionedActionControl {
         final ActionResult interactionResult = item.useOnBlock(context);
 
         if(interactionResult == ActionResult.CONSUME || failedInteractions > 15) {
+            decreaseResourcesAmount();
             this.reset();
             this.placeCooldown = 6;
         } else {
@@ -79,8 +79,21 @@ public class PlaceControl extends PositionedActionControl {
         colonist.world.setBlockState(goal, stateForPlacement, 3);
         colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal);
 
+        decreaseResourcesAmount();
+
         this.reset();
         this.placeCooldown = 6;
+    }
+
+    private void decreaseResourcesAmount() {
+        colonist.doActionOnMasterPlayer(p -> {
+            final var fortressServerManager = p.getFortressServerManager();
+            final var taskControl = colonist.getTaskControl();
+            if(fortressServerManager.isSurvival() && taskControl.hasTask()) {
+                final var resourceManager = fortressServerManager.getServerResourceManager();
+                resourceManager.removeReservedItem(taskControl.getTaskId(), item);
+            }
+        });
     }
 
     public boolean isCantPlaceUnderMyself() {

@@ -1,13 +1,18 @@
 package org.minefortress.tasks;
 
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.tasks.interfaces.Task;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class TaskManager {
 
@@ -52,15 +57,31 @@ public class TaskManager {
         }
     }
 
-    public void addTask(Task task) {
+    public void addTask(Task task, FortressServerManager manager) {
         task.prepareTask();
         if(task.hasAvailableParts()) {
+
+            if(task instanceof SimpleSelectionTask simpleSelectionTask) {
+                if(manager.isSurvival()) {
+                    final var spliterator = simpleSelectionTask
+                            .getBlocksForPart(Pair.of(simpleSelectionTask.getStartingBlock(), simpleSelectionTask.getEndingBlock()))
+                            .spliterator();
+
+                    final var blocksCount = (int)StreamSupport.stream(spliterator, false).count();
+                    final var placingItem = simpleSelectionTask.getPlacingItem();
+
+                    final var info = new ItemInfo(placingItem, blocksCount);
+
+                    manager.getServerResourceManager().reserveItems(task.getId(), Collections.singletonList(info));
+                }
+            }
             tasks.add(task);
         }
     }
 
-    public void cancelTask(UUID id) {
+    public void cancelTask(UUID id, FortressServerManager manager) {
         cancelledTasks.add(id);
+        manager.getServerResourceManager().returnReservedItems(id);
         tasks.removeIf(task -> task.getId().equals(id));
     }
 

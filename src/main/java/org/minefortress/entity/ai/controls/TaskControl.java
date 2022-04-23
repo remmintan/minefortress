@@ -108,6 +108,10 @@ public class TaskControl {
         return !blocks.hasNext();
     }
 
+    public UUID getTaskId() {
+        return task.getId();
+    }
+
     @Nullable
     public TaskBlockInfo getNextBlock() {
         return blocks.next();

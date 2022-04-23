@@ -6,6 +6,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.tasks.RoadsTask;
@@ -47,13 +48,14 @@ public class ServerboundRoadsTaskPacket implements FortressServerPacket {
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final FortressServerPlayerEntity fortressPlayer = (FortressServerPlayerEntity) player;
         final TaskManager taskManager = fortressPlayer.getTaskManager();
+        final var fortressServerManager = fortressPlayer.getFortressServerManager();
         final ItemStack itemInHand = player.getStackInHand(Hand.MAIN_HAND);
         final RoadsTask buildTask = new RoadsTask(placeUuid, TaskType.BUILD, blocks, itemInHand.getItem());
         final Runnable onDigComplete = () -> {
-            taskManager.addTask(buildTask);
+            taskManager.addTask(buildTask, fortressServerManager);
         };
 
         final RoadsTask digTask = new RoadsTask(digUuid, TaskType.REMOVE, blocks, null, onDigComplete);
-        taskManager.addTask(digTask);
+        taskManager.addTask(digTask, fortressServerManager);
     }
 }

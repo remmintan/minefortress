@@ -75,6 +75,10 @@ public class SimpleSelectionTask extends AbstractTask {
         this.placingItem = placingItem;
     }
 
+    public Item getPlacingItem() {
+        return placingItem;
+    }
+
     @Override
     public TaskPart getNextPart(ServerWorld world) {
         Pair<BlockPos, BlockPos> startAndEnd = parts.poll();
@@ -106,7 +110,7 @@ public class SimpleSelectionTask extends AbstractTask {
         return blocksInfo;
     }
 
-    private Iterable<BlockPos> getBlocksForPart(Pair<BlockPos, BlockPos> part) {
+    public Iterable<BlockPos> getBlocksForPart(Pair<BlockPos, BlockPos> part) {
         if(selectionType == SelectionType.LADDER) {
             return PathUtils.getLadderSelection(this.startingBlock, part.getFirst(), part.getSecond(), Direction.Axis.X);
         } else if(selectionType == SelectionType.LADDER_Z_DIRECTION) {

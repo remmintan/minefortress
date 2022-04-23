@@ -47,6 +47,14 @@ public abstract class AbstractTask implements Task {
         this.endingBlock = endingBlock;
     }
 
+    public BlockPos getStartingBlock() {
+        return startingBlock;
+    }
+
+    public BlockPos getEndingBlock() {
+        return endingBlock;
+    }
+
     @Override
     public UUID getId() {
         return id;
