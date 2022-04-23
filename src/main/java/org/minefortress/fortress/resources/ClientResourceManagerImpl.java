@@ -5,6 +5,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ClientResourceManagerImpl implements ClientResourceManager {
 
@@ -17,13 +18,20 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
 
     @Override
     public boolean hasStacks(List<ItemStack> stacks) {
+        final var stacksSet = stacks.stream().map(this::getInfo).collect(Collectors.toSet());
+
         final var count = resources.values()
                 .stream()
                 .flatMap(it -> it.values().stream())
                 .filter(it -> !it.isEmpty())
-                .filter(stacks::contains)
+                .map(this::getInfo)
+                .filter(stacksSet::contains)
                 .count();
         return count == stacks.size();
+    }
+
+    private ItemInfo getInfo(ItemStack stack) {
+        return new ItemInfo(stack.getItem(), stack.getCount());
     }
 
     @Override
