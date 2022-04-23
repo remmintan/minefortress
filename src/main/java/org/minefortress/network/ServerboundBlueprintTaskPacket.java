@@ -57,12 +57,12 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation, floorLevel);
 
             if (player instanceof FortressServerPlayerEntity fortressPlayer) {
-                Runnable executeBuildTask = () -> fortressPlayer.getTaskManager().addTask(task);
+                Runnable executeBuildTask = () -> fortressPlayer.getTaskManager().addTask(task, fortressPlayer.getFortressServerManager());
                 if (floorLevel > 0) {
                     final SimpleSelectionTask digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintFile, rotation);
                     digTask.addFinishListener(executeBuildTask);
 
-                    fortressPlayer.getTaskManager().addTask(digTask);
+                    fortressPlayer.getTaskManager().addTask(digTask, fortressPlayer.getFortressServerManager());
                 } else {
                     executeBuildTask.run();
                 }

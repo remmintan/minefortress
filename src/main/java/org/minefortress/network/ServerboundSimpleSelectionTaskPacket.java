@@ -92,7 +92,8 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         UUID id = this.getId();
         TaskType taskType = this.getTaskType();
-        TaskManager taskManager = ((FortressServerPlayerEntity) player).getTaskManager();
+        final var fortressPlayer = (FortressServerPlayerEntity) player;
+        TaskManager taskManager = fortressPlayer.getTaskManager();
         BlockPos startingBlock = this.getStart();
         BlockPos endingBlock = this.getEnd();
         HitResult hitResult = this.getHitResult();
@@ -107,6 +108,6 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
             }
         }
 
-        taskManager.addTask(simpleSelectionTask);
+        taskManager.addTask(simpleSelectionTask, fortressPlayer.getFortressServerManager());
     }
 }

@@ -33,7 +33,8 @@ public class ServerboundCancelTaskPacket implements FortressServerPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         UUID id = this.getTaskId();
-        TaskManager taskManager = ((FortressServerPlayerEntity)player).getTaskManager();
-        taskManager.cancelTask(id);
+        final var fortressPlayer = (FortressServerPlayerEntity) player;
+        TaskManager taskManager = fortressPlayer.getTaskManager();
+        taskManager.cancelTask(id, fortressPlayer.getFortressServerManager());
     }
 }
