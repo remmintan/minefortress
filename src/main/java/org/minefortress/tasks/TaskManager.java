@@ -62,7 +62,7 @@ public class TaskManager {
         if(task.hasAvailableParts()) {
 
             if(task instanceof SimpleSelectionTask simpleSelectionTask) {
-                if(manager.isSurvival()) {
+                if(manager.isSurvival() && task.getTaskType() == TaskType.BUILD) {
                     final var spliterator = simpleSelectionTask
                             .getBlocksForPart(Pair.of(simpleSelectionTask.getStartingBlock(), simpleSelectionTask.getEndingBlock()))
                             .spliterator();

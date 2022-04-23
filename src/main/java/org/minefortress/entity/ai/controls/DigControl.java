@@ -50,15 +50,17 @@ public class DigControl extends PositionedActionControl {
 
         if(destroyProgress >= 1.0f){
             this.destroyProgress = 0f;
+
+            final var blockState = level.getBlockState(goal);
+            final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(goal, blockState) : null;
+            final var drop = Block.getDroppedStacks(blockState, level, goal, blockEntity);
+
             level.breakBlock(this.goal, false, this.colonist);
             level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, goal);
             colonist.doActionOnMasterPlayer(p -> {
                 final var fortressServerManager = p.getFortressServerManager();
                 if(fortressServerManager.isSurvival()) {
                     final var serverResourceManager = fortressServerManager.getServerResourceManager();
-                    final var blockState = level.getBlockState(goal);
-                    final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(goal, blockState) : null;
-                    final var drop = Block.getDroppedStacks(blockState, level, goal, blockEntity);
                     for (ItemStack itemStack : drop) {
                         final var item = itemStack.getItem();
                         final var count = itemStack.getCount();
