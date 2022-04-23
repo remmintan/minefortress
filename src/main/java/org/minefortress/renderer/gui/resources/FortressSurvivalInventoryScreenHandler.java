@@ -104,11 +104,11 @@ public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScr
 
         @Override
         public boolean canTakeItems(PlayerEntity playerEntity) {
-            return false;
-//            if (super.canTakeItems(playerEntity) && this.hasStack()) {
-//                return this.getStack().getSubNbt(CUSTOM_FORTRESS_SURVIVAL_LOCK_KEY) == null;
-//            }
-//            return !this.hasStack();
+//            return false;
+            if (super.canTakeItems(playerEntity) && this.hasStack()) {
+                return this.getStack().getSubNbt(CUSTOM_FORTRESS_SURVIVAL_LOCK_KEY) == null;
+            }
+            return !this.hasStack();
         }
     }
 
