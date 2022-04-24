@@ -98,8 +98,8 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
     @Override
     public void read(NbtCompound tag) {
-        this.resources.clear();
         if(tag.contains("resources")) {
+            this.resources.clear();
             final var resourcesTags = tag.getList("resources", NbtList.COMPOUND_TYPE);
             final var size = resourcesTags.size();
             for(int i = 0; i < size; i++) {
@@ -110,10 +110,8 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
                 this.resources.getStack(item).increaseBy(amount);
             }
+            this.syncAll();
         }
-
-
-        this.syncAll();
     }
 
     @Override
@@ -149,16 +147,19 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     private static class Synchronizer {
 
         private final List<ItemInfo> infosToSync = new ArrayList<>();
+        private boolean needReset = false;
 
         void reset() {
             this.infosToSync.clear();
+            this.needReset = true;
         }
 
         void sync(ServerPlayerEntity player) {
-            if(infosToSync.isEmpty()) return;
-            final var packet = new ClientboundSyncItemsPacket(infosToSync);
+            if(infosToSync.isEmpty() && !needReset) return;
+            final var packet = new ClientboundSyncItemsPacket(infosToSync, needReset);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESOURCES_SYNC, packet);
             infosToSync.clear();
+            this.needReset = false;
         }
 
         void syncItem(Item item, int amount) {

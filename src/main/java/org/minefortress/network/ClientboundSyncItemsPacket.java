@@ -14,9 +14,11 @@ import java.util.List;
 public class ClientboundSyncItemsPacket implements FortressClientPacket {
 
     private final List<ItemInfo> itemInfo;
+    private final boolean needReset;
 
-    public ClientboundSyncItemsPacket(List<ItemInfo> itemInfo) {
+    public ClientboundSyncItemsPacket(List<ItemInfo> itemInfo, boolean needReset) {
         this.itemInfo = Collections.unmodifiableList(itemInfo);
+        this.needReset = needReset;
     }
 
     public ClientboundSyncItemsPacket(PacketByteBuf buf) {
@@ -29,12 +31,14 @@ public class ClientboundSyncItemsPacket implements FortressClientPacket {
         }
 
         this.itemInfo = Collections.unmodifiableList(tempList);
+        this.needReset = buf.readBoolean();
     }
 
     @Override
     public void handle(MinecraftClient client) {
         final var fortressClientManager = ((FortressMinecraftClient) client).getFortressClientManager();
         final var resourceManager = fortressClientManager.getResourceManager();
+        if(needReset) resourceManager.reset();
         for (ItemInfo info : itemInfo) {
             resourceManager.setItemAmount(info.item(), info.amount());
         }
@@ -50,5 +54,7 @@ public class ClientboundSyncItemsPacket implements FortressClientPacket {
             buf.writeInt(Item.getRawId(item));
             buf.writeInt(amount);
         }
+
+        buf.writeBoolean(needReset);
     }
 }
