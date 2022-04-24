@@ -94,7 +94,7 @@ public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScr
 
     @Override
     public void setCursorStack(ItemStack stack) {
-        this.parent.setCursorStack(stack);
+        this.parent.setCursorStack(new ItemStack(stack.getItem()));
     }
 
     static class LockableSlot extends Slot {
@@ -104,11 +104,36 @@ public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScr
 
         @Override
         public boolean canTakeItems(PlayerEntity playerEntity) {
-//            return false;
             if (super.canTakeItems(playerEntity) && this.hasStack()) {
                 return this.getStack().getSubNbt(CUSTOM_FORTRESS_SURVIVAL_LOCK_KEY) == null;
             }
             return !this.hasStack();
+        }
+
+        @Override
+        public ItemStack takeStack(int amount) {
+            final var stack = this.getStack();
+            return new ItemStack(stack.getItem(), stack.getCount());
+        }
+
+        @Override
+        public ItemStack insertStack(ItemStack stack) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public ItemStack insertStack(ItemStack stack, int count) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public int getMaxItemCount() {
+            return 10000;
+        }
+
+        @Override
+        public int getMaxItemCount(ItemStack stack) {
+            return 10000;
         }
     }
 
