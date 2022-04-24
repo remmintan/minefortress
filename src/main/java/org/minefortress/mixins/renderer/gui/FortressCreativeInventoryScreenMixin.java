@@ -16,6 +16,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -69,6 +70,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Shadow protected abstract boolean renderTabTooltipIfHovered(MatrixStack matrices, ItemGroup group, int mouseX, int mouseY);
 
+    @Shadow @Final private static SimpleInventory INVENTORY;
     private static final GameMode FORTRESS_GAMEMODE = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
 
     public FortressCreativeInventoryScreenMixin(CreativeInventoryScreen.CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {
@@ -78,7 +80,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     @Inject(method = "<init>", at = @At("RETURN"))
     void init(PlayerEntity player, CallbackInfo ci) {
         if(isFortressGamemode() && isNotCreative()){
-            super.handler = new FortressSurvivalInventoryScreenHandler(player);
+            super.handler = new FortressSurvivalInventoryScreenHandler(player, INVENTORY);
             player.currentScreenHandler = super.handler;
         }
     }

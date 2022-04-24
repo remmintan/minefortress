@@ -8,7 +8,8 @@
     "entity.FortressItemEntityMixin",
     "network.FortressClientPlayNetworkHandlerMixin",
     "renderer.FortressFluidRendererMixin",
-    "renderer.gui.FortressCreativeInventoryScreenMixin"
+    "renderer.gui.FortressCreativeInventoryScreenMixin",
+    "renderer.gui.FortressSimpleInventory"
   ],
   "client": [
     "FortressMinecraftClientMixin",

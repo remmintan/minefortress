@@ -11,14 +11,15 @@ import net.minecraft.screen.slot.Slot;
 public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScreen.CreativeScreenHandler {
 
     private static final String CUSTOM_FORTRESS_SURVIVAL_LOCK_KEY = "CustomCreativeLock";
-    private final Inventory INVENTORY  = new FortressSimpleInventory(45);
+    private final Inventory INVENTORY;
 
     private final ScreenHandler parent;
 
-    public FortressSurvivalInventoryScreenHandler(PlayerEntity player) {
+    public FortressSurvivalInventoryScreenHandler(PlayerEntity player, Inventory inventory) {
         super(player);
         super.slots.clear();
         super.itemList.clear();
+        this.INVENTORY = inventory;
         INVENTORY.clear();
 
         int i;
@@ -88,13 +89,19 @@ public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScr
 
     @Override
     public ItemStack getCursorStack() {
-        return this.parent.getCursorStack();
+        final var cursorStack = this.parent.getCursorStack();
+        return cursorStack != null ? new ItemStack(cursorStack.getItem()) : null;
     }
 
     @Override
     public void setCursorStack(ItemStack stack) {
         this.parent.setCursorStack(new ItemStack(stack.getItem()));
     }
+
+//    @Override
+//    public void setCursorStack(ItemStack stack) {
+//        this.parent.setCursorStack(new ItemStack(stack.getItem()));
+//    }
 
     static class LockableSlot extends Slot {
         public LockableSlot(Inventory inventory, int i, int j, int k) {
@@ -112,7 +119,7 @@ public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScr
         @Override
         public ItemStack takeStack(int amount) {
             final var stack = this.getStack();
-            return new ItemStack(stack.getItem(), stack.getCount());
+            return new ItemStack(stack.getItem());
         }
 
         @Override

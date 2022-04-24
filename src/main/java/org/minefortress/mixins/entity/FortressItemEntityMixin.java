@@ -30,8 +30,8 @@ public abstract class FortressItemEntityMixin extends Entity {
     void disablePickup(PlayerEntity player, CallbackInfo ci) {
         final ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
         final ServerPlayerInteractionManager interactionManager = serverPlayer.interactionManager;
-        final boolean notBlueprintsWorld = player.world.getRegistryKey() != BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
-        final boolean isFortressGamemode = interactionManager.getGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+        final boolean notBlueprintsWorld = !isBlueprintsWorld();
+        final boolean isFortressGamemode = isFortressGamemode(interactionManager);
         if(isFortressGamemode && notBlueprintsWorld) {
             ci.cancel();
         }
@@ -39,7 +39,16 @@ public abstract class FortressItemEntityMixin extends Entity {
 
     @Inject(method = "tick", at =@At("RETURN"))
     void tickReturn(CallbackInfo ci) {
-        this.discard();
+        if(isBlueprintsWorld())
+            this.discard();
+    }
+
+    private boolean isFortressGamemode(ServerPlayerInteractionManager interactionManager) {
+        return interactionManager.getGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+    }
+
+    private boolean isBlueprintsWorld() {
+        return this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
     }
 
 }
