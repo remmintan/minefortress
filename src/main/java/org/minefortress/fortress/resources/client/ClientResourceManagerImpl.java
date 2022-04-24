@@ -3,74 +3,46 @@ package org.minefortress.fortress.resources.client;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import org.minefortress.fortress.resources.ItemInfo;
 
 import java.util.*;
 
 public class ClientResourceManagerImpl implements ClientResourceManager {
 
-    private final Map<ItemGroup, Map<Item, ItemStack>> resources = new HashMap<>();
+    private final StackGroupsManager groupManager = new StackGroupsManager();
 
     @Override
     public Set<ItemGroup> getGroups() {
-        return resources.keySet();
+        return groupManager.getGroups();
     }
 
     @Override
     public boolean hasStacks(List<ItemStack> stacks) {
         return stacks
                 .stream()
-                .map(this::getInfo)
                 .allMatch(it -> {
-                    final var item = it.item();
-                    final var group = getGroup(item);
-                    final var itemStack = resources.get(group).get(item);
+                    final var item = it.getItem();
+                    final var group = groupManager.getGroup(item);
+                    final var itemStack = groupManager.getStcksManager(group).getStack(item);
                     if(itemStack == null) return false;
-                    return itemStack.getCount() >= it.amount();
+                    return itemStack.getCount() >= it.getCount();
                 });
-    }
-
-    private ItemInfo getInfo(ItemStack stack) {
-        return new ItemInfo(stack.getItem(), stack.getCount());
     }
 
     @Override
     public List<ItemStack> getStacks(ItemGroup group) {
-        return new ArrayList<>(getStacksForGroup(group).values());
+        return groupManager.getStacksFromGroup(group);
     }
 
     @Override
     public void setItemAmount(Item item, int amount) {
-        final var group = this.getGroup(item);
-        final var stacksForGroup = getStacksForGroup(group);
-        if(amount > 0) {
-            stacksForGroup.put(item, new FortressItemStack(item, amount));
-        } else {
-            stacksForGroup.remove(item);
-        }
-
-        if(stacksForGroup.isEmpty()) {
-            resources.remove(group);
-        }
+        final var group = groupManager.getGroup(item);
+        final var manager = groupManager.getStcksManager(group);
+        manager.getStack(item).setCount(amount);
     }
 
     @Override
     public void reset() {
-        resources.clear();
-    }
-
-    private ItemGroup getGroup(Item item) {
-        for (ItemGroup group : ItemGroup.GROUPS) {
-            if(item.isIn(group)) {
-                return group;
-            }
-        }
-
-        throw new IllegalArgumentException("Item " + item + " is not in any group");
-    }
-
-    private Map<Item, ItemStack> getStacksForGroup(ItemGroup group) {
-        return resources.computeIfAbsent(group, k -> new HashMap<>());
+        groupManager.clear();
     }
 
 }
