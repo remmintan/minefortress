@@ -3,11 +3,9 @@ package org.minefortress.entity.ai.controls;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.loot.context.LootContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Hand;
@@ -16,11 +14,6 @@ import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.AbstractFortressManager;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.ServerResourceManager;
-
-import java.util.List;
-import java.util.Optional;
 
 public class DigControl extends PositionedActionControl {
 

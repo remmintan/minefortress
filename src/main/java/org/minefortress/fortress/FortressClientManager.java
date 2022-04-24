@@ -9,15 +9,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.resources.ClientResourceManager;
-import org.minefortress.fortress.resources.ClientResourceManagerImpl;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
+import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.ServerboundSetGamemodePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ClientProfessionManager;
-import org.minefortress.professions.ProfessionManager;
 import org.minefortress.tasks.BuildingManager;
 
 import java.util.*;

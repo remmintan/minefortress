@@ -1,8 +1,9 @@
-package org.minefortress.fortress.resources;
+package org.minefortress.fortress.resources.client;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import org.minefortress.fortress.resources.ItemInfo;
 
 import java.util.*;
 

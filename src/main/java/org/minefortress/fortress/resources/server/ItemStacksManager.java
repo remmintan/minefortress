@@ -1,13 +1,14 @@
-package org.minefortress.fortress.resources;
+package org.minefortress.fortress.resources.server;
 
 import net.minecraft.item.Item;
+import org.minefortress.fortress.resources.ItemInfo;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ItemStacksManager {
+class ItemStacksManager {
 
     private final Map<Item, EasyItemStack> stacks = new HashMap<>();
 
