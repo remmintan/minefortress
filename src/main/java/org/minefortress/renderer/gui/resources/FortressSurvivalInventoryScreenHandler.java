@@ -4,7 +4,6 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -12,7 +11,7 @@ import net.minecraft.screen.slot.Slot;
 public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScreen.CreativeScreenHandler {
 
     private static final String CUSTOM_FORTRESS_SURVIVAL_LOCK_KEY = "CustomCreativeLock";
-    private final Inventory INVENTORY  = new SimpleInventory(45);
+    private final Inventory INVENTORY  = new FortressSimpleInventory(45);
 
     private final ScreenHandler parent;
 
