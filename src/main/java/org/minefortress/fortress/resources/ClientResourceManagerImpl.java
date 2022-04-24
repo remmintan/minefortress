@@ -43,7 +43,7 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
         final var group = this.getGroup(item);
         final var stacksForGroup = getStacksForGroup(group);
         if(amount > 0) {
-            stacksForGroup.put(item, new ItemStack(item, amount));
+            stacksForGroup.put(item, new FortressItemStack(item, amount));
         } else {
             stacksForGroup.remove(item);
         }
@@ -51,6 +51,11 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
         if(stacksForGroup.isEmpty()) {
             resources.remove(group);
         }
+    }
+
+    @Override
+    public void reset() {
+        resources.clear();
     }
 
     private ItemGroup getGroup(Item item) {
