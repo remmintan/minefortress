@@ -1,10 +1,11 @@
-package org.minefortress.fortress.resources;
+package org.minefortress.fortress.resources.server;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.network.ClientboundSyncItemsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;

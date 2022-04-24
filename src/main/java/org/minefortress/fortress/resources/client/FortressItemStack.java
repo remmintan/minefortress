@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources;
+package org.minefortress.fortress.resources.client;
 
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;

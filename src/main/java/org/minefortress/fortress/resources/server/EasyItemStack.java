@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources;
+package org.minefortress.fortress.resources.server;
 
 class EasyItemStack {
 

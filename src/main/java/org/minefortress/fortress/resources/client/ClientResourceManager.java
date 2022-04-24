@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources;
+package org.minefortress.fortress.resources.client;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;

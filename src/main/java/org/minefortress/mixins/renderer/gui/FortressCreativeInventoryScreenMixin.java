@@ -27,7 +27,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.fortress.resources.ClientResourceManager;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
 import org.spongepowered.asm.mixin.Final;
