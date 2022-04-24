@@ -32,7 +32,7 @@ public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScr
             }
         }
         for (i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 9 + i * 18, 112));
+            this.addSlot(new FortressPlayerInvSlot(playerInventory, i, 9 + i * 18, 112));
         }
 
         this.scrollItems(0.0f);
@@ -140,6 +140,19 @@ public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScr
         @Override
         public int getMaxItemCount(ItemStack stack) {
             return 10000;
+        }
+    }
+
+    static class FortressPlayerInvSlot extends Slot {
+
+        public FortressPlayerInvSlot(Inventory inventory, int index, int x, int y) {
+            super(inventory, index, x, y);
+        }
+
+        @Override
+        public ItemStack insertStack(ItemStack stack, int count) {
+            if(!super.getStack().isEmpty()) return ItemStack.EMPTY;
+            return super.insertStack(new ItemStack(stack.getItem()), 1);
         }
     }
 
