@@ -25,7 +25,7 @@ class StackGroupsManager {
     Set<ItemGroup> getGroups() {
         return groups.entrySet()
                 .stream()
-                .filter(e -> e.getValue().isEmpty())
+                .filter(e -> !e.getValue().isEmpty())
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
     }
@@ -36,6 +36,7 @@ class StackGroupsManager {
 
     ItemGroup getGroup(Item item) {
         for (ItemGroup group : ItemGroup.GROUPS) {
+            if(group == ItemGroup.SEARCH) continue;
             if(item.isIn(group)) {
                 return group;
             }
