@@ -93,7 +93,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
         }
 
         tag.put("resources", stacks);
-        this.resources.clear();
+//        this.resources.clear();
     }
 
     @Override
