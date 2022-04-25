@@ -4,8 +4,10 @@ import com.chocohead.mm.api.ClassTinkerers;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.network.Packet;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
@@ -20,6 +22,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
@@ -56,9 +59,9 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
 
     @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
-        if(client.interactionManager != null && client.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+        final var fortressClient = getFortressClient();
+        if(fortressClient.isFortressGamemode()){
             if(client.options.keySprint.isPressed()) {
-                final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
                 final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
                 if(clientBlueprintManager.hasSelectedBlueprint()) {
                     clientBlueprintManager.rotateSelectedStructureCounterClockwise();
@@ -69,6 +72,18 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
                 cir.setReturnValue(false);
             }
         }
+    }
+
+    @Redirect(method = "dropSelectedItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/network/Packet;)V"))
+    void sendDropPacket(ClientPlayNetworkHandler instance, Packet<?> packet) {
+        final var fortressClient = getFortressClient();
+        if (fortressClient.isNotFortressGamemode() || !fortressClient.getFortressClientManager().isSurvival()) {
+            instance.sendPacket(packet);
+        }
+    }
+
+    private FortressMinecraftClient getFortressClient() {
+        return (FortressMinecraftClient) this.client;
     }
 
 }
