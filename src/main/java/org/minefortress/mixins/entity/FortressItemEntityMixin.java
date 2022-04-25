@@ -5,22 +5,25 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.minefortress.blueprints.world.BlueprintsWorld;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemEntity.class)
 public abstract class FortressItemEntityMixin extends Entity {
 
     @Shadow private int itemAge;
+
+    @Shadow public abstract ItemStack getStack();
 
     public FortressItemEntityMixin(EntityType<?> type, World world) {
         super(type, world);
@@ -39,8 +42,24 @@ public abstract class FortressItemEntityMixin extends Entity {
 
     @Inject(method = "tick", at =@At("RETURN"))
     void tickReturn(CallbackInfo ci) {
-        if(isBlueprintsWorld())
+        if(isBlueprintsWorld()) {
             this.discard();
+            return;
+        }
+
+        if(!this.world.isClient) {
+            final var closestPlayer = this.world.getClosestPlayer(this, 100.0D);
+            if(closestPlayer != null) {
+                final var fortressServerPlayer = (FortressServerPlayerEntity) closestPlayer;
+                if(fortressServerPlayer.isFortressSurvival()) {
+                    final var fortressServerManager = fortressServerPlayer.getFortressServerManager();
+                    final var resourceManager = fortressServerManager.getServerResourceManager();
+                    final var stack = this.getStack();
+                    resourceManager.addItem(stack.getItem(), stack.getCount());
+                    this.discard();
+                }
+            }
+        }
     }
 
     private boolean isFortressGamemode(ServerPlayerInteractionManager interactionManager) {

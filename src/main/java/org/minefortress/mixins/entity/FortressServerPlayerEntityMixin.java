@@ -38,6 +38,7 @@ import java.util.UUID;
 @Mixin(ServerPlayerEntity.class)
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
 
+    private final GameMode fortressGamemode = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
     private UUID fortressUUID = UUID.randomUUID();
 
     private Vec3d persistedPos;
@@ -152,7 +153,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Redirect(method = "moveToSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/SpawnLocating;findOverworldSpawn(Lnet/minecraft/server/world/ServerWorld;IIZ)Lnet/minecraft/util/math/BlockPos;"))
     public BlockPos moveToSpawnFindOverworldSpawn(ServerWorld world, int x, int z, boolean validSpawnNeeded) {
         final BlockPos actualSpawn = FortressSpawnLocating.findOverworldSpawn(world, x, z, validSpawnNeeded);
-        if(actualSpawn != null && this.server.getDefaultGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")){
+        if(actualSpawn != null && this.server.getDefaultGameMode() == fortressGamemode) {
             return actualSpawn.up(20);
         } else {
             return actualSpawn;
@@ -162,5 +163,11 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Override
     public TaskManager getTaskManager() {
         return this.taskManager;
+    }
+
+    @Override
+    public boolean isFortressSurvival() {
+        return interactionManager != null && interactionManager.getGameMode() == fortressGamemode &&
+                fortressServerManager.isSurvival();
     }
 }
