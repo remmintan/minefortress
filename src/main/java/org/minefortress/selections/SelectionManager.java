@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressWorldRenderer;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
+import org.minefortress.utils.BlockUtils;
 
 import java.util.*;
 
@@ -77,11 +78,15 @@ public class SelectionManager implements FortressWorldRenderer {
             if(clickType == ClickType.BUILD && clickingBlockState != null) {
                 final var clientManager = ((FortressMinecraftClient) client).getFortressClientManager();
                 if(clientManager.isSurvival()){
-                    final var blocksAmount = this.selection.getSelection().size();
-                    final var item = clickingBlockState.getBlock().asItem();
-                    final var resourceManager = clientManager.getResourceManager();
-                    final var itemStack = new ItemStack(item, blocksAmount);
-                    inCorrectState = resourceManager.hasStacks(Collections.singletonList(itemStack));
+                    if(BlockUtils.isCountableBlock(clickingBlockState)) {
+                        final var blocksAmount = this.selection.getSelection().size();
+                        final var item = clickingBlockState.getBlock().asItem();
+                        final var resourceManager = clientManager.getResourceManager();
+                        final var itemStack = new ItemStack(item, blocksAmount);
+                        inCorrectState = resourceManager.hasStacks(Collections.singletonList(itemStack));
+                    } else {
+                        inCorrectState = true;
+                    }
                 } else {
                     inCorrectState = true;
                 }
