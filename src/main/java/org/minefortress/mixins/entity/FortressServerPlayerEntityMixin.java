@@ -38,6 +38,7 @@ import java.util.UUID;
 @Mixin(ServerPlayerEntity.class)
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
 
+    private final GameMode fortressGamemode = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
     private UUID fortressUUID = UUID.randomUUID();
 
     private Vec3d persistedPos;
@@ -162,5 +163,11 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Override
     public TaskManager getTaskManager() {
         return this.taskManager;
+    }
+
+    @Override
+    public boolean isFortressSurvival() {
+        return interactionManager != null && interactionManager.getGameMode() == fortressGamemode &&
+                fortressServerManager.isSurvival();
     }
 }

@@ -12,5 +12,6 @@ public interface FortressServerPlayerEntity {
     FortressServerManager getFortressServerManager();
     ServerBlueprintManager getServerBlueprintManager();
     TaskManager getTaskManager();
+    boolean isFortressSurvival();
 
 }
