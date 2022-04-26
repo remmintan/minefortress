@@ -4,10 +4,13 @@ package org.minefortress;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.block.Blocks;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.resources.craft.FortressCraftingScreenHandler;
 import org.minefortress.network.*;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -18,6 +21,9 @@ import org.minefortress.registries.FortressItems;
 public class MineFortressMod implements ModInitializer {
 
     public static final String MOD_ID = "minefortress";
+
+    private static final Identifier FORTRESS_CRAFTING_HANDLER = new Identifier(MOD_ID, "fortress_crafting_handler");
+    public static final ScreenHandlerType<FortressCraftingScreenHandler> FORTRESS_CRAFTING_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(FORTRESS_CRAFTING_HANDLER, FortressCraftingScreenHandler::new);
 
     @Override
     public void onInitialize() {
@@ -41,5 +47,6 @@ public class MineFortressMod implements ModInitializer {
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, ServerboundChangeProfessionStatePacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SET_GAMEMODE, ServerboundSetGamemodePacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SET_TICKS_SPEED, ServerboundSetTickSpeedPacket::new);
+        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, ServerboundOpenCraftingScreenPacket::new);
     }
 }
