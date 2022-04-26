@@ -22,8 +22,8 @@ public class MineFortressMod implements ModInitializer {
 
     public static final String MOD_ID = "minefortress";
 
-    private static final Identifier FORTRESS_CRAFTING_HANDLER = new Identifier(MOD_ID, "fortress_crafting_handler");
-    public static final ScreenHandlerType<FortressCraftingScreenHandler> FORTRESS_CRAFTING_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(FORTRESS_CRAFTING_HANDLER, FortressCraftingScreenHandler::new);
+    private static final Identifier FORTRESS_CRAFTING_SCREEN_HANDLER_ID = new Identifier(MOD_ID, "fortress_crafting_handler");
+    public static final ScreenHandlerType<FortressCraftingScreenHandler> FORTRESS_CRAFTING_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(FORTRESS_CRAFTING_SCREEN_HANDLER_ID, FortressCraftingScreenHandler::new);
 
     @Override
     public void onInitialize() {
