@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.HungerConstants;
@@ -24,6 +25,8 @@ import java.util.Optional;
 public class ColonistsGui extends FortressGuiScreen{
 
     private final FortressItemButtonWidget professionsButton;
+    private final FortressItemButtonWidget inventoryButton;
+    private final FortressItemButtonWidget craftingButton;
 
     private int colonistsCount = 0;
     private boolean hovered;
@@ -34,10 +37,28 @@ public class ColonistsGui extends FortressGuiScreen{
         this.professionsButton = new FortressItemButtonWidget(
                 0,
                 0,
-                Items.CRAFTING_TABLE,
+                Items.PLAYER_HEAD,
                 itemRenderer,
                 btn -> client.setScreen(new ProfessionsScreen(getFortressClient())),
                 (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Manage professions"), mouseX, mouseY),
+                Text.of("")
+        );
+        this.inventoryButton = new FortressItemButtonWidget(
+                0,
+                0,
+                Items.CHEST,
+                itemRenderer,
+                btn -> client.setScreen(new CreativeInventoryScreen(client.player)),
+                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Inventory"), mouseX, mouseY),
+                Text.of("")
+        );
+        this.craftingButton = new FortressItemButtonWidget(
+                0,
+                0,
+                Items.CRAFTING_TABLE,
+                itemRenderer,
+                btn -> {},
+                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Crafting"), mouseX, mouseY),
                 Text.of("")
         );
     }
@@ -63,6 +84,12 @@ public class ColonistsGui extends FortressGuiScreen{
 
         this.professionsButton.setPos(screenWidth / 2 - 91 + 35, screenHeight - 43);
         this.professionsButton.render(matrices, (int)mouseX, (int)mouseY, delta);
+
+        this.inventoryButton.setPos(screenWidth / 2 - 91 + 35 + 20, screenHeight - 43);
+        this.inventoryButton.render(matrices, (int)mouseX, (int)mouseY, delta);
+
+        this.craftingButton.setPos(screenWidth / 2 - 91 + 35 + 40, screenHeight - 43);
+        this.craftingButton.render(matrices, (int)mouseX, (int)mouseY, delta);
     }
 
     private void renderSelectedColonistInfo(MatrixStack matrices, TextRenderer font, int screenHeight, FortressClientManager fortressManager) {
@@ -146,13 +173,19 @@ public class ColonistsGui extends FortressGuiScreen{
 
     @Override
     boolean isHovered() {
-        return this.hovered || this.professionsButton.isHovered();
+        return this.hovered || this.professionsButton.isHovered() || this.inventoryButton.isHovered() || this.craftingButton.isHovered();
     }
 
     @Override
     void onClick(double mouseX, double mouseY) {
         if(this.professionsButton.isHovered()) {
             this.professionsButton.onClick(mouseX, mouseY);
+        }
+        if (this.inventoryButton.isHovered()) {
+            this.inventoryButton.onClick(mouseX, mouseY);
+        }
+        if (this.craftingButton.isHovered()) {
+            this.craftingButton.onClick(mouseX, mouseY);
         }
     }
 }
