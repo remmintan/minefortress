@@ -60,7 +60,6 @@ public class TaskManager {
     public void addTask(Task task, FortressServerManager manager) {
         task.prepareTask();
         if(task.hasAvailableParts()) {
-
             if(task instanceof SimpleSelectionTask simpleSelectionTask) {
                 if(manager.isSurvival() && task.getTaskType() == TaskType.BUILD) {
                     final var spliterator = simpleSelectionTask

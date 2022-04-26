@@ -75,7 +75,7 @@ public class SelectionManager implements FortressWorldRenderer {
             this.selection.update(pickedPos, upSelectionDelta);
             this.setNeedsUpdate(true);
 
-            if(clickType == ClickType.BUILD && clickingBlockState != null) {
+            if((clickType == ClickType.BUILD || clickType == ClickType.ROADS)&& clickingBlockState != null) {
                 final var clientManager = ((FortressMinecraftClient) client).getFortressClientManager();
                 if(clientManager.isSurvival()){
                     if(BlockUtils.isCountableBlock(clickingBlockState)) {

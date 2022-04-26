@@ -1,5 +1,6 @@
 package org.minefortress.network;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
@@ -7,6 +8,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.tasks.RoadsTask;
@@ -46,16 +49,19 @@ public class ServerboundRoadsTaskPacket implements FortressServerPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final FortressServerPlayerEntity fortressPlayer = (FortressServerPlayerEntity) player;
-        final TaskManager taskManager = fortressPlayer.getTaskManager();
+        final var fortressPlayer = (FortressServerPlayerEntity) player;
+        final var taskManager = fortressPlayer.getTaskManager();
         final var fortressServerManager = fortressPlayer.getFortressServerManager();
-        final ItemStack itemInHand = player.getStackInHand(Hand.MAIN_HAND);
-        final RoadsTask buildTask = new RoadsTask(placeUuid, TaskType.BUILD, blocks, itemInHand.getItem());
-        final Runnable onDigComplete = () -> {
-            taskManager.addTask(buildTask, fortressServerManager);
-        };
+        final var serverResourceManager = fortressServerManager.getServerResourceManager();
+        final var itemInHand = player.getStackInHand(Hand.MAIN_HAND);
+        final var item = itemInHand.getItem();
+        final var buildTask = new RoadsTask(placeUuid, TaskType.BUILD, blocks, item);
+        final Runnable onDigComplete = () -> taskManager.addTask(buildTask, fortressServerManager);
 
-        final RoadsTask digTask = new RoadsTask(digUuid, TaskType.REMOVE, blocks, null, onDigComplete);
+        if(fortressServerManager.isSurvival())
+            serverResourceManager.reserveItems(placeUuid, Collections.singletonList(new ItemInfo(item, blocks.size())));
+
+        final var digTask = new RoadsTask(digUuid, TaskType.REMOVE, blocks, null, onDigComplete);
         taskManager.addTask(digTask, fortressServerManager);
     }
 }
