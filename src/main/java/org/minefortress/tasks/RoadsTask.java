@@ -1,7 +1,6 @@
 package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -73,14 +72,14 @@ public class RoadsTask implements Task {
 
         Pair<BlockPos, BlockPos> partStartAndEnd = Pair.of(first, last);
 
-        final List<TaskBlockInfo> collect = partBlocks.stream().map(pos -> {
+        final List<TaskBlockInfo> blocks = partBlocks.stream().map(pos -> {
             if (Objects.isNull(item)) {
                 return new DigTaskBlockInfo(pos);
             } else {
                 return new BlockStateTaskBlockInfo(item, pos, BlockUtils.getBlockStateFromItem(item));
             }
         }).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-        return new TaskPart(partStartAndEnd, collect, this);
+        return new TaskPart(partStartAndEnd, blocks, this);
     }
 
     @Override

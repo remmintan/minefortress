@@ -63,6 +63,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
     @Override
     public void returnReservedItems(UUID taskId) {
+        if(!reservedResources.containsKey(taskId)) return;
         final var manager = this.getManagerFromTaskId(taskId);
 
         final var infosToSync = new ArrayList<ItemInfo>();
