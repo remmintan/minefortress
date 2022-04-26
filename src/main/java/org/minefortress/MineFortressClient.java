@@ -3,9 +3,11 @@ package org.minefortress;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.minecraft.client.world.ClientWorld;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.entity.renderer.ColonistRenderer;
+import org.minefortress.fortress.resources.craft.FortressCraftingScreen;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.*;
@@ -14,6 +16,8 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressKeybindings;
 import org.minefortress.tasks.ClientTasksHolder;
+
+import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
 
 public class MineFortressClient implements ClientModInitializer {
 
@@ -44,6 +48,8 @@ public class MineFortressClient implements ClientModInitializer {
                 }
             }
         });
+
+        ScreenRegistry.register(FORTRESS_CRAFTING_SCREEN_HANDLER, FortressCraftingScreen::new);
 
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FINISH_TASK, ClientboundTaskExecutedPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_MANAGER_SYNC, ClientboundSyncFortressManagerPacket::new);
