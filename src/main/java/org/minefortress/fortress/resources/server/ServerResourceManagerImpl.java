@@ -1,5 +1,6 @@
 package org.minefortress.fortress.resources.server;
 
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -55,6 +56,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
     @Override
     public void removeReservedItem(UUID taskId, Item item) {
+        if(!(item instanceof BlockItem)) return;
         if(!hasReservedItem(taskId, item)) throw new IllegalStateException("Item not reserved " + item.getName().asString());
         this.getManagerFromTaskId(taskId).getStack(item).decrease();
     }
@@ -123,6 +125,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     private boolean hasItems(List<ItemInfo> infos) {
         for(ItemInfo info : infos) {
             final var item = info.item();
+            if(item == Items.FLINT_AND_STEEL || item == Items.WATER_BUCKET || item == Items.LAVA_BUCKET) continue;
             final var amount = info.amount();
             final var stack = resources.getStack(item);
             if(!stack.hasEnough(amount)) return false;
