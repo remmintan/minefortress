@@ -16,6 +16,9 @@ import net.minecraft.text.Text;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.ServerboundOpenCraftingScreenPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.Profession;
 import org.minefortress.renderer.gui.professions.ProfessionsScreen;
 import org.minefortress.renderer.gui.widget.FortressItemButtonWidget;
@@ -57,7 +60,7 @@ public class ColonistsGui extends FortressGuiScreen{
                 0,
                 Items.CRAFTING_TABLE,
                 itemRenderer,
-                btn -> {},
+                btn -> FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket()),
                 (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Crafting"), mouseX, mouseY),
                 Text.of("")
         );
