@@ -10,7 +10,7 @@ import java.util.Map;
 
 class ClientItemStacksManager {
 
-    private Map<Item, FortressItemStack> stacks = new HashMap<>();
+    private final Map<Item, FortressItemStack> stacks = new HashMap<>();
 
     public FortressItemStack getStack(Item item) {
         return stacks.computeIfAbsent(item, i -> new FortressItemStack(i, 0));
@@ -21,7 +21,7 @@ class ClientItemStacksManager {
     }
 
     List<ItemStack> getStacks() {
-        return new ArrayList<>(stacks.values());
+        return new ArrayList<>(stacks.values().stream().filter(it -> !it.isEmpty()).toList());
     }
 
 }
