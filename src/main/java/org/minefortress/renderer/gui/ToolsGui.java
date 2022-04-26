@@ -57,7 +57,7 @@ public class ToolsGui extends FortressGuiScreen {
         this.blueprints = new FortressBlueprintsButtonWidget(
                 0,
                 0,
-                Items.BOOK,
+                Items.OAK_DOOR,
                 itemRenderer,
                 btn -> {
                     if(blueprintSelected(fortressClient)) {
