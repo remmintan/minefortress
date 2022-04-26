@@ -43,24 +43,9 @@ public class DigControl extends PositionedActionControl {
 
         if(destroyProgress >= 1.0f){
             this.destroyProgress = 0f;
-
-            final var blockState = level.getBlockState(goal);
-            final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(goal, blockState) : null;
-            final var drop = Block.getDroppedStacks(blockState, level, goal, blockEntity);
-
+            addDropToTheResourceManager(level, goal, colonist);
             level.breakBlock(this.goal, false, this.colonist);
             level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, goal);
-            colonist.doActionOnMasterPlayer(p -> {
-                final var fortressServerManager = p.getFortressServerManager();
-                if(fortressServerManager.isSurvival()) {
-                    final var serverResourceManager = fortressServerManager.getServerResourceManager();
-                    for (ItemStack itemStack : drop) {
-                        final var item = itemStack.getItem();
-                        final var count = itemStack.getCount();
-                        serverResourceManager.addItem(item, count);
-                    }
-                }
-            });
             return true;
         } else {
             this.destroyProgress += this.getDestroyProgress(level.getBlockState(goal), colonist, level, goal);
@@ -70,6 +55,24 @@ public class DigControl extends PositionedActionControl {
             }
             return false;
         }
+    }
+
+    public static void addDropToTheResourceManager(ServerWorld w, BlockPos g, Colonist c) {
+        final var blockState = w.getBlockState(g);
+        final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(g, blockState) : null;
+        final var drop = Block.getDroppedStacks(blockState, w, g, blockEntity);
+
+        c.doActionOnMasterPlayer(p -> {
+            final var fortressServerManager = p.getFortressServerManager();
+            if(fortressServerManager.isSurvival()) {
+                final var serverResourceManager = fortressServerManager.getServerResourceManager();
+                for (ItemStack itemStack : drop) {
+                    final var item = itemStack.getItem();
+                    final var count = itemStack.getCount();
+                    serverResourceManager.addItem(item, count);
+                }
+            }
+        });
     }
 
     private void putProperItemInHand() {
