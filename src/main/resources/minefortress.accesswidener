@@ -29,3 +29,4 @@ accessible field net/minecraft/screen/ScreenHandler revision I
 accessible field net/minecraft/screen/ScreenHandler cursorStack Lnet/minecraft/item/ItemStack;
 accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeBook Lnet/minecraft/client/recipebook/ClientRecipeBook;
 accessible method net/minecraft/recipe/InputSlotFiller canReturnInputs ()Z
+accessible method net/minecraft/screen/CraftingScreenHandler updateResult (Lnet/minecraft/screen/ScreenHandler;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/inventory/CraftingInventory;Lnet/minecraft/inventory/CraftingResultInventory;)V

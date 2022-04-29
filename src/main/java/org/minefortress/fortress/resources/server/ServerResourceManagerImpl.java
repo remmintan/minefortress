@@ -127,7 +127,10 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
     @Override
     public List<ItemStack> getAllItems() {
-        return resources.getAll().stream().map(it -> (ItemStack)new FortressItemStack(it.item(), it.amount())).toList();
+        return resources.getAll().stream()
+                .filter(info -> info.amount() > 0)
+                .map(it -> (ItemStack)new FortressItemStack(it.item(), it.amount()))
+                .toList();
     }
 
     private boolean hasItems(List<ItemInfo> infos) {
