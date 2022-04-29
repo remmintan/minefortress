@@ -29,11 +29,10 @@ public class FortressRecipeBookWidget extends RecipeBookWidget {
                 });
 
         this.recipeBook = new ClientRecipeBook();
-        this.recipeBook.reload(new ArrayList<>(craftingRecipes));
         this.recipeBook.setGuiOpen(this.craftingScreenHandler.getCategory(), true);
+        this.recipeBook.reload(new ArrayList<>(craftingRecipes));
         super.initialize(parentWidth, parentHeight, client, narrow, craftingScreenHandler);
         this.setOpen(true);
-
     }
 
     public void update() {
