@@ -14,5 +14,6 @@ public interface ClientResourceManager {
     List<ItemStack> getStacks(ItemGroup group);
     void setItemAmount(Item item, int amount);
     void reset();
+    List<ItemStack> getAllStacks();
 
 }
