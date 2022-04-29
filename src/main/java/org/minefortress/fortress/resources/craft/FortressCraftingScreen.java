@@ -2,17 +2,17 @@ package org.minefortress.fortress.resources.craft;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
+import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.minefortress.fortress.resources.client.FortressItemStack;
 
-import java.util.List;
-
-public class FortressCraftingScreen extends HandledScreen<FortressCraftingScreenHandler> {
+public class FortressCraftingScreen extends HandledScreen<FortressCraftingScreenHandler>
+implements RecipeBookProvider
+{
 
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/crafting_table.png");
     private boolean narrow;
@@ -70,5 +70,15 @@ public class FortressCraftingScreen extends HandledScreen<FortressCraftingScreen
     public void removed() {
         this.recipeBook.close();
         super.removed();
+    }
+
+    @Override
+    public void refreshRecipeBook() {
+        recipeBook.refresh();
+    }
+
+    @Override
+    public RecipeBookWidget getRecipeBookWidget() {
+        return recipeBook;
     }
 }

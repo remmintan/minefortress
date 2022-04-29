@@ -147,6 +147,11 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         CraftingScreenHandler.updateResult(this, world, this.player, this.input, this.result);
     }
 
+    @Override
+    public void close(PlayerEntity player) {
+        super.close(player);
+    }
+
     public void scrollItems(float position) {
         final var items = this.serverResourceManager.getAllItems();
         int i = (items.size() + 9 - 1) / 9 - 4;
