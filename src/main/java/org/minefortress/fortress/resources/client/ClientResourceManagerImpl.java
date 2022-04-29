@@ -45,4 +45,9 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
         groupManager.clear();
     }
 
+    @Override
+    public List<ItemStack> getAllStacks() {
+        return groupManager.getGroups().stream().flatMap(it -> groupManager.getStacksFromGroup(it).stream()).toList();
+    }
+
 }
