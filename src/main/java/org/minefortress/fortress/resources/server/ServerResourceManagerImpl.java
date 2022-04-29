@@ -2,11 +2,13 @@ package org.minefortress.fortress.resources.server;
 
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.network.ClientboundSyncItemsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -121,6 +123,11 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     @Override
     public void tick(ServerPlayerEntity player) {
         synchronizer.sync(player);
+    }
+
+    @Override
+    public List<ItemStack> getAllItems() {
+        return resources.getAll().stream().map(it -> (ItemStack)new FortressItemStack(it.item(), it.amount())).toList();
     }
 
     private boolean hasItems(List<ItemInfo> infos) {

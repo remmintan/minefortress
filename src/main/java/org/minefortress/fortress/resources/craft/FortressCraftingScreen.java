@@ -32,13 +32,6 @@ public class FortressCraftingScreen extends HandledScreen<FortressCraftingScreen
         this.x = this.recipeBook.findLeftEdge(this.width, this.backgroundWidth);
         this.addSelectableChild(this.recipeBook);
         this.setInitialFocus(this.recipeBook);
-
-
-        this.handler.setItems(List.of(
-                new FortressItemStack(Items.DIRT, 32)
-        ));
-        this.handler.scrollItems(0f);
-
         this.titleX = 29;
     }
 
