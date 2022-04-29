@@ -69,7 +69,7 @@ public class DigControl extends PositionedActionControl {
                 for (ItemStack itemStack : drop) {
                     final var item = itemStack.getItem();
                     final var count = itemStack.getCount();
-                    serverResourceManager.addItem(item, count);
+                    serverResourceManager.increaseItemAmount(item, count);
                 }
             }
         });

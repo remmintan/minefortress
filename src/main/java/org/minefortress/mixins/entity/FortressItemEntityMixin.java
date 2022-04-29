@@ -55,7 +55,7 @@ public abstract class FortressItemEntityMixin extends Entity {
                     final var fortressServerManager = fortressServerPlayer.getFortressServerManager();
                     final var resourceManager = fortressServerManager.getServerResourceManager();
                     final var stack = this.getStack();
-                    resourceManager.addItem(stack.getItem(), stack.getCount());
+                    resourceManager.increaseItemAmount(stack.getItem(), stack.getCount());
                     this.discard();
                 }
             }

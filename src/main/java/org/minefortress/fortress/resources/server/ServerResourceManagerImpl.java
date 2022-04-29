@@ -28,7 +28,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     }
 
     @Override
-    public void addItem(Item item, int amount) {
+    public void increaseItemAmount(Item item, int amount) {
         final var stack = resources.getStack(item);
         stack.increaseBy(amount);
 
