@@ -4,19 +4,19 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.CraftingResultInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
+import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
-
-import java.util.List;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
 
@@ -28,6 +28,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     private final World world;
     private final SimpleInventory screenInventory = new SimpleInventory(36);;
     private final ServerResourceManager serverResourceManager;
+    private final PlayerEntity player;
 
     public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, null);
@@ -36,7 +37,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory, ServerResourceManager resourceManager) {
         super(FORTRESS_CRAFTING_SCREEN_HANDLER, syncId);
         this.serverResourceManager = resourceManager;
-        final var player = inventory.player;
+        this.player = inventory.player;
         this.world = player.world;
         
         this.addSlot(new CraftingResultSlot(player, this.input, this.result, 0, 124, 35));
@@ -112,8 +113,38 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
 
     @Override
     public ItemStack transferSlot(PlayerEntity player, int index) {
-        if(index != 0) return ItemStack.EMPTY;
-        return super.transferSlot(player, index);
+        ItemStack itemStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+        if (slot.hasStack()) {
+            ItemStack itemStack2 = slot.getStack();
+            itemStack = itemStack2.copy();
+            if (index == 0) {
+                if (!this.insertItem(itemStack2, 10, 46, true)) {
+                    return ItemStack.EMPTY;
+                }
+                slot.onQuickTransfer(itemStack2, itemStack);
+            } else if (index >= 10 && index < 46 ? !this.insertItem(itemStack2, 1, 10, false) && (index < 37 ? !this.insertItem(itemStack2, 37, 46, false) : !this.insertItem(itemStack2, 10, 37, false)) : !this.insertItem(itemStack2, 10, 46, false)) {
+                return ItemStack.EMPTY;
+            }
+            if (itemStack2.isEmpty()) {
+                slot.setStack(ItemStack.EMPTY);
+            } else {
+                slot.markDirty();
+            }
+            if (itemStack2.getCount() == itemStack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+            slot.onTakeItem(player, itemStack2);
+            if (index == 0) {
+                player.dropItem(itemStack2, false);
+            }
+        }
+        return itemStack;
+    }
+
+    @Override
+    public void onContentChanged(Inventory inventory) {
+        CraftingScreenHandler.updateResult(this, world, this.player, this.input, this.result);
     }
 
     public void scrollItems(float position) {
