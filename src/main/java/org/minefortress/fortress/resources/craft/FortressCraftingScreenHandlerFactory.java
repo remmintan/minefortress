@@ -22,7 +22,6 @@ public class FortressCraftingScreenHandlerFactory implements NamedScreenHandlerF
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         FortressServerPlayerEntity fortressPlayer = (FortressServerPlayerEntity) player;
         final var serverResourceManager = fortressPlayer.getFortressServerManager().getServerResourceManager();
-
-        return new FortressCraftingScreenHandler(syncId, inv);
+        return new FortressCraftingScreenHandler(syncId, inv, serverResourceManager);
     }
 }

@@ -26,16 +26,15 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     private final CraftingResultInventory result = new CraftingResultInventory();
 
     private final World world;
-    private final SimpleInventory screenInventory;
+    private final SimpleInventory screenInventory = new SimpleInventory(36);;
     private final ServerResourceManager serverResourceManager;
 
     public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, new SimpleInventory(36), null);
+        this(syncId, inventory, null);
     }
 
-    public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory, SimpleInventory screeInventory, ServerResourceManager resourceManager) {
+    public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory, ServerResourceManager resourceManager) {
         super(FORTRESS_CRAFTING_SCREEN_HANDLER, syncId);
-        this.screenInventory = screeInventory;
         this.serverResourceManager = resourceManager;
         final var player = inventory.player;
         this.world = player.world;
@@ -48,11 +47,11 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         }
         for (int row = 0; row < 3; ++row) {
             for (int column = 0; column < 9; ++column) {
-                this.addSlot(new Slot(screeInventory, column + row * 9 + 9, 8 + column * 18, 84 + row * 18));
+                this.addSlot(new Slot(this.screenInventory, column + row * 9 + 9, 8 + column * 18, 84 + row * 18));
             }
         }
         for (int column = 0; column < 9; ++column) {
-            this.addSlot(new Slot(screeInventory, column, 8 + column * 18, 142));
+            this.addSlot(new Slot(this.screenInventory, column, 8 + column * 18, 142));
         }
 
         if(this.serverResourceManager != null) {
