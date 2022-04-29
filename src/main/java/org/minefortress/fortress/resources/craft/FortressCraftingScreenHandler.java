@@ -17,8 +17,10 @@ import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
+import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.interfaces.FortressSimpleInventory;
 
 import java.util.Collections;
 import java.util.List;
@@ -50,19 +52,19 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         this.player = inventory.player;
         this.world = player.world;
         
-        this.addSlot(new CraftingResultSlot(player, this.input, this.result, 0, 124, 35));
+        this.addSlot(new FortressCraftingResultSlot(player, this.input, this.result, 0, 124, 35));
         for (int row = 0; row < 3; ++row) {
             for (int column = 0; column < 3; ++column) {
-                this.addSlot(new Slot(this.input, column + row * 3, 30 + column * 18, 17 + row * 18));
+                this.addSlot(new FortressSlot(this.input, column + row * 3, 30 + column * 18, 17 + row * 18));
             }
         }
         for (int row = 0; row < 3; ++row) {
             for (int column = 0; column < 9; ++column) {
-                this.addSlot(new Slot(this.screenInventory, column + row * 9 + 9, 8 + column * 18, 84 + row * 18));
+                this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + row * 9 + 9, 8 + column * 18, 84 + row * 18));
             }
         }
         for (int column = 0; column < 9; ++column) {
-            this.addSlot(new Slot(this.screenInventory, column, 8 + column * 18, 142));
+            this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column, 8 + column * 18, 142));
         }
 
         if(this.serverResourceManager != null) {
@@ -133,7 +135,8 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
         if (slot.hasStack()) {
-            ItemStack itemStack2 = slot.getStack();
+            final var stack = slot.getStack();
+            ItemStack itemStack2 = new FortressItemStack(stack.getItem(), stack.getCount());
             itemStack = itemStack2.copy();
             if (index == 0) {
                 if (!this.insertItem(itemStack2, 10, 46, true)) {
@@ -221,5 +224,85 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
 
     public SimpleInventory getScreenInventory() {
         return screenInventory;
+    }
+
+    private static class FortressSlot extends Slot {
+
+        public FortressSlot(Inventory inventory, int index, int x, int y) {
+            super(inventory, index, x, y);
+        }
+
+        @Override
+        public int getMaxItemCount(ItemStack stack) {
+            return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public int getMaxItemCount() {
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    private static final class FortressNotInsertableSlot extends FortressSlot {
+        public FortressNotInsertableSlot(Inventory inventory, int index, int x, int y) {
+            super(inventory, index, x, y);
+        }
+
+        @Override
+        public ItemStack insertStack(ItemStack stack, int count) {
+            if (stack.isEmpty() || !this.canInsert(stack)) {
+                return stack;
+            }
+            ItemStack itemStack = this.getStack();
+            if (itemStack.isEmpty()) {
+                if(this.inventory instanceof FortressSimpleInventory fortressSimpleInventory) {
+                    final var i = fortressSimpleInventory.indexOf(stack);
+                    if(i != -1) {
+                        this.inventory.getStack(i).increment(count);
+                        stack.decrement(count);
+                    } else {
+                        final var split = stack.split(count);
+                        this.setStack(split);
+                    }
+                }
+            } else if (ItemStack.canCombine(itemStack, stack)) {
+                itemStack.increment(count);
+                this.setStack(itemStack);
+                stack.decrement(count);
+            }
+            return stack;
+        }
+    }
+
+    private static final class FortressCraftingResultSlot extends CraftingResultSlot {
+
+        public FortressCraftingResultSlot(PlayerEntity player, CraftingInventory input, Inventory inventory, int index, int x, int y) {
+            super(player, input, inventory, index, x, y);
+        }
+
+        @Override
+        public int getMaxItemCount(ItemStack stack) {
+            return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public int getMaxItemCount() {
+            return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public ItemStack insertStack(ItemStack stack) {
+            if (stack.isEmpty() || !this.canInsert(stack)) {
+                return stack;
+            }
+            ItemStack itemStack = this.getStack();
+            if (itemStack.isEmpty()) {
+                this.setStack(stack);
+            } else if (ItemStack.canCombine(itemStack, stack)) {
+                itemStack.increment(stack.getCount());
+                this.setStack(itemStack);
+            }
+            return stack;
+        }
     }
 }

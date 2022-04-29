@@ -11,6 +11,19 @@ public class FortressItemStack extends ItemStack {
 
     @Override
     public int getMaxCount() {
-        return 10000;
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public ItemStack copy() {
+        if (this.isEmpty()) {
+            return EMPTY;
+        }
+        ItemStack itemStack = new FortressItemStack(this.getItem(), this.getCount());
+        itemStack.setCooldown(this.getCooldown());
+        if (this.getNbt() != null) {
+            itemStack.setNbt(this.getNbt().copy());
+        }
+        return itemStack;
     }
 }
