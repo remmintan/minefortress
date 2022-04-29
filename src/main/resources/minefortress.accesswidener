@@ -28,3 +28,4 @@ extendable  class   net/minecraft/item/ItemStack
 accessible field net/minecraft/screen/ScreenHandler revision I
 accessible field net/minecraft/screen/ScreenHandler cursorStack Lnet/minecraft/item/ItemStack;
 accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeBook Lnet/minecraft/client/recipebook/ClientRecipeBook;
+accessible method net/minecraft/recipe/InputSlotFiller canReturnInputs ()Z

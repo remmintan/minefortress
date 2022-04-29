@@ -4,7 +4,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.CraftingResultInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
@@ -13,8 +12,9 @@ import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 
 import java.util.List;
 
@@ -25,13 +25,18 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     private final CraftingInventory input = new CraftingInventory(this, 3, 3);
     private final CraftingResultInventory result = new CraftingResultInventory();
 
-    private final DefaultedList<ItemStack> items = DefaultedList.of();
-    private final Inventory tableInventory = new SimpleInventory(46);
-
     private final World world;
+    private final SimpleInventory screenInventory;
+    private final ServerResourceManager serverResourceManager;
 
     public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory) {
+        this(syncId, inventory, new SimpleInventory(36), null);
+    }
+
+    public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory, SimpleInventory screeInventory, ServerResourceManager resourceManager) {
         super(FORTRESS_CRAFTING_SCREEN_HANDLER, syncId);
+        this.screenInventory = screeInventory;
+        this.serverResourceManager = resourceManager;
         final var player = inventory.player;
         this.world = player.world;
         
@@ -43,11 +48,15 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         }
         for (int row = 0; row < 3; ++row) {
             for (int column = 0; column < 9; ++column) {
-                this.addSlot(new Slot(tableInventory, column + row * 9 + 9, 8 + column * 18, 84 + row * 18));
+                this.addSlot(new Slot(screeInventory, column + row * 9 + 9, 8 + column * 18, 84 + row * 18));
             }
         }
         for (int column = 0; column < 9; ++column) {
-            this.addSlot(new Slot(tableInventory, column, 8 + column * 18, 142));
+            this.addSlot(new Slot(screeInventory, column, 8 + column * 18, 142));
+        }
+
+        if(this.serverResourceManager != null) {
+            this.scrollItems(0f);
         }
     }
 
@@ -115,7 +124,8 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     }
 
     public void scrollItems(float position) {
-        int i = (this.items.size() + 9 - 1) / 9 - 5;
+        final var items = this.serverResourceManager.getAllItems();
+        int i = (items.size() + 9 - 1) / 9 - 5;
         int j = (int)((double)(position * (float)i) + 0.5);
         if (j < 0) {
             j = 0;
@@ -123,18 +133,21 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         for (int k = 0; k < 5; ++k) {
             for (int l = 0; l < 9; ++l) {
                 int m = l + (k + j) * 9;
-                if (m >= 0 && m < this.items.size()) {
-                    tableInventory.setStack(l + k * 9, this.items.get(m));
+                if (m >= 0 && m < items.size()) {
+                    screenInventory.setStack(l + k * 9, items.get(m));
                     continue;
                 }
-                tableInventory.setStack(l + k * 9, ItemStack.EMPTY);
+                screenInventory.setStack(l + k * 9, ItemStack.EMPTY);
             }
         }
     }
 
-    public void setItems(List<ItemStack> items) {
-        this.items.clear();
-        this.items.addAll(items);
+    @Override
+    public void fillInputSlots(boolean craftAll, Recipe<?> recipe, ServerPlayerEntity player) {
+        new FortressInputSlotFiller(this).fillInputSlots(player, (Recipe<CraftingInventory>) recipe, craftAll);
     }
 
+    public SimpleInventory getScreenInventory() {
+        return screenInventory;
+    }
 }

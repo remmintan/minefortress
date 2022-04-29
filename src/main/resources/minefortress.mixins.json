@@ -10,7 +10,7 @@
     "network.FortressClientPlayNetworkHandlerMixin",
     "renderer.FortressFluidRendererMixin",
     "renderer.gui.FortressCreativeInventoryScreenMixin",
-    "renderer.gui.FortressSimpleInventory"
+    "renderer.gui.FortressSimpleInventoryMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",

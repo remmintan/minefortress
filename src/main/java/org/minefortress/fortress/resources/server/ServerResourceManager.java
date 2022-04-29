@@ -1,6 +1,7 @@
 package org.minefortress.fortress.resources.server;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -18,5 +19,7 @@ public interface ServerResourceManager {
     void write(NbtCompound tag);
     void read(NbtCompound tag);
     void tick(ServerPlayerEntity player);
+
+    List<ItemStack> getAllItems();
 
 }
