@@ -29,25 +29,25 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
     }
 
     public void fillInputSlots(ServerPlayerEntity entity, @Nullable Recipe<CraftingInventory> recipe, boolean craftAll) {
-        if (recipe == null || !entity.getRecipeBook().contains(recipe)) {
+        if (recipe == null) {
             return;
         }
 
-            this.inventory = handler.getScreenInventory();
+        this.inventory = handler.getScreenInventory();
 
-            if (!this.canReturnInputs() && !entity.isCreative()) {
-                return;
-            }
-            this.matcher.clear();
-            ((FortressSimpleInventory)handler.getScreenInventory()).populateRecipeFinder(this.matcher);
-            this.handler.populateRecipeFinder(this.matcher);
-            if (this.matcher.match(recipe, null)) {
-                this.fillInputSlots(recipe, craftAll);
-            } else {
-                this.returnInputs();
-                entity.networkHandler.sendPacket(new CraftFailedResponseS2CPacket(entity.currentScreenHandler.syncId, recipe));
-            }
-            handler.getScreenInventory().markDirty();
+        if (!this.canReturnInputs() && !entity.isCreative()) {
+            return;
+        }
+        this.matcher.clear();
+        ((FortressSimpleInventory)handler.getScreenInventory()).populateRecipeFinder(this.matcher);
+        this.handler.populateRecipeFinder(this.matcher);
+        if (this.matcher.match(recipe, null)) {
+            this.fillInputSlots(recipe, craftAll);
+        } else {
+            this.returnInputs();
+            entity.networkHandler.sendPacket(new CraftFailedResponseS2CPacket(entity.currentScreenHandler.syncId, recipe));
+        }
+        handler.getScreenInventory().markDirty();
     }
 
     private void returnInputs() {

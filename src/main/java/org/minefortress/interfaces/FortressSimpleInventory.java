@@ -12,5 +12,6 @@ public interface FortressSimpleInventory extends Inventory {
     int getOccupiedSlotWithRoomForStack(ItemStack stack);
     int indexOf(ItemStack stack);
     void populateRecipeFinder(RecipeMatcher recipeMatcher);
+    int getChangeCount();
 
 }
