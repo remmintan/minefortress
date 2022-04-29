@@ -6,6 +6,7 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeMatcher;
@@ -17,6 +18,12 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
 
@@ -29,6 +36,9 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     private final SimpleInventory screenInventory = new SimpleInventory(36);;
     private final ServerResourceManager serverResourceManager;
     private final PlayerEntity player;
+
+    private final List<ItemStack> allItems;
+    private final Map<Item, Integer> allItemsBeforeEdit;
 
     public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, null);
@@ -56,7 +66,14 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         }
 
         if(this.serverResourceManager != null) {
+            this.allItems = Collections.unmodifiableList(this.serverResourceManager.getAllItems());
+            this.allItemsBeforeEdit = this.allItems.stream()
+                    .map(ItemStack::copy)
+                    .collect(Collectors.toUnmodifiableMap(ItemStack::getItem, ItemStack::getCount));
             this.scrollItems(0f);
+        } else {
+            this.allItems = Collections.emptyList();
+            this.allItemsBeforeEdit = Collections.emptyMap();
         }
     }
 
@@ -150,10 +167,36 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     @Override
     public void close(PlayerEntity player) {
         super.close(player);
+        if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
+            final var fortressServerManager = fortressServerPlayer.getFortressServerManager();
+            final var serverResourceManager = fortressServerManager.getServerResourceManager();
+
+            final var itemsAfterEdit = this.screenInventory
+                    .clearToList()
+                    .stream()
+                    .collect(Collectors.toUnmodifiableMap(ItemStack::getItem, ItemStack::getCount));
+
+            for(var itemEntry : itemsAfterEdit.entrySet()) {
+                final var item = itemEntry.getKey();
+                final var countAfterEdit = itemEntry.getValue();
+                if(allItemsBeforeEdit.containsKey(item)) {
+                    final var countBeforeEdit = allItemsBeforeEdit.get(item);
+                    serverResourceManager.increaseItemAmount(item, countAfterEdit - countBeforeEdit);
+                } else {
+                    serverResourceManager.increaseItemAmount(item, countAfterEdit);
+                }
+            }
+
+            for(var item : allItemsBeforeEdit.keySet()) {
+                if(!itemsAfterEdit.containsKey(item)) {
+                    serverResourceManager.increaseItemAmount(item, -allItemsBeforeEdit.get(item));
+                }
+            }
+        }
     }
 
     public void scrollItems(float position) {
-        final var items = this.serverResourceManager.getAllItems();
+        final var items = this.allItems;
         int i = (items.size() + 9 - 1) / 9 - 4;
         int j = (int)((double)(position * (float)i) + 0.5);
         if (j < 0) {
