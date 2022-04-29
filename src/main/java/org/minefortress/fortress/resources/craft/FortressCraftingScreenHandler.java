@@ -116,20 +116,14 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         return super.transferSlot(player, index);
     }
 
-    @Override
-    public void updateSlotStacks(int revision, List<ItemStack> stacks, ItemStack cursorStack) {
-        this.cursorStack = cursorStack;
-        this.revision = revision;
-    }
-
     public void scrollItems(float position) {
         final var items = this.serverResourceManager.getAllItems();
-        int i = (items.size() + 9 - 1) / 9 - 5;
+        int i = (items.size() + 9 - 1) / 9 - 4;
         int j = (int)((double)(position * (float)i) + 0.5);
         if (j < 0) {
             j = 0;
         }
-        for (int k = 0; k < 5; ++k) {
+        for (int k = 0; k < 4; ++k) {
             for (int l = 0; l < 9; ++l) {
                 int m = l + (k + j) * 9;
                 if (m >= 0 && m < items.size()) {
