@@ -45,7 +45,12 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
 
     @Override
     public int indexOf(ItemStack stack) {
-        return this.stacks.indexOf(stack);
+        if(stack == null || stack.isEmpty()) return -1;
+        return this.stacks.stream()
+                .filter(it -> it.getItem() == stack.getItem())
+                .findFirst()
+                .map(this.stacks::indexOf)
+                .orElse(-1);
     }
 
     @Override
