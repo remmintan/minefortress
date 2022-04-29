@@ -26,7 +26,7 @@ public abstract class FortressPlayerInventoryMixin {
             final var resourceManager = fortressClientManager.getResourceManager();
             final var allStacks = resourceManager.getAllStacks();
             finder.clear();
-            allStacks.forEach(it -> finder.addInput(it, 10000));
+            allStacks.forEach(it -> finder.addInput(it, Integer.MAX_VALUE));
             ci.cancel();
         }
     }
