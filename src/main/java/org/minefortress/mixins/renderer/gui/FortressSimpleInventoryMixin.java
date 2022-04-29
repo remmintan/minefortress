@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.util.collection.DefaultedList;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -15,7 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.List;
 
 @Mixin(SimpleInventory.class)
-public abstract class FortressSimpleInventoryMixin implements Inventory, FortressSimpleInventory {
+public abstract class FortressSimpleInventoryMixin implements FortressSimpleInventory {
 
     @Shadow @Final private DefaultedList<ItemStack> stacks;
 
@@ -24,7 +25,7 @@ public abstract class FortressSimpleInventoryMixin implements Inventory, Fortres
         if(getFortressMinecraftClient().isFortressGamemode() && isNotCreative())
             return 10000;
         else
-            return Inventory.super.getMaxCountPerStack();
+            return FortressSimpleInventory.super.getMaxCountPerStack();
     }
 
     @Override
@@ -45,6 +46,13 @@ public abstract class FortressSimpleInventoryMixin implements Inventory, Fortres
     @Override
     public int indexOf(ItemStack stack) {
         return this.stacks.indexOf(stack);
+    }
+
+    @Override
+    public void populateRecipeFinder(RecipeMatcher recipeMatcher) {
+        for (ItemStack itemStack : this.stacks) {
+            recipeMatcher.addInput(itemStack, 10000);
+        }
     }
 
     private MinecraftClient getClient() {
