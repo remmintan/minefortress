@@ -174,6 +174,8 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
             final var fortressServerManager = fortressServerPlayer.getFortressServerManager();
             final var serverResourceManager = fortressServerManager.getServerResourceManager();
 
+            new FortressInputSlotFiller(this).returnInputs();
+
             final var itemsAfterEdit = this.screenInventory
                     .clearToList()
                     .stream()

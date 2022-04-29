@@ -50,7 +50,9 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
         handler.getScreenInventory().markDirty();
     }
 
-    private void returnInputs() {
+    public void returnInputs() {
+        if(this.inventory == null)
+            this.inventory = handler.getScreenInventory();
         for (int i = 0; i < this.handler.getCraftingSlotCount(); ++i) {
             if (!this.handler.canInsertIntoSlot(i)) continue;
             ItemStack itemStack = this.handler.getSlot(i).getStack().copy();
