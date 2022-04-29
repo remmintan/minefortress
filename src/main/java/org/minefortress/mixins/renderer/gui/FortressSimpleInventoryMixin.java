@@ -12,11 +12,16 @@ import org.minefortress.interfaces.FortressSimpleInventory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
 @Mixin(SimpleInventory.class)
 public abstract class FortressSimpleInventoryMixin implements FortressSimpleInventory {
+
+    private int changeCount = 0;
 
     @Shadow @Final private DefaultedList<ItemStack> stacks;
 
@@ -58,6 +63,16 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
         for (ItemStack itemStack : this.stacks) {
             recipeMatcher.addInput(itemStack, 10000);
         }
+    }
+
+    @Override
+    public int getChangeCount() {
+        return this.changeCount;
+    }
+
+    @Inject(method = "markDirty", at = @At("RETURN"))
+    public void markDirty(CallbackInfo ci) {
+        changeCount++;
     }
 
     private MinecraftClient getClient() {
