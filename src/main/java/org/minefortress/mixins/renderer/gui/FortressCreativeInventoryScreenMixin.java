@@ -42,6 +42,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 @Mixin(CreativeInventoryScreen.class)
 public abstract class FortressCreativeInventoryScreenMixin extends AbstractInventoryScreen<CreativeInventoryScreen.CreativeScreenHandler> {
@@ -60,7 +61,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     @Shadow private @Nullable Slot deleteItemSlot;
     @Shadow @Final private static Text DELETE_ITEM_SLOT_TEXT;
     @Shadow private boolean scrolling;
-    @Shadow @Final private Map<Identifier, Tag<Item>> searchResultTags;
+    @Shadow @Final private Set<Tag<Item>> searchResultTags;
 
     @Shadow protected abstract void searchForTags(String id2);
 

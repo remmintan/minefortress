@@ -20,7 +20,7 @@ public class FortressItemStack extends ItemStack {
             return EMPTY;
         }
         ItemStack itemStack = new FortressItemStack(this.getItem(), this.getCount());
-        itemStack.setCooldown(this.getCooldown());
+        itemStack.setBobbingAnimationTime(this.getBobbingAnimationTime());
         if (this.getNbt() != null) {
             itemStack.setNbt(this.getNbt().copy());
         }
