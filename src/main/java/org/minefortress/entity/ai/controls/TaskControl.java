@@ -117,4 +117,8 @@ public class TaskControl {
         return blocks.next();
     }
 
+    public boolean isBlueprintTask() {
+        return task instanceof BlueprintTask;
+    }
+
 }
