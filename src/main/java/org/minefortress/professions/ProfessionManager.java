@@ -184,7 +184,7 @@ public abstract class ProfessionManager {
             entry(
                     "crafter",
                     new Profession(
-                            "Crafter",
+                            "Craftsman",
                             Items.CRAFTING_TABLE,
                             "Can craft any item that doesn't need smelting.\nCan't use redstone or nether blocks/items",
                             "Build crafting table to unlock",
@@ -354,6 +354,10 @@ public abstract class ProfessionManager {
 
     public Profession getProfession(String name) {
         return professions.get(name);
+    }
+
+    public boolean hasProfession(String name) {
+        return professions.containsKey(name) && professions.get(name).getAmount() > 0;
     }
 
     /**
