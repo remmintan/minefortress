@@ -91,8 +91,15 @@ public class ColonistsGui extends FortressGuiScreen{
         this.inventoryButton.setPos(screenWidth / 2 - 91 + 35 + 20, screenHeight - 43);
         this.inventoryButton.render(matrices, (int)mouseX, (int)mouseY, delta);
 
-        this.craftingButton.setPos(screenWidth / 2 - 91 + 35 + 40, screenHeight - 43);
-        this.craftingButton.render(matrices, (int)mouseX, (int)mouseY, delta);
+
+        if(isSurvival()) {
+            this.craftingButton.setPos(screenWidth / 2 - 91 + 35 + 40, screenHeight - 43);
+            this.craftingButton.render(matrices, (int)mouseX, (int)mouseY, delta);
+        }
+    }
+
+    private boolean isSurvival() {
+        return getFortressClient().isFortressGamemode() && getFortressClientManager().isSurvival();
     }
 
     private void renderSelectedColonistInfo(MatrixStack matrices, TextRenderer font, int screenHeight, FortressClientManager fortressManager) {
