@@ -3,7 +3,12 @@ package org.minefortress.renderer.gui.blueprints.handler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import net.minecraft.util.BlockRotation;
+import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
+import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundEditBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -46,7 +51,9 @@ public final class BlueprintScreenHandler {
     }
 
     public void scroll(float scrollPosition) {
-        final List<BlueprintMetadata> allBlueprint = fortressClient.getBlueprintManager().getAllBlueprints(selectedGroup);
+        final var blueprintManager = fortressClient.getBlueprintManager();
+        final var resourceManager = fortressClient.getFortressClientManager().getResourceManager();
+        final List<BlueprintMetadata> allBlueprint = blueprintManager.getAllBlueprints(selectedGroup);
         this.totalSize = allBlueprint.size();
         this.currentSlots = new ArrayList<>();
 
@@ -60,7 +67,10 @@ public final class BlueprintScreenHandler {
                 int m = column + (row + skippedRows) * 9;
                 if (m >= 0 && m < this.totalSize) {
                     final BlueprintMetadata blueprintMetadata = allBlueprint.get(m);
-                    this.currentSlots.add(new BlueprintSlot(blueprintMetadata));
+                    final var blockData = blueprintManager.getBlockDataManager().getBlockData(blueprintMetadata.getFile(), BlockRotation.NONE);
+                    final var stacks = blockData.getStacks();
+                    final var hasEnoughItems = resourceManager.hasItems(stacks);
+                    this.currentSlots.add(new BlueprintSlot(blueprintMetadata, hasEnoughItems, blockData));
                 }
             }
         }

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
@@ -16,6 +17,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
+import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
@@ -53,14 +57,14 @@ public final class BlueprintsScreen extends Screen {
     protected void init() {
         if(this.client != null) {
             this.client.keyboard.setRepeatEvents(true);
-            final ClientPlayerInteractionManager interactionManager = this.client.interactionManager;
-            if(interactionManager != null && interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+
+            if(client instanceof FortressMinecraftClient fortressClient && fortressClient.isFortressGamemode()) {
                 super.init();
                 this.x = (this.width - backgroundWidth - previewWidth - previewOffset) / 2;
                 this.y = (this.height - backgroundHeight) / 2;
 
                 this.handler = new BlueprintScreenHandler(this.client);
-                this.blueprintRenderer = ((FortressMinecraftClient)this.client).getBlueprintRenderer();
+                this.blueprintRenderer = fortressClient.getBlueprintRenderer();
             } else {
                 this.client.setScreen(null);
             }
@@ -177,10 +181,22 @@ public final class BlueprintsScreen extends Screen {
             this.drawSlot(blueprintSlot, slotColumn, slotRow);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
+            final var fortressClient = (FortressMinecraftClient) this.client;
+            final var fortressClientManager = fortressClient.getFortressClientManager();
+            final var resourceManager = fortressClientManager.getResourceManager();
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(matrices, slotX, slotY, this.getZOffset());
 
             this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
+            final var stacks = blueprintSlot.getBlockData().getStacks();
+            for (int i1 = 0; i1 < stacks.size(); i1++) {
+                final ItemInfo stack = stacks.get(i1);
+                final var hasItem = resourceManager.hasItem(stack);
+                final var itemX = this.x + this.backgroundWidth + this.previewOffset + i1 * 38;
+                final var itemY = this.y + this.backgroundHeight;
+                itemRenderer.renderInGui(new ItemStack(stack.item()), itemX, itemY);
+                this.textRenderer.draw(matrices, "x"+stack.amount(), itemX + 20, itemY + 1, hasItem?0xFFFFFF:0xFF0000);
+            }
         }
 
         this.drawForeground(matrices);
@@ -270,8 +286,9 @@ public final class BlueprintsScreen extends Screen {
 
         RenderSystem.enableDepthTest();
         final BlueprintMetadata metadata = slot.getMetadata();
+        final var enoughResources = slot.isEnoughResources();
         if(this.client != null){
-            this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow);
+            this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
         }
 
         if(client instanceof FortressMinecraftClient fortressClient){

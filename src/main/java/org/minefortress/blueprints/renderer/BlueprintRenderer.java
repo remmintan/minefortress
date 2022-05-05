@@ -78,10 +78,10 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         final float y = -60f * scaleFactor;
         final float z = 45f * scaleFactor;
 
-        renderBlueprintInGui(builtBlueprint, scale, x, y, z);
+        renderBlueprintInGui(builtBlueprint, scale, x, y, z, true);
     }
 
-    public void renderBlueprintInGui(String fileName, BlockRotation blockRotation, int slotColumn, int slotRow) {
+    public void renderBlueprintInGui(String fileName, BlockRotation blockRotation, int slotColumn, int slotRow, boolean isEnoughResources) {
         final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
 
         final Vec3i size = builtBlueprint.getSize();
@@ -93,14 +93,14 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         final float y = -17f * scaleFactor - 11.25f * slotRow  * scaleFactor / 1.25f;
         final float z = 22f * scaleFactor;
 
-        renderBlueprintInGui(builtBlueprint, scale, x, y, z);
+        renderBlueprintInGui(builtBlueprint, scale, x, y, z, isEnoughResources);
     }
 
     public BlueprintsModelBuilder getBlueprintsModelBuilder() {
         return blueprintsModelBuilder;
     }
 
-    private void renderBlueprintInGui(BuiltBlueprint builtBlueprint, float scale, float x, float y, float z) {
+    private void renderBlueprintInGui(BuiltBlueprint builtBlueprint, float scale, float x, float y, float z, boolean isEnoughResources) {
         super.client.getProfiler().push("blueprint_render_model");
         DiffuseLighting.enableGuiDepthLighting();
 
@@ -115,11 +115,10 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         matrices.scale(scale, -scale, scale);
         matrices.translate(cameraMove.getX(), cameraMove.getY(), cameraMove.getZ());
 
-        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f);
-        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f);
-        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f);
-        this.renderLayer(RenderLayer.getTranslucent(), builtBlueprint, matrices, projectionMatrix4f);
-
+        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
+        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
+        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
+        this.renderLayer(RenderLayer.getTranslucent(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
 
         matrices.pop();
         super.client.getProfiler().pop();
@@ -165,7 +164,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         matrices.multiply(pitchSceneRotation);
     }
 
-    private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices, Matrix4f matrix4f) {
+    private void renderLayer(RenderLayer renderLayer, BuiltBlueprint builtBlueprint, MatrixStack matrices, Matrix4f matrix4f, boolean isEnoughResources) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
 
         renderLayer.startDrawing();
@@ -186,7 +185,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
             shader.projectionMat.set(matrix4f);
         }
         if (shader.colorModulator != null) {
-            shader.colorModulator.set(new Vec3f(1F, 1.0F, 1F));
+            shader.colorModulator.set(isEnoughResources?CORRECT_PLACEMENT_COLOR:WRONG_PLACEMENT_COLOR);
         }
         if (shader.fogStart != null) {
             shader.fogStart.set(RenderSystem.getShaderFogStart());
