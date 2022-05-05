@@ -181,21 +181,23 @@ public final class BlueprintsScreen extends Screen {
             this.drawSlot(blueprintSlot, slotColumn, slotRow);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
-            final var fortressClient = (FortressMinecraftClient) this.client;
-            final var fortressClientManager = fortressClient.getFortressClientManager();
+            final FortressClientManager fortressClientManager = getFortressClientManager();
             final var resourceManager = fortressClientManager.getResourceManager();
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(matrices, slotX, slotY, this.getZOffset());
 
             this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
-            final var stacks = blueprintSlot.getBlockData().getStacks();
-            for (int i1 = 0; i1 < stacks.size(); i1++) {
-                final ItemInfo stack = stacks.get(i1);
-                final var hasItem = resourceManager.hasItem(stack);
-                final var itemX = this.x + this.backgroundWidth + this.previewOffset + i1 * 38;
-                final var itemY = this.y + this.backgroundHeight;
-                itemRenderer.renderInGui(new ItemStack(stack.item()), itemX, itemY);
-                this.textRenderer.draw(matrices, "x"+stack.amount(), itemX + 20, itemY + 1, hasItem?0xFFFFFF:0xFF0000);
+
+            if(fortressClientManager.isSurvival()) {
+                final var stacks = blueprintSlot.getBlockData().getStacks();
+                for (int i1 = 0; i1 < stacks.size(); i1++) {
+                    final ItemInfo stack = stacks.get(i1);
+                    final var hasItem = resourceManager.hasItem(stack);
+                    final var itemX = this.x + this.backgroundWidth + this.previewOffset + i1 * 38;
+                    final var itemY = this.y + this.backgroundHeight;
+                    itemRenderer.renderInGui(new ItemStack(stack.item()), itemX, itemY);
+                    this.textRenderer.draw(matrices, "x"+stack.amount(), itemX + 20, itemY + 1, hasItem?0xFFFFFF:0xFF0000);
+                }
             }
         }
 
@@ -220,6 +222,11 @@ public final class BlueprintsScreen extends Screen {
 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+    }
+
+    private FortressClientManager getFortressClientManager() {
+        final var fortressClient = (FortressMinecraftClient) this.client;
+        return fortressClient.getFortressClientManager();
     }
 
     @Override
@@ -286,7 +293,7 @@ public final class BlueprintsScreen extends Screen {
 
         RenderSystem.enableDepthTest();
         final BlueprintMetadata metadata = slot.getMetadata();
-        final var enoughResources = slot.isEnoughResources();
+        final var enoughResources = !getFortressClientManager().isSurvival() || slot.isEnoughResources();
         if(this.client != null){
             this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
         }
