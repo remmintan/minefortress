@@ -10,6 +10,9 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
+import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundBlueprintTaskPacket;
@@ -32,6 +35,7 @@ public class ClientBlueprintManager {
 
     private BlueprintMetadata selectedStructure;
     private BlockPos blueprintBuildPos = null;
+    private boolean enoughResources = true;
     private boolean cantBuild = false;
 
     public ClientBlueprintManager(MinecraftClient client) {
@@ -46,12 +50,28 @@ public class ClientBlueprintManager {
         if(!hasSelectedBlueprint()) return;
         blueprintBuildPos = getSelectedPos();
         if(blueprintBuildPos == null) return;
+        checkNotEnoughResources();
         checkCantBuild();
     }
 
+    private void checkNotEnoughResources() {
+        final var fortressClient = (FortressMinecraftClient) this.client;
+        final var fortressClientManager = fortressClient.getFortressClientManager();
+        if(fortressClientManager.isSurvival()) {
+            final var resourceManager = fortressClientManager.getResourceManager();
+            final var stacks = getBlockData().getStacks();
+            enoughResources = resourceManager.hasItems(stacks);
+        } else {
+            enoughResources = true;
+        }
+    }
+
     private void checkCantBuild() {
-        final BlueprintBlockData blockData = blockDataManager
-                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
+        if(!enoughResources) {
+            cantBuild = true;
+            return;
+        }
+        final BlueprintBlockData blockData = getBlockData();
         final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL)
                 .entrySet()
                 .stream()
@@ -76,6 +96,11 @@ public class ClientBlueprintManager {
         cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
     }
 
+    private BlueprintBlockData getBlockData() {
+        return blockDataManager
+                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
+    }
+
     @Nullable
     private BlockPos getSelectedPos() {
         if(client.crosshairTarget instanceof final BlockHitResult crosshairTarget) {
@@ -90,8 +115,7 @@ public class ClientBlueprintManager {
         if(selectedStructure == null) return pos;
 
         final boolean posSolid = !BuildingManager.doesNotHaveCollisions(client.world, pos);
-        final BlueprintBlockData blockData = blockDataManager
-                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
+        final BlueprintBlockData blockData = getBlockData();
         final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
         BlockPos movedPos = pos.subtract(halfSize);
@@ -126,8 +150,7 @@ public class ClientBlueprintManager {
         UUID taskId = UUID.randomUUID();
         final FortressClientWorld world = (FortressClientWorld) client.world;
         if(world != null) {
-            final BlueprintBlockData blockData = blockDataManager
-                    .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
+            final BlueprintBlockData blockData = getBlockData();
             final Map<BlockPos, BlockState> structureData = blockData
                     .getLayer(BlueprintDataLayer.GENERAL);
             final int floorLevel = selectedStructure.getFloorLevel();
