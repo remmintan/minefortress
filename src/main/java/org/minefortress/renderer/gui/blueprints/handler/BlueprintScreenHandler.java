@@ -4,11 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
-import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundEditBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -52,7 +48,8 @@ public final class BlueprintScreenHandler {
 
     public void scroll(float scrollPosition) {
         final var blueprintManager = fortressClient.getBlueprintManager();
-        final var resourceManager = fortressClient.getFortressClientManager().getResourceManager();
+        final var fortressClientManager = fortressClient.getFortressClientManager();
+        final var resourceManager = fortressClientManager.getResourceManager();
         final List<BlueprintMetadata> allBlueprint = blueprintManager.getAllBlueprints(selectedGroup);
         this.totalSize = allBlueprint.size();
         this.currentSlots = new ArrayList<>();
@@ -68,9 +65,13 @@ public final class BlueprintScreenHandler {
                 if (m >= 0 && m < this.totalSize) {
                     final BlueprintMetadata blueprintMetadata = allBlueprint.get(m);
                     final var blockData = blueprintManager.getBlockDataManager().getBlockData(blueprintMetadata.getFile(), BlockRotation.NONE);
-                    final var stacks = blockData.getStacks();
-                    final var hasEnoughItems = resourceManager.hasItems(stacks);
-                    this.currentSlots.add(new BlueprintSlot(blueprintMetadata, hasEnoughItems, blockData));
+                    if(fortressClientManager.isSurvival()) {
+                        final var stacks = blockData.getStacks();
+                        final var hasEnoughItems = resourceManager.hasItems(stacks);
+                        this.currentSlots.add(new BlueprintSlot(blueprintMetadata, hasEnoughItems, blockData));
+                    } else {
+                        this.currentSlots.add(new BlueprintSlot(blueprintMetadata, true, blockData));
+                    }
                 }
             }
         }
@@ -108,6 +109,7 @@ public final class BlueprintScreenHandler {
 
     public void clickOnFocusedSlot() {
         if(focusedSlot == null) return;
+        if(!focusedSlot.isEnoughResources()) return;
         fortressClient.getBlueprintManager().select(focusedSlot.getMetadata());
     }
 
@@ -117,10 +119,6 @@ public final class BlueprintScreenHandler {
 
     public Text getFocusedSlotName() {
         return this.focusedSlot.getTooltipText();
-    }
-
-    public BlueprintMetadata getFocusedSlotMetadata() {
-        return this.focusedSlot.getMetadata();
     }
 
 }
