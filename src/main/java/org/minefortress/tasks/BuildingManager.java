@@ -53,7 +53,8 @@ public class BuildingManager {
     public static boolean canRemoveBlock(World level, BlockState state, BlockPos pos) {
         return inWorldBounds(level, pos) &&
                 !isAirOrFluid(state) &&
-                !state.isOf(Blocks.BEDROCK);
+                !state.isOf(Blocks.BEDROCK) &&
+                !state.isOf(Blocks.BARRIER);
     }
 
     public static boolean canStayOnBlock(WorldAccess level, BlockPos pos) {
