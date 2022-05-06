@@ -110,6 +110,7 @@ public class ColonistExecuteTaskGoal extends Goal {
     private boolean blockInCorrectState(BlockPos pos) {
         if(pos == null) return false;
         if(getTaskControl().is(TaskType.REMOVE)) {
+            if(colonist.getFortressCenter().equals(pos)) return false;
             return BuildingManager.canRemoveBlock(world, pos);
         } else if(getTaskControl().is(TaskType.BUILD)) {
             return BuildingManager.canPlaceBlock(world, pos);
