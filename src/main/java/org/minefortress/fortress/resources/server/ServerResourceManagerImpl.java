@@ -24,6 +24,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
     public ServerResourceManagerImpl() {
         resources.getStack(Items.OAK_PLANKS).increaseBy(12);
+        resources.getStack(Items.CRAFTING_TABLE).increaseBy(1);
         this.syncAll();
     }
 
@@ -61,6 +62,13 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
         if(!(item instanceof BlockItem)) return;
         if(!hasReservedItem(taskId, item)) throw new IllegalStateException("Item not reserved " + item.getName().asString());
         this.getManagerFromTaskId(taskId).getStack(item).decrease();
+    }
+
+    @Override
+    public void removeItemIfExists(Item item) {
+        final var stack = resources.getStack(item);
+        if(stack.getAmount() <= 0) return;
+        stack.decrease();
     }
 
     @Override
