@@ -15,6 +15,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.resources.craft.MissingCraftsmanScreen;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundOpenCraftingScreenPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -60,7 +61,12 @@ public class ColonistsGui extends FortressGuiScreen{
                 0,
                 Items.CRAFTING_TABLE,
                 itemRenderer,
-                btn -> FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket()),
+                btn -> {
+                    if(hasCraftsmanInVillage())
+                        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket());
+                    else
+                        this.client.setScreen(new MissingCraftsmanScreen());
+                },
                 (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Crafting"), mouseX, mouseY),
                 Text.of("")
         );
@@ -197,5 +203,15 @@ public class ColonistsGui extends FortressGuiScreen{
         if (this.craftingButton.isHovered()) {
             this.craftingButton.onClick(mouseX, mouseY);
         }
+    }
+
+    private boolean hasCraftsmanInVillage() {
+        final var fortressClient = getClient();
+        final var clientManager = fortressClient.getFortressClientManager();
+        return fortressClient.isFortressGamemode() && clientManager.getProfessionManager().hasProfession("crafter");
+    }
+
+    private FortressMinecraftClient getClient() {
+        return (FortressMinecraftClient) MinecraftClient.getInstance();
     }
 }
