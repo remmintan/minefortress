@@ -14,6 +14,7 @@ public interface ServerResourceManager {
     void increaseItemAmount(Item item, int amount);
     void reserveItems(UUID uuid, List<ItemInfo> stacks);
     void removeReservedItem(UUID taskId, Item item);
+    void removeItemIfExists(Item item);
     void returnReservedItems(UUID taskId);
 
     void write(NbtCompound tag);

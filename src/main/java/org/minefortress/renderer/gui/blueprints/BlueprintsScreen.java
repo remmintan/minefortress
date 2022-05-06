@@ -186,19 +186,21 @@ public final class BlueprintsScreen extends Screen {
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(matrices, slotX, slotY, this.getZOffset());
 
-            this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
-
             if(fortressClientManager.isSurvival()) {
                 final var stacks = blueprintSlot.getBlockData().getStacks();
                 for (int i1 = 0; i1 < stacks.size(); i1++) {
                     final ItemInfo stack = stacks.get(i1);
                     final var hasItem = resourceManager.hasItem(stack);
-                    final var itemX = this.x + this.backgroundWidth + this.previewOffset + i1 * 38;
-                    final var itemY = this.y + this.backgroundHeight;
+                    final var itemX = this.x + this.backgroundWidth/2 + 25 + i1%4 * 30;
+                    final var itemY = i1/4 * 20 + this.backgroundHeight - (i>16 ? 20 : 0);
                     itemRenderer.renderInGui(new ItemStack(stack.item()), itemX, itemY);
-                    this.textRenderer.draw(matrices, "x"+stack.amount(), itemX + 20, itemY + 1, hasItem?0xFFFFFF:0xFF0000);
+                    this.textRenderer.draw(matrices, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000);
                 }
             }
+
+            this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
+
+
         }
 
         this.drawForeground(matrices);
