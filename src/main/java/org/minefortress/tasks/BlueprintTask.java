@@ -7,8 +7,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
@@ -18,7 +16,6 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressBedInfo;
 import org.minefortress.fortress.FortressBulding;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
@@ -96,31 +93,14 @@ public class BlueprintTask extends AbstractTask {
             blueprintEntityData.forEach((pos, state) -> {
                 world.setBlockState(pos.add(startingBlock), state, 3);
                 final var item = state.getBlock().asItem();
-                final var fortressManagerOpt = colonist.getFortressManager();
-                if(fortressManagerOpt.isPresent()) {
-                    final var fortressServerManager = fortressManagerOpt.get();
-                    if(fortressServerManager.isSurvival()) {
-                        if (BlueprintBlockData.IGNORED_ITEMS.contains(item)) {
-                            fortressServerManager
-                                    .getServerResourceManager()
-                                    .removeItemIfExists(item);
-                        } else {
-                            fortressServerManager
-                                    .getServerResourceManager()
-                                    .removeReservedItem(this.getId(), item);
-                        }
-                    }
-                }
+                removeReservedItem(colonist, item);
             });
 
             if(blueprintAutomaticData != null)
                 blueprintAutomaticData
                         .forEach((pos, state) -> {
                             world.setBlockState(pos.add(startingBlock), state, 3);
-                            colonist.doActionOnMasterPlayer(player -> player
-                                    .getFortressServerManager()
-                                    .getServerResourceManager()
-                                    .removeReservedItem(this.getId(), state.getBlock().asItem()));
+                            removeReservedItem(colonist, state.getBlock().asItem());
                         });
 
 
@@ -131,6 +111,24 @@ public class BlueprintTask extends AbstractTask {
             });
         }
         super.finishPart(part, colonist);
+    }
+
+    private void removeReservedItem(Colonist colonist, Item item) {
+        final var fortressManagerOpt = colonist.getFortressManager();
+        if(fortressManagerOpt.isPresent()) {
+            final var fortressServerManager = fortressManagerOpt.get();
+            if(fortressServerManager.isSurvival()) {
+                if (BlueprintBlockData.IGNORED_ITEMS.contains(item)) {
+                    fortressServerManager
+                            .getServerResourceManager()
+                            .removeItemIfExists(item);
+                } else {
+                    fortressServerManager
+                            .getServerResourceManager()
+                            .removeReservedItem(this.getId(), item);
+                }
+            }
+        }
     }
 
     private Item getItemFromState(BlockState state) {
