@@ -5,12 +5,18 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
+import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
 
+import java.util.List;
 import java.util.UUID;
 
 public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
@@ -57,6 +63,17 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation, floorLevel);
 
             if (player instanceof FortressServerPlayerEntity fortressPlayer) {
+                if(fortressPlayer.getFortressServerManager().isSurvival()) {
+                    final var serverResourceManager = fortressPlayer.getFortressServerManager().getServerResourceManager();
+                    final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintFile, rotation).getStacks();
+                    try {
+                        serverResourceManager.reserveItems(taskId, stacks);
+                    }catch (IllegalStateException e) {
+                        LogManager.getLogger().error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
+                        FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
+                        return;
+                    }
+                }
                 Runnable executeBuildTask = () -> fortressPlayer.getTaskManager().addTask(task, fortressPlayer.getFortressServerManager());
                 if (floorLevel > 0) {
                     final SimpleSelectionTask digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintFile, rotation);
@@ -66,7 +83,6 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
                 } else {
                     executeBuildTask.run();
                 }
-
             }
         }
     }
