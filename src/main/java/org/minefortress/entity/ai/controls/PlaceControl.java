@@ -89,7 +89,7 @@ public class PlaceControl extends PositionedActionControl {
         colonist.doActionOnMasterPlayer(p -> {
             final var fortressServerManager = p.getFortressServerManager();
             final var taskControl = colonist.getTaskControl();
-            if(fortressServerManager.isSurvival() && taskControl.hasTask() && !taskControl.isBlueprintTask()) {
+            if(fortressServerManager.isSurvival() && taskControl.hasTask()) {
                 final var resourceManager = fortressServerManager.getServerResourceManager();
                 resourceManager.removeReservedItem(taskControl.getTaskId(), item);
             }

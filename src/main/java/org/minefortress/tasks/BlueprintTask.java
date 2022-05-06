@@ -91,11 +91,23 @@ public class BlueprintTask extends AbstractTask {
     public void finishPart(TaskPart part, Colonist colonist) {
         final ServerWorld world = (ServerWorld) colonist.world;
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
-            blueprintEntityData.forEach((pos, state) -> world.setBlockState(pos.add(startingBlock), state, 3));
+            blueprintEntityData.forEach((pos, state) -> {
+                world.setBlockState(pos.add(startingBlock), state, 3);
+                colonist.doActionOnMasterPlayer(player -> player
+                        .getFortressServerManager()
+                        .getServerResourceManager()
+                        .removeReservedItem(this.getId(), state.getBlock().asItem()));
+            });
 
             if(blueprintAutomaticData != null)
                 blueprintAutomaticData
-                        .forEach((pos, state) -> world.setBlockState(pos.add(startingBlock), state, 3));
+                        .forEach((pos, state) -> {
+                            world.setBlockState(pos.add(startingBlock), state, 3);
+                            colonist.doActionOnMasterPlayer(player -> player
+                                    .getFortressServerManager()
+                                    .getServerResourceManager()
+                                    .removeReservedItem(this.getId(), state.getBlock().asItem()));
+                        });
 
 
             colonist.doActionOnMasterPlayer(player -> {
