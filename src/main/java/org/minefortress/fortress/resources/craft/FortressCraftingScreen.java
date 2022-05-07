@@ -46,7 +46,7 @@ implements RecipeBookProvider
         if(hasCraftsmanInVillage())
             this.recipeBook.update();
         else {
-            this.onClose();
+            this.close();
         }
     }
 
