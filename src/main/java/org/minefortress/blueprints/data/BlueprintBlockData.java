@@ -90,12 +90,22 @@ public final class BlueprintBlockData {
         }
 
         BlueprintBlockData build() {
-            instance.stacks = instance.layers
-                    .values()
-                    .stream()
-                    .flatMap(it -> it.values().stream())
-                    .collect(Collectors.collectingAndThen(Collectors.groupingBy(it -> it.getBlock().asItem(), Collectors.counting()), Collections::unmodifiableMap))
-                    .entrySet()
+
+            final var layerBlockByItems = instance.layers.containsKey(BlueprintDataLayer.GENERAL) ?
+                    instance.layers
+                            .get(BlueprintDataLayer.GENERAL)
+                            .values()
+                            .stream()
+                            .collect(Collectors.collectingAndThen(Collectors.groupingBy(it -> it.getBlock().asItem(), Collectors.counting()), Collections::unmodifiableMap))
+                    :
+                    instance.layers
+                            .values()
+                            .stream()
+                            .flatMap(it -> it.values().stream())
+                            .collect(Collectors.collectingAndThen(Collectors.groupingBy(it -> it.getBlock().asItem(), Collectors.counting()), Collections::unmodifiableMap));
+
+
+            instance.stacks = layerBlockByItems.entrySet()
                     .stream()
                     .filter(it -> it.getValue() > 0 && !IGNORED_ITEMS.contains(it.getKey()))
                     .map(it -> new ItemInfo(it.getKey(), (int)(long)it.getValue()))
