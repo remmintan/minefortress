@@ -16,6 +16,8 @@ public class ClientProfessionManager extends ProfessionManager {
 
     @Override
     public void increaseAmount(String professionId) {
+        if("colonist".equals(professionId)) return;
+        if(!super.isRequirementsFulfilled(this.getProfession(professionId))) return;
         final ServerboundChangeProfessionStatePacket.AmountChange change =
                 ServerboundChangeProfessionStatePacket.AmountChange.ADD;
         final ServerboundChangeProfessionStatePacket packet =
@@ -26,6 +28,7 @@ public class ClientProfessionManager extends ProfessionManager {
 
     @Override
     public void decreaseAmount(String professionId) {
+        if("colonist".equals(professionId)) return;
         final ServerboundChangeProfessionStatePacket.AmountChange change =
                 ServerboundChangeProfessionStatePacket.AmountChange.REMOVE;
         final ServerboundChangeProfessionStatePacket packet =
