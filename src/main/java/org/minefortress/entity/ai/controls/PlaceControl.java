@@ -6,6 +6,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
+import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
@@ -90,8 +91,15 @@ public class PlaceControl extends PositionedActionControl {
             final var fortressServerManager = p.getFortressServerManager();
             final var taskControl = colonist.getTaskControl();
             if(fortressServerManager.isSurvival() && taskControl.hasTask()) {
-                final var resourceManager = fortressServerManager.getServerResourceManager();
-                resourceManager.removeReservedItem(taskControl.getTaskId(), item);
+                if (BlueprintBlockData.IGNORED_ITEMS.contains(item)) {
+                    fortressServerManager
+                            .getServerResourceManager()
+                            .removeItemIfExists(item);
+                } else {
+                    fortressServerManager
+                            .getServerResourceManager()
+                            .removeReservedItem(taskControl.getTaskId(), item);
+                }
             }
         });
     }

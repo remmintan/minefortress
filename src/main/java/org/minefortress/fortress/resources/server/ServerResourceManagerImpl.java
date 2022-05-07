@@ -60,7 +60,9 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     @Override
     public void removeReservedItem(UUID taskId, Item item) {
         if(!(item instanceof BlockItem)) return;
-        if(!hasReservedItem(taskId, item)) throw new IllegalStateException("Item not reserved " + item.getName().asString());
+        if(!hasReservedItem(taskId, item)) {
+            throw new IllegalStateException("Item not reserved " + item.getName().asString());
+        }
         this.getManagerFromTaskId(taskId).getStack(item).decrease();
     }
 
