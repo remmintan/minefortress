@@ -203,6 +203,9 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method="tick", at=@At("TAIL"))
     public void tick(CallbackInfo ci) {
+        if(this.world == null && this.fortressHud.isHovered()) {
+            this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
+        }
         this.fortressHud.tick();
         this.fortressClientManager.tick(this);
         if(this.fortressClientManager.gamemodeNeedsInitialization() && !(this.currentScreen instanceof ChooseModeScreen)) {
