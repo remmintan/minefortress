@@ -19,6 +19,7 @@ import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
 import org.minefortress.network.ClientboundSyncBuildingsPacket;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.ClientboundSyncSpecialBlocksPacket;
@@ -120,7 +121,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             building.tick();
         }
 
-        if(!specialBlocks.isEmpty()) {
+        if(!specialBlocks.isEmpty() && world != null && world.getDimension() == FortressDimensionTypeMixin.getOverworld()) {
             boolean needSync = false;
             for(Map.Entry<Block, List<BlockPos>> entry : new HashSet<>(specialBlocks.entrySet())) {
                 final Block block = entry.getKey();
