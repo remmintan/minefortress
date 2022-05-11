@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class ServerProfessionManager extends ProfessionManager{
 
-    private boolean needsUpdate = false;
+    private boolean needsUpdate = true;
 
     public ServerProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
         super(fortressManagerSupplier);

@@ -36,8 +36,8 @@ public final class FortressServerManager extends AbstractFortressManager {
     private static final int DEFAULT_COLONIST_COUNT = 5;
 
     private boolean needSync = true;
-    private boolean needSyncBuildings = false;
-    private boolean needSyncSpecialBlocks = false;
+    private boolean needSyncBuildings = true;
+    private boolean needSyncSpecialBlocks = true;
 
     private BlockPos fortressCenter = null;
     private final Set<Colonist> colonists = new HashSet<>();
