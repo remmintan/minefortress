@@ -78,10 +78,11 @@ public abstract class AbstractCustomRenderer {
         if (shader.colorModulator != null) {
             shader.colorModulator.set(getColorModulator());
         }
-        if(shader.fogStart != null && shader.fogEnd != null && shader.fogColor != null) {
+        if(shader.fogStart != null && shader.fogEnd != null && shader.fogColor != null && shader.fogShape != null) {
             shader.fogStart.set(RenderSystem.getShaderFogStart());
             shader.fogEnd.set(RenderSystem.getShaderFogEnd());
             shader.fogColor.set(RenderSystem.getShaderFogColor());
+            shader.fogShape.set(0);
         }
         if(shader.textureMat != null) {
             shader.textureMat.set(RenderSystem.getTextureMatrix());
