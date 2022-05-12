@@ -1,9 +1,7 @@
 package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
@@ -88,6 +86,7 @@ public class TaskManager {
     private List<Colonist> getCompletelyFreePawns(Task task, List<Colonist> freeColonists) {
         return freeColonists
                 .stream()
+                .filter(c -> isBuilderProfession(c.getProfessionId()))
                 .filter(c -> c.getTaskControl().canStartTask(task))
                 .filter(c -> !c.getTaskControl().isDoingEverydayTasks())
                 .collect(Collectors.toList());
