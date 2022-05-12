@@ -32,44 +32,19 @@ import java.util.Optional;
 
 public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityModel<Colonist>> {
 
-    private static final Identifier STEVE = new Identifier("textures/entity/steve.png");
-    /*
-        baker.png
-        blacksmith.png
-        butcher.png
-        crafter.png
-        farmer.png
-        fisherman.png
-        hunter.png
-        lumberjack.png
-        medieval_underwear.png
-        miner.png
-        peasant.png
-        beggar.png
-     */
-    private static final Identifier BAKER = new Identifier("minefortress", "textures/skins/baker.png");
-    private static final Identifier BLACKSMITH = new Identifier("minefortress", "textures/skins/blacksmith.png");
-    private static final Identifier BUTCHER = new Identifier("minefortress", "textures/skins/butcher.png");
-    private static final Identifier CRAFTER = new Identifier("minefortress", "textures/skins/crafter.png");
-    private static final Identifier FARMER = new Identifier("minefortress", "textures/skins/farmer.png");
-    private static final Identifier FISHERMAN = new Identifier("minefortress", "textures/skins/fisherman.png");
-    private static final Identifier HUNTER = new Identifier("minefortress", "textures/skins/hunter.png");
-    private static final Identifier LUMBERJACK = new Identifier("minefortress", "textures/skins/lumberjack.png");
-    private static final Identifier MINER = new Identifier("minefortress", "textures/skins/miner.png");
-    private static final Identifier PEASANT = new Identifier("minefortress", "textures/skins/peasant.png");
-    private static final Identifier BEGGAR = new Identifier("minefortress", "textures/skins/beggar.png");
+    private static final Identifier GUY = new Identifier("minefortress", "textures/skins/guy.png");
+    private static final Identifier GUY2 = new Identifier("minefortress", "textures/skins/guy2.png");
+    private static final Identifier GUY3 = new Identifier("minefortress", "textures/skins/guy3.png");
+    private static final Identifier GUY4 = new Identifier("minefortress", "textures/skins/guy4.png");
 
     public ColonistRenderer(EntityRendererFactory.Context context) {
         super(context, new PlayerEntityModel<>(context.getPart(EntityModelLayers.PLAYER), false), 0.5f);
-        BipedEntityModel<Colonist> innerArmor = new BipedEntityModel<>(context.getPart(EntityModelLayers.PLAYER_INNER_ARMOR));
-        BipedEntityModel<Colonist> outerArmor = new BipedEntityModel<>(context.getPart(EntityModelLayers.PLAYER_OUTER_ARMOR));
-
-        this.addFeature(new ArmorFeatureRenderer<>(this, innerArmor, outerArmor));
+        this.addFeature(new ColonistClothesFeature(this));
     }
 
     @Override
     public Identifier getTexture(Colonist colonist) {
-        return convertProfessionToSkin(colonist.getProfessionId());
+        return GUY;
     }
 
     @Override
@@ -145,18 +120,4 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
         }
     }
 
-    private Identifier convertProfessionToSkin(String professionId) {
-        return switch (professionId) {
-            case "baker" -> BAKER;
-            case "blacksmith" -> BLACKSMITH;
-            case "butcher" -> BUTCHER;
-            case "crafter" -> CRAFTER;
-            case "farmer" -> FARMER;
-            case "fisherman" -> FISHERMAN;
-            case "hunter" -> HUNTER;
-            case "lumberjack1", "lumberjack2", "lumberjack3" -> LUMBERJACK;
-            case "miner1", "miner2", "miner3" -> MINER;
-            default -> STEVE;
-        };
-    }
 }
