@@ -58,6 +58,7 @@ public class Colonist extends PassiveEntity {
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<String> PROFESSION_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> HAS_TASK = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Integer> GUY_TYPE = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
     private static final String DEFAULT_PROFESSION_ID = "colonist";
 
     public static final float WORK_REACH_DISTANCE = 4f;
@@ -99,6 +100,7 @@ public class Colonist extends PassiveEntity {
         this.dataTracker.startTracking(CURRENT_FOOD_LEVEL, HungerConstants.FULL_FOOD_LEVEL);
         this.dataTracker.startTracking(PROFESSION_ID, DEFAULT_PROFESSION_ID);
         this.dataTracker.startTracking(HAS_TASK, false);
+        this.dataTracker.startTracking(GUY_TYPE, world.random.nextInt(4));
     }
 
     @Override
@@ -495,6 +497,9 @@ public class Colonist extends PassiveEntity {
         if(!DEFAULT_PROFESSION_ID.equals(professionId)) {
             nbt.putString("professionId", professionId);
         }
+
+        final var guyType = this.getGuyType();
+        nbt.putInt("guyType", guyType);
     }
 
     public String getProfessionId() {
@@ -522,6 +527,10 @@ public class Colonist extends PassiveEntity {
         if(nbt.contains("professionId")) {
             final String professionId = nbt.getString("professionId");
             this.setProfession(professionId);
+        }
+
+        if (nbt.contains("guyType")) {
+            this.dataTracker.set(GUY_TYPE, nbt.getInt("guyType"));
         }
     }
 
@@ -551,6 +560,10 @@ public class Colonist extends PassiveEntity {
 
     public void setProfession(String professionId) {
         this.dataTracker.set(PROFESSION_ID, professionId);
+    }
+
+    public int getGuyType() {
+        return this.dataTracker.get(GUY_TYPE);
     }
 
     public void resetProfession() {
