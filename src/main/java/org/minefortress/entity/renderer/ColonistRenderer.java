@@ -44,7 +44,13 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
 
     @Override
     public Identifier getTexture(Colonist colonist) {
-        return GUY;
+        final var guyType = colonist.getGuyType();
+        return switch (guyType) {
+            case 0 -> GUY;
+            case 1 -> GUY2;
+            case 2 -> GUY3;
+            default -> GUY4;
+        };
     }
 
     @Override

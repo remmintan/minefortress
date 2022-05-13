@@ -1,19 +1,16 @@
 package org.minefortress.entity.renderer;
 
-import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
-import net.minecraft.client.render.entity.feature.VillagerClothingFeatureRenderer;
-import net.minecraft.client.render.entity.model.AnimalModel;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ArmorItem;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 
 public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntityModel<Colonist>> {
@@ -60,11 +57,37 @@ public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntit
     @Override
     public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, Colonist entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
         if(entity.isSleeping()) return;
-        VillagerClothingFeatureRenderer.renderModel(this.getContextModel(), this.getArmorTexture(), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+        ColonistClothesFeature.renderModel(this.getContextModel(), this.getArmorTexture(entity.getProfessionId()), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+    }
+
+    protected static <T extends LivingEntity> void renderModel(EntityModel<T> model, Identifier texture, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float red, float green, float blue) {
+        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(texture));
+        model.render(matrices, vertexConsumer, light, LivingEntityRenderer.getOverlay(entity, 0.0f), red, green, blue, 1f);
     }
 
 
-    private Identifier getArmorTexture() {
-        return MINER_T2;
+    private Identifier getArmorTexture(String professionId) {
+        return switch (professionId) {
+            case "miner1" -> MINER;
+            case "miner2" -> MINER_T2;
+            case "miner3" -> MINER_T3;
+            case "lumberjack1" -> LUMBERJACK;
+            case "lumberjack2" -> LUMBERJACK_T2;
+            case "lumberjack3" -> LUMBERJACK_T3;
+            case "forester" -> FORESTER;
+            case "hunter" -> HUNTER;
+            case "fisherman" -> FISHERMAN;
+            case "farmer" -> FARMER;
+            case "baker" -> BAKER;
+            case "shepherd" -> SHEPHERD;
+            case "stableman" -> STABLEMAN;
+            case "butcher" -> BUTCHER;
+            case "cook" -> COOK;
+            case "crafter" -> CRAFTER;
+            case "leather_worker1", "leather_worker2" -> LEATHER_WORKER;
+            case "blacksmith1" -> BLACKSMITH;
+            case "weaver" -> WEAVER;
+            default -> COLONIST;
+        };
     }
 }
