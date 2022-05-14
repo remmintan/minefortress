@@ -96,7 +96,7 @@ public class ColonistNameGenerator {
 
     public ColonistNameGenerator() {
         mandatoryNames = new ArrayDeque<>();
-        mandatoryNames.addAll(Arrays.asList("Jèff", "Fed", "Noah", "Ray", "Dean", "Lyam", "Takelale", "Varneke"));
+        mandatoryNames.addAll(Arrays.asList("Jèff", "Fed", "Noah", "Dean", "Lyam", "Takelale", "Varneke", "Brandon"));
     }
 
     public ColonistNameGenerator(NbtCompound nbtCompound) {
