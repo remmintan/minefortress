@@ -21,6 +21,10 @@ import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSimpleInventory;
+import org.minefortress.network.ServerboundScrollCurrentScreenPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.renderer.gui.interfaces.ScrollableHandler;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,18 +33,19 @@ import java.util.stream.Collectors;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
 
-public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<CraftingInventory> {
+public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<CraftingInventory>  implements ScrollableHandler {
 
     private final CraftingInventory input = new CraftingInventory(this, 3, 3);
     private final CraftingResultInventory result = new CraftingResultInventory();
 
     private final World world;
-    private final SimpleInventory screenInventory = new SimpleInventory(36);;
+    private final SimpleInventory screenInventory = new SimpleInventory(999);;
     private final ServerResourceManager serverResourceManager;
     private final PlayerEntity player;
 
     private final List<ItemStack> allItems;
     private final Map<Item, Integer> allItemsBeforeEdit;
+    private int clientCurrentRow = 5;
 
     public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, null);
@@ -60,11 +65,11 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         }
         for (int row = 0; row < 3; ++row) {
             for (int column = 0; column < 9; ++column) {
-                this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + row * 9 + 9, 8 + column * 18, 84 + row * 18));
+                this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + row * 9, 8 + column * 18, 84 + row * 18));
             }
         }
         for (int column = 0; column < 9; ++column) {
-            this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column, 8 + column * 18, 142));
+            this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + 27, 8 + column * 18, 142));
         }
 
         if(this.serverResourceManager != null) {
@@ -72,6 +77,16 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
             this.allItemsBeforeEdit = this.allItems.stream()
                     .map(ItemStack::copy)
                     .collect(Collectors.toUnmodifiableMap(ItemStack::getItem, ItemStack::getCount));
+
+            int rowsCount = getRowsCount();
+            if(rowsCount > 4) {
+                for (int row = 0; row < rowsCount-4; row++) {
+                    for (int column = 0; column < 9; ++column) {
+                        this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + row * 9 + 9, 8 + column * 18, 150 + row * 18));
+                    }
+                }
+            }
+
             this.scrollItems(0f);
         } else {
             this.allItems = Collections.emptyList();
@@ -201,22 +216,47 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     }
 
     public void scrollItems(float position) {
-        final var items = this.allItems;
-        int i = (items.size() + 9 - 1) / 9 - 4;
-        int j = (int)((double)(position * (float)i) + 0.5);
-        if (j < 0) {
-            j = 0;
+        if(serverResourceManager == null) {
+            final var packet = new ServerboundScrollCurrentScreenPacket(position);
+            FortressClientNetworkHelper.send(FortressChannelNames.SCROLL_CURRENT_SCREEN, packet);
+            return;
         }
-        for (int k = 0; k < 4; ++k) {
-            for (int l = 0; l < 9; ++l) {
-                int m = l + (k + j) * 9;
-                if (m >= 0 && m < items.size()) {
-                    screenInventory.setStack(l + k * 9, items.get(m));
+
+        final var totalRows = getRowsCount();
+        int totalAdditionalRows = totalRows - 4;
+        int rowOffset = (int)((double)(position * (float)totalAdditionalRows) + 0.5);
+        if (rowOffset < 0) {
+            rowOffset = 0;
+        }
+        for (int row = 0; row < totalRows; ++row) {
+            for (int column = 0; column < 9; ++column) {
+                var currentRow = row + rowOffset;
+                if (currentRow >= totalRows) {
+                    currentRow -= totalRows;
+                }
+                int m = column + currentRow * 9;
+                if (m >= 0 && m < this.allItems.size()) {
+                    screenInventory.setStack(column + row * 9, allItems.get(m));
                     continue;
                 }
-                screenInventory.setStack(l + k * 9, ItemStack.EMPTY);
+                screenInventory.setStack(column + row * 9, ItemStack.EMPTY);
             }
         }
+    }
+
+    @Override
+    public void updateSlotStacks(int revision, List<ItemStack> stacks, ItemStack cursorStack) {
+        while (slots.size() < stacks.size()) {
+            for (int column = 0; column < 9; ++column) {
+                this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + clientCurrentRow * 9 + 9, 8 + column * 18, 80 + clientCurrentRow * 18));
+            }
+            clientCurrentRow++;
+        }
+        super.updateSlotStacks(revision, stacks, cursorStack);
+    }
+
+    public int getRowsCount() {
+        return ((serverResourceManager!=null? allItems: slots).size() + 9 - 1) / 9;
     }
 
     @Override

@@ -27,5 +27,6 @@ public class FortressChannelNames {
     public static final String FORTRESS_SET_TICKS_SPEED = "fortress_set_ticks_speed";
     public static final String FORTRESS_RESOURCES_SYNC = "fortress_resources_sync";
     public static final String FORTRESS_OPEN_CRAFTING_TABLE = "fortress_open_crafting_table";
+    public static final String SCROLL_CURRENT_SCREEN = "scroll_current_screen";
 
 }
