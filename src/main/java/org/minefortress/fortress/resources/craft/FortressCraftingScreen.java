@@ -18,6 +18,7 @@ implements RecipeBookProvider
 {
 
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/crafting_table.png");
+    private static final Identifier SCROLLBAR_TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
     private boolean narrow;
 
     private final FortressRecipeBookWidget recipeBook = new FortressRecipeBookWidget();
@@ -53,11 +54,8 @@ implements RecipeBookProvider
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            int scrollbarX1 = this.x + 175;
-            int scrollbarX2 = scrollbarX1 + 12;
-            int scrollbarY = this.y + 18;
-            int scrollbarY2 = scrollbarY + 112;
-            if(mouseX > scrollbarX1 && mouseX < scrollbarX2 && mouseY > scrollbarY && mouseY < scrollbarY2) {
+            final var bounds = getScrollbarBounds();
+            if(mouseX >= bounds.x1() && mouseX <= bounds.x2() && mouseY >= bounds.y1() && mouseY <= bounds.y2()) {
                 this.scrolling = this.hasScrollbar();
                 return true;
             }
@@ -75,9 +73,8 @@ implements RecipeBookProvider
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (this.scrolling) {
-            int i = this.y + 18;
-            int j = i + 112;
-            this.scrollPosition = ((float)mouseY - (float)i - 7.5f) / ((float)(j - i) - 15.0f);
+            final var bounds = getScrollbarBounds();
+            this.scrollPosition = ((float)mouseY - (float)bounds.y1() - 7.5f) / ((float)(bounds.y2() - bounds.y1()) - 15.0f);
             this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
             this.handler.scrollItems(this.scrollPosition);
             return true;
@@ -103,9 +100,9 @@ implements RecipeBookProvider
             this.recipeBook.drawGhostSlots(matrices, this.x, this.y, true, delta);
         }
         super.render(matrices, mouseX, mouseY, delta);
+        renderScrollbar(matrices);
         this.drawMouseoverTooltip(matrices, mouseX, mouseY);
         this.recipeBook.drawTooltip(matrices, this.x, this.y, mouseX, mouseY);
-        renderScrollbar(matrices);
     }
 
     @Override
@@ -149,12 +146,18 @@ implements RecipeBookProvider
     }
 
     private void renderScrollbar(MatrixStack matrices) {
-        int i = this.x + 175;
-        int j = this.y + 18;
-        int k = j + 112;
+        final var bounds = getScrollbarBounds();
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, TEXTURE);
-        this.drawTexture(matrices, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
+        RenderSystem.setShaderTexture(0, SCROLLBAR_TEXTURE);
+        this.drawTexture(matrices, bounds.x1(), bounds.y1() + (int)((float)(bounds.y2() - bounds.y1() - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
+    }
+
+    private ScrollbarBounds getScrollbarBounds() {
+        var x1 = this.x + 177;
+        var y1 = this.y + 2;
+        var x2 = x1 + 12;
+        var y2 = y1 + this.backgroundHeight - 4;
+        return new ScrollbarBounds(x1, y1, x2, y2);
     }
 
     private boolean hasScrollbar() {
@@ -170,4 +173,6 @@ implements RecipeBookProvider
     private FortressMinecraftClient getClient() {
         return (FortressMinecraftClient) MinecraftClient.getInstance();
     }
+
+    private static record ScrollbarBounds(int x1, int y1, int x2, int y2) {}
 }
