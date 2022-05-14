@@ -30,3 +30,4 @@ accessible method net/minecraft/screen/CraftingScreenHandler updateResult (Lnet/
 accessible field  net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeFinder Lnet/minecraft/recipe/RecipeMatcher;
 accessible method net/minecraft/client/gui/screen/recipebook/RecipeBookWidget refreshResults (Z)V
 accessible field net/minecraft/screen/ScreenHandler slots Lnet/minecraft/util/collection/DefaultedList;
+accessible method net/minecraft/client/gui/screen/ingame/HandledScreen getSlotAt (DD)Lnet/minecraft/screen/slot/Slot;
