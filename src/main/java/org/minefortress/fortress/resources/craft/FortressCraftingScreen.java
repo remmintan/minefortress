@@ -102,10 +102,10 @@ implements RecipeBookProvider
             super.render(matrices, mouseX, mouseY, delta);
             this.recipeBook.drawGhostSlots(matrices, this.x, this.y, true, delta);
         }
+        super.render(matrices, mouseX, mouseY, delta);
         this.drawMouseoverTooltip(matrices, mouseX, mouseY);
         this.recipeBook.drawTooltip(matrices, this.x, this.y, mouseX, mouseY);
         renderScrollbar(matrices);
-        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
