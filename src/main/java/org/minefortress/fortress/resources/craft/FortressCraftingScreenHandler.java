@@ -82,7 +82,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
             if(rowsCount > 4) {
                 for (int row = 0; row < rowsCount-4; row++) {
                     for (int column = 0; column < 9; ++column) {
-                        this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + row * 9 + 9, 8 + column * 18, 150 + row * 18));
+                        this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + (row+4) * 9, 8 + column * 18, 150 + row * 18));
                     }
                 }
             }
@@ -248,7 +248,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     public void updateSlotStacks(int revision, List<ItemStack> stacks, ItemStack cursorStack) {
         while (slots.size() < stacks.size()) {
             for (int column = 0; column < 9; ++column) {
-                this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + clientCurrentRow * 9 + 9, 8 + column * 18, 80 + clientCurrentRow * 18));
+                this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + clientCurrentRow * 9, 8 + column * 18, 80 + clientCurrentRow * 18));
             }
             clientCurrentRow++;
         }
