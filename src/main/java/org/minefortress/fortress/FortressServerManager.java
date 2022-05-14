@@ -148,6 +148,15 @@ public final class FortressServerManager extends AbstractFortressManager {
                 world.setBlockState(aboveTheCenter, DEFAULT_STATE_ABOVE_CAMPFIRE, 3);
                 world.emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
             }
+
+            if(this.colonists.size() < DEFAULT_COLONIST_COUNT) {
+                final var randomSpawnPosition = getRandomSpawnPosition(world);
+                if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
+                    final var tag = getColonistInfoTag((FortressServerPlayerEntity) player);
+                    EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
+                    colonistType.spawn((ServerWorld) world, tag, null, player, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+                }
+            }
         }
     }
 
@@ -155,34 +164,37 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(fortressCenter == null) throw new IllegalArgumentException("Center cannot be null");
         this.fortressCenter = fortressCenter;
 
-        if(!(world instanceof ServerWorld serverWorld))
+        if(!(world instanceof ServerWorld))
             throw new IllegalArgumentException("World must be a server world");
 
         world.setBlockState(fortressCenter, getStateForCampCenter(), 3);
         world.emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
 
-        final NbtCompound nbtCompound = new NbtCompound();
-        nbtCompound.putUuid("fortressUUID", ((FortressServerPlayerEntity)player).getFortressUuid());
-        nbtCompound.putInt("centerX", fortressCenter.getX());
-        nbtCompound.putInt("centerY", fortressCenter.getY());
-        nbtCompound.putInt("centerZ", fortressCenter.getZ());
-
-        if(minX > fortressCenter.getX()-10) minX = fortressCenter.getX()-10;
-        if(minZ > fortressCenter.getZ()-10) minZ = fortressCenter.getZ()-10;
-        if(maxX < fortressCenter.getX()+10) maxX = fortressCenter.getX()+10;
-        if(maxZ < fortressCenter.getZ()+10) maxZ = fortressCenter.getZ()+10;
-
-        EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
-        Iterable<BlockPos> spawnPlaces = BlockPos.iterateRandomly(world.random, DEFAULT_COLONIST_COUNT, fortressCenter, 3);
-        for(BlockPos spawnPlace : spawnPlaces) {
-            int spawnY = world.getTopY(Heightmap.Type.WORLD_SURFACE, spawnPlace.getX(), spawnPlace.getZ());
-            BlockPos spawnPos = new BlockPos(spawnPlace.getX(), spawnY, spawnPlace.getZ());
-            colonistType.spawn(serverWorld, nbtCompound, null, player, spawnPos, SpawnReason.MOB_SUMMONED, true, false);
-        }
+        if(minX > this.fortressCenter.getX()-10) minX = this.fortressCenter.getX()-10;
+        if(minZ > this.fortressCenter.getZ()-10) minZ = this.fortressCenter.getZ()-10;
+        if(maxX < this.fortressCenter.getX()+10) maxX = this.fortressCenter.getX()+10;
+        if(maxZ < this.fortressCenter.getZ()+10) maxZ = this.fortressCenter.getZ()+10;
 
         this.scheduleSync();
     }
 
+    private NbtCompound getColonistInfoTag(FortressServerPlayerEntity player) {
+        final NbtCompound nbtCompound = new NbtCompound();
+        nbtCompound.putUuid("fortressUUID", player.getFortressUuid());
+        nbtCompound.putInt("centerX", this.fortressCenter.getX());
+        nbtCompound.putInt("centerY", this.fortressCenter.getY());
+        nbtCompound.putInt("centerZ", this.fortressCenter.getZ());
+
+        return nbtCompound;
+    }
+
+    private BlockPos getRandomSpawnPosition(World world) {
+        final var spawnX = fortressCenter.getX() + world.random.nextInt(10) - 5;
+        final var spawnZ = fortressCenter.getZ() + world.random.nextInt(10) - 5;
+        final var spawnY = world.getTopY(Heightmap.Type.WORLD_SURFACE, spawnX, spawnZ);
+
+        return new BlockPos(spawnX, spawnY, spawnZ);
+    }
 
     private void scheduleSync() {
         needSync = true;
