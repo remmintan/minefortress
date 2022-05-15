@@ -2,6 +2,7 @@ package org.minefortress.fortress.resources.client;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import org.minefortress.fortress.resources.SimilarItemsHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,15 @@ class ClientItemStacksManager {
 
     public FortressItemStack getStack(Item item) {
         return stacks.computeIfAbsent(item, i -> new FortressItemStack(i, 0));
+    }
+
+    public List<FortressItemStack> getNonEmptySimilarStacks(Item item) {
+        return SimilarItemsHelper.getSimilarItems(item)
+                .stream()
+                .filter(stacks::containsKey)
+                .map(stacks::get)
+                .filter(it -> !it.isEmpty())
+                .toList();
     }
 
     boolean isEmpty() {

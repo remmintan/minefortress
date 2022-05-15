@@ -14,7 +14,7 @@ class StackGroupsManager {
 
     private final Map<ItemGroup, ClientItemStacksManager> groups = new HashMap<>();
 
-    ClientItemStacksManager getStcksManager(ItemGroup group) {
+    ClientItemStacksManager getStacksManager(ItemGroup group) {
         return groups.computeIfAbsent(group, (g) -> new ClientItemStacksManager());
     }
 
@@ -31,7 +31,7 @@ class StackGroupsManager {
     }
 
     List<ItemStack> getStacksFromGroup(ItemGroup group) {
-        return this.getStcksManager(group).getStacks();
+        return this.getStacksManager(group).getStacks();
     }
 
     ItemGroup getGroup(Item item) {
