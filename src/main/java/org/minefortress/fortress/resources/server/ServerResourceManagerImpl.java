@@ -60,6 +60,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
             stack.decreaseBy(amount);
             reservedStack.increaseBy(amount);
 
+            infosToSync.add(new ItemInfo(item, stack.getAmount()));
             if(yetToFulfill>0) {
                 final var similarItems = resources.getNonEmptySimilarStacks(item);
                 for(var similarStack : similarItems) {
@@ -74,11 +75,10 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
                         similarStack.decreaseBy(similarStackAmount);
                         newReservedStack.increaseBy(similarStackAmount);
                     }
+                    infosToSync.add(new ItemInfo(similarStack.getItem(), similarStack.getAmount()));
                     if(yetToFulfill==0) break;
                 }
             }
-
-            infosToSync.add(new ItemInfo(item, stack.getAmount()));
         }
 
         synchronizer.syncAll(infosToSync);
@@ -90,7 +90,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
         final var reservedItemsManager = this.getManagerFromTaskId(taskId);
         final var reservedStack = reservedItemsManager.getStack(item);
-        if(reservedStack.getAmount() > 1) {
+        if(reservedStack.getAmount() >= 1) {
             reservedStack.decrease();
         } else {
             final var nonEmptySimilarStacks = reservedItemsManager.getNonEmptySimilarStacks(item);
