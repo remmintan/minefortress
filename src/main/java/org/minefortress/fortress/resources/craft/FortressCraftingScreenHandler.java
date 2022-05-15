@@ -17,6 +17,7 @@ import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
+import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -26,9 +27,10 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.interfaces.ScrollableHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
@@ -39,12 +41,11 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     private final CraftingResultInventory result = new CraftingResultInventory();
 
     private final World world;
-    private final SimpleInventory screenInventory = new SimpleInventory(999);;
+    private final SimpleInventory screenInventory = new SimpleInventory(999);
+    private final VirtualInventory virtualInventory;
     private final ServerResourceManager serverResourceManager;
     private final PlayerEntity player;
 
-    private final List<ItemStack> allItems;
-    private final Map<Item, Integer> allItemsBeforeEdit;
     private int clientCurrentRow = 5;
 
     public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory) {
@@ -73,10 +74,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         }
 
         if(this.serverResourceManager != null) {
-            this.allItems = Collections.unmodifiableList(this.serverResourceManager.getAllItems());
-            this.allItemsBeforeEdit = this.allItems.stream()
-                    .map(ItemStack::copy)
-                    .collect(Collectors.toUnmodifiableMap(ItemStack::getItem, ItemStack::getCount));
+            this.virtualInventory = new VirtualInventory(this.serverResourceManager.getAllItems());
 
             int rowsCount = getRowsCount();
             if(rowsCount > 4) {
@@ -89,8 +87,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
 
             this.scrollItems(0f);
         } else {
-            this.allItems = Collections.emptyList();
-            this.allItemsBeforeEdit = Collections.emptyMap();
+            this.virtualInventory = null;
         }
     }
 
@@ -191,27 +188,10 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
 
             new FortressInputSlotFiller(this).returnInputs();
 
-            final var itemsAfterEdit = this.screenInventory
-                    .clearToList()
-                    .stream()
-                    .collect(Collectors.toUnmodifiableMap(ItemStack::getItem, ItemStack::getCount));
-
-            for(var itemEntry : itemsAfterEdit.entrySet()) {
-                final var item = itemEntry.getKey();
-                final var countAfterEdit = itemEntry.getValue();
-                if(allItemsBeforeEdit.containsKey(item)) {
-                    final var countBeforeEdit = allItemsBeforeEdit.get(item);
-                    serverResourceManager.increaseItemAmount(item, countAfterEdit - countBeforeEdit);
-                } else {
-                    serverResourceManager.increaseItemAmount(item, countAfterEdit);
-                }
-            }
-
-            for(var item : allItemsBeforeEdit.keySet()) {
-                if(!itemsAfterEdit.containsKey(item)) {
-                    serverResourceManager.increaseItemAmount(item, -allItemsBeforeEdit.get(item));
-                }
-            }
+            final var diff = this.virtualInventory.getDiff();
+            diff.added.forEach(stack -> serverResourceManager.setItemAmount(stack.item(), stack.amount()));
+            diff.updated.forEach(stack -> serverResourceManager.setItemAmount(stack.item(), stack.amount()));
+            diff.removed.forEach(item -> serverResourceManager.setItemAmount(item, 0));
         }
     }
 
@@ -235,8 +215,8 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
                     currentRow -= totalRows;
                 }
                 int m = column + currentRow * 9;
-                if (m >= 0 && m < this.allItems.size()) {
-                    screenInventory.setStack(column + row * 9, allItems.get(m));
+                if (m >= 0) {
+                    screenInventory.setStack(column + row * 9, virtualInventory.get(m));
                     continue;
                 }
                 screenInventory.setStack(column + row * 9, ItemStack.EMPTY);
@@ -256,7 +236,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     }
 
     public int getRowsCount() {
-        return ((serverResourceManager!=null? allItems: slots).size() + 9 - 1) / 9;
+        return ((serverResourceManager!=null? virtualInventory.size(): slots.size()) + 9 - 1) / 9;
     }
 
     @Override
@@ -285,9 +265,17 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         }
     }
 
-    private static final class FortressNotInsertableSlot extends FortressSlot {
+    private final class FortressNotInsertableSlot extends FortressSlot {
+
         public FortressNotInsertableSlot(Inventory inventory, int index, int x, int y) {
             super(inventory, index, x, y);
+        }
+
+        @Override
+        public void setStack(ItemStack stack) {
+            if(FortressCraftingScreenHandler.this.virtualInventory != null)
+                FortressCraftingScreenHandler.this.virtualInventory.set(this.getIndex(), stack);
+            super.setStack(stack);
         }
 
         @Override
@@ -347,4 +335,72 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
             return stack;
         }
     }
+
+    private static final class VirtualInventory {
+
+        private final Set<Item> itemsBefore;
+        private final List<ItemStack> items;
+
+        private int rowsOffset = 0;
+
+        VirtualInventory(List<ItemStack> items) {
+            this.items = new ArrayList<>(items.stream().filter(it -> !it.isEmpty()).toList());
+            this.itemsBefore = this.items
+                    .stream()
+                    .map(ItemStack::getItem)
+                    .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+        }
+
+        ItemStack get(int index) {
+            return this.items.get(index);
+        }
+
+        void set(int index, ItemStack stack) {
+            final var realIndex = index + rowsOffset * 9;
+            final var itemsCount = this.items.size();
+
+            final var insertIndex = realIndex < itemsCount ? realIndex : (realIndex - itemsCount);
+
+            if(this.items.get(insertIndex).isEmpty())
+                this.items.set(index, stack);
+            else
+                this.items.add(stack);
+        }
+
+        void setRowsOffset(int rowsOffset) {
+            this.rowsOffset = rowsOffset;
+        }
+
+        int size() {
+            return this.items.size();
+        }
+
+        InventoryDiff getDiff() {
+            final var itemsAfter = this.items.stream()
+                    .filter(it -> !it.isEmpty())
+                    .map(ItemStack::getItem)
+                    .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+
+            final var itemsToRemove = itemsBefore.stream()
+                    .filter(it -> !itemsAfter.contains(it))
+                    .toList();
+
+            final var itemsToAdd = items.stream()
+                    .filter(it -> !it.isEmpty())
+                    .filter(it -> !itemsBefore.contains(it.getItem()))
+                    .map(it -> new ItemInfo(it.getItem(), it.getCount()))
+                    .toList();
+
+            final var itemsToUpdate = items.stream()
+                    .filter(it -> !it.isEmpty())
+                    .filter(it -> itemsBefore.contains(it.getItem()))
+                    .map(it -> new ItemInfo(it.getItem(), it.getCount()))
+                    .toList();
+
+            return new InventoryDiff(itemsToAdd, itemsToUpdate, itemsToRemove);
+        }
+
+    }
+
+    private static record InventoryDiff(List<ItemInfo> added, List<ItemInfo> updated, List<Item> removed) {}
 }

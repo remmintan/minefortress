@@ -4,10 +4,6 @@ class EasyItemStack {
 
     private int amount = 0;
 
-    void increase() {
-        amount++;
-    }
-
     void decrease() {
         amount--;
         if (amount < 0) {
@@ -28,6 +24,10 @@ class EasyItemStack {
         if (this.amount < 0) {
             this.amount = 0;
         }
+    }
+
+    void setAmount(int amount) {
+        this.amount = amount;
     }
 
     boolean hasEnough(int amount) {
