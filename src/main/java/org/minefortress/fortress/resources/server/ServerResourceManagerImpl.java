@@ -48,16 +48,35 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     public void reserveItems(UUID taskId, List<ItemInfo> infos) {
         if(!hasItems(infos)) throw new IllegalStateException("Not enough resources");
 
-        final var manager = this.getManagerFromTaskId(taskId);
+        final var reservedItemsManager = this.getManagerFromTaskId(taskId);
         final var infosToSync = new ArrayList<ItemInfo>();
         for(ItemInfo info : infos) {
             final var item = info.item();
             final var amount = info.amount();
             final var stack = resources.getStack(item);
-            final var reservedStack = manager.getStack(item);
+            final var reservedStack = reservedItemsManager.getStack(item);
 
+            var yetToFulfill = amount - stack.getAmount();
             stack.decreaseBy(amount);
             reservedStack.increaseBy(amount);
+
+            if(yetToFulfill>0) {
+                final var similarItems = resources.getNonEmptySimilarStacks(item);
+                for(var similarStack : similarItems) {
+                    var newReservedStack = reservedItemsManager.getStack(similarStack.getItem());
+                    final var similarStackAmount = similarStack.getAmount();
+                    if(similarStackAmount >=yetToFulfill) {
+                        similarStack.decreaseBy(yetToFulfill);
+                        newReservedStack.increaseBy(yetToFulfill);
+                        yetToFulfill = 0;
+                    } else {
+                        yetToFulfill -= similarStackAmount;
+                        similarStack.decreaseBy(similarStackAmount);
+                        newReservedStack.increaseBy(similarStackAmount);
+                    }
+                    if(yetToFulfill==0) break;
+                }
+            }
 
             infosToSync.add(new ItemInfo(item, stack.getAmount()));
         }
@@ -68,10 +87,20 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     @Override
     public void removeReservedItem(UUID taskId, Item item) {
         if(!(item instanceof BlockItem)) return;
-        if(!hasReservedItem(taskId, item)) {
-            throw new IllegalStateException("Item not reserved " + item.getName().asString());
+
+        final var reservedItemsManager = this.getManagerFromTaskId(taskId);
+        final var reservedStack = reservedItemsManager.getStack(item);
+        if(reservedStack.getAmount() > 1) {
+            reservedStack.decrease();
+        } else {
+            final var nonEmptySimilarStacks = reservedItemsManager.getNonEmptySimilarStacks(item);
+            if(!nonEmptySimilarStacks.isEmpty()) {
+                final var similarStack = nonEmptySimilarStacks.get(0);
+                similarStack.decrease();
+            } else{
+                throw new IllegalStateException("Item not reserved or not enough items " + item.getName().asString());
+            }
         }
-        this.getManagerFromTaskId(taskId).getStack(item).decrease();
     }
 
     @Override
@@ -157,15 +186,16 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
             if(item == Items.FLINT_AND_STEEL || item == Items.WATER_BUCKET || item == Items.LAVA_BUCKET) continue;
             final var amount = info.amount();
             final var stack = resources.getStack(item);
-            if(!stack.hasEnough(amount)) return false;
+            if(!stack.hasEnough(amount)) {
+                final var sumAmountOfSimilarItems = resources.getNonEmptySimilarStacks(item)
+                        .stream()
+                        .map(EasyItemStack::getAmount)
+                        .reduce(0, Integer::sum);
+
+                if(sumAmountOfSimilarItems + stack.getAmount() < amount) return false;
+            }
         }
-
         return true;
-    }
-
-    private boolean hasReservedItem(UUID taskId, Item item) {
-        final var manager = this.getManagerFromTaskId(taskId);
-        return manager.getStack(item).hasEnough(1);
     }
     
     private ItemStacksManager getManagerFromTaskId(UUID taskId) {
