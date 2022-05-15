@@ -1,6 +1,14 @@
 package org.minefortress.fortress.resources.server;
 
+import net.minecraft.item.Item;
+
 class EasyItemStack {
+
+    private final Item item;
+
+    EasyItemStack(Item item) {
+        this.item = item;
+    }
 
     private int amount = 0;
 
@@ -32,6 +40,10 @@ class EasyItemStack {
 
     boolean hasEnough(int amount) {
         return this.amount >= amount;
+    }
+
+    Item getItem() {
+        return item;
     }
 
 }
