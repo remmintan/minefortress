@@ -22,10 +22,8 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
                 .stream()
                 .allMatch(it -> {
                     final var item = it.getItem();
-                    final var group = groupManager.getGroup(item);
-                    final var itemStack = groupManager.getStcksManager(group).getStack(item);
-                    if(itemStack == null) return false;
-                    return itemStack.getCount() >= it.getCount();
+                    final var amount = it.getCount();
+                    return hasItem(item, amount);
                 });
     }
 
@@ -35,20 +33,32 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
                 .stream()
                 .allMatch(it -> {
                     final var item = it.item();
-                    final var group = groupManager.getGroup(item);
-                    final var itemStack = groupManager.getStcksManager(group).getStack(item);
-                    if(itemStack == null) return false;
-                    return itemStack.getCount() >= it.amount();
+                    final var amount = it.amount();
+                    return this.hasItem(item, amount);
                 });
     }
 
     @Override
-    public boolean hasItem(ItemInfo item) {
-        final var group = groupManager.getGroup(item.item());
-        final var manager = groupManager.getStcksManager(group);
-        final var stack = manager.getStack(item.item());
-        if(stack == null) return false;
-        return stack.getCount() >= item.amount();
+    public boolean hasItem(ItemInfo itemInfo) {
+        final var item = itemInfo.item();
+        final var amount = itemInfo.amount();
+        return hasItem(item, amount);
+    }
+
+    private boolean hasItem(Item item, int amount) {
+        final var group = groupManager.getGroup(item);
+        final var manager = groupManager.getStacksManager(group);
+        final var stack = manager.getStack(item);
+        if (stack == null) return false;
+        final var availableAmount = stack.getCount();
+        if(availableAmount >= amount) return true;
+        final var amountOfNonEmptySimilarElements = manager
+                .getNonEmptySimilarStacks(item)
+                .stream()
+                .map(ItemStack::getCount)
+                .reduce(0, Integer::sum);
+
+        return (amountOfNonEmptySimilarElements + availableAmount) >= amount;
     }
 
     @Override
@@ -59,7 +69,7 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
     @Override
     public void setItemAmount(Item item, int amount) {
         final var group = groupManager.getGroup(item);
-        final var manager = groupManager.getStcksManager(group);
+        final var manager = groupManager.getStacksManager(group);
         manager.getStack(item).setCount(amount);
     }
 
