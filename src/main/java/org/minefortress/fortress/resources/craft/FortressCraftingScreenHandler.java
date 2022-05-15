@@ -47,6 +47,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     private final PlayerEntity player;
 
     private int clientCurrentRow = 5;
+    private float lastScrollPosition = 0;
 
     public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, null);
@@ -151,7 +152,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
             ItemStack itemStack2 = new FortressItemStack(stack.getItem(), stack.getCount());
             itemStack = itemStack2.copy();
             if (index == 0) {
-                if (!this.insertItem(itemStack2, 10, 46, true)) {
+                if (!this.insertItem(itemStack2, 10, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
                 slot.onQuickTransfer(itemStack2, itemStack);
@@ -215,13 +216,16 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
                     currentRow -= totalRows;
                 }
                 int m = column + currentRow * 9;
-                if (m >= 0) {
+                if (m >= 0 && m < this.virtualInventory.size()) {
                     screenInventory.setStack(column + row * 9, virtualInventory.get(m));
                     continue;
                 }
                 screenInventory.setStack(column + row * 9, ItemStack.EMPTY);
             }
         }
+
+        this.virtualInventory.setRowsOffset(rowOffset);
+        this.lastScrollPosition = position;
     }
 
     @Override
@@ -276,6 +280,11 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
             if(FortressCraftingScreenHandler.this.virtualInventory != null)
                 FortressCraftingScreenHandler.this.virtualInventory.set(this.getIndex(), stack);
             super.setStack(stack);
+        }
+
+        @Override
+        public boolean canInsert(ItemStack stack) {
+            return this.getStack().isEmpty() || ItemStack.canCombine(this.getStack(), stack);
         }
 
         @Override
@@ -336,7 +345,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
         }
     }
 
-    private static final class VirtualInventory {
+    private final class VirtualInventory {
 
         private final Set<Item> itemsBefore;
         private final List<ItemStack> items;
@@ -363,8 +372,33 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
 
             if(this.items.get(insertIndex).isEmpty())
                 this.items.set(index, stack);
-            else
-                this.items.add(stack);
+            else {
+                final var firstEmptyIndex = this.items.stream()
+                        .filter(ItemStack::isEmpty)
+                        .findFirst()
+                        .map(items::indexOf)
+                        .orElse(-1);
+                final var handler = FortressCraftingScreenHandler.this;
+                if(firstEmptyIndex != -1) {
+                    this.items.set(firstEmptyIndex, stack);
+                } else {
+                    final var beforeRowsCount = (this.items.size() + 9 - 1) / 9;
+                    this.items.add(stack);
+                    final var afterRowsCount = (this.items.size() + 9 - 1) / 9;
+                    if(afterRowsCount > beforeRowsCount) {
+
+                        for (int column = 0; column < 9; ++column) {
+                            final var slotIndex = column + afterRowsCount * 9;
+                            final var slotX = 8 + column * 18;
+                            final var slotY = 80 + afterRowsCount * 18;
+                            handler.addSlot(new FortressNotInsertableSlot(handler.screenInventory, slotIndex, slotX, slotY));
+                        }
+                    }
+                }
+
+                handler.scrollItems(handler.lastScrollPosition);
+            }
+
         }
 
         void setRowsOffset(int rowsOffset) {
