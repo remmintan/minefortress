@@ -47,7 +47,8 @@ public class SimilarItemsHelper {
             ItemTags.FENCES,
             ItemTags.LEAVES,
             ItemTags.FLOWERS,
-            ItemTags.LOGS
+            ItemTags.LOGS,
+            ItemTags.PLANKS
     );
 
     public static List<Item> getSimilarItems(Item item) {

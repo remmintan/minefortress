@@ -28,6 +28,7 @@ class EasyItemStack {
     }
 
     void decreaseBy(int amount) {
+        if(this.amount  < amount) throw new RuntimeException("Tried to decrease by more than the amount of items in the stack");
         this.amount -= amount;
         if (this.amount < 0) {
             this.amount = 0;

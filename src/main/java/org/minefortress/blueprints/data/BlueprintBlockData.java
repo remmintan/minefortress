@@ -3,6 +3,7 @@ package org.minefortress.blueprints.data;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.tag.ItemTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -108,7 +109,9 @@ public final class BlueprintBlockData {
             instance.stacks = layerBlockByItems.entrySet()
                     .stream()
                     .filter(it -> it.getValue() > 0 && !IGNORED_ITEMS.contains(it.getKey()))
-                    .map(it -> new ItemInfo(it.getKey(), (int)(long)it.getValue()))
+                    .map(it -> new ItemInfo(it.getKey(), (int) (
+                            (ItemTags.BEDS.contains(it.getKey()) || ItemTags.DOORS.contains(it.getKey())) ?
+                                    it.getValue()/2 : it.getValue())))
                     .toList();
 
             return instance;

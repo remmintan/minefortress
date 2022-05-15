@@ -57,10 +57,17 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
             final var reservedStack = reservedItemsManager.getStack(item);
 
             var yetToFulfill = amount - stack.getAmount();
-            stack.decreaseBy(amount);
-            reservedStack.increaseBy(amount);
 
+            if(yetToFulfill>0) {
+                final var existingAmount = stack.getAmount();
+                stack.decreaseBy(existingAmount);
+                reservedStack.increaseBy(existingAmount);
+            } else {
+                stack.decreaseBy(amount);
+                reservedStack.increaseBy(amount);
+            }
             infosToSync.add(new ItemInfo(item, stack.getAmount()));
+
             if(yetToFulfill>0) {
                 final var similarItems = resources.getNonEmptySimilarStacks(item);
                 for(var similarStack : similarItems) {
