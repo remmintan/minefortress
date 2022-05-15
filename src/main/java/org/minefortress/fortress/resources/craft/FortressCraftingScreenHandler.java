@@ -152,7 +152,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
             ItemStack itemStack2 = new FortressItemStack(stack.getItem(), stack.getCount());
             itemStack = itemStack2.copy();
             if (index == 0) {
-                if (!this.insertItem(itemStack2, 10, this.slots.size(), true)) {
+                if (!this.insertItem(itemStack2, 10, this.slots.size(), false)) {
                     return ItemStack.EMPTY;
                 }
                 slot.onQuickTransfer(itemStack2, itemStack);
@@ -240,7 +240,7 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
     }
 
     public int getRowsCount() {
-        return ((serverResourceManager!=null? virtualInventory.size(): slots.size()) + 9 - 1) / 9;
+        return ((serverResourceManager!=null? virtualInventory.size(): slots.size()) + 9) / 9;
     }
 
     @Override
@@ -371,28 +371,24 @@ public class FortressCraftingScreenHandler extends AbstractRecipeScreenHandler<C
             final var insertIndex = realIndex < itemsCount ? realIndex : (realIndex - itemsCount);
 
             if(this.items.get(insertIndex).isEmpty())
-                this.items.set(index, stack);
+                this.items.set(insertIndex, stack);
             else {
-                final var firstEmptyIndex = this.items.stream()
-                        .filter(ItemStack::isEmpty)
-                        .findFirst()
-                        .map(items::indexOf)
-                        .orElse(-1);
                 final var handler = FortressCraftingScreenHandler.this;
-                if(firstEmptyIndex != -1) {
-                    this.items.set(firstEmptyIndex, stack);
-                } else {
-                    final var beforeRowsCount = (this.items.size() + 9 - 1) / 9;
-                    this.items.add(stack);
-                    final var afterRowsCount = (this.items.size() + 9 - 1) / 9;
-                    if(afterRowsCount > beforeRowsCount) {
+                final var beforeRowsCount = (itemsCount + 9) / 9;
 
-                        for (int column = 0; column < 9; ++column) {
-                            final var slotIndex = column + afterRowsCount * 9;
-                            final var slotX = 8 + column * 18;
-                            final var slotY = 80 + afterRowsCount * 18;
-                            handler.addSlot(new FortressNotInsertableSlot(handler.screenInventory, slotIndex, slotX, slotY));
-                        }
+                if(index >= itemsCount) {
+                    for(int i = 0; i < (index - itemsCount + 1); i++) {
+                        this.items.add(ItemStack.EMPTY);
+                    }
+                }
+                this.items.set(realIndex, stack);
+                final var afterRowsCount = (this.items.size() + 9) / 9;
+                if(afterRowsCount > beforeRowsCount) {
+                    for (int column = 0; column < 9; ++column) {
+                        final var slotIndex = column + afterRowsCount * 9;
+                        final var slotX = 8 + column * 18;
+                        final var slotY = 80 + afterRowsCount * 18;
+                        handler.addSlot(new FortressNotInsertableSlot(handler.screenInventory, slotIndex, slotX, slotY));
                     }
                 }
 
