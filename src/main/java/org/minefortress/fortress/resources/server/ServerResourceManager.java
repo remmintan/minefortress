@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public interface ServerResourceManager {
 
+    void setItemAmount(Item item, int amount);
     void increaseItemAmount(Item item, int amount);
     void reserveItems(UUID uuid, List<ItemInfo> stacks);
     void removeReservedItem(UUID taskId, Item item);
