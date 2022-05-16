@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 
@@ -92,7 +93,7 @@ public class PlaceControl extends PositionedActionControl {
             final var fortressServerManager = p.getFortressServerManager();
             final var taskControl = colonist.getTaskControl();
             if(fortressServerManager.isSurvival() && taskControl.hasTask()) {
-                if (BlueprintBlockData.IGNORED_ITEMS.contains(item) || ItemTags.DOORS.contains(item) || ItemTags.BEDS.contains(item)) {
+                if (BlueprintBlockData.IGNORED_ITEMS.contains(item) || SimilarItemsHelper.contains(ItemTags.BEDS, item) || SimilarItemsHelper.contains(ItemTags.DOORS, item)) {
                     fortressServerManager
                             .getServerResourceManager()
                             .removeItemIfExists(item);

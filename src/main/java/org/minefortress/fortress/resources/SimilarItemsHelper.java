@@ -4,11 +4,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagKey;
+import net.minecraft.util.registry.Registry;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class SimilarItemsHelper {
 
@@ -34,7 +33,7 @@ public class SimilarItemsHelper {
             Items.STRIPPED_CRIMSON_HYPHAE
     );
 
-    private static final List<Tag.Identified<Item>> tags = Arrays.asList(
+    private static final List<TagKey<Item>> tags = Arrays.asList(
             ItemTags.WOODEN_BUTTONS,
             ItemTags.WOODEN_PRESSURE_PLATES,
             ItemTags.WOODEN_SLABS,
@@ -61,17 +60,34 @@ public class SimilarItemsHelper {
         }
 
         return getItemTag(item)
-                .map(tag -> tag.values().stream().filter(it -> it != item).toList())
+                .map(tag -> getItems(tag).stream().filter(it -> it != item).toList())
                 .orElse(Collections.emptyList());
     }
 
-    private static Optional<Tag.Identified<Item>> getItemTag(Item item) {
+    private static Optional<TagKey<Item>> getItemTag(Item item) {
         for(var tag: tags) {
-            if(tag.contains(item)) {
+            if(contains(tag, item)) {
                 return Optional.of(tag);
             }
         }
         return Optional.empty();
+    }
+
+    public static boolean contains(TagKey<Item> tag, Item item) {
+        for(var it: Registry.ITEM.iterateEntries(tag)) {
+            if(it.value() == item) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<Item> getItems(TagKey<Item> tag) {
+        var items  = new ArrayList<Item>();
+        for(var it: Registry.ITEM.iterateEntries(tag)) {
+            items.add(it.value());
+        }
+        return Collections.unmodifiableList(items);
     }
 
 }

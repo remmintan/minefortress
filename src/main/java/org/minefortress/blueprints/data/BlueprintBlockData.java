@@ -7,6 +7,7 @@ import net.minecraft.tag.ItemTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.spongepowered.include.com.google.common.collect.Sets;
 
 import java.util.*;
@@ -110,7 +111,7 @@ public final class BlueprintBlockData {
                     .stream()
                     .filter(it -> it.getValue() > 0 && !IGNORED_ITEMS.contains(it.getKey()))
                     .map(it -> new ItemInfo(it.getKey(), (int) (
-                            (ItemTags.BEDS.contains(it.getKey()) || ItemTags.DOORS.contains(it.getKey())) ?
+                            (SimilarItemsHelper.contains(ItemTags.BEDS, it.getKey()) || SimilarItemsHelper.contains(ItemTags.DOORS, it.getKey())) ?
                                     it.getValue()/2 : it.getValue())))
                     .toList();
 
