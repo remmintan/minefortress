@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.recipe.RecipeType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -21,7 +22,7 @@ implements RecipeBookProvider
     private static final Identifier SCROLLBAR_TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
     private boolean narrow;
 
-    private final FortressRecipeBookWidget recipeBook = new FortressRecipeBookWidget();
+    private final FortressRecipeBookWidget recipeBook = new FortressRecipeBookWidget(RecipeType.CRAFTING);
 
     private boolean scrolling = false;
 

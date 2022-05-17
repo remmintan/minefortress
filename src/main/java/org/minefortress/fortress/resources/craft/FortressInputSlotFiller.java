@@ -14,6 +14,7 @@ import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.fortress.resources.AbstractFortressRecipeScreenHandler;
 import org.minefortress.interfaces.FortressSimpleInventory;
 
 import java.util.ArrayList;
@@ -22,9 +23,9 @@ import java.util.Iterator;
 public final class FortressInputSlotFiller implements RecipeGridAligner<Integer> {
     private final RecipeMatcher matcher = new RecipeMatcher();
     private SimpleInventory inventory;
-    private final FortressCraftingScreenHandler handler;
+    private final AbstractFortressRecipeScreenHandler handler;
 
-    public FortressInputSlotFiller(FortressCraftingScreenHandler handler) {
+    public FortressInputSlotFiller(AbstractFortressRecipeScreenHandler handler) {
         this.handler = handler;
     }
 
