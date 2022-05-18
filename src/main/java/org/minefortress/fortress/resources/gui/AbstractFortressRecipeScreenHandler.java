@@ -8,6 +8,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
@@ -156,8 +157,6 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     }
 
     protected abstract T getInput();
-
-    protected abstract CraftingResultInventory getResult();
 
     @Override
     public void scrollItems(float position) {

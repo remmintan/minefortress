@@ -57,8 +57,8 @@ public class FortressCraftingScreenHandler extends AbstractFortressRecipeScreenH
         return this.input;
     }
 
-    @Override
-    protected CraftingResultInventory getResult() {
+
+    private CraftingResultInventory getResult() {
         return this.result;
     }
 
