@@ -10,6 +10,7 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
+import org.minefortress.fortress.resources.gui.FortressRecipeBookWidget;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
 public class FortressCraftingScreen extends AbstractFortressRecipeScreen<FortressCraftingScreenHandler> {
