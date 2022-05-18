@@ -42,7 +42,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private Vec3d selectedColonistDelta;
 
     private List<EssentialBuildingInfo> buildings = new ArrayList<>();
-    private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
+    private Map<Block, Set<BlockPos>> specialBlocks = new HashMap<>();
 
     private FortressGamemode gamemode;
 
@@ -62,7 +62,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         this.buildings = buildings;
     }
 
-    public void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks) {
+    public void setSpecialBlocks(Map<Block, Set<BlockPos>> specialBlocks) {
         this.specialBlocks = specialBlocks;
     }
 
