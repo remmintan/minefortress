@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources.gui.craft;
+package org.minefortress.fortress.resources.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
@@ -7,6 +7,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
+import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.interfaces.FortressSimpleInventory;
 
 import java.util.ArrayList;
