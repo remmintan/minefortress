@@ -10,15 +10,13 @@ import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressClientPacket;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ClientboundSyncSpecialBlocksPacket implements FortressClientPacket {
 
-    private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
+    private Map<Block, Set<BlockPos>> specialBlocks = new HashMap<>();
 
-    public ClientboundSyncSpecialBlocksPacket(Map<Block, List<BlockPos>> specialBlocks){
+    public ClientboundSyncSpecialBlocksPacket(Map<Block, Set<BlockPos>> specialBlocks){
         this.specialBlocks = specialBlocks;
     }
 
@@ -26,10 +24,10 @@ public class ClientboundSyncSpecialBlocksPacket implements FortressClientPacket 
         int size = buf.readInt();
         for (int i = 0; i < size; i++) {
             Block block = Registry.BLOCK.get(new Identifier(buf.readString()));
-            int size2 = buf.readInt();
-            List<BlockPos> list = specialBlocks.computeIfAbsent(block, k -> new java.util.ArrayList<>());
-            for (int j = 0; j < size2; j++) {
-                list.add(buf.readBlockPos());
+            int blocksAmount = buf.readInt();
+            Set<BlockPos> set = specialBlocks.computeIfAbsent(block, k -> new HashSet<>());
+            for (int j = 0; j < blocksAmount; j++) {
+                set.add(buf.readBlockPos());
             }
         }
     }
@@ -44,7 +42,7 @@ public class ClientboundSyncSpecialBlocksPacket implements FortressClientPacket 
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeInt(specialBlocks.size());
-        for (Map.Entry<Block, List<BlockPos>> entry : specialBlocks.entrySet()) {
+        for (Map.Entry<Block, Set<BlockPos>> entry : specialBlocks.entrySet()) {
             buf.writeString(Registry.BLOCK.getId(entry.getKey()).toString());
             buf.writeInt(entry.getValue().size());
             for (BlockPos pos : entry.getValue()) {

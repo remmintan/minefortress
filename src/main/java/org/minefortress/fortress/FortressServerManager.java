@@ -5,7 +5,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
@@ -42,7 +45,9 @@ public final class FortressServerManager extends AbstractFortressManager {
     private BlockPos fortressCenter = null;
     private final Set<Colonist> colonists = new HashSet<>();
     private final Set<FortressBulding> buildings = new HashSet<>();
-    private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
+
+    private final Map<Block, Set<BlockPos>> specialBlocks = new HashMap<>();
+    private final Map<Block, Set<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
 
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
     private final ServerProfessionManager serverProfessionManager;
@@ -123,9 +128,9 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         if(!specialBlocks.isEmpty() && world != null && world.getDimension() == FortressDimensionTypeMixin.getOverworld()) {
             boolean needSync = false;
-            for(Map.Entry<Block, List<BlockPos>> entry : new HashSet<>(specialBlocks.entrySet())) {
-                final Block block = entry.getKey();
-                final List<BlockPos> positions = entry.getValue();
+            for(var entry : new HashSet<>(specialBlocks.entrySet())) {
+                final var block = entry.getKey();
+                final var positions = entry.getValue();
                 needSync = positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
                 if (positions.isEmpty()) {
                     specialBlocks.remove(block);
@@ -243,7 +248,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         if(!specialBlocks.isEmpty()) {
             final NbtCompound specialBlocksTag = new NbtCompound();
-            for (Map.Entry<Block, List<BlockPos>> specialBlock : this.specialBlocks.entrySet()) {
+            for (var specialBlock : this.specialBlocks.entrySet()) {
                 final String blockId = Registry.BLOCK.getId(specialBlock.getKey()).toString();
                 final NbtList posList = new NbtList();
                 for (BlockPos pos : specialBlock.getValue()) {
@@ -298,11 +303,11 @@ public final class FortressServerManager extends AbstractFortressManager {
             for (String blockId : specialBlocksTag.getKeys()) {
                 final Block block = Registry.BLOCK.get(new Identifier(blockId));
                 final NbtList posList = specialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
-                final List<BlockPos> posList2 = new ArrayList<>();
+                final var positions = new HashSet<BlockPos>();
                 for (int j = 0; j < posList.size(); j++) {
-                    posList2.add(NbtHelper.toBlockPos(posList.getCompound(j)));
+                    positions.add(NbtHelper.toBlockPos(posList.getCompound(j)));
                 }
-                this.specialBlocks.put(block, posList2);
+                this.specialBlocks.put(block, positions);
             }
             this.scheduleSyncSpecialBlocks();
         }
@@ -368,11 +373,11 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public boolean isBlockSpecial(Block block) {
-        return block.equals(Blocks.CRAFTING_TABLE);
+        return block.equals(Blocks.CRAFTING_TABLE) || block.equals(Blocks.FURNACE);
     }
 
-    public void addSpecialBlocks(Block block, List<BlockPos> blockPos) {
-        specialBlocks.computeIfAbsent(block, k -> new ArrayList<>()).addAll(blockPos);
+    public void addSpecialBlocks(Block block, BlockPos blockPos) {
+        specialBlocks.computeIfAbsent(block, k -> new HashSet<>()).add(blockPos);
         scheduleSyncSpecialBlocks();
     }
 
@@ -389,8 +394,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         return this.colonists.stream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
     }
 
-    public List<BlockPos> getSpecialBlocksByType(Block block) {
-        return specialBlocks.getOrDefault(block, Collections.emptyList());
+    public Set<BlockPos> getSpecialBlocksByType(Block block) {
+        return specialBlocks.getOrDefault(block, Collections.emptySet());
     }
 
     @Override
