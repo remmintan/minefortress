@@ -15,7 +15,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.fortress.resources.craft.MissingCraftsmanScreen;
+import org.minefortress.fortress.resources.gui.craft.MissingCraftsmanScreen;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundOpenCraftingScreenPacket;
 import org.minefortress.network.helpers.FortressChannelNames;

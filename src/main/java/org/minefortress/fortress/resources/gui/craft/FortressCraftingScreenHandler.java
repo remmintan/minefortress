@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources.craft;
+package org.minefortress.fortress.resources.gui.craft;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -10,7 +10,7 @@ import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.slot.CraftingResultSlot;
-import org.minefortress.fortress.resources.AbstractFortressRecipeScreenHandler;
+import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
