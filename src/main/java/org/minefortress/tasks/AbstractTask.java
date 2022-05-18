@@ -1,25 +1,18 @@
 package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
 import org.minefortress.tasks.interfaces.Task;
 import org.minefortress.utils.PathUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class AbstractTask implements Task {
 
@@ -37,8 +30,6 @@ public abstract class AbstractTask implements Task {
     private int completedParts;
 
     private final List<Runnable> taskFinishListeners = new ArrayList<>();
-    private final List<BlockPos> specialBlocks = new ArrayList<>();
-    private Block specialBlock;
 
     protected AbstractTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock) {
         this.id = id;
@@ -103,33 +94,12 @@ public abstract class AbstractTask implements Task {
     @Override
     public void finishPart(TaskPart part, Colonist colonsit) {
         completedParts++;
-
         ServerWorld world = (ServerWorld) colonsit.world;
-
-        if(this.taskType == TaskType.BUILD) {
-            this.checkAndPutSpecialBlocksInPart(part, colonsit);
-        } else if(this.taskType == TaskType.REMOVE) {
-
-        }
-
         if(parts.isEmpty() && totalParts <= completedParts) {
             ServerPlayerEntity randomPlayer = world.getRandomAlivePlayer();
             if(randomPlayer != null) {
                 sendFinishTaskNotificationToPlayer(randomPlayer);
             }
-
-            if(this.taskType == TaskType.BUILD) {
-                colonsit.doActionOnMasterPlayer(player -> {
-                    if(!this.specialBlocks.isEmpty()) {
-                        final FortressServerManager fortressServerManager = player.getFortressServerManager();
-                        if(fortressServerManager != null) {
-                            fortressServerManager.addSpecialBlocks(this.specialBlock, this.specialBlocks);
-                        }
-                    }
-                });
-            }
-
-
             taskFinishListeners.forEach(Runnable::run);
         }
     }
@@ -157,25 +127,6 @@ public abstract class AbstractTask implements Task {
             cursor.setZ(endingBlock.getZ());
         }
         return cursor.toImmutable();
-    }
-
-    private void checkAndPutSpecialBlocksInPart(TaskPart part, Colonist colonist) {
-        final List<TaskBlockInfo> blocks = part.getBlocks();
-        if(blocks == null || blocks.isEmpty()) return;
-        final TaskBlockInfo firstBlockInfo = blocks.stream().findFirst().get();
-        final Item placingItem = firstBlockInfo.getPlacingItem();
-        if(!(placingItem instanceof final BlockItem blockItem)) return;
-
-        colonist.doActionOnMasterPlayer(player -> {
-            final FortressServerManager fortressServerManager = player.getFortressServerManager();
-            final Block block = blockItem.getBlock();
-            final boolean blockSpecial = fortressServerManager.isBlockSpecial(block);
-            if(blockSpecial) {
-                final List<BlockPos> pos = blocks.stream().map(TaskBlockInfo::getPos).collect(Collectors.toList());
-                this.specialBlock = block;
-                this.specialBlocks.addAll(pos);
-            }
-        });
     }
 
 }
