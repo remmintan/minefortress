@@ -1,6 +1,7 @@
 package org.minefortress.entity.ai.controls;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.ActionResult;
@@ -68,7 +69,7 @@ public class PlaceControl extends PositionedActionControl {
         final ActionResult interactionResult = item.useOnBlock(context);
 
         if(interactionResult == ActionResult.CONSUME || failedInteractions > 15) {
-            decreaseResourcesAmount();
+            decreaseResourcesAndAddSpecialBlocksAmount();
             this.reset();
             this.placeCooldown = 6;
         } else {
@@ -82,13 +83,13 @@ public class PlaceControl extends PositionedActionControl {
         colonist.world.setBlockState(goal, stateForPlacement, 3);
         colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal);
 
-        decreaseResourcesAmount();
+        decreaseResourcesAndAddSpecialBlocksAmount();
 
         this.reset();
         this.placeCooldown = 6;
     }
 
-    private void decreaseResourcesAmount() {
+    private void decreaseResourcesAndAddSpecialBlocksAmount() {
         colonist.doActionOnMasterPlayer(p -> {
             final var fortressServerManager = p.getFortressServerManager();
             final var taskControl = colonist.getTaskControl();
@@ -102,6 +103,10 @@ public class PlaceControl extends PositionedActionControl {
                             .getServerResourceManager()
                             .removeReservedItem(taskControl.getTaskId(), item);
                 }
+            }
+
+            if(item instanceof BlockItem blockItem && fortressServerManager.isBlockSpecial(blockItem.getBlock())){
+                fortressServerManager.addSpecialBlocks(blockItem.getBlock(), goal);
             }
         });
     }
