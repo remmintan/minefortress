@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.minecraft.client.world.ClientWorld;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.entity.renderer.ColonistRenderer;
-import org.minefortress.fortress.resources.craft.FortressCraftingScreen;
+import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreen;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.*;

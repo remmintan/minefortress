@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources.craft;
+package org.minefortress.fortress.resources.gui.craft;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -7,9 +7,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.mixins.entity.FortressServerPlayerEntityMixin;
 
 public class FortressCraftingScreenHandlerFactory implements NamedScreenHandlerFactory {
     @Override

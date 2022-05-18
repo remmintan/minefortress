@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources;
+package org.minefortress.fortress.resources.gui;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
@@ -13,8 +13,9 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
+import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.FortressItemStack;
-import org.minefortress.fortress.resources.craft.FortressInputSlotFiller;
+import org.minefortress.fortress.resources.gui.craft.FortressInputSlotFiller;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSimpleInventory;

@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources.craft;
+package org.minefortress.fortress.resources.gui.craft;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -9,7 +9,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.minefortress.fortress.resources.AbstractFortressRecipeScreen;
+import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
 public class FortressCraftingScreen extends AbstractFortressRecipeScreen<FortressCraftingScreenHandler> {

@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources.craft;
+package org.minefortress.fortress.resources.gui.craft;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;

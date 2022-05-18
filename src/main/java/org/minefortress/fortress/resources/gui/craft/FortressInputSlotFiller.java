@@ -1,4 +1,4 @@
-package org.minefortress.fortress.resources.craft;
+package org.minefortress.fortress.resources.gui.craft;
 
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -14,7 +14,7 @@ import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.resources.AbstractFortressRecipeScreenHandler;
+import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
 import org.minefortress.interfaces.FortressSimpleInventory;
 
 import java.util.ArrayList;

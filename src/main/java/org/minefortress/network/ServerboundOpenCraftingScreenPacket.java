@@ -3,7 +3,7 @@ package org.minefortress.network;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.fortress.resources.craft.FortressCraftingScreenHandlerFactory;
+import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandlerFactory;
 import org.minefortress.network.interfaces.FortressServerPacket;
 
 public class ServerboundOpenCraftingScreenPacket implements FortressServerPacket {
