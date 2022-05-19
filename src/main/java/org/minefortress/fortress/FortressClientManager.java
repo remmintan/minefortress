@@ -43,6 +43,7 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private List<EssentialBuildingInfo> buildings = new ArrayList<>();
     private Map<Block, Set<BlockPos>> specialBlocks = new HashMap<>();
+    private Map<Block, Set<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
 
     private FortressGamemode gamemode;
 
@@ -62,8 +63,9 @@ public final class FortressClientManager extends AbstractFortressManager {
         this.buildings = buildings;
     }
 
-    public void setSpecialBlocks(Map<Block, Set<BlockPos>> specialBlocks) {
+    public void setSpecialBlocks(Map<Block, Set<BlockPos>> specialBlocks, Map<Block, Set<BlockPos>> blueprintSpecialBlocks) {
         this.specialBlocks = specialBlocks;
+        this.blueprintsSpecialBlocks = blueprintSpecialBlocks;
     }
 
     public boolean isSelectingColonist() {
@@ -203,8 +205,11 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     @Override
-    public boolean hasRequiredBlock(Block block) {
-        return this.specialBlocks.containsKey(block);
+    public boolean hasRequiredBlock(Block block, boolean blueprint) {
+        if(blueprint)
+            return this.blueprintsSpecialBlocks.containsKey(block);
+        else
+            return this.specialBlocks.containsKey(block);
     }
 
     @Override

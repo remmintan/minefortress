@@ -101,7 +101,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             needSyncBuildings = false;
         }
         if(needSyncSpecialBlocks){
-            final ClientboundSyncSpecialBlocksPacket syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks);
+            final ClientboundSyncSpecialBlocksPacket syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks, blueprintsSpecialBlocks);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, syncBlocks);
             needSyncSpecialBlocks = false;
         }
@@ -134,6 +134,14 @@ public final class FortressServerManager extends AbstractFortressManager {
                 needSync = positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
                 if (positions.isEmpty()) {
                     specialBlocks.remove(block);
+                }
+            }
+            for (var entry : new HashSet<>(blueprintsSpecialBlocks.entrySet())) {
+                final var block = entry.getKey();
+                final var positions = entry.getValue();
+                needSync = positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
+                if (positions.isEmpty()) {
+                    blueprintsSpecialBlocks.remove(block);
                 }
             }
             if(needSync) {
@@ -259,6 +267,19 @@ public final class FortressServerManager extends AbstractFortressManager {
             tag.put("specialBlocks", specialBlocksTag);
         }
 
+        if(!blueprintsSpecialBlocks.isEmpty()) {
+            final NbtCompound blueprintsSpecialBlocksTag = new NbtCompound();
+            for (var specialBlock : this.blueprintsSpecialBlocks.entrySet()) {
+                final String blockId = Registry.BLOCK.getId(specialBlock.getKey()).toString();
+                final NbtList posList = new NbtList();
+                for (BlockPos pos : specialBlock.getValue()) {
+                    posList.add(NbtHelper.fromBlockPos(pos));
+                }
+                blueprintsSpecialBlocksTag.put(blockId, posList);
+            }
+            tag.put("blueprintsSpecialBlocks", blueprintsSpecialBlocksTag);
+        }
+
         NbtCompound professionTag = new NbtCompound();
         serverProfessionManager.writeToNbt(professionTag);
         tag.put("profession", professionTag);
@@ -308,6 +329,20 @@ public final class FortressServerManager extends AbstractFortressManager {
                     positions.add(NbtHelper.toBlockPos(posList.getCompound(j)));
                 }
                 this.specialBlocks.put(block, positions);
+            }
+            this.scheduleSyncSpecialBlocks();
+        }
+
+        if (tag.contains("blueprintsSpecialBlocks")) {
+            final NbtCompound blueprintsSpecialBlocksTag = tag.getCompound("blueprintsSpecialBlocks");
+            for (String blockId : blueprintsSpecialBlocksTag.getKeys()) {
+                final Block block = Registry.BLOCK.get(new Identifier(blockId));
+                final NbtList posList = blueprintsSpecialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
+                final var positions = new HashSet<BlockPos>();
+                for (int j = 0; j < posList.size(); j++) {
+                    positions.add(NbtHelper.toBlockPos(posList.getCompound(j)));
+                }
+                this.blueprintsSpecialBlocks.put(block, positions);
             }
             this.scheduleSyncSpecialBlocks();
         }
@@ -368,16 +403,22 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     @Override
-    public boolean hasRequiredBlock(Block block) {
-        return this.specialBlocks.containsKey(block);
+    public boolean hasRequiredBlock(Block block, boolean blueprint) {
+        if(blueprint)
+            return blueprintsSpecialBlocks.containsKey(block);
+        else
+            return this.specialBlocks.containsKey(block);
     }
 
     public boolean isBlockSpecial(Block block) {
         return block.equals(Blocks.CRAFTING_TABLE) || block.equals(Blocks.FURNACE);
     }
 
-    public void addSpecialBlocks(Block block, BlockPos blockPos) {
-        specialBlocks.computeIfAbsent(block, k -> new HashSet<>()).add(blockPos);
+    public void addSpecialBlocks(Block block, BlockPos blockPos, boolean blueprint) {
+        if(blueprint)
+            blueprintsSpecialBlocks.computeIfAbsent(block, k -> new HashSet<>()).add(blockPos);
+        else
+            specialBlocks.computeIfAbsent(block, k -> new HashSet<>()).add(blockPos);
         scheduleSyncSpecialBlocks();
     }
 

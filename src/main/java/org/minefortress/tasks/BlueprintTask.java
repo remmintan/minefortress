@@ -90,19 +90,25 @@ public class BlueprintTask extends AbstractTask {
     public void finishPart(TaskPart part, Colonist colonist) {
         final ServerWorld world = (ServerWorld) colonist.world;
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
-            blueprintEntityData.forEach((pos, state) -> {
-                world.setBlockState(pos.add(startingBlock), state, 3);
-                final var item = state.getBlock().asItem();
-                removeReservedItem(colonist, item);
-            });
+            if(blueprintEntityData != null) {
+                blueprintEntityData.forEach((pos, state) -> {
+                    final var realPos = pos.add(startingBlock);
+                    world.setBlockState(realPos, state, 3);
+                    final var item = state.getBlock().asItem();
+                    removeReservedItem(colonist, item);
+                    addSpecialBlueprintBlock(colonist, state.getBlock(), realPos);
+                });
+            }
 
-            if(blueprintAutomaticData != null)
+            if(blueprintAutomaticData != null) {
                 blueprintAutomaticData
-                        .forEach((pos, state) -> {
-                            world.setBlockState(pos.add(startingBlock), state, 3);
-                            removeReservedItem(colonist, state.getBlock().asItem());
-                        });
-
+                    .forEach((pos, state) -> {
+                        final var realpos = pos.add(startingBlock);
+                        world.setBlockState(realpos, state, 3);
+                        removeReservedItem(colonist, state.getBlock().asItem());
+                        addSpecialBlueprintBlock(colonist, state.getBlock(), realpos);
+                    });
+            }
 
             colonist.doActionOnMasterPlayer(player -> {
                 final FortressServerManager fortressServerManager = player.getFortressServerManager();
@@ -111,6 +117,10 @@ public class BlueprintTask extends AbstractTask {
             });
         }
         super.finishPart(part, colonist);
+    }
+
+    private void addSpecialBlueprintBlock(Colonist colonist, Block block, BlockPos pos) {
+        colonist.doActionOnMasterPlayer(p -> p.getFortressServerManager().addSpecialBlocks(block, pos, true));
     }
 
     private void removeReservedItem(Colonist colonist, Item item) {

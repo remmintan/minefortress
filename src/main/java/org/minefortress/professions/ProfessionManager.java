@@ -347,7 +347,7 @@ public abstract class ProfessionManager {
         boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement);
         final Block blockRequirement = profession.getBlockRequirement();
         if(Objects.nonNull(blockRequirement)) {
-            satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement);
+            satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement, false);
         }
         return satisfied;
     }
