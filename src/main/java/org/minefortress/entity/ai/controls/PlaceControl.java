@@ -106,7 +106,7 @@ public class PlaceControl extends PositionedActionControl {
             }
 
             if(item instanceof BlockItem blockItem && fortressServerManager.isBlockSpecial(blockItem.getBlock())){
-                fortressServerManager.addSpecialBlocks(blockItem.getBlock(), goal);
+                fortressServerManager.addSpecialBlocks(blockItem.getBlock(), goal, taskControl.isBlueprintTask());
             }
         });
     }

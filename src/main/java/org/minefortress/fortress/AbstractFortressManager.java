@@ -10,7 +10,7 @@ public abstract class AbstractFortressManager {
         return Blocks.CAMPFIRE.getDefaultState();
     }
     public abstract boolean hasRequiredBuilding(String requirementId);
-    public abstract boolean hasRequiredBlock(Block block);
+    public abstract boolean hasRequiredBlock(Block block, boolean blueprint);
 
     public abstract int getTotalColonistsCount();
 
