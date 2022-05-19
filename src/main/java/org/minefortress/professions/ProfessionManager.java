@@ -189,7 +189,7 @@ public abstract class ProfessionManager {
                             "Can craft any item that doesn't need smelting.\nCan't use redstone or nether blocks/items",
                             "Build crafting table to unlock",
                             "_"
-                    ).setBlockRequirement(Blocks.CRAFTING_TABLE)
+                    ).setBlockRequirement(Blocks.CRAFTING_TABLE, false)
             ),
             entry(
                     "leather_worker1",
@@ -216,10 +216,10 @@ public abstract class ProfessionManager {
                     new Profession(
                             "Blacksmith",
                             Items.IRON_INGOT,
-                            "",
-                            "Will be available in future releases",
+                            "Can smelt ores and cook food in furnace",
+                            "Build any blueprint with a Furnace to unlock",
                             "_"
-                    )
+                    ).setBlockRequirement(Blocks.FURNACE, true)
             ),
             entry(
                     "armorer",
@@ -345,9 +345,9 @@ public abstract class ProfessionManager {
 
         final AbstractFortressManager fortressManager = fortressManagerSupplier.get();
         boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement);
-        final Block blockRequirement = profession.getBlockRequirement();
+        final Profession.BlockRequirement blockRequirement = profession.getBlockRequirement();
         if(Objects.nonNull(blockRequirement)) {
-            satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement, false);
+            satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement.block(), blockRequirement.blueprint());
         }
         return satisfied;
     }
@@ -365,12 +365,13 @@ public abstract class ProfessionManager {
      * miner1 -> miner2
      * lumberjack1 -> lumberjack2
      * forester -> hunter, fisherman, farmer
-     * crafter -> leather_worker1
+     * crafter -> blacksmith
      * miner2 -> miner3
      * lumberjack2 -> lumberjack3
      * hunter -> warrior1, archer1, knight1
      * farmer -> baker, shepherd
-     * leather_worker1 -> leather_worker2, blacksmith, weaver
+     * blacksmith -> leather_worker1, weaver
+     * leather_worker1 -> leather_worker2
      * warrior1 -> warrior2
      * archer1 -> archer2
      * knight1 -> knight2
@@ -403,9 +404,9 @@ public abstract class ProfessionManager {
         Profession farmer = getProfession("farmer");
         addChildren(forester, hunter, fisherman, farmer);
 
-        // crafter -> leather_worker1
-        Profession leather_worker1 = getProfession("leather_worker1");
-        addChildren(crafter, leather_worker1);
+        // crafter -> blacksmith
+        Profession blacksmith = getProfession("blacksmith");
+        addChildren(crafter, blacksmith);
 
         // miner2 -> miner3
         Profession miner3 = getProfession("miner3");
@@ -426,11 +427,14 @@ public abstract class ProfessionManager {
         Profession shepherd = getProfession("shepherd");
         addChildren(farmer, baker, shepherd);
 
-        // leather_worker1 -> leather_worker2, blacksmith, weaver
-        Profession leather_worker2 = getProfession("leather_worker2");
-        Profession blacksmith = getProfession("blacksmith");
+        // blacksmith -> leather_worker1, weaver
+        Profession leather_worker1 = getProfession("leather_worker1");
         Profession weaver = getProfession("weaver");
-        addChildren(leather_worker1, leather_worker2, blacksmith, weaver);
+        addChildren(blacksmith, leather_worker1, weaver);
+
+        // leather_worker1 -> leather_worker2
+        Profession leather_worker2 = getProfession("leather_worker2");
+        addChildren(leather_worker1, leather_worker2);
 
         // warrior1 -> warrior2
         Profession warrior2 = getProfession("warrior2");

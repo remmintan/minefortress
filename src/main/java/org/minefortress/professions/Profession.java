@@ -25,6 +25,7 @@ public class Profession {
     private final List<Text> lockedDescription;
     private final String buildingRequirement;
     private Block blockRequirement = null;
+    private boolean blueprint = false;
 
     private Profession parent;
     private final List<Profession> children = new ArrayList<>();
@@ -90,8 +91,9 @@ public class Profession {
         return parent;
     }
 
-    public Profession setBlockRequirement(Block block) {
+    public Profession setBlockRequirement(Block block, boolean blueprint) {
         this.blockRequirement = block;
+        this.blueprint = blueprint;
         return this;
     }
 
@@ -101,8 +103,8 @@ public class Profession {
     }
 
     @Nullable
-    public Block getBlockRequirement() {
-        return blockRequirement;
+    public BlockRequirement getBlockRequirement() {
+        return new BlockRequirement(blockRequirement, blueprint);
     }
 
     public NbtCompound toNbt() {
@@ -117,4 +119,6 @@ public class Profession {
         else
             amount = 0;
     }
+
+    public static record BlockRequirement(Block block, boolean blueprint) {}
 }
