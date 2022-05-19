@@ -4,6 +4,7 @@ import net.minecraft.entity.ai.goal.Goal;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.TaskControl;
+import org.minefortress.entity.ai.professions.BlacksmithDailyTask;
 import org.minefortress.entity.ai.professions.CrafterDailyTask;
 import org.minefortress.entity.ai.professions.ProfessionDailyTask;
 
@@ -16,7 +17,8 @@ public class DailyProfessionTasksGoal extends Goal {
 
     private final Colonist colonist;
     private final Map<String, ProfessionDailyTask> dailyTasks = Map.ofEntries(
-            entry("crafter", new CrafterDailyTask())
+            entry("crafter", new CrafterDailyTask()),
+            entry("blacksmith", new BlacksmithDailyTask())
     );
 
     private ProfessionDailyTask currentTask;
@@ -62,10 +64,14 @@ public class DailyProfessionTasksGoal extends Goal {
     @Override
     public void stop() {
         if(this.currentTask.isWorkTimeout()){
-            restTicks = 100;
+            restTicks = getRestTicks();
         }
         this.currentTask.stop(colonist);
         colonist.getTaskControl().setDoingEverydayTasks(false);
+    }
+
+    private int getRestTicks() {
+        return this.currentTask.getRestTicks();
     }
 
     @Override
@@ -75,9 +81,5 @@ public class DailyProfessionTasksGoal extends Goal {
 
     private TaskControl getTaskControl() {
         return colonist.getTaskControl();
-    }
-
-    private MovementHelper getMovementHelper() {
-        return colonist.getMovementHelper();
     }
 }
