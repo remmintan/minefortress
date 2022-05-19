@@ -52,6 +52,11 @@ public class ClientboundSyncSpecialBlocksPacket implements FortressClientPacket 
 
     @Override
     public void write(PacketByteBuf buf) {
+        writeSpecialBlocks(buf, this.basicSpecialBlocks);
+        writeSpecialBlocks(buf, this.blueprintSpecialBlocks);
+    }
+
+    private void writeSpecialBlocks(PacketByteBuf buf, Map<Block, Set<BlockPos>> basicSpecialBlocks) {
         buf.writeInt(basicSpecialBlocks.size());
         for (Map.Entry<Block, Set<BlockPos>> entry : basicSpecialBlocks.entrySet()) {
             buf.writeString(Registry.BLOCK.getId(entry.getKey()).toString());
