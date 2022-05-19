@@ -1,6 +1,7 @@
 package org.minefortress.fortress.resources.gui.smelt;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.recipebook.FurnaceRecipeBookScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.render.GameRenderer;
@@ -9,6 +10,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
+import org.minefortress.interfaces.FortressMinecraftClient;
 
 public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<FortressFurnaceScreenHandler> {
 
@@ -26,7 +28,13 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
 
     @Override
     protected boolean professionRequirementSatisfied() {
-        return true;
+        final var fortressClient = getClient();
+        final var clientManager = fortressClient.getFortressClientManager();
+        return fortressClient.isFortressGamemode() && clientManager.getProfessionManager().hasProfession("blacksmith");
+    }
+
+    private FortressMinecraftClient getClient() {
+        return (FortressMinecraftClient) MinecraftClient.getInstance();
     }
 
     @Override

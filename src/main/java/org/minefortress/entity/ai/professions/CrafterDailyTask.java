@@ -62,9 +62,15 @@ public class CrafterDailyTask implements ProfessionDailyTask{
         final Optional<FortressServerManager> fortressManagerOpt = colonist.getFortressServerManager();
         if(fortressManagerOpt.isEmpty()) return;
         final FortressServerManager fortressManager = fortressManagerOpt.get();
-        final Optional<BlockPos> tablePosOpt = fortressManager.getSpecialBlocksByType(Blocks.CRAFTING_TABLE)
+        Optional<BlockPos> tablePosOpt = fortressManager.getSpecialBlocksByType(Blocks.CRAFTING_TABLE, true)
                 .stream()
                 .findFirst();
+
+        if(tablePosOpt.isEmpty()) {
+            tablePosOpt = fortressManager.getSpecialBlocksByType(Blocks.CRAFTING_TABLE, false)
+                    .stream()
+                    .findFirst();
+        }
 
         if(tablePosOpt.isEmpty()) return;
         this.tablePos = tablePosOpt.get();
