@@ -85,7 +85,7 @@ public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntit
             case "cook" -> COOK;
             case "crafter" -> CRAFTER;
             case "leather_worker1", "leather_worker2" -> LEATHER_WORKER;
-            case "blacksmith1" -> BLACKSMITH;
+            case "blacksmith" -> BLACKSMITH;
             case "weaver" -> WEAVER;
             default -> COLONIST;
         };
