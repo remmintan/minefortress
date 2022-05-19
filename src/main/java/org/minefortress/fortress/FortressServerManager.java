@@ -435,8 +435,11 @@ public final class FortressServerManager extends AbstractFortressManager {
         return this.colonists.stream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
     }
 
-    public Set<BlockPos> getSpecialBlocksByType(Block block) {
-        return specialBlocks.getOrDefault(block, Collections.emptySet());
+    public Set<BlockPos> getSpecialBlocksByType(Block block, boolean blueprint) {
+        if(blueprint)
+            return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptySet());
+        else
+            return specialBlocks.getOrDefault(block, Collections.emptySet());
     }
 
     @Override
