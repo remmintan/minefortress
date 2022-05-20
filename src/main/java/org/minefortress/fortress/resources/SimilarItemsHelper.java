@@ -50,6 +50,14 @@ public class SimilarItemsHelper {
             ItemTags.PLANKS
     );
 
+    private static final List<Item> similarDirt = Arrays.asList(
+            Items.DIRT,
+            Items.GRASS_BLOCK,
+            Items.FARMLAND,
+            Items.COARSE_DIRT,
+            Items.PODZOL
+    );
+
     public static List<Item> getSimilarItems(Item item) {
         if(strippedLogs.contains(item)) {
             return strippedLogs;
@@ -57,6 +65,10 @@ public class SimilarItemsHelper {
 
         if(strippedWood.contains(item)) {
             return strippedWood;
+        }
+
+        if(similarDirt.contains(item)) {
+            return similarDirt;
         }
 
         return getItemTag(item)
