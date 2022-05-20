@@ -6,6 +6,7 @@
   "mixins": [
     "FortressServerMixin",
     "entity.FortressItemEntityMixin",
+    "entity.FurnaceBlockEntityMixin",
     "entity.player.FortressPlayerInventoryMixin",
     "network.FortressClientPlayNetworkHandlerMixin",
     "renderer.FortressFluidRendererMixin",

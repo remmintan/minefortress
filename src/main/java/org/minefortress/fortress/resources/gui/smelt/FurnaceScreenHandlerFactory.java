@@ -31,13 +31,11 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
                     .findFirst();
             if(furnaceBlockOpt.isPresent()) {
                 final var furnaceBlockPos = furnaceBlockOpt.get();
-                if(Blocks.FURNACE instanceof BlockEntityProvider furnaceBlockEntityProvider) {
-                    final var blockEntity = furnaceBlockEntityProvider.createBlockEntity(furnaceBlockPos,  player.world.getBlockState(furnaceBlockPos));
+                    final var blockEntity = player.world.getBlockEntity(furnaceBlockPos);
                     if(blockEntity instanceof FurnaceBlockEntity furnaceBlockEntity) {
                         final var resourceManager = manager.getServerResourceManager();
                         return new FortressFurnaceScreenHandler(syncId, inv, resourceManager, furnaceBlockEntity, furnaceBlockEntity.propertyDelegate);
                     }
-                }
             }
         }
         return null;

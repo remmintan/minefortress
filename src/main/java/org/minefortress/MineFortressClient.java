@@ -8,6 +8,7 @@ import net.minecraft.client.world.ClientWorld;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.entity.renderer.ColonistRenderer;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreen;
+import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreen;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.*;
@@ -18,6 +19,7 @@ import org.minefortress.registries.FortressKeybindings;
 import org.minefortress.tasks.ClientTasksHolder;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
+import static org.minefortress.MineFortressMod.FORTRESS_FURNACE_SCREEN_HANDLER;
 
 public class MineFortressClient implements ClientModInitializer {
 
@@ -50,6 +52,7 @@ public class MineFortressClient implements ClientModInitializer {
         });
 
         ScreenRegistry.register(FORTRESS_CRAFTING_SCREEN_HANDLER, FortressCraftingScreen::new);
+        ScreenRegistry.register(FORTRESS_FURNACE_SCREEN_HANDLER, FortressFurnaceScreen::new);
 
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FINISH_TASK, ClientboundTaskExecutedPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_MANAGER_SYNC, ClientboundSyncFortressManagerPacket::new);

@@ -140,7 +140,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
             final var fortressServerManager = fortressServerPlayer.getFortressServerManager();
             final var serverResourceManager = fortressServerManager.getServerResourceManager();
 
-            new FortressInputSlotFiller(this).returnInputs();
+            returnInputs();
 
             final var diff = this.virtualInventory.getDiff();
             diff.added.forEach(stack -> serverResourceManager.setItemAmount(stack.item(), stack.amount()));
@@ -149,6 +149,9 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         }
     }
 
+    protected void returnInputs() {
+        new FortressInputSlotFiller(this).returnInputs();
+    }
 
 
     @Override
