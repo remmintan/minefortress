@@ -42,6 +42,7 @@ public class WanderAroundTheFortressGoal extends Goal {
             final Optional<BlockPos> goalOpt = fortressServerManager.randomSurfacePos((ServerWorld) colonist.world);
             if(goalOpt.isPresent()) {
                 colonist.setCurrentTaskDesc("Wandering around");
+                colonist.putItemInHand(null);
                 final BlockPos goal = goalOpt.get();
                 final EntityNavigation navigation = colonist.getNavigation();
                 final NodeMaker nodeMaker = (NodeMaker)navigation.getNodeMaker();
