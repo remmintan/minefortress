@@ -58,7 +58,7 @@ public class DailyProfessionTasksGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return this.currentTask.shouldContinue(colonist);
+        return this.dailyTasks.containsKey(colonist.getProfessionId()) && this.currentTask.shouldContinue(colonist);
     }
 
     @Override
