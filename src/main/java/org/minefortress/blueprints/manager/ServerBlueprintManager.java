@@ -65,6 +65,8 @@ public class ServerBlueprintManager {
                             new BlueprintMetadata("Stone Lumberjack's house", "lumberjack_house_stone").setRequirementId("lumberjack_stone"),
                             new BlueprintMetadata("Lumberjack's guild house", "lumberjack_house_guild").setRequirementId("lumberjack_guild"),
 
+                            new BlueprintMetadata("Blacksmith's house", "small_house_3_with_furnace").setRequirementId("blacksmith"),
+
                             //armorer_house_1.nbt
                             new BlueprintMetadata("Armorer House 1", "armorer_house_1").setRequirementId("armorer"),
                             //butcher_shop_1.nbt
