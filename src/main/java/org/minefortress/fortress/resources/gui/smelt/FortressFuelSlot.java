@@ -2,7 +2,6 @@ package org.minefortress.fortress.resources.gui.smelt;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.screen.slot.FurnaceFuelSlot;
 import net.minecraft.screen.slot.Slot;
 
@@ -22,11 +21,6 @@ public class FortressFuelSlot extends Slot {
 
     @Override
     public int getMaxItemCount(ItemStack stack) {
-        return FurnaceFuelSlot.isBucket(stack) ? 1 : super.getMaxItemCount(stack);
+        return FurnaceFuelSlot.isBucket(stack) ? 1 : Integer.MAX_VALUE;
     }
-
-    public static boolean isBucket(ItemStack stack) {
-        return stack.isOf(Items.BUCKET);
-    }
-
 }
