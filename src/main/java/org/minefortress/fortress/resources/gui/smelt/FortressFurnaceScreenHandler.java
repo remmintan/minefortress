@@ -1,6 +1,7 @@
 package org.minefortress.fortress.resources.gui.smelt;
 
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -109,4 +110,6 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
         return this.propertyDelegate.get(0) > 0;
     }
 
+    @Override
+    protected void returnInputs() {}
 }
