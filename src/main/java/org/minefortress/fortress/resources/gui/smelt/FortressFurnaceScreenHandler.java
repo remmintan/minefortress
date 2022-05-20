@@ -11,8 +11,6 @@ import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.slot.FurnaceOutputSlot;
-import net.minecraft.screen.slot.Slot;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 
@@ -33,9 +31,9 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
         this.furnaceInventory = furnace;
         this.propertyDelegate = propertyDelegate;
 
-        this.addSlot(new Slot(furnaceInventory, 0, 56, 17));
+        this.addSlot(new FortressSlot(furnaceInventory, 0, 56, 17));
         this.addSlot(new FortressFuelSlot(this, furnaceInventory, 1, 56, 53));
-        this.addSlot(new FurnaceOutputSlot(inventory.player, furnaceInventory, 2, 116, 35));
+        this.addSlot(new FortressFurnaceOutputSlot(inventory.player, furnaceInventory, 2, 116, 35));
 
         super.createDefaultsScrollableSlots();
         this.addProperties(this.propertyDelegate);
@@ -112,4 +110,48 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
 
     @Override
     protected void returnInputs() {}
+
+    private static class FortressFurnaceOutputSlot extends FortressSlot {
+
+        private final PlayerEntity player;
+        private int amount;
+
+
+        public FortressFurnaceOutputSlot(PlayerEntity player, Inventory inventory, int index, int x, int y) {
+            super(inventory, index, x, y);
+            this.player = player;
+        }
+
+        @Override
+        public boolean canInsert(ItemStack stack) {
+            return false;
+        }
+
+        @Override
+        public ItemStack takeStack(int amount) {
+            if (this.hasStack()) {
+                this.amount += Math.min(amount, this.getStack().getCount());
+            }
+            return super.takeStack(amount);
+        }
+
+        @Override
+        public void onTakeItem(PlayerEntity player, ItemStack stack) {
+            this.onCrafted(stack);
+            super.onTakeItem(player, stack);
+        }
+
+        @Override
+        protected void onCrafted(ItemStack stack, int amount) {
+            this.amount += amount;
+            this.onCrafted(stack);
+        }
+
+        @Override
+        protected void onCrafted(ItemStack stack) {
+            stack.onCraft(this.player.world, this.player, this.amount);
+            this.amount = 0;
+        }
+
+    }
 }
