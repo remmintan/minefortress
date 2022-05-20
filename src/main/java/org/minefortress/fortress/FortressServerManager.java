@@ -126,12 +126,12 @@ public final class FortressServerManager extends AbstractFortressManager {
             building.tick();
         }
 
-        if(!specialBlocks.isEmpty() && world != null && world.getDimension() == FortressDimensionTypeMixin.getOverworld()) {
+        if(!(specialBlocks.isEmpty() || blueprintsSpecialBlocks.isEmpty())  && world != null && world.getDimension() == FortressDimensionTypeMixin.getOverworld()) {
             boolean needSync = false;
             for(var entry : new HashSet<>(specialBlocks.entrySet())) {
                 final var block = entry.getKey();
                 final var positions = entry.getValue();
-                needSync = positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
+                needSync = needSync || positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
                 if (positions.isEmpty()) {
                     specialBlocks.remove(block);
                 }
@@ -139,7 +139,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             for (var entry : new HashSet<>(blueprintsSpecialBlocks.entrySet())) {
                 final var block = entry.getKey();
                 final var positions = entry.getValue();
-                needSync = positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
+                needSync = needSync || positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
                 if (positions.isEmpty()) {
                     blueprintsSpecialBlocks.remove(block);
                 }
