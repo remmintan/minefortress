@@ -40,7 +40,7 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
         if(professionRequirementSatisfied())
             getRecipeBookWidget().update();
         else {
-            this.onClose();
+            this.close();
         }
     }
 
