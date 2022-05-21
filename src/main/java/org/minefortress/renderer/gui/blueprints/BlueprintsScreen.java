@@ -187,7 +187,7 @@ public final class BlueprintsScreen extends Screen {
                     final ItemInfo stack = stacks.get(i1);
                     final var hasItem = resourceManager.hasItem(stack);
                     final var itemX = this.x + this.backgroundWidth/2 + 25 + i1%4 * 30;
-                    final var itemY = i1/4 * 20 + this.backgroundHeight - (i>16 ? 20 : 0);
+                    final var itemY = i1/4 * 20 + this.backgroundHeight - (i1>12 ? this.height : 0);
                     itemRenderer.renderInGui(new ItemStack(stack.item()), itemX, itemY);
                     this.textRenderer.draw(matrices, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000);
                 }
