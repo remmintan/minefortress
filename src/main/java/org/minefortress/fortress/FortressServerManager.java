@@ -162,14 +162,18 @@ public final class FortressServerManager extends AbstractFortressManager {
                 world.emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
             }
 
-            if(this.colonists.size() < DEFAULT_COLONIST_COUNT) {
-                final var randomSpawnPosition = getRandomSpawnPosition(world);
-                if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
-                    final var tag = getColonistInfoTag((FortressServerPlayerEntity) player);
-                    EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
-                    colonistType.spawn((ServerWorld) world, tag, null, player, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
-                }
+            if(world.getTime() % 100 == 0 && this.colonists.size() < buildings.stream().map(FortressBulding::getBedsCount).reduce(0, Integer::sum) && world.random.nextInt(100) > 95) {
+                spawnPawnNearCampfire(player, world);
             }
+        }
+    }
+
+    private void spawnPawnNearCampfire(ServerPlayerEntity player, World world) {
+        final var randomSpawnPosition = getRandomSpawnPosition(world);
+        if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
+            final var tag = getColonistInfoTag((FortressServerPlayerEntity) player);
+            EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
+            colonistType.spawn((ServerWorld) world, tag, null, player, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
         }
     }
 
@@ -187,6 +191,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(minZ > this.fortressCenter.getZ()-10) minZ = this.fortressCenter.getZ()-10;
         if(maxX < this.fortressCenter.getX()+10) maxX = this.fortressCenter.getX()+10;
         if(maxZ < this.fortressCenter.getZ()+10) maxZ = this.fortressCenter.getZ()+10;
+
+        for (int i = 0; i < 5; i++) {
+            spawnPawnNearCampfire(player, world);
+        }
 
         this.scheduleSync();
     }
