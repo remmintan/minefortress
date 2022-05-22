@@ -29,7 +29,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
         if(this.blockPos == null) return;
         final MovementHelper movementHelper = colonist.getMovementHelper();
         if(movementHelper.hasReachedWorkGoal()) {
-            if(workingTicks % 10 == 0) {
+            if(workingTicks % 10 * colonist.getHungerMultiplier() == 0) {
                 colonist.swingHand(colonist.world.random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
                 colonist.putItemInHand(getWorkingItem());
                 colonist.addExhaustion(0.1f);
