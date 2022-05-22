@@ -27,8 +27,13 @@ public class DailyProfessionTasksGoal extends Goal {
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Goal.Control.JUMP));
     }
 
+    private boolean isStarving() {
+        return colonist.getCurrentFoodLevel() <= 0;
+    }
+
     @Override
     public boolean canStart() {
+        if(this.isStarving()) return false;
         final TaskControl taskControl = getTaskControl();
         if(taskControl.hasTask()) return false;
         final String professionId = colonist.getProfessionId();
@@ -52,7 +57,7 @@ public class DailyProfessionTasksGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return this.dailyTasks.containsKey(colonist.getProfessionId())
+        return !isStarving() && this.dailyTasks.containsKey(colonist.getProfessionId())
                 && this.currentTask.shouldContinue(colonist)
                 && !getTaskControl().hasTask();
     }
@@ -65,7 +70,7 @@ public class DailyProfessionTasksGoal extends Goal {
 
     @Override
     public boolean canStop() {
-        return false;
+        return this.isStarving();
     }
 
     private TaskControl getTaskControl() {

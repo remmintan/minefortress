@@ -22,7 +22,7 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     @Override
     public boolean canStop() {
-        return false;
+        return colonistIsStarving();
     }
 
     public ColonistExecuteTaskGoal(Colonist colonist) {
@@ -39,7 +39,7 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        return getTaskControl().hasTask();
+        return getTaskControl().hasTask() && !colonistIsStarving();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return getTaskControl().hasTask() &&
+        return !colonistIsStarving() && getTaskControl().hasTask() &&
             (
                 getMovementHelper().stillTryingToReachGoal() ||
                 workGoal !=null ||
@@ -121,6 +121,10 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     private TaskControl getTaskControl() {
         return this.colonist.getTaskControl();
+    }
+
+    private boolean colonistIsStarving() {
+        return colonist.getCurrentFoodLevel() <= 0;
     }
 
     private MovementHelper getMovementHelper() {
