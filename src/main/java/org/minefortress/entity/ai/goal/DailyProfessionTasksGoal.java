@@ -5,6 +5,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.controls.TaskControl;
 import org.minefortress.entity.ai.professions.BlacksmithDailyTask;
 import org.minefortress.entity.ai.professions.CrafterDailyTask;
+import org.minefortress.entity.ai.professions.ForesterDailyTask;
 import org.minefortress.entity.ai.professions.ProfessionDailyTask;
 
 import java.util.EnumSet;
@@ -17,7 +18,8 @@ public class DailyProfessionTasksGoal extends Goal {
     private final Colonist colonist;
     private final Map<String, ProfessionDailyTask> dailyTasks = Map.ofEntries(
             entry("crafter", new CrafterDailyTask()),
-            entry("blacksmith", new BlacksmithDailyTask())
+            entry("blacksmith", new BlacksmithDailyTask()),
+            entry("forester", new ForesterDailyTask())
     );
 
     private ProfessionDailyTask currentTask;
