@@ -69,7 +69,7 @@ public class MovementHelper {
         nodeEvaluator.setWallClimbMode(false);
 
         if(path != null && (path.reachesTarget() || navigation.getCurrentPath() == null || !navigation.getCurrentPath().equals(path))) {
-            navigation.startMovingAlong(path, 1.75f);
+            navigation.startMovingAlong(path, 1.75f / colonist.getHungerMultiplier());
         }
 
         if (path == null) {
