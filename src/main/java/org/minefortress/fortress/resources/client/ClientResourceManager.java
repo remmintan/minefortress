@@ -13,7 +13,7 @@ public interface ClientResourceManager {
     Set<ItemGroup> getGroups();
     boolean hasStacks(List<ItemStack> stacks);
     boolean hasItems(List<ItemInfo> stacks);
-    boolean hasItem(ItemInfo item);
+    boolean hasItem(ItemInfo item, List<ItemInfo> items);
     List<ItemStack> getStacks(ItemGroup group);
     void setItemAmount(Item item, int amount);
     void reset();

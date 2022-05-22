@@ -61,19 +61,27 @@ public class SimilarItemsHelper {
 
     public static List<Item> getSimilarItems(Item item) {
         if(strippedLogs.contains(item)) {
-            return strippedLogs;
+            return strippedLogs.stream().filter(i -> i != item).toList();
         }
 
         if(strippedWood.contains(item)) {
-            return strippedWood;
+            return strippedWood.stream().filter(i -> i != item).toList();
         }
 
         if(similarDirt.contains(item)) {
-            return similarDirt;
+            return similarDirt.stream().filter(i -> i != item).toList();
         }
 
         return getItemTag(item)
-                .map(tag -> tag.values().stream().filter(it -> it != item).toList())
+                .map(tag ->
+                        tag.values()
+                                .stream()
+                                .filter(it -> it != item)
+                                .filter(it -> !strippedLogs.contains(it))
+                                .filter(it -> !strippedWood.contains(it))
+                                .filter(it -> !similarDirt.contains(it))
+                                .toList()
+                )
                 .orElse(Collections.emptyList());
     }
 
