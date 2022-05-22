@@ -2,6 +2,7 @@ package org.minefortress.network;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -40,7 +41,9 @@ public class ClientboundSyncItemsPacket implements FortressClientPacket {
         final var resourceManager = fortressClientManager.getResourceManager();
         if(needReset) resourceManager.reset();
         for (ItemInfo info : itemInfo) {
-            resourceManager.setItemAmount(info.item(), info.amount());
+            final var item = info.item();
+            if(item == Items.STRUCTURE_VOID) continue;
+            resourceManager.setItemAmount(item, info.amount());
         }
     }
 
