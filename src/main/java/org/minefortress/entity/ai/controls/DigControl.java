@@ -49,9 +49,9 @@ public class DigControl extends PositionedActionControl {
             level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, goal);
             return true;
         } else {
-            this.destroyProgress += this.getDestroyProgress(level.getBlockState(goal), colonist, level, goal);
+            this.destroyProgress += this.getDestroyProgress(level.getBlockState(goal), colonist, level, goal)/colonist.getHungerMultiplier();
             this.colonist.lookAtGoal();
-            if(++destroyTicks % 4 == 0) {
+            if(++destroyTicks % (4 * colonist.getHungerMultiplier()) == 0) {
                 this.colonist.swingHand(Hand.MAIN_HAND);
             }
             return false;
