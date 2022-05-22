@@ -10,10 +10,5 @@ public interface ProfessionDailyTask {
     void tick(Colonist colonist);
     void stop(Colonist colonist);
     boolean shouldContinue(Colonist colonist);
-    boolean isWorkTimeout();
-
-    default int getRestTicks() {
-        return 100;
-    }
 
 }

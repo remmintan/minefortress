@@ -23,15 +23,6 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
         return tablePosOpt.get();
     }
 
-    @Override
-    protected int getMaxWorkTicks() {
-        return 1000;
-    }
-
-    @Override
-    public int getRestTicks() {
-        return 10;
-    }
 
     @Override
     protected Item getWorkingItem() {

@@ -1,16 +1,11 @@
 package org.minefortress.entity.ai.professions;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.fortress.FortressServerManager;
-
-import java.util.Optional;
 
 abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
 
@@ -61,7 +56,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return blockPos != null && colonist.world.isDay() && workingTicks < getMaxWorkTicks();
+        return blockPos != null && colonist.world.isDay();
     }
 
     private void setupTablePos(Colonist colonist) {
@@ -70,15 +65,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
         this.blockPos = blockPos;
     }
 
-
-
-    @Override
-    public boolean isWorkTimeout() {
-        return workingTicks >= getMaxWorkTicks();
-    }
-
     protected abstract BlockPos getBlockPos(Colonist colonist);
-    protected abstract int getMaxWorkTicks();
 
 }
 
