@@ -16,7 +16,7 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
 
     @Override
     public boolean canStart(Colonist colonist) {
-        return super.canStart(colonist) || craftingTableMenuOpened(colonist);
+        return craftingTableMenuOpened(colonist);
     }
 
     @Override
