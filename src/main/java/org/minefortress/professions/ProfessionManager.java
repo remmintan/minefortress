@@ -93,7 +93,7 @@ public abstract class ProfessionManager {
                     new Profession(
                             "Forester",
                             Items.APPLE,
-                            "Collects seeds, apples and some other basic food\nCan collect and plant saplings.",
+                            "Collects seeds, apples and some other basic food\nWhile working every tick has small chance of getting food.\nCollects saplings and sticks.",
                             "Build 'Forester's house' to unlock",
                             "forester"
                     )
