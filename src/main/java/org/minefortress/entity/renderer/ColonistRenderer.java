@@ -28,6 +28,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
+import java.awt.*;
 import java.util.Optional;
 
 public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityModel<Colonist>> {
@@ -73,11 +74,41 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
         if(currentGamemode == fortress) {
             final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == colonist;
             final boolean selecting = getFortressClientManager().getSelectedColonist() == colonist;
-            if(hovering || selecting) {
+            var color = getHealthFoodLevelColor(colonist);
+            if(hovering || selecting || color != null) {
                 final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-                ColonistRenderer.renderRhombus(matrixStack, buffer, colonist, selecting);
+                if(color != null && hovering) {
+                    color.scale(0.7f);
+                }
+                if(color == null)
+                    color = new Vec3f(selecting ? 0.7f : 0.0f, selecting ? 0.7f : 1.0f, selecting ? 0.7f : 0.0f);
+                ColonistRenderer.renderRhombus(matrixStack, buffer, colonist, color);
             }
         }
+    }
+
+    private float getHealthFoodLevel(Colonist colonist) {
+        final var health = colonist.getHealth();
+        final var foodLevel = colonist.getCurrentFoodLevel();
+
+        return Math.min(health, foodLevel);
+    }
+
+    @Nullable
+    private Vec3f getHealthFoodLevelColor(Colonist colonist) {
+        final var healthFoodLevel = getHealthFoodLevel(colonist);
+        final var maxLevelOfEachColor = 0xFFf;
+        if(healthFoodLevel > 10) return null;
+        if(healthFoodLevel <= 10 && healthFoodLevel >= 5) {
+            final var red = 0xFFf / maxLevelOfEachColor;
+            final var green = 0xAA / maxLevelOfEachColor;
+            final var blue = 0x00 / maxLevelOfEachColor;
+            return new Vec3f(red, green, blue);
+        }
+        final var red = 0xFFf / maxLevelOfEachColor;
+        final var green = 0x55f / maxLevelOfEachColor;
+        final var blue = 0x55f / maxLevelOfEachColor;
+        return new Vec3f(red, green, blue);
     }
 
     @Nullable
@@ -108,7 +139,7 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
         colonistModel.rightSleeve.visible = !colonist.isSleeping();
     }
 
-    private static void renderRhombus(MatrixStack matrices, VertexConsumer vertices, Entity entity, boolean selecting) {
+    private static void renderRhombus(MatrixStack matrices, VertexConsumer vertices, Entity entity, Vec3f color) {
         Box box = entity.getBoundingBox().offset(-entity.getX(), -entity.getY(), -entity.getZ());
         if (entity instanceof LivingEntity) {
             matrices.push();
@@ -121,7 +152,7 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
             matrices.multiply(yRoation);
             matrices.scale(0.3f, 0.3f, 0.3f);
 
-            WorldRenderer.drawBox(matrices, vertices, -0.5f,  -0.5f, -0.5f, 0.5f,  0.5f, 0.5f, selecting?0.0f:0.7f, selecting?1.0f:0.7f, selecting?0.0f:0.7f, 1.0f);
+            WorldRenderer.drawBox(matrices, vertices, -0.5f,  -0.5f, -0.5f, 0.5f,  0.5f, 0.5f, color.getX(), color.getY(), color.getZ(), 1.0f);
             matrices.pop();
         }
     }
