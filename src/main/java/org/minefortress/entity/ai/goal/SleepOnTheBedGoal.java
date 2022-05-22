@@ -51,8 +51,10 @@ public class SleepOnTheBedGoal extends Goal {
             if(hasReachedTheBed()) {
                 if(!colonist.isSleeping()) {
                     final BlockPos bedPos = this.bedInfo.getPos();
-                    if(BlockTags.BEDS.contains(colonist.world.getBlockState(bedPos).getBlock()))
+                    if(BlockTags.BEDS.contains(colonist.world.getBlockState(bedPos).getBlock())) {
                         colonist.sleep(bedPos);
+                        colonist.putItemInHand(null);
+                    }
                 }
             } else {
                 moveToBed();
@@ -85,7 +87,7 @@ public class SleepOnTheBedGoal extends Goal {
 
     @Override
     public boolean canStop() {
-        return false;
+        return true;
     }
 
     @Override

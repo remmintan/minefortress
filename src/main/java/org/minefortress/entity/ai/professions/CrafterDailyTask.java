@@ -31,7 +31,7 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return super.shouldContinue(colonist) && ticksAfterTableClose > 0;
+        return super.shouldContinue(colonist) && ticksAfterTableClose > 0 || craftingTableMenuOpened(colonist);
     }
 
     @Override
