@@ -3,7 +3,6 @@ package org.minefortress.fortress.resources.server;
 import net.minecraft.item.Item;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
-import org.minefortress.fortress.resources.client.FortressItemStack;
 
 import java.util.HashMap;
 import java.util.List;

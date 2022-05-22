@@ -45,4 +45,11 @@ class StackGroupsManager {
         throw new IllegalArgumentException("Item " + item + " is not in any group");
     }
 
+    List<FortressItemStack> getNonEmptySimilarStacks(Item item) {
+        return groups.values()
+                .stream()
+                .flatMap(it -> it.getNonEmptySimilarStacks(item).stream())
+                .toList();
+    }
+
 }

@@ -52,7 +52,7 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
         if (stack == null) return false;
         final var availableAmount = stack.getCount();
         if(availableAmount >= amount) return true;
-        final var amountOfNonEmptySimilarElements = manager
+        final var amountOfNonEmptySimilarElements = groupManager
                 .getNonEmptySimilarStacks(item)
                 .stream()
                 .map(ItemStack::getCount)
