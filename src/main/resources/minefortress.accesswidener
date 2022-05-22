@@ -35,3 +35,4 @@ accessible method net/minecraft/client/gui/screen/recipebook/RecipeBookWidget re
 accessible field net/minecraft/screen/ScreenHandler slots Lnet/minecraft/util/collection/DefaultedList;
 accessible method net/minecraft/client/gui/screen/ingame/HandledScreen getSlotAt (DD)Lnet/minecraft/screen/slot/Slot;
 accessible field net/minecraft/block/entity/AbstractFurnaceBlockEntity propertyDelegate Lnet/minecraft/screen/PropertyDelegate;
+accessible method net/minecraft/block/entity/AbstractFurnaceBlockEntity isBurning ()Z
