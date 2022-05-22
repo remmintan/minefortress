@@ -7,7 +7,6 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.ColonistNavigation;
 import org.minefortress.entity.ai.NodeMaker;
 import org.minefortress.fortress.FortressBedInfo;
 import org.minefortress.fortress.FortressServerManager;
@@ -51,8 +50,10 @@ public class SleepOnTheBedGoal extends Goal {
             if(hasReachedTheBed()) {
                 if(!colonist.isSleeping()) {
                     final BlockPos bedPos = this.bedInfo.getPos();
-                    if(colonist.world.getBlockState(bedPos).isIn(BlockTags.BEDS))
+                    if(colonist.world.getBlockState(bedPos).isIn(BlockTags.BEDS)) {
                         colonist.sleep(bedPos);
+                        colonist.putItemInHand(null);
+                    }
                 }
             } else {
                 moveToBed();
@@ -85,7 +86,7 @@ public class SleepOnTheBedGoal extends Goal {
 
     @Override
     public boolean canStop() {
-        return false;
+        return true;
     }
 
     @Override
