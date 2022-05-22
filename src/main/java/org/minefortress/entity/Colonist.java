@@ -24,6 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.text.LiteralText;
@@ -349,7 +350,24 @@ public class Colonist extends PassiveEntity {
         this.hungerManager.update(this);
 
         if(this.getCurrentFoodLevel() != this.hungerManager.getFoodLevel()) {
+            sendHungerMessage();
             this.updateCurrentFoodLevel();
+        }
+    }
+
+    private void sendHungerMessage() {
+        final var masterPlayerOpt = this.getMasterPlayer();
+        if(masterPlayerOpt.isPresent()) {
+            final var masterPlayer = masterPlayerOpt.get();
+            if(masterPlayer instanceof ServerPlayerEntity player) {
+                if(hungerManager.prevFoodLevel > 0 && this.hungerManager.getFoodLevel() <= 0) {
+                    player.sendMessage(new LiteralText(getName().asString() + "is starving! Do something!"), false);
+                } else if(this.hungerManager.prevFoodLevel >= 5 && this.hungerManager.foodLevel < 5) {
+                    player.sendMessage(new LiteralText(getName().asString() + " is very hungry! Bring some food to the village!"), false);
+                } else if(this.hungerManager.prevFoodLevel >= 10 && this.hungerManager.foodLevel < 10) {
+                    player.sendMessage(new LiteralText(getName().asString() + " is hungry. It's time to eat something!"), false);
+                }
+            }
         }
     }
 
