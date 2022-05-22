@@ -63,6 +63,10 @@ public class FortressBulding {
         return beds.stream().filter(b -> !b.isOccupied()).findFirst();
     }
 
+    public int getBedsCount() {
+        return beds.size();
+    }
+
     public void writeToNbt(NbtCompound tag) {
         tag.putLong("start", start.asLong());
         tag.putLong("end", end.asLong());
