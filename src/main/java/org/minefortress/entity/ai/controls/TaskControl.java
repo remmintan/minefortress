@@ -34,7 +34,7 @@ public class TaskControl {
     }
 
     public boolean canStartTask(Task task) {
-        return !hasTask() && !this.returnedIds.asMap().containsKey(task.getId());
+        return !hasTask() && !this.returnedIds.asMap().containsKey(task.getId()) && colonist.getCurrentFoodLevel() > 0;
     }
 
     public void setTask(@NotNull Task task, TaskPart taskPart, Consumer<TaskPart> onTaskFailed, Supplier<Boolean> cancelled) {

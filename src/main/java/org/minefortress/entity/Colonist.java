@@ -287,7 +287,7 @@ public class Colonist extends PassiveEntity {
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
-        this.goalSelector.add(3, new MeleeAttackGoal(this, 1.5, true));
+        this.goalSelector.add(3, new FortressMeleeAttackGoal(this, 1.5, true));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
         this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
