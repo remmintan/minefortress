@@ -1,17 +1,44 @@
 package org.minefortress.entity.ai.professions;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 
 import java.util.Optional;
 
 public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
+
+    private int ticksAfterTableClose = 0;
+
+    @Override
+    public boolean canStart(Colonist colonist) {
+        return super.canStart(colonist) || craftingTableMenuOpened(colonist);
+    }
+
+    @Override
+    public void tick(Colonist colonist) {
+        super.tick(colonist);
+        if(craftingTableMenuOpened(colonist)) {
+            ticksAfterTableClose = 400;
+        } else {
+            ticksAfterTableClose--;
+        }
+    }
+
+    @Override
+    public boolean shouldContinue(Colonist colonist) {
+        return super.shouldContinue(colonist) && ticksAfterTableClose > 0;
+    }
+
+    @Override
+    public void stop(Colonist colonist) {
+        super.stop(colonist);
+        this.ticksAfterTableClose = 0;
+    }
 
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
@@ -30,6 +57,17 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
 
         if(tablePosOpt.isEmpty()) return null;
         return tablePosOpt.get();
+    }
+
+    private boolean craftingTableMenuOpened(Colonist colonsit) {
+        final var masterPlayerOpt = colonsit.getMasterPlayer();
+        if(masterPlayerOpt.isEmpty()) return false;
+        final var masterPlayer = masterPlayerOpt.get();
+        if (masterPlayer instanceof ServerPlayerEntity serverPlayer) {
+            final var currentScreenHandler = serverPlayer.currentScreenHandler;
+            return currentScreenHandler instanceof FortressCraftingScreenHandler;
+        }
+        return false;
     }
 
 }

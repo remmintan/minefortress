@@ -134,8 +134,7 @@ public class Colonist extends PassiveEntity {
     }
 
     public void doActionOnMasterPlayer(Consumer<FortressServerPlayerEntity> playerConsumer) {
-        final MinecraftServer server = getServer();
-        final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer(server);
+        final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer();
         if(masterPlayer.isPresent()) {
             playerConsumer.accept(masterPlayer.get());
         } else {
@@ -144,12 +143,13 @@ public class Colonist extends PassiveEntity {
     }
 
     public Optional<FortressServerManager> getFortressManager() {
-        final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer(getServer());
+        final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer();
         return masterPlayer.map(FortressServerPlayerEntity::getFortressServerManager);
     }
 
     @NotNull
-    private Optional<FortressServerPlayerEntity> getMasterPlayer(MinecraftServer server) {
+    public Optional<FortressServerPlayerEntity> getMasterPlayer() {
+        final var server = getServer();
         if(server == null || masterPlayerId == null) return Optional.empty();
         return server
                 .getPlayerManager()
@@ -162,7 +162,7 @@ public class Colonist extends PassiveEntity {
     }
 
     public Optional<FortressServerManager> getFortressServerManager() {
-        return getMasterPlayer(this.getServer()).map(FortressServerPlayerEntity::getFortressServerManager);
+        return getMasterPlayer().map(FortressServerPlayerEntity::getFortressServerManager);
     }
 
     public BlockPos getFortressCenter() {
@@ -283,11 +283,11 @@ public class Colonist extends PassiveEntity {
         this.goalSelector.add(3, new MeleeAttackGoal(this, 1.5, true));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
-        this.goalSelector.add(7, new WanderAroundTheFortressGoal(this));
-        this.goalSelector.add(7, new SleepOnTheBedGoal(this));
-        this.goalSelector.add(8, new ReturnToFireGoal(this));
-        this.goalSelector.add(9, new WanderAroundFarGoal(this, 1.0D));
-        this.goalSelector.add(10, new LookAroundGoal(this));
+        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
+        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
+        this.goalSelector.add(9, new ReturnToFireGoal(this));
+        this.goalSelector.add(10, new WanderAroundFarGoal(this, 1.0D));
+        this.goalSelector.add(11, new LookAroundGoal(this));
 
         this.targetSelector.add(1, new RevengeGoal(this).setGroupRevenge());
     }
@@ -331,7 +331,7 @@ public class Colonist extends PassiveEntity {
         super.mobTick();
         tickProfessionCheck();
         if(!this.masterPlayerActionQueue.isEmpty()) {
-            final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer(this.getServer());
+            final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer();
             if(masterPlayer.isPresent()) {
                 final FortressServerPlayerEntity fortressServerPlayerEntity = masterPlayer.get();
                 masterPlayerActionQueue.forEach(action -> action.accept(fortressServerPlayerEntity));
