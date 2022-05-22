@@ -97,17 +97,17 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
     @Nullable
     private Vec3f getHealthFoodLevelColor(Colonist colonist) {
         final var healthFoodLevel = getHealthFoodLevel(colonist);
-        final var maxLevelOfEachColor = 0xFFf;
+        final var maxLevelOfEachColor = (float)0xFF;
         if(healthFoodLevel > 10) return null;
         if(healthFoodLevel <= 10 && healthFoodLevel >= 5) {
-            final var red = 0xFFf / maxLevelOfEachColor;
+            final var red = 0xFF / maxLevelOfEachColor;
             final var green = 0xAA / maxLevelOfEachColor;
             final var blue = 0x00 / maxLevelOfEachColor;
             return new Vec3f(red, green, blue);
         }
-        final var red = 0xFFf / maxLevelOfEachColor;
-        final var green = 0x55f / maxLevelOfEachColor;
-        final var blue = 0x55f / maxLevelOfEachColor;
+        final var red = 0xFF / maxLevelOfEachColor;
+        final var green = 0x55 / maxLevelOfEachColor;
+        final var blue = 0x55 / maxLevelOfEachColor;
         return new Vec3f(red, green, blue);
     }
 
