@@ -5,18 +5,29 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
+import net.minecraft.tag.ItemTags;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.minefortress.blueprints.world.BlueprintsWorld;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.professions.ServerProfessionManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.minefortress.professions.ProfessionManager.FISHERMAN_ITEMS;
+import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
 
 @Mixin(ItemEntity.class)
 public abstract class FortressItemEntityMixin extends Entity {
@@ -55,11 +66,23 @@ public abstract class FortressItemEntityMixin extends Entity {
                     final var fortressServerManager = fortressServerPlayer.getFortressServerManager();
                     final var resourceManager = fortressServerManager.getServerResourceManager();
                     final var stack = this.getStack();
-                    resourceManager.increaseItemAmount(stack.getItem(), stack.getCount());
+                    final var item = stack.getItem();
+                    if(shouldCollectInInventory(fortressServerManager.getServerProfessionManager(), item))
+                        resourceManager.increaseItemAmount(item, stack.getCount());
                     this.discard();
                 }
             }
         }
+    }
+
+    private boolean shouldCollectInInventory(ServerProfessionManager serverProfessionManager, Item item) {
+        if(ItemTags.SAPLINGS.contains(item) || FORESTER_ITEMS.contains(item))
+            return serverProfessionManager.hasProfession("forester");
+
+        if(FISHERMAN_ITEMS.contains(item))
+            return serverProfessionManager.hasProfession("fisherman");
+
+        return true;
     }
 
     private boolean isFortressGamemode(ServerPlayerInteractionManager interactionManager) {

@@ -2,18 +2,36 @@ package org.minefortress.professions;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import org.apache.logging.log4j.util.Strings;
 import org.minefortress.fortress.AbstractFortressManager;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static java.util.Map.entry;
 
 public abstract class ProfessionManager {
+
+    public static final List<Item> FORESTER_ITEMS = Arrays.asList(
+            Items.BEETROOT_SEEDS,
+            Items.CARROT,
+            Items.POTATO,
+            Items.WHEAT_SEEDS,
+            Items.PUMPKIN_SEEDS,
+            Items.MELON_SEEDS,
+            Items.APPLE
+    );
+
+    public static final List<Item> FISHERMAN_ITEMS = Arrays.asList(
+            Items.COD,
+            Items.SALMON,
+            Items.TROPICAL_FISH,
+            Items.PUFFERFISH,
+            Items.INK_SAC,
+            Items.GLOW_INK_SAC
+    );
 
     public final Map<String, Profession> professions = Map.ofEntries(
             entry(
