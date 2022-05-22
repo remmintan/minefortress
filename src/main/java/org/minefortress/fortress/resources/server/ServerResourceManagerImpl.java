@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.network.ClientboundSyncItemsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -52,19 +53,19 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
         final var infosToSync = new ArrayList<ItemInfo>();
         for(ItemInfo info : infos) {
             final var item = info.item();
-            final var amount = info.amount();
+            final var requiredAmount = info.amount();
             final var stack = resources.getStack(item);
             final var reservedStack = reservedItemsManager.getStack(item);
 
-            var yetToFulfill = amount - stack.getAmount();
+            var yetToFulfill = requiredAmount - stack.getAmount();
 
             if(yetToFulfill>0) {
                 final var existingAmount = stack.getAmount();
                 stack.decreaseBy(existingAmount);
                 reservedStack.increaseBy(existingAmount);
             } else {
-                stack.decreaseBy(amount);
-                reservedStack.increaseBy(amount);
+                stack.decreaseBy(requiredAmount);
+                reservedStack.increaseBy(requiredAmount);
             }
             infosToSync.add(new ItemInfo(item, stack.getAmount()));
 
@@ -105,7 +106,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
                 final var similarStack = nonEmptySimilarStacks.get(0);
                 similarStack.decrease();
             } else{
-                throw new IllegalStateException("Item not reserved or not enough items " + item.getName().asString());
+                throw new IllegalStateException("Item not reserved or not enough items " + item);
             }
         }
     }
@@ -199,7 +200,13 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
                         .map(EasyItemStack::getAmount)
                         .reduce(0, Integer::sum);
 
-                if(sumAmountOfSimilarItems + stack.getAmount() < amount) return false;
+                final var similarItemsSet = new HashSet<>(SimilarItemsHelper.getSimilarItems(item));
+                final var requiredSimilarItems = infos.stream()
+                        .filter(it -> similarItemsSet.contains(it.item()))
+                        .mapToInt(ItemInfo::amount)
+                        .sum();
+
+                if(sumAmountOfSimilarItems - requiredSimilarItems + stack.getAmount() < amount) return false;
             }
         }
         return true;
