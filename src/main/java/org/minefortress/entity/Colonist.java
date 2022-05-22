@@ -129,6 +129,10 @@ public class Colonist extends PassiveEntity {
         }
     }
 
+    public void addExhaustion(float exhaustion) {
+        this.hungerManager.addExhaustion(exhaustion);
+    }
+
     public void doActionOnMasterPlayer(Consumer<FortressServerPlayerEntity> playerConsumer) {
         final MinecraftServer server = getServer();
         final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer(server);
