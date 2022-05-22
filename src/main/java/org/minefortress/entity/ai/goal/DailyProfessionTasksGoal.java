@@ -2,7 +2,6 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.ai.goal.Goal;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.TaskControl;
 import org.minefortress.entity.ai.professions.BlacksmithDailyTask;
 import org.minefortress.entity.ai.professions.CrafterDailyTask;
@@ -22,7 +21,6 @@ public class DailyProfessionTasksGoal extends Goal {
     );
 
     private ProfessionDailyTask currentTask;
-    private int restTicks;
 
     public DailyProfessionTasksGoal(Colonist colonist) {
         this.colonist = colonist;
@@ -31,10 +29,6 @@ public class DailyProfessionTasksGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if(restTicks > 0) {
-            restTicks--;
-            return false;
-        }
         final TaskControl taskControl = getTaskControl();
         if(taskControl.hasTask()) return false;
         final String professionId = colonist.getProfessionId();
@@ -58,20 +52,15 @@ public class DailyProfessionTasksGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return this.dailyTasks.containsKey(colonist.getProfessionId()) && this.currentTask.shouldContinue(colonist);
+        return this.dailyTasks.containsKey(colonist.getProfessionId())
+                && this.currentTask.shouldContinue(colonist)
+                && !getTaskControl().hasTask();
     }
 
     @Override
     public void stop() {
-        if(this.currentTask.isWorkTimeout()){
-            restTicks = getRestTicks();
-        }
         this.currentTask.stop(colonist);
         colonist.getTaskControl().setDoingEverydayTasks(false);
-    }
-
-    private int getRestTicks() {
-        return this.currentTask.getRestTicks();
     }
 
     @Override

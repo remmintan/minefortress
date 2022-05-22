@@ -32,8 +32,4 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
         return tablePosOpt.get();
     }
 
-    @Override
-    protected int getMaxWorkTicks() {
-        return 300;
-    }
 }
