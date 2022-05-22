@@ -3,6 +3,7 @@ package org.minefortress.fortress;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.nbt.NbtCompound;
@@ -11,6 +12,7 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -162,19 +164,25 @@ public final class FortressServerManager extends AbstractFortressManager {
                 world.emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
             }
 
-            if(world.getTime() % 100 == 0 && this.colonists.size() < buildings.stream().map(FortressBulding::getBedsCount).reduce(0, Integer::sum) && world.random.nextInt(100) > 95) {
-                spawnPawnNearCampfire(player, world);
+            if(world.getTime() % 100 == 0  && world.random.nextInt(100) > 50 && this.colonists.size() < buildings.stream().map(FortressBulding::getBedsCount).reduce(0, Integer::sum)) {
+                final var colonistOpt = spawnPawnNearCampfire(player, world);
+                if(colonistOpt.isPresent()) {
+                    final var colonist = colonistOpt.get();
+                    player.sendMessage(new LiteralText(colonist.getName().asString()+" appeared in the village."), false);
+                }
             }
         }
     }
 
-    private void spawnPawnNearCampfire(ServerPlayerEntity player, World world) {
+    private Optional<Colonist> spawnPawnNearCampfire(ServerPlayerEntity player, World world) {
         final var randomSpawnPosition = getRandomSpawnPosition(world);
         if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
             final var tag = getColonistInfoTag((FortressServerPlayerEntity) player);
             EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
-            colonistType.spawn((ServerWorld) world, tag, null, player, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+            final var spawnedPawn = (Colonist)colonistType.spawn((ServerWorld) world, tag, null, player, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+            return Optional.ofNullable(spawnedPawn);
         }
+        return Optional.empty();
     }
 
     public void setupCenter(BlockPos fortressCenter, World world, ServerPlayerEntity player) {
