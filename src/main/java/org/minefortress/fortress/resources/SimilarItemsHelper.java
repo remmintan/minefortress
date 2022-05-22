@@ -3,7 +3,6 @@ package org.minefortress.fortress.resources;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.Tag;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.registry.Registry;
 import org.minefortress.blueprints.data.BlueprintBlockData;

@@ -14,7 +14,6 @@ import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.network.ClientboundSyncItemsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.slf4j.Logger;
 
 import java.util.*;
 
