@@ -58,6 +58,12 @@ public class WanderAroundTheFortressGoal extends Goal {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        colonist.addExhaustion(0.005f);
+    }
+
+    @Override
     public boolean shouldContinue() {
         return isDay() && !this.colonist.getNavigation().isIdle() && !colonist.getTaskControl().hasTask();
     }
