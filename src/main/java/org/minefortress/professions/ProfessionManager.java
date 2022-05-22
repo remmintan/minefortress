@@ -93,9 +93,8 @@ public abstract class ProfessionManager {
                     new Profession(
                             "Forester",
                             Items.APPLE,
-                            "Hunts animals\nCollects seeds\nGet's and cooks on fire some basic food.\nCan collect and plant saplings.",
-//                            "Build 'Forester's house' to unlock",
-                            "Will be available in 1.5-alpha",
+                            "Collects seeds, apples and some other basic food\nCan collect and plant saplings.",
+                            "Build 'Forester's house' to unlock",
                             "forester"
                     )
             ),
@@ -105,8 +104,10 @@ public abstract class ProfessionManager {
                             "Hunter",
                             Items.BOW,
                             "Can use bow.\nDefends village from monsters.\nHunts monsters.\nCan work at night",
-                            "Build 'Shooting gallery' to unlock",
-                            "shooting_gallery"
+//                            "Build 'Shooting gallery' to unlock",
+                            "Will be available in future updates",
+//                            "shooting_gallery"
+                            "_"
                     )
             ),
             entry(
