@@ -115,6 +115,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
         final var stack = resources.getStack(item);
         if(stack.getAmount() <= 0) return;
         stack.decrease();
+        synchronizer.syncItem(item, stack.getAmount());
     }
 
     @Override
