@@ -123,6 +123,13 @@ public class Colonist extends PassiveEntity {
         return movementHelper;
     }
 
+    public float getHungerMultiplier() {
+        final var foodLevel = this.hungerManager.getFoodLevel();
+        if(foodLevel  < 5) return 3f;
+        if(foodLevel  < 10) return 1.5f;
+        return 1f;
+    }
+
     private void setCustomNameIfNeeded(FortressServerPlayerEntity player) {
         if(!this.hasCustomName()) {
             this.setCustomName(new LiteralText(player.getFortressServerManager().getNameGenerator().generateRandomName()));

@@ -21,7 +21,7 @@ public class PlaceControl extends PositionedActionControl {
 
     private final Colonist colonist;
 
-    private int placeCooldown = 0;
+    private float placeCooldown = 0;
     private int failedInteractions = 0;
     private boolean cantPlaceUnderMyself = false;
 
@@ -34,7 +34,7 @@ public class PlaceControl extends PositionedActionControl {
         if(isDone()) return;
         if(!super.canReachTheGoal(colonist) || !colonist.getNavigation().isIdle()) return;
 
-        if(placeCooldown>0) placeCooldown--;
+        if(placeCooldown>0) placeCooldown-=1f/colonist.getHungerMultiplier();
 
         final BlockPos blockPos = colonist.getBlockPos();
         if(blockPos.equals(goal))
