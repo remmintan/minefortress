@@ -169,6 +169,16 @@ public class Colonist extends PassiveEntity {
                 .findFirst();
     }
 
+    public ColonistHungerManager getHungerManager() {
+        return hungerManager;
+    }
+
+    @Override
+    public ItemStack eatFood(World world, ItemStack stack) {
+        this.getHungerManager().eat(stack.getItem(), stack);
+        return super.eatFood(world, stack);
+    }
+
     public Optional<FortressServerManager> getFortressServerManager() {
         return getMasterPlayer().map(FortressServerPlayerEntity::getFortressServerManager);
     }
