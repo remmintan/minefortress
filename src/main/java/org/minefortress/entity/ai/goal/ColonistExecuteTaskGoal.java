@@ -4,14 +4,14 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.minefortress.entity.ai.controls.TaskControl;
-import org.minefortress.tasks.*;
-import org.minefortress.entity.ai.ColonistNavigation;
-import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.MovementHelper;
+import org.minefortress.entity.ai.controls.TaskControl;
+import org.minefortress.tasks.BuildingManager;
+import org.minefortress.tasks.TaskType;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-import java.util.*;
+import java.util.EnumSet;
 
 public class ColonistExecuteTaskGoal extends Goal {
 
