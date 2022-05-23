@@ -3,8 +3,8 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
@@ -12,54 +12,10 @@ import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Optional;
 
 public class ColonistEatGoal extends Goal {
-
-    private static final List<Item> FOOD_ITEMS = Arrays.asList(
-            Items.APPLE,
-            Items.BAKED_POTATO,
-            Items.BEETROOT,
-            Items.BEETROOT_SOUP,
-            Items.BREAD,
-            Items.CAKE,
-            Items.CARROT,
-            Items.CHORUS_FRUIT,
-            Items.COCOA_BEANS,
-            Items.COOKED_CHICKEN,
-            Items.COOKED_COD,
-            Items.COOKED_MUTTON,
-            Items.COOKED_PORKCHOP,
-            Items.COOKED_RABBIT,
-            Items.COOKED_SALMON,
-            Items.COOKIE,
-            Items.DRIED_KELP,
-            Items.ENCHANTED_GOLDEN_APPLE,
-            Items.EGG,
-            Items.HONEY_BOTTLE,
-            Items.MELON,
-            Items.MELON_SLICE,
-            Items.MUSHROOM_STEW,
-            Items.BROWN_MUSHROOM,
-            Items.RED_MUSHROOM,
-            Items.PUFFERFISH,
-            Items.PUMPKIN_PIE,
-            Items.RABBIT_STEW,
-            Items.BEEF,
-            Items.CHICKEN,
-            Items.COD,
-            Items.MUTTON,
-            Items.PORKCHOP,
-            Items.RABBIT,
-            Items.SALMON,
-            Items.SUSPICIOUS_STEW,
-            Items.SWEET_BERRIES,
-            Items.TROPICAL_FISH,
-            Items.WHEAT
-    );
 
     private final Colonist colonist;
     private BlockPos goal;
@@ -77,7 +33,7 @@ public class ColonistEatGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        return colonist.getCurrentFoodLevel() < 10 && colonist.getFortressCenter() != null;
+        return colonist.getCurrentFoodLevel() < 12 && colonist.getFortressCenter() != null && this.hasEatableItem() ;
     }
 
     @Override
@@ -98,9 +54,15 @@ public class ColonistEatGoal extends Goal {
     public void tick() {
         final MovementHelper movementHelper = colonist.getMovementHelper();
         if(movementHelper.hasReachedWorkGoal()) {
-            if(this.foodInHand != null) {
-                colonist.eatFood(colonist.world, new ItemStack(this.foodInHand));
+            if(this.foodInHand != null && !colonist.getActiveItem().isEmpty() && colonist.getItemUseTimeLeft() <= 0) {
                 this.foodInHand = null;
+                colonist.putItemInHand(this.foodInHand);
+            } else if(this.foodInHand != null) {
+                this.colonist.setCurrentTaskDesc("Eating...");
+                colonist.putItemInHand(this.foodInHand);
+                if(!colonist.isUsingItem()) {
+                    colonist.setCurrentHand(Hand.MAIN_HAND);
+                }
             } else {
                 putFoodInHand();
             }
@@ -113,7 +75,11 @@ public class ColonistEatGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return colonist.getCurrentFoodLevel() < 18 && (colonist.getFoodSaturation() > 0 || hasEatableItem() || this.foodInHand != null);
+        return colonist.getCurrentFoodLevel() < 12 && (hasEatableItem() || this.foodInHand != null || hasntReachedTheWorkGoal());
+    }
+
+    private boolean hasntReachedTheWorkGoal() {
+        return this.goal != null && !colonist.getMovementHelper().hasReachedWorkGoal();
     }
 
     @Override
@@ -126,6 +92,7 @@ public class ColonistEatGoal extends Goal {
         this.foodInHand = null;
         this.goal = null;
         this.colonist.getNavigation().stop();
+        colonist.putItemInHand(this.foodInHand);
     }
 
     private void putFoodInHand() {
@@ -150,7 +117,7 @@ public class ColonistEatGoal extends Goal {
     }
 
     private boolean isEatableItem(ItemStack st) {
-        return !st.isEmpty() && FOOD_ITEMS.contains(st.getItem());
+        return !st.isEmpty() && st.getItem().isFood();
     }
 
     private Optional<ServerResourceManager> getServerResourceManager() {
@@ -158,16 +125,11 @@ public class ColonistEatGoal extends Goal {
     }
 
     private int getHomeOuterRadius() {
-        return Math.max(getColonistsCount(), 5) * 4 / 5;
-    }
-
-
-    private int getColonistsCount() {
-        return colonist.getFortressServerManager().map(FortressServerManager::getColonistsCount).orElse(5);
+        return 8;
     }
 
     private int getHomeInnerRadius() {
-        return Math.max(getColonistsCount(), 5) * 2 / 5;
+        return 3;
     }
 
 }
