@@ -291,6 +291,7 @@ public class Colonist extends PassiveEntity {
         this.goalSelector.add(3, new FortressMeleeAttackGoal(this, 1.5, true));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
+        this.goalSelector.add(7, new ColonistEatGoal(this));
         this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
         this.goalSelector.add(8, new SleepOnTheBedGoal(this));
         this.goalSelector.add(9, new ReturnToFireGoal(this));
@@ -582,6 +583,10 @@ public class Colonist extends PassiveEntity {
 
     public int getCurrentFoodLevel() {
         return this.dataTracker.get(CURRENT_FOOD_LEVEL);
+    }
+
+    public float getFoodSaturation() {
+        return this.hungerManager.foodSaturationLevel;
     }
 
     public void setProfession(String professionId) {
