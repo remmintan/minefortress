@@ -60,7 +60,7 @@ public class WanderAroundTheFortressGoal extends Goal {
     @Override
     public void tick() {
         super.tick();
-        colonist.addExhaustion(0.005f);
+        colonist.addExhaustion(0.001f);
     }
 
     @Override

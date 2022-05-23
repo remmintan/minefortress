@@ -41,7 +41,7 @@ public class DigControl extends PositionedActionControl {
     private boolean act() {
         putProperItemInHand();
 
-        colonist.addExhaustion(0.1f);
+        colonist.addExhaustion(0.01f);
         if(destroyProgress >= 1.0f){
             this.destroyProgress = 0f;
             addDropToTheResourceManager(level, goal, colonist);
