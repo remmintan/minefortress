@@ -55,7 +55,7 @@ public class PlaceControl extends PositionedActionControl {
 
         if (placeCooldown <= 0) {
             this.colonist.swingHand(Hand.MAIN_HAND);
-            colonist.addExhaustion(0.1f);
+            colonist.addExhaustion(0.01f);
 
             if(taskBlockInfo instanceof ItemTaskBlockInfo)
                 place((ItemTaskBlockInfo) taskBlockInfo);

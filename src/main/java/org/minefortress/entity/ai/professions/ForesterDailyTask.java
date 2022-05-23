@@ -38,7 +38,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
             if(workingTicks % 10 * colonist.getHungerMultiplier() == 0) {
                 colonist.swingHand(colonist.world.random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
                 colonist.putItemInHand(Items.WOODEN_HOE);
-                colonist.addExhaustion(0.05f);
+                colonist.addExhaustion(0.005f);
                 this.interactionsCount++;
                 this.gatherItemAndAddToInventory(colonist);
                 if(this.interactionsCount > 5) {

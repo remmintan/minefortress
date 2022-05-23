@@ -112,7 +112,7 @@ public abstract class ProfessionManager {
                             "Forester",
                             Items.APPLE,
                             "Collects seeds, apples and some other basic food\nWhile working every tick has small chance of getting food.\nCollects saplings and sticks.",
-                            "Build 'Forester's house' to unlock",
+                            "Brings food. Build 'Forester's house' to unlock",
                             "forester"
                     )
             ),
