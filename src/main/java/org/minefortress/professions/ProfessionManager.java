@@ -134,8 +134,10 @@ public abstract class ProfessionManager {
                             "Fisherman",
                             Items.FISHING_ROD,
                             "Catches fish in ponds\nCooks fish",
-                            "Build 'Fishing hut' to unlock",
-                            "fisher"
+//                            "Build 'Fishing hut' to unlock",
+                            "Will be available in future updates",
+//                            "fisher"
+                            "_"
                     )
             ),
             entry(
@@ -144,8 +146,10 @@ public abstract class ProfessionManager {
                             "Farmer",
                             Items.WHEAT,
                             "Plants any kind of seeds including wheat, watermelon and pumpkin",
-                            "Build 'Farm' to unlock",
-                            "farmer"
+//                            "Build 'Farm' to unlock",
+                            "Will be available in future updates",
+//                            "farmer"
+                            "_"
                     )
             ),
             entry(
