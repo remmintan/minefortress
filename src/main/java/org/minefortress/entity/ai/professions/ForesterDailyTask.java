@@ -41,7 +41,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
                 colonist.addExhaustion(0.005f);
                 this.interactionsCount++;
                 this.gatherItemAndAddToInventory(colonist);
-                if(this.interactionsCount > 5) {
+                if(this.interactionsCount > 2) {
                     this.setGoal(colonist);
                     colonist.getMovementHelper().set(this.blockPos);
                     this.interactionsCount = 0;
@@ -87,7 +87,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
 
     private boolean isSuccess(Colonist colonist){
         final var random = colonist.world.random;
-        return random.nextInt(100) < 50;
+        return random.nextInt(100) < 25;
     }
 
     private void setGoal(Colonist colonist){
