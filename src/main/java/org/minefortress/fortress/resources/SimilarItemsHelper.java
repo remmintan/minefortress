@@ -6,6 +6,7 @@ import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.registry.Registry;
+import org.minefortress.blueprints.data.BlueprintBlockData;
 
 import java.util.*;
 
@@ -58,6 +59,10 @@ public class SimilarItemsHelper {
             Items.PODZOL
     );
 
+    public static boolean isIgnorable(Item it) {
+        return BlueprintBlockData.IGNORED_ITEMS.contains(it) || SimilarItemsHelper.contains(ItemTags.BEDS, it) || SimilarItemsHelper.contains(ItemTags.DOORS, it);
+    }
+
     public static List<Item> getSimilarItems(Item item) {
         if(strippedLogs.contains(item)) {
             return strippedLogs.stream().filter(i -> i != item).toList();
@@ -92,6 +97,9 @@ public class SimilarItemsHelper {
         }
         return Optional.empty();
     }
+
+
+
 
     public static boolean contains(TagKey<Item> tag, Item item) {
         for(var it: Registry.ITEM.iterateEntries(tag)) {

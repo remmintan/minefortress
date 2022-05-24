@@ -2,6 +2,7 @@ package org.minefortress.entity.ai.controls;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.ActionResult;
@@ -13,6 +14,8 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
+
+import static org.minefortress.fortress.resources.SimilarItemsHelper.isIgnorable;
 
 public class PlaceControl extends PositionedActionControl {
 
@@ -94,7 +97,7 @@ public class PlaceControl extends PositionedActionControl {
             final var fortressServerManager = p.getFortressServerManager();
             final var taskControl = colonist.getTaskControl();
             if(fortressServerManager.isSurvival() && taskControl.hasTask()) {
-                if (BlueprintBlockData.IGNORED_ITEMS.contains(item) || SimilarItemsHelper.contains(ItemTags.BEDS, item) || SimilarItemsHelper.contains(ItemTags.DOORS, item)) {
+                if (isIgnorable(item)) {
                     fortressServerManager
                             .getServerResourceManager()
                             .removeItemIfExists(item);
