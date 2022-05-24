@@ -16,6 +16,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressBedInfo;
 import org.minefortress.fortress.FortressBulding;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
@@ -128,7 +129,7 @@ public class BlueprintTask extends AbstractTask {
         if(fortressManagerOpt.isPresent()) {
             final var fortressServerManager = fortressManagerOpt.get();
             if(fortressServerManager.isSurvival()) {
-                if (BlueprintBlockData.IGNORED_ITEMS.contains(item)) {
+                if (SimilarItemsHelper.isIgnorable(item)) {
                     fortressServerManager
                             .getServerResourceManager()
                             .removeItemIfExists(item);

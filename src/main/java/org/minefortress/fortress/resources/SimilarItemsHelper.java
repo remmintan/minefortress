@@ -4,6 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
+import org.minefortress.blueprints.data.BlueprintBlockData;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,6 +59,10 @@ public class SimilarItemsHelper {
             Items.COARSE_DIRT,
             Items.PODZOL
     );
+
+    public static boolean isIgnorable(Item it) {
+        return BlueprintBlockData.IGNORED_ITEMS.contains(it) || ItemTags.BEDS.contains(it) || ItemTags.DOORS.contains(it);
+    }
 
     public static List<Item> getSimilarItems(Item item) {
         if(strippedLogs.contains(item)) {

@@ -3,17 +3,16 @@ package org.minefortress.entity.ai.controls;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.tag.ItemTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
-import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 
 import static org.minefortress.entity.colonist.ColonistHungerManager.ACTIVE_EXHAUSTION;
+import static org.minefortress.fortress.resources.SimilarItemsHelper.isIgnorable;
 
 public class PlaceControl extends PositionedActionControl {
 
@@ -96,7 +95,7 @@ public class PlaceControl extends PositionedActionControl {
             final var fortressServerManager = p.getFortressServerManager();
             final var taskControl = colonist.getTaskControl();
             if(fortressServerManager.isSurvival() && taskControl.hasTask()) {
-                if (BlueprintBlockData.IGNORED_ITEMS.contains(item) || ItemTags.DOORS.contains(item) || ItemTags.BEDS.contains(item)) {
+                if (isIgnorable(item)) {
                     fortressServerManager
                             .getServerResourceManager()
                             .removeItemIfExists(item);
