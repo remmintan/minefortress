@@ -7,12 +7,14 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.apache.logging.log4j.LogManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.network.ClientboundSyncItemsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.slf4j.Logger;
 
 import java.util.*;
 
@@ -106,7 +108,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
                 final var similarStack = nonEmptySimilarStacks.get(0);
                 similarStack.decrease();
             } else{
-                throw new IllegalStateException("Item not reserved or not enough items " + item);
+                LogManager.getLogger().warn("Tried to remove reserved item, but not enough items: " + item.getName().asString());
             }
         }
     }
