@@ -15,40 +15,46 @@ import java.util.stream.Collectors;
 
 public final class BlueprintBlockData {
 
-    public static final Set<Item> IGNORED_ITEMS = Sets.newHashSet(
-            Items.AIR,
-            Items.STRUCTURE_VOID,
-            Items.BARRIER,
-            Items.DIRT,
-            Items.GRASS_BLOCK,
-            Items.DIRT_PATH,
-            Items.GLASS,
-            Items.GLASS_PANE,
-            Items.WHITE_BED,
-            Items.ORANGE_BED,
-            Items.MAGENTA_BED,
-            Items.LIGHT_BLUE_BED,
-            Items.YELLOW_BED,
-            Items.LIME_BED,
-            Items.PINK_BED,
-            Items.GRAY_BED,
-            Items.LIGHT_GRAY_BED,
-            Items.CYAN_BED,
-            Items.PURPLE_BED,
-            Items.BLUE_BED,
-            Items.BROWN_BED,
-            Items.GREEN_BED,
-            Items.RED_BED,
-            Items.BLACK_BED,
-            Items.GRASS,
-            Items.TALL_GRASS,
-            Items.ACACIA_LEAVES,
-            Items.BIRCH_LEAVES,
-            Items.DARK_OAK_LEAVES,
-            Items.JUNGLE_LEAVES,
-            Items.OAK_LEAVES,
-            Items.SPRUCE_LEAVES
-    );
+    public static final Set<Item> IGNORED_ITEMS;
+
+    static {
+        final var items = Sets.newHashSet(
+                Items.AIR,
+                Items.STRUCTURE_VOID,
+                Items.BARRIER,
+                Items.DIRT,
+                Items.GRASS_BLOCK,
+                Items.DIRT_PATH,
+                Items.GLASS,
+                Items.GLASS_PANE,
+                Items.WHITE_BED,
+                Items.ORANGE_BED,
+                Items.MAGENTA_BED,
+                Items.LIGHT_BLUE_BED,
+                Items.YELLOW_BED,
+                Items.LIME_BED,
+                Items.PINK_BED,
+                Items.GRAY_BED,
+                Items.LIGHT_GRAY_BED,
+                Items.CYAN_BED,
+                Items.PURPLE_BED,
+                Items.BLUE_BED,
+                Items.BROWN_BED,
+                Items.GREEN_BED,
+                Items.RED_BED,
+                Items.BLACK_BED,
+                Items.GRASS,
+                Items.TALL_GRASS,
+                Items.ACACIA_LEAVES,
+                Items.BIRCH_LEAVES,
+                Items.DARK_OAK_LEAVES,
+                Items.JUNGLE_LEAVES,
+                Items.OAK_LEAVES,
+                Items.SPRUCE_LEAVES
+        );
+        items.addAll(ItemTags.FLOWERS.values());
+        IGNORED_ITEMS = items;
+    }
 
     private final Vec3i size;
     private final Map<BlueprintDataLayer, Map<BlockPos, BlockState>> layers = new HashMap<>();
@@ -92,7 +98,6 @@ public final class BlueprintBlockData {
         }
 
         BlueprintBlockData build() {
-
             final var layerBlockByItems = instance.layers.containsKey(BlueprintDataLayer.GENERAL) ?
                     instance.layers
                             .get(BlueprintDataLayer.GENERAL)
