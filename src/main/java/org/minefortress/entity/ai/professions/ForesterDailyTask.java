@@ -8,6 +8,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
+import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.BuildingManager;
 
 import static org.minefortress.entity.colonist.ColonistHungerManager.PASSIVE_EXHAUSTION;
@@ -99,7 +100,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
                         randPointAround,
                         20,
                         10,
-                        (BlockPos pos) -> BlockTags.LEAVES.contains(world.getBlockState(pos).getBlock())
+                        (BlockPos pos) -> SimilarItemsHelper.contains(BlockTags.LEAVES, world.getBlockState(pos).getBlock())
                 );
         if(closestLeavesOpt.isPresent()){
             this.blockPos = closestLeavesOpt.get();
@@ -111,7 +112,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
                         randPointAround,
                         20,
                         10,
-                        (BlockPos pos) -> BlockTags.HOE_MINEABLE.contains(world.getBlockState(pos).getBlock())
+                        (BlockPos pos) -> SimilarItemsHelper.contains(BlockTags.HOE_MINEABLE, world.getBlockState(pos).getBlock())
                 );
 
         if(closestHoeMineableOpt.isPresent()){

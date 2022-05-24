@@ -22,7 +22,7 @@ public class ColonistHungerManager extends HungerManager {
         if (this.exhaustion > 4.0f) {
             this.exhaustion -= 4.0f;
             if (this.saturationLevel > 0.0f) {
-                this.saturationLevel = Math.max(this.foodSaturationLevel - 1.0f, 0.0f);
+                this.saturationLevel = Math.max(this.saturationLevel - 1.0f, 0.0f);
             } else {
                 this.foodLevel = Math.max(this.foodLevel - 1, 0);
             }

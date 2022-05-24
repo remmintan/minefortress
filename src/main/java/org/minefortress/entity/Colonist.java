@@ -596,7 +596,7 @@ public class Colonist extends PassiveEntity {
     }
 
     public float getFoodSaturation() {
-        return this.hungerManager.foodSaturationLevel;
+        return this.hungerManager.saturationLevel;
     }
 
     public void setProfession(String professionId) {

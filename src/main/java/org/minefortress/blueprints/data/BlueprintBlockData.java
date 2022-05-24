@@ -52,7 +52,7 @@ public final class BlueprintBlockData {
                 Items.OAK_LEAVES,
                 Items.SPRUCE_LEAVES
         );
-        items.addAll(ItemTags.FLOWERS.values());
+        items.addAll(SimilarItemsHelper.getItems(ItemTags.FLOWERS));
         IGNORED_ITEMS = items;
     }
 

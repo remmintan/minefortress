@@ -1,5 +1,6 @@
 package org.minefortress.fortress.resources;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.tag.ItemTags;
@@ -109,7 +110,16 @@ public class SimilarItemsHelper {
         return false;
     }
 
-    private static List<Item> getItems(TagKey<Item> tag) {
+    public static boolean contains(TagKey<Block> tag, Block block) {
+        for(var it: Registry.BLOCK.iterateEntries(tag)) {
+            if(it.value() == block) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static List<Item> getItems(TagKey<Item> tag) {
         var items  = new ArrayList<Item>();
         for(var it: Registry.ITEM.iterateEntries(tag)) {
             items.add(it.value());
