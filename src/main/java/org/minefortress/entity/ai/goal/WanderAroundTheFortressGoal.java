@@ -12,6 +12,8 @@ import org.minefortress.fortress.FortressServerManager;
 import java.util.EnumSet;
 import java.util.Optional;
 
+import static org.minefortress.entity.colonist.ColonistHungerManager.IDLE_EXHAUSTION;
+
 public class WanderAroundTheFortressGoal extends Goal {
 
     private final Colonist colonist;
@@ -60,7 +62,7 @@ public class WanderAroundTheFortressGoal extends Goal {
     @Override
     public void tick() {
         super.tick();
-        colonist.addExhaustion(0.001f);
+        colonist.addExhaustion(IDLE_EXHAUSTION);
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.tasks.BuildingManager;
 
+import static org.minefortress.entity.colonist.ColonistHungerManager.PASSIVE_EXHAUSTION;
 import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
 
 public class ForesterDailyTask implements ProfessionDailyTask{
@@ -38,7 +39,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
             if(workingTicks % 10 * colonist.getHungerMultiplier() == 0) {
                 colonist.swingHand(colonist.world.random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
                 colonist.putItemInHand(Items.WOODEN_HOE);
-                colonist.addExhaustion(0.005f);
+                colonist.addExhaustion(PASSIVE_EXHAUSTION);
                 this.interactionsCount++;
                 this.gatherItemAndAddToInventory(colonist);
                 if(this.interactionsCount > 2) {

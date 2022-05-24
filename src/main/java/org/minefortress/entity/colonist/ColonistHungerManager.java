@@ -8,6 +8,10 @@ import org.minefortress.fortress.FortressServerManager;
 
 public class ColonistHungerManager extends HungerManager {
 
+    public static final float ACTIVE_EXHAUSTION = 0.003f;
+    public static final float PASSIVE_EXHAUSTION = 0.0025f;
+    public static final float IDLE_EXHAUSTION = 0.0005f;
+
     public void update(Colonist livingEntity) {
         if(livingEntity.getFortressServerManager().map(FortressServerManager::isCreative).orElse(true)) {
             this.foodLevel = 20;

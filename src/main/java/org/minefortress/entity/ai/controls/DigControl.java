@@ -15,6 +15,8 @@ import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.AbstractFortressManager;
 
+import static org.minefortress.entity.colonist.ColonistHungerManager.ACTIVE_EXHAUSTION;
+
 public class DigControl extends PositionedActionControl {
 
     private final Colonist colonist;
@@ -41,7 +43,7 @@ public class DigControl extends PositionedActionControl {
     private boolean act() {
         putProperItemInHand();
 
-        colonist.addExhaustion(0.005f);
+        colonist.addExhaustion(ACTIVE_EXHAUSTION);
         if(destroyProgress >= 1.0f){
             this.destroyProgress = 0f;
             addDropToTheResourceManager(level, goal, colonist);

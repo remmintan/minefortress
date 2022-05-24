@@ -2,19 +2,16 @@ package org.minefortress.entity.ai.controls;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.tag.ItemTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
-import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 
+import static org.minefortress.entity.colonist.ColonistHungerManager.ACTIVE_EXHAUSTION;
 import static org.minefortress.fortress.resources.SimilarItemsHelper.isIgnorable;
 
 public class PlaceControl extends PositionedActionControl {
@@ -59,7 +56,7 @@ public class PlaceControl extends PositionedActionControl {
 
         if (placeCooldown <= 0) {
             this.colonist.swingHand(Hand.MAIN_HAND);
-            colonist.addExhaustion(0.005f);
+            colonist.addExhaustion(ACTIVE_EXHAUSTION);
 
             if(taskBlockInfo instanceof ItemTaskBlockInfo)
                 place((ItemTaskBlockInfo) taskBlockInfo);
