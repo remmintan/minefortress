@@ -4,10 +4,12 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.world.GameRules;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.FortressServerManager;
 
 public class ColonistHungerManager extends HungerManager {
 
     public void update(Colonist livingEntity) {
+        if(livingEntity.getFortressServerManager().map(FortressServerManager::isCreative).orElse(true)) return;
         boolean naturalRegen = livingEntity.world.getGameRules().getBoolean(GameRules.NATURAL_REGENERATION);
         this.prevFoodLevel = this.foodLevel;
         if (this.exhaustion > 4.0f) {
