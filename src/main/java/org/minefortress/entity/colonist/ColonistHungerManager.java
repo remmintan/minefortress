@@ -9,7 +9,10 @@ import org.minefortress.fortress.FortressServerManager;
 public class ColonistHungerManager extends HungerManager {
 
     public void update(Colonist livingEntity) {
-        if(livingEntity.getFortressServerManager().map(FortressServerManager::isCreative).orElse(true)) return;
+        if(livingEntity.getFortressServerManager().map(FortressServerManager::isCreative).orElse(true)) {
+            this.foodLevel = 20;
+            return;
+        }
         boolean naturalRegen = livingEntity.world.getGameRules().getBoolean(GameRules.NATURAL_REGENERATION);
         this.prevFoodLevel = this.foodLevel;
         if (this.exhaustion > 4.0f) {
