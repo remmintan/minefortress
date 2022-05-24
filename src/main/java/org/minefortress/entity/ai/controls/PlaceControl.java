@@ -13,6 +13,8 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 
+import static org.minefortress.entity.colonist.ColonistHungerManager.ACTIVE_EXHAUSTION;
+
 public class PlaceControl extends PositionedActionControl {
 
     private final Colonist colonist;
@@ -55,7 +57,7 @@ public class PlaceControl extends PositionedActionControl {
 
         if (placeCooldown <= 0) {
             this.colonist.swingHand(Hand.MAIN_HAND);
-            colonist.addExhaustion(0.005f);
+            colonist.addExhaustion(ACTIVE_EXHAUSTION);
 
             if(taskBlockInfo instanceof ItemTaskBlockInfo)
                 place((ItemTaskBlockInfo) taskBlockInfo);
