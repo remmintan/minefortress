@@ -418,16 +418,16 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     @Override
-    public boolean hasRequiredBuilding(String requirementId) {
-        return buildings.stream().anyMatch(b -> b.getRequirementId().equals(requirementId));
+    public boolean hasRequiredBuilding(String requirementId, int minCount) {
+        return buildings.stream().filter(b -> b.getRequirementId().equals(requirementId)).count() > minCount;
     }
 
     @Override
-    public boolean hasRequiredBlock(Block block, boolean blueprint) {
+    public boolean hasRequiredBlock(Block block, boolean blueprint, int minCount) {
         if(blueprint)
-            return blueprintsSpecialBlocks.containsKey(block);
+            return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptySet()).size() > minCount;
         else
-            return this.specialBlocks.containsKey(block);
+            return this.specialBlocks.getOrDefault(block, Collections.emptySet()).size() > minCount;
     }
 
     public boolean isBlockSpecial(Block block) {
