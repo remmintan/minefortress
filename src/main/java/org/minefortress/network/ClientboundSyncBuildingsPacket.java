@@ -22,7 +22,7 @@ public class ClientboundSyncBuildingsPacket implements FortressClientPacket {
     public ClientboundSyncBuildingsPacket(Set<FortressBulding> houses) {
         this.houses = houses
                 .stream()
-                .map(h -> new EssentialBuildingInfo(h.getStart(), h.getEnd(), h.getRequirementId()))
+                .map(h -> new EssentialBuildingInfo(h.getStart(), h.getEnd(), h.getRequirementId(), h.getBedsCount()))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
