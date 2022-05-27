@@ -68,18 +68,19 @@ public class ProfessionWidget extends DrawableHelper {
                 this.drawVerticalLine(matrices, j, m, k, n);
             }
         }
-        if(!isUnlocked()) return;
+        if(!isUnlocked(false)) return;
         for (ProfessionWidget child : this.children) {
             child.renderLines(matrices, x, y, bl);
         }
     }
 
     public void renderWidgets(MatrixStack matrices, int x, int y){
-        final boolean unlocked = isUnlocked();
+        final boolean unlockedWithCount = isUnlocked(true);
+        final boolean unlocked = isUnlocked(false);
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
-        AdvancementObtainedStatus status = unlocked ? AdvancementObtainedStatus.OBTAINED : AdvancementObtainedStatus.UNOBTAINED;
+        AdvancementObtainedStatus status = unlockedWithCount ? AdvancementObtainedStatus.OBTAINED : AdvancementObtainedStatus.UNOBTAINED;
         final int v = 128 + status.getSpriteIndex() * 26;
         final int u = profession.getType().getTextureV();
         this.drawTexture(matrices, x + this.x + 3, y + this.y, u, v, 26, 26);
@@ -132,7 +133,7 @@ public class ProfessionWidget extends DrawableHelper {
 
     boolean shouldRender(int originX, int originY, int mouseX, int mouseY) {
         final Profession parent = profession.getParent();
-        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent)){
+        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent, false)){
             return false;
         }
 
@@ -144,9 +145,10 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     public void drawTooltip(MatrixStack matrices, int originX, int originY, float alpha, int x, int y, int screenWidth) {
-        final boolean unlocked = isUnlocked();
+        final boolean unlocked = isUnlocked(false);
+        final boolean unlockedWithCount = isUnlocked(true);
 
-        AdvancementObtainedStatus status = unlocked?AdvancementObtainedStatus.OBTAINED:AdvancementObtainedStatus.UNOBTAINED;
+        AdvancementObtainedStatus status = unlockedWithCount?AdvancementObtainedStatus.OBTAINED:AdvancementObtainedStatus.UNOBTAINED;
         int j = MathHelper.floor((float)this.width);
         int k = this.width - j;
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -158,7 +160,7 @@ public class ProfessionWidget extends DrawableHelper {
         int m = bl ? originX + this.x - this.width + 26 + 6 : originX + this.x;
 
         final String title = this.profession.getTitle();
-        final List<Text> description = unlocked? this.profession.getUnlockedDescription(): this.profession.getLockedDescription();
+        final List<Text> description = unlockedWithCount? this.profession.getUnlockedDescription(): this.profession.getLockedDescription();
 
         int n = 32 + description.size() * this.client.textRenderer.fontHeight;
         boolean bl2 = 113 - originY - this.y - 26 <= 6 + description.size() * client.textRenderer.fontHeight;
@@ -234,8 +236,8 @@ public class ProfessionWidget extends DrawableHelper {
         return y;
     }
 
-    public boolean isUnlocked() {
-        return this.professionManager.isRequirementsFulfilled(this.profession);
+    public boolean isUnlocked(boolean countProfessionals) {
+        return this.professionManager.isRequirementsFulfilled(this.profession, countProfessionals);
     }
 
     public void onClick(int button) {

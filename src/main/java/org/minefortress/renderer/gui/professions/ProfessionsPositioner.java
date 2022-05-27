@@ -37,7 +37,7 @@ public class ProfessionsPositioner {
 
     private ProfessionsPositioner findChildrenRecursively(ProfessionWidget profession, ProfessionsPositioner lastChild) {
         final ProfessionWidget parent = profession.getParent();
-        if(parent == null || parent.isUnlocked()) {
+        if(parent == null || parent.isUnlocked(false)) {
             lastChild = new ProfessionsPositioner(profession, this, lastChild, this.children.size() + 1, this.depth + 1);
             this.children.add(lastChild);
         } else {
