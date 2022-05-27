@@ -49,7 +49,7 @@ public class ServerProfessionManager extends ProfessionManager{
             if(prof.getAmount() > 0) {
                 final boolean unlocked = this.isRequirementsFulfilled(prof);
                 if(!unlocked) {
-                    prof.setAmount(0);
+                    prof.setAmount(prof.getAmount() - 1);
                     this.scheduleSync();
                 }
             }
