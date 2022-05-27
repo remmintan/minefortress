@@ -419,6 +419,13 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
+        if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack")) {
+            return buildings.stream()
+                    .filter(b -> b.getRequirementId().equals(requirementId))
+                    .mapToInt(FortressBulding::getBedsCount)
+                    .sum() > minCount;
+        }
+
         return buildings.stream().filter(b -> b.getRequirementId().equals(requirementId)).count() > minCount;
     }
 
