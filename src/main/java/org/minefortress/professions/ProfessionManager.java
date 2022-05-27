@@ -146,10 +146,8 @@ public abstract class ProfessionManager {
                             "Farmer",
                             Items.WHEAT,
                             "Plants any kind of seeds including wheat, watermelon and pumpkin",
-//                            "Build 'Farm' to unlock",
-                            "Will be available in future updates",
-//                            "farmer"
-                            "_"
+                            "Build any farm to unlock",
+                            "farmer"
                     )
             ),
             entry(
@@ -158,8 +156,10 @@ public abstract class ProfessionManager {
                             "Baker",
                             Items.BREAD,
                             "Bakes bread, cakes and other food",
-                            "Build 'Bakery' to unlock",
-                            "backer"
+//                            "Build 'Bakery' to unlock",
+                            "Will be available in future releases",
+//                            "backer",
+                            "_"
                     )
             ),
             entry(
@@ -169,7 +169,7 @@ public abstract class ProfessionManager {
                             Items.CARROT_ON_A_STICK,
                             "Brings pigs, sheeps and cows to the village.\nProvides milks, wool and meat",
 //                            "Build 'Animal Pen' to unlock",
-                            "Will be available in 1.5-alpha",
+                            "Will be available in future releases",
                             "_"
                     )
             ),
@@ -350,6 +350,10 @@ public abstract class ProfessionManager {
     }
 
     public boolean isRequirementsFulfilled(Profession profession) {
+        return isRequirementsFulfilled(profession, false);
+    }
+
+    public boolean isRequirementsFulfilled(Profession profession, boolean countProfessionals) {
         if(fortressManagerSupplier.get().isCreative())
             return true;
 
@@ -360,17 +364,18 @@ public abstract class ProfessionManager {
 
         final Profession parent = profession.getParent();
         if(Objects.nonNull(parent)) {
-            final boolean parentUnlocked = this.isRequirementsFulfilled(parent);
+            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, false);
             if(!parentUnlocked) {
                 return false;
             }
         }
 
         final AbstractFortressManager fortressManager = fortressManagerSupplier.get();
-        boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement);
+        final var minRequirementCount = countProfessionals ? profession.getAmount() : 0;
+        boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement, minRequirementCount);
         final Profession.BlockRequirement blockRequirement = profession.getBlockRequirement();
         if(Objects.nonNull(blockRequirement)) {
-            satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement.block(), blockRequirement.blueprint());
+            satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement.block(), blockRequirement.blueprint(), minRequirementCount);
         }
         return satisfied;
     }
