@@ -59,11 +59,9 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
     @Override
     protected BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation, int floorLevel) {
-        Vec3i size = structure.getRotatedSize(rotation);
-        final int biggerSide = Math.max(size.getX(), size.getZ());
-        final BlockPos pivot = BlockPos.ORIGIN.add(biggerSide / 2, 0, biggerSide / 2);
-
-        size = new Vec3i(biggerSide, size.getY(), biggerSide);
+        final var sizeAndPivot = getSizeAndPivot(structure, rotation);
+        final var size = sizeAndPivot.size();
+        final var pivot = sizeAndPivot.pivot();
 
         final Map<BlockPos, BlockState> structureData = getStrcutureData(structure, rotation, pivot);
 

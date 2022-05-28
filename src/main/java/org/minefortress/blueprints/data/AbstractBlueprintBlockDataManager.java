@@ -11,6 +11,7 @@ import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 abstract class AbstractBlueprintBlockDataManager {
 
@@ -49,15 +51,37 @@ abstract class AbstractBlueprintBlockDataManager {
     protected Map<BlockPos, BlockState> getStrcutureData(Structure structure, BlockRotation rotation, BlockPos pivot) {
         final StructurePlacementData placementData = new StructurePlacementData().setRotation(rotation);
         final List<Structure.StructureBlockInfo> blockInfos = placementData
-                .getRandomBlockInfos(structure.blockInfoLists, BlockPos.ORIGIN)
+                .getRandomBlockInfos(structure.blockInfoLists, pivot)
                 .getAll();
         placementData.setPosition(pivot);
 
-        return blockInfos
+        final var convertedStructureBlocks = blockInfos
                 .stream()
                 .map(AbstractBlueprintBlockDataManager::convertJigsawBlock)
+                .toList();
+
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+
+        for(var structureBlock : convertedStructureBlocks) {
+            final var transformedPos = Structure.transform(placementData, structureBlock.pos);
+            if(transformedPos.getX() < minX) {
+                minX = transformedPos.getX();
+            }
+            if(transformedPos.getY() < minY) {
+                minY = transformedPos.getY();
+            }
+            if(transformedPos.getZ() < minZ) {
+                minZ = transformedPos.getZ();
+            }
+        }
+        final var minPos = new BlockPos(minX, minY, minZ);
+
+        return convertedStructureBlocks
+                .stream()
                 .collect(Collectors.toMap(
-                        inf -> Structure.transform(placementData, inf.pos.add(BlockPos.ORIGIN)),
+                        inf -> Structure.transform(placementData, inf.pos).subtract(minPos),
                         inf -> inf.state.rotate(rotation)
                 ));
     }
@@ -91,4 +115,14 @@ abstract class AbstractBlueprintBlockDataManager {
     protected void reset() {
         this.blueprints.clear();
     }
+
+    protected SizeAndPivot getSizeAndPivot(Structure structure, BlockRotation rotation) {
+        Vec3i size = structure.getRotatedSize(rotation);
+//        final int biggerSide = Math.max(size.getX(), size.getZ());
+        final BlockPos pivot = BlockPos.ORIGIN.add(size.getX() / 2, 0,  size.getZ() / 2);
+        size = new Vec3i(size.getX(), size.getY(), size.getZ());
+        return new SizeAndPivot(size, pivot);
+    }
+
+    protected record SizeAndPivot(Vec3i size, BlockPos pivot) {}
 }
