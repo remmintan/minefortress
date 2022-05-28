@@ -198,7 +198,7 @@ public class ServerBlueprintManager {
         final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation, floorLevel);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
-        final BlockPos endPos = startPos.add(new Vec3i(size.getX(), size.getY(), size.getZ()));
+        final BlockPos endPos = getEndPos(startPos, size);
         final Map<BlockPos, BlockState> manualLayer = serverStructureInfo.getLayer(BlueprintDataLayer.MANUAL);
         final Map<BlockPos, BlockState> automatic = serverStructureInfo.getLayer(BlueprintDataLayer.AUTOMATIC);
         final Map<BlockPos, BlockState> entityLayer = serverStructureInfo.getLayer(BlueprintDataLayer.ENTITY);
@@ -209,9 +209,13 @@ public class ServerBlueprintManager {
         final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
-        final BlockPos endPos = startPos.add(new Vec3i(size.getX(), size.getY(), size.getZ()));
+        final BlockPos endPos = getEndPos(startPos, size);
 
         return new BlueprintDigTask(uuid, startPos, endPos);
+    }
+
+    private BlockPos getEndPos(BlockPos startPos, Vec3i size) {
+        return startPos.add(new Vec3i(size.getX()-1, size.getY()-1, size.getZ()-1));
     }
 
     public void writeToNbt(NbtCompound compound) {
