@@ -40,6 +40,7 @@ public class BlueprintsModelBuilder {
         for(BuiltBlueprint blueprint : this.blueprintsToClose) {
             blueprint.close();
         }
+        this.blueprintsToClose.clear();
 
         String key = getKey(fileName, rotation);
         if(!this.builtBlueprints.containsKey(key)) {
