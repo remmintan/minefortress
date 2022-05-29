@@ -70,7 +70,8 @@ public class PlaceControl extends PositionedActionControl {
         final ActionResult interactionResult = item.useOnBlock(context);
 
         if(interactionResult == ActionResult.CONSUME || failedInteractions > 15) {
-            decreaseResourcesAndAddSpecialBlocksAmount();
+            if(interactionResult == ActionResult.CONSUME)
+                decreaseResourcesAndAddSpecialBlocksAmount();
             this.reset();
             this.placeCooldown = 6;
         } else {
@@ -94,8 +95,8 @@ public class PlaceControl extends PositionedActionControl {
         colonist.doActionOnMasterPlayer(p -> {
             final var fortressServerManager = p.getFortressServerManager();
             final var taskControl = colonist.getTaskControl();
-            if(fortressServerManager.isSurvival() && taskControl.hasTask()) {
-                if (isIgnorable(item)) {
+            if(fortressServerManager.isSurvival()) {
+                if (isIgnorable(item) || !taskControl.hasTask()) {
                     fortressServerManager
                             .getServerResourceManager()
                             .removeItemIfExists(item);
