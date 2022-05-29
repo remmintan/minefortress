@@ -110,6 +110,14 @@ public final class FortressServerManager extends AbstractFortressManager {
         needSync = false;
     }
 
+    public Optional<FortressBulding> getRandomBuilding(String requirementId, Random random) {
+        final var buildings = this.buildings.stream()
+                .filter(building -> building.getRequirementId().equals(requirementId))
+                .toList();
+        if(buildings.isEmpty()) return Optional.empty();
+        return Optional.of(buildings.get(random.nextInt(buildings.size())));
+    }
+
     public void tickFortress(ServerPlayerEntity player, World world) {
         final List<Colonist> deadColonists = colonists.stream()
                 .filter(colonist -> !colonist.isAlive())

@@ -3,10 +3,7 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.entity.ai.goal.Goal;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.controls.TaskControl;
-import org.minefortress.entity.ai.professions.BlacksmithDailyTask;
-import org.minefortress.entity.ai.professions.CrafterDailyTask;
-import org.minefortress.entity.ai.professions.ForesterDailyTask;
-import org.minefortress.entity.ai.professions.ProfessionDailyTask;
+import org.minefortress.entity.ai.professions.*;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -19,7 +16,8 @@ public class DailyProfessionTasksGoal extends Goal {
     private final Map<String, ProfessionDailyTask> dailyTasks = Map.ofEntries(
             entry("crafter", new CrafterDailyTask()),
             entry("blacksmith", new BlacksmithDailyTask()),
-            entry("forester", new ForesterDailyTask())
+            entry("forester", new ForesterDailyTask()),
+            entry("farmer", new FarmerDailyTask())
     );
 
     private ProfessionDailyTask currentTask;
