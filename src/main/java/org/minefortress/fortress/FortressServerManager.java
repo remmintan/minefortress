@@ -450,10 +450,11 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void addSpecialBlocks(Block block, BlockPos blockPos, boolean blueprint) {
-        if(blueprint)
-            blueprintsSpecialBlocks.computeIfAbsent(block, k -> new ArrayList<>()).add(blockPos);
-        else
-            specialBlocks.computeIfAbsent(block, k -> new ArrayList<>()).add(blockPos);
+        final var blocks = blueprint ?
+                blueprintsSpecialBlocks.computeIfAbsent(block, k -> new ArrayList<>())
+                :
+                specialBlocks.computeIfAbsent(block, k -> new ArrayList<>());
+        if(!blocks.contains(blockPos)) blocks.add(blockPos);
         scheduleSyncSpecialBlocks();
     }
 
