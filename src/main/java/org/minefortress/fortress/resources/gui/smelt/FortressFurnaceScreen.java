@@ -50,7 +50,7 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
             k = this.handler.getFuelProgress();
             this.drawTexture(matrices, i + 56, j + 36 + 12 - k, 176, 12 - k, 14, k + 1);
         }
-        k = this.handler .getCookProgress();
+        k = this.handler.getCookProgress();
         this.drawTexture(matrices, i + 79, j + 34, 176, 14, k + 1, 16);
     }
 }
