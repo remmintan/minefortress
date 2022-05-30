@@ -41,7 +41,8 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
         while (addedFurnaces.size() < furnaces.size()) {
             final var addedFurnaces = this.addedFurnaces.size();
             final var otherFurnace = furnaces.get(addedFurnaces);
-            final var btn = new ButtonWidget(this.width - 5, 5 + addedFurnaces * 25, 150, 20, new LiteralText("Furnace " + addedFurnaces), (buttonWidget) -> {
+            final var width = 150;
+            final var btn = new ButtonWidget(this.width - 5 - width, 5 + addedFurnaces * 25, width, 20, new LiteralText("Furnace " + addedFurnaces), (buttonWidget) -> {
                 final var posX = otherFurnace.getPosX();
                 final var posY = otherFurnace.getPosY();
                 final var posZ = otherFurnace.getPosZ();
