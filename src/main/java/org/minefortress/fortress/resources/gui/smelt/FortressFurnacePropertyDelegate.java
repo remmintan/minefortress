@@ -11,18 +11,6 @@ public interface FortressFurnacePropertyDelegate extends PropertyDelegate {
         return this.get(0);
     }
 
-    default int getFuelTime() {
-        return this.get(1);
-    }
-
-    default int getCookTime() {
-        return this.get(2);
-    }
-
-    default int getCookTimeTotal() {
-        return this.get(3);
-    }
-
     default int getPosX() {
         return this.get(4);
     }
@@ -35,8 +23,18 @@ public interface FortressFurnacePropertyDelegate extends PropertyDelegate {
         return this.get(6);
     }
 
-    default int isSelected() {
-        return this.get(7);
+    default boolean isSelected() {
+        return this.get(7)==1;
     }
+
+    default int getCookProgress() {
+        int i = this.get(2);
+        int j = this.get(3);
+        if (j == 0 || i == 0) {
+            return 0;
+        }
+        return i * 24 / j;
+    }
+
 
 }

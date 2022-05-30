@@ -4,21 +4,65 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.recipebook.FurnaceRecipeBookScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.ServerboundOpenCraftingScreenPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<FortressFurnaceScreenHandler> {
 
     private static final Identifier BACKGROUND_TEXTURE = new Identifier("textures/gui/container/furnace.png");
     private final FurnaceRecipeBookScreen furnaceRecipeBookScreen = new FurnaceRecipeBookScreen();
+    private final FortressFurnaceScreenHandler furnaceScreenHandler;
+
+    private final List<AddedFurnace> addedFurnaces = new ArrayList<>();
 
     public FortressFurnaceScreen(FortressFurnaceScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+        this.furnaceScreenHandler = handler;
+    }
+
+    @Override
+    public void handledScreenTick() {
+        super.handledScreenTick();
+        final var furnaces = furnaceScreenHandler.getFurnaces();
+        while (addedFurnaces.size() < furnaces.size()) {
+            final var addedFurnaces = this.addedFurnaces.size();
+            final var otherFurnace = furnaces.get(addedFurnaces);
+            final var btn = new ButtonWidget(this.width - 5, 5 + addedFurnaces * 25, 150, 20, new LiteralText("Furnace " + addedFurnaces), (buttonWidget) -> {
+                final var posX = otherFurnace.getPosX();
+                final var posY = otherFurnace.getPosY();
+                final var posZ = otherFurnace.getPosZ();
+                final var packet = new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE, new BlockPos(posX, posY, posZ));
+                if (this.client != null) this.onClose();
+                FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, packet);
+            });
+            this.addDrawableChild(btn);
+            this.addedFurnaces.add(new AddedFurnace(otherFurnace, btn));
+        }
+
+        for(AddedFurnace addedFurnace : addedFurnaces) {
+            final var furnace = addedFurnace.furnace;
+            final var btn = addedFurnace.button;
+
+            final var selectedLabel = furnace.isSelected() ? "*" : "";
+            final var isBurning = furnace.getBurnTime() > 0;
+            final var burningLabel = isBurning ? ("" + furnace.getCookProgress()+"%") : ("not burning");
+
+            btn.setMessage(new LiteralText("Furnace"+selectedLabel+": "+burningLabel));
+        }
     }
 
     @Override
@@ -53,4 +97,6 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
         k = this.handler.getCookProgress();
         this.drawTexture(matrices, i + 79, j + 34, 176, 14, k + 1, 16);
     }
+
+    private static record AddedFurnace(FortressFurnacePropertyDelegate furnace, ButtonWidget button) {}
 }
