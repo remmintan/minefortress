@@ -12,19 +12,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.Objects;
 
 public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
 
-    private final Long furnacePos;
+    private final BlockPos furnacePos;
 
-    public FurnaceScreenHandlerFactory() {
-        this(null);
-    }
-
-    public FurnaceScreenHandlerFactory(Long furnacePos) {
+    public FurnaceScreenHandlerFactory(BlockPos furnacePos) {
         this.furnacePos = furnacePos;
     }
 
@@ -46,8 +41,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
                     .filter(Objects::nonNull)
                     .toList();
 
-            final BlockPos selectedFurnacePos = furnacePos == null ? otherFurnaceBlocks.get(0) : BlockPos.fromLong(furnacePos);
-
+            final BlockPos selectedFurnacePos = furnacePos == null ? otherFurnaceBlocks.get(0) : furnacePos;
             final var otherFurnacesDelegates = otherFurnaceBlocks.stream()
                     .map(it -> {
                         final var blockEnt = player.world.getBlockEntity(it);
