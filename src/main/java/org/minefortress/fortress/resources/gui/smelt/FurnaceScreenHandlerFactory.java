@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.Objects;
 
@@ -37,9 +38,11 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
             final var manager = fortressServerPlayer.getFortressServerManager();
-
+            final var professionManager = manager.getServerProfessionManager();
+            final var blacksmithsCount = professionManager.getProfession("blacksmith").getAmount();
             final var otherFurnaceBlocks = manager.getSpecialBlocksByType(Blocks.FURNACE, true)
                     .stream()
+                    .limit(blacksmithsCount)
                     .filter(Objects::nonNull)
                     .toList();
 
