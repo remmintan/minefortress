@@ -16,22 +16,28 @@ import net.minecraft.screen.slot.Slot;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 
+import java.util.Collections;
+import java.util.List;
+
 import static org.minefortress.MineFortressMod.FORTRESS_FURNACE_SCREEN_HANDLER;
+import static org.minefortress.fortress.resources.gui.smelt.FortressFurnacePropertyDelegate.TOTAL_FIELDS;
 
 public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHandler<Inventory> implements FuelChecker{
 
     private final Inventory furnaceInventory;
     private final PropertyDelegate propertyDelegate;
+    private final List<PropertyDelegate> otherFurnaces;
 
     public FortressFurnaceScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, null, new SimpleInventory(3), new ArrayPropertyDelegate(4));
+        this(syncId, inventory, null, new SimpleInventory(3), new ArrayPropertyDelegate(4), Collections.emptyList());
     }
 
-    public FortressFurnaceScreenHandler(int syncId, PlayerInventory inventory, ServerResourceManager resourceManager, Inventory furnace, PropertyDelegate propertyDelegate) {
+    public FortressFurnaceScreenHandler(int syncId, PlayerInventory inventory, ServerResourceManager resourceManager, Inventory furnace, PropertyDelegate propertyDelegate, List<PropertyDelegate> otherFurnaces) {
         super(FORTRESS_FURNACE_SCREEN_HANDLER, syncId, resourceManager, inventory.player);
 
         this.furnaceInventory = furnace;
         this.propertyDelegate = propertyDelegate;
+        this.otherFurnaces = otherFurnaces;
 
         this.addSlot(new FortressSlot(furnaceInventory, 0, 56, 17));
         this.addSlot(new FortressFuelSlot(this, furnaceInventory, 1, 56, 53));
@@ -39,6 +45,9 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
 
         super.createDefaultsScrollableSlots();
         this.addProperties(this.propertyDelegate);
+        for (PropertyDelegate delegate : this.otherFurnaces) {
+            this.addProperties(delegate);
+        }
     }
 
     @Override
@@ -57,6 +66,20 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
     public void clearCraftingSlots() {
         this.getSlot(0).setStack(ItemStack.EMPTY);
         this.getSlot(2).setStack(ItemStack.EMPTY);
+    }
+
+    @Override
+    public void setProperty(int id, int value) {
+        if(otherFurnaces.size() * TOTAL_FIELDS < id-4) {
+            final var newFurnace = new ArrayPropertyDelegate(TOTAL_FIELDS);
+            this.addProperties(newFurnace);
+            this.otherFurnaces.add(newFurnace);
+        }
+        super.setProperty(id, value);
+    }
+
+    public List<FortressFurnacePropertyDelegate> getFurnaces() {
+        return this.otherFurnaces.stream().map(delegate -> (FortressFurnacePropertyDelegate) delegate).toList();
     }
 
     @Override
