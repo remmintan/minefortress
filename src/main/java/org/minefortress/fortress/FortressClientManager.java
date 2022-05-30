@@ -42,8 +42,8 @@ public final class FortressClientManager extends AbstractFortressManager {
     private Vec3d selectedColonistDelta;
 
     private List<EssentialBuildingInfo> buildings = new ArrayList<>();
-    private Map<Block, Set<BlockPos>> specialBlocks = new HashMap<>();
-    private Map<Block, Set<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
+    private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
+    private Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
 
     private FortressGamemode gamemode;
 
@@ -63,7 +63,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         this.buildings = buildings;
     }
 
-    public void setSpecialBlocks(Map<Block, Set<BlockPos>> specialBlocks, Map<Block, Set<BlockPos>> blueprintSpecialBlocks) {
+    public void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks) {
         this.specialBlocks = specialBlocks;
         this.blueprintsSpecialBlocks = blueprintSpecialBlocks;
     }
@@ -214,9 +214,9 @@ public final class FortressClientManager extends AbstractFortressManager {
     @Override
     public boolean hasRequiredBlock(Block block, boolean blueprint, int minCount) {
         if(blueprint)
-            return this.blueprintsSpecialBlocks.getOrDefault(block, Collections.emptySet()).size() > minCount;
+            return this.blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
         else
-            return this.specialBlocks.getOrDefault(block, Collections.emptySet()).size() > minCount;
+            return this.specialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
     }
 
     @Override
