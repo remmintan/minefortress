@@ -48,8 +48,8 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final Set<Colonist> colonists = new HashSet<>();
     private final Set<FortressBulding> buildings = new HashSet<>();
 
-    private final Map<Block, Set<BlockPos>> specialBlocks = new HashMap<>();
-    private final Map<Block, Set<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
+    private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
+    private final Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
 
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
     private final ServerProfessionManager serverProfessionManager;
@@ -352,7 +352,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             for (String blockId : specialBlocksTag.getKeys()) {
                 final Block block = Registry.BLOCK.get(new Identifier(blockId));
                 final NbtList posList = specialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
-                final var positions = new HashSet<BlockPos>();
+                final var positions = new ArrayList<BlockPos>();
                 for (int j = 0; j < posList.size(); j++) {
                     positions.add(NbtHelper.toBlockPos(posList.getCompound(j)));
                 }
@@ -366,7 +366,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             for (String blockId : blueprintsSpecialBlocksTag.getKeys()) {
                 final Block block = Registry.BLOCK.get(new Identifier(blockId));
                 final NbtList posList = blueprintsSpecialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
-                final var positions = new HashSet<BlockPos>();
+                final var positions = new ArrayList<BlockPos>();
                 for (int j = 0; j < posList.size(); j++) {
                     positions.add(NbtHelper.toBlockPos(posList.getCompound(j)));
                 }
@@ -440,9 +440,9 @@ public final class FortressServerManager extends AbstractFortressManager {
     @Override
     public boolean hasRequiredBlock(Block block, boolean blueprint, int minCount) {
         if(blueprint)
-            return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptySet()).size() > minCount;
+            return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
         else
-            return this.specialBlocks.getOrDefault(block, Collections.emptySet()).size() > minCount;
+            return this.specialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
     }
 
     public boolean isBlockSpecial(Block block) {
@@ -451,9 +451,9 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public void addSpecialBlocks(Block block, BlockPos blockPos, boolean blueprint) {
         if(blueprint)
-            blueprintsSpecialBlocks.computeIfAbsent(block, k -> new HashSet<>()).add(blockPos);
+            blueprintsSpecialBlocks.computeIfAbsent(block, k -> new ArrayList<>()).add(blockPos);
         else
-            specialBlocks.computeIfAbsent(block, k -> new HashSet<>()).add(blockPos);
+            specialBlocks.computeIfAbsent(block, k -> new ArrayList<>()).add(blockPos);
         scheduleSyncSpecialBlocks();
     }
 
@@ -470,11 +470,11 @@ public final class FortressServerManager extends AbstractFortressManager {
         return this.colonists.stream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
     }
 
-    public Set<BlockPos> getSpecialBlocksByType(Block block, boolean blueprint) {
+    public List<BlockPos> getSpecialBlocksByType(Block block, boolean blueprint) {
         if(blueprint)
-            return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptySet());
+            return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList());
         else
-            return specialBlocks.getOrDefault(block, Collections.emptySet());
+            return specialBlocks.getOrDefault(block, Collections.emptyList());
     }
 
     @Override
