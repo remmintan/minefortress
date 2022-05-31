@@ -32,6 +32,10 @@ public class MovementHelper {
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
     }
 
+    public BlockPos getWorkGoal() {
+        return workGoal;
+    }
+
     public void set(BlockPos goal) {
         this.workGoal = goal;
         this.cantFindPath = false;
