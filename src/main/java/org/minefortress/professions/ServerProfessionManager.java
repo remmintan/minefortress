@@ -28,7 +28,7 @@ public class ServerProfessionManager extends ProfessionManager{
         if(super.getFreeColonists() <= 0) return;
         final Profession profession = super.getProfession(professionId);
         if(profession == null) return;
-        if(!super.isRequirementsFulfilled(profession)) return;
+        if(!super.isRequirementsFulfilled(profession, true)) return;
 
         profession.setAmount(profession.getAmount() + 1);
         scheduleSync();
