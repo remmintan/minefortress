@@ -28,6 +28,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
 
     @Override
     public void start(Colonist colonist) {
+        colonist.setCurrentTaskDesc("Looking for food");
         this.setGoal(colonist);
         colonist.getMovementHelper().set(this.blockPos);
     }
@@ -89,7 +90,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
 
     private boolean isSuccess(Colonist colonist){
         final var random = colonist.world.random;
-        return random.nextInt(100) < 25;
+        return random.nextInt(100) < 20;
     }
 
     private void setGoal(Colonist colonist){
