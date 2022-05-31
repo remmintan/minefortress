@@ -4,6 +4,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.tag.ItemTags;
+import org.apache.commons.logging.Log;
+import org.apache.logging.log4j.LogManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressClientPacket;
@@ -43,7 +46,13 @@ public class ClientboundSyncItemsPacket implements FortressClientPacket {
         for (ItemInfo info : itemInfo) {
             final var item = info.item();
             if(item == Items.STRUCTURE_VOID) continue;
-            resourceManager.setItemAmount(item, info.amount());
+            try {
+                resourceManager.setItemAmount(item, info.amount());
+            } catch (IllegalArgumentException e) {
+                LogManager.getLogger().warn("Failed to set item amount for item: " + item.getName().getString());
+                LogManager.getLogger().warn("error: " + e.getMessage());
+            }
+
         }
     }
 
