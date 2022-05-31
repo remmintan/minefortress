@@ -33,7 +33,7 @@ public interface FortressFurnacePropertyDelegate extends PropertyDelegate {
         if (j == 0 || i == 0) {
             return 0;
         }
-        return i * 24 / j;
+        return i * 100 / j;
     }
 
 
