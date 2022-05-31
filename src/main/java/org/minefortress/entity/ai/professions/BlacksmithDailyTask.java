@@ -15,6 +15,12 @@ import java.util.Optional;
 public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
 
     @Override
+    public void start(Colonist colonist) {
+        colonist.setCurrentTaskDesc("Smelting");
+        super.start(colonist);
+    }
+
+    @Override
     public boolean canStart(Colonist colonist) {
         return shouldWork(colonist);
     }

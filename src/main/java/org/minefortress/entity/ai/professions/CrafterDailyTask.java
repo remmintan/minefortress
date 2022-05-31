@@ -19,6 +19,13 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
         return craftingTableMenuOpened(colonist);
     }
 
+
+    @Override
+    public void start(Colonist colonist) {
+        colonist.setCurrentTaskDesc("Crafting");
+        super.start(colonist);
+    }
+
     @Override
     public void tick(Colonist colonist) {
         super.tick(colonist);

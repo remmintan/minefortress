@@ -47,6 +47,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
 
     @Override
     public void start(Colonist colonist) {
+        colonist.setCurrentTaskDesc("Farming");
         getFarm(colonist).ifPresent(f -> this.currentFarm = f);
         initIterator();
     }
