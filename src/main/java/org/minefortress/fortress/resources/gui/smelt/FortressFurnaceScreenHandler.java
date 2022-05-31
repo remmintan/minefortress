@@ -16,6 +16,7 @@ import net.minecraft.screen.slot.Slot;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
     private final List<PropertyDelegate> otherFurnaces;
 
     public FortressFurnaceScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, null, new SimpleInventory(3), new ArrayPropertyDelegate(4), Collections.emptyList());
+        this(syncId, inventory, null, new SimpleInventory(3), new ArrayPropertyDelegate(4), new ArrayList<>());
     }
 
     public FortressFurnaceScreenHandler(int syncId, PlayerInventory inventory, ServerResourceManager resourceManager, Inventory furnace, PropertyDelegate propertyDelegate, List<PropertyDelegate> otherFurnaces) {
@@ -70,8 +71,8 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
 
     @Override
     public void setProperty(int id, int value) {
-        if(otherFurnaces.size() * TOTAL_FIELDS < id-4) {
-            final var newFurnace = new ArrayPropertyDelegate(TOTAL_FIELDS);
+        if(otherFurnaces.size() * TOTAL_FIELDS < id-3) {
+            final var newFurnace = new FortressArrayPropertyDelegate(TOTAL_FIELDS);
             this.addProperties(newFurnace);
             this.otherFurnaces.add(newFurnace);
         }

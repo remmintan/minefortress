@@ -26,10 +26,10 @@ public class FortressFurnacePropertyDelegateImpl implements FortressFurnacePrope
         }
 
         return switch (index) {
-            case 0 -> x;
-            case 1 -> y;
-            case 2 -> z;
-            case 3 -> selected ? 1 : 0;
+            case 4 -> x;
+            case 5 -> y;
+            case 6 -> z;
+            case 7 -> selected ? 1 : 0;
             default -> throw new IllegalArgumentException("Can't get property " + index + " in  FortressFurnacePropertyDelegateImpl");
         };
     }
