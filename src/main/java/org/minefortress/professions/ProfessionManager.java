@@ -40,6 +40,7 @@ public abstract class ProfessionManager {
                             "Colonist",
                             Items.PLAYER_HEAD,
                             "Can do any type of work, but is not very good at it.\nCan use only wooden tools.\nCan't fall tall trees\nCan't provide any food.",
+                            "",
                             ""
                     )
             ),
@@ -51,6 +52,7 @@ public abstract class ProfessionManager {
                             Items.STONE_PICKAXE,
                             "Can work in mine and quarry.\nCan use stone shovel and pickaxe.",
                             "Build 'Wooden Miner's house' to unlock",
+                            "Build more 'Wooden Miner's houses' to unlock more",
                             "miner_wooden"
                     )
             ),
@@ -61,6 +63,7 @@ public abstract class ProfessionManager {
                             Items.IRON_PICKAXE,
                             "Can work in mine and quarry.\nCan use iron shovel and pickaxe.",
                             "Build 'Stone Miner's house' to unlock",
+                            "Build more 'Stone Miner's houses' to unlock more",
                             "miner_stone"
                     )
             ),
@@ -71,6 +74,7 @@ public abstract class ProfessionManager {
                             Items.DIAMOND_PICKAXE,
                             "Can work in mine and quarry.\nCan use diamond shovel and pickaxe.",
                             "Build 'Miners' guild house' to unlock",
+                            "Build more 'Miners' guild houses' to unlock more",
                             "miners_guild"
                     )
             ),
@@ -82,6 +86,7 @@ public abstract class ProfessionManager {
                             Items.STONE_AXE,
                             "Can fall tall trees.\nCan use stone axe.\nCollects saplings.",
                             "Build 'Wooden Lumberjack's house' to unlock",
+                            "Build more 'Wooden Lumberjack's houses' to unlock more",
                             "lumberjack_wooden"
                     )
             ),
@@ -92,6 +97,7 @@ public abstract class ProfessionManager {
                             Items.IRON_AXE,
                             "Can fall tall trees.\nCan use iron axe.\nCan plant saplings.",
                             "Build 'Stone Lumberjack's house' to unlock",
+                            "Build more 'Stone Lumberjack's houses' to unlock more",
                             "lumberjack_stone"
                     )
             ),
@@ -102,6 +108,7 @@ public abstract class ProfessionManager {
                             Items.DIAMOND_AXE,
                             "Can fall tall trees.\nCan use diamond axe.\nCan plant saplings.",
                             "Build 'Lumberjack's guild house' to unlock",
+                            "Build more 'Lumberjack's guild houses' to unlock more",
                             "lumberjack_guild"
                     )
             ),
@@ -113,6 +120,7 @@ public abstract class ProfessionManager {
                             Items.APPLE,
                             "Collects seeds, apples and some other basic food\nWhile working every tick has small chance of getting food.\nCollects saplings and sticks.",
                             "Brings food. Build 'Forester's house' to unlock",
+                            "Build more 'Forester's houses' to unlock more",
                             "forester"
                     )
             ),
@@ -125,6 +133,7 @@ public abstract class ProfessionManager {
 //                            "Build 'Shooting gallery' to unlock",
                             "Will be available in future updates",
 //                            "shooting_gallery"
+                            "",
                             "_"
                     )
             ),
@@ -136,6 +145,7 @@ public abstract class ProfessionManager {
                             "Catches fish in ponds\nCooks fish",
 //                            "Build 'Fishing hut' to unlock",
                             "Will be available in future updates",
+                            "",
 //                            "fisher"
                             "_"
                     )
@@ -147,6 +157,7 @@ public abstract class ProfessionManager {
                             Items.WHEAT,
                             "Plants any kind of seeds including wheat, watermelon and pumpkin",
                             "Build any farm to unlock",
+                            "Build more farms to hire more",
                             "farmer"
                     )
             ),
@@ -158,6 +169,7 @@ public abstract class ProfessionManager {
                             "Bakes bread, cakes and other food",
 //                            "Build 'Bakery' to unlock",
                             "Will be available in future releases",
+                            "",
 //                            "backer",
                             "_"
                     )
@@ -170,6 +182,7 @@ public abstract class ProfessionManager {
                             "Brings pigs, sheeps and cows to the village.\nProvides milks, wool and meat",
 //                            "Build 'Animal Pen' to unlock",
                             "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -179,7 +192,8 @@ public abstract class ProfessionManager {
                             "Stableman",
                             Items.LEAD,
                             "",
-                            "Will be available in 1.5-alpha",
+                            "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -189,7 +203,8 @@ public abstract class ProfessionManager {
                             "Butcher",
                             Items.BEEF,
                             "",
-                            "Will be available in 1.5-alpha",
+                            "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -199,7 +214,8 @@ public abstract class ProfessionManager {
                             "Cook",
                             Items.COOKED_BEEF,
                             "",
-                            "Will be available in 1.5-alpha",
+                            "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -211,6 +227,7 @@ public abstract class ProfessionManager {
                             Items.CRAFTING_TABLE,
                             "Can craft any item that doesn't need smelting.\nCan't use redstone or nether blocks/items",
                             "Build crafting table to unlock",
+                            "Build more crafting tables to unlock more",
                             "_"
                     ).setBlockRequirement(Blocks.CRAFTING_TABLE, false)
             ),
@@ -221,6 +238,7 @@ public abstract class ProfessionManager {
                             Items.LEATHER,
                             "",
                             "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -231,6 +249,7 @@ public abstract class ProfessionManager {
                             Items.LEATHER_HORSE_ARMOR,
                             "",
                             "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -241,6 +260,7 @@ public abstract class ProfessionManager {
                             Items.IRON_INGOT,
                             "Can smelt ores and cook food in furnace",
                             "Build any blueprint with a Furnace to unlock",
+                            "Build more blueprints with Furnaces to unlock more",
                             "_"
                     ).setBlockRequirement(Blocks.FURNACE, true)
             ),
@@ -261,6 +281,7 @@ public abstract class ProfessionManager {
                             Items.STRING,
                             "",
                             "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -271,6 +292,7 @@ public abstract class ProfessionManager {
                             Items.WHITE_BANNER,
                             "",
                             "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -282,6 +304,7 @@ public abstract class ProfessionManager {
                             Items.STONE_SWORD,
                             "",
                             "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -292,6 +315,7 @@ public abstract class ProfessionManager {
                             Items.IRON_SWORD,
                             "",
                             "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
@@ -301,6 +325,7 @@ public abstract class ProfessionManager {
                             "Archer",
                             Items.BOW,
                             "Will be available in future releases",
+                            "",
                             "",
                             "_"
                     )
@@ -312,6 +337,7 @@ public abstract class ProfessionManager {
                             Items.CROSSBOW,
                             "Will be available in future releases",
                             "",
+                            "",
                             "_"
                     )
             ),
@@ -322,6 +348,7 @@ public abstract class ProfessionManager {
                             Items.IRON_HORSE_ARMOR,
                             "Will be available in future releases",
                             "",
+                            "",
                             "_"
                     )
             ),
@@ -331,6 +358,7 @@ public abstract class ProfessionManager {
                             "Knight - LVL2",
                             Items.DIAMOND_HORSE_ARMOR,
                             "Will be available in future releases",
+                            "",
                             "",
                             "_"
                     )
