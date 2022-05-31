@@ -184,7 +184,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         final var blockState = world.getBlockState(goal);
         final var goalCorrect = blockState.isOf(Blocks.FARMLAND) || blockState.isOf(Blocks.DIRT) || blockState.isOf(Blocks.GRASS_BLOCK);
         final var aboveGoalState = world.getBlockState(goal.up());
-        final var aboveGoalCorrect = BlockTags.CROPS.contains(aboveGoalState.getBlock()) || aboveGoalState.isAir();
+        final var aboveGoalCorrect = aboveGoalState.isIn(BlockTags.CROPS) || aboveGoalState.isAir();
         return goalCorrect && aboveGoalCorrect;
     }
 

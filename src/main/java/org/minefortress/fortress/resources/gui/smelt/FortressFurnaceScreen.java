@@ -47,7 +47,7 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
                 final var posY = otherFurnace.getPosY();
                 final var posZ = otherFurnace.getPosZ();
                 final var packet = new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE, new BlockPos(posX, posY, posZ));
-                if (this.client != null) this.onClose();
+                if (this.client != null) this.close();
                 FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, packet);
             });
             this.addDrawableChild(btn);
