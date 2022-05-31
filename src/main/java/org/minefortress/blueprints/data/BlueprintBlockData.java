@@ -50,7 +50,15 @@ public final class BlueprintBlockData {
                 Items.DARK_OAK_LEAVES,
                 Items.JUNGLE_LEAVES,
                 Items.OAK_LEAVES,
-                Items.SPRUCE_LEAVES
+                Items.SPRUCE_LEAVES,
+                Items.STRIPPED_ACACIA_LOG,
+                Items.STRIPPED_BIRCH_LOG,
+                Items.STRIPPED_DARK_OAK_LOG,
+                Items.STRIPPED_JUNGLE_LOG,
+                Items.STRIPPED_OAK_LOG,
+                Items.STRIPPED_SPRUCE_LOG,
+                Items.STRIPPED_WARPED_STEM,
+                Items.STRIPPED_CRIMSON_STEM
         );
         items.addAll(SimilarItemsHelper.getItems(ItemTags.FLOWERS));
         IGNORED_ITEMS = items;
