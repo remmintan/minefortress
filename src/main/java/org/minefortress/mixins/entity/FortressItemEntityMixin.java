@@ -70,9 +70,10 @@ public abstract class FortressItemEntityMixin extends Entity {
                     final var item = stack.getItem();
                     if(shouldCollectInInventory(fortressServerManager.getServerProfessionManager(), item))
                         resourceManager.increaseItemAmount(item, stack.getCount());
-                    this.discard();
+
                 }
             }
+            this.discard();
         }
     }
 

@@ -398,7 +398,7 @@ public class Colonist extends PassiveEntity {
     public void tick() {
         super.tick();
         if(this.taskControl != null) {
-            this.setHasTask(this.dataTracker.get(HAS_TASK));
+            this.setHasTask(this.taskControl.hasTask() || this.taskControl.isDoingEverydayTasks());
         }
         if(fallDistance > getSafeFallDistance()) {
             BlockPos currentHitPos = getBlockPos().down().down();

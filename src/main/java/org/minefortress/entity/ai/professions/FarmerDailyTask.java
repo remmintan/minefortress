@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressBulding;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
@@ -54,23 +55,22 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     public void tick(Colonist colonist) {
         if(this.currentFarm == null) return;
         if(!this.farmIterator.hasNext()) return;
+        final var movementHelper = colonist.getMovementHelper();
         if(this.goal == null) {
             findCorrectGoal(colonist);
             if(this.goal == null) return;
-            colonist.getMovementHelper().set(goal);
+            movementHelper.set(goal);
         }
 
 
-        if(colonist.getMovementHelper().hasReachedWorkGoal()) {
+        if(movementHelper.hasReachedWorkGoal()) {
             this.workingTicks++;
             final var goalBLockState = colonist.world.getBlockState(this.goal);
             if (goalBLockState.isOf(Blocks.DIRT) || goalBLockState.isOf(Blocks.GRASS_BLOCK)) {
                 colonist.putItemInHand(Items.WOODEN_HOE);
                 colonist.swingHand(Hand.MAIN_HAND);
-                if(workingTicks % 20 == 0) {
-                    colonist.world.setBlockState(goal, Blocks.FARMLAND.getDefaultState(), 3);
-                    colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal);
-                }
+                colonist.world.setBlockState(goal, Blocks.FARMLAND.getDefaultState(), 3);
+                colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal);
             } else if(goalBLockState.isOf(Blocks.FARMLAND)) {
                 if(colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone()) {
                     final var aboveBlock = goal.up();
@@ -88,12 +88,14 @@ public class FarmerDailyTask implements ProfessionDailyTask{
                             final var wheatSeeds = (BlockItem) Items.WHEAT_SEEDS;
                             final var blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(wheatSeeds, aboveBlock, wheatSeeds.getBlock().getDefaultState());
                             colonist.setGoal(blockStateTaskBlockInfo);
+                            movementHelper.set(aboveBlock);
                         } else {
                             final var seedsOpt = getSeeds(colonist);
                             if(seedsOpt.isPresent()) {
                                 final var blockItem = (BlockItem) seedsOpt.get();
                                 final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlock, blockItem.getBlock().getDefaultState());
                                 colonist.setGoal(bsTaskBlockInfo);
+                                movementHelper.set(aboveBlock);
                             } else {
                                 this.goal = null;
                             }
@@ -107,7 +109,12 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             }
         }
 
-        colonist.getMovementHelper().tick();
+        movementHelper.tick();
+        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isCantFindPath()){
+            final var workGoal = movementHelper.getWorkGoal().up();
+            colonist.teleport(workGoal.getX(), workGoal.getY(), workGoal.getZ());
+        }
+
     }
 
     @Override
@@ -116,6 +123,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         this.farmIterator = Collections.emptyIterator();
         this.stopTime = colonist.world.getTime();
         this.workingTicks = 0;
+        colonist.resetControls();
     }
 
     @Override
