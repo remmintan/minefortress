@@ -22,6 +22,7 @@ public class Profession {
     private int amount = 0;
     private final AdvancementFrame type = AdvancementFrame.TASK;
     private final List<Text> unlockedDescription;
+    private final List<Text> notEnoughBuildingsDescription;
     private final List<Text> lockedDescription;
     private final String buildingRequirement;
     private Block blockRequirement = null;
@@ -30,18 +31,20 @@ public class Profession {
     private Profession parent;
     private final List<Profession> children = new ArrayList<>();
 
-    public Profession(String title, Item icon, String unlockedDescription, String lockedDescription) {
+    public Profession(String title, Item icon, String unlockedDescription, String lockedDescription, String notEnoughBuildingDescription) {
         this.title = title;
         this.icon = new ItemStack(icon);
         this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, MAX_WIDTH);
         this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, MAX_WIDTH);
+        this.notEnoughBuildingsDescription = GuiUtils.splitTextInWordsForLength(notEnoughBuildingDescription, MAX_WIDTH);
         this.buildingRequirement = null;
     }
-    public Profession(String title, Item icon, String unlockedDescription, String lockedDescription, String buildingRequirement) {
+    public Profession(String title, Item icon, String unlockedDescription, String lockedDescription, String notEnoughBuildingDescription, String buildingRequirement) {
         this.title = title;
         this.icon = new ItemStack(icon);
         this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, MAX_WIDTH);
         this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, MAX_WIDTH);
+        this.notEnoughBuildingsDescription = GuiUtils.splitTextInWordsForLength(notEnoughBuildingDescription, MAX_WIDTH);
         this.buildingRequirement = buildingRequirement;
     }
 
@@ -85,6 +88,10 @@ public class Profession {
 
     public List<Text> getLockedDescription() {
         return lockedDescription;
+    }
+
+    public List<Text> getNotEnoughBuildingsDescription() {
+        return notEnoughBuildingsDescription;
     }
 
     public Profession getParent() {

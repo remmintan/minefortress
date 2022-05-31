@@ -160,7 +160,14 @@ public class ProfessionWidget extends DrawableHelper {
         int m = bl ? originX + this.x - this.width + 26 + 6 : originX + this.x;
 
         final String title = this.profession.getTitle();
-        final List<Text> description = unlockedWithCount? this.profession.getUnlockedDescription(): this.profession.getLockedDescription();
+        List<Text> description;
+        if(unlockedWithCount) {
+            description = this.profession.getUnlockedDescription();
+        } else if(unlocked) {
+            description = this.profession.getNotEnoughBuildingsDescription();
+        } else {
+            description = this.profession.getLockedDescription();
+        }
 
         int n = 32 + description.size() * this.client.textRenderer.fontHeight;
         boolean bl2 = 113 - originY - this.y - 26 <= 6 + description.size() * client.textRenderer.fontHeight;
