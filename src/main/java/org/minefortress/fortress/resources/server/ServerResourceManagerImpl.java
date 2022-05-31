@@ -27,6 +27,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     public ServerResourceManagerImpl() {
         resources.getStack(Items.OAK_PLANKS).increaseBy(12);
         resources.getStack(Items.CRAFTING_TABLE).increaseBy(1);
+        resources.getStack(Items.APPLE).increaseBy(5);
         this.syncAll();
     }
 
