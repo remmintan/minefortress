@@ -271,6 +271,7 @@ public abstract class ProfessionManager {
                             Items.IRON_CHESTPLATE,
                             "",
                             "Will be available in future releases",
+                            "",
                             "_"
                     )
             ),
