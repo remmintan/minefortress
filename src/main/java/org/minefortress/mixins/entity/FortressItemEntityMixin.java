@@ -77,8 +77,11 @@ public abstract class FortressItemEntityMixin extends Entity {
     }
 
     private boolean shouldCollectInInventory(ServerProfessionManager serverProfessionManager, Item item) {
-        if(ItemTags.SAPLINGS.contains(item) || FORESTER_ITEMS.contains(item))
+        if(ItemTags.SAPLINGS.contains(item))
             return serverProfessionManager.hasProfession("forester");
+
+        if(FORESTER_ITEMS.contains(item))
+            return serverProfessionManager.hasProfession("forester") || serverProfessionManager.hasProfession("farmer");
 
         if(FISHERMAN_ITEMS.contains(item))
             return serverProfessionManager.hasProfession("fisherman");
