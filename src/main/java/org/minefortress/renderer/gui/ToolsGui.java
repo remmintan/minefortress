@@ -11,6 +11,9 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.ServerboundSetCombatStatePacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.widget.*;
 import org.minefortress.selections.SelectionType;
@@ -27,6 +30,7 @@ public class ToolsGui extends FortressGuiScreen {
     private final FortressItemButtonWidget blueprints;
     private final FortressItemButtonWidget treeCutter;
     private final FortressItemButtonWidget roadsBuilder;
+    private final FortressItemButtonWidget combatMode;
     private final ButtonWidget questionButton;
     private final ButtonWidget selectionVisibilityButton;
 
@@ -121,6 +125,26 @@ public class ToolsGui extends FortressGuiScreen {
                 Text.of("")
         );
 
+        this.combatMode = new FortressCombatButtonWidget(
+                0,
+                0,
+                Items.DIAMOND_SWORD,
+                itemRenderer,
+                btn -> {
+                    final var inCombat = isInCombat(fortressClient);
+                    final var packet = new ServerboundSetCombatStatePacket(!inCombat);
+                    FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_COMBAT_STATE, packet);
+                },
+                (button, matrices, mouseX, mouseY) -> {
+                    if(isInCombat(fortressClient)) {
+                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
+                    } else {
+                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Fight"), mouseX, mouseY);
+                    }
+                },
+                Text.of("")
+        );
+
         this.selectionVisibilityButton = new FortressSelectionVisibilityButtonWidget(
                 0,
                 0,
@@ -183,32 +207,35 @@ public class ToolsGui extends FortressGuiScreen {
             }
 
             this.questionButton.x = screenWidth - 25;
-            this.questionButton.y = 130;
+            this.questionButton.y = 155;
             this.questionButton.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
-        if(!treeCutterSelected(fortressClient) && !roadsSelected(fortressClient)) {
+        if(!treeCutterSelected(fortressClient) && !roadsSelected(fortressClient) && !isInCombat(fortressClient)) {
             this.blueprints.setPos(screenWidth - 25, 30);
             this.blueprints.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
-        if(!blueprintSelected(fortressClient) && !roadsSelected(fortressClient)) {
+        if(!blueprintSelected(fortressClient) && !roadsSelected(fortressClient) && !isInCombat(fortressClient)) {
             this.treeCutter.setPos(screenWidth - 25, 55);
             this.treeCutter.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
-        if(!blueprintSelected(fortressClient) && !treeCutterSelected(fortressClient)) {
+        if(!blueprintSelected(fortressClient) && !treeCutterSelected(fortressClient) && !isInCombat(fortressClient)) {
             this.roadsBuilder.setPos(screenWidth - 25, 80);
             this.roadsBuilder.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
-        this.selectionVisibilityButton.x = screenWidth - 25;
-        this.selectionVisibilityButton.y = 105;
-        this.selectionVisibilityButton.render(p, (int)mouseX, (int)mouseY, delta);
-    }
+        if(!blueprintSelected(fortressClient) && !treeCutterSelected(fortressClient) && !roadsSelected(fortressClient)) {
+            this.combatMode.setPos(screenWidth - 25, 105);
+            this.combatMode.render(p, (int)mouseX, (int)mouseY, delta);
+        }
 
-    private boolean blueprintSelected(FortressMinecraftClient fortressClient) {
-        return fortressClient.getBlueprintManager().hasSelectedBlueprint();
+        if(!isInCombat(fortressClient)) {
+            this.selectionVisibilityButton.x = screenWidth - 25;
+            this.selectionVisibilityButton.y = 130;
+            this.selectionVisibilityButton.render(p, (int)mouseX, (int)mouseY, delta);
+        }
     }
 
     @Override
@@ -219,6 +246,7 @@ public class ToolsGui extends FortressGuiScreen {
                 this.blueprints.isHovered() ||
                 this.treeCutter.isHovered() ||
                 this.roadsBuilder.isHovered() ||
+                this.combatMode.isHovered() ||
                 this.selectionVisibilityButton.isHovered();
 
     }
@@ -241,6 +269,9 @@ public class ToolsGui extends FortressGuiScreen {
         if(this.roadsBuilder.isHovered())
             this.roadsBuilder.onClick(mouseX, mouseY);
 
+        if(this.combatMode.isHovered())
+            this.combatMode.onClick(mouseX, mouseY);
+
         for (ButtonWidget btn : selectionButtons) {
             if (btn.visible && btn.isHovered())
                 btn.onClick(mouseX, mouseY);
@@ -253,5 +284,13 @@ public class ToolsGui extends FortressGuiScreen {
 
     private boolean roadsSelected(FortressMinecraftClient fortressClient) {
         return fortressClient.getSelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
+    }
+
+    private boolean blueprintSelected(FortressMinecraftClient fortressClient) {
+        return fortressClient.getBlueprintManager().hasSelectedBlueprint();
+    }
+
+    private boolean isInCombat(FortressMinecraftClient fortressClient) {
+        return fortressClient.getFortressClientManager().isInCombat();
     }
 }
