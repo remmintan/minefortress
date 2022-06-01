@@ -47,6 +47,8 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private FortressGamemode gamemode;
 
+    private boolean isInCombat;
+
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
     }
@@ -252,5 +254,13 @@ public final class FortressClientManager extends AbstractFortressManager {
         return pos.getX() >= start.getX() && pos.getX() <= end.getX() &&
                 pos.getY() >= start.getY() && pos.getY() <= end.getY() &&
                 pos.getZ() >= start.getZ() && pos.getZ() <= end.getZ();
+    }
+
+    public boolean isInCombat() {
+        return isInCombat;
+    }
+
+    public void setInCombat(boolean inCombat) {
+        isInCombat = inCombat;
     }
 }
