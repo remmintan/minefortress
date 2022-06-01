@@ -13,33 +13,31 @@ import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.EnumSet;
 
-public class ColonistExecuteTaskGoal extends Goal {
+public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
-    private final Colonist colonist;
     private final ServerWorld world;
 
     private BlockPos workGoal =  null;
+
+    public ColonistExecuteTaskGoal(Colonist colonist) {
+        super(colonist);
+        World level = this.colonist.world;
+        if(level instanceof ServerWorld) {
+            this.world = (ServerWorld) level;
+        } else {
+            throw new IllegalStateException("AI should run on the server entities!");
+        }
+
+    }
 
     @Override
     public boolean canStop() {
         return colonistIsStarving();
     }
 
-    public ColonistExecuteTaskGoal(Colonist colonist) {
-        this.colonist = colonist;
-
-        World level = this.colonist.world;
-        if(level instanceof ServerWorld) {
-            this.world = (ServerWorld) level;
-        } else
-            throw new IllegalStateException("AI should run on the server entities!");
-
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Goal.Control.JUMP));
-    }
-
     @Override
     public boolean canStart() {
-        return getTaskControl().hasTask() && !colonistIsStarving();
+        return notInCombat() && getTaskControl().hasTask() && !colonistIsStarving();
     }
 
     @Override
@@ -71,7 +69,7 @@ public class ColonistExecuteTaskGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return !colonistIsStarving() && getTaskControl().hasTask() &&
+        return notInCombat() && !colonistIsStarving() && getTaskControl().hasTask() &&
             (
                 getMovementHelper().stillTryingToReachGoal() ||
                 workGoal !=null ||

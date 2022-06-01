@@ -15,25 +15,18 @@ import org.minefortress.fortress.resources.server.ServerResourceManager;
 import java.util.EnumSet;
 import java.util.Optional;
 
-public class ColonistEatGoal extends Goal {
+public class ColonistEatGoal extends AbstractFortressGoal {
 
-    private final Colonist colonist;
     private BlockPos goal;
     private Item foodInHand;
 
     public ColonistEatGoal(Colonist colonist) {
-        this.colonist = colonist;
-        World level = this.colonist.world;
-        if (!(level instanceof ServerWorld)) {
-            throw new IllegalStateException("AI should run on the server entities!");
-        }
-
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Goal.Control.JUMP));
+        super(colonist);
     }
 
     @Override
     public boolean canStart() {
-        return colonist.getCurrentFoodLevel() < 12 && colonist.getFortressCenter() != null && this.hasEatableItem() ;
+        return colonist.getCurrentFoodLevel() < 12 && colonist.getFortressCenter() != null && this.hasEatableItem() && notInCombat();
     }
 
     @Override
@@ -75,7 +68,7 @@ public class ColonistEatGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return colonist.getCurrentFoodLevel() < 12 && (hasEatableItem() || this.foodInHand != null || hasntReachedTheWorkGoal());
+        return notInCombat() && colonist.getCurrentFoodLevel() < 12 && (hasEatableItem() || this.foodInHand != null || hasntReachedTheWorkGoal());
     }
 
     private boolean hasntReachedTheWorkGoal() {

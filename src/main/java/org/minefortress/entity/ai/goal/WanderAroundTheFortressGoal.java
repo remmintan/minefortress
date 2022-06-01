@@ -1,6 +1,5 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.server.world.ServerWorld;
@@ -9,24 +8,20 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.NodeMaker;
 import org.minefortress.fortress.FortressServerManager;
 
-import java.util.EnumSet;
 import java.util.Optional;
 
 import static org.minefortress.entity.colonist.ColonistHungerManager.IDLE_EXHAUSTION;
 
-public class WanderAroundTheFortressGoal extends Goal {
+public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
 
-    private final Colonist colonist;
 
     public WanderAroundTheFortressGoal(Colonist colonist) {
-        this.colonist = colonist;
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK,Goal.Control.JUMP));
-
+        super(colonist);
     }
 
     @Override
     public boolean canStart() {
-        if(!isDay() || colonist.getTaskControl().hasTask()) return false;
+        if(isInCombat() || !isDay() || colonist.getTaskControl().hasTask()) return false;
         final Optional<FortressServerManager> fortressManagerOpt = colonist.getFortressServerManager();
         if (fortressManagerOpt.isPresent()) {
             final FortressServerManager fortressManager = fortressManagerOpt.get();
@@ -67,7 +62,7 @@ public class WanderAroundTheFortressGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return isDay() && !this.colonist.getNavigation().isIdle() && !colonist.getTaskControl().hasTask();
+        return notInCombat() && isDay() && !this.colonist.getNavigation().isIdle() && !colonist.getTaskControl().hasTask();
     }
 
     @Override
