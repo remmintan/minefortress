@@ -14,19 +14,17 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Random;
 
-public class ReturnToFireGoal extends Goal {
+public class ReturnToFireGoal extends AbstractFortressGoal {
 
     private final Random random = new Random();
-    private final Colonist colonist;
 
     public ReturnToFireGoal(Colonist colonist) {
-        super();
-        this.colonist = colonist;
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK,Goal.Control.JUMP));
+        super(colonist);
     }
 
     @Override
     public boolean canStart() {
+        if(isInCombat()) return false;
         if(!isNight()) {
             final Optional<FortressServerManager> fortressServerManager = colonist.getFortressServerManager();
             if(fortressServerManager.isPresent()) {
@@ -90,7 +88,7 @@ public class ReturnToFireGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return isNight() && !colonist.getTaskControl().hasTask() && !this.colonist.getNavigation().isIdle();
+        return notInCombat() && isNight() && !colonist.getTaskControl().hasTask() && !this.colonist.getNavigation().isIdle();
     }
 
     @Override

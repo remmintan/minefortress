@@ -10,9 +10,8 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-public class DailyProfessionTasksGoal extends Goal {
+public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
-    private final Colonist colonist;
     private final Map<String, ProfessionDailyTask> dailyTasks = Map.ofEntries(
             entry("crafter", new CrafterDailyTask()),
             entry("blacksmith", new BlacksmithDailyTask()),
@@ -23,8 +22,7 @@ public class DailyProfessionTasksGoal extends Goal {
     private ProfessionDailyTask currentTask;
 
     public DailyProfessionTasksGoal(Colonist colonist) {
-        this.colonist = colonist;
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Goal.Control.JUMP));
+        super(colonist);
     }
 
     private boolean isStarving() {
@@ -33,6 +31,7 @@ public class DailyProfessionTasksGoal extends Goal {
 
     @Override
     public boolean canStart() {
+        if(isInCombat()) return false;
         if(this.isStarving()) return false;
         final TaskControl taskControl = getTaskControl();
         if(taskControl.hasTask()) return false;
@@ -57,7 +56,7 @@ public class DailyProfessionTasksGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return !isStarving() && this.dailyTasks.containsKey(colonist.getProfessionId())
+        return notInCombat() && !isStarving() && this.dailyTasks.containsKey(colonist.getProfessionId())
                 && this.currentTask.shouldContinue(colonist)
                 && !getTaskControl().hasTask();
     }

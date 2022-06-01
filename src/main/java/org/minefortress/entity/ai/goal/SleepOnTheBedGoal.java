@@ -14,19 +14,17 @@ import org.minefortress.fortress.FortressServerManager;
 import java.util.EnumSet;
 import java.util.Optional;
 
-public class SleepOnTheBedGoal extends Goal {
+public class SleepOnTheBedGoal extends AbstractFortressGoal {
 
-    private final Colonist colonist;
     private FortressBedInfo bedInfo;
 
     public SleepOnTheBedGoal(Colonist colonist) {
-        this.colonist = colonist;
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK,Goal.Control.JUMP));
+        super(colonist);
     }
 
     @Override
     public boolean canStart() {
-        if(!isNight() || colonist.getTaskControl().hasTask()) return false;
+        if(isInCombat() || !isNight() || colonist.getTaskControl().hasTask()) return false;
 
         final Optional<FortressBedInfo> freeBedOptional = getFreeBed();
         return freeBedOptional.isPresent();
@@ -81,7 +79,7 @@ public class SleepOnTheBedGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return isNight() && bedInfo != null && !colonist.getTaskControl().hasTask();
+        return notInCombat() && isNight() && bedInfo != null && !colonist.getTaskControl().hasTask();
     }
 
     @Override
