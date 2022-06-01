@@ -3,7 +3,6 @@ package org.minefortress.fortress;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.nbt.NbtCompound;
@@ -26,6 +25,7 @@ import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
 import org.minefortress.network.ClientboundSyncBuildingsPacket;
+import org.minefortress.network.ClientboundSyncCombatStatePacket;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -43,6 +43,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private boolean needSync = true;
     private boolean needSyncBuildings = true;
     private boolean needSyncSpecialBlocks = true;
+    private boolean needSyncCombat = true;
 
     private BlockPos fortressCenter = null;
     private final Set<Colonist> colonists = new HashSet<>();
@@ -61,6 +62,8 @@ public final class FortressServerManager extends AbstractFortressManager {
     private int minZ = Integer.MAX_VALUE;
 
     private FortressGamemode gamemode = FortressGamemode.NONE;
+
+    private boolean combatMode;
 
     public FortressServerManager() {
         serverProfessionManager = new ServerProfessionManager(() -> this);
@@ -106,6 +109,11 @@ public final class FortressServerManager extends AbstractFortressManager {
             final ClientboundSyncSpecialBlocksPacket syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks, blueprintsSpecialBlocks);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, syncBlocks);
             needSyncSpecialBlocks = false;
+        }
+        if(needSyncCombat) {
+            final ClientboundSyncCombatStatePacket syncCombatState = new ClientboundSyncCombatStatePacket(combatMode);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_COMBAT_STATE_SYNC, syncCombatState);
+            needSyncCombat = false;
         }
         needSync = false;
     }
@@ -248,6 +256,11 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private void scheduleSyncSpecialBlocks() {
         needSyncSpecialBlocks = true;
+        this.scheduleSync();
+    }
+
+    private void scheduleSyncCombat() {
+        needSyncCombat = true;
         this.scheduleSync();
     }
 
@@ -495,5 +508,14 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public ServerResourceManager getServerResourceManager() {
         return serverResourceManager;
+    }
+
+    public boolean isCombatMode() {
+        return combatMode;
+    }
+
+    public void setCombatMode(boolean combatMode) {
+        this.combatMode = combatMode;
+        this.scheduleSyncCombat();
     }
 }
