@@ -21,6 +21,8 @@ public class ClientboundSyncCombatStatePacket implements FortressClientPacket {
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
             fortressClient.getFortressClientManager().setInCombat(isInCombat);
+            if(isInCombat)
+                fortressClient.setTicksSpeed(1);
         }
     }
 

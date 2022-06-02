@@ -107,6 +107,7 @@ public class ColonistsGui extends FortressGuiScreen{
 
         this.hovered = colonsitsCountHovered;
 
+        if(isCombat()) return;
         this.professionsButton.setPos(screenWidth / 2 - 91 + 35, screenHeight - 43);
         this.professionsButton.render(matrices, (int)mouseX, (int)mouseY, delta);
 
@@ -125,6 +126,10 @@ public class ColonistsGui extends FortressGuiScreen{
 
     private boolean isSurvival() {
         return getFortressClient().isFortressGamemode() && getFortressClientManager().isSurvival();
+    }
+
+    private boolean isCombat() {
+        return getFortressClient().getFortressClientManager().isInCombat();
     }
 
     private void renderSelectedColonistInfo(MatrixStack matrices, TextRenderer font, int screenHeight, FortressClientManager fortressManager) {
