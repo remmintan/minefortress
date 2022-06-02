@@ -3,6 +3,7 @@ package org.minefortress.fortress;
 import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
@@ -56,6 +57,13 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public void select(Colonist colonist) {
+        if(isInCombat) {
+            final var mouse = MinecraftClient.getInstance().mouse;
+            fightManager.getSelectionManager().startSelection(mouse.getX(), mouse.getY(), colonist.getBlockPos());
+
+            selectedColonist = null;
+            return;
+        }
         this.selectedColonist = colonist;
         final Vec3d entityPos = colonist.getPos();
         final Vec3d playerPos = MinecraftClient.getInstance().player.getPos();
@@ -73,7 +81,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public boolean isSelectingColonist() {
-        return selectedColonist != null;
+        return selectedColonist != null && !isInCombat;
     }
 
     public Colonist getSelectedColonist() {

@@ -2,17 +2,22 @@ package org.minefortress.mixins.renderer;
 
 import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
+import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressGameRenderer;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -43,6 +48,10 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Shadow public abstract void tick();
 
+    @Shadow public abstract void reset();
+
+    @Shadow public abstract void reload(ResourceManager manager);
+
     @Override
     public double getFov(float f, boolean b) {
         return this.getFov(this.getCamera(), f, b);
@@ -57,6 +66,31 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                 BlockHitResult blockHitResult = (BlockHitResult) this.client.crosshairTarget;
 
                 final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
+                final var fightSelectionManager = fortressClientManager
+                        .getFightManager()
+                        .getSelectionManager();
+                if(fortressClientManager.isInCombat()) {
+                    resetSelection(selectionManager);
+                    if(fightSelectionManager.isSelectionStarted()) {
+                        final var mouse = client.mouse;
+                        final var crosshairTarget = client.crosshairTarget;
+                        BlockPos pos;
+                        if(crosshairTarget instanceof BlockHitResult) {
+                            pos = ((BlockHitResult) crosshairTarget).getBlockPos();
+                        } else if(crosshairTarget instanceof EntityHitResult) {
+                            pos = ((EntityHitResult) crosshairTarget).getEntity().getBlockPos();
+                        } else {
+                            pos = null;
+                        }
+                        if(pos != null) {
+                            fightSelectionManager.updateSelection(mouse.getX(), mouse.getY(), pos);
+                        }
+                    }
+                    return;
+                } else {
+                    fightSelectionManager.resetSelection();
+                }
+
                 if(fortressClientManager.isFortressInitializationNeeded()) {
                     resetSelection(selectionManager);
                     fortressClientManager.updateRenderer(client.worldRenderer);

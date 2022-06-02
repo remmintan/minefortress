@@ -3,6 +3,7 @@ package org.minefortress.mixins.interaction;
 import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.tutorial.TutorialManager;
@@ -18,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
+import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.SelectionManager;
@@ -79,6 +81,14 @@ public abstract class FortressInteractionManagerMixin {
             final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
             final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
+            if(fortressManager.isInCombat()) {
+                final var selectionManager = fortressManager.getFightManager().getSelectionManager();
+                final var mouse = client.mouse;
+
+                selectionManager.startSelection(mouse.getX(), mouse.getY(), pos);
+                return;
+            }
+
             if(fortressManager.isSelectingColonist()){
                 fortressManager.stopSelectingColonist();
                 cir.setReturnValue(false);
@@ -102,6 +112,20 @@ public abstract class FortressInteractionManagerMixin {
     public void updateBlockBreakingProgress(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if(getCurrentGameMode() == FORTRESS)
             cir.setReturnValue(true);
+    }
+
+    @Inject(method = "cancelBlockBreaking", at = @At("HEAD"), cancellable = true)
+    public void cancelBlockBreaking(CallbackInfo ci) {
+        if(getCurrentGameMode() == FORTRESS) {
+            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+            final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+            final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+
+            if(fortressManager.isInCombat()) {
+                final var selectionManager = fortressManager.getFightManager().getSelectionManager();
+                selectionManager.endSelection();
+            }
+        }
     }
 
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)
