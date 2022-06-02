@@ -26,6 +26,7 @@ public class FortressHud {
    private final ColonistsGui colonistsGui;
    private final ToolsGui toolsGui;
    private final TimeGui timeGui;
+   private final FightGui fightGui;
 
    private boolean isHovered = false;
 
@@ -34,6 +35,7 @@ public class FortressHud {
         this.colonistsGui = new ColonistsGui(client, client.getItemRenderer());
         this.toolsGui = new ToolsGui(client, client.getItemRenderer());
         this.timeGui = new TimeGui(client, client.getItemRenderer());
+        this.fightGui = new FightGui(client, client.getItemRenderer());
     }
 
     private SelectionManager getSelectionManager() {
@@ -72,6 +74,8 @@ public class FortressHud {
             this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             this.timeGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+            if(fortressManager.isInCombat())
+                fightGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
         }
     }
 

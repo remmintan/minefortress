@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -27,6 +28,7 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private final ClientProfessionManager professionManager;
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
+    private final ClientFightManager fightManager = new ClientFightManager();
 
     private boolean initialized = false;
 
@@ -262,5 +264,9 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public void setInCombat(boolean inCombat) {
         isInCombat = inCombat;
+    }
+
+    public ClientFightManager getFightManager() {
+        return fightManager;
     }
 }
