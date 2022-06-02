@@ -58,23 +58,25 @@ public class TimeGui extends FortressGuiScreen {
 
     @Override
     void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
-        final int y = 15;
+        if(!this.isCombat()) {
+            final int y = 15;
 
-        this.pause.x = 5;
-        this.pause.y = y;
-        this.pause.render(p, (int)mouseX, (int)mouseY, delta);
+            this.pause.x = 5;
+            this.pause.y = y;
+            this.pause.render(p, (int)mouseX, (int)mouseY, delta);
 
-        this.speed1.x = 5 + (5 + 20);
-        this.speed1.y = y;
-        this.speed1.render(p, (int)mouseX, (int)mouseY, delta);
+            this.speed1.x = 5 + (5 + 20);
+            this.speed1.y = y;
+            this.speed1.render(p, (int)mouseX, (int)mouseY, delta);
 
-        this.speed2.x = 5 + (5 + 20) * 2;
-        this.speed2.y = y;
-        this.speed2.render(p, (int)mouseX, (int)mouseY, delta);
+            this.speed2.x = 5 + (5 + 20) * 2;
+            this.speed2.y = y;
+            this.speed2.render(p, (int)mouseX, (int)mouseY, delta);
 
 //        this.speed4.x = 5 + (5 + 20) * 3;
 //        this.speed4.y = y;
 //        this.speed4.render(p, (int)mouseX, (int)mouseY, delta);
+        }
 
         final Optional<ClientWorld> world = Optional.ofNullable(this.client.world);
         final long timeTicks = world.map(World::getTime).orElse(0L) + 6500L;
@@ -112,6 +114,14 @@ public class TimeGui extends FortressGuiScreen {
 
     private void setSpeed(int speed) {
         this.fortressClient.setTicksSpeed(speed);
+    }
+
+    private FortressMinecraftClient getClient() {
+        return (FortressMinecraftClient) MinecraftClient.getInstance();
+    }
+
+    private boolean isCombat() {
+        return getClient().getFortressClientManager().isInCombat();
     }
 
 }

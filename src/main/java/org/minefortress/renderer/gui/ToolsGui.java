@@ -194,7 +194,7 @@ public class ToolsGui extends FortressGuiScreen {
     void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
 
-        if(!blueprintSelected(fortressClient) && !treeCutterSelected(fortressClient) && !roadsSelected(fortressClient)) {
+        if(!blueprintSelected(fortressClient) && !treeCutterSelected(fortressClient) && !roadsSelected(fortressClient) && !isInCombat(fortressClient)) {
             this.selectionType.setPos(screenWidth - 25, 5);
             this.selectionType.render(p, (int)mouseX, (int)mouseY, delta);
 

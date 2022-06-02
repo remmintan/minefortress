@@ -60,7 +60,6 @@ public class FortressHud {
 
         renderWatermarks(p, font, scaledWidth, scaledHeight);
 
-
         if (fortressManager.isFortressInitializationNeeded()) {
             DrawableHelper.drawStringWithShadow(p, font, "Choose where to place your Fortress", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
             DrawableHelper.drawStringWithShadow(p, font, "right click - set fortress center", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
@@ -69,7 +68,7 @@ public class FortressHud {
             DrawableHelper.drawStringWithShadow(p, font, "esc - to save changes", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
         } else {
             renderHints(p, scaledHeight, font);
-            renderSelectTypeName(p, font, scaledHeight);
+            renderSelectTypeName(p, font);
             this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             this.timeGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
@@ -78,6 +77,14 @@ public class FortressHud {
 
     private void renderHints(MatrixStack p, int scaledHeight, TextRenderer font) {
         if(getFortressClient().getFortressClientManager().isSelectingColonist()) return;
+
+        if(getFortressClient().getFortressClientManager().isInCombat()) {
+            DrawableHelper.drawStringWithShadow(p, font, "hold left mouse button and", 5, scaledHeight - font.fontHeight - 45, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "drag to select units", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "click right mouse button", 5, scaledHeight - font.fontHeight - 25, MOD_GUI_COLOR);
+            DrawableHelper.drawStringWithShadow(p, font, "to give commands", 5, scaledHeight - font.fontHeight - 15, MOD_GUI_COLOR);
+            return;
+        }
 
         final ClientBlueprintManager clientBlueprintManager = getBlueprintManager();
         if(clientBlueprintManager.hasSelectedBlueprint()) {
@@ -161,7 +168,9 @@ public class FortressHud {
         }
     }
 
-    private void renderSelectTypeName(MatrixStack p, TextRenderer font, int scaledHeight) {
+    private void renderSelectTypeName(MatrixStack p, TextRenderer font) {
+        if(getFortressClient().getFortressClientManager().isInCombat()) return;
+        if(getFortressClient().getBlueprintManager().hasSelectedBlueprint())return;
         final SelectionManager selectionManager = getSelectionManager();
         String name = selectionManager.getCurrentSelectionType().getName();
         String selectionText = "Selection type: " + name;
