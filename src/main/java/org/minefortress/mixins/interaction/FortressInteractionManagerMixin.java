@@ -143,6 +143,14 @@ public abstract class FortressInteractionManagerMixin {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
                 final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
                 final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+                if(fortressManager.isInCombat()) {
+                    final var selectionManager = fortressManager.getFightManager().getSelectionManager();
+                    if(selectionManager.isSelecting())
+                        selectionManager.resetSelection();
+                    cir.setReturnValue(ActionResult.SUCCESS);
+                    return;
+                }
+
                 if(fortressManager.isFortressInitializationNeeded()) {
                     fortressManager.setupFortressCenter();
                     cir.setReturnValue(ActionResult.SUCCESS);

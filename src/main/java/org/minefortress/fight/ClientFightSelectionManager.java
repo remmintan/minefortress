@@ -3,10 +3,8 @@ package org.minefortress.fight;
 import com.google.common.base.Predicates;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityType;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import org.minefortress.entity.Colonist;
 
 import java.util.Collections;
@@ -30,10 +28,14 @@ public class ClientFightSelectionManager {
     }
 
     public void endSelection() {
-        this.resetSelection();
+        this.selectionStartBlock = null;
+        this.selectionStartPos = null;
+        this.selectionCurBlock = null;
+        this.selectionCurPos = null;
     }
 
     public void updateSelection(double x, double y, Vec3d endBlock) {
+        if(!isSelectionStarted()) return;
         this.selectionCurPos = new MousePos(x, y);
         this.selectionCurBlock = endBlock;
 
