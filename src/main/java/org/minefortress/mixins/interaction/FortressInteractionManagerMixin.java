@@ -49,6 +49,8 @@ public abstract class FortressInteractionManagerMixin {
     @Shadow
     private void syncSelectedSlot() {}
 
+    @Shadow public abstract void setGameMode(GameMode gameMode);
+
     @Inject(method = "setGameModes", at = @At("RETURN"))
     public void setGameModes(GameMode gameMode, GameMode previousGameMode, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
@@ -85,7 +87,11 @@ public abstract class FortressInteractionManagerMixin {
                 final var selectionManager = fortressManager.getFightManager().getSelectionManager();
                 final var mouse = client.mouse;
 
-                selectionManager.startSelection(mouse.getX(), mouse.getY(), pos);
+                if(selectionManager.isSelecting())
+                    selectionManager.endSelection();
+                else
+                    selectionManager.startSelection(mouse.getX(), mouse.getY(), pos);
+                cir.setReturnValue(false);
                 return;
             }
 
@@ -114,19 +120,19 @@ public abstract class FortressInteractionManagerMixin {
             cir.setReturnValue(true);
     }
 
-    @Inject(method = "cancelBlockBreaking", at = @At("HEAD"), cancellable = true)
-    public void cancelBlockBreaking(CallbackInfo ci) {
-        if(getCurrentGameMode() == FORTRESS) {
-            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-            final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
-            final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
-
-            if(fortressManager.isInCombat()) {
-                final var selectionManager = fortressManager.getFightManager().getSelectionManager();
-                selectionManager.endSelection();
-            }
-        }
-    }
+//    @Inject(method = "cancelBlockBreaking", at = @At("HEAD"), cancellable = true)
+//    public void cancelBlockBreaking(CallbackInfo ci) {
+//        if(getCurrentGameMode() == FORTRESS) {
+//            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+//            final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+//            final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+//
+//            if(fortressManager.isInCombat()) {
+//                final var selectionManager = fortressManager.getFightManager().getSelectionManager();
+//                selectionManager.endSelection();
+//            }
+//        }
+//    }
 
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)
     public void interactBlock(ClientPlayerEntity player, ClientWorld world, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {

@@ -73,15 +73,20 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
         final GameMode fortress = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
         if(currentGamemode == fortress) {
             final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == colonist;
+            final var fightSelecting = getFortressClientManager().getFightManager().getSelectionManager().isSelected(colonist);
             final boolean selecting = getFortressClientManager().getSelectedColonist() == colonist;
             var color = getHealthFoodLevelColor(colonist);
-            if(hovering || selecting || color != null) {
+            if(hovering || selecting || color != null || fightSelecting) {
                 final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-                if(color != null && hovering) {
+                if(color != null && hovering && !fightSelecting) {
                     color.scale(0.7f);
                 }
                 if(color == null)
                     color = new Vec3f(selecting ? 0.7f : 0.0f, selecting ? 0.7f : 1.0f, selecting ? 0.7f : 0.0f);
+
+                if(fightSelecting) {
+                    color = new Vec3f(0.0f, 1.0f, 0.0f);
+                }
                 ColonistRenderer.renderRhombus(matrixStack, buffer, colonist, color);
             }
         }
