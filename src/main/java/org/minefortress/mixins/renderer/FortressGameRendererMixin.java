@@ -74,11 +74,11 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                     if(fightSelectionManager.isSelectionStarted()) {
                         final var mouse = client.mouse;
                         final var crosshairTarget = client.crosshairTarget;
-                        BlockPos pos;
+                        Vec3d pos;
                         if(crosshairTarget instanceof BlockHitResult) {
-                            pos = ((BlockHitResult) crosshairTarget).getBlockPos();
+                            pos = crosshairTarget.getPos();
                         } else if(crosshairTarget instanceof EntityHitResult) {
-                            pos = ((EntityHitResult) crosshairTarget).getEntity().getBlockPos();
+                            pos = ((EntityHitResult) crosshairTarget).getEntity().getPos();
                         } else {
                             pos = null;
                         }

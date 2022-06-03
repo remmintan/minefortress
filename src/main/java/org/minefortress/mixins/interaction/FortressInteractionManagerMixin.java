@@ -90,7 +90,7 @@ public abstract class FortressInteractionManagerMixin {
                 if(selectionManager.isSelecting())
                     selectionManager.endSelection();
                 else
-                    selectionManager.startSelection(mouse.getX(), mouse.getY(), pos);
+                    selectionManager.startSelection(mouse.getX(), mouse.getY(), client.crosshairTarget.getPos());
                 cir.setReturnValue(false);
                 return;
             }

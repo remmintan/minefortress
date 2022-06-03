@@ -59,7 +59,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     public void select(Colonist colonist) {
         if(isInCombat) {
             final var mouse = MinecraftClient.getInstance().mouse;
-            fightManager.getSelectionManager().startSelection(mouse.getX(), mouse.getY(), colonist.getBlockPos());
+            fightManager.getSelectionManager().startSelection(mouse.getX(), mouse.getY(), colonist.getPos());
 
             selectedColonist = null;
             return;

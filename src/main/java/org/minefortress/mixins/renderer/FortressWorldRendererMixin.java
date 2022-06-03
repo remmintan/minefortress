@@ -84,7 +84,7 @@ public abstract class FortressWorldRendererMixin  {
                 final HitResult crosshairTarget = client.crosshairTarget;
                 if(crosshairTarget instanceof BlockHitResult bhr) {
                     BlockPos pos = bhr.getBlockPos();
-                    if(pos != null && !world.getBlockState(pos).isAir()) {
+                    if(pos != null && !world.getBlockState(pos).isAir() && !fortressClientManager.isInCombat()) {
                         final List<BlockPos> buildingSelection = fortressClientManager.getBuildingSelection(pos);
                         for(BlockPos sel: buildingSelection) {
                             if(this.world.getWorldBorder().contains(sel)) {
