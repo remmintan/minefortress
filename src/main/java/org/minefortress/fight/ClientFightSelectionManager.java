@@ -5,6 +5,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import org.minefortress.entity.Colonist;
 
 import java.util.Collections;
@@ -13,15 +15,15 @@ import java.util.List;
 public class ClientFightSelectionManager {
 
     private MousePos selectionStartPos;
-    private BlockPos selectionStartBlock;
+    private Vec3d selectionStartBlock;
     private MousePos selectionCurPos;
-    private BlockPos selectionCurBlock;
+    private Vec3d selectionCurBlock;
 
     private List<Colonist> selectedColonists = Collections.emptyList();
 
-    private BlockPos cachedBlockPos;
+    private Vec3d cachedBlockPos;
 
-    public void startSelection(double x, double y, BlockPos startBlock) {
+    public void startSelection(double x, double y, Vec3d startBlock) {
         this.resetSelection();
         this.selectionStartPos = new MousePos(x, y);
         this.selectionStartBlock = startBlock;
@@ -31,7 +33,7 @@ public class ClientFightSelectionManager {
         this.resetSelection();
     }
 
-    public void updateSelection(double x, double y, BlockPos endBlock) {
+    public void updateSelection(double x, double y, Vec3d endBlock) {
         this.selectionCurPos = new MousePos(x, y);
         this.selectionCurBlock = endBlock;
 
@@ -70,7 +72,7 @@ public class ClientFightSelectionManager {
         return selectionStartPos;
     }
 
-    public BlockPos getSelectionStartBlock() {
+    public Vec3d getSelectionStartBlock() {
         return selectionStartBlock;
     }
 
@@ -78,7 +80,7 @@ public class ClientFightSelectionManager {
         return selectionCurPos;
     }
 
-    public BlockPos getSelectionCurBlock() {
+    public Vec3d getSelectionCurBlock() {
         return selectionCurBlock;
     }
 
