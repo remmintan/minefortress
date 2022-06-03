@@ -9,34 +9,41 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 
 class FightGui extends FortressGuiScreen{
 
-    private static final int SELECTION_COLOR = 0x060606;
-
-    private final ClientFightSelectionManager fightSelectionManager;
+    private static final int SELECTION_COLOR = 0xFF00FF00;
 
     FightGui(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
-        if(client instanceof FortressMinecraftClient fortressMinecraftClient) {
-            final var fortressManager = fortressMinecraftClient.getFortressClientManager();
-            this.fightSelectionManager = fortressManager.getFightManager().getSelectionManager();
-        } else {
-            throw new IllegalArgumentException("Client is not a FortressClient!");
-        }
     }
 
     @Override
     void render(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
-        if(!this.fightSelectionManager.isSelecting()) return;
-        final var selectionStartPos = this.fightSelectionManager.getSelectionStartPos();
-        final var selectionCurPos = this.fightSelectionManager.getSelectionCurPos();
+        final var fightSelectionManager = getFightSelectionManager();
+        if(!fightSelectionManager.isSelecting()) return;
+        final var selectionStartPos = fightSelectionManager.getSelectionStartPos();
+        final var selectionCurPos = fightSelectionManager.getSelectionCurPos();
 
-        super.drawHorizontalLine(matrices, selectionStartPos.getX(), selectionCurPos.getX(), selectionStartPos.getY(), SELECTION_COLOR);
-        super.drawVerticalLine(matrices, selectionCurPos.getX(), selectionStartPos.getY(), selectionCurPos.getY(), SELECTION_COLOR);
-        super.drawHorizontalLine(matrices, selectionStartPos.getX(), selectionCurPos.getX(), selectionCurPos.getY(), SELECTION_COLOR);
-        super.drawVerticalLine(matrices, selectionStartPos.getX(), selectionStartPos.getY(), selectionCurPos.getY(), SELECTION_COLOR);
+        final var widthScaleFactor = (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+        final var heightScaleFactor = (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
+
+
+
+        final var selectionStartX = (int) (selectionStartPos.x() * widthScaleFactor);
+        final var selectionStartY = (int) (selectionStartPos.y() * heightScaleFactor);
+        final var selectionCurX = (int) (selectionCurPos.x() * widthScaleFactor);
+        final var selectionCurY = (int) (selectionCurPos.y() * heightScaleFactor);
+
+        super.drawHorizontalLine(matrices, selectionStartX, selectionCurX, selectionStartY, SELECTION_COLOR);
+        super.drawVerticalLine(matrices, selectionCurX, selectionStartY, selectionCurY, SELECTION_COLOR);
+        super.drawHorizontalLine(matrices, selectionStartX, selectionCurX, selectionCurY, SELECTION_COLOR);
+        super.drawVerticalLine(matrices, selectionStartX, selectionStartY, selectionCurY, SELECTION_COLOR);
     }
 
     @Override
     boolean isHovered() {
         return false;
+    }
+
+    private ClientFightSelectionManager getFightSelectionManager() {
+        return ((FortressMinecraftClient)this.client).getFortressClientManager().getFightManager().getSelectionManager();
     }
 }
