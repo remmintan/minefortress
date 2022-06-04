@@ -1,6 +1,7 @@
 package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -28,11 +29,10 @@ public class FightGoal extends AbstractFortressGoal {
 
     @Override
     public void start() {
-        colonist.putItemInHand(Items.WOODEN_SWORD);
+        putCorrectSwordInHand();
         colonist.setCurrentTaskDesc("Fighting");
         this.cooldown = 0;
     }
-
 
     @Override
     public void tick() {
@@ -40,8 +40,8 @@ public class FightGoal extends AbstractFortressGoal {
 
         final var moveHelper = colonist.getMovementHelper();
 
-        if (colonist.getActiveItem() == null || colonist.getActiveItem().getItem() != Items.WOODEN_SWORD) {
-            colonist.putItemInHand(Items.WOODEN_SWORD);
+        if (colonist.getActiveItem() == null || colonist.getActiveItem().getItem() != getCorrectItem()) {
+            putCorrectSwordInHand();
         }
 
         findMoveTarget();
@@ -124,5 +124,18 @@ public class FightGoal extends AbstractFortressGoal {
 
     protected double getSquaredMaxAttackDistance(LivingEntity entity) {
         return this.colonist.getWidth() * 2.0f * (this.colonist.getWidth() * 2.0f) + entity.getWidth();
+    }
+
+    private void putCorrectSwordInHand() {
+        colonist.putItemInHand(getCorrectItem());
+    }
+
+    private Item getCorrectItem() {
+        if(colonist.getProfessionId().equals("warrior1"))
+            return Items.STONE_SWORD;
+        else if(colonist.getProfessionId().equals("warrior2"))
+            return Items.IRON_SWORD;
+        else
+            return Items.WOODEN_SWORD;
     }
 }
