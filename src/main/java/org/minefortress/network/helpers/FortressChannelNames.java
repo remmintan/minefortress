@@ -30,5 +30,6 @@ public class FortressChannelNames {
     public static final String SCROLL_CURRENT_SCREEN = "scroll_current_screen";
     public static final String FORTRESS_COMBAT_STATE_SYNC = "fortress_combat_state_sync";
     public static final String FORTRESS_SET_COMBAT_STATE = "fortress_set_combat_state";
+    public static final String FORTRESS_SELECT_COLONISTS = "fortress_select_colonists";
 
 }
