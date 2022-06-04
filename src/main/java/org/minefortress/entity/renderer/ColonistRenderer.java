@@ -78,15 +78,17 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
             var color = getHealthFoodLevelColor(colonist);
             if(hovering || selecting || color != null || fightSelecting) {
                 final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-                if(color != null && hovering && !fightSelecting) {
+                if(color != null && (hovering || fightSelecting)) {
                     color.scale(0.7f);
                 }
-                if(color == null)
-                    color = new Vec3f(selecting ? 0.7f : 0.0f, selecting ? 0.7f : 1.0f, selecting ? 0.7f : 0.0f);
 
-                if(fightSelecting) {
-                    color = new Vec3f(0.0f, 1.0f, 0.0f);
+                if(color == null) {
+                    color = new Vec3f(selecting ? 0.7f : 0.0f, selecting ? 0.7f : 1.0f, selecting ? 0.7f : 0.0f);
+                    if(fightSelecting) {
+                        color = new Vec3f(0.0f, 1.0f, 0.0f);
+                    }
                 }
+
                 ColonistRenderer.renderRhombus(matrixStack, buffer, colonist, color);
             }
         }
