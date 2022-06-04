@@ -53,5 +53,7 @@ public class MineFortressMod implements ModInitializer {
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, ServerboundOpenCraftingScreenPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.SCROLL_CURRENT_SCREEN, ServerboundScrollCurrentScreenPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SET_COMBAT_STATE, ServerboundSetCombatStatePacket::new);
+        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SELECT_COLONISTS, ServerboundSelectColonistsPacket::new);
+        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, ServerboundSelectFightTargetPacket::new);
     }
 }

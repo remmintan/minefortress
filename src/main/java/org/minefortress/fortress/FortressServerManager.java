@@ -540,4 +540,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var selectedColonists = this.colonists.stream().filter(c -> selectedIds.contains(c.getId())).toList();
         selectionManager.selectColonists(selectedColonists);
     }
+
+    public ServerFightManager getServerFightManager() {
+        return serverFightManager;
+    }
 }
