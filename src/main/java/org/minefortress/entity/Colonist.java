@@ -70,6 +70,7 @@ public class Colonist extends PassiveEntity {
     private final TaskControl taskControl;
     private final MovementHelper movementHelper;
     private final MLGControl mlgControl;
+    private final FightControl fightControl;
 
     private UUID masterPlayerId;
     private BlockPos fortressCenter;
@@ -88,6 +89,7 @@ public class Colonist extends PassiveEntity {
             mlgControl = new MLGControl(this);
             taskControl = new TaskControl(this);
             movementHelper = new MovementHelper((ColonistNavigation) this.getNavigation(), this);
+            fightControl = new FightControl();
         } else {
             digControl = null;
             placeControl = null;
@@ -95,6 +97,7 @@ public class Colonist extends PassiveEntity {
             mlgControl = null;
             taskControl = null;
             movementHelper = null;
+            fightControl = null;
         }
 
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
@@ -298,7 +301,8 @@ public class Colonist extends PassiveEntity {
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
-        this.goalSelector.add(3, new FortressMeleeAttackGoal(this, 1.5, true));
+        this.goalSelector.add(3, new FightGoal(this));
+        this.goalSelector.add(4, new FortressMeleeAttackGoal(this, 1.5, true));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
         this.goalSelector.add(7, new ColonistEatGoal(this));
@@ -428,6 +432,7 @@ public class Colonist extends PassiveEntity {
         if(getPlaceControl() != null) getPlaceControl().tick();
         if(getMlgControl() != null) getMlgControl().tick();
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();
+        if(getFightControl() != null) getFightControl().tick();
     }
 
     private boolean isHalfInWall() {
@@ -473,6 +478,10 @@ public class Colonist extends PassiveEntity {
 
     public ScaffoldsControl getScaffoldsControl() {
         return scaffoldsControl;
+    }
+
+    public FightControl getFightControl() {
+        return fightControl;
     }
 
     public MLGControl getMlgControl() {
