@@ -35,7 +35,7 @@ public abstract class FortressMobMixin extends HostileEntity {
 
     @Inject(method="initGoals", at=@At("TAIL"))
     protected void initGoals(CallbackInfo ci) {
-        if(this instanceof HostileEntity)
+        if(this instanceof HostileEntity && !((Object)this instanceof EndermanEntity))
             super.targetSelector.add(2, new ActiveTargetGoal<>(this, Colonist.class, true));
     }
 
