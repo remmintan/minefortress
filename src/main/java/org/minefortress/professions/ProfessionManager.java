@@ -303,10 +303,10 @@ public abstract class ProfessionManager {
                     new Profession(
                             "Warrior - LVL1",
                             Items.STONE_SWORD,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
+                            "Defends the village, can use stone sword and leather armor [1 stone sword for each]",
+                            "Build Small Warrior's house to unlock",
+                            "You need more stone swords or build another Small Warrior's house to hire more!",
+                            "warrior1"
                     )
             ),
             entry(
@@ -314,10 +314,10 @@ public abstract class ProfessionManager {
                     new Profession(
                             "Warrior - LVL2",
                             Items.IRON_SWORD,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
+                            "Defends the village, can use iron sword and iron armor [1 iron sword for each, 1 iron armor set for each]",
+                            "Build Medium Warrior's house to unlock",
+                            "You need more iron swords/armors or build another Medium Warrior's house to hire more!",
+                            "warrior2"
                     )
             ),
             entry(
@@ -421,11 +421,11 @@ public abstract class ProfessionManager {
      * colonist -> miner1, lumberjack1, forester, crafter
      * miner1 -> miner2
      * lumberjack1 -> lumberjack2
-     * forester -> hunter, fisherman, farmer
+     * forester -> hunter, fisherman, farmer, warrior1
      * crafter -> blacksmith
      * miner2 -> miner3
      * lumberjack2 -> lumberjack3
-     * hunter -> warrior1, archer1, knight1
+     * hunter -> archer1, knight1
      * farmer -> baker, shepherd
      * blacksmith -> leather_worker1, weaver
      * leather_worker1 -> leather_worker2
@@ -455,11 +455,12 @@ public abstract class ProfessionManager {
         Profession lumberjack2 = getProfession("lumberjack2");
         addChildren(lumberjack1, lumberjack2);
 
-        // forester -> hunter, fisherman, farmer
+        // forester -> warrior1, hunter, fisherman, farmer
+        Profession warrior1 = getProfession("warrior1");
         Profession hunter = getProfession("hunter");
         Profession fisherman = getProfession("fisherman");
         Profession farmer = getProfession("farmer");
-        addChildren(forester, hunter, fisherman, farmer);
+        addChildren(forester, warrior1, hunter, fisherman, farmer);
 
         // crafter -> blacksmith
         Profession blacksmith = getProfession("blacksmith");
@@ -473,11 +474,10 @@ public abstract class ProfessionManager {
         Profession lumberjack3 = getProfession("lumberjack3");
         addChildren(lumberjack2, lumberjack3);
 
-        // hunter -> warrior1, archer1, knight1
-        Profession warrior1 = getProfession("warrior1");
+        // hunter -> archer1, knight1
         Profession archer1 = getProfession("archer1");
         Profession knight1 = getProfession("knight1");
-        addChildren(hunter, warrior1, archer1, knight1);
+        addChildren(hunter, archer1, knight1);
 
         // farmer -> baker, shepherd
         Profession baker = getProfession("baker");
