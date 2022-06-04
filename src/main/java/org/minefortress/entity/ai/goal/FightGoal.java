@@ -1,6 +1,8 @@
 package org.minefortress.entity.ai.goal;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.BuildingManager;
@@ -9,6 +11,11 @@ public class FightGoal extends AbstractFortressGoal {
 
     private BlockPos cachedMoveTarget;
     private BlockPos correctMoveTarget;
+
+    private int cooldown;
+
+
+    private LivingEntity attackTarget;
 
     public FightGoal(Colonist colonist) {
         super(colonist);
@@ -23,6 +30,7 @@ public class FightGoal extends AbstractFortressGoal {
     public void start() {
         colonist.putItemInHand(Items.WOODEN_SWORD);
         colonist.setCurrentTaskDesc("Fighting");
+        this.cooldown = 0;
     }
 
 
@@ -32,12 +40,27 @@ public class FightGoal extends AbstractFortressGoal {
 
         final var moveHelper = colonist.getMovementHelper();
 
+        if (colonist.getActiveItem() == null || colonist.getActiveItem().getItem() != Items.WOODEN_SWORD) {
+            colonist.putItemInHand(Items.WOODEN_SWORD);
+        }
+
         findMoveTarget();
         if(correctMoveTarget != null) {
             moveHelper.set(correctMoveTarget);
+        } else {
+            moveHelper.reset();
         }
-
         moveHelper.tick();
+
+        attackTarget = colonist.getFightControl().getAttackTarget();
+        if(attackTarget != null && colonist.getNavigation().isIdle()) {
+            final var distanceToAttackTarget = this.colonist.squaredDistanceTo(attackTarget);
+            if(distanceToAttackTarget > this.getSquaredMaxAttackDistance(attackTarget))
+                colonist.getNavigation().startMovingTo(attackTarget, 1.75);
+            this.attack(distanceToAttackTarget);
+        }
+        this.cooldown--;
+        this.cooldown = Math.max(0, this.cooldown);
     }
 
     private void findMoveTarget() {
@@ -64,6 +87,8 @@ public class FightGoal extends AbstractFortressGoal {
         colonist.putItemInHand(null);
         this.cachedMoveTarget = null;
         this.correctMoveTarget = null;
+        this.attackTarget = null;
+        this.cooldown = 0;
     }
 
     @Override
@@ -82,5 +107,22 @@ public class FightGoal extends AbstractFortressGoal {
 
     private boolean correctMoveTarget(BlockPos target) {
         return BuildingManager.canStayOnBlock(colonist.world, target);
+    }
+
+    protected void attack(double squaredDistance) {
+        double d = this.getSquaredMaxAttackDistance(this.attackTarget);
+        if (squaredDistance <= d && this.cooldown <= 0) {
+            this.resetCooldown();
+            this.colonist.swingHand(Hand.MAIN_HAND);
+            this.colonist.tryAttack(this.attackTarget);
+        }
+    }
+
+    protected void resetCooldown() {
+        this.cooldown = 10;
+    }
+
+    protected double getSquaredMaxAttackDistance(LivingEntity entity) {
+        return this.colonist.getWidth() * 2.0f * (this.colonist.getWidth() * 2.0f) + entity.getWidth();
     }
 }

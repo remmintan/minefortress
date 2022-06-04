@@ -265,13 +265,13 @@ public class Colonist extends PassiveEntity {
 
     public static DefaultAttributeContainer.Builder createAttributes() {
         return LivingEntity.createLivingAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 40)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 7.0D)
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2F)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 64f)
-                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 0f)
-                .add(EntityAttributes.GENERIC_ATTACK_SPEED, 100f)
-                .add(EntityAttributes.GENERIC_LUCK, 1024f);
+                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
+                .add(EntityAttributes.GENERIC_ATTACK_SPEED)
+                .add(EntityAttributes.GENERIC_LUCK);
     }
 
     @Override
