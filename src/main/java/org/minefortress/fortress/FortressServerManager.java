@@ -19,6 +19,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.controls.FightControl;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
@@ -517,5 +518,13 @@ public final class FortressServerManager extends AbstractFortressManager {
     public void setCombatMode(boolean combatMode) {
         this.combatMode = combatMode;
         this.scheduleSyncCombat();
+        for(Colonist colonist : this.colonists) {
+            final var fightControl = colonist.getFightControl();
+            if(this.combatMode) {
+                fightControl.setMoveTarget(this.fortressCenter);
+            } else {
+                fightControl.reset();
+            }
+        }
     }
 }
