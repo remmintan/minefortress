@@ -45,7 +45,21 @@ public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntit
     private static final Identifier WARRIOR = new Identifier("minefortress", "textures/skins/warrior.png");
     private static final Identifier WEAVER = new Identifier("minefortress", "textures/skins/weaver.png");
 
-
+    // soldier clothes
+    private static final Identifier SOLDIER_BLACK = new Identifier("minefortress", "textures/skins/soldier/soldier_black.png");
+    private static final Identifier SOLDIER_BLUE = new Identifier("minefortress", "textures/skins/soldier/soldier_blue.png");
+    private static final Identifier SOLDIER_BROWN = new Identifier("minefortress", "textures/skins/soldier/soldier_brown.png");
+    private static final Identifier SOLDIER_CYAN = new Identifier("minefortress", "textures/skins/soldier/soldier_cyan.png");
+    private static final Identifier SOLDIER_GRAY = new Identifier("minefortress", "textures/skins/soldier/soldier_gray.png");
+    private static final Identifier SOLDIER_GREEN = new Identifier("minefortress", "textures/skins/soldier/soldier_green.png");
+    private static final Identifier SOLDIER_LIGHT_BLUE = new Identifier("minefortress", "textures/skins/soldier/soldier_lightblue.png");
+    private static final Identifier SOLDIER_LIGHT_GRAY = new Identifier("minefortress", "textures/skins/soldier/soldier_lightgray.png");
+    private static final Identifier SOLDIER_LIME = new Identifier("minefortress", "textures/skins/soldier/soldier_lime.png");
+    private static final Identifier SOLDIER_MAGENTA = new Identifier("minefortress", "textures/skins/soldier/soldier_magenta.png");
+    private static final Identifier SOLDIER_PURPLE = new Identifier("minefortress", "textures/skins/soldier/soldier_purple.png");
+    private static final Identifier SOLDIER_RED = new Identifier("minefortress", "textures/skins/soldier/soldier_red.png");
+    private static final Identifier SOLDIER_WHITE = new Identifier("minefortress", "textures/skins/soldier/soldier_white.png");
+    private static final Identifier SOLDIER_YELLOW = new Identifier("minefortress", "textures/skins/soldier/soldier_yellow.png");
 
     public ColonistClothesFeature(
             FeatureRendererContext<Colonist, BipedEntityModel<Colonist>> context
@@ -57,7 +71,12 @@ public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntit
     @Override
     public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, Colonist entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
         if(entity.isSleeping()) return;
-        ColonistClothesFeature.renderModel(this.getContextModel(), this.getArmorTexture(entity.getProfessionId()), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+        final var professionId = entity.getProfessionId();
+        if(isWarrior(professionId)) {
+            ColonistClothesFeature.renderModel(this.getContextModel(), SOLDIER_BLUE, matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+        }
+        ColonistClothesFeature.renderModel(this.getContextModel(), this.getArmorTexture(professionId), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+
     }
 
     protected static <T extends LivingEntity> void renderModel(EntityModel<T> model, Identifier texture, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float red, float green, float blue) {
@@ -87,7 +106,13 @@ public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntit
             case "leather_worker1", "leather_worker2" -> LEATHER_WORKER;
             case "blacksmith" -> BLACKSMITH;
             case "weaver" -> WEAVER;
+            case "warrior1" -> WARRIOR;
+            case "warrior2" -> FOOTMAN;
             default -> COLONIST;
         };
+    }
+
+    private boolean isWarrior(String professionId) {
+        return professionId.equals("warrior1") || professionId.equals("warrior2");
     }
 }
