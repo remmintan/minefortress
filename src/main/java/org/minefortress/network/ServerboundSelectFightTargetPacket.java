@@ -1,39 +1,42 @@
 package org.minefortress.network;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.fight.ServerFightManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
+
+import java.util.UUID;
 
 public class ServerboundSelectFightTargetPacket implements FortressServerPacket {
 
     private final TargetType targetType;
     private final BlockPos pos;
-    private final LivingEntity entity;
+    private final Integer entityId;
 
     public ServerboundSelectFightTargetPacket(BlockPos pos) {
         this.targetType = TargetType.MOVE;
         this.pos = pos;
-        this.entity = null;
+        this.entityId = null;
     }
 
     public ServerboundSelectFightTargetPacket(LivingEntity entity) {
         this.targetType = TargetType.ATTACK;
         this.pos = null;
-        this.entity = entity;
+        this.entityId = entity.getId();
     }
 
     public ServerboundSelectFightTargetPacket(PacketByteBuf buf) {
         this.targetType = buf.readEnumConstant(TargetType.class);
         if(targetType == TargetType.MOVE) {
             this.pos = buf.readBlockPos();
-            this.entity = null;
+            this.entityId = null;
         } else {
-            throw new IllegalArgumentException("Invalid target type");
+            this.entityId = buf.readInt();
+            this.pos = null;
         }
     }
 
@@ -43,7 +46,7 @@ public class ServerboundSelectFightTargetPacket implements FortressServerPacket 
         if(targetType == TargetType.MOVE) {
             buf.writeBlockPos(pos);
         } else if(targetType == TargetType.ATTACK) {
-            throw new IllegalArgumentException("Not implemented yet");
+            buf.writeInt(entityId);
         }
     }
 
@@ -53,6 +56,9 @@ public class ServerboundSelectFightTargetPacket implements FortressServerPacket 
             final var fightManager = fortressPlayer.getFortressServerManager().getServerFightManager();
             if(targetType == TargetType.MOVE) {
                 fightManager.setMoveTarget(pos);
+            } else if(targetType == TargetType.ATTACK) {
+                final var entityById = (LivingEntity)player.world.getEntityById(entityId);
+                fightManager.setAttackTarget(entityById);
             }
         }
     }

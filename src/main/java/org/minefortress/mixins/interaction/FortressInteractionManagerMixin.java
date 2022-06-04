@@ -9,6 +9,8 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.tutorial.TutorialManager;
 import net.minecraft.client.tutorial.TutorialStep;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -119,6 +121,25 @@ public abstract class FortressInteractionManagerMixin {
     public void updateBlockBreakingProgress(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if(getCurrentGameMode() == FORTRESS)
             cir.setReturnValue(true);
+    }
+
+    @Inject(method = "interactEntity", at = @At("HEAD"), cancellable = true)
+    public void interactEntity(PlayerEntity player, Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        if(getCurrentGameMode() == FORTRESS) {
+            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+            final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+            if(fortressManager.isInCombat()) {
+                final var fightManager = fortressManager.getFightManager();
+                final var selectionManager = fightManager.getSelectionManager();
+                if(selectionManager.isSelecting())
+                    selectionManager.resetSelection();
+
+                if(selectionManager.hasSelected()) {
+                    fightManager.setTarget(entity);
+                }
+                cir.setReturnValue(ActionResult.SUCCESS);
+            }
+        }
     }
 
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)

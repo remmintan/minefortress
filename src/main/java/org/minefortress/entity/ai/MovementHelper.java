@@ -37,10 +37,12 @@ public class MovementHelper {
     }
 
     public void set(BlockPos goal) {
+        if(goal != null && goal.equals(workGoal))
+            this.colonist.getNavigation().stop();
         this.workGoal = goal;
         this.cantFindPath = false;
         this.stuckOnSamePosition = 0;
-        this.colonist.getNavigation().stop();
+
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
     }
 
