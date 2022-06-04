@@ -19,8 +19,9 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.controls.FightControl;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
+import org.minefortress.fight.ServerFightManager;
+import org.minefortress.fight.ServerFightSelectionManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -56,6 +57,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
     private final ServerProfessionManager serverProfessionManager;
     private final ServerResourceManager serverResourceManager = new ServerResourceManagerImpl();
+    private final ServerFightManager serverFightManager = new ServerFightManager();
 
     private int maxX = Integer.MIN_VALUE;
     private int maxZ = Integer.MIN_VALUE;
@@ -526,5 +528,16 @@ public final class FortressServerManager extends AbstractFortressManager {
                 fightControl.reset();
             }
         }
+    }
+
+    public void selectColonists(List<Integer> selectedIds) {
+        final var selectionManager = serverFightManager.getServerFightSelectionManager();
+        if(selectedIds.isEmpty()){
+            selectionManager.clearSelection();
+            return;
+        }
+
+        final var selectedColonists = this.colonists.stream().filter(c -> selectedIds.contains(c.getId())).toList();
+        selectionManager.selectColonists(selectedColonists);
     }
 }

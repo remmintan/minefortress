@@ -6,6 +6,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.entity.Colonist;
+import org.minefortress.network.ServerboundSelectColonistsPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +35,7 @@ public class ClientFightSelectionManager {
         this.selectionStartPos = null;
         this.selectionCurBlock = null;
         this.selectionCurPos = null;
+        this.updateSelectionOnServer();
     }
 
     public void updateSelection(double x, double y, Vec3d endBlock) {
@@ -60,6 +64,7 @@ public class ClientFightSelectionManager {
         this.selectionCurPos = null;
         this.selectionCurBlock = null;
         this.selectedColonists = Collections.emptyList();
+        this.updateSelectionOnServer();
     }
 
     public boolean isSelecting() {
@@ -74,16 +79,8 @@ public class ClientFightSelectionManager {
         return selectionStartPos;
     }
 
-    public Vec3d getSelectionStartBlock() {
-        return selectionStartBlock;
-    }
-
     public MousePos getSelectionCurPos() {
         return selectionCurPos;
-    }
-
-    public Vec3d getSelectionCurBlock() {
-        return selectionCurBlock;
     }
 
     public boolean isSelected(Colonist colonist) {
@@ -98,5 +95,12 @@ public class ClientFightSelectionManager {
         public int getY() {
             return (int) y;
         }
+    }
+
+    private void updateSelectionOnServer() {
+        if(this.selectedColonists == null) return;
+        final var ids = this.selectedColonists.stream().map(Colonist::getId).toList();
+        final var packet = new ServerboundSelectColonistsPacket(ids);
+        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SELECT_COLONISTS, packet);
     }
 }
