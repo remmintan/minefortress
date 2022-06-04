@@ -40,6 +40,7 @@ public class MovementHelper {
         this.workGoal = goal;
         this.cantFindPath = false;
         this.stuckOnSamePosition = 0;
+        this.colonist.getNavigation().stop();
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
     }
 

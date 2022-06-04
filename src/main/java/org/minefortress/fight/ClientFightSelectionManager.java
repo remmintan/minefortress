@@ -38,6 +38,10 @@ public class ClientFightSelectionManager {
         this.updateSelectionOnServer();
     }
 
+    public boolean hasSelected() {
+        return !this.selectedColonists.isEmpty();
+    }
+
     public void updateSelection(double x, double y, Vec3d endBlock) {
         if(!isSelectionStarted()) return;
         this.selectionCurPos = new MousePos(x, y);

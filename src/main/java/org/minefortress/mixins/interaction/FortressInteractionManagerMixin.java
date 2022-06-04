@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
+import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -120,20 +121,6 @@ public abstract class FortressInteractionManagerMixin {
             cir.setReturnValue(true);
     }
 
-//    @Inject(method = "cancelBlockBreaking", at = @At("HEAD"), cancellable = true)
-//    public void cancelBlockBreaking(CallbackInfo ci) {
-//        if(getCurrentGameMode() == FORTRESS) {
-//            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-//            final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
-//            final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
-//
-//            if(fortressManager.isInCombat()) {
-//                final var selectionManager = fortressManager.getFightManager().getSelectionManager();
-//                selectionManager.endSelection();
-//            }
-//        }
-//    }
-
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)
     public void interactBlock(ClientPlayerEntity player, ClientWorld world, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
         if(getCurrentGameMode() == FORTRESS) {
@@ -144,9 +131,14 @@ public abstract class FortressInteractionManagerMixin {
                 final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
                 final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
                 if(fortressManager.isInCombat()) {
-                    final var selectionManager = fortressManager.getFightManager().getSelectionManager();
+                    final var fightManager = fortressManager.getFightManager();
+                    final var selectionManager = fightManager.getSelectionManager();
                     if(selectionManager.isSelecting())
                         selectionManager.resetSelection();
+
+                    if(selectionManager.hasSelected()) {
+                        fightManager.setTarget(hitResult);
+                    }
                     cir.setReturnValue(ActionResult.SUCCESS);
                     return;
                 }

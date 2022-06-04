@@ -3,6 +3,7 @@ package org.minefortress.fight;
 import org.minefortress.entity.Colonist;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ServerFightSelectionManager {
@@ -14,7 +15,10 @@ public class ServerFightSelectionManager {
     }
 
     public void clearSelection() {
-        selectedColonists.clear();
+        selectedColonists = Collections.emptyList();
     }
 
+    public List<Colonist> getSelectedColonists() {
+        return selectedColonists;
+    }
 }
