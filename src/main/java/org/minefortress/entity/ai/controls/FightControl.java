@@ -4,6 +4,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
@@ -138,4 +140,25 @@ public class FightControl {
     public static boolean isDefender(Colonist colonist) {
         return DEFENDER_PROFESSIONS.contains(colonist.getProfessionId());
     }
+
+    public void checkAndPutCorrectItemInHand() {
+        if (colonist.getActiveItem() == null || colonist.getActiveItem().getItem() != getCorrectItem()) {
+            putCorrectSwordInHand();
+        }
+    }
+
+    private void putCorrectSwordInHand() {
+        colonist.putItemInHand(getCorrectItem());
+    }
+
+    private Item getCorrectItem() {
+        if(colonist.getProfessionId().equals("warrior1"))
+            return Items.STONE_SWORD;
+        else if(colonist.getProfessionId().equals("warrior2"))
+            return Items.IRON_SWORD;
+        else
+            return Items.WOODEN_SWORD;
+    }
+
+
 }

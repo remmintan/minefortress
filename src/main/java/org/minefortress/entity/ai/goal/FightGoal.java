@@ -29,7 +29,6 @@ public class FightGoal extends AbstractFortressGoal {
 
     @Override
     public void start() {
-        putCorrectSwordInHand();
         colonist.setCurrentTaskDesc("Fighting");
         this.cooldown = 0;
     }
@@ -40,9 +39,7 @@ public class FightGoal extends AbstractFortressGoal {
 
         final var moveHelper = colonist.getMovementHelper();
 
-        if (colonist.getActiveItem() == null || colonist.getActiveItem().getItem() != getCorrectItem()) {
-            putCorrectSwordInHand();
-        }
+        colonist.getFightControl().checkAndPutCorrectItemInHand();
 
         findMoveTarget();
         if(correctMoveTarget != null) {
@@ -109,21 +106,6 @@ public class FightGoal extends AbstractFortressGoal {
 
     private boolean correctMoveTarget(BlockPos target) {
         return BuildingManager.canStayOnBlock(colonist.world, target);
-    }
-
-
-
-    private void putCorrectSwordInHand() {
-        colonist.putItemInHand(getCorrectItem());
-    }
-
-    private Item getCorrectItem() {
-        if(colonist.getProfessionId().equals("warrior1"))
-            return Items.STONE_SWORD;
-        else if(colonist.getProfessionId().equals("warrior2"))
-            return Items.IRON_SWORD;
-        else
-            return Items.WOODEN_SWORD;
     }
 
     private void attack(double squaredDistance) {
