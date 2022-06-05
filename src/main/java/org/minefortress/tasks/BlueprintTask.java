@@ -11,10 +11,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressBedInfo;
-import org.minefortress.fortress.FortressBulding;
+import org.minefortress.fortress.FortressBuilding;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
@@ -113,8 +112,8 @@ public class BlueprintTask extends AbstractTask {
 
             colonist.doActionOnMasterPlayer(player -> {
                 final FortressServerManager fortressServerManager = player.getFortressServerManager();
-                final FortressBulding fortressBulding = new FortressBulding(startingBlock, endingBlock, beds, requirementId);
-                fortressServerManager.addBuilding(fortressBulding);
+                final FortressBuilding fortressBuilding = new FortressBuilding(startingBlock, endingBlock, beds, requirementId);
+                fortressServerManager.addBuilding(fortressBuilding);
             });
         }
         super.finishPart(part, colonist);

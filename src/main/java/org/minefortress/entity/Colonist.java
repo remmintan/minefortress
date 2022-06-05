@@ -16,6 +16,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.HungerConstants;
@@ -268,7 +269,7 @@ public class Colonist extends PassiveEntity {
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2F)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 64f)
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 40f)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED)
                 .add(EntityAttributes.GENERIC_LUCK);
@@ -300,8 +301,9 @@ public class Colonist extends PassiveEntity {
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
-        this.goalSelector.add(3, new FightGoal(this));
-        this.goalSelector.add(4, new FortressMeleeAttackGoal(this, 1.5, true));
+        this.goalSelector.add(3, new FortressEscapeDangerGoal(this, 1.75));
+        this.goalSelector.add(4, new FightGoal(this));
+        this.goalSelector.add(4, new HideGoal(this));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
         this.goalSelector.add(7, new ColonistEatGoal(this));
@@ -310,7 +312,7 @@ public class Colonist extends PassiveEntity {
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
 
-        this.targetSelector.add(1, new RevengeGoal(this).setGroupRevenge());
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, true));
     }
 
     @Nullable

@@ -12,8 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.fortress.FortressBulding;
+import org.minefortress.fortress.FortressBuilding;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
@@ -34,7 +33,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             Items.COCOA_BEANS
     );
 
-    private FortressBulding currentFarm;
+    private FortressBuilding currentFarm;
     private Iterator<BlockPos> farmIterator;
     private BlockPos goal;
     private long stopTime = 0L;
@@ -132,7 +131,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         return colonist.world.isDay() && farmIterator.hasNext();
     }
 
-    private Optional<FortressBulding> getFarm(Colonist colonist) {
+    private Optional<FortressBuilding> getFarm(Colonist colonist) {
         return colonist
             .getFortressServerManager()
             .flatMap(it -> it.getRandomBuilding("farmer", colonist.world.random));
