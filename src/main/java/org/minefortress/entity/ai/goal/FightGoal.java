@@ -24,7 +24,7 @@ public class FightGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        return isInCombat();
+        return isFighting();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class FightGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return isInCombat();
+        return isFighting();
     }
 
     @Override

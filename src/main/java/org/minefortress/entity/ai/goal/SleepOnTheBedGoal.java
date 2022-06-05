@@ -1,6 +1,5 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.tag.BlockTags;
@@ -11,7 +10,6 @@ import org.minefortress.entity.ai.NodeMaker;
 import org.minefortress.fortress.FortressBedInfo;
 import org.minefortress.fortress.FortressServerManager;
 
-import java.util.EnumSet;
 import java.util.Optional;
 
 public class SleepOnTheBedGoal extends AbstractFortressGoal {
@@ -24,7 +22,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(isInCombat() || !isNight() || colonist.getTaskControl().hasTask()) return false;
+        if(!notInCombat() || !isNight() || colonist.getTaskControl().hasTask()) return false;
 
         final Optional<FortressBedInfo> freeBedOptional = getFreeBed();
         return freeBedOptional.isPresent();

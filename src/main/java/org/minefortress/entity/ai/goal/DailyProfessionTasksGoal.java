@@ -1,11 +1,9 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.entity.ai.goal.Goal;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.controls.TaskControl;
 import org.minefortress.entity.ai.professions.*;
 
-import java.util.EnumSet;
 import java.util.Map;
 
 import static java.util.Map.entry;
@@ -31,7 +29,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(isInCombat()) return false;
+        if(!notInCombat()) return false;
         if(this.isStarving()) return false;
         final TaskControl taskControl = getTaskControl();
         if(taskControl.hasTask()) return false;
