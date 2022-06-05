@@ -53,12 +53,12 @@ public class FightGoal extends AbstractFortressGoal {
         moveHelper.tick();
 
         attackTarget = colonist.getFightControl().getAttackTarget();
+        final var distanceToAttackTarget = this.colonist.squaredDistanceTo(attackTarget);
         if(attackTarget != null && colonist.getNavigation().isIdle()) {
-            final var distanceToAttackTarget = this.colonist.squaredDistanceTo(attackTarget);
             if(distanceToAttackTarget > this.getSquaredMaxAttackDistance(attackTarget))
                 colonist.getNavigation().startMovingTo(attackTarget, 1.75);
-            this.attack(distanceToAttackTarget);
         }
+        this.attack(distanceToAttackTarget);
         this.cooldown--;
         this.cooldown = Math.max(0, this.cooldown);
     }
@@ -79,7 +79,7 @@ public class FightGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return isFighting();
+        return isFighting() && !colonist.getFightControl().creeperNearby();
     }
 
     @Override
@@ -93,7 +93,7 @@ public class FightGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return false;
+        return colonist.getFightControl().creeperNearby();
     }
 
     private BlockPos findCorrectTarget(BlockPos target) {

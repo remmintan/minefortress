@@ -5,7 +5,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.professions.ProfessionManager;
 
 import java.util.EnumSet;
 
@@ -23,19 +22,11 @@ abstract class AbstractFortressGoal extends Goal {
     }
 
     protected boolean isFighting() {
-        return isFortressInCombatMode() && isDefender();
+        return isFortressInCombatMode() && colonist.getFightControl().isDefender();
     }
 
     protected boolean isHiding() {
-        return isFortressInCombatMode() && !isDefender() && isVillageUnderAttack();
-    }
-
-    private boolean isDefender() {
-        return ProfessionManager.DEFENDER_PROFESSIONS.contains(colonist.getProfessionId());
-    }
-
-    private boolean isWarrior() {
-        return ProfessionManager.WARRIOR_PROFESSIONS.contains(colonist.getProfessionId());
+        return isFortressInCombatMode() && !colonist.getFightControl().isDefender() && isVillageUnderAttack();
     }
 
     private boolean isFortressInCombatMode() {
@@ -55,7 +46,8 @@ abstract class AbstractFortressGoal extends Goal {
     }
 
     protected boolean isScared() {
-        return !isWarrior() && colonist.getFightControl().canSeeMonster();
+        final var fightControl = colonist.getFightControl();
+        return !fightControl.isWarrior() && fightControl.canSeeMonster() && !isFighting();
     }
 
 }
