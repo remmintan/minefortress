@@ -18,7 +18,6 @@ public class WarriorDailyTask implements ProfessionDailyTask{
 
     @Override
     public void start(Colonist colonist) {
-        putCorrectSwordInHand(colonist);
         colonist.setCurrentTaskDesc("Fighting");
         this.cooldown = 0;
     }
@@ -27,9 +26,7 @@ public class WarriorDailyTask implements ProfessionDailyTask{
     public void tick(Colonist colonist) {
         if(!colonist.getFightControl().hasAttackTarget()) return;
 
-        if (colonist.getActiveItem() == null || colonist.getActiveItem().getItem() != getCorrectItem(colonist)) {
-            putCorrectSwordInHand(colonist);
-        }
+        colonist.getFightControl().checkAndPutCorrectItemInHand();
 
         attackTarget = colonist.getFightControl().getAttackTarget();
         final var distanceToAttackTarget = colonist.squaredDistanceTo(attackTarget);
@@ -52,19 +49,6 @@ public class WarriorDailyTask implements ProfessionDailyTask{
     @Override
     public boolean shouldContinue(Colonist colonist) {
         return colonist.getFightControl().hasAttackTarget();
-    }
-
-    private void putCorrectSwordInHand(Colonist colonist) {
-        colonist.putItemInHand(getCorrectItem(colonist));
-    }
-
-    private Item getCorrectItem(Colonist colonist) {
-        if(colonist.getProfessionId().equals("warrior1"))
-            return Items.STONE_SWORD;
-        else if(colonist.getProfessionId().equals("warrior2"))
-            return Items.IRON_SWORD;
-        else
-            return Items.WOODEN_SWORD;
     }
 
 
