@@ -66,11 +66,6 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
     }
 
     @Override
-    public boolean canStop() {
-        return true;
-    }
-
-    @Override
     public void stop() {
         colonist.getNavigation().stop();
     }

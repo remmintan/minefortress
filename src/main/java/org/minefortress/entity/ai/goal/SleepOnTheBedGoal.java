@@ -81,11 +81,6 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
     }
 
     @Override
-    public boolean canStop() {
-        return true;
-    }
-
-    @Override
     public void stop() {
         colonist.getNavigation().stop();
         this.bedInfo.setOccupied(false);
