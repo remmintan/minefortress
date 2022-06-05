@@ -107,6 +107,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         tickFortress(player, player.world);
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
+        serverFightManager.tick();
         if(!needSync) return;
         final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
@@ -541,8 +542,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.villageUnderAttack = villageUnderAttack;
         this.scheduleSyncCombat();
         for(Colonist colonist : this.colonists) {
-            final var professionId = colonist.getProfessionId();
-            if(!ProfessionManager.DEFENDER_PROFESSIONS.contains(professionId)) return;
+            if(!colonist.getFightControl().isDefender()) return;
             final var fightControl = colonist.getFightControl();
             if(this.combatMode) {
                 fightControl.setMoveTarget(this.fortressCenter);
@@ -561,7 +561,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         final var selectedColonists = this.colonists.stream()
                 .filter(c -> selectedIds.contains(c.getId()))
-                .filter(c -> ServerProfessionManager.DEFENDER_PROFESSIONS.contains(c.getProfessionId()))
+                .filter(c -> c.getFightControl().isDefender())
                 .toList();
         selectionManager.selectColonists(selectedColonists);
     }

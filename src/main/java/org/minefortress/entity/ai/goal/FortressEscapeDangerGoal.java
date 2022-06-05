@@ -3,7 +3,6 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.professions.ProfessionManager;
 
 public class FortressEscapeDangerGoal extends EscapeDangerGoal {
 
@@ -16,19 +15,17 @@ public class FortressEscapeDangerGoal extends EscapeDangerGoal {
 
     @Override
     public boolean canStart() {
-        return super.canStart() && !isFighting() && !isWarrior();
+        return super.canStart() && !isFighting() && !colonist.getFightControl().isWarrior();
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        colonist.getFortressServerManager().ifPresent(it -> it.getServerFightManager().addScaryMob(this.colonist.getAttacker()));
     }
 
     protected boolean isFighting() {
-        return isFortressInCombatMode() && isDefender();
-    }
-
-    private boolean isDefender() {
-        return ProfessionManager.DEFENDER_PROFESSIONS.contains(colonist.getProfessionId());
-    }
-
-    private boolean isWarrior() {
-        return ProfessionManager.WARRIOR_PROFESSIONS.contains(colonist.getProfessionId());
+        return isFortressInCombatMode() && colonist.getFightControl().isDefender();
     }
 
     private boolean isFortressInCombatMode() {

@@ -24,6 +24,7 @@ public class HideGoal extends AbstractFortressGoal{
     @Override
     public void start() {
         final var fortressServerManager = colonist.getFortressServerManager();
+        fortressServerManager.ifPresent(it -> it.getServerFightManager().addScaryMob(colonist.getTarget()));
         shelterBlockPos = fortressServerManager
                 .flatMap(it -> it.getRandomBed(colonist.world.random))
                 .map(FortressBedInfo::getPos)
