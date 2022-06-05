@@ -7,6 +7,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 
@@ -35,11 +36,17 @@ public class FightControl {
     private LivingEntity attackTarget;
     private boolean forcedToAttackCreeper;
 
+    private float meleeAttackCooldown = 0;
+
     public FightControl(Colonist colonist) {
         this.colonist = colonist;
     }
 
     public void tick() {
+        if(meleeAttackCooldown > 0) {
+            meleeAttackCooldown--;
+        }
+
         if(moveTargetNotReached()) return;
 
         if(this.attackTarget != null && !this.attackTarget.isAlive()){
@@ -65,6 +72,40 @@ public class FightControl {
             }
         }
     }
+
+    public void attackTargetIfPossible() {
+        if(!this.hasAttackTarget()) return;
+        if(!isLongRangeAttacker())
+            this.meleeAttack();
+        else
+            this.longRangeAttack();
+    }
+
+    private void longRangeAttack() {
+
+    }
+
+    private void meleeAttack() {
+        final var distanceToAttackTarget = this.colonist.squaredDistanceTo(attackTarget);
+        if(colonist.getNavigation().isIdle()) {
+            if(distanceToAttackTarget > this.getSquaredMaxAttackDistance(attackTarget))
+                colonist.getNavigation().startMovingTo(attackTarget, 1.75);
+        }
+        this.meleeAttack(distanceToAttackTarget);
+    }
+
+    private void meleeAttack(double squaredDistance) {
+        double d = this.getSquaredMaxAttackDistance(this.attackTarget);
+        if (squaredDistance <= d && this.meleeAttackCooldown <= 0) {
+            this.meleeAttackCooldown = 20;
+            this.colonist.swingHand(Hand.MAIN_HAND);
+            this.colonist.tryAttack(this.attackTarget);
+        }
+    }
+
+    private double getSquaredMaxAttackDistance(LivingEntity entity) {
+        return this.colonist.getWidth() * 2.0f * (this.colonist.getWidth() * 2.0f) + entity.getWidth();
+    }
     
     private boolean moveTargetNotReached() {
         return this.moveTarget != null && !this.moveTarget.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE);
@@ -72,12 +113,12 @@ public class FightControl {
 
     private boolean isTargetAcceptable(LivingEntity target) {
         if(target instanceof CreeperEntity) {
-            return longRangeAttacker();
+            return isLongRangeAttacker();
         }
         return true;
     }
 
-    private boolean longRangeAttacker() {
+    private boolean isLongRangeAttacker() {
         return LONG_RANGE_ATTACKERS.contains(colonist.getProfessionId());
     }
 
@@ -85,6 +126,7 @@ public class FightControl {
         moveTarget = null;
         attackTarget = null;
         this.forcedToAttackCreeper = false;
+        this.meleeAttackCooldown = 0;
     }
 
     public void setMoveTarget(BlockPos moveTarget) {
