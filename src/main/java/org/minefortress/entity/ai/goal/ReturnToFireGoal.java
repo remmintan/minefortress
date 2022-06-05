@@ -41,11 +41,6 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     private boolean isNight() {
         return colonist.world.isNight();
     }
-
-    @Override
-    public boolean canStop() {
-        return true;
-    }
     
     private int getHomeOuterRadius() {
         return Math.max(getColonistsCount(), 5) * 4 / 5;
