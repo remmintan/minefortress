@@ -1,6 +1,8 @@
 package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 
@@ -21,7 +23,11 @@ public class FortressEscapeDangerGoal extends EscapeDangerGoal {
     @Override
     public void start() {
         super.start();
-        colonist.getFortressServerManager().ifPresent(it -> it.getServerFightManager().addScaryMob(this.colonist.getAttacker()));
+        colonist.getFortressServerManager().ifPresent(it -> {
+            it.setCombatMode(true, true);
+            colonist.doActionOnMasterPlayer(p -> ((ServerPlayerEntity)p).sendMessage(new LiteralText("§a Village is under attack!  Defend it!§a"), false));
+            it.getServerFightManager().addScaryMob(this.colonist.getAttacker());
+        });
     }
 
     protected boolean isFighting() {

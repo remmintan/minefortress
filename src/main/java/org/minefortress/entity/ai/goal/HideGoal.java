@@ -18,7 +18,7 @@ public class HideGoal extends AbstractFortressGoal{
 
     @Override
     public boolean canStart() {
-        return isScared();
+        return isScared() || isHiding();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class HideGoal extends AbstractFortressGoal{
 
     @Override
     public boolean shouldContinue() {
-        return super.shouldContinue() && this.hideTicks > 0 && !this.colonist.getMovementHelper().isCantFindPath();
+        return (this.hideTicks > 0 || super.isHiding()) && !this.colonist.getMovementHelper().isCantFindPath();
     }
 
     @Override
