@@ -32,7 +32,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return super.isStarving() || super.isScared();
+        return super.isStarving() || super.isScared() || super.isFighting() || super.isHiding();
     }
 
     @Override

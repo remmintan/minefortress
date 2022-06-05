@@ -63,7 +63,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return this.isStarving() || this.isScared();
+        return this.isStarving() || this.isScared() || super.isFighting() || super.isHiding();
     }
 
     private TaskControl getTaskControl() {
