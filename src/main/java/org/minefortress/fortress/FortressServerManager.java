@@ -542,7 +542,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.villageUnderAttack = villageUnderAttack;
         this.scheduleSyncCombat();
         for(Colonist colonist : this.colonists) {
-            if(!colonist.getFightControl().isDefender()) return;
+            if(!colonist.getFightControl().isDefender()) continue;
             final var fightControl = colonist.getFightControl();
             if(this.combatMode) {
                 fightControl.setMoveTarget(this.fortressCenter);

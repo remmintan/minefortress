@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.controls.FightControl;
 import org.minefortress.network.ServerboundSelectColonistsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -54,7 +55,7 @@ public class ClientFightSelectionManager {
             final var world = MinecraftClient.getInstance().world;
             if(world != null) {
                 selectedColonists = world
-                        .getEntitiesByType(colonistType, selectionBox, it -> ((Colonist)it).getFightControl().isDefender())
+                        .getEntitiesByType(colonistType, selectionBox, it -> FightControl.isDefender((Colonist)it))
                         .stream()
                         .map(it -> (Colonist)it)
                         .toList();

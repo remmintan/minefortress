@@ -134,4 +134,8 @@ public class FightControl {
     public boolean isForcedToAttackCreeper() {
         return forcedToAttackCreeper;
     }
+
+    public static boolean isDefender(Colonist colonist) {
+        return DEFENDER_PROFESSIONS.contains(colonist.getProfessionId());
+    }
 }
