@@ -3,9 +3,11 @@ package org.minefortress.professions;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import org.apache.logging.log4j.util.Strings;
 import org.minefortress.fortress.AbstractFortressManager;
+import org.minefortress.fortress.resources.ItemInfo;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -314,6 +316,9 @@ public abstract class ProfessionManager {
                             "You need more stone swords or build another Small Warrior's house to hire more!",
                             "warrior1"
                     )
+                        .setItemsRequirement(Collections.singletonList(
+                                new ItemInfo(Items.STONE_SWORD, 1)
+                        ))
             ),
             entry(
                     "warrior2",
@@ -325,6 +330,13 @@ public abstract class ProfessionManager {
                             "You need more iron swords/armors or build another Medium Warrior's house to hire more!",
                             "warrior2"
                     )
+                        .setItemsRequirement(Arrays.asList(
+                                new ItemInfo(Items.IRON_SWORD, 1),
+                                new ItemInfo(Items.IRON_HELMET, 1),
+                                new ItemInfo(Items.IRON_CHESTPLATE, 1),
+                                new ItemInfo(Items.IRON_LEGGINGS, 1),
+                                new ItemInfo(Items.IRON_BOOTS, 1)
+                        ))
             ),
             entry(
                     "archer1",
@@ -412,6 +424,13 @@ public abstract class ProfessionManager {
         if(Objects.nonNull(blockRequirement)) {
             satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement.block(), blockRequirement.blueprint(), minRequirementCount);
         }
+
+        final var itemsRequirement = profession.getItemsRequirement();
+        if(countProfessionals && Objects.nonNull(itemsRequirement)) {
+            final var hasItems = fortressManager.getResourceManager().hasItems(itemsRequirement);
+            satisfied = satisfied && hasItems;
+        }
+
         return satisfied;
     }
 

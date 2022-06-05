@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.utils.GuiUtils;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class Profession {
     private final List<Text> lockedDescription;
     private final String buildingRequirement;
     private Block blockRequirement = null;
+    private List<ItemInfo> itemsRequirement = null;
     private boolean blueprint = false;
 
     private Profession parent;
@@ -102,6 +104,15 @@ public class Profession {
         this.blockRequirement = block;
         this.blueprint = blueprint;
         return this;
+    }
+
+    public Profession setItemsRequirement(List<ItemInfo> itemStacks) {
+        this.itemsRequirement = Collections.unmodifiableList(itemStacks);
+        return this;
+    }
+
+    public List<ItemInfo> getItemsRequirement() {
+        return itemsRequirement;
     }
 
     @Nullable

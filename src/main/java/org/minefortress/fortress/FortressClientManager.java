@@ -214,7 +214,7 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
-        if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack")) {
+        if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
             return buildings.stream()
                     .filter(b -> b.getRequirementId().equals(requirementId))
                     .mapToInt(EssentialBuildingInfo::getBedsCount)
