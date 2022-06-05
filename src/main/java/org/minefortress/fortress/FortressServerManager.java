@@ -465,7 +465,8 @@ public final class FortressServerManager extends AbstractFortressManager {
                     .mapToInt(FortressBuilding::getBedsCount)
                     .sum() > minCount;
         }
-
+        if(requirementId.equals("shooting_gallery"))
+            minCount = 0;
         return buildings.stream().filter(b -> b.getRequirementId().equals(requirementId)).count() > minCount;
     }
 

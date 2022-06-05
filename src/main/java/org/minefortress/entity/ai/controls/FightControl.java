@@ -21,15 +21,17 @@ public class FightControl {
     private static final List<String> DEFENDER_PROFESSIONS = Arrays.asList(
             "warrior1",
             "warrior2",
-            "colonist"
+            "colonist",
+            "archer1"
     );
 
     private static final List<String> WARRIOR_PROFESSIONS = Arrays.asList(
             "warrior1",
-            "warrior2"
+            "warrior2",
+            "archer1"
     );
     
-    private static final List<String> LONG_RANGE_ATTACKERS = Collections.emptyList();
+    private static final List<String> LONG_RANGE_ATTACKERS = Collections.singletonList("archer1");
     
     private final Colonist colonist;
 

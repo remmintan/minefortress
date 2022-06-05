@@ -337,11 +337,15 @@ public abstract class ProfessionManager {
                     new Profession(
                             "Archer",
                             Items.BOW,
-                            "Will be available in future releases",
-                            "",
-                            "",
-                            "_"
+                            "Defends the village, ranged fighter [1 bow, 32 arrow for each]",
+                            "Build Shooting gallery to unlock",
+                            "You need more bows/arrows to hire more!",
+                            "shooting_gallery"
                     )
+                    .setItemsRequirement(Arrays.asList(
+                            new ItemInfo(Items.BOW, 1),
+                            new ItemInfo(Items.ARROW, 32)
+                    ))
             ),
             entry(
                     "archer2",
@@ -494,9 +498,8 @@ public abstract class ProfessionManager {
         addChildren(lumberjack2, lumberjack3);
 
         // hunter -> archer1, knight1
-        Profession archer1 = getProfession("archer1");
         Profession knight1 = getProfession("knight1");
-        addChildren(hunter, archer1, knight1);
+        addChildren(hunter, knight1);
 
         // farmer -> baker, shepherd
         Profession baker = getProfession("baker");
@@ -514,7 +517,8 @@ public abstract class ProfessionManager {
 
         // warrior1 -> warrior2
         Profession warrior2 = getProfession("warrior2");
-        addChildren(warrior1, warrior2);
+        Profession archer1 = getProfession("archer1");
+        addChildren(warrior1, warrior2, archer1);
 
         // archer1 -> archer2
         Profession archer2 = getProfession("archer2");
