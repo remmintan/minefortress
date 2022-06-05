@@ -19,8 +19,11 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     private ProfessionDailyTask currentTask;
 
+    private final WarriorDailyTask warriorTask;
+
     public DailyProfessionTasksGoal(Colonist colonist) {
         super(colonist);
+        this.warriorTask = new WarriorDailyTask();
     }
 
     @Override
@@ -31,9 +34,10 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
         if(taskControl.hasTask()) return false;
         final String professionId = colonist.getProfessionId();
         if(colonist.getFortressManager().isEmpty()) return false;
-        if(!dailyTasks.containsKey(professionId)) return false;
+        final var warriorProfession = professionId.startsWith("warrior");
+        if(!dailyTasks.containsKey(professionId) && !warriorProfession) return false;
 
-        this.currentTask = dailyTasks.get(professionId);
+        this.currentTask = warriorProfession ? warriorTask : dailyTasks.get(professionId);
         return this.currentTask.canStart(colonist);
     }
 

@@ -5,6 +5,7 @@ import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.professions.ProfessionManager;
@@ -108,8 +109,6 @@ public class FightControl {
     public boolean isWarrior() {
         return WARRIOR_PROFESSIONS.contains(colonist.getProfessionId());
     }
-    
-    
     
     public boolean canSeeMonster() {
         final var target = this.colonist.getTarget();

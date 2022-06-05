@@ -109,22 +109,7 @@ public class FightGoal extends AbstractFortressGoal {
         return BuildingManager.canStayOnBlock(colonist.world, target);
     }
 
-    protected void attack(double squaredDistance) {
-        double d = this.getSquaredMaxAttackDistance(this.attackTarget);
-        if (squaredDistance <= d && this.cooldown <= 0) {
-            this.resetCooldown();
-            this.colonist.swingHand(Hand.MAIN_HAND);
-            this.colonist.tryAttack(this.attackTarget);
-        }
-    }
 
-    protected void resetCooldown() {
-        this.cooldown = 10;
-    }
-
-    protected double getSquaredMaxAttackDistance(LivingEntity entity) {
-        return this.colonist.getWidth() * 2.0f * (this.colonist.getWidth() * 2.0f) + entity.getWidth();
-    }
 
     private void putCorrectSwordInHand() {
         colonist.putItemInHand(getCorrectItem());
@@ -138,4 +123,22 @@ public class FightGoal extends AbstractFortressGoal {
         else
             return Items.WOODEN_SWORD;
     }
+
+    private void attack(double squaredDistance) {
+        double d = this.getSquaredMaxAttackDistance(this.attackTarget);
+        if (squaredDistance <= d && this.cooldown <= 0) {
+            this.resetCooldown();
+            this.colonist.swingHand(Hand.MAIN_HAND);
+            this.colonist.tryAttack(this.attackTarget);
+        }
+    }
+
+    private double getSquaredMaxAttackDistance(LivingEntity entity) {
+        return this.colonist.getWidth() * 2.0f * (this.colonist.getWidth() * 2.0f) + entity.getWidth();
+    }
+
+    private void resetCooldown() {
+        this.cooldown = 10;
+    }
+
 }
