@@ -5,10 +5,8 @@ import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
-import org.minefortress.professions.ProfessionManager;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,11 +38,23 @@ public class FightControl {
     }
 
     public void tick() {
-        if(!this.attackTarget.isAlive()){
+        if(moveTargetNotReached()) return;
+
+        if(this.attackTarget != null && !this.attackTarget.isAlive()){
             this.attackTarget = null;
         }
-        
-        if(this.attackTarget == null && dontHaveMoveTarget()) {
+
+        colonist.getFortressServerManager().ifPresent(it -> {
+            final var serverFightManager = it.getServerFightManager();
+            if(serverFightManager.hasAnyScaryMob()) {
+                final var randomScaryMob = serverFightManager.getRandomScaryMob(colonist.world.random);
+                if(isTargetAcceptable(randomScaryMob)) {
+                    this.attackTarget = randomScaryMob;
+                }
+            }
+        });
+
+        if(this.attackTarget == null) {
             final var target = this.colonist.getTarget();
             if(target instanceof HostileEntity && isTargetAcceptable(target)) {
                 this.attackTarget = target;
@@ -54,8 +64,8 @@ public class FightControl {
         }
     }
     
-    private boolean dontHaveMoveTarget() {
-        return this.moveTarget == null || this.moveTarget.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE);
+    private boolean moveTargetNotReached() {
+        return this.moveTarget != null && !this.moveTarget.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE);
     }
 
     private boolean isTargetAcceptable(LivingEntity target) {
