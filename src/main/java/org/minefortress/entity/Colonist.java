@@ -24,7 +24,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
@@ -302,6 +301,7 @@ public class Colonist extends PassiveEntity {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
         this.goalSelector.add(3, new FortressEscapeDangerGoal(this, 1.75));
+        this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
         this.goalSelector.add(4, new FightGoal(this));
         this.goalSelector.add(4, new HideGoal(this));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
