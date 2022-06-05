@@ -24,6 +24,7 @@ public class FortressEscapeDangerGoal extends EscapeDangerGoal {
     public void start() {
         super.start();
         colonist.getFortressServerManager().ifPresent(it -> {
+            if(it.isCombatMode()) return;
             it.setCombatMode(true, true);
             colonist.doActionOnMasterPlayer(p -> ((ServerPlayerEntity)p).sendMessage(new LiteralText("§a Village is under attack!  Defend it!§a"), false));
             it.getServerFightManager().addScaryMob(this.colonist.getAttacker());
