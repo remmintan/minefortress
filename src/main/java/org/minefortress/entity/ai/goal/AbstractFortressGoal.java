@@ -1,6 +1,8 @@
 package org.minefortress.entity.ai.goal;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
@@ -34,6 +36,10 @@ abstract class AbstractFortressGoal extends Goal {
         return ProfessionManager.DEFENDER_PROFESSIONS.contains(colonist.getProfessionId());
     }
 
+    private boolean isWarrior() {
+        return ProfessionManager.WARRIOR_PROFESSIONS.contains(colonist.getProfessionId());
+    }
+
     private boolean isFortressInCombatMode() {
         return colonist.getFortressServerManager().map(FortressServerManager::isCombatMode).orElse(false);
     }
@@ -44,6 +50,14 @@ abstract class AbstractFortressGoal extends Goal {
 
     protected boolean notInCombat() {
         return !isFighting() && !isHiding();
+    }
+
+    protected boolean isStarving() {
+        return colonist.getCurrentFoodLevel() <= 0;
+    }
+
+    protected boolean isScared() {
+        return !isWarrior() && colonist.getFightControl().canSeeMonster();
     }
 
 }

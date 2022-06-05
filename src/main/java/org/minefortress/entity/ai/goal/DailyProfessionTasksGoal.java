@@ -23,10 +23,6 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
         super(colonist);
     }
 
-    private boolean isStarving() {
-        return colonist.getCurrentFoodLevel() <= 0;
-    }
-
     @Override
     public boolean canStart() {
         if(!notInCombat()) return false;
@@ -67,7 +63,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return this.isStarving();
+        return this.isStarving() || this.isScared();
     }
 
     private TaskControl getTaskControl() {
