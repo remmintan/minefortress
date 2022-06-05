@@ -14,6 +14,12 @@ import static java.util.Map.entry;
 
 public abstract class ProfessionManager {
 
+    public static final List<String> DEFENDER_PROFESSIONS = Arrays.asList(
+            "warrior1",
+            "warrior2",
+            "colonist"
+    );
+
     public static final List<Item> FORESTER_ITEMS = Arrays.asList(
             Items.BEETROOT_SEEDS,
             Items.CARROT,

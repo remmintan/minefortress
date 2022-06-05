@@ -32,6 +32,7 @@ import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.minefortress.professions.ProfessionManager;
 import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.*;
@@ -67,6 +68,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private FortressGamemode gamemode = FortressGamemode.NONE;
 
     private boolean combatMode;
+    private boolean villageUnderAttack;
 
     public FortressServerManager() {
         serverProfessionManager = new ServerProfessionManager(() -> this);
@@ -517,10 +519,17 @@ public final class FortressServerManager extends AbstractFortressManager {
         return combatMode;
     }
 
-    public void setCombatMode(boolean combatMode) {
+    public boolean isVillageUnderAttack() {
+        return villageUnderAttack;
+    }
+
+    public void setCombatMode(boolean combatMode, boolean villageUnderAttack) {
         this.combatMode = combatMode;
+        this.villageUnderAttack = villageUnderAttack;
         this.scheduleSyncCombat();
         for(Colonist colonist : this.colonists) {
+            final var professionId = colonist.getProfessionId();
+            if(!ProfessionManager.DEFENDER_PROFESSIONS.contains(professionId)) return;
             final var fightControl = colonist.getFightControl();
             if(this.combatMode) {
                 fightControl.setMoveTarget(this.fortressCenter);
@@ -537,7 +546,10 @@ public final class FortressServerManager extends AbstractFortressManager {
             return;
         }
 
-        final var selectedColonists = this.colonists.stream().filter(c -> selectedIds.contains(c.getId())).toList();
+        final var selectedColonists = this.colonists.stream()
+                .filter(c -> selectedIds.contains(c.getId()))
+                .filter(c -> ServerProfessionManager.DEFENDER_PROFESSIONS.contains(c.getProfessionId()))
+                .toList();
         selectionManager.selectColonists(selectedColonists);
     }
 

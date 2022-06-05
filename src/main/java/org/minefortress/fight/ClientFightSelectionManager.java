@@ -9,6 +9,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.network.ServerboundSelectColonistsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.professions.ProfessionManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +54,7 @@ public class ClientFightSelectionManager {
             final var world = MinecraftClient.getInstance().world;
             if(world != null) {
                 selectedColonists = world
-                        .getEntitiesByType(colonistType, selectionBox, Predicates.alwaysTrue())
+                        .getEntitiesByType(colonistType, selectionBox, it -> ProfessionManager.DEFENDER_PROFESSIONS.contains(((Colonist)it).getProfessionId()))
                         .stream()
                         .map(it -> (Colonist)it)
                         .toList();

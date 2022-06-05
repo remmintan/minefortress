@@ -21,7 +21,7 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(isInCombat() || !isDay() || colonist.getTaskControl().hasTask()) return false;
+        if(!notInCombat() || !isDay() || colonist.getTaskControl().hasTask()) return false;
         final Optional<FortressServerManager> fortressManagerOpt = colonist.getFortressServerManager();
         if (fortressManagerOpt.isPresent()) {
             final FortressServerManager fortressManager = fortressManagerOpt.get();

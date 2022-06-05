@@ -1,6 +1,5 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.server.world.ServerWorld;
@@ -10,7 +9,6 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.NodeMaker;
 import org.minefortress.fortress.FortressServerManager;
 
-import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Random;
 
@@ -24,7 +22,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(isInCombat()) return false;
+        if(!notInCombat()) return false;
         if(!isNight()) {
             final Optional<FortressServerManager> fortressServerManager = colonist.getFortressServerManager();
             if(fortressServerManager.isPresent()) {

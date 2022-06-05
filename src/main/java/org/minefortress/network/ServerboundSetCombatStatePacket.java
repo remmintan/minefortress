@@ -26,7 +26,7 @@ public class ServerboundSetCombatStatePacket implements FortressServerPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         if(player instanceof FortressServerPlayerEntity fortressPlayer) {
-            fortressPlayer.getFortressServerManager().setCombatMode(combatMode);
+            fortressPlayer.getFortressServerManager().setCombatMode(combatMode, false);
         }
     }
 }
