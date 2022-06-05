@@ -32,12 +32,12 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return colonistIsStarving();
+        return super.isStarving() || super.isScared();
     }
 
     @Override
     public boolean canStart() {
-        return notInCombat() && getTaskControl().hasTask() && !colonistIsStarving();
+        return notInCombat() && getTaskControl().hasTask() && !super.isStarving();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() && !colonistIsStarving() && getTaskControl().hasTask() &&
+        return notInCombat() && !super.isStarving() && getTaskControl().hasTask() &&
             (
                 getMovementHelper().stillTryingToReachGoal() ||
                 workGoal !=null ||
@@ -119,10 +119,6 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     private TaskControl getTaskControl() {
         return this.colonist.getTaskControl();
-    }
-
-    private boolean colonistIsStarving() {
-        return colonist.getCurrentFoodLevel() <= 0;
     }
 
     private MovementHelper getMovementHelper() {

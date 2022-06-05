@@ -22,6 +22,11 @@ public abstract class ProfessionManager {
             "colonist"
     );
 
+    public static final List<String> WARRIOR_PROFESSIONS = Arrays.asList(
+            "warrior1",
+            "warrior2"
+    );
+
     public static final List<Item> FORESTER_ITEMS = Arrays.asList(
             Items.BEETROOT_SEEDS,
             Items.CARROT,

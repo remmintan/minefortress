@@ -81,7 +81,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return hasEatableItem();
+        return !hasEatableItem() || isScared();
     }
 
     @Override

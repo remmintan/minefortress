@@ -89,7 +89,7 @@ public class Colonist extends PassiveEntity {
             mlgControl = new MLGControl(this);
             taskControl = new TaskControl(this);
             movementHelper = new MovementHelper((ColonistNavigation) this.getNavigation(), this);
-            fightControl = new FightControl();
+            fightControl = new FightControl(this);
         } else {
             digControl = null;
             placeControl = null;
