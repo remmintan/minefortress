@@ -62,8 +62,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             movementHelper.set(goal);
         }
 
-
-        if(movementHelper.hasReachedWorkGoal()) {
+        if(movementHelper.getWorkGoal() != null && movementHelper.hasReachedWorkGoal()) {
             this.workingTicks++;
             final var goalBLockState = colonist.world.getBlockState(this.goal);
             if (goalBLockState.isOf(Blocks.DIRT) || goalBLockState.isOf(Blocks.GRASS_BLOCK)) {
@@ -110,7 +109,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         }
 
         movementHelper.tick();
-        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isCantFindPath()){
+        if(movementHelper.getWorkGoal() != null && !movementHelper.hasReachedWorkGoal() && movementHelper.isCantFindPath()){
             final var workGoal = movementHelper.getWorkGoal().up();
             colonist.teleport(workGoal.getX(), workGoal.getY(), workGoal.getZ());
         }
