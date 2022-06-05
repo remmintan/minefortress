@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -53,7 +54,7 @@ import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-public class Colonist extends PassiveEntity {
+public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
@@ -632,4 +633,8 @@ public class Colonist extends PassiveEntity {
         return this.dataTracker.get(HAS_TASK);
     }
 
+    @Override
+    public void attack(LivingEntity target, float pullProgress) {
+
+    }
 }
