@@ -22,6 +22,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fight.ServerFightManager;
 import org.minefortress.fight.ServerFightSelectionManager;
+import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -96,6 +97,11 @@ public final class FortressServerManager extends AbstractFortressManager {
     public void addColonist(Colonist colonist) {
         colonists.add(colonist);
         scheduleSync();
+    }
+
+    @Override
+    public FortressResourceManager getResourceManager() {
+        return serverResourceManager;
     }
 
     public void tick(ServerPlayerEntity player) {
@@ -445,7 +451,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
-        if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack")) {
+        if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
             return buildings.stream()
                     .filter(b -> b.getRequirementId().equals(requirementId))
                     .mapToInt(FortressBulding::getBedsCount)

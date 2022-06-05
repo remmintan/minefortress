@@ -30,6 +30,11 @@ public class ServerProfessionManager extends ProfessionManager{
         if(profession == null) return;
         if(!super.isRequirementsFulfilled(profession, true)) return;
 
+        final var fortressServerManager = (FortressServerManager) fortressManagerSupplier.get();
+        final var serverResourceManager = fortressServerManager.getServerResourceManager();
+        if(profession.getItemsRequirement() != null)
+            serverResourceManager.removeItems(profession.getItemsRequirement());
+
         profession.setAmount(profession.getAmount() + 1);
         scheduleSync();
     }

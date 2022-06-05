@@ -122,6 +122,15 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
         synchronizer.syncItem(item, stack.getAmount());
     }
 
+    public void removeItems(List<ItemInfo> items) {
+        for(ItemInfo itemInfo:items) {
+            final var stack = resources.getStack(itemInfo.item());
+            if(stack.getAmount()<=0)return;
+            stack.decreaseBy(itemInfo.amount());
+            synchronizer.syncItem(itemInfo.item(), stack.getAmount());
+        }
+    }
+
     @Override
     public void returnReservedItems(UUID taskId) {
         if(!reservedResources.containsKey(taskId)) return;
@@ -192,7 +201,8 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
                 .toList();
     }
 
-    private boolean hasItems(List<ItemInfo> infos) {
+    @Override
+    public boolean hasItems(List<ItemInfo> infos) {
         for(ItemInfo info : infos) {
             final var item = info.item();
             if(item == Items.FLINT_AND_STEEL || item == Items.WATER_BUCKET || item == Items.LAVA_BUCKET) continue;
