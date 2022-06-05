@@ -53,12 +53,14 @@ public class FightGoal extends AbstractFortressGoal {
         moveHelper.tick();
 
         attackTarget = colonist.getFightControl().getAttackTarget();
-        final var distanceToAttackTarget = this.colonist.squaredDistanceTo(attackTarget);
-        if(attackTarget != null && colonist.getNavigation().isIdle()) {
-            if(distanceToAttackTarget > this.getSquaredMaxAttackDistance(attackTarget))
-                colonist.getNavigation().startMovingTo(attackTarget, 1.75);
+        if(attackTarget != null) {
+            final var distanceToAttackTarget = this.colonist.squaredDistanceTo(attackTarget);
+            if(colonist.getNavigation().isIdle()) {
+                if(distanceToAttackTarget > this.getSquaredMaxAttackDistance(attackTarget))
+                    colonist.getNavigation().startMovingTo(attackTarget, 1.75);
+            }
+            this.attack(distanceToAttackTarget);
         }
-        this.attack(distanceToAttackTarget);
         this.cooldown--;
         this.cooldown = Math.max(0, this.cooldown);
     }
