@@ -18,7 +18,7 @@ public class HideGoal extends AbstractFortressGoal{
 
     @Override
     public boolean canStart() {
-        return isScared() || isHiding();
+        return (isScared() || isHiding()) && colonist.getFortressServerManager().isPresent();
     }
 
     @Override
