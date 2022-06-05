@@ -54,7 +54,7 @@ public class ClientFightSelectionManager {
             final var world = MinecraftClient.getInstance().world;
             if(world != null) {
                 selectedColonists = world
-                        .getEntitiesByType(colonistType, selectionBox, it -> ProfessionManager.DEFENDER_PROFESSIONS.contains(((Colonist)it).getProfessionId()))
+                        .getEntitiesByType(colonistType, selectionBox, it -> ((Colonist)it).getFightControl().isDefender())
                         .stream()
                         .map(it -> (Colonist)it)
                         .toList();
