@@ -11,6 +11,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.FortressServerManager;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,20 +63,21 @@ public class FightControl {
             this.attackTarget = null;
         }
 
-        colonist.getFortressServerManager().ifPresent(it -> {
-            final var serverFightManager = it.getServerFightManager();
-            if(serverFightManager.hasAnyScaryMob()) {
-                final var randomScaryMob = serverFightManager.getRandomScaryMob(colonist.world.random);
-                if(isTargetAcceptable(randomScaryMob)) {
-                    this.attackTarget = randomScaryMob;
+        if(attackTarget == null)
+            colonist.getFortressServerManager().ifPresent(it -> {
+                final var serverFightManager = it.getServerFightManager();
+                if(serverFightManager.hasAnyScaryMob()) {
+                    final var randomScaryMob = serverFightManager.getRandomScaryMob(colonist.world.random);
+                    if(isTargetAcceptable(randomScaryMob)) {
+                        this.setAttackTarget(randomScaryMob);
+                    }
                 }
-            }
-        });
+            });
 
         if(this.attackTarget == null) {
             final var target = this.colonist.getTarget();
             if(target instanceof HostileEntity && isTargetAcceptable(target)) {
-                this.attackTarget = target;
+                this.setAttackTarget(target);
             } else {
                 this.attackTarget = null;
             }
@@ -158,7 +160,15 @@ public class FightControl {
     }
     
     private boolean moveTargetNotReached() {
-        return this.moveTarget != null && !this.moveTarget.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE);
+        if(fortressInCombat()) {
+            return this.moveTarget != null;
+        }  else {
+            return this.moveTarget != null && !this.moveTarget.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE);
+        }
+    }
+
+    private boolean fortressInCombat() {
+        return colonist.getFortressServerManager().map(FortressServerManager::isCombatMode).orElse(false);
     }
 
     private boolean isTargetAcceptable(LivingEntity target) {

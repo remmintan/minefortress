@@ -539,6 +539,10 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void setCombatMode(boolean combatMode, boolean villageUnderAttack) {
+        if(this.combatMode == combatMode) {
+            this.villageUnderAttack = villageUnderAttack;
+            return;
+        }
         this.combatMode = combatMode;
         this.villageUnderAttack = villageUnderAttack;
         this.scheduleSyncCombat();
