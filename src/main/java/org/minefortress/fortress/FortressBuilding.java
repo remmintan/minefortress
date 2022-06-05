@@ -7,21 +7,21 @@ import net.minecraft.util.math.BlockPos;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FortressBulding {
+public class FortressBuilding {
 
     private final BlockPos start;
     private final BlockPos end;
     private final Set<FortressBedInfo> beds;
     private final String requirementId;
 
-    public FortressBulding(BlockPos start, BlockPos end, Set<FortressBedInfo> bedPositions, String requirementId) {
+    public FortressBuilding(BlockPos start, BlockPos end, Set<FortressBedInfo> bedPositions, String requirementId) {
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.beds = Collections.unmodifiableSet(bedPositions);
         this.requirementId = requirementId;
     }
 
-    public FortressBulding(NbtCompound tag) {
+    public FortressBuilding(NbtCompound tag) {
         if(tag.contains("start"))
             this.start = BlockPos.fromLong(tag.getLong("start"));
         else
@@ -77,6 +77,10 @@ public class FortressBulding {
                 .collect(Collectors.toList());
         tag.putLongArray("beds", beds);
         tag.putString("requirementId", requirementId);
+    }
+
+    public Set<FortressBedInfo> getBeds() {
+        return beds;
     }
 
     public String getRequirementId() {

@@ -21,7 +21,6 @@ import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fight.ServerFightManager;
-import org.minefortress.fight.ServerFightSelectionManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
@@ -51,7 +50,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private BlockPos fortressCenter = null;
     private final Set<Colonist> colonists = new HashSet<>();
-    private final Set<FortressBulding> buildings = new HashSet<>();
+    private final Set<FortressBuilding> buildings = new HashSet<>();
 
     private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
     private final Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
@@ -75,7 +74,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         serverProfessionManager = new ServerProfessionManager(() -> this);
     }
 
-    public void addBuilding(FortressBulding building) {
+    public void addBuilding(FortressBuilding building) {
         final BlockPos start = building.getStart();
         final BlockPos end = building.getEnd();
         if(start.getX() < minX) minX = start.getX();
@@ -87,7 +86,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public Optional<FortressBedInfo> getFreeBed(){
-        for(FortressBulding building : buildings){
+        for(FortressBuilding building : buildings){
             final Optional<FortressBedInfo> freeBed = building.getFreeBed();
             if(freeBed.isPresent()) return freeBed;
         }
@@ -129,12 +128,20 @@ public final class FortressServerManager extends AbstractFortressManager {
         needSync = false;
     }
 
-    public Optional<FortressBulding> getRandomBuilding(String requirementId, Random random) {
+    public Optional<FortressBuilding> getRandomBuilding(String requirementId, Random random) {
         final var buildings = this.buildings.stream()
                 .filter(building -> building.getRequirementId().equals(requirementId))
                 .toList();
         if(buildings.isEmpty()) return Optional.empty();
         return Optional.of(buildings.get(random.nextInt(buildings.size())));
+    }
+
+    public Optional<FortressBedInfo> getRandomBed(Random random) {
+        final var allBeds = this.buildings.stream()
+                .flatMap(building -> building.getBeds().stream())
+                .toList();
+        if(allBeds.isEmpty()) return Optional.empty();
+        return Optional.of(allBeds.get(random.nextInt(allBeds.size())));
     }
 
     public void tickFortress(ServerPlayerEntity player, World world) {
@@ -151,7 +158,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             scheduleSync();
         }
 
-        for (FortressBulding building : buildings) {
+        for (FortressBuilding building : buildings) {
             building.tick();
         }
 
@@ -193,7 +200,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
             if(world.getTime() % 100 == 0  && world.random.nextInt(100) > 75) {
                 final var colonistsCount = this.colonists.size();
-                final var bedsCount = buildings.stream().map(FortressBulding::getBedsCount).reduce(0, Integer::sum);
+                final var bedsCount = buildings.stream().map(FortressBuilding::getBedsCount).reduce(0, Integer::sum);
                 if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
                     final var colonistOpt = spawnPawnNearCampfire(player, world);
                     if(colonistOpt.isPresent()) {
@@ -294,7 +301,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(!buildings.isEmpty()) {
             int i = 0;
             final NbtCompound buildingsTag = new NbtCompound();
-            for (FortressBulding building : this.buildings) {
+            for (FortressBuilding building : this.buildings) {
                 final NbtCompound buildingTag = new NbtCompound();
                 building.writeToNbt(buildingTag);
                 buildingsTag.put("building" + i++, buildingTag);
@@ -360,7 +367,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             int i = 0;
             while(buildingsTag.contains("building" + i)) {
                 final NbtCompound buildingTag = buildingsTag.getCompound("building" + i++);
-                FortressBulding building = new FortressBulding(buildingTag);
+                FortressBuilding building = new FortressBuilding(buildingTag);
                 buildings.add(building);
                 this.scheduleSyncBuildings();
             }
@@ -454,7 +461,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
             return buildings.stream()
                     .filter(b -> b.getRequirementId().equals(requirementId))
-                    .mapToInt(FortressBulding::getBedsCount)
+                    .mapToInt(FortressBuilding::getBedsCount)
                     .sum() > minCount;
         }
 

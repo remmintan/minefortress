@@ -1,8 +1,6 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
