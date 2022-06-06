@@ -352,8 +352,8 @@ public abstract class ProfessionManager {
                     new Profession(
                             "Archer - LVL2",
                             Items.CROSSBOW,
-                            "Will be available in future releases",
                             "",
+                            "Will be available in future releases",
                             "",
                             "_"
                     )

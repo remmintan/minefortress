@@ -153,7 +153,7 @@ public class FightControl {
 
     private double getSquaredMaxAttackDistance() {
         if(isLongRangeAttacker()) {
-            return 16d*16d;
+            return 17d*17d;
         } else {
             return this.colonist.getWidth() * 2.0f * (this.colonist.getWidth() * 2.0f) + attackTarget.getWidth();
         }

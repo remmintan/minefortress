@@ -21,12 +21,15 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.HungerConstants;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Hand;
@@ -638,6 +641,13 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     @Override
     public void attack(LivingEntity target, float pullProgress) {
-
+        final var arrow = ProjectileUtil.createArrowProjectile(this, new ItemStack(Items.ARROW), pullProgress);
+        double d = target.getX() - this.getX();
+        double e = target.getBodyY(0.3333333333333333) - arrow.getY();
+        double f = target.getZ() - this.getZ();
+        double g = Math.sqrt(d * d + f * f);
+        arrow.setVelocity(d, e + g * (double)0.2f, f, 1.6f, 4);
+        this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+        this.world.spawnEntity(arrow);
     }
 }
