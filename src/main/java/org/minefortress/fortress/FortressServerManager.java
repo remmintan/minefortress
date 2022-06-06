@@ -199,7 +199,7 @@ public final class FortressServerManager extends AbstractFortressManager {
                 world.emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
             }
 
-            if(world.getTime() % 100 == 0  && world.random.nextInt(100) > 75) {
+            if(world.getTime() % 100 == 0  && world.random.nextInt(100) > 85) {
                 final var colonistsCount = this.colonists.size();
                 final var bedsCount = buildings.stream().map(FortressBuilding::getBedsCount).reduce(0, Integer::sum);
                 if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {

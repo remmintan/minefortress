@@ -34,7 +34,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
         if(taskControl.hasTask()) return false;
         final String professionId = colonist.getProfessionId();
         if(colonist.getFortressManager().isEmpty()) return false;
-        final var warriorProfession = professionId.startsWith("warrior");
+        final var warriorProfession = professionId.startsWith("warrior") || professionId.startsWith("archer");
         if(!dailyTasks.containsKey(professionId) && !warriorProfession) return false;
 
         this.currentTask = warriorProfession ? warriorTask : dailyTasks.get(professionId);
