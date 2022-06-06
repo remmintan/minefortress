@@ -108,7 +108,7 @@ public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntit
             case "weaver" -> WEAVER;
             case "warrior1" -> WARRIOR;
             case "warrior2" -> FOOTMAN;
-            case "archer" -> ARCHER;
+            case "archer1" -> ARCHER;
             default -> COLONIST;
         };
     }
