@@ -90,7 +90,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
 
     private boolean isSuccess(Colonist colonist){
         final var random = colonist.world.random;
-        return random.nextInt(100) < 25;
+        return random.nextInt(100) < 18;
     }
 
     private void setGoal(Colonist colonist){
