@@ -108,11 +108,12 @@ public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntit
             case "weaver" -> WEAVER;
             case "warrior1" -> WARRIOR;
             case "warrior2" -> FOOTMAN;
+            case "archer" -> ARCHER;
             default -> COLONIST;
         };
     }
 
     private boolean isWarrior(String professionId) {
-        return professionId.equals("warrior1") || professionId.equals("warrior2");
+        return professionId.equals("warrior1") || professionId.equals("warrior2") || professionId.startsWith("archer");
     }
 }
