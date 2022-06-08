@@ -4,28 +4,24 @@
   "package": "org.minefortress.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "FortressServerMixin",
-    "entity.FortressItemEntityMixin",
-    "entity.FurnaceBlockEntityMixin",
-    "entity.player.FortressPlayerInventoryMixin",
-    "network.FortressClientPlayNetworkHandlerMixin",
-    "renderer.FortressFluidRendererMixin",
-    "renderer.gui.FortressCreativeInventoryScreenMixin",
-    "renderer.gui.FortressSimpleInventoryMixin"
+    "interfaces.FortressDimensionTypeMixin",
+    "entity.FortressSlimeEntityMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",
+    "entity.FortressItemEntityMixin",
+    "entity.FurnaceBlockEntityMixin",
+    "network.FortressClientPlayNetworkHandlerMixin",
+    "renderer.FortressFluidRendererMixin",
+    "renderer.gui.FortressCreativeInventoryScreenMixin",
+    "renderer.gui.FortressSimpleInventoryMixin",
+    "entity.player.FortressPlayerInventoryMixin",
     "entity.FortressClientPlayerEntityMixin",
-    "entity.FortressMobMixin",
-    "entity.FortressServerPlayerEntityMixin",
-    "entity.FortressSlimeEntityMixin",
     "interaction.FortressGameModeMixin",
     "interaction.FortressInteractionManagerMixin",
     "interaction.FortressKeyboardInputMixin",
     "interaction.FortressMouseMixin",
     "interaction.FortressTutorialManagerMixin",
-    "interfaces.FortressDimensionTypeMixin",
-    "network.FortressServerPlayNetworkHandlerMixin",
     "renderer.FortressCreateWorldScreenMixin",
     "renderer.FortressCyclingButtonMixin",
     "renderer.FortressGameRendererMixin",
@@ -33,7 +29,12 @@
     "renderer.FortressWorldRendererMixin",
     "world.FortressClientWorldMixin"
   ],
-  "server": [],
+  "server": [
+    "FortressServerMixin",
+    "entity.FortressMobMixin",
+    "entity.FortressServerPlayerEntityMixin",
+    "network.FortressServerPlayNetworkHandlerMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
