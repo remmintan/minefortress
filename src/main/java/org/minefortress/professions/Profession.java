@@ -1,5 +1,7 @@
 package org.minefortress.professions;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -34,19 +36,21 @@ public class Profession {
     private final List<Profession> children = new ArrayList<>();
 
     public Profession(String title, Item icon, String unlockedDescription, String lockedDescription, String notEnoughBuildingDescription) {
-        this.title = title;
-        this.icon = new ItemStack(icon);
-        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, MAX_WIDTH);
-        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, MAX_WIDTH);
-        this.notEnoughBuildingsDescription = GuiUtils.splitTextInWordsForLength(notEnoughBuildingDescription, MAX_WIDTH);
-        this.buildingRequirement = null;
+        this(title, icon, unlockedDescription, lockedDescription, notEnoughBuildingDescription, null);
     }
     public Profession(String title, Item icon, String unlockedDescription, String lockedDescription, String notEnoughBuildingDescription, String buildingRequirement) {
         this.title = title;
         this.icon = new ItemStack(icon);
-        this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, MAX_WIDTH);
-        this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, MAX_WIDTH);
-        this.notEnoughBuildingsDescription = GuiUtils.splitTextInWordsForLength(notEnoughBuildingDescription, MAX_WIDTH);
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, MAX_WIDTH);
+            this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, MAX_WIDTH);
+            this.notEnoughBuildingsDescription = GuiUtils.splitTextInWordsForLength(notEnoughBuildingDescription, MAX_WIDTH);
+        } else {
+            this.unlockedDescription = null;
+            this.lockedDescription = null;
+            this.notEnoughBuildingsDescription = null;
+        }
+
         this.buildingRequirement = buildingRequirement;
     }
 
