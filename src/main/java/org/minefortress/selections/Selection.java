@@ -2,17 +2,15 @@ package org.minefortress.selections;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
+import net.minecraft.world.World;
 import org.minefortress.tasks.TaskType;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public abstract class Selection {
     public abstract boolean isSelecting();
@@ -20,7 +18,7 @@ public abstract class Selection {
     public abstract boolean needUpdate(BlockPos pickedBlock, int upDelta);
 
     public abstract boolean selectBlock(
-            ClientWorld level,
+            World level,
             Item mainHandItem,
             BlockPos pickedBlock,
             int upDelta,

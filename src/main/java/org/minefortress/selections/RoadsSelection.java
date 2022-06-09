@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.network.ServerboundRoadsTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -23,7 +24,7 @@ import java.util.*;
 public class RoadsSelection extends WallsSelection{
 
     @Override
-    public boolean selectBlock(ClientWorld level, Item mainHandItem, BlockPos pickedBlock, int upDelta, ClickType click, ClientPlayNetworkHandler connection, HitResult hitResult) {
+    public boolean selectBlock(World level, Item mainHandItem, BlockPos pickedBlock, int upDelta, ClickType click, ClientPlayNetworkHandler connection, HitResult hitResult) {
         if(click == ClickType.REMOVE) return true;
 
         if(corners.isEmpty()) {

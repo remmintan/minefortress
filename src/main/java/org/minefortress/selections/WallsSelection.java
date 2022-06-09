@@ -9,6 +9,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -161,7 +162,7 @@ public class WallsSelection extends Selection {
 
     @Override
     public boolean selectBlock(
-            ClientWorld level,
+            World level,
             Item mainHandItem,
             BlockPos pickedBlock,
             final int upDelta,

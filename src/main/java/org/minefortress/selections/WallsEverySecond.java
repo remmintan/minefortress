@@ -6,6 +6,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class WallsEverySecond extends WallsSelection{
     }
 
     @Override
-    public boolean selectBlock(ClientWorld level,
+    public boolean selectBlock(World level,
                                Item item,
                                BlockPos pickedBlock,
                                int upDelta,

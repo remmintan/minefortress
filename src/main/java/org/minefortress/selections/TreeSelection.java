@@ -5,12 +5,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.network.ServerboundCutTreesTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -42,7 +41,7 @@ public class TreeSelection extends Selection {
     }
 
     @Override
-    public boolean selectBlock(ClientWorld level, Item mainHandItem, BlockPos pickedBlock, int upDelta, ClickType click, ClientPlayNetworkHandler clientPacketListener, HitResult hitResult) {
+    public boolean selectBlock(World level, Item mainHandItem, BlockPos pickedBlock, int upDelta, ClickType click, ClientPlayNetworkHandler clientPacketListener, HitResult hitResult) {
         if(click == ClickType.BUILD) {
             return start != null;
         }
@@ -90,7 +89,7 @@ public class TreeSelection extends Selection {
     }
 
     private void updateSelection() {
-        final ClientWorld world = MinecraftClient.getInstance().world;
+        final World world = MinecraftClient.getInstance().world;
         if (world == null) return;
 
         updateTreeRoots(world);
@@ -102,7 +101,7 @@ public class TreeSelection extends Selection {
 
     }
 
-    private void updateTreeRoots(ClientWorld world) {
+    private void updateTreeRoots(World world) {
         treeRoots.clear();
         int minY = Math.min(start.getY(), end.getY());
 
@@ -133,7 +132,7 @@ public class TreeSelection extends Selection {
             rootUpFromGround.ifPresent(treeRoots::add);
         }
     }
-    private void updateTreeData(ClientWorld world) {
+    private void updateTreeData(World world) {
         this.selectedTreeBlocks.clear();
         for(BlockPos root: new ArrayList<>(treeRoots)) {
             final Optional<TreeBlocks> treeBlocks = getTreeBlocks(root, world);
@@ -147,7 +146,7 @@ public class TreeSelection extends Selection {
         }
     }
 
-    private Optional<BlockPos> findRootDownFromLog(BlockPos start, ClientWorld world) {
+    private Optional<BlockPos> findRootDownFromLog(BlockPos start, World world) {
         BlockPos cursor = start;
         BlockState cursorState;
 
@@ -160,7 +159,7 @@ public class TreeSelection extends Selection {
         return Optional.of(cursor.up());
     }
 
-    private Optional<BlockPos> findRootDownFromAirOrLeaves(BlockPos start, ClientWorld world) {
+    private Optional<BlockPos> findRootDownFromAirOrLeaves(BlockPos start, World world) {
         BlockPos cursor = start;
         BlockState cursorState;
 
@@ -173,7 +172,7 @@ public class TreeSelection extends Selection {
         return Optional.empty();
     }
 
-    private Optional<BlockPos> findRootUpFromGround(BlockPos start, ClientWorld world) {
+    private Optional<BlockPos> findRootUpFromGround(BlockPos start, World world) {
         BlockPos cursor = start;
         BlockState cursorState;
 
