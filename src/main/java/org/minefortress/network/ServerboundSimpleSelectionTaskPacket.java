@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.selections.SelectionType;
+import org.minefortress.selections.ServerSelectionType;
 import org.minefortress.tasks.SimpleSelectionTask;
 import org.minefortress.tasks.TaskManager;
 import org.minefortress.tasks.TaskType;
@@ -25,7 +26,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
     private final BlockPos start;
     private final BlockPos end;
     private final HitResult hitResult;
-    private final SelectionType selectionType;
+    private final String selectionType;
 
     public ServerboundSimpleSelectionTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, SelectionType selectionType) {
         this.id = id;
@@ -33,7 +34,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
         this.start = start;
         this.end = end;
         this.hitResult = hitResult;
-        this.selectionType = selectionType;
+        this.selectionType = selectionType.name();
     }
 
     public ServerboundSimpleSelectionTaskPacket(PacketByteBuf buffer) {
@@ -47,7 +48,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
         } else {
             this.hitResult = null;
         }
-        this.selectionType = buffer.readEnumConstant(SelectionType.class);
+        this.selectionType = buffer.readString();
     }
 
     @Override
@@ -61,7 +62,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
         if(type == HitResult.Type.BLOCK) {
             buffer.writeBlockHitResult((BlockHitResult) this.hitResult);
         }
-        buffer.writeEnumConstant(selectionType);
+        buffer.writeString(selectionType);
     }
 
     public TaskType getTaskType() {
@@ -80,8 +81,8 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
         return hitResult;
     }
 
-    public SelectionType getSelectionType() {
-        return selectionType;
+    public ServerSelectionType getSelectionType() {
+        return ServerSelectionType.valueOf(selectionType);
     }
 
     public UUID getId() {
@@ -97,7 +98,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacke
         BlockPos startingBlock = this.getStart();
         BlockPos endingBlock = this.getEnd();
         HitResult hitResult = this.getHitResult();
-        SelectionType selectionType = this.getSelectionType();
+        ServerSelectionType selectionType = this.getSelectionType();
         SimpleSelectionTask simpleSelectionTask = new SimpleSelectionTask(id, taskType, startingBlock, endingBlock, hitResult, selectionType);
         if(simpleSelectionTask.getTaskType() == TaskType.BUILD) {
             final ItemStack itemInHand = player.getStackInHand(Hand.MAIN_HAND);

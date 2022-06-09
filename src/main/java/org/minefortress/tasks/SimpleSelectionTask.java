@@ -9,7 +9,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.minefortress.selections.SelectionType;
+import org.minefortress.selections.ServerSelectionType;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
@@ -25,11 +25,11 @@ public class SimpleSelectionTask extends AbstractTask {
 
     private final HitResult hitResult;
     private final Direction horizontalDirection;
-    private final SelectionType selectionType;
+    private final ServerSelectionType selectionType;
 
     private Item placingItem;
 
-    public SimpleSelectionTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, HitResult hitResult, SelectionType selectionType) {
+    public SimpleSelectionTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, HitResult hitResult, ServerSelectionType selectionType) {
         super(id, taskType, startingBlock, endingBlock);
         this.selectionType = selectionType;
 
@@ -42,10 +42,10 @@ public class SimpleSelectionTask extends AbstractTask {
             this.endingBlock = endingBlock;
         }
 
-        if(selectionType == SelectionType.LADDER && hitResult instanceof BlockHitResult) {
+        if(selectionType == ServerSelectionType.LADDER && hitResult instanceof BlockHitResult) {
             this.horizontalDirection  = startingBlock.getX() > endingBlock.getX() ? Direction.WEST : Direction.EAST;
             this.hitResult = new BlockHitResult(hitResult.getPos(), Direction.UP, ((BlockHitResult) hitResult).getBlockPos(), ((BlockHitResult) hitResult).isInsideBlock());
-        } else if (selectionType == SelectionType.LADDER_Z_DIRECTION && hitResult instanceof BlockHitResult) {
+        } else if (selectionType == ServerSelectionType.LADDER_Z_DIRECTION && hitResult instanceof BlockHitResult) {
             this.horizontalDirection  = startingBlock.getZ() > endingBlock.getZ() ? Direction.NORTH : Direction.SOUTH;
             this.hitResult = new BlockHitResult(hitResult.getPos(), Direction.UP, ((BlockHitResult) hitResult).getBlockPos(), ((BlockHitResult) hitResult).isInsideBlock());
         } else {
@@ -54,16 +54,16 @@ public class SimpleSelectionTask extends AbstractTask {
         }
     }
 
-    private boolean isShouldSwapEnds(TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, SelectionType selectionType) {
+    private boolean isShouldSwapEnds(TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, ServerSelectionType selectionType) {
         boolean removeFromBottomToTop = taskType == TaskType.REMOVE && endingBlock.getY() > startingBlock.getY();
         boolean buildFromTopToBottom = taskType == TaskType.BUILD && endingBlock.getY() < startingBlock.getY();
-        boolean isLadder = selectionType == SelectionType.LADDER || selectionType == SelectionType.LADDER_Z_DIRECTION;
+        boolean isLadder = selectionType == ServerSelectionType.LADDER || selectionType == ServerSelectionType.LADDER_Z_DIRECTION;
         return !isLadder && (removeFromBottomToTop || buildFromTopToBottom);
     }
 
     @Override
     public void prepareTask() {
-        if(selectionType == SelectionType.WALLS_EVERY_SECOND) {
+        if(selectionType == ServerSelectionType.WALLS_EVERY_SECOND) {
             parts.add(Pair.of(startingBlock, endingBlock));
             super.totalParts = 1;
         } else {
@@ -111,9 +111,9 @@ public class SimpleSelectionTask extends AbstractTask {
     }
 
     public Iterable<BlockPos> getBlocksForPart(Pair<BlockPos, BlockPos> part) {
-        if(selectionType == SelectionType.LADDER) {
+        if(selectionType == ServerSelectionType.LADDER) {
             return PathUtils.getLadderSelection(this.startingBlock, part.getFirst(), part.getSecond(), Direction.Axis.X);
-        } else if(selectionType == SelectionType.LADDER_Z_DIRECTION) {
+        } else if(selectionType == ServerSelectionType.LADDER_Z_DIRECTION) {
             return PathUtils.getLadderSelection(this.startingBlock, part.getFirst(), part.getSecond(), Direction.Axis.Z);
         } else {
             return PathUtils.fromStartToEnd(part.getFirst(), part.getSecond(), selectionType);

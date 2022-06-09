@@ -5,7 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
-import org.minefortress.selections.SelectionType;
+import org.minefortress.selections.ServerSelectionType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class PathUtils {
         return Math.abs(end - start);
     }
 
-    public static Iterable<BlockPos> fromStartToEnd(BlockPos start, BlockPos end, SelectionType selectionType) {
+    public static Iterable<BlockPos> fromStartToEnd(BlockPos start, BlockPos end, ServerSelectionType selectionType) {
         Vec3i moveDirection = getDirection(start, end);
         Vec3i diff = diff(start, end).add(moveDirection);
 
@@ -62,7 +62,7 @@ public class PathUtils {
                 );
 
                 ++index;
-                if(selectionType == SelectionType.WALLS_EVERY_SECOND) ++index;
+                if(selectionType == ServerSelectionType.WALLS_EVERY_SECOND) ++index;
 
                 return cursor.set(start.add(offset));
             }
