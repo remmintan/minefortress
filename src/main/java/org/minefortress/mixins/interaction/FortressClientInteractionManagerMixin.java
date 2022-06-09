@@ -38,7 +38,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import static org.minefortress.MineFortressConstants.PICK_DISTANCE_FLOAT;
 
 @Mixin(ClientPlayerInteractionManager.class)
-public abstract class FortressInteractionManagerMixin {
+public abstract class FortressClientInteractionManagerMixin {
 
     private static final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
 
