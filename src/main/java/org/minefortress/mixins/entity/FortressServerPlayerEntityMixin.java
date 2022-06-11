@@ -14,6 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
+import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.Colonist;
@@ -38,7 +39,6 @@ import java.util.UUID;
 @Mixin(ServerPlayerEntity.class)
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
 
-    private final GameMode fortressGamemode = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
     private UUID fortressUUID = UUID.randomUUID();
 
     private Vec3d persistedPos;
@@ -104,7 +104,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
     public void attack(Entity target, CallbackInfo ci) {
         final GameMode gameMode = this.interactionManager.getGameMode();
-        if(gameMode != ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) return;
+        if(gameMode != MineFortressMod.FORTRESS) return;
 
         if(target instanceof Colonist colonist) {
             final int id = colonist.getId();
@@ -153,7 +153,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Redirect(method = "moveToSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/SpawnLocating;findOverworldSpawn(Lnet/minecraft/server/world/ServerWorld;II)Lnet/minecraft/util/math/BlockPos;"))
     public BlockPos moveToSpawnFindOverworldSpawn(ServerWorld world, int x, int z) {
         final BlockPos actualSpawn = FortressSpawnLocating.findOverworldSpawn(world, x, z);
-        if(actualSpawn != null && this.server.getDefaultGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")){
+        if(actualSpawn != null && this.server.getDefaultGameMode() == MineFortressMod.FORTRESS){
             return actualSpawn.up(20);
         } else {
             return actualSpawn;
@@ -167,7 +167,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Override
     public boolean isFortressSurvival() {
-        return interactionManager != null && interactionManager.getGameMode() == fortressGamemode &&
+        return interactionManager != null && interactionManager.getGameMode() == MineFortressMod.FORTRESS &&
                 fortressServerManager.isSurvival();
     }
 }

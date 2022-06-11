@@ -1,6 +1,5 @@
 package org.minefortress.mixins;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import com.google.common.base.Supplier;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
@@ -20,8 +19,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
-import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
@@ -138,7 +137,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Override
     public boolean isNotFortressGamemode() {
-        return this.interactionManager == null || this.interactionManager.getCurrentGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+        return this.interactionManager == null || this.interactionManager.getCurrentGameMode() != MineFortressMod.FORTRESS;
     }
 
     @Override
@@ -174,7 +173,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/TutorialManager;onInventoryOpened()V", shift = At.Shift.BEFORE))
     private void handleInputEvents(CallbackInfo ci) {
-        if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+        if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS) {
             if(this.options.sprintKey.isPressed()) {
                 if(this.getBlueprintManager().hasSelectedBlueprint()) {
                     this.getBlueprintManager().rotateSelectedStructureClockwise();
@@ -187,7 +186,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreenMix(Screen screen, CallbackInfo ci) {
-        if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+        if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS) {
             if(this.options.sprintKey.isPressed() && screen instanceof InventoryScreen) {
                 ci.cancel();
             }

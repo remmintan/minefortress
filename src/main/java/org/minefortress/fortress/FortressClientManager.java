@@ -9,6 +9,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
@@ -116,7 +117,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         if(
                 client.world == null ||
                 client.interactionManager == null ||
-                client.interactionManager.getCurrentGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS")
+                client.interactionManager.getCurrentGameMode() != MineFortressMod.FORTRESS
         ) {
             if(setCenterToast != null) {
                 setCenterToast.hide();

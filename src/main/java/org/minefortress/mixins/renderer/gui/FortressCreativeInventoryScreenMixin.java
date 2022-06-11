@@ -27,6 +27,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.MineFortressMod;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -72,7 +73,6 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     @Shadow protected abstract boolean renderTabTooltipIfHovered(MatrixStack matrices, ItemGroup group, int mouseX, int mouseY);
 
     @Shadow @Final private static SimpleInventory INVENTORY;
-    private static final GameMode FORTRESS_GAMEMODE = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
 
     public FortressCreativeInventoryScreenMixin(CreativeInventoryScreen.CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {
         super(screenHandler, playerInventory, text);
@@ -221,7 +221,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     }
 
     private boolean isFortressGamemode() {
-        return getClient().interactionManager != null && FORTRESS_GAMEMODE == getClient().interactionManager.getCurrentGameMode();
+        return getClient().interactionManager != null && getClient().interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
     }
 
     private MinecraftClient getClient() {

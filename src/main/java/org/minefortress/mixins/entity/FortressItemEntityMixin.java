@@ -13,6 +13,7 @@ import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
+import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
@@ -92,7 +93,7 @@ public abstract class FortressItemEntityMixin extends Entity {
     }
 
     private boolean isFortressGamemode(ServerPlayerInteractionManager interactionManager) {
-        return interactionManager.getGameMode() == ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+        return interactionManager.getGameMode() == MineFortressMod.FORTRESS;
     }
 
     private boolean isBlueprintsWorld() {

@@ -20,6 +20,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
+import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fight.ClientFightSelectionManager;
@@ -40,7 +41,7 @@ import static org.minefortress.MineFortressConstants.PICK_DISTANCE_FLOAT;
 @Mixin(ClientPlayerInteractionManager.class)
 public abstract class FortressClientInteractionManagerMixin {
 
-    private static final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+    private static final GameMode FORTRESS = MineFortressMod.FORTRESS;
 
     @Shadow
     @Final

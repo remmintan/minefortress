@@ -16,6 +16,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.FortressClientManager;
@@ -35,8 +36,6 @@ import static org.minefortress.MineFortressConstants.PICK_DISTANCE;
 
 @Mixin(GameRenderer.class)
 public abstract class FortressGameRendererMixin implements FortressGameRenderer {
-
-    private final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
 
     @Shadow
     public abstract Camera getCamera();
@@ -126,7 +125,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
     @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;"))
     public Vec3d updateTargetedEntityGetRotation(Entity instance, float tickDelta) {
         final ClientPlayerInteractionManager interactionManager = MinecraftClient.getInstance().interactionManager;
-        if(interactionManager != null && interactionManager.getCurrentGameMode() == FORTRESS && instance instanceof ClientPlayerEntity player) {
+        if(interactionManager != null && interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS && instance instanceof ClientPlayerEntity player) {
             return CameraTools.getMouseBasedViewVector(MinecraftClient.getInstance(), player.getPitch(), player.getYaw());
         } else {
             return instance.getRotationVec(tickDelta);
@@ -138,7 +137,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         final double realDistance = instance.squaredDistanceTo(vec);
 
         final ClientPlayerInteractionManager interactionManager = MinecraftClient.getInstance().interactionManager;
-        if(interactionManager != null && interactionManager.getCurrentGameMode() != FORTRESS) return realDistance;
+        if(interactionManager != null && interactionManager.getCurrentGameMode() != MineFortressMod.FORTRESS) return realDistance;
         if(realDistance > PICK_DISTANCE * PICK_DISTANCE) {
             return realDistance;
         } else {

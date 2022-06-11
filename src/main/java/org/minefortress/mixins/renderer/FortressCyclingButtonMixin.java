@@ -7,6 +7,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.GameMode;
+import org.minefortress.MineFortressMod;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,7 +32,7 @@ public abstract class FortressCyclingButtonMixin {
         if(value instanceof CreateWorldScreen.Mode) {
             List newValues = new ArrayList();
             values.getCurrent().forEach(newValues::add);
-            CreateWorldScreen.Mode.DEBUG.defaultGameMode = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+            CreateWorldScreen.Mode.DEBUG.defaultGameMode = MineFortressMod.FORTRESS;
             CreateWorldScreen.Mode.DEBUG.translationSuffix = "fortress";
             CreateWorldScreen.Mode.DEBUG.text = new TranslatableText("selectWorld.gameMode." + "fortress");
             newValues.add(CreateWorldScreen.Mode.DEBUG);

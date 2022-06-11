@@ -1,8 +1,8 @@
 package org.minefortress.mixins.interaction;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.world.GameMode;
+import org.minefortress.MineFortressMod;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +16,7 @@ public class FortressGameModeMixin {
     public void setAbilities(PlayerAbilities abilities, CallbackInfo ci) {
         GameMode currentGameMode = (GameMode) (Object) this;
 
-        if(currentGameMode == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+        if(currentGameMode == MineFortressMod.FORTRESS) {
             abilities.allowFlying = true;
             abilities.creativeMode = true;
             abilities.invulnerable = true;
@@ -25,7 +25,7 @@ public class FortressGameModeMixin {
 
     @Inject(method = "isCreative", at = @At("HEAD"), cancellable = true)
     public void isCreative(CallbackInfoReturnable<Boolean> cir) {
-        if((Object) this == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+        if((Object) this == MineFortressMod.FORTRESS) {
             cir.setReturnValue(true);
         }
     }

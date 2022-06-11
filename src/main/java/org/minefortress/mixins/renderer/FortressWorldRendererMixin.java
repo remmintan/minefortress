@@ -15,6 +15,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.GameMode;
+import org.minefortress.MineFortressMod;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.FortressRenderLayer;
@@ -79,7 +80,7 @@ public abstract class FortressWorldRendererMixin  {
         VertexConsumer vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
         if (!selectionManager.isSelecting()) {
             final GameMode currentGameMode = this.client.interactionManager.getCurrentGameMode();
-            if(currentGameMode == ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) {
+            if(currentGameMode == MineFortressMod.FORTRESS) {
                 final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
                 final HitResult crosshairTarget = client.crosshairTarget;
                 if(crosshairTarget instanceof BlockHitResult bhr) {

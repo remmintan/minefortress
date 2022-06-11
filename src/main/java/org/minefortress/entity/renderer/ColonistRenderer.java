@@ -24,6 +24,7 @@ import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -70,8 +71,7 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
                 .map(ClientPlayerInteractionManager::getCurrentGameMode)
                 .orElse(GameMode.DEFAULT);
 
-        final GameMode fortress = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
-        if(currentGamemode == fortress) {
+        if(currentGamemode == MineFortressMod.FORTRESS) {
             final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == colonist;
             final var fightSelecting = getFortressClientManager().getFightManager().getSelectionManager().isSelected(colonist);
             final boolean selecting = getFortressClientManager().getSelectedColonist() == colonist;

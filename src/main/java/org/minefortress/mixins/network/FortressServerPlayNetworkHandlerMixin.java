@@ -22,6 +22,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.MineFortressMod;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.registries.FortressEntities;
@@ -71,7 +72,7 @@ public class FortressServerPlayNetworkHandlerMixin {
     @Redirect(method = "onPlayerInteractEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;squaredDistanceTo(Lnet/minecraft/entity/Entity;)D"))
     public double playerInteractEntitySquareDistance(ServerPlayerEntity instance, Entity entity) {
         final double realDistance = instance.squaredDistanceTo(entity);
-        if(instance.interactionManager.getGameMode() != ClassTinkerers.getEnum(GameMode.class, "FORTRESS")) return realDistance;
+        if(instance.interactionManager.getGameMode() != MineFortressMod.FORTRESS) return realDistance;
         if(Math.sqrt(realDistance) < PICK_DISTANCE) return 1;
         return realDistance;
     }
