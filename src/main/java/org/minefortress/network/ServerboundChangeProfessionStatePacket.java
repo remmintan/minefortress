@@ -30,8 +30,7 @@ public class ServerboundChangeProfessionStatePacket implements FortressServerPac
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final FortressServerPlayerEntity fortressPlayer = (FortressServerPlayerEntity) player;
-        final ServerProfessionManager manager = fortressPlayer.getFortressServerManager().getServerProfessionManager();
+        final ServerProfessionManager manager = this.getFortressServerManager(server, player).getServerProfessionManager();
         if (amountChange == AmountChange.ADD) {
             manager.increaseAmount(professionId);
         } else {

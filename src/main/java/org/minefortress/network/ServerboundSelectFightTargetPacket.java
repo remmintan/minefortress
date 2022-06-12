@@ -52,14 +52,12 @@ public class ServerboundSelectFightTargetPacket implements FortressServerPacket 
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        if(player instanceof FortressServerPlayerEntity fortressPlayer) {
-            final var fightManager = fortressPlayer.getFortressServerManager().getServerFightManager();
-            if(targetType == TargetType.MOVE) {
-                fightManager.setMoveTarget(pos);
-            } else if(targetType == TargetType.ATTACK) {
-                final var entityById = (LivingEntity)player.world.getEntityById(entityId);
-                fightManager.setAttackTarget(entityById);
-            }
+        final var fightManager = this.getFortressServerManager(server, player).getServerFightManager();
+        if(targetType == TargetType.MOVE) {
+            fightManager.setMoveTarget(pos);
+        } else if(targetType == TargetType.ATTACK) {
+            final var entityById = (LivingEntity)player.world.getEntityById(entityId);
+            fightManager.setAttackTarget(entityById);
         }
     }
 

@@ -143,8 +143,4 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         }
     }
 
-    @Override
-    public TaskManager getTaskManager() {
-        return this.taskManager;
-    }
 }

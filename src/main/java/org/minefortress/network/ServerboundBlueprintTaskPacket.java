@@ -7,6 +7,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -59,12 +60,13 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         if(player instanceof final FortressServerPlayerEntity fortressServerPlayer) {
+            final var fortressServerManager = this.getFortressServerManager(server, player);
             final ServerBlueprintManager blueprintManager = fortressServerPlayer.getServerBlueprintManager();
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation, floorLevel);
 
             if (player instanceof FortressServerPlayerEntity fortressPlayer) {
-                if(fortressPlayer.getFortressServerManager().isSurvival()) {
-                    final var serverResourceManager = fortressPlayer.getFortressServerManager().getServerResourceManager();
+                if(fortressServerManager.isSurvival()) {
+                    final var serverResourceManager = fortressServerManager.getServerResourceManager();
                     final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintFile, rotation).getStacks();
                     try {
                         serverResourceManager.reserveItems(taskId, stacks);
@@ -74,12 +76,12 @@ public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
                         return;
                     }
                 }
-                Runnable executeBuildTask = () -> fortressPlayer.getTaskManager().addTask(task, fortressPlayer.getFortressServerManager());
+                Runnable executeBuildTask = () -> fortressServerManager.getTaskManager().addTask(task, fortressServerManager);
                 if (floorLevel > 0) {
                     final SimpleSelectionTask digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintFile, rotation);
                     digTask.addFinishListener(executeBuildTask);
 
-                    fortressPlayer.getTaskManager().addTask(digTask, fortressPlayer.getFortressServerManager());
+                    fortressServerManager.getTaskManager().addTask(digTask, fortressServerManager);
                 } else {
                     executeBuildTask.run();
                 }

@@ -113,6 +113,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         return serverResourceManager;
     }
 
+    public TaskManager getTaskManager() {
+        return taskManager;
+    }
+
     public void tick(@Nullable ServerPlayerEntity player) {
         taskManager.tick(this, getWorld());
         tickFortress(player);

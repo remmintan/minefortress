@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
+import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSimpleInventory;
 import org.minefortress.network.ServerboundScrollCurrentScreenPacket;
@@ -136,8 +137,8 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     @Override
     public void close(PlayerEntity player) {
         super.close(player);
-        if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
-            final var fortressServerManager = fortressServerPlayer.getFortressServerManager();
+        if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof FortressServer fortressServer) {
+            final var fortressServerManager = fortressServer.getFortressModServerManager().getByPlayer(serverPlayer);
             final var serverResourceManager = fortressServerManager.getServerResourceManager();
 
             returnInputs();

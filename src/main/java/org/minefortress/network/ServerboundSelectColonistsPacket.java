@@ -3,6 +3,7 @@ package org.minefortress.network;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
 
@@ -35,9 +36,7 @@ public class ServerboundSelectColonistsPacket implements FortressServerPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        if(player instanceof FortressServerPlayerEntity fortressPlayer) {
-            final var fortressServerManager = fortressPlayer.getFortressServerManager();
-            fortressServerManager.selectColonists(colonistIds);
-        }
+        final var fortressServerManager = this.getFortressServerManager(server, player);
+        fortressServerManager.selectColonists(colonistIds);
     }
 }

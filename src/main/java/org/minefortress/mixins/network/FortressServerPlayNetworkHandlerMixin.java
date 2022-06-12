@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -24,8 +25,10 @@ import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.registries.FortressEntities;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -42,6 +45,8 @@ public class FortressServerPlayNetworkHandlerMixin {
     @Shadow public ServerPlayerEntity player;
 
     @Shadow private @Nullable Vec3d requestedTeleportPos;
+
+    @Shadow @Final private MinecraftServer server;
 
     @Inject(method = "onPlayerInteractBlock", at = @At(value = "INVOKE", target="Lnet/minecraft/server/network/ServerPlayerEntity;updateLastActionTime()V", shift = At.Shift.AFTER), cancellable = true)
     public void onPlayerInteractBlock(PlayerInteractBlockC2SPacket packet, CallbackInfo ci) {
@@ -90,17 +95,17 @@ public class FortressServerPlayNetworkHandlerMixin {
         if(stack.getItem() instanceof SpawnEggItem eggItem) {
             if(eggItem.getEntityType(stack.getNbt()) != FortressEntities.COLONIST_ENTITY_TYPE) return;
             if(stack.getNbt() == null) stack.setNbt(new NbtCompound());
-            if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
-                final NbtCompound nbt = stack.getNbt();
-                nbt.putUuid("fortressUUID", fortressServerPlayer.getFortressUuid());
 
-                final FortressServerManager fortressManager = fortressServerPlayer.getFortressServerManager();
-                final BlockPos fortressCenter = fortressManager.getFortressCenter();
-                if(fortressCenter != null) {
-                    nbt.putInt("centerX", fortressCenter.getX());
-                    nbt.putInt("centerY", fortressCenter.getY());
-                    nbt.putInt("centerZ", fortressCenter.getZ());
-                }
+            final var fortressServer = (FortressServer) this.server;
+            final var fortressManager = fortressServer.getFortressModServerManager().getByPlayer(player);
+
+            final NbtCompound nbt = stack.getNbt();
+            nbt.putUuid("fortressUUID", fortressManager.getId());
+            final BlockPos fortressCenter = fortressManager.getFortressCenter();
+            if(fortressCenter != null) {
+                nbt.putInt("centerX", fortressCenter.getX());
+                nbt.putInt("centerY", fortressCenter.getY());
+                nbt.putInt("centerZ", fortressCenter.getZ());
             }
         }
     }

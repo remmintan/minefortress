@@ -1,32 +1,25 @@
 package org.minefortress.mixins.entity;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.tag.ItemTags;
-import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.world.BlueprintsWorld;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.interfaces.FortressServer;
 import org.minefortress.professions.ServerProfessionManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.minefortress.professions.ProfessionManager.FISHERMAN_ITEMS;
 import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
@@ -63,9 +56,9 @@ public abstract class FortressItemEntityMixin extends Entity {
         if(!this.world.isClient) {
             final var closestPlayer = this.world.getClosestPlayer(this, 100.0D);
             if(closestPlayer != null) {
-                final var fortressServerPlayer = (FortressServerPlayerEntity) closestPlayer;
-                if(fortressServerPlayer.isFortressSurvival()) {
-                    final var fortressServerManager = fortressServerPlayer.getFortressServerManager();
+                final var fortressServer = (FortressServer) closestPlayer.getServer();
+                final var fortressServerManager = fortressServer.getFortressModServerManager().getByPlayer((ServerPlayerEntity) closestPlayer);
+                if(fortressServerManager.isSurvival()) {
                     final var resourceManager = fortressServerManager.getServerResourceManager();
                     final var stack = this.getStack();
                     final var item = stack.getItem();

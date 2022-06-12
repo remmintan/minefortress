@@ -27,8 +27,7 @@ public class ServerboundFortressCenterSetPacket implements FortressServerPacket 
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final FortressServerPlayerEntity fortressPlayer = (FortressServerPlayerEntity) player;
-        final FortressServerManager fortressServerManager = fortressPlayer.getFortressServerManager();
+        final var fortressServerManager = this.getFortressServerManager(server, player);
         fortressServerManager.setupCenter(pos, player.world, player);
     }
 }

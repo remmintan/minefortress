@@ -49,9 +49,8 @@ public class ServerboundRoadsTaskPacket implements FortressServerPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressPlayer = (FortressServerPlayerEntity) player;
-        final var taskManager = fortressPlayer.getTaskManager();
-        final var fortressServerManager = fortressPlayer.getFortressServerManager();
+        final var fortressServerManager = this.getFortressServerManager(server, player);
+        final var taskManager = fortressServerManager.getTaskManager();
         final var serverResourceManager = fortressServerManager.getServerResourceManager();
         final var itemInHand = player.getStackInHand(Hand.MAIN_HAND);
         final var item = itemInHand.getItem();
