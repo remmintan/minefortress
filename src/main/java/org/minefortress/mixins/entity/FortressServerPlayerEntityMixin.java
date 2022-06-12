@@ -49,7 +49,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Shadow @Final public ServerPlayerInteractionManager interactionManager;
     @Shadow @Final public MinecraftServer server;
     private ServerBlueprintManager serverBlueprintManager;
-    private final TaskManager taskManager = new TaskManager();
 
     public FortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
@@ -63,7 +62,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Inject(method="tick", at=@At("TAIL"))
     public void tick(CallbackInfo ci) {
         serverBlueprintManager.tick((ServerPlayerEntity)(Object)this);
-        taskManager.tick(fortressServerManager, (ServerWorld) world);
     }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))

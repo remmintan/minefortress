@@ -35,6 +35,7 @@ import org.minefortress.network.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.professions.ServerProfessionManager;
+import org.minefortress.tasks.TaskManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,6 +56,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final ServerProfessionManager serverProfessionManager;
     private final ServerResourceManager serverResourceManager = new ServerResourceManagerImpl();
     private final ServerFightManager serverFightManager = new ServerFightManager();
+    private final TaskManager taskManager = new TaskManager();
     
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
 
@@ -112,6 +114,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void tick(@Nullable ServerPlayerEntity player) {
+        taskManager.tick(this, getWorld());
         tickFortress(player);
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);

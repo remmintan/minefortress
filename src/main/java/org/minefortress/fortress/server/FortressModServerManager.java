@@ -14,32 +14,31 @@ import java.util.UUID;
 
 public class FortressModServerManager {
 
-    private static final String MANAGERS_FILE_NAME = "managers.nbt";
+    private static final String MANAGERS_FILE_NAME = "serverManagers.nbt";
     private final MinecraftServer server;
-
-    private Map<UUID, FortressServerManager> managers = new HashMap<>();
+    private final Map<UUID, FortressServerManager> serverManagers = new HashMap<>();
 
     public FortressModServerManager(MinecraftServer server) {
         this.server = server;
     }
 
     public FortressServerManager getByPlayer(ServerPlayerEntity player) {
-        return managers.computeIfAbsent(player.getUuid(), (it) -> new FortressServerManager(server));
+        return serverManagers.computeIfAbsent(player.getUuid(), (it) -> new FortressServerManager(server));
     }
 
     public FortressServerManager getByFortressId(UUID uuid) {
-        for(FortressServerManager manager : managers.values()) {
+        for(FortressServerManager manager : serverManagers.values()) {
             if(manager.getId().equals(uuid)) {
                 return manager;
             }
         }
         LogManager.getLogger().warn("Can't find fortress with id " + uuid + " creating new one");
-        return managers.put(UUID.randomUUID(), new FortressServerManager(server));
+        return serverManagers.put(UUID.randomUUID(), new FortressServerManager(server));
     }
 
     public void save() {
         final var nbt = new NbtCompound();
-        for (Map.Entry<UUID, FortressServerManager> entry : managers.entrySet()) {
+        for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
             final var fortressNbt = new NbtCompound();
             final var id = entry.getKey();
             final var manager = entry.getValue();
@@ -51,7 +50,7 @@ public class FortressModServerManager {
     }
 
     public void tick(PlayerManager playerManager) {
-        for (Map.Entry<UUID, FortressServerManager> entry : managers.entrySet()) {
+        for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
             final var playerId = entry.getKey();
             final var manager = entry.getValue();
             final var player = playerManager.getPlayer(playerId);
@@ -64,7 +63,7 @@ public class FortressModServerManager {
             final var managerNbt = nbtCompound.getCompound(key);
             final var manager = new FortressServerManager(server);
             manager.readFromNbt(managerNbt);
-            managers.put(UUID.fromString(key), manager);
+            serverManagers.put(UUID.fromString(key), manager);
         }
     }
 
