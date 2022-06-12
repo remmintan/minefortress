@@ -245,7 +245,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
         }
 
         void sync(ServerPlayerEntity player) {
-            if(infosToSync.isEmpty() && !needReset) return;
+            if(player == null || (infosToSync.isEmpty() && !needReset)) return;
             final var packet = new ClientboundSyncItemsPacket(infosToSync, needReset);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESOURCES_SYNC, packet);
             infosToSync.clear();

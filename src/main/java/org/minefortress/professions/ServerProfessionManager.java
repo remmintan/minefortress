@@ -2,6 +2,7 @@ package org.minefortress.professions;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
@@ -49,7 +50,7 @@ public class ServerProfessionManager extends ProfessionManager{
         scheduleSync();
     }
 
-    public void tick(ServerPlayerEntity player) {
+    public void tick(@Nullable ServerPlayerEntity player) {
         for(Profession prof : professions.values()) {
             if(prof.getAmount() > 0) {
                 final boolean unlocked = this.isRequirementsFulfilled(prof);
@@ -61,7 +62,7 @@ public class ServerProfessionManager extends ProfessionManager{
         }
 
         tickRemoveFromProfession();
-        if(needsUpdate) {
+        if(player != null && needsUpdate) {
             ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(this.professions);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             needsUpdate = false;

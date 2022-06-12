@@ -1,6 +1,7 @@
 package org.minefortress.fortress.server;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.logging.log4j.LogManager;
@@ -13,12 +14,17 @@ import java.util.UUID;
 
 public class FortressModServerManager {
 
-    private final String MANAGERS_FILE_NAME = "managers.nbt";
+    private static final String MANAGERS_FILE_NAME = "managers.nbt";
+    private final MinecraftServer server;
 
     private Map<UUID, FortressServerManager> managers = new HashMap<>();
 
+    public FortressModServerManager(MinecraftServer server) {
+        this.server = server;
+    }
+
     public FortressServerManager getByPlayer(ServerPlayerEntity player) {
-        return managers.computeIfAbsent(player.getUuid(), (it) -> new FortressServerManager());
+        return managers.computeIfAbsent(player.getUuid(), (it) -> new FortressServerManager(server));
     }
 
     public FortressServerManager getByFortressId(UUID uuid) {
@@ -28,7 +34,7 @@ public class FortressModServerManager {
             }
         }
         LogManager.getLogger().warn("Can't find fortress with id " + uuid + " creating new one");
-        return managers.put(UUID.randomUUID(), new FortressServerManager());
+        return managers.put(UUID.randomUUID(), new FortressServerManager(server));
     }
 
     public void save() {
@@ -56,7 +62,7 @@ public class FortressModServerManager {
         final var nbtCompound = FortressModDataLoader.getInstance().readNbt(MANAGERS_FILE_NAME);
         for (String key : nbtCompound.getKeys()) {
             final var managerNbt = nbtCompound.getCompound(key);
-            final var manager = new FortressServerManager();
+            final var manager = new FortressServerManager(server);
             manager.readFromNbt(managerNbt);
             managers.put(UUID.fromString(key), manager);
         }

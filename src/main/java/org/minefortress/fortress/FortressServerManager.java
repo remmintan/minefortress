@@ -9,6 +9,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
@@ -18,6 +19,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fight.ServerFightManager;
@@ -41,23 +43,20 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private static final BlockState DEFAULT_STATE_ABOVE_CAMPFIRE = Blocks.BARRIER.getDefaultState();
     private static final int DEFAULT_COLONIST_COUNT = 5;
-
-    private boolean needSync = true;
-    private boolean needSyncBuildings = true;
-    private boolean needSyncSpecialBlocks = true;
-    private boolean needSyncCombat = true;
-
-    private BlockPos fortressCenter = null;
+    
+    private final MinecraftServer server;
+    
     private final Set<Colonist> colonists = new HashSet<>();
     private final Set<FortressBuilding> buildings = new HashSet<>();
 
     private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
     private final Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
-
-    private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
+    
     private final ServerProfessionManager serverProfessionManager;
     private final ServerResourceManager serverResourceManager = new ServerResourceManagerImpl();
     private final ServerFightManager serverFightManager = new ServerFightManager();
+    
+    private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
 
     private int maxX = Integer.MIN_VALUE;
     private int maxZ = Integer.MIN_VALUE;
@@ -71,7 +70,15 @@ public final class FortressServerManager extends AbstractFortressManager {
     private boolean combatMode;
     private boolean villageUnderAttack;
 
-    public FortressServerManager() {
+    private boolean needSync = true;
+    private boolean needSyncBuildings = true;
+    private boolean needSyncSpecialBlocks = true;
+    private boolean needSyncCombat = true;
+
+    private BlockPos fortressCenter = null;
+
+    public FortressServerManager(MinecraftServer server) {
+        this.server = server;
         serverProfessionManager = new ServerProfessionManager(() -> this);
     }
 
@@ -104,12 +111,12 @@ public final class FortressServerManager extends AbstractFortressManager {
         return serverResourceManager;
     }
 
-    public void tick(ServerPlayerEntity player) {
-        tickFortress(player, player.world);
+    public void tick(@Nullable ServerPlayerEntity player) {
+        tickFortress(player);
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
         serverFightManager.tick();
-        if(!needSync) return;
+        if(!needSync || player == null) return;
         final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
@@ -146,7 +153,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Optional.of(allBeds.get(random.nextInt(allBeds.size())));
     }
 
-    public void tickFortress(ServerPlayerEntity player, World world) {
+    public void tickFortress(@Nullable ServerPlayerEntity player) {
         final List<Colonist> deadColonists = colonists.stream()
                 .filter(colonist -> !colonist.isAlive())
                 .collect(Collectors.toList());
@@ -164,12 +171,12 @@ public final class FortressServerManager extends AbstractFortressManager {
             building.tick();
         }
 
-        if(!(specialBlocks.isEmpty() || blueprintsSpecialBlocks.isEmpty())  && world != null && world.getDimension() == FortressDimensionTypeMixin.getOverworld()) {
+        if(!(specialBlocks.isEmpty() || blueprintsSpecialBlocks.isEmpty())  && getWorld() != null && getWorld().getDimension() == FortressDimensionTypeMixin.getOverworld()) {
             boolean needSync = false;
             for(var entry : new HashSet<>(specialBlocks.entrySet())) {
                 final var block = entry.getKey();
                 final var positions = entry.getValue();
-                needSync = needSync || positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
+                needSync = needSync || positions.removeIf(pos -> getWorld().getBlockState(pos).getBlock() != block);
                 if (positions.isEmpty()) {
                     specialBlocks.remove(block);
                 }
@@ -177,7 +184,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             for (var entry : new HashSet<>(blueprintsSpecialBlocks.entrySet())) {
                 final var block = entry.getKey();
                 final var positions = entry.getValue();
-                needSync = needSync || positions.removeIf(pos -> world.getBlockState(pos).getBlock() != block);
+                needSync = needSync || positions.removeIf(pos -> getWorld().getBlockState(pos).getBlock() != block);
                 if (positions.isEmpty()) {
                     blueprintsSpecialBlocks.remove(block);
                 }
@@ -188,24 +195,26 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         if(this.fortressCenter != null) {
-            final BlockState blockState = world.getBlockState(this.fortressCenter);
+            final BlockState blockState = getWorld().getBlockState(this.fortressCenter);
             if(blockState != Blocks.CAMPFIRE.getDefaultState()) {
-                world.setBlockState(fortressCenter, getStateForCampCenter(), 3);
-                world.emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
+                getWorld().setBlockState(fortressCenter, getStateForCampCenter(), 3);
+                if(player != null)
+                    getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
             }
             final BlockPos aboveTheCenter = this.fortressCenter.up();
-            final BlockState blockStateAbove = world.getBlockState(aboveTheCenter);
+            final BlockState blockStateAbove = getWorld().getBlockState(aboveTheCenter);
             if(blockStateAbove != DEFAULT_STATE_ABOVE_CAMPFIRE) {
-                world.setBlockState(aboveTheCenter, DEFAULT_STATE_ABOVE_CAMPFIRE, 3);
-                world.emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
+                getWorld().setBlockState(aboveTheCenter, DEFAULT_STATE_ABOVE_CAMPFIRE, 3);
+                if(player != null)
+                    getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
             }
 
-            if(world.getTime() % 100 == 0  && world.random.nextInt(100) > 85) {
+            if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) > 85) {
                 final var colonistsCount = this.colonists.size();
                 final var bedsCount = buildings.stream().map(FortressBuilding::getBedsCount).reduce(0, Integer::sum);
                 if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
-                    final var colonistOpt = spawnPawnNearCampfire(player, world);
-                    if(colonistOpt.isPresent()) {
+                    final var colonistOpt = spawnPawnNearCampfire();
+                    if(player != null && colonistOpt.isPresent()) {
                         final var colonist = colonistOpt.get();
                         player.sendMessage(new LiteralText(colonist.getName().asString()+" appeared in the village."), false);
                     }
@@ -214,12 +223,13 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
     }
 
-    private Optional<Colonist> spawnPawnNearCampfire(ServerPlayerEntity player, World world) {
+    private Optional<Colonist> spawnPawnNearCampfire() {
+        final var world = getWorld();
         final var randomSpawnPosition = getRandomSpawnPosition(world);
         if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
-            final var tag = getColonistInfoTag((FortressServerPlayerEntity) player);
+            final var tag = getColonistInfoTag();
             EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
-            final var spawnedPawn = (Colonist)colonistType.spawn((ServerWorld) world, tag, null, player, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+            final var spawnedPawn = (Colonist)colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
             return Optional.ofNullable(spawnedPawn);
         }
         return Optional.empty();
@@ -232,8 +242,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(!(world instanceof ServerWorld))
             throw new IllegalArgumentException("World must be a server world");
 
-        world.setBlockState(fortressCenter, getStateForCampCenter(), 3);
-        world.emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
+        getWorld().setBlockState(fortressCenter, getStateForCampCenter(), 3);
+        getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
 
         if(minX > this.fortressCenter.getX()-10) minX = this.fortressCenter.getX()-10;
         if(minZ > this.fortressCenter.getZ()-10) minZ = this.fortressCenter.getZ()-10;
@@ -241,15 +251,15 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(maxZ < this.fortressCenter.getZ()+10) maxZ = this.fortressCenter.getZ()+10;
 
         for (int i = 0; i < 5; i++) {
-            spawnPawnNearCampfire(player, world);
+            spawnPawnNearCampfire();
         }
 
         this.scheduleSync();
     }
 
-    private NbtCompound getColonistInfoTag(FortressServerPlayerEntity player) {
+    private NbtCompound getColonistInfoTag() {
         final NbtCompound nbtCompound = new NbtCompound();
-        nbtCompound.putUuid("fortressUUID", player.getFortressUuid());
+        nbtCompound.putUuid("fortressUUID", id);
         nbtCompound.putInt("centerX", this.fortressCenter.getX());
         nbtCompound.putInt("centerY", this.fortressCenter.getY());
         nbtCompound.putInt("centerZ", this.fortressCenter.getZ());
@@ -258,9 +268,9 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     private BlockPos getRandomSpawnPosition(World world) {
-        final var spawnX = fortressCenter.getX() + world.random.nextInt(10) - 5;
-        final var spawnZ = fortressCenter.getZ() + world.random.nextInt(10) - 5;
-        final var spawnY = world.getTopY(Heightmap.Type.WORLD_SURFACE, spawnX, spawnZ);
+        final var spawnX = fortressCenter.getX() + getWorld().random.nextInt(10) - 5;
+        final var spawnZ = fortressCenter.getZ() + getWorld().random.nextInt(10) - 5;
+        final var spawnY = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, spawnX, spawnZ);
 
         return new BlockPos(spawnX, spawnY, spawnZ);
     }
@@ -451,13 +461,13 @@ public final class FortressServerManager extends AbstractFortressManager {
         BlockPos fortressPos;
         boolean isFluid, isFluidAbove;
         do {
-            int x = world.random.nextInt(maxX - minX) + minX;
-            int z = world.random.nextInt(maxZ - minZ) + minZ;
-            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
+            int x = getWorld().random.nextInt(maxX - minX) + minX;
+            int z = getWorld().random.nextInt(maxZ - minZ) + minZ;
+            int y = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
 
             fortressPos = new BlockPos(x, y, z);
-            isFluid = world.getBlockState(fortressPos).isOf(Blocks.WATER);
-            isFluidAbove = world.getBlockState(fortressPos.down()).isOf(Blocks.WATER);
+            isFluid = getWorld().getBlockState(fortressPos).isOf(Blocks.WATER);
+            isFluidAbove = getWorld().getBlockState(fortressPos.down()).isOf(Blocks.WATER);
             tires++;
         }while((isFluid || isFluidAbove) && tires < 10);
 
@@ -586,5 +596,9 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public UUID getId() {
         return id;
+    }
+
+    private ServerWorld getWorld() {
+        return this.server.getWorld(World.OVERWORLD);
     }
 }

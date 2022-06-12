@@ -48,7 +48,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Shadow @Final public ServerPlayerInteractionManager interactionManager;
     @Shadow @Final public MinecraftServer server;
-    private FortressServerManager fortressServerManager;
     private ServerBlueprintManager serverBlueprintManager;
     private final TaskManager taskManager = new TaskManager();
 
@@ -58,13 +57,11 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method="<init>", at=@At("RETURN"))
     public void init(MinecraftServer server, ServerWorld world, GameProfile profile, CallbackInfo ci) {
-        fortressServerManager = new FortressServerManager();
         serverBlueprintManager = new ServerBlueprintManager(server);
     }
 
     @Inject(method="tick", at=@At("TAIL"))
     public void tick(CallbackInfo ci) {
-        fortressServerManager.tick((ServerPlayerEntity)(Object)this);
         serverBlueprintManager.tick((ServerPlayerEntity)(Object)this);
         taskManager.tick(fortressServerManager, (ServerWorld) world);
     }
@@ -72,10 +69,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
         nbt.putUuid("fortressUuid", fortressUUID);
-        final NbtCompound fortressManagerTag = new NbtCompound();
-        fortressServerManager.writeToNbt(fortressManagerTag);
-        nbt.put("FortressManager", fortressManagerTag);
-
         serverBlueprintManager.writeToNbt(nbt);
     }
 
@@ -83,10 +76,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if(nbt.contains("fortressUuid")) {
             fortressUUID = nbt.getUuid("fortressUuid");
-        }
-        if(nbt.contains("FortressManager")) {
-            final NbtCompound fortressManagerTag = nbt.getCompound("FortressManager");
-            fortressServerManager.readFromNbt(fortressManagerTag);
         }
         serverBlueprintManager.readFromNbt(nbt);
     }
@@ -118,7 +107,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Inject(method = "copyFrom", at = @At("TAIL"))
     public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         if(oldPlayer instanceof FortressServerPlayerEntity fortressServerPlayer) {
-            this.fortressServerManager = fortressServerPlayer.getFortressServerManager();
             this.serverBlueprintManager = fortressServerPlayer.getServerBlueprintManager();
         }
     }
@@ -163,11 +151,5 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Override
     public TaskManager getTaskManager() {
         return this.taskManager;
-    }
-
-    @Override
-    public boolean isFortressSurvival() {
-        return interactionManager != null && interactionManager.getGameMode() == MineFortressMod.FORTRESS &&
-                fortressServerManager.isSurvival();
     }
 }
