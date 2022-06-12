@@ -13,11 +13,11 @@
     "interaction.FortressGameModeMixin",
     "renderer.gui.FortressCreativeInventoryScreenMixin",
     "renderer.gui.FortressSimpleInventoryMixin",
-    "entity.player.FortressPlayerInventoryMixin",
     "entity.FortressItemEntityMixin",
     "entity.FurnaceBlockEntityMixin"
   ],
   "client": [
+    "entity.player.FortressPlayerInventoryMixin",
     "FortressMinecraftClientMixin",
     "network.FortressClientPlayNetworkHandlerMixin",
     "renderer.FortressFluidRendererMixin",
