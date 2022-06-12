@@ -28,6 +28,7 @@ import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
+import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.interfaces.FortressServer;
 
 import java.io.File;
@@ -38,8 +39,7 @@ import java.util.function.BooleanSupplier;
 
 public class BlueprintsWorld {
 
-    private static final String MOD_DIR = "minefortress";
-    private static final String WORLD_DIR_PREFIX = "blueprints";
+
     private static final GameRules EDIT_BLUEPRINT_RULES = Util.make(new GameRules(), gameRules -> {
         gameRules.get(GameRules.DO_MOB_SPAWNING).set(false, null);
         gameRules.get(GameRules.DO_WEATHER_CYCLE).set(false, null);
@@ -101,14 +101,8 @@ public class BlueprintsWorld {
     private void create() {
         final Executor executor = Util.getMainWorkerExecutor();
         final DynamicRegistryManager dynamicRegistryManager = server.getRegistryManager();
-        final File runDirectory = MinecraftClient.getInstance().runDirectory;
 
-        final LevelStorage fortressLevelStorage = LevelStorage.create(runDirectory.toPath().resolve(MOD_DIR));
-        try {
-            fortressSession = fortressLevelStorage.createSession(WORLD_DIR_PREFIX+UUID.randomUUID());
-        }catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        this.fortressSession = FortressModDataLoader.getInstance().getBlueprintsWorldSession();
 
         final Registry<Biome> biomeRegistry = dynamicRegistryManager.get(Registry.BIOME_KEY);
         final Registry<DimensionType> dimensionTypeRegistry = dynamicRegistryManager.get(Registry.DIMENSION_TYPE_KEY);

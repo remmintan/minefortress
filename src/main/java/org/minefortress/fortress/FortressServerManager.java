@@ -32,7 +32,6 @@ import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.professions.ProfessionManager;
 import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.*;
@@ -66,6 +65,8 @@ public final class FortressServerManager extends AbstractFortressManager {
     private int minZ = Integer.MAX_VALUE;
 
     private FortressGamemode gamemode = FortressGamemode.NONE;
+
+    private UUID id = UUID.randomUUID();
 
     private boolean combatMode;
     private boolean villageUnderAttack;
@@ -288,6 +289,10 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void writeToNbt(NbtCompound tag) {
+        if(id != null) {
+            tag.putUuid("id", id);
+        }
+
         if(fortressCenter != null) {
             tag.putInt("centerX", fortressCenter.getX());
             tag.putInt("centerY", fortressCenter.getY());
@@ -351,6 +356,10 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void readFromNbt(NbtCompound tag) {
+        if(tag.contains("id")) {
+            this.id = tag.getUuid("id");
+        }
+
         final int centerX = tag.getInt("centerX");
         final int centerY = tag.getInt("centerY");
         final int centerZ = tag.getInt("centerZ");
@@ -573,5 +582,9 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public ServerFightManager getServerFightManager() {
         return serverFightManager;
+    }
+
+    public UUID getId() {
+        return id;
     }
 }
