@@ -10,11 +10,10 @@ import net.minecraft.util.UserCache;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
-import net.minecraft.world.SaveProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.minefortress.blueprints.world.BlueprintsWorld;
+import org.minefortress.fortress.server.FortressModServerManager;
 import org.minefortress.interfaces.FortressServer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +38,10 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
 
     @Shadow protected abstract boolean shouldKeepTicking();
 
+    @Shadow public abstract PlayerManager getPlayerManager();
+
     private BlueprintsWorld blueprintsWorld;
+    private FortressModServerManager fortressModServerManager;
     private int ticksMultiplier = 1;
 
     public FortressServerMixin(String string) {
@@ -49,6 +51,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     public void init(Thread serverThread, LevelStorage.Session session, ResourcePackManager dataPackManager, SaveLoader saveLoader, Proxy proxy, DataFixer dataFixer, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepo, UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory, CallbackInfo ci) {
         blueprintsWorld = new BlueprintsWorld((MinecraftServer) (Object)this);
+        fortressModServerManager = new FortressModServerManager((MinecraftServer)(Object)this);
     }
 
     @Redirect(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick(Ljava/util/function/BooleanSupplier;)V"))
@@ -68,6 +71,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
         if(ticksMultiplier > 0) {
             instance.tick(shouldKeepTicking);
         }
+        fortressModServerManager.tick(getPlayerManager());
     }
 
     @Inject(method = "tickWorlds", at = @At(value="INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", ordinal = 1, shift = At.Shift.BEFORE))
@@ -119,5 +123,10 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     public void setTicksMultiplier(int multiplier) {
         final int mul = Math.max(0, multiplier);
         this.ticksMultiplier = mul>1? mul * 32:mul;
+    }
+
+    @Override
+    public FortressModServerManager getFortressModServerManager() {
+        return fortressModServerManager;
     }
 }
