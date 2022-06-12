@@ -10,6 +10,7 @@ import org.minefortress.fortress.FortressServerManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FortressModServerManager {
@@ -34,6 +35,15 @@ public class FortressModServerManager {
         }
         LogManager.getLogger().warn("Can't find fortress with id " + uuid + " creating new one");
         return serverManagers.put(UUID.randomUUID(), new FortressServerManager(server));
+    }
+
+    public Optional<ServerPlayerEntity> getPlayerByFortressId(UUID fortressId) {
+        for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
+            if (entry.getValue().getId().equals(fortressId)) {
+                return Optional.ofNullable(server.getPlayerManager().getPlayer(entry.getKey()));
+            }
+        }
+        return Optional.empty();
     }
 
     public void save() {

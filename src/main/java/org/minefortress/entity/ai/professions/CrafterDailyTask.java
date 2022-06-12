@@ -65,14 +65,7 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
     }
 
     private boolean craftingTableMenuOpened(Colonist colonsit) {
-        final var masterPlayerOpt = colonsit.getMasterPlayer();
-        if(masterPlayerOpt.isEmpty()) return false;
-        final var masterPlayer = masterPlayerOpt.get();
-        if (masterPlayer instanceof ServerPlayerEntity serverPlayer) {
-            final var currentScreenHandler = serverPlayer.currentScreenHandler;
-            return currentScreenHandler instanceof FortressCraftingScreenHandler;
-        }
-        return false;
+        return colonsit.isScreenOpen(FortressCraftingScreenHandler.class);
     }
 
 }

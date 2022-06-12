@@ -52,9 +52,7 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     }
 
     private boolean atLeastOneFurnaceIsBurning(Colonist colonist){
-        final Optional<FortressServerManager> fortressManagerOpt = colonist.getFortressServerManager();
-        if(fortressManagerOpt.isEmpty()) return false;
-        final FortressServerManager fortressManager = fortressManagerOpt.get();
+        final FortressServerManager fortressManager = colonist.getFortressServerManager();
         final var furnaces = fortressManager.getSpecialBlocksByType(Blocks.FURNACE, true);
         for(BlockPos pos : furnaces){
             final var furnace = colonist.world.getBlockEntity(pos);
@@ -66,11 +64,6 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     }
 
     private boolean furnaceScreenIsOpen(Colonist colonist){
-        final var masterPlayerOpt = colonist.getMasterPlayer();
-        if(masterPlayerOpt.isEmpty()) return false;
-        final var masterPlayer = masterPlayerOpt.get();
-        if(!(masterPlayer instanceof ServerPlayerEntity serverPlayer)) return false;
-        final var currentScreenHandler = serverPlayer.currentScreenHandler;
-        return currentScreenHandler instanceof FortressFurnaceScreenHandler;
+        return colonist.isScreenOpen(FortressFurnaceScreenHandler.class);
     }
 }

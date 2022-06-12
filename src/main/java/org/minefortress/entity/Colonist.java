@@ -26,6 +26,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -47,6 +48,7 @@ import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.server.FortressModServerManager;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
@@ -335,20 +337,31 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         }
     }
 
+    public void sendMessageToMasterPlayer(String message) {
+        final Optional<ServerPlayerEntity> player = getMasterPlayer();
+        player.ifPresent(p -> p.sendMessage(new LiteralText(message), false));
+    }
+
+    public boolean isScreenOpen(Class<? extends ScreenHandler> screenHandlerClass) {
+        return getMasterPlayer()
+                .map(it -> it.currentScreenHandler)
+                .map(screenHandlerClass::isInstance)
+                .orElse(false);
+    }
+
     private void sendHungerMessage() {
-        final var masterPlayerOpt = this.getMasterPlayer();
-        if(masterPlayerOpt.isPresent()) {
-            final var masterPlayer = masterPlayerOpt.get();
-            if(masterPlayer instanceof ServerPlayerEntity player) {
-                if(hungerManager.prevFoodLevel > 0 && this.hungerManager.getFoodLevel() <= 0) {
-                    player.sendMessage(new LiteralText(getName().asString() + "is starving! Do something!"), false);
-                } else if(this.hungerManager.prevFoodLevel >= 5 && this.hungerManager.foodLevel < 5) {
-                    player.sendMessage(new LiteralText(getName().asString() + " is very hungry! Bring some food to the village!"), false);
-                } else if(this.hungerManager.prevFoodLevel >= 10 && this.hungerManager.foodLevel < 10) {
-                    player.sendMessage(new LiteralText(getName().asString() + " is hungry. It's time to eat something!"), false);
-                }
-            }
+        if(hungerManager.prevFoodLevel > 0 && this.hungerManager.getFoodLevel() <= 0) {
+            sendMessageToMasterPlayer(getName().asString() + "is starving! Do something!");
+        } else if(this.hungerManager.prevFoodLevel >= 5 && this.hungerManager.foodLevel < 5) {
+            sendMessageToMasterPlayer(getName().asString() + " is very hungry! Bring some food to the village!");
+        } else if(this.hungerManager.prevFoodLevel >= 10 && this.hungerManager.foodLevel < 10) {
+            sendMessageToMasterPlayer(getName().asString() + " is hungry. It's time to eat something!");
         }
+    }
+
+    private Optional<ServerPlayerEntity> getMasterPlayer() {
+        if(fortressId == null) throw new IllegalStateException("Fortress ID is null");
+        return getFortressModServerManager().getPlayerByFortressId(fortressId);
     }
 
     private void tickProfessionCheck() {
@@ -540,9 +553,14 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     public FortressServerManager getFortressManager() {
         if(this.fortressId == null) throw new IllegalStateException("Fortress id is null");
+        final FortressModServerManager fortressModServerManager = getFortressModServerManager();
+        return fortressModServerManager.getByFortressId(fortressId);
+    }
+
+    private FortressModServerManager getFortressModServerManager() {
         final var server = super.getServer();
         if(!(server instanceof FortressServer fortressServer)) throw new IllegalStateException("FortressServerManager is only available on FortressServer");
-        return fortressServer.getFortressModServerManager().getByFortressId(fortressId);
+        return fortressServer.getFortressModServerManager();
     }
 
     public boolean isAllowToPlaceBlockFromFarAway() {

@@ -39,7 +39,7 @@ import java.util.UUID;
 @Mixin(ServerPlayerEntity.class)
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
 
-    private UUID fortressUUID = UUID.randomUUID();
+    private UUID fortressUUID = null;
 
     private Vec3d persistedPos;
     private Vec3d persistedVelocity;
@@ -66,7 +66,9 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
-        nbt.putUuid("fortressUuid", fortressUUID);
+        if(fortressUUID != null) {
+            nbt.putUuid("fortressUuid", fortressUUID);
+        }
         serverBlueprintManager.writeToNbt(nbt);
     }
 

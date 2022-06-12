@@ -26,7 +26,7 @@ public class FortressEscapeDangerGoal extends EscapeDangerGoal {
         final var it = colonist.getFortressServerManager();
         if(it.isCombatMode()) return;
         it.setCombatMode(true, true);
-        colonist.getMasterPlayer(p -> ((ServerPlayerEntity)p).sendMessage(new LiteralText("§a Village is under attack!  Defend it!§a"), false));
+        colonist.sendMessageToMasterPlayer("§a Village is under attack!  Defend it!§a");
         it.getServerFightManager().addScaryMob(this.colonist.getAttacker());
 
     }
