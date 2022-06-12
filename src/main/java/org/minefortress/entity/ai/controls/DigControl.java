@@ -65,21 +65,19 @@ public class DigControl extends PositionedActionControl {
         final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(g, blockState) : null;
         final var drop = Block.getDroppedStacks(blockState, w, g, blockEntity);
 
-        c.doActionOnMasterPlayer(p -> {
-            final var fortressServerManager = p.getFortressServerManager();
-            if(fortressServerManager.isSurvival()) {
-                final var serverResourceManager = fortressServerManager.getServerResourceManager();
-                for (ItemStack itemStack : drop) {
-                    final var item = itemStack.getItem();
-                    final var count = itemStack.getCount();
-                    serverResourceManager.increaseItemAmount(item, count);
-                }
+        final var fortressServerManager = c.getFortressServerManager();
+        if(fortressServerManager.isSurvival()) {
+            final var serverResourceManager = fortressServerManager.getServerResourceManager();
+            for (ItemStack itemStack : drop) {
+                final var item = itemStack.getItem();
+                final var count = itemStack.getCount();
+                serverResourceManager.increaseItemAmount(item, count);
             }
-        });
+        }
     }
 
     private void putProperItemInHand() {
-        final Boolean creative = colonist.getFortressManager().map(AbstractFortressManager::isCreative).orElse(false);
+        final var creative = colonist.getFortressManager().isCreative();
 
         final BlockState blockState = level.getBlockState(goal);
         Item item = null;
@@ -134,10 +132,7 @@ public class DigControl extends PositionedActionControl {
     }
 
     private float getDestroyProgress(BlockState p_60466_, Colonist p_60467_, StructureWorldAccess p_60468_, BlockPos p_60469_) {
-        final boolean creative = colonist
-                .getFortressManager()
-                .map(AbstractFortressManager::isCreative)
-                .orElse(false);
+        final boolean creative = colonist.getFortressServerManager().isCreative();
         if(creative) return 1.0f;
 
         float f = p_60466_.getHardness(p_60468_, p_60469_);

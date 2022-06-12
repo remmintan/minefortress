@@ -21,12 +21,12 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.HungerConstants;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -39,7 +39,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.ColonistNavigation;
 import org.minefortress.entity.ai.MovementHelper;
@@ -48,6 +47,7 @@ import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.professions.ServerProfessionManager;
@@ -55,7 +55,6 @@ import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.*;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 
 public class Colonist extends PassiveEntity implements RangedAttackMob {
 
@@ -76,12 +75,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private final MLGControl mlgControl;
     private final FightControl fightControl;
 
-    private UUID masterPlayerId;
+    private UUID fortressId;
     private BlockPos fortressCenter;
 
     private boolean allowToPlaceBlockFromFarAway = false;
     private final ColonistHungerManager hungerManager = new ColonistHungerManager();
-    private final Queue<Consumer<FortressServerPlayerEntity>> masterPlayerActionQueue = new ArrayDeque<>();
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
         super(entityType, world);
@@ -114,15 +112,14 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
-        this.masterPlayerId = entityNbt.getUuid("fortressUUID");
+        this.fortressId = entityNbt.getUuid("fortressUUID");
         int centerX = entityNbt.getInt("centerX");
         int centerY = entityNbt.getInt("centerY");
         int centerZ = entityNbt.getInt("centerZ");
         this.fortressCenter = new BlockPos(centerX, centerY, centerZ);
 
-        this.doActionOnMasterPlayer(player -> player.getFortressServerManager().addColonist(this));
-        this.doActionOnMasterPlayer(this::setCustomNameIfNeeded);
-
+        getFortressServerManager().addColonist(this);
+        this.setCustomNameIfNeeded();
 
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
@@ -138,42 +135,14 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return 1f;
     }
 
-    private void setCustomNameIfNeeded(FortressServerPlayerEntity player) {
+    private void setCustomNameIfNeeded() {
         if(!this.hasCustomName()) {
-            this.setCustomName(new LiteralText(player.getFortressServerManager().getNameGenerator().generateRandomName()));
+            this.setCustomName(new LiteralText(getFortressServerManager().getNameGenerator().generateRandomName()));
         }
     }
 
     public void addExhaustion(float exhaustion) {
         this.hungerManager.addExhaustion(exhaustion);
-    }
-
-    public void doActionOnMasterPlayer(Consumer<FortressServerPlayerEntity> playerConsumer) {
-        final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer();
-        if(masterPlayer.isPresent()) {
-            playerConsumer.accept(masterPlayer.get());
-        } else {
-            masterPlayerActionQueue.add(playerConsumer);
-        }
-    }
-
-    public Optional<FortressServerManager> getFortressManager() {
-        final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer();
-        return masterPlayer.map(FortressServerPlayerEntity::getFortressServerManager);
-    }
-
-    @NotNull
-    public Optional<FortressServerPlayerEntity> getMasterPlayer() {
-        final var server = getServer();
-        if(server == null || masterPlayerId == null) return Optional.empty();
-        return server
-                .getPlayerManager()
-                .getPlayerList()
-                .stream()
-                .filter(p -> p instanceof FortressServerPlayerEntity)
-                .map(p -> (FortressServerPlayerEntity) p)
-                .filter(p -> p.getFortressUuid().equals(masterPlayerId))
-                .findFirst();
     }
 
     public ColonistHungerManager getHungerManager() {
@@ -186,8 +155,8 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return super.eatFood(world, stack);
     }
 
-    public Optional<FortressServerManager> getFortressServerManager() {
-        return getMasterPlayer().map(FortressServerPlayerEntity::getFortressServerManager);
+    public FortressServerManager getFortressServerManager() {
+        return getFortressManager();
     }
 
     public BlockPos getFortressCenter() {
@@ -285,7 +254,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     @Override
     public boolean isInvulnerable() {
-        if(this.getFortressManager().map(AbstractFortressManager::isCreative).orElse(false))
+        if(getFortressServerManager().isCreative())
             return true;
         else
             return super.isInvulnerable();
@@ -293,7 +262,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        if(this.getFortressManager().map(AbstractFortressManager::isCreative).orElse(false)) {
+        if(getFortressServerManager().isCreative()) {
             return !damageSource.isOutOfWorld();
         } else {
             return super.isInvulnerableTo(damageSource);
@@ -357,14 +326,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     protected void mobTick() {
         super.mobTick();
         tickProfessionCheck();
-        if(!this.masterPlayerActionQueue.isEmpty()) {
-            final Optional<FortressServerPlayerEntity> masterPlayer = getMasterPlayer();
-            if(masterPlayer.isPresent()) {
-                final FortressServerPlayerEntity fortressServerPlayerEntity = masterPlayer.get();
-                masterPlayerActionQueue.forEach(action -> action.accept(fortressServerPlayerEntity));
-                masterPlayerActionQueue.clear();
-            }
-        }
 
         this.hungerManager.update(this);
 
@@ -393,11 +354,9 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private void tickProfessionCheck() {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId)) {
-            this.doActionOnMasterPlayer(player -> {
-                final ServerProfessionManager manager = player.getFortressServerManager().getServerProfessionManager();
-                manager.getProfessionsWithAvailablePlaces().ifPresent(p -> {
-                    this.dataTracker.set(PROFESSION_ID, p);
-                });
+            final ServerProfessionManager manager = getFortressServerManager().getServerProfessionManager();
+            manager.getProfessionsWithAvailablePlaces().ifPresent(p -> {
+                this.dataTracker.set(PROFESSION_ID, p);
             });
         }
     }
@@ -422,7 +381,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         }
 
         if(this.isTouchingWater() || this.isInLava()) {
-            if(!this.hasTask())
+            if(this.doesNotHaveTask())
                 getJumpControl().setActive();
             if(getMlgControl() != null) {
                 getMlgControl().clearResults();
@@ -526,13 +485,13 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     @Override
     public boolean isPushedByFluids() {
-        return !this.hasTask();
+        return this.doesNotHaveTask();
     }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putUuid("playerId", this.masterPlayerId);
+        nbt.putUuid("playerId", this.fortressId);
         if(this.fortressCenter != null) {
             nbt.putInt("fortressCenterX", this.fortressCenter.getX());
             nbt.putInt("fortressCenterY", this.fortressCenter.getY());
@@ -560,19 +519,14 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         if(nbt == null) return;
-        this.masterPlayerId = nbt.getUuid("playerId");
+        this.fortressId = nbt.getUuid("playerId");
         if(nbt.contains("fortressCenterX")) {
             this.fortressCenter = new BlockPos(nbt.getInt("fortressCenterX"), nbt.getInt("fortressCenterY"), nbt.getInt("fortressCenterZ"));
         }
         if(nbt.contains("hunger")) {
             this.hungerManager.readNbt(nbt.getCompound("hunger"));
         }
-        if(masterPlayerId != null) {
-            doActionOnMasterPlayer(this::setCustomNameIfNeeded);
-            doActionOnMasterPlayer(masterPlayer -> {
-               masterPlayer.getFortressServerManager().addColonist(this);
-            });
-        }
+        getFortressManager().addColonist(this);
 
         if(nbt.contains("professionId")) {
             final String professionId = nbt.getString("professionId");
@@ -582,6 +536,13 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         if (nbt.contains("guyType")) {
             this.dataTracker.set(GUY_TYPE, nbt.getInt("guyType"));
         }
+    }
+
+    public FortressServerManager getFortressManager() {
+        if(this.fortressId == null) throw new IllegalStateException("Fortress id is null");
+        final var server = super.getServer();
+        if(!(server instanceof FortressServer fortressServer)) throw new IllegalStateException("FortressServerManager is only available on FortressServer");
+        return fortressServer.getFortressModServerManager().getByFortressId(fortressId);
     }
 
     public boolean isAllowToPlaceBlockFromFarAway() {
@@ -632,8 +593,8 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         this.dataTracker.set(HAS_TASK, hasTask);
     }
 
-    private boolean hasTask() {
-        return this.dataTracker.get(HAS_TASK);
+    private boolean doesNotHaveTask() {
+        return !this.dataTracker.get(HAS_TASK);
     }
 
     @Override

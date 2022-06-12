@@ -76,9 +76,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
         }
         if (this.matcher.match(recipe, (IntList)(itemStack = new IntArrayList()), j = this.getAmountToFill(craftAll, i, bl))) {
             int k = j;
-            IntListIterator intListIterator = ((IntList)itemStack).iterator();
-            while (intListIterator.hasNext()) {
-                int l = intListIterator.next();
+            for (int l : (IntList) itemStack) {
                 int m = RecipeMatcher.getStackFromId(l).getMaxCount();
                 if (m >= k) continue;
                 k = m;

@@ -110,33 +110,27 @@ public class BlueprintTask extends AbstractTask {
                     });
             }
 
-            colonist.doActionOnMasterPlayer(player -> {
-                final FortressServerManager fortressServerManager = player.getFortressServerManager();
-                final FortressBuilding fortressBuilding = new FortressBuilding(startingBlock, endingBlock, beds, requirementId);
-                fortressServerManager.addBuilding(fortressBuilding);
-            });
+            final FortressBuilding fortressBuilding = new FortressBuilding(startingBlock, endingBlock, beds, requirementId);
+            colonist.getFortressServerManager().addBuilding(fortressBuilding);
         }
         super.finishPart(part, colonist);
     }
 
     private void addSpecialBlueprintBlock(Colonist colonist, Block block, BlockPos pos) {
-        colonist.doActionOnMasterPlayer(p -> p.getFortressServerManager().addSpecialBlocks(block, pos, true));
+        colonist.getFortressServerManager().addSpecialBlocks(block, pos, true);
     }
 
     private void removeReservedItem(Colonist colonist, Item item) {
-        final var fortressManagerOpt = colonist.getFortressManager();
-        if(fortressManagerOpt.isPresent()) {
-            final var fortressServerManager = fortressManagerOpt.get();
-            if(fortressServerManager.isSurvival()) {
-                if (SimilarItemsHelper.isIgnorable(item)) {
-                    fortressServerManager
-                            .getServerResourceManager()
-                            .removeItemIfExists(item);
-                } else {
-                    fortressServerManager
-                            .getServerResourceManager()
-                            .removeReservedItem(this.getId(), item);
-                }
+        final var fortressManager = colonist.getFortressServerManager();
+        if(fortressManager.isSurvival()) {
+            if (SimilarItemsHelper.isIgnorable(item)) {
+                fortressManager
+                        .getServerResourceManager()
+                        .removeItemIfExists(item);
+            } else {
+                fortressManager
+                        .getServerResourceManager()
+                        .removeReservedItem(this.getId(), item);
             }
         }
     }

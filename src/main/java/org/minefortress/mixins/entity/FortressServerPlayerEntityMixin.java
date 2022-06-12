@@ -79,11 +79,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     }
 
     @Override
-    public FortressServerManager getFortressServerManager() {
-        return fortressServerManager;
-    }
-
-    @Override
     public ServerBlueprintManager getServerBlueprintManager() {
         return serverBlueprintManager;
     }

@@ -22,34 +22,27 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
     @Override
     public boolean canStart() {
         if(!notInCombat() || !isDay() || colonist.getTaskControl().hasTask()) return false;
-        final Optional<FortressServerManager> fortressManagerOpt = colonist.getFortressServerManager();
-        if (fortressManagerOpt.isPresent()) {
-            final FortressServerManager fortressManager = fortressManagerOpt.get();
-            final Optional<BlockPos> blockPos = fortressManager.randomSurfacePos((ServerWorld) colonist.world);
-            return blockPos.isPresent();
-        }
-        return false;
+        final FortressServerManager fortressManager = colonist.getFortressServerManager();
+        final Optional<BlockPos> blockPos = fortressManager.randomSurfacePos((ServerWorld) colonist.world);
+        return blockPos.isPresent();
     }
 
     @Override
     public void start() {
-        final Optional<FortressServerManager> fortressServerManagerOpt = colonist.getFortressServerManager();
-        if (fortressServerManagerOpt.isPresent()) {
-            final FortressServerManager fortressServerManager = fortressServerManagerOpt.get();
-            final Optional<BlockPos> goalOpt = fortressServerManager.randomSurfacePos((ServerWorld) colonist.world);
-            if(goalOpt.isPresent()) {
-                colonist.setCurrentTaskDesc("Wandering around");
-                colonist.putItemInHand(null);
-                final BlockPos goal = goalOpt.get();
-                final EntityNavigation navigation = colonist.getNavigation();
-                final NodeMaker nodeMaker = (NodeMaker)navigation.getNodeMaker();
-                nodeMaker.setWallClimbMode(true);
-                final Path path = navigation.findPathTo(goal, 1);
-                nodeMaker.setWallClimbMode(false);
-                navigation.startMovingAlong(path, 1.0D);
-                if(colonist.isSleeping()) {
-                    colonist.wakeUp();
-                }
+        final FortressServerManager fortressServerManager = colonist.getFortressServerManager();
+        final Optional<BlockPos> goalOpt = fortressServerManager.randomSurfacePos((ServerWorld) colonist.world);
+        if(goalOpt.isPresent()) {
+            colonist.setCurrentTaskDesc("Wandering around");
+            colonist.putItemInHand(null);
+            final BlockPos goal = goalOpt.get();
+            final EntityNavigation navigation = colonist.getNavigation();
+            final NodeMaker nodeMaker = (NodeMaker)navigation.getNodeMaker();
+            nodeMaker.setWallClimbMode(true);
+            final Path path = navigation.findPathTo(goal, 1);
+            nodeMaker.setWallClimbMode(false);
+            navigation.startMovingAlong(path, 1.0D);
+            if(colonist.isSleeping()) {
+                colonist.wakeUp();
             }
         }
     }

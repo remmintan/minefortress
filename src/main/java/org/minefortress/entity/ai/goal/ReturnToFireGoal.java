@@ -24,12 +24,9 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     public boolean canStart() {
         if(!notInCombat()) return false;
         if(!isNight()) {
-            final Optional<FortressServerManager> fortressServerManager = colonist.getFortressServerManager();
-            if(fortressServerManager.isPresent()) {
-                final FortressServerManager serverManager = fortressServerManager.get();
-                final Optional<BlockPos> pos = serverManager.randomSurfacePos((ServerWorld) colonist.world);
-                if(pos.isPresent()) return false; // is day and have some surface positions
-            }
+            final FortressServerManager serverManager = colonist.getFortressServerManager();
+            final Optional<BlockPos> pos = serverManager.randomSurfacePos((ServerWorld) colonist.world);
+            if(pos.isPresent()) return false;
         }
 
         final BlockPos fortressCenter = colonist.getFortressCenter();
@@ -48,7 +45,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     @NotNull
     private Integer getColonistsCount() {
-        return colonist.getFortressServerManager().map(FortressServerManager::getColonistsCount).orElse(5);
+        return colonist.getFortressServerManager().getColonistsCount();
     }
 
     private int getHomeInnerRadius() {

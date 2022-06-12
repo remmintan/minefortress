@@ -148,12 +148,12 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Optional.of(buildings.get(random.nextInt(buildings.size())));
     }
 
-    public Optional<FortressBedInfo> getRandomBed(Random random) {
+    public Optional<FortressBedInfo> getRandomBed() {
         final var allBeds = this.buildings.stream()
                 .flatMap(building -> building.getBeds().stream())
                 .toList();
         if(allBeds.isEmpty()) return Optional.empty();
-        return Optional.of(allBeds.get(random.nextInt(allBeds.size())));
+        return Optional.of(allBeds.get(getWorld().random.nextInt(allBeds.size())));
     }
 
     public void tickFortress(@Nullable ServerPlayerEntity player) {

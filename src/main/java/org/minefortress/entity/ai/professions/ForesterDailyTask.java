@@ -74,12 +74,9 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     private void gatherItemAndAddToInventory(Colonist colonist) {
         if(isSuccess(colonist)){
             final var item = getRandomForesterItem(colonist);
-            final var fortressServerManagerOpt = colonist.getFortressServerManager();
-            if(fortressServerManagerOpt.isPresent()){
-                final var fortressServerManager = fortressServerManagerOpt.get();
-                final var resourceManager = fortressServerManager.getServerResourceManager();
-                resourceManager.increaseItemAmount(item, 1);
-            }
+            colonist.getFortressServerManager()
+                    .getServerResourceManager()
+                    .increaseItemAmount(item, 1);
         }
     }
 

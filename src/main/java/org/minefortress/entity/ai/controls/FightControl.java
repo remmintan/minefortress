@@ -63,16 +63,15 @@ public class FightControl {
             this.attackTarget = null;
         }
 
-        if(attackTarget == null)
-            colonist.getFortressServerManager().ifPresent(it -> {
-                final var serverFightManager = it.getServerFightManager();
-                if(serverFightManager.hasAnyScaryMob()) {
-                    final var randomScaryMob = serverFightManager.getRandomScaryMob(colonist.world.random);
-                    if(isTargetAcceptable(randomScaryMob)) {
-                        this.setAttackTarget(randomScaryMob);
-                    }
+        if(attackTarget == null){
+            final var serverFightManager = colonist.getFortressServerManager().getServerFightManager();
+            if(serverFightManager.hasAnyScaryMob()) {
+                final var randomScaryMob = serverFightManager.getRandomScaryMob(colonist.world.random);
+                if(isTargetAcceptable(randomScaryMob)) {
+                    this.setAttackTarget(randomScaryMob);
                 }
-            });
+            }
+        }
 
         if(this.attackTarget == null) {
             final var target = this.colonist.getTarget();
@@ -168,7 +167,7 @@ public class FightControl {
     }
 
     private boolean fortressInCombat() {
-        return colonist.getFortressServerManager().map(FortressServerManager::isCombatMode).orElse(false);
+        return colonist.getFortressServerManager().isCombatMode();
     }
 
     private boolean isTargetAcceptable(LivingEntity target) {

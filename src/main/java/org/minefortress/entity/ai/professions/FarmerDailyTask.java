@@ -14,6 +14,7 @@ import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressBuilding;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;
@@ -133,7 +134,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     private Optional<FortressBuilding> getFarm(Colonist colonist) {
         return colonist
             .getFortressServerManager()
-            .flatMap(it -> it.getRandomBuilding("farmer", colonist.world.random));
+            .getRandomBuilding("farmer", colonist.world.random);
     }
 
     private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {
@@ -149,21 +150,16 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private Optional<Item> getSeeds(Colonist colonist) {
-        final var itemOpt = colonist.getFortressServerManager()
-                .map(FortressServerManager::getServerResourceManager)
-                .flatMap(rm -> rm.getAllItems()
-                        .stream()
-                        .filter(it -> !it.isEmpty())
-                        .map(ItemStack::getItem)
-                        .filter(FARMER_SEEDS::contains)
-                        .findFirst()
-                );
+        final var serverResourceManager = colonist.getFortressServerManager().getServerResourceManager();
+        final var itemOpt = serverResourceManager
+                .getAllItems()
+                .stream()
+                .filter(it -> !it.isEmpty())
+                .map(ItemStack::getItem)
+                .filter(FARMER_SEEDS::contains)
+                .findFirst();
 
-        itemOpt.ifPresent(
-                i -> colonist.getFortressServerManager()
-                        .ifPresent(m -> m.getServerResourceManager().removeItemIfExists(i))
-        );
-
+        itemOpt.ifPresent(serverResourceManager::removeItemIfExists);
         return itemOpt;
     }
 
@@ -187,6 +183,6 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private boolean isCreative(Colonist colonist) {
-        return colonist.getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
+        return colonist.getFortressServerManager().isCreative();
     }
 }

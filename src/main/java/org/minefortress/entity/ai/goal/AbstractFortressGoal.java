@@ -30,11 +30,11 @@ abstract class AbstractFortressGoal extends Goal {
     }
 
     private boolean isFortressInCombatMode() {
-        return colonist.getFortressServerManager().map(FortressServerManager::isCombatMode).orElse(false);
+        return colonist.getFortressServerManager().isCombatMode();
     }
 
     private boolean isVillageUnderAttack() {
-        return colonist.getFortressServerManager().map(FortressServerManager::isVillageUnderAttack).orElse(false);
+        return colonist.getFortressServerManager().isVillageUnderAttack();
     }
 
     protected boolean notInCombat() {

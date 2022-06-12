@@ -23,12 +23,12 @@ public class FortressEscapeDangerGoal extends EscapeDangerGoal {
     @Override
     public void start() {
         super.start();
-        colonist.getFortressServerManager().ifPresent(it -> {
-            if(it.isCombatMode()) return;
-            it.setCombatMode(true, true);
-            colonist.doActionOnMasterPlayer(p -> ((ServerPlayerEntity)p).sendMessage(new LiteralText("§a Village is under attack!  Defend it!§a"), false));
-            it.getServerFightManager().addScaryMob(this.colonist.getAttacker());
-        });
+        final var it = colonist.getFortressServerManager();
+        if(it.isCombatMode()) return;
+        it.setCombatMode(true, true);
+        colonist.getMasterPlayer(p -> ((ServerPlayerEntity)p).sendMessage(new LiteralText("§a Village is under attack!  Defend it!§a"), false));
+        it.getServerFightManager().addScaryMob(this.colonist.getAttacker());
+
     }
 
     protected boolean isFighting() {
@@ -36,7 +36,7 @@ public class FortressEscapeDangerGoal extends EscapeDangerGoal {
     }
 
     private boolean isFortressInCombatMode() {
-        return colonist.getFortressServerManager().map(FortressServerManager::isCombatMode).orElse(false);
+        return colonist.getFortressServerManager().isCombatMode();
     }
 
 }

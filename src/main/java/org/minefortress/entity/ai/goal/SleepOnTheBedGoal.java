@@ -92,8 +92,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
 
     @NotNull
     private Optional<FortressBedInfo> getFreeBed() {
-        return colonist
-                .getFortressServerManager().flatMap(FortressServerManager::getFreeBed);
+        return colonist.getFortressServerManager().getFreeBed();
     }
 
     private boolean isNight() {

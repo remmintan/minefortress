@@ -32,9 +32,7 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
 
     @Override
     protected BlockPos getBlockPos(Colonist colonist) {
-        final Optional<FortressServerManager> fortressManagerOpt = colonist.getFortressServerManager();
-        if(fortressManagerOpt.isEmpty()) return null;
-        final FortressServerManager fortressManager = fortressManagerOpt.get();
+        final FortressServerManager fortressManager = colonist.getFortressServerManager();
         Optional<BlockPos> tablePosOpt = fortressManager.getSpecialBlocksByType(Blocks.FURNACE, true)
                 .stream()
                 .findFirst();

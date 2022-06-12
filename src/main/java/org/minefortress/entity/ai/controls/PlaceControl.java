@@ -92,25 +92,23 @@ public class PlaceControl extends PositionedActionControl {
     }
 
     private void decreaseResourcesAndAddSpecialBlocksAmount() {
-        colonist.doActionOnMasterPlayer(p -> {
-            final var fortressServerManager = p.getFortressServerManager();
-            final var taskControl = colonist.getTaskControl();
-            if(fortressServerManager.isSurvival()) {
-                if (isIgnorable(item) || !taskControl.hasTask()) {
-                    fortressServerManager
-                            .getServerResourceManager()
-                            .removeItemIfExists(item);
-                } else {
-                    fortressServerManager
-                            .getServerResourceManager()
-                            .removeReservedItem(taskControl.getTaskId(), item);
-                }
+        final var fortressServerManager = colonist.getFortressServerManager();
+        final var taskControl = colonist.getTaskControl();
+        if(fortressServerManager.isSurvival()) {
+            if (isIgnorable(item) || !taskControl.hasTask()) {
+                fortressServerManager
+                        .getServerResourceManager()
+                        .removeItemIfExists(item);
+            } else {
+                fortressServerManager
+                        .getServerResourceManager()
+                        .removeReservedItem(taskControl.getTaskId(), item);
             }
+        }
 
-            if(item instanceof BlockItem blockItem && fortressServerManager.isBlockSpecial(blockItem.getBlock())){
-                fortressServerManager.addSpecialBlocks(blockItem.getBlock(), goal, taskControl.isBlueprintTask());
-            }
-        });
+        if(item instanceof BlockItem blockItem && fortressServerManager.isBlockSpecial(blockItem.getBlock())){
+            fortressServerManager.addSpecialBlocks(blockItem.getBlock(), goal, taskControl.isBlueprintTask());
+        }
     }
 
     public boolean isCantPlaceUnderMyself() {

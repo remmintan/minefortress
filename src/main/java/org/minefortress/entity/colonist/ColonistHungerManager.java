@@ -13,7 +13,7 @@ public class ColonistHungerManager extends HungerManager {
     public static final float IDLE_EXHAUSTION = 0.002f;
 
     public void update(Colonist livingEntity) {
-        if(livingEntity.getFortressServerManager().map(FortressServerManager::isCreative).orElse(true)) {
+        if(livingEntity.getFortressServerManager().isCreative()) {
             this.foodLevel = 20;
             return;
         }

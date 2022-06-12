@@ -49,9 +49,7 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
 
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
-        final Optional<FortressServerManager> fortressManagerOpt = colonist.getFortressServerManager();
-        if(fortressManagerOpt.isEmpty()) return null;
-        final FortressServerManager fortressManager = fortressManagerOpt.get();
+        final FortressServerManager fortressManager = colonist.getFortressServerManager();
         Optional<BlockPos> tablePosOpt = fortressManager.getSpecialBlocksByType(Blocks.CRAFTING_TABLE, true)
                 .stream()
                 .findFirst();

@@ -1,18 +1,12 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
 
-import java.util.EnumSet;
 import java.util.Optional;
 
 public class ColonistEatGoal extends AbstractFortressGoal {
@@ -94,31 +88,27 @@ public class ColonistEatGoal extends AbstractFortressGoal {
 
     private void putFoodInHand() {
         this.getEatableItem().ifPresent(item -> {
-            getServerResourceManager()
-                    .ifPresent(man -> man.increaseItemAmount(item.getItem(), -1));
+            colonist.getFortressServerManager()
+                    .getServerResourceManager().increaseItemAmount(item.getItem(), -1);
             this.foodInHand = item.getItem();
         });
     }
 
     private Optional<ItemStack> getEatableItem() {
-        return getServerResourceManager()
-                .map(ServerResourceManager::getAllItems)
-                .flatMap(it -> it.stream().filter(this::isEatableItem).findFirst());
+        return colonist.getFortressServerManager()
+                .getServerResourceManager()
+                .getAllItems()
+                .stream()
+                .filter(this::isEatableItem)
+                .findFirst();
     }
 
     private boolean hasEatableItem() {
-        return getServerResourceManager()
-                .map(ServerResourceManager::getAllItems)
-                .map(it -> it.stream().anyMatch(this::isEatableItem))
-                .orElse(false);
+        return getEatableItem().isPresent();
     }
 
     private boolean isEatableItem(ItemStack st) {
         return !st.isEmpty() && st.getItem().isFood();
-    }
-
-    private Optional<ServerResourceManager> getServerResourceManager() {
-        return colonist.getFortressServerManager().map(FortressServerManager::getServerResourceManager);
     }
 
     private int getHomeOuterRadius() {
