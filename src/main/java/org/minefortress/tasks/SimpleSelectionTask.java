@@ -9,6 +9,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.minefortress.entity.Colonist;
 import org.minefortress.selections.ServerSelectionType;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
@@ -80,26 +81,24 @@ public class SimpleSelectionTask extends AbstractTask {
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld world) {
+    public TaskPart getNextPart(ServerWorld world, Colonist colonist) {
         Pair<BlockPos, BlockPos> startAndEnd = parts.poll();
         if(startAndEnd == null) throw new IllegalStateException("Null part for task!");
-        final List<TaskBlockInfo> blocks = getPartBlocksInfo(startAndEnd, world);
+        final List<TaskBlockInfo> blocks = getPartBlocksInfo(startAndEnd, world, colonist);
         return new TaskPart(startAndEnd, blocks, this);
     }
 
-
-
-    private List<TaskBlockInfo> getPartBlocksInfo(Pair<BlockPos, BlockPos> startAndEnd, ServerWorld world) {
+    private List<TaskBlockInfo> getPartBlocksInfo(Pair<BlockPos, BlockPos> startAndEnd, ServerWorld world, Colonist colonist) {
         final List<TaskBlockInfo> blocksInfo = new ArrayList<>();
         getBlocksForPart(startAndEnd).spliterator().forEachRemaining(pos -> {
             pos = pos.toImmutable();
             if(placingItem != null) {
                 if(BlockInfoUtils.shouldBePlacedAsItem(placingItem)) {
-                    final ItemUsageContext useOnContext = BlockInfoUtils.getUseOnContext(this.hitResult, this.placingItem, pos, world);
+                    final ItemUsageContext useOnContext = BlockInfoUtils.getUseOnContext(this.hitResult, this.placingItem, pos, world, colonist);
                     final ItemTaskBlockInfo itemTaskBlockInfo = new ItemTaskBlockInfo(placingItem, pos, useOnContext);
                     blocksInfo.add(itemTaskBlockInfo);
                 } else {
-                    final BlockState blockStateForPlacement = BlockInfoUtils.getBlockStateForPlacement(placingItem, hitResult, horizontalDirection, world, pos);
+                    final BlockState blockStateForPlacement = BlockInfoUtils.getBlockStateForPlacement(placingItem, hitResult, horizontalDirection, world, pos, colonist);
                     final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(placingItem, pos, blockStateForPlacement);
                     blocksInfo.add(blockStateTaskBlockInfo);
                 }

@@ -96,10 +96,8 @@ public abstract class AbstractTask implements Task {
         completedParts++;
         ServerWorld world = (ServerWorld) colonsit.world;
         if(parts.isEmpty() && totalParts <= completedParts) {
-            ServerPlayerEntity randomPlayer = world.getRandomAlivePlayer();
-            if(randomPlayer != null) {
-                sendFinishTaskNotificationToPlayer(randomPlayer);
-            }
+            final var masterPlayerOpt = colonsit.getMasterPlayer();
+            masterPlayerOpt.ifPresent(this::sendFinishTaskNotificationToPlayer);
             taskFinishListeners.forEach(Runnable::run);
         }
     }

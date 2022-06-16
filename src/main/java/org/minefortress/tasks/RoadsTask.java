@@ -98,7 +98,7 @@ public class RoadsTask implements Task {
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld level) {
+    public TaskPart getNextPart(ServerWorld level, Colonist colonist) {
         return taskParts.poll();
     }
 

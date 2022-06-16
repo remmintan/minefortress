@@ -64,7 +64,7 @@ public class BlueprintTask extends AbstractTask {
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld level) {
+    public TaskPart getNextPart(ServerWorld level, Colonist colonist) {
         final Pair<BlockPos, BlockPos> partStartAndEnd = parts.poll();
         List<TaskBlockInfo> blockInfos = getTaskBlockInfos(partStartAndEnd);
         return new TaskPart(partStartAndEnd, blockInfos, this);

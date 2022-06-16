@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.minefortress.MineFortressMod;
+import org.minefortress.interfaces.FortressServer;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.Collections;
@@ -28,7 +29,7 @@ public abstract class FurnaceBlockEntityMixin extends AbstractFurnaceBlockEntity
     @Override
     public List<Recipe<?>> getRecipesUsedAndDropExperience(ServerWorld world, Vec3d pos) {
         if(world == null) throw new IllegalStateException("World is null");
-        final var isFortress = world.getRandomAlivePlayer().interactionManager.getGameMode() == MineFortressMod.FORTRESS;
+        final var isFortress = world.getServer() instanceof FortressServer;
         if(isFortress)
             return Collections.emptyList();
         else

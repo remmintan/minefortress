@@ -13,6 +13,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.FortressBlockPlaceContext;
 import org.minefortress.entity.ai.FortressUseOnContext;
 
@@ -33,14 +34,14 @@ public class BlockInfoUtils {
         return block instanceof BlockWithEntity;
     }
 
-    public static BlockState getBlockStateForPlacement(Item item, HitResult hitResult, Direction direction, ServerWorld world, BlockPos pos) {
+    public static BlockState getBlockStateForPlacement(Item item, HitResult hitResult, Direction direction, ServerWorld world, BlockPos pos, Colonist colonist) {
         BlockState stateForPlacement;
         if(isItemBucket(item)) {
             stateForPlacement = getBlockStateForBucketItem(item);
         } else {
             final BlockItem blockItem = (BlockItem) item;
             final Block block = blockItem.getBlock();
-            final ItemPlacementContext blockPlaceContext = getBlockPlaceContext(hitResult, direction, item, pos, world);
+            final ItemPlacementContext blockPlaceContext = getBlockPlaceContext(hitResult, direction, item, pos, world, colonist);
             stateForPlacement = Optional
                     .ofNullable(block.getPlacementState(blockPlaceContext))
                     .orElse(block.getDefaultState());
@@ -55,16 +56,13 @@ public class BlockInfoUtils {
         return Blocks.AIR.getDefaultState();
     }
 
-    public static ItemUsageContext getUseOnContext(HitResult hitResult, Item placingItem, BlockPos goal, ServerWorld world) {
+    public static ItemUsageContext getUseOnContext(HitResult hitResult, Item placingItem, BlockPos goal, ServerWorld world, Colonist colonist) {
         if(hitResult instanceof BlockHitResult) {
-            ServerPlayerEntity randomPlayer = ((ServerWorld) world).getRandomAlivePlayer();
-            if (randomPlayer == null) {
-                throw new IllegalStateException("Player can't be null");
-            }
+            ServerPlayerEntity masterPlayer = colonist.getMasterPlayer().orElseThrow(() -> new IllegalStateException("Colonist has no master player"));
             final BlockHitResult movedHitResult = moveHitResult((BlockHitResult)hitResult,  goal);
             return new FortressUseOnContext(
                     world,
-                    randomPlayer,
+                    masterPlayer,
                     Hand.MAIN_HAND,
                     new ItemStack(placingItem),
                     movedHitResult
@@ -80,13 +78,9 @@ public class BlockInfoUtils {
 
 
 
-    private static ItemPlacementContext getBlockPlaceContext(HitResult hitResult, Direction horizontalDirection, Item placingItem, BlockPos goal, ServerWorld world) {
+    private static ItemPlacementContext getBlockPlaceContext(HitResult hitResult, Direction horizontalDirection, Item placingItem, BlockPos goal, ServerWorld world, Colonist colonist) {
         if(hitResult instanceof BlockHitResult) {
-            ServerPlayerEntity randomPlayer = ((ServerWorld)world).getRandomAlivePlayer();
-            if(randomPlayer == null) {
-                throw new IllegalStateException("Player can't be null");
-            }
-
+            ServerPlayerEntity randomPlayer = colonist.getMasterPlayer().orElseThrow(() -> new IllegalStateException("Colonist has no master player"));
             final BlockHitResult movedHitResult = moveHitResult((BlockHitResult) hitResult, goal);
             if(horizontalDirection != null){
                 return new FortressBlockPlaceContext(

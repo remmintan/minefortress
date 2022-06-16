@@ -358,7 +358,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         }
     }
 
-    private Optional<ServerPlayerEntity> getMasterPlayer() {
+    public Optional<ServerPlayerEntity> getMasterPlayer() {
         if(fortressId == null) throw new IllegalStateException("Fortress ID is null");
         return getFortressModServerManager().getPlayerByFortressId(fortressId);
     }

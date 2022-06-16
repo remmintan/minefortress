@@ -48,7 +48,7 @@ public class CutTreesTask implements Task {
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld level) {
+    public TaskPart getNextPart(ServerWorld level, Colonist colonist) {
         if(!treeRoots.isEmpty()) {
             final BlockPos root = treeRoots.remove();
             final TaskBlockInfo rootBlockInfo = new DigTaskBlockInfo( root);

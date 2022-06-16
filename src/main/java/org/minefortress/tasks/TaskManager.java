@@ -106,7 +106,7 @@ public class TaskManager {
     private boolean setPawnsToTask(ServerWorld world, Task task, List<Colonist> completelyFreePawns) {
         for(Colonist c : completelyFreePawns) {
             if(!task.hasAvailableParts()) break;
-            c.getTaskControl().setTask(task, task.getNextPart(world), this::returnTaskPart, () -> this.isCancelled(task.getId()));
+            c.getTaskControl().setTask(task, task.getNextPart(world, c), this::returnTaskPart, () -> this.isCancelled(task.getId()));
         }
         if(!task.hasAvailableParts()) {
             tasks.remove();
