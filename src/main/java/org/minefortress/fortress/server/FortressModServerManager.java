@@ -64,6 +64,7 @@ public class FortressModServerManager {
             final var playerId = entry.getKey();
             final var manager = entry.getValue();
             final var player = playerManager.getPlayer(playerId);
+            manager.tick(player);
         }
     }
 
