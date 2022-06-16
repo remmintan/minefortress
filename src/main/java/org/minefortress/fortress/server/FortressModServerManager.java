@@ -60,7 +60,10 @@ public class FortressModServerManager {
             }
         }
         LogManager.getLogger().warn("Can't find fortress with id " + uuid + " creating new one");
-        return serverManagers.put(UUID.randomUUID(), new FortressServerManager(server));
+        final var fortressServerManager = new FortressServerManager(server);
+        fortressServerManager.setId(uuid);
+        serverManagers.put(UUID.randomUUID(), fortressServerManager);
+        return fortressServerManager;
     }
 
     public Optional<ServerPlayerEntity> getPlayerByFortressId(UUID fortressId) {

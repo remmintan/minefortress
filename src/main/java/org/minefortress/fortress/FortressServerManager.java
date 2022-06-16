@@ -462,7 +462,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public BlockPos getFortressCenter() {
-        return fortressCenter.toImmutable();
+        return fortressCenter!=null?fortressCenter.toImmutable():null;
     }
 
     public Optional<BlockPos> randomSurfacePos(ServerWorld world){

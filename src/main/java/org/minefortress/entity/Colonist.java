@@ -1,6 +1,9 @@
 package org.minefortress.entity;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -49,6 +52,7 @@ import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.server.FortressModServerManager;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
@@ -114,6 +118,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
         this.fortressId = entityNbt.getUuid("fortressUUID");
+        if(fortressId == null) throw new IllegalStateException("Fortress UUID cannot be null for colonist");
         getFortressServerManager().addColonist(this);
         this.setCustomNameIfNeeded();
 
@@ -152,9 +157,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     }
 
     public FortressServerManager getFortressServerManager() {
-        if(this.fortressId == null) throw new IllegalStateException("Fortress id is null");
+        if(this.fortressId == null){
+            throw new IllegalStateException("Fortress id is null");
+        }
         final FortressModServerManager fortressModServerManager = getFortressModServerManager();
-        return fortressModServerManager.getByFortressId(fortressId);
+        return getFortressModServerManager().getByFortressId(fortressId);
     }
 
     @Override
@@ -248,7 +255,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     @Override
     public boolean isInvulnerable() {
-        if(getFortressServerManager().isCreative())
+        if(isFortressCreative())
             return true;
         else
             return super.isInvulnerable();
@@ -256,7 +263,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        if(getFortressServerManager().isCreative()) {
+        if(isFortressCreative()) {
             return !damageSource.isOutOfWorld();
         } else {
             return super.isInvulnerableTo(damageSource);
@@ -363,6 +370,15 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             manager.getProfessionsWithAvailablePlaces().ifPresent(p -> {
                 this.dataTracker.set(PROFESSION_ID, p);
             });
+        }
+    }
+
+    private boolean isFortressCreative() {
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            final var client = (FortressMinecraftClient) MinecraftClient.getInstance();
+            return client.getFortressClientManager().isCreative();
+        } else {
+            return getFortressServerManager().isCreative();
         }
     }
 

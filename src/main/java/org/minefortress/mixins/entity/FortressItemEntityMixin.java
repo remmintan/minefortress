@@ -65,8 +65,8 @@ public abstract class FortressItemEntityMixin extends Entity {
                     if(shouldCollectInInventory(fortressServerManager.getServerProfessionManager(), item))
                         resourceManager.increaseItemAmount(item, stack.getCount());
 
-                    this.discard();
                 }
+                this.discard();
             }
 
         }
