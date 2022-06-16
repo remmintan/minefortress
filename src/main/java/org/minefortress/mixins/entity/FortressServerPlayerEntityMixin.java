@@ -114,6 +114,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         if(oldPlayer instanceof FortressServerPlayerEntity fortressServerPlayer) {
             this.serverBlueprintManager = fortressServerPlayer.getServerBlueprintManager();
+            this.fortressServerManager = fortressServerPlayer.getFortressServerManager();
         }
     }
 

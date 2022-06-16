@@ -301,6 +301,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Collections.unmodifiableSet(colonists);
     }
 
+    public void clearColonists() {
+        colonists.clear();
+    }
+
     public void writeToNbt(NbtCompound tag) {
         if(id != null) {
             tag.putUuid("id", id);

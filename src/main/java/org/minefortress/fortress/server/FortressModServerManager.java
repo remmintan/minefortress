@@ -25,17 +25,32 @@ public class FortressModServerManager {
     }
 
     public FortressServerManager getByPlayer(ServerPlayerEntity player) {
-        final var fortressPlayer = (FortressServerPlayerEntity) player;
-        final var fortressServerManager = fortressPlayer.getFortressServerManager();
-        if (fortressServerManager != null) {
-            fortressServerManager.setId(fortressPlayer.getFortressUuid());
-            serverManagers.put(player.getUuid(), fortressServerManager);
+        final var playerId = player.getUuid();
+        final var manager = serverManagers.get(playerId);
+        if(manager == null) {
+            final var fortressPlayer = (FortressServerPlayerEntity) player;
+            final var fortressServerManager = fortressPlayer.getFortressServerManager();
+            // migrating exising fortress to new system
+            if (fortressServerManager != null) {
+                fortressServerManager.setId(fortressPlayer.getFortressUuid());
+                final var fortressPlayerIdOpt = getPlayerByFortressId(fortressServerManager.getId())
+                        .map(ServerPlayerEntity::getUuid);
+                if(fortressPlayerIdOpt.isPresent()) {
+                    final var fortressPlayerId = fortressPlayerIdOpt.get();
+                    // move all colonists from existing fortress to players one
+                    final var existingFortress = serverManagers.get(fortressPlayerId);
+                    existingFortress.getColonists()
+                            .forEach(fortressServerManager::addColonist);
+                    existingFortress.clearColonists();
 
-            getPlayerByFortressId(fortressServerManager.getId())
-                    .map(ServerPlayerEntity::getUuid)
-                    .ifPresent(serverManagers::remove);
+                    serverManagers.remove(fortressPlayerId);
+                }
+                serverManagers.put(playerId, fortressServerManager);
+            }
+            return serverManagers.computeIfAbsent(playerId, (it) -> new FortressServerManager(server));
         }
-        return serverManagers.computeIfAbsent(player.getUuid(), (it) -> new FortressServerManager(server));
+
+        return manager;
     }
 
     public FortressServerManager getByFortressId(UUID uuid) {
