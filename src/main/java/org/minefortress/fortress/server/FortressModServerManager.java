@@ -33,8 +33,7 @@ public class FortressModServerManager {
             // migrating exising fortress to new system
             if (fortressServerManager != null) {
                 fortressServerManager.setId(fortressPlayer.getFortressUuid());
-                final var fortressPlayerIdOpt = getPlayerByFortressId(fortressServerManager.getId())
-                        .map(ServerPlayerEntity::getUuid);
+                final var fortressPlayerIdOpt = getPlayerIdByFortressId(fortressServerManager.getId());
                 if(fortressPlayerIdOpt.isPresent()) {
                     final var fortressPlayerId = fortressPlayerIdOpt.get();
                     // move all colonists from existing fortress to players one
@@ -70,6 +69,15 @@ public class FortressModServerManager {
         for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
             if (entry.getValue().getId().equals(fortressId)) {
                 return Optional.ofNullable(server.getPlayerManager().getPlayer(entry.getKey()));
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<UUID> getPlayerIdByFortressId(UUID fortressId) {
+        for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
+            if (entry.getValue().getId().equals(fortressId)) {
+                return Optional.ofNullable(entry.getKey());
             }
         }
         return Optional.empty();
