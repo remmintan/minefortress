@@ -7,6 +7,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.logging.log4j.LogManager;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,16 @@ public class FortressModServerManager {
     }
 
     public FortressServerManager getByPlayer(ServerPlayerEntity player) {
+        final var fortressPlayer = (FortressServerPlayerEntity) player;
+        final var fortressServerManager = fortressPlayer.getFortressServerManager();
+        if (fortressServerManager != null) {
+            fortressServerManager.setId(fortressPlayer.getFortressUuid());
+            serverManagers.put(player.getUuid(), fortressServerManager);
+
+            getPlayerByFortressId(fortressServerManager.getId())
+                    .map(ServerPlayerEntity::getUuid)
+                    .ifPresent(serverManagers::remove);
+        }
         return serverManagers.computeIfAbsent(player.getUuid(), (it) -> new FortressServerManager(server));
     }
 

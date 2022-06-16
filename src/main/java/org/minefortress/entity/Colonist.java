@@ -158,7 +158,9 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     }
 
     public FortressServerManager getFortressServerManager() {
-        return getFortressManager();
+        if(this.fortressId == null) throw new IllegalStateException("Fortress id is null");
+        final FortressModServerManager fortressModServerManager = getFortressModServerManager();
+        return fortressModServerManager.getByFortressId(fortressId);
     }
 
     public BlockPos getFortressCenter() {
@@ -539,7 +541,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         if(nbt.contains("hunger")) {
             this.hungerManager.readNbt(nbt.getCompound("hunger"));
         }
-        getFortressManager().addColonist(this);
+        getFortressServerManager().addColonist(this);
 
         if(nbt.contains("professionId")) {
             final String professionId = nbt.getString("professionId");
@@ -549,12 +551,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         if (nbt.contains("guyType")) {
             this.dataTracker.set(GUY_TYPE, nbt.getInt("guyType"));
         }
-    }
-
-    public FortressServerManager getFortressManager() {
-        if(this.fortressId == null) throw new IllegalStateException("Fortress id is null");
-        final FortressModServerManager fortressModServerManager = getFortressModServerManager();
-        return fortressModServerManager.getByFortressId(fortressId);
     }
 
     private FortressModServerManager getFortressModServerManager() {
@@ -585,10 +581,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     public int getCurrentFoodLevel() {
         return this.dataTracker.get(CURRENT_FOOD_LEVEL);
-    }
-
-    public float getFoodSaturation() {
-        return this.hungerManager.saturationLevel;
     }
 
     public void setProfession(String professionId) {

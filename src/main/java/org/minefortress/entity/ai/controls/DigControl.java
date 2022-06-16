@@ -77,7 +77,7 @@ public class DigControl extends PositionedActionControl {
     }
 
     private void putProperItemInHand() {
-        final var creative = colonist.getFortressManager().isCreative();
+        final var creative = colonist.getFortressServerManager().isCreative();
 
         final BlockState blockState = level.getBlockState(goal);
         Item item = null;

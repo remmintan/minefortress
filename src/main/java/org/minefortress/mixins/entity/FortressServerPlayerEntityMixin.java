@@ -39,6 +39,9 @@ import java.util.UUID;
 @Mixin(ServerPlayerEntity.class)
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
 
+    @Shadow @Final public ServerPlayerInteractionManager interactionManager;
+    @Shadow @Final public MinecraftServer server;
+
     private UUID fortressUUID = null;
 
     private Vec3d persistedPos;
@@ -46,9 +49,8 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     private float persistedYaw;
     private float persistedPitch;
 
-    @Shadow @Final public ServerPlayerInteractionManager interactionManager;
-    @Shadow @Final public MinecraftServer server;
     private ServerBlueprintManager serverBlueprintManager;
+    private FortressServerManager fortressServerManager = null;
 
     public FortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
@@ -77,7 +79,16 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         if(nbt.contains("fortressUuid")) {
             fortressUUID = nbt.getUuid("fortressUuid");
         }
+        if(nbt.contains("FortressManager")) {
+            final NbtCompound fortressManagerTag = nbt.getCompound("FortressManager");
+            fortressServerManager = new FortressServerManager(server);
+            fortressServerManager.readFromNbt(fortressManagerTag);
+        }
         serverBlueprintManager.readFromNbt(nbt);
+    }
+
+    public FortressServerManager getFortressServerManager() {
+        return fortressServerManager;
     }
 
     @Override

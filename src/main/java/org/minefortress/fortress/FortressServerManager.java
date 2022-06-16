@@ -372,6 +372,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.serverResourceManager.write(tag);
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public void readFromNbt(NbtCompound tag) {
         if(tag.contains("id")) {
             this.id = tag.getUuid("id");
