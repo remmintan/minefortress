@@ -20,7 +20,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        return isHungryEnough() && colonist.getFortressCenter() != null && this.hasEatableItem() && notInCombat();
+        return isHungryEnough() && colonist.getFortressServerManager().getFortressCenter() != null && this.hasEatableItem() && notInCombat();
     }
 
     private boolean isHungryEnough() {
@@ -30,7 +30,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
     @Override
     public void start() {
         super.start();
-        final BlockPos fortressCenter = colonist.getFortressCenter().toImmutable();
+        final BlockPos fortressCenter = colonist.getFortressServerManager().getFortressCenter();
 
         final var random = colonist.world.random;
         final int x = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);

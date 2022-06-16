@@ -29,7 +29,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
             if(pos.isPresent()) return false;
         }
 
-        final BlockPos fortressCenter = colonist.getFortressCenter();
+        final BlockPos fortressCenter = colonist.getFortressServerManager().getFortressCenter();
         return !colonist.getTaskControl().hasTask() &&
                 fortressCenter != null &&
                 colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()) > Math.pow(getHomeOuterRadius(), 2);
@@ -55,7 +55,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     @Override
     public void start() {
         super.start();
-        final BlockPos fortressCenter = colonist.getFortressCenter().toImmutable();
+        final BlockPos fortressCenter = colonist.getFortressServerManager().getFortressCenter();
 
         final int x = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
         final int z = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);

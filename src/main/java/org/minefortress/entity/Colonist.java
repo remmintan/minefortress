@@ -78,7 +78,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private final FightControl fightControl;
 
     private UUID fortressId;
-    private BlockPos fortressCenter;
 
     private boolean allowToPlaceBlockFromFarAway = false;
     private final ColonistHungerManager hungerManager = new ColonistHungerManager();
@@ -115,11 +114,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
         this.fortressId = entityNbt.getUuid("fortressUUID");
-        int centerX = entityNbt.getInt("centerX");
-        int centerY = entityNbt.getInt("centerY");
-        int centerZ = entityNbt.getInt("centerZ");
-        this.fortressCenter = new BlockPos(centerX, centerY, centerZ);
-
         getFortressServerManager().addColonist(this);
         this.setCustomNameIfNeeded();
 
@@ -161,10 +155,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         if(this.fortressId == null) throw new IllegalStateException("Fortress id is null");
         final FortressModServerManager fortressModServerManager = getFortressModServerManager();
         return fortressModServerManager.getByFortressId(fortressId);
-    }
-
-    public BlockPos getFortressCenter() {
-        return fortressCenter;
     }
 
     @Override
@@ -507,11 +497,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putUuid("playerId", this.fortressId);
-        if(this.fortressCenter != null) {
-            nbt.putInt("fortressCenterX", this.fortressCenter.getX());
-            nbt.putInt("fortressCenterY", this.fortressCenter.getY());
-            nbt.putInt("fortressCenterZ", this.fortressCenter.getZ());
-        }
 
         final NbtCompound hunger = new NbtCompound();
         this.hungerManager.writeNbt(hunger);
@@ -535,9 +520,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         super.readCustomDataFromNbt(nbt);
         if(nbt == null) return;
         this.fortressId = nbt.getUuid("playerId");
-        if(nbt.contains("fortressCenterX")) {
-            this.fortressCenter = new BlockPos(nbt.getInt("fortressCenterX"), nbt.getInt("fortressCenterY"), nbt.getInt("fortressCenterZ"));
-        }
         if(nbt.contains("hunger")) {
             this.hungerManager.readNbt(nbt.getCompound("hunger"));
         }

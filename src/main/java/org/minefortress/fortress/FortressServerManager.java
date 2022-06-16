@@ -267,10 +267,6 @@ public final class FortressServerManager extends AbstractFortressManager {
     private NbtCompound getColonistInfoTag() {
         final NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putUuid("fortressUUID", id);
-        nbtCompound.putInt("centerX", this.fortressCenter.getX());
-        nbtCompound.putInt("centerY", this.fortressCenter.getY());
-        nbtCompound.putInt("centerZ", this.fortressCenter.getZ());
-
         return nbtCompound;
     }
 
@@ -462,7 +458,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public BlockPos getFortressCenter() {
-        return fortressCenter;
+        return fortressCenter.toImmutable();
     }
 
     public Optional<BlockPos> randomSurfacePos(ServerWorld world){
