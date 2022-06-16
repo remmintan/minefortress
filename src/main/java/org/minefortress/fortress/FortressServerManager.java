@@ -1,5 +1,7 @@
 package org.minefortress.fortress;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -82,6 +84,9 @@ public final class FortressServerManager extends AbstractFortressManager {
     public FortressServerManager(MinecraftServer server) {
         this.server = server;
         serverProfessionManager = new ServerProfessionManager(() -> this);
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+            this.gamemode = FortressGamemode.SURVIVAL;
+        }
     }
 
     public void addBuilding(FortressBuilding building) {
