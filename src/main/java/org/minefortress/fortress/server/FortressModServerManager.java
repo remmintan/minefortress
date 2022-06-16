@@ -56,7 +56,7 @@ public class FortressModServerManager {
             nbt.put(id.toString(), fortressNbt);
         }
 
-        FortressModDataLoader.getInstance().saveNbt(nbt, MANAGERS_FILE_NAME);
+        FortressModDataLoader.saveNbt(nbt, MANAGERS_FILE_NAME, server.session);
     }
 
     public void tick(PlayerManager playerManager) {
@@ -68,7 +68,7 @@ public class FortressModServerManager {
     }
 
     public void load() {
-        final var nbtCompound = FortressModDataLoader.getInstance().readNbt(MANAGERS_FILE_NAME);
+        final var nbtCompound = FortressModDataLoader.readNbt(MANAGERS_FILE_NAME, server.session);
         for (String key : nbtCompound.getKeys()) {
             final var managerNbt = nbtCompound.getCompound(key);
             final var manager = new FortressServerManager(server);

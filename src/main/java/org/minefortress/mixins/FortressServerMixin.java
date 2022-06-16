@@ -5,6 +5,7 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.*;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.UserCache;
 import net.minecraft.util.crash.CrashException;
@@ -66,6 +67,11 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
         }
     }
 
+    @Inject(method = "loadWorld", at = @At("HEAD"))
+    public void loadWorld(CallbackInfo ci) {
+        fortressModServerManager.load();
+    }
+
     @Redirect(method = "tickWorlds", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tick(Ljava/util/function/BooleanSupplier;)V"))
     public void tickWorld(ServerWorld instance, BooleanSupplier shouldKeepTicking) {
         if(ticksMultiplier > 0) {
@@ -106,6 +112,7 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
 
     @Inject(method="shutdown", at=@At("TAIL"))
     public void shutdown(CallbackInfo ci) {
+        fortressModServerManager.save();
         getBlueprintsWorld().closeSession();
     }
 

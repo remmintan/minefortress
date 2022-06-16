@@ -1,10 +1,17 @@
 package org.minefortress.data;
 
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.impl.resource.loader.FabricModResourcePack;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.impl.launch.FabricLauncher;
+import net.fabricmc.loader.impl.launch.FabricLauncherBase;
+import net.fabricmc.loader.impl.launch.knot.FabricGlobalPropertyService;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -43,17 +50,18 @@ public class FortressModDataLoader {
         }
     }
 
-    public void saveNbt(NbtCompound nbt, String fileName) {
-        final var file = getModDir().resolve(fileName).toFile();
+    public static void saveNbt(NbtCompound nbt, String fileName, LevelStorage.Session session) {
+        final var file = getWorldSaveDir(session).resolve(fileName).toFile();
         try {
+            if(!file.exists()) file.createNewFile();
             NbtIo.writeCompressed(nbt, file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public NbtCompound readNbt(String fileName) {
-        final var file = getModDir().resolve(fileName).toFile();
+    public static NbtCompound readNbt(String fileName, LevelStorage.Session session) {
+        final var file = getWorldSaveDir(session).resolve(fileName).toFile();
         if(file.exists()) {
             try {
                 return NbtIo.readCompressed(file);
@@ -65,7 +73,16 @@ public class FortressModDataLoader {
         }
     }
 
-    private Path getModDir() {
+    private static Path getWorldSaveDir(LevelStorage.Session session) {
+        final var worldDirectory = session.getWorldDirectory(World.OVERWORLD);
+        final var modDirectory = worldDirectory.toPath().resolve(MOD_DIR);
+        if(!modDirectory.toFile().exists()) modDirectory.toFile().mkdir();
+
+        return modDirectory;
+    }
+
+    private static Path getModDir() {
+//        FabricLauncherBase.getLauncher().getMappingConfiguration()
         return FabricLoader.getInstance().getGameDir().resolve(MOD_DIR);
     }
 
