@@ -98,7 +98,7 @@ public class SimpleSelectionTask extends AbstractTask {
                     final ItemTaskBlockInfo itemTaskBlockInfo = new ItemTaskBlockInfo(placingItem, pos, useOnContext);
                     blocksInfo.add(itemTaskBlockInfo);
                 } else {
-                    final BlockState blockStateForPlacement = BlockInfoUtils.getBlockStateForPlacement(placingItem, hitResult, horizontalDirection, world, pos, colonist);
+                    final BlockState blockStateForPlacement = BlockInfoUtils.getBlockStateForPlacement(placingItem, hitResult, horizontalDirection, pos, colonist);
                     final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(placingItem, pos, blockStateForPlacement);
                     blocksInfo.add(blockStateTaskBlockInfo);
                 }

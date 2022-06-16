@@ -34,14 +34,14 @@ public class BlockInfoUtils {
         return block instanceof BlockWithEntity;
     }
 
-    public static BlockState getBlockStateForPlacement(Item item, HitResult hitResult, Direction direction, ServerWorld world, BlockPos pos, Colonist colonist) {
+    public static BlockState getBlockStateForPlacement(Item item, HitResult hitResult, Direction direction, BlockPos pos, Colonist colonist) {
         BlockState stateForPlacement;
         if(isItemBucket(item)) {
             stateForPlacement = getBlockStateForBucketItem(item);
         } else {
             final BlockItem blockItem = (BlockItem) item;
             final Block block = blockItem.getBlock();
-            final ItemPlacementContext blockPlaceContext = getBlockPlaceContext(hitResult, direction, item, pos, world, colonist);
+            final ItemPlacementContext blockPlaceContext = getBlockPlaceContext(hitResult, direction, item, pos, colonist);
             stateForPlacement = Optional
                     .ofNullable(block.getPlacementState(blockPlaceContext))
                     .orElse(block.getDefaultState());
@@ -78,7 +78,7 @@ public class BlockInfoUtils {
 
 
 
-    private static ItemPlacementContext getBlockPlaceContext(HitResult hitResult, Direction horizontalDirection, Item placingItem, BlockPos goal, ServerWorld world, Colonist colonist) {
+    private static ItemPlacementContext getBlockPlaceContext(HitResult hitResult, Direction horizontalDirection, Item placingItem, BlockPos goal, Colonist colonist) {
         if(hitResult instanceof BlockHitResult) {
             ServerPlayerEntity randomPlayer = colonist.getMasterPlayer().orElseThrow(() -> new IllegalStateException("Colonist has no master player"));
             final BlockHitResult movedHitResult = moveHitResult((BlockHitResult) hitResult, goal);
