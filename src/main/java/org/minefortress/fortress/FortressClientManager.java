@@ -1,14 +1,11 @@
 package org.minefortress.fortress;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameMode;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fight.ClientFightManager;
@@ -30,7 +27,9 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private final ClientProfessionManager professionManager;
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
-    private final ClientFightManager fightManager = new ClientFightManager();
+    private final ClientFightManager fightManager;
+
+    private UUID id;
 
     private boolean initialized = false;
 
@@ -55,6 +54,7 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
+        fightManager = new ClientFightManager(() -> this);
     }
 
     public void select(Colonist colonist) {
@@ -103,11 +103,16 @@ public final class FortressClientManager extends AbstractFortressManager {
         return colonistsCount;
     }
 
-    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode) {
+    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, UUID fortressId) {
         this.colonistsCount = colonistsCount;
         this.fortressCenter = fortressCenter;
         this.gamemode = gamemode;
+        this.id = fortressId;
         initialized = true;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public void tick(FortressMinecraftClient fortressClient) {

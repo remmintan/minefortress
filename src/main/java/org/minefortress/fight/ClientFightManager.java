@@ -6,13 +6,20 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.network.ServerboundSelectFightTargetPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
+import java.util.function.Supplier;
+
 public class ClientFightManager {
 
-    private final ClientFightSelectionManager selectionManager = new ClientFightSelectionManager();
+    private final ClientFightSelectionManager selectionManager;
+
+    public ClientFightManager(Supplier<FortressClientManager> fortressClientManagerSupplier) {
+         selectionManager = new ClientFightSelectionManager(fortressClientManagerSupplier);
+    }
 
     public ClientFightSelectionManager getSelectionManager() {
         return selectionManager;

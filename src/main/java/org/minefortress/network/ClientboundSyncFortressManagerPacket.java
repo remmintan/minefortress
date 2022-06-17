@@ -7,16 +7,20 @@ import org.minefortress.fortress.FortressGamemode;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressClientPacket;
 
+import java.util.UUID;
+
 public class ClientboundSyncFortressManagerPacket implements FortressClientPacket {
 
     private final int colonistsCount;
     private final BlockPos fortressPos;
     private final FortressGamemode fortressGamemode;
+    private final UUID fortressId;
 
-    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode) {
+    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode, UUID fortressId) {
         this.colonistsCount = colonistsCount;
         this.fortressPos = fortressPos;
         this.fortressGamemode = fortressGamemode;
+        this.fortressId = fortressId;
     }
 
     public ClientboundSyncFortressManagerPacket(PacketByteBuf buf) {
@@ -28,12 +32,13 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
             this.fortressPos = null;
 
         this.fortressGamemode = FortressGamemode.valueOf(buf.readString(100));
+        this.fortressId = buf.readUuid();
     }
 
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode);
+            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.fortressId);
         }
     }
 
@@ -46,5 +51,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
             buf.writeBlockPos(fortressPos);
 
         buf.writeString(fortressGamemode.name());
+        buf.writeUuid(fortressId);
     }
 }

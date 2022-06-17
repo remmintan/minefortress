@@ -1,21 +1,23 @@
 package org.minefortress.fight;
 
-import com.google.common.base.Predicates;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.controls.FightControl;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.network.ServerboundSelectColonistsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.professions.ProfessionManager;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ClientFightSelectionManager {
+
+    private final Supplier<FortressClientManager> fortressClientManagerSupplier;
 
     private MousePos selectionStartPos;
     private Vec3d selectionStartBlock;
@@ -25,6 +27,10 @@ public class ClientFightSelectionManager {
     private List<Colonist> selectedColonists = Collections.emptyList();
 
     private Vec3d cachedBlockPos;
+
+    public ClientFightSelectionManager(Supplier<FortressClientManager> fortressClientManagerSupplier) {
+        this.fortressClientManagerSupplier = fortressClientManagerSupplier;
+    }
 
     public void startSelection(double x, double y, Vec3d startBlock) {
         this.resetSelection();
@@ -55,7 +61,12 @@ public class ClientFightSelectionManager {
             final var world = MinecraftClient.getInstance().world;
             if(world != null) {
                 selectedColonists = world
-                        .getEntitiesByType(colonistType, selectionBox, it -> FightControl.isDefender((Colonist)it))
+                        .getEntitiesByType(colonistType, selectionBox, it ->{
+                            final var colonist = (Colonist) it;
+                            final var clientFortressId = fortressClientManagerSupplier.get().getId();
+                            final var colonistFortressId = colonist.getFortressId();
+                            return colonistFortressId != null && colonistFortressId.equals(clientFortressId) && FightControl.isDefender(colonist);
+                        })
                         .stream()
                         .map(it -> (Colonist)it)
                         .toList();

@@ -129,7 +129,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         serverResourceManager.tick(player);
         serverFightManager.tick();
         if(!needSync || player == null) return;
-        final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode);
+        final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode, this.id);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
             final ClientboundSyncBuildingsPacket syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
@@ -379,6 +379,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public void setId(UUID id) {
         this.id = id;
+        this.scheduleSync();
     }
 
     public void readFromNbt(NbtCompound tag) {
