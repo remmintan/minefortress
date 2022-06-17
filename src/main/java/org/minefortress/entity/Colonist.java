@@ -69,6 +69,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private static final TrackedData<String> PROFESSION_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> HAS_TASK = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> GUY_TYPE = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
     private static final String DEFAULT_PROFESSION_ID = "colonist";
 
     public static final float WORK_REACH_DISTANCE = 4f;
@@ -80,8 +81,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private final MovementHelper movementHelper;
     private final MLGControl mlgControl;
     private final FightControl fightControl;
-
-    private UUID fortressId;
 
     private boolean allowToPlaceBlockFromFarAway = false;
     private final ColonistHungerManager hungerManager = new ColonistHungerManager();
@@ -112,13 +111,14 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         this.dataTracker.startTracking(PROFESSION_ID, DEFAULT_PROFESSION_ID);
         this.dataTracker.startTracking(HAS_TASK, false);
         this.dataTracker.startTracking(GUY_TYPE, world.random.nextInt(4));
+        this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
     }
 
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
-        this.fortressId = entityNbt.getUuid("fortressUUID");
-        if(fortressId == null) throw new IllegalStateException("Fortress UUID cannot be null for colonist");
+        this.setFortressId(entityNbt.getUuid("fortressUUID"));
+        if(this.getFortressId() == null) throw new IllegalStateException("Fortress UUID cannot be null for colonist");
         getFortressServerManager().addColonist(this);
         this.setCustomNameIfNeeded();
 
@@ -157,11 +157,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     }
 
     public FortressServerManager getFortressServerManager() {
-        if(this.fortressId == null){
+        if(this.getFortressId() == null){
             throw new IllegalStateException("Fortress id is null");
         }
         final FortressModServerManager fortressModServerManager = getFortressModServerManager();
-        return getFortressModServerManager().getByFortressId(fortressId);
+        return getFortressModServerManager().getByFortressId(this.getFortressId());
     }
 
     @Override
@@ -359,8 +359,8 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     }
 
     public Optional<ServerPlayerEntity> getMasterPlayer() {
-        if(fortressId == null) throw new IllegalStateException("Fortress ID is null");
-        return getFortressModServerManager().getPlayerByFortressId(fortressId);
+        if(this.getFortressId() == null) throw new IllegalStateException("Fortress ID is null");
+        return getFortressModServerManager().getPlayerByFortressId(this.getFortressId());
     }
 
     private void tickProfessionCheck() {
@@ -512,7 +512,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putUuid("playerId", this.fortressId);
+        nbt.putUuid("playerId", this.getFortressId());
 
         final NbtCompound hunger = new NbtCompound();
         this.hungerManager.writeNbt(hunger);
@@ -535,7 +535,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         if(nbt == null) return;
-        this.fortressId = nbt.getUuid("playerId");
+        this.setFortressId(nbt.getUuid("playerId"));
         if(nbt.contains("hunger")) {
             this.hungerManager.readNbt(nbt.getCompound("hunger"));
         }
@@ -616,4 +616,13 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
         this.world.spawnEntity(arrow);
     }
+
+    private void setFortressId(UUID id) {
+        this.dataTracker.set(FORTRESS_ID, Optional.ofNullable(id));
+    }
+
+    public UUID getFortressId() {
+        return this.dataTracker.get(FORTRESS_ID).orElse(null);
+    }
+
 }
