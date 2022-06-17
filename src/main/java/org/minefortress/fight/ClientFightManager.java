@@ -11,14 +11,17 @@ import org.minefortress.network.ServerboundSelectFightTargetPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class ClientFightManager {
 
     private final ClientFightSelectionManager selectionManager;
+    private final Supplier<FortressClientManager> fortressClientManagerSupplier;
 
     public ClientFightManager(Supplier<FortressClientManager> fortressClientManagerSupplier) {
          selectionManager = new ClientFightSelectionManager(fortressClientManagerSupplier);
+        this.fortressClientManagerSupplier = fortressClientManagerSupplier;
     }
 
     public ClientFightSelectionManager getSelectionManager() {
@@ -33,7 +36,11 @@ public class ClientFightManager {
         } else if (hitResult instanceof EntityHitResult entityHitResult) {
             final var entity = entityHitResult.getEntity();
             if(!(entity instanceof LivingEntity livingEntity)) return;
-            if(entity instanceof Colonist) return;
+            if(entity instanceof Colonist col) {
+                final var colonistFortressId = col.getFortressId();
+                if(colonistFortressId != null && colonistFortressId.equals(fortressClientManagerSupplier.get().getId()))
+                    return;
+            }
             final var packet = new ServerboundSelectFightTargetPacket(livingEntity);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, packet);
         }

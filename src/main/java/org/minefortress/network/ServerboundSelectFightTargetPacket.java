@@ -6,6 +6,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
 
@@ -52,11 +54,16 @@ public class ServerboundSelectFightTargetPacket implements FortressServerPacket 
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fightManager = this.getFortressServerManager(server, player).getServerFightManager();
+        final var fortressServerManager = this.getFortressServerManager(server, player);
+        final var fightManager = fortressServerManager.getServerFightManager();
         if(targetType == TargetType.MOVE) {
             fightManager.setMoveTarget(pos);
         } else if(targetType == TargetType.ATTACK) {
             final var entityById = (LivingEntity)player.world.getEntityById(entityId);
+            if(entityById instanceof Colonist colonist) {
+                final var fortressId = colonist.getFortressId();
+                if(fortressId != null && fortressId.equals(fortressServerManager.getId())) return;
+            }
             fightManager.setAttackTarget(entityById);
         }
     }
