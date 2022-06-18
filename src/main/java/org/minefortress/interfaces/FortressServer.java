@@ -8,7 +8,6 @@ public interface FortressServer {
 
     BlueprintsWorld getBlueprintsWorld();
     WorldGenerationProgressListener getWorldGenerationProgressListener();
-    void setTicksMultiplier(int multiplier);
     FortressModServerManager getFortressModServerManager();
 
 }

@@ -52,7 +52,6 @@ public class MineFortressMod implements ModInitializer {
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_ROADS_TASK, ServerboundRoadsTaskPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, ServerboundChangeProfessionStatePacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SET_GAMEMODE, ServerboundSetGamemodePacket::new);
-        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SET_TICKS_SPEED, ServerboundSetTickSpeedPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, ServerboundOpenCraftingScreenPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.SCROLL_CURRENT_SCREEN, ServerboundScrollCurrentScreenPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SET_COMBAT_STATE, ServerboundSetCombatStatePacket::new);

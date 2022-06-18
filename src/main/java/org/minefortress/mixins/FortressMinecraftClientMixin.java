@@ -27,9 +27,6 @@ import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.ServerboundSetTickSpeedPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.gui.ChooseModeScreen;
@@ -96,8 +93,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Shadow public abstract void setScreen(@Nullable Screen screen);
 
     @Shadow @Nullable public Screen currentScreen;
-
-    private int ticksSpeed = 1;
 
     public FortressMinecraftClientMixin(String string) {
         super(string);
@@ -271,23 +266,9 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return this.clientBlueprintManager;
     }
 
-
-
     @Override
     public boolean isSupporter() {
         return true;
-    }
-
-    @Override
-    public void setTicksSpeed(int ticksSpeed) {
-        final ServerboundSetTickSpeedPacket packet = new ServerboundSetTickSpeedPacket(ticksSpeed);
-        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_TICKS_SPEED, packet);
-        this.ticksSpeed = ticksSpeed;
-    }
-
-    @Override
-    public int getTicksSpeed() {
-        return this.ticksSpeed;
     }
 
     @Inject(method = "close", at = @At("HEAD"))

@@ -43,7 +43,6 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
 
     private BlueprintsWorld blueprintsWorld;
     private FortressModServerManager fortressModServerManager;
-    private int ticksMultiplier = 1;
 
     public FortressServerMixin(String string) {
         super(string);
@@ -55,18 +54,6 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
         fortressModServerManager = new FortressModServerManager((MinecraftServer)(Object)this);
     }
 
-    @Redirect(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;tick(Ljava/util/function/BooleanSupplier;)V"))
-    public void runWorld(MinecraftServer instance, BooleanSupplier shouldKeepTicking) {
-        if(ticksMultiplier > 0) {
-            for (int i = 0; i < ticksMultiplier; i++) {
-                instance.tick(shouldKeepTicking);
-                if(i >= ticksMultiplier) break;
-            }
-        } else {
-            instance.tick(shouldKeepTicking);
-        }
-    }
-
     @Inject(method = "loadWorld", at = @At("HEAD"))
     public void loadWorld(CallbackInfo ci) {
         fortressModServerManager.load();
@@ -74,9 +61,6 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
 
     @Redirect(method = "tickWorlds", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tick(Ljava/util/function/BooleanSupplier;)V"))
     public void tickWorld(ServerWorld instance, BooleanSupplier shouldKeepTicking) {
-        if(ticksMultiplier > 0) {
-            instance.tick(shouldKeepTicking);
-        }
         fortressModServerManager.tick(getPlayerManager());
     }
 
@@ -124,12 +108,6 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Override
     public WorldGenerationProgressListener getWorldGenerationProgressListener() {
         return this.worldGenerationProgressListenerFactory.create(11);
-    }
-
-    @Override
-    public void setTicksMultiplier(int multiplier) {
-        final int mul = Math.max(0, multiplier);
-        this.ticksMultiplier = mul>1? mul * 32:mul;
     }
 
     @Override
