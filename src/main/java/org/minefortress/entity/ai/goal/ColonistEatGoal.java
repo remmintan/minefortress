@@ -20,7 +20,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        return isHungryEnough() && colonist.getFortressServerManager().getFortressCenter() != null && this.hasEatableItem() && notInCombat();
+        return isHungryEnough() && colonist.getFortressServerManager().getFortressCenter() != null && colonist.getEatControl().hasEatableItem() && notInCombat();
     }
 
     private boolean isHungryEnough() {
@@ -45,18 +45,8 @@ public class ColonistEatGoal extends AbstractFortressGoal {
     public void tick() {
         final MovementHelper movementHelper = colonist.getMovementHelper();
         if(movementHelper.hasReachedWorkGoal()) {
-            if(this.foodInHand != null && !colonist.getActiveItem().isEmpty() && colonist.getItemUseTimeLeft() <= 0) {
-                this.foodInHand = null;
-                colonist.putItemInHand(this.foodInHand);
-            } else if(this.foodInHand != null) {
-                this.colonist.setCurrentTaskDesc("Eating...");
-                colonist.putItemInHand(this.foodInHand);
-                if(!colonist.isUsingItem()) {
-                    colonist.setCurrentHand(Hand.MAIN_HAND);
-                }
-            } else {
-                putFoodInHand();
-            }
+            if(!colonist.getEatControl().isEating())
+                colonist.getEatControl().putFoodInHand();
         }
         movementHelper.tick();
 
@@ -66,7 +56,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() && isHungryEnough() && (hasEatableItem() || this.foodInHand != null || hasntReachedTheWorkGoal());
+        return notInCombat() && isHungryEnough() && (colonist.getEatControl().hasEatableItem() || this.foodInHand != null || hasntReachedTheWorkGoal());
     }
 
     private boolean hasntReachedTheWorkGoal() {
@@ -75,7 +65,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return !hasEatableItem() || isScared();
+        return !colonist.getEatControl().hasEatableItem() || isScared();
     }
 
     @Override
@@ -84,31 +74,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
         this.goal = null;
         this.colonist.getNavigation().stop();
         colonist.putItemInHand(this.foodInHand);
-    }
-
-    private void putFoodInHand() {
-        this.getEatableItem().ifPresent(item -> {
-            colonist.getFortressServerManager()
-                    .getServerResourceManager().increaseItemAmount(item.getItem(), -1);
-            this.foodInHand = item.getItem();
-        });
-    }
-
-    private Optional<ItemStack> getEatableItem() {
-        return colonist.getFortressServerManager()
-                .getServerResourceManager()
-                .getAllItems()
-                .stream()
-                .filter(this::isEatableItem)
-                .findFirst();
-    }
-
-    private boolean hasEatableItem() {
-        return getEatableItem().isPresent();
-    }
-
-    private boolean isEatableItem(ItemStack st) {
-        return !st.isEmpty() && st.getItem().isFood();
+        colonist.getEatControl().reset();
     }
 
     private int getHomeOuterRadius() {

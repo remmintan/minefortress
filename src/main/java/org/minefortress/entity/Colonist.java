@@ -81,6 +81,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private final MovementHelper movementHelper;
     private final MLGControl mlgControl;
     private final FightControl fightControl;
+    private final EatControl eatControl;
 
     private boolean allowToPlaceBlockFromFarAway = false;
     private final ColonistHungerManager hungerManager = new ColonistHungerManager();
@@ -96,6 +97,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             taskControl = new TaskControl(this);
             movementHelper = new MovementHelper((ColonistNavigation) this.getNavigation(), this);
             fightControl = new FightControl(this);
+            eatControl = new EatControl(this);
         } else {
             digControl = null;
             placeControl = null;
@@ -104,6 +106,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             taskControl = null;
             movementHelper = null;
             fightControl = null;
+            eatControl = null;
         }
 
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
@@ -530,6 +533,10 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     public String getProfessionId() {
         return this.dataTracker.get(PROFESSION_ID);
+    }
+
+    public EatControl getEatControl() {
+        return eatControl;
     }
 
     @Override
