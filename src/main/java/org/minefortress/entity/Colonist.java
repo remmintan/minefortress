@@ -331,6 +331,10 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     protected void mobTick() {
         super.mobTick();
         tickProfessionCheck();
+        final var target = this.getTarget();
+        if(target != null && !target.isAlive()) {
+            this.setTarget(null);
+        }
 
         this.hungerManager.update(this);
 

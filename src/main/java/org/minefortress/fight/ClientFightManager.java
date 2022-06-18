@@ -48,7 +48,11 @@ public class ClientFightManager {
 
     public void setTarget(Entity entity) {
         if(!(entity instanceof LivingEntity livingEntity)) return;
-        if(entity instanceof Colonist) return;
+        if(entity instanceof Colonist col) {
+            final var colonistFortressId = col.getFortressId();
+            if(colonistFortressId != null && colonistFortressId.equals(fortressClientManagerSupplier.get().getId()))
+                return;
+        }
         final var packet = new ServerboundSelectFightTargetPacket(livingEntity);
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, packet);
     }

@@ -82,7 +82,7 @@ public class FightControl {
 
         if(this.attackTarget == null) {
             final var target = this.colonist.getTarget();
-            if(target instanceof HostileEntity && isTargetAcceptable(target)) {
+            if((target instanceof HostileEntity || target instanceof Colonist) && isTargetAcceptable(target)) {
                 this.attackTarget = target;
             } else {
                 this.attackTarget = null;
@@ -189,6 +189,9 @@ public class FightControl {
 
     private boolean isTargetAcceptable(LivingEntity target) {
         if(!isLongRangeAttacker() && target instanceof CreeperEntity)
+            return false;
+
+        if(target instanceof Colonist col && col.getFortressId().equals(colonist.getFortressId()))
             return false;
 
         if(this.moveTarget != null) {
