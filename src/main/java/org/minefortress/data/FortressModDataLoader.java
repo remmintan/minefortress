@@ -75,7 +75,7 @@ public class FortressModDataLoader {
 
     private static Path getWorldSaveDir(LevelStorage.Session session) {
         final var worldDirectory = session.getWorldDirectory(World.OVERWORLD);
-        final var modDirectory = worldDirectory.toPath().resolve(MOD_DIR);
+        final var modDirectory = worldDirectory.resolve(MOD_DIR);
         if(!modDirectory.toFile().exists()) modDirectory.toFile().mkdir();
 
         return modDirectory;
