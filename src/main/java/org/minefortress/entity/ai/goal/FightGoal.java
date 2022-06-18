@@ -2,6 +2,7 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.controls.FightControl;
 import org.minefortress.tasks.BuildingManager;
 
 public class FightGoal extends AbstractFortressGoal {
@@ -29,7 +30,8 @@ public class FightGoal extends AbstractFortressGoal {
 
         final var moveHelper = colonist.getMovementHelper();
 
-        colonist.getFightControl().checkAndPutCorrectItemInHand();
+        final var fightControl = colonist.getFightControl();
+        fightControl.checkAndPutCorrectItemInHand();
 
         findMoveTarget();
         if(correctMoveTarget != null) {
@@ -37,9 +39,11 @@ public class FightGoal extends AbstractFortressGoal {
         } else {
             moveHelper.reset();
         }
-        moveHelper.tick();
+        if (!fightControl.hasAttackTarget() || cachedMoveTarget == null || !cachedMoveTarget.isWithinDistance(colonist.getPos(), FightControl.DEFEND_RANGE)) {
+            moveHelper.tick();
+        }
 
-        colonist.getFightControl().attackTargetIfPossible();
+        fightControl.attackTargetIfPossible();
     }
 
     private void findMoveTarget() {
@@ -66,6 +70,7 @@ public class FightGoal extends AbstractFortressGoal {
         colonist.putItemInHand(null);
         this.cachedMoveTarget = null;
         this.correctMoveTarget = null;
+        colonist.getMovementHelper().reset();
     }
 
     @Override

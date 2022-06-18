@@ -19,6 +19,8 @@ import java.util.List;
 
 public class FightControl {
 
+    public static final float DEFEND_RANGE = 10f;
+
     private static final List<String> DEFENDER_PROFESSIONS = Arrays.asList(
             "warrior1",
             "warrior2",
@@ -57,18 +59,23 @@ public class FightControl {
             rangedAttackCooldown--;
         }
 
-        if(moveTargetNotReached()) return;
-
-        if(this.attackTarget != null && !this.attackTarget.isAlive()){
+        if(this.attackTarget != null &&
+            (!this.attackTarget.isAlive()
+            ||
+            this.moveTarget != null && !this.moveTarget.isWithinDistance(this.attackTarget.getPos(), getDefendAttackRange()))
+        ){
             this.attackTarget = null;
         }
+
+        if(moveTargetNotReached()) return;
 
         if(attackTarget == null){
             final var serverFightManager = colonist.getFortressServerManager().getServerFightManager();
             if(serverFightManager.hasAnyScaryMob()) {
                 final var randomScaryMob = serverFightManager.getRandomScaryMob(colonist.world.random);
                 if(isTargetAcceptable(randomScaryMob)) {
-                    this.setAttackTarget(randomScaryMob);
+//                    this.setAttackTarget(randomScaryMob);
+                    this.attackTarget = randomScaryMob;
                 }
             }
         }
@@ -76,7 +83,8 @@ public class FightControl {
         if(this.attackTarget == null) {
             final var target = this.colonist.getTarget();
             if(target instanceof HostileEntity && isTargetAcceptable(target)) {
-                this.setAttackTarget(target);
+//                this.setAttackTarget(target);
+                this.attackTarget = target;
             } else {
                 this.attackTarget = null;
             }
@@ -85,10 +93,11 @@ public class FightControl {
 
     public void attackTargetIfPossible() {
         if(!this.hasAttackTarget()) return;
-        if(!isLongRangeAttacker())
-            this.meleeAttack();
-        else
+        if (isLongRangeAttacker()) {
             this.longRangeAttack();
+        } else {
+            this.meleeAttack();
+        }
     }
 
     private void longRangeAttack() {
@@ -144,13 +153,17 @@ public class FightControl {
     private void meleeAttack(double squaredDistance) {
         double d = this.getSquaredMaxAttackDistance();
         if (squaredDistance <= d && this.meleeAttackCooldown <= 0) {
-            this.meleeAttackCooldown = 20;
+            this.meleeAttackCooldown = 15;
             this.colonist.swingHand(Hand.MAIN_HAND);
             this.colonist.tryAttack(this.attackTarget);
         }
     }
 
     private double getSquaredMaxAttackDistance() {
+        return getSquaredMaxAttackDistance(this.attackTarget);
+    }
+
+    private double getSquaredMaxAttackDistance(LivingEntity attackTarget) {
         if(isLongRangeAttacker()) {
             return 17d*17d;
         } else {
@@ -159,22 +172,27 @@ public class FightControl {
     }
     
     private boolean moveTargetNotReached() {
-        if(fortressInCombat()) {
-            return this.moveTarget != null;
-        }  else {
-            return this.moveTarget != null && !this.moveTarget.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE);
-        }
-    }
-
-    private boolean fortressInCombat() {
-        return colonist.getFortressServerManager().isCombatMode();
+        return this.moveTarget != null && !this.moveTarget.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE);
     }
 
     private boolean isTargetAcceptable(LivingEntity target) {
-        if(target instanceof CreeperEntity) {
-            return isLongRangeAttacker();
+        if(!isLongRangeAttacker() && target instanceof CreeperEntity)
+            return false;
+
+        if(this.moveTarget != null) {
+            final double defendAttackRange = getDefendAttackRange(target);
+            return this.moveTarget.isWithinDistance(target.getPos(), defendAttackRange);
         }
         return true;
+    }
+
+    private double getDefendAttackRange() {
+        return getDefendAttackRange(this.attackTarget);
+    }
+
+    private double getDefendAttackRange(LivingEntity target) {
+        final var maxAttackDistance = Math.sqrt(this.getSquaredMaxAttackDistance(target));
+        return DEFEND_RANGE + maxAttackDistance;
     }
 
     private boolean isLongRangeAttacker() {

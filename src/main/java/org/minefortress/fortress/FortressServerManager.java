@@ -242,6 +242,9 @@ public final class FortressServerManager extends AbstractFortressManager {
             final var tag = getColonistInfoTag();
             EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
             final var spawnedPawn = (Colonist)colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+            if(villageUnderAttack) {
+                spawnedPawn.getFightControl().setMoveTarget(getFortressCenter());
+            }
             return Optional.ofNullable(spawnedPawn);
         }
         return Optional.empty();
