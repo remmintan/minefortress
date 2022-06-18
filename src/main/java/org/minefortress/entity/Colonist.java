@@ -286,7 +286,8 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
 
-        this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, true));
+        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
     }
 
     @Nullable
