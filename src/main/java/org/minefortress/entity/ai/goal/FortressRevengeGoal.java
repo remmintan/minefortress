@@ -2,9 +2,7 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.goal.RevengeGoal;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.math.Box;
 import org.minefortress.entity.Colonist;
@@ -20,11 +18,18 @@ public class FortressRevengeGoal extends RevengeGoal {
     protected void callSameTypeForRevenge() {
         double d = this.getFollowRange();
         Box box = Box.from(this.mob.getPos()).expand(d, 10.0, d);
-        List<Colonist> list = this.mob.world.getEntitiesByClass(Colonist.class, box, EntityPredicates.EXCEPT_SPECTATOR);
+        List<Colonist> list = this.mob.world.getEntitiesByClass(Colonist.class, box, EntityPredicates.EXCEPT_SPECTATOR.and(this::fromTheSameFortress));
         for (Colonist colonist : list) {
-            final var thisColonist = (Colonist) this.mob;
-            if (this.mob == colonist || colonist.getTarget() != null || colonist.getFortressId().equals(thisColonist.getFortressId())) continue;
+            if (this.mob == colonist || colonist.getTarget() != null) continue;
             this.setMobEntityTarget(colonist, this.mob.getAttacker());
         }
+    }
+
+    private boolean fromTheSameFortress(Entity entity) {
+        final var thisColonist = (Colonist) this.mob;
+        if(entity instanceof Colonist colonist) {
+            return colonist.getFortressId() != null && colonist.getFortressId().equals(thisColonist.getFortressId());
+        }
+        return false;
     }
 }

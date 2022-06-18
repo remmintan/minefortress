@@ -184,7 +184,7 @@ public class FightControl {
     }
     
     private boolean moveTargetNotReached() {
-        return this.moveTarget != null && !this.moveTarget.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE);
+        return this.moveTarget != null && !this.moveTarget.isWithinDistance(this.colonist.getBlockPos().up(), DEFEND_RANGE);
     }
 
     private boolean isTargetAcceptable(LivingEntity target) {
@@ -271,7 +271,7 @@ public class FightControl {
     }
 
     public void checkAndPutCorrectItemInHand() {
-        if (!colonist.getEatControl().isEating() && (colonist.getActiveItem() == null || colonist.getActiveItem().getItem() != getCorrectItem())) {
+        if (!colonist.getEatControl().isEating() && (colonist.getActiveItem() == null || !colonist.getActiveItem().getItem().equals(getCorrectItem()))) {
             putCorrectSwordInHand();
         }
     }
