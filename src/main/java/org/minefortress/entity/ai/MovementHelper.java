@@ -47,6 +47,8 @@ public class MovementHelper {
     }
 
     public boolean hasReachedWorkGoal() {
+        if(this.workGoal == null) return false;
+
         final boolean withinDistance =
                 this.workGoal.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE)
                 || this.colonist.isAllowToPlaceBlockFromFarAway();

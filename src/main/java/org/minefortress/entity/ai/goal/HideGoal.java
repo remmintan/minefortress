@@ -33,6 +33,7 @@ public class HideGoal extends AbstractFortressGoal{
                 .map(FortressBedInfo::getPos)
                 .orElse(fortressServerManager.getFortressCenter());
 
+        if(shelterBlockPos == null) return;
         this.moveGoal = findCorrectGoal();
         colonist.getMovementHelper().set(moveGoal);
         this.hideTicks = 100;
@@ -50,7 +51,7 @@ public class HideGoal extends AbstractFortressGoal{
 
     @Override
     public boolean shouldContinue() {
-        return (this.hideTicks > 0 || super.isHiding()) && !this.colonist.getMovementHelper().isCantFindPath();
+        return shelterBlockPos!=null && (this.hideTicks > 0 || super.isHiding()) && !this.colonist.getMovementHelper().isCantFindPath();
     }
 
     @Override
