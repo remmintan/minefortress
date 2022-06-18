@@ -59,8 +59,8 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
         fortressModServerManager.load();
     }
 
-    @Redirect(method = "tickWorlds", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tick(Ljava/util/function/BooleanSupplier;)V"))
-    public void tickWorld(ServerWorld instance, BooleanSupplier shouldKeepTicking) {
+    @Inject(method = "tickWorlds", at = @At("TAIL"))
+    public void tickWorld(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         fortressModServerManager.tick(getPlayerManager());
     }
 
