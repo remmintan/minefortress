@@ -11,7 +11,6 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -68,13 +67,14 @@ public class FightControl {
         }
 
         if(moveTargetNotReached()) return;
+        final var eatControl = colonist.getEatControl();
+        if(eatControl.isEating()) return;
 
         if(attackTarget == null){
             final var serverFightManager = colonist.getFortressServerManager().getServerFightManager();
             if(serverFightManager.hasAnyScaryMob()) {
                 final var randomScaryMob = serverFightManager.getRandomScaryMob(colonist.world.random);
                 if(isTargetAcceptable(randomScaryMob)) {
-//                    this.setAttackTarget(randomScaryMob);
                     this.attackTarget = randomScaryMob;
                 }
             }
@@ -83,10 +83,22 @@ public class FightControl {
         if(this.attackTarget == null) {
             final var target = this.colonist.getTarget();
             if(target instanceof HostileEntity && isTargetAcceptable(target)) {
-//                this.setAttackTarget(target);
                 this.attackTarget = target;
             } else {
                 this.attackTarget = null;
+            }
+        }
+
+        if(this.moveTarget != null && this.attackTarget == null) {
+            if(eatControl.isHungryEnough() && eatControl.hasEatableItem()) {
+                final var fortressServerManager = colonist.getFortressServerManager();
+                final var fortressCenter = fortressServerManager.getFortressCenter();
+                if(fortressCenter != null) {
+                    final var isWithinCampfireRange = fortressCenter.isWithinDistance(colonist.getPos(), DEFEND_RANGE);
+                    if(isWithinCampfireRange) {
+                        eatControl.putFoodInHand();
+                    }
+                }
             }
         }
     }
@@ -259,7 +271,7 @@ public class FightControl {
     }
 
     public void checkAndPutCorrectItemInHand() {
-        if (colonist.getActiveItem() == null || colonist.getActiveItem().getItem() != getCorrectItem()) {
+        if (!colonist.getEatControl().isEating() && (colonist.getActiveItem() == null || colonist.getActiveItem().getItem() != getCorrectItem())) {
             putCorrectSwordInHand();
         }
     }

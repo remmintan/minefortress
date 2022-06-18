@@ -16,6 +16,10 @@ public class EatControl {
         this.colonist = colonist;
     }
 
+    public boolean isHungryEnough() {
+        return colonist.getCurrentFoodLevel() < 12 || (colonist.getHealth() <= 10 && colonist.getCurrentFoodLevel() < 20);
+    }
+
     public void tick() {
         if(this.foodInHand != null && foodInHand.equals(colonist.getActiveItem().getItem()) && !colonist.getActiveItem().isEmpty() && colonist.getItemUseTimeLeft() <= 0) {
             reset();

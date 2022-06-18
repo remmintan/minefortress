@@ -20,11 +20,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        return isHungryEnough() && colonist.getFortressServerManager().getFortressCenter() != null && colonist.getEatControl().hasEatableItem() && notInCombat();
-    }
-
-    private boolean isHungryEnough() {
-        return colonist.getCurrentFoodLevel() < 12 || (colonist.getHealth() <= 10 && colonist.getCurrentFoodLevel() < 20);
+        return colonist.getEatControl().isHungryEnough() && colonist.getFortressServerManager().getFortressCenter() != null && colonist.getEatControl().hasEatableItem() && notInCombat();
     }
 
     @Override
@@ -56,7 +52,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() && isHungryEnough() && (colonist.getEatControl().hasEatableItem() || this.foodInHand != null || hasntReachedTheWorkGoal());
+        return notInCombat() && colonist.getEatControl().isHungryEnough() && (colonist.getEatControl().hasEatableItem() || this.foodInHand != null || hasntReachedTheWorkGoal());
     }
 
     private boolean hasntReachedTheWorkGoal() {
