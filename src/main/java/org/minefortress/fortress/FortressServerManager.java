@@ -73,6 +73,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private boolean combatMode;
     private boolean villageUnderAttack;
+    private int attackTicks = 0;
 
     private boolean needSync = true;
     private boolean needSyncBuildings = true;
@@ -169,6 +170,13 @@ public final class FortressServerManager extends AbstractFortressManager {
         final List<Colonist> deadColonists = colonists.stream()
                 .filter(colonist -> !colonist.isAlive())
                 .collect(Collectors.toList());
+
+        if(this.villageUnderAttack && player == null) {
+            this.attackTicks++;
+            if(this.attackTicks >= 60 * 20) {
+                this.setCombatMode(false, false);
+            }
+        }
 
         if(!deadColonists.isEmpty()) {
             for(Colonist colonist : deadColonists) {
@@ -578,6 +586,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void setCombatMode(boolean combatMode, boolean villageUnderAttack) {
+        this.attackTicks = 0;
         if(this.combatMode == combatMode) {
             this.villageUnderAttack = villageUnderAttack;
             return;
