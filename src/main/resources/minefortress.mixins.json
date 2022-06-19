@@ -12,7 +12,8 @@
     "entity.FurnaceBlockEntityMixin",
     "interaction.FortressGameModeMixin",
     "interfaces.FortressDimensionTypeMixin",
-    "network.FortressServerPlayNetworkHandlerMixin"
+    "network.FortressServerPlayNetworkHandlerMixin",
+    "renderer.gui.FortressSimpleInventoryMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",
@@ -31,7 +32,6 @@
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
     "renderer.gui.FortressCreativeInventoryScreenMixin",
-    "renderer.gui.FortressSimpleInventoryMixin",
     "world.FortressClientWorldMixin"
   ],
   "server": [],

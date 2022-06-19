@@ -1,13 +1,9 @@
 package org.minefortress.mixins.renderer.gui;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.util.collection.DefaultedList;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressSimpleInventory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,10 +23,7 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
 
     @Override
     public int getMaxCountPerStack() {
-        if(getFortressMinecraftClient().isFortressGamemode() && isNotCreative())
-            return 10000;
-        else
-            return FortressSimpleInventory.super.getMaxCountPerStack();
+        return 10000;
     }
 
     @Override
@@ -73,22 +66,6 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
     @Inject(method = "markDirty", at = @At("RETURN"))
     public void markDirty(CallbackInfo ci) {
         changeCount++;
-    }
-
-    private MinecraftClient getClient() {
-        return MinecraftClient.getInstance();
-    }
-
-    private FortressClientManager getClientManager() {
-        return getFortressMinecraftClient().getFortressClientManager();
-    }
-
-    private FortressMinecraftClient getFortressMinecraftClient() {
-        return (FortressMinecraftClient) getClient();
-    }
-
-    private boolean isNotCreative() {
-        return !getClientManager().isCreative();
     }
 
 }
