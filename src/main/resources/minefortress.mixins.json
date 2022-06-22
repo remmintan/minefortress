@@ -19,7 +19,6 @@
     "FortressMinecraftClientMixin",
     "entity.FortressClientPlayerEntityMixin",
     "entity.player.FortressPlayerEntityRendererMixin",
-    "entity.player.FortressPlayerInventoryMixin",
     "interaction.FortressClientInteractionManagerMixin",
     "interaction.FortressKeyboardInputMixin",
     "interaction.FortressMouseMixin",
@@ -34,7 +33,9 @@
     "renderer.gui.FortressCreativeInventoryScreenMixin",
     "world.FortressClientWorldMixin"
   ],
-  "server": [],
+  "server": [
+    "entity.player.FortressPlayerInventoryMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

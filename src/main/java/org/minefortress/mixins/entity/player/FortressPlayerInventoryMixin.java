@@ -1,10 +1,15 @@
 package org.minefortress.mixins.entity.player;
 
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeMatcher;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.minefortress.interfaces.FortressServer;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -12,21 +17,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerInventory.class)
 public abstract class FortressPlayerInventoryMixin {
 
+    @Shadow @Final public PlayerEntity player;
+
     @Inject(method = "populateRecipeFinder", at = @At("HEAD"), cancellable = true)
-    void populateFinder(RecipeMatcher finder, CallbackInfo ci) {
-        final var fortressClient = getFortressClient();
-        final var fortressClientManager = fortressClient.getFortressClientManager();
-        if(fortressClient.isFortressGamemode() && fortressClientManager.isSurvival()) {
-            final var resourceManager = fortressClientManager.getResourceManager();
-            final var allStacks = resourceManager.getAllStacks();
+    void populateFinder(RecipeMatcher finder, CallbackInfo ci) {;
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+            final var player = (ServerPlayerEntity) this.player;
+            final var server = (FortressServer)player.getServer();
+            final var serverManager = server.getFortressModServerManager().getByPlayer(player);
+            final var allItems = serverManager.getServerResourceManager().getAllItems();
             finder.clear();
-            allStacks.forEach(it -> finder.addInput(it, Integer.MAX_VALUE));
+            allItems.forEach(it -> finder.addInput(it, Integer.MAX_VALUE));
             ci.cancel();
         }
-    }
-
-    private FortressMinecraftClient getFortressClient() {
-        return (FortressMinecraftClient) MinecraftClient.getInstance();
     }
 
 }
