@@ -150,6 +150,15 @@ public final class FortressServerManager extends AbstractFortressManager {
         needSync = false;
     }
 
+    public void scheduleSyncEverything() {
+        this.needSyncSpecialBlocks = true;
+        this.needSyncBuildings = true;
+        this.needSyncCombat = true;
+        this.serverResourceManager.syncAll();
+        this.serverProfessionManager.scheduleSync();
+        this.needSync = true;
+    }
+
     public Optional<FortressBuilding> getRandomBuilding(String requirementId, Random random) {
         final var buildings = this.buildings.stream()
                 .filter(building -> building.getRequirementId().equals(requirementId))

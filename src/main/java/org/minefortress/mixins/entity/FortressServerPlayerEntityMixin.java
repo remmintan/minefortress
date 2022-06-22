@@ -19,6 +19,7 @@ import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.ClientboundFollowColonistPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -153,6 +154,14 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         } else {
             return actualSpawn;
         }
+    }
+
+    @Inject(method="onSpawn", at=@At("TAIL"))
+    public void onSpawn(CallbackInfo ci) {
+        final var fortressServer = (FortressServer) this.server;
+        final var serverManager = fortressServer.getFortressModServerManager();
+        final var fortressManager = serverManager.getByPlayer((ServerPlayerEntity) (Object) this);
+        fortressManager.scheduleSyncEverything();
     }
 
 }
