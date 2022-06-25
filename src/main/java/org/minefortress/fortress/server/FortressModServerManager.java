@@ -27,9 +27,6 @@ public class FortressModServerManager {
     }
 
     public FortressServerManager getByPlayer(ServerPlayerEntity player) {
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-            return null;
-        }
         final var playerId = player.getUuid();
         final var manager = serverManagers.get(playerId);
         if(manager == null) {
@@ -58,9 +55,6 @@ public class FortressModServerManager {
     }
 
     public FortressServerManager getByFortressId(UUID uuid) {
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-            return null;
-        }
         for(FortressServerManager manager : serverManagers.values()) {
             if(manager.getId().equals(uuid)) {
                 return manager;
@@ -74,9 +68,6 @@ public class FortressModServerManager {
     }
 
     public Optional<ServerPlayerEntity> getPlayerByFortressId(UUID fortressId) {
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-            return null;
-        }
         for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
             if (entry.getValue().getId().equals(fortressId)) {
                 return Optional.ofNullable(server.getOverworld().getRandomAlivePlayer());
