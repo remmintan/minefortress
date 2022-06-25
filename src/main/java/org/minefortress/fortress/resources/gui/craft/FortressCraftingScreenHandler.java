@@ -39,6 +39,7 @@ public class FortressCraftingScreenHandler extends AbstractFortressRecipeScreenH
     @Override
     public void onContentChanged(Inventory inventory) {
         CraftingScreenHandler.updateResult(this, world, player, getInput(), getResult());
+        super.onContentChanged(inventory);
     }
 
     @Override
