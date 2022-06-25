@@ -13,7 +13,8 @@
     "interaction.FortressGameModeMixin",
     "interfaces.FortressDimensionTypeMixin",
     "network.FortressServerPlayNetworkHandlerMixin",
-    "renderer.gui.FortressSimpleInventoryMixin"
+    "renderer.gui.FortressSimpleInventoryMixin",
+    "entity.player.FortressPlayerInventoryMixin",
   ],
   "client": [
     "FortressMinecraftClientMixin",
@@ -34,7 +35,7 @@
     "world.FortressClientWorldMixin"
   ],
   "server": [
-    "entity.player.FortressPlayerInventoryMixin"
+
   ],
   "injectors": {
     "defaultRequire": 1
