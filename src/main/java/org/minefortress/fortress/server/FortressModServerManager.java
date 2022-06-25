@@ -1,5 +1,7 @@
 package org.minefortress.fortress.server;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -25,6 +27,9 @@ public class FortressModServerManager {
     }
 
     public FortressServerManager getByPlayer(ServerPlayerEntity player) {
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+            return null;
+        }
         final var playerId = player.getUuid();
         final var manager = serverManagers.get(playerId);
         if(manager == null) {
@@ -53,6 +58,9 @@ public class FortressModServerManager {
     }
 
     public FortressServerManager getByFortressId(UUID uuid) {
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+            return null;
+        }
         for(FortressServerManager manager : serverManagers.values()) {
             if(manager.getId().equals(uuid)) {
                 return manager;
@@ -66,9 +74,12 @@ public class FortressModServerManager {
     }
 
     public Optional<ServerPlayerEntity> getPlayerByFortressId(UUID fortressId) {
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+            return null;
+        }
         for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
             if (entry.getValue().getId().equals(fortressId)) {
-                return Optional.ofNullable(server.getPlayerManager().getPlayer(entry.getKey()));
+                return Optional.ofNullable(server.getOverworld().getRandomAlivePlayer());
             }
         }
         return Optional.empty();

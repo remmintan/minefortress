@@ -58,6 +58,10 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
             if (!this.handler.canInsertIntoSlot(i)) continue;
             ItemStack itemStack = this.handler.getSlot(i).getStack().copy();
             this.inventory.addStack(itemStack);
+            final var virtualInventory = this.handler.getVirtualInventory();
+            if(!virtualInventory.hasItem(itemStack.getItem())) {
+                virtualInventory.addItem(itemStack);
+            }
             this.handler.getSlot(i).setStack(itemStack);
         }
         this.handler.clearCraftingSlots();
@@ -131,6 +135,10 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
             this.inventory.removeStack(i, 1);
         } else {
             this.inventory.removeStack(i);
+            final var virtualInventory = this.handler.getVirtualInventory();
+            if(virtualInventory != null) {
+                virtualInventory.set(i, ItemStack.EMPTY);
+            }
         }
         itemStack.setCount(1);
         if (slot.getStack().isEmpty()) {

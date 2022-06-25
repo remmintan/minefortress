@@ -11,6 +11,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
+import org.minefortress.commands.CommandsManager;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
@@ -40,6 +41,8 @@ public class MineFortressMod implements ModInitializer {
         // entities
         FabricDefaultAttributeRegistry.register(FortressEntities.COLONIST_ENTITY_TYPE, Colonist.createAttributes());
         Registry.register(Registry.ITEM, new Identifier("minefortress", "colonist_spawn_egg"), FortressItems.COLONIST_SPAWN_EGG);
+
+        CommandsManager.registerCommands();
 
         // networking
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.NEW_SELECTION_TASK, ServerboundSimpleSelectionTaskPacket::new);

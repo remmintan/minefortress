@@ -176,6 +176,9 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void tickFortress(@Nullable ServerPlayerEntity player) {
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+            throw new IllegalStateException("Tick should not be called on server");
+        }
         final List<Colonist> deadColonists = colonists.stream()
                 .filter(colonist -> !colonist.isAlive())
                 .collect(Collectors.toList());

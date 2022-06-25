@@ -2,13 +2,11 @@ package org.minefortress.fortress.resources.gui;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
@@ -18,7 +16,6 @@ import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServer;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSimpleInventory;
 import org.minefortress.network.ServerboundScrollCurrentScreenPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -49,7 +46,19 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     }
 
     public int getRowsCount() {
-        return ((serverResourceManager!=null? virtualInventory.size(): slots.size()) + 9) / 9;
+        final var rowsCount = ((virtualInventory != null ? virtualInventory.size() : slots.size())) / 9;
+        return rowsCount + (virtualInventory != null && virtualInventory.full() ? 1 : 0);
+    }
+
+    @Override
+    public void setStackInSlot(int slot, int revision, ItemStack stack) {
+        while (slots.size() <= slot) {
+            for (int column = 0; column < 9; ++column) {
+                this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + clientCurrentRow * 9, 8 + column * 18, 80 + clientCurrentRow * 18));
+            }
+            clientCurrentRow++;
+        }
+        super.setStackInSlot(slot, revision, stack);
     }
 
     @Override
@@ -195,6 +204,10 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         this.lastScrollPosition = position;
     }
 
+    public VirtualInventory getVirtualInventory() {
+        return virtualInventory;
+    }
+
     @Override
     public boolean matches(Recipe<? super T> recipe) {
         return recipe.matches(getInput(), world);
@@ -225,9 +238,15 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
         @Override
         public void setStack(ItemStack stack) {
-            if(AbstractFortressRecipeScreenHandler.this.virtualInventory != null)
-                AbstractFortressRecipeScreenHandler.this.virtualInventory.set(this.getIndex(), stack);
+            final var handler = AbstractFortressRecipeScreenHandler.this;
+            if(handler.virtualInventory != null)
+                handler.virtualInventory.set(this.getIndex(), stack);
             super.setStack(stack);
+        }
+
+        @Override
+        public ItemStack getStack() {
+            return super.getStack();
         }
 
         @Override
@@ -276,41 +295,44 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
                     .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
         }
 
+        boolean full() {
+            return !this.items.stream().anyMatch(ItemStack::isEmpty);
+        }
+
         ItemStack get(int index) {
             return this.items.get(index);
         }
 
+        boolean hasItem(Item item) {
+            return this.items.stream().anyMatch(it -> it.getItem().equals(item));
+        }
+
+        void addItem(ItemStack itemStack) {
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).isEmpty()) {
+                    items.set(i, itemStack);
+                    return;
+                }
+            }
+        }
+
         void set(int index, ItemStack stack) {
+            final var slots = AbstractFortressRecipeScreenHandler.this.slots;
+
+            final var storageSlotsCount = slots.size() - AbstractFortressRecipeScreenHandler.this.getCraftingSlotCount();
+            while (storageSlotsCount>items.size()) {
+                this.items.add(ItemStack.EMPTY);
+            }
+
             final var realIndex = index + rowsOffset * 9;
             final var itemsCount = this.items.size();
 
             final var insertIndex = realIndex < itemsCount ? realIndex : (realIndex - itemsCount);
 
-            if(this.items.get(insertIndex).isEmpty())
+            if(this.items.get(insertIndex).isEmpty() || stack.isEmpty())
                 this.items.set(insertIndex, stack);
-            else {
-                final var handler = AbstractFortressRecipeScreenHandler.this;
-                final var beforeRowsCount = (itemsCount + 9) / 9;
-
-                if(index >= itemsCount) {
-                    for(int i = 0; i < (index - itemsCount + 1); i++) {
-                        this.items.add(ItemStack.EMPTY);
-                    }
-                }
-                this.items.set(realIndex, stack);
-                final var afterRowsCount = (this.items.size() + 9) / 9;
-                if(afterRowsCount > beforeRowsCount) {
-                    for (int column = 0; column < 9; ++column) {
-                        final var slotIndex = column + afterRowsCount * 9;
-                        final var slotX = 8 + column * 18;
-                        final var slotY = 80 + afterRowsCount * 18;
-                        handler.addSlot(new FortressNotInsertableSlot(handler.screenInventory, slotIndex, slotX, slotY));
-                    }
-                }
-
-                handler.scrollItems(handler.lastScrollPosition);
-            }
-
+            else
+                throw new IllegalStateException();
         }
 
         void setRowsOffset(int rowsOffset) {
