@@ -53,6 +53,17 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     }
 
     @Override
+    public void setStackInSlot(int slot, int revision, ItemStack stack) {
+        while (slots.size() <= slot) {
+            for (int column = 0; column < 9; ++column) {
+                this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + clientCurrentRow * 9, 8 + column * 18, 80 + clientCurrentRow * 18));
+            }
+            clientCurrentRow++;
+        }
+        super.setStackInSlot(slot, revision, stack);
+    }
+
+    @Override
     public void updateSlotStacks(int revision, List<ItemStack> stacks, ItemStack cursorStack) {
         while (slots.size() < stacks.size()) {
             for (int column = 0; column < 9; ++column) {
@@ -285,19 +296,20 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
             final var itemsCount = this.items.size();
 
             final var insertIndex = realIndex < itemsCount ? realIndex : (realIndex - itemsCount);
+//            final var insertIndex = realIndex;
 
-            if(this.items.get(insertIndex).isEmpty())
+            if(insertIndex<itemsCount && this.items.get(insertIndex).isEmpty())
                 this.items.set(insertIndex, stack);
             else {
                 final var handler = AbstractFortressRecipeScreenHandler.this;
                 final var beforeRowsCount = (itemsCount + 9) / 9;
 
-                if(index >= itemsCount) {
+                if(insertIndex >= itemsCount) {
                     for(int i = 0; i < (index - itemsCount + 1); i++) {
                         this.items.add(ItemStack.EMPTY);
                     }
                 }
-                this.items.set(realIndex, stack);
+                this.items.set(insertIndex, stack);
                 final var afterRowsCount = (this.items.size() + 9) / 9;
                 if(afterRowsCount > beforeRowsCount) {
                     for (int column = 0; column < 9; ++column) {
