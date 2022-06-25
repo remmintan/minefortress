@@ -303,6 +303,19 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
             return this.items.get(index);
         }
 
+        boolean hasItem(Item item) {
+            return this.items.stream().anyMatch(it -> it.getItem().equals(item));
+        }
+
+        void addItem(ItemStack itemStack) {
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).isEmpty()) {
+                    items.set(i, itemStack);
+                    return;
+                }
+            }
+        }
+
         void set(int index, ItemStack stack) {
             final var slots = AbstractFortressRecipeScreenHandler.this.slots;
 
