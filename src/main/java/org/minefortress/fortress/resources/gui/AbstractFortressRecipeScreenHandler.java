@@ -10,6 +10,7 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -106,6 +107,8 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         return true;
     }
 
+
+
     @Override
     public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack itemStack = ItemStack.EMPTY;
@@ -153,9 +156,9 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
             returnInputs();
 
             final var diff = this.virtualInventory.getDiff();
-            diff.added.forEach(stack -> serverResourceManager.setItemAmount(stack.item(), stack.amount()));
-            diff.updated.forEach(stack -> serverResourceManager.setItemAmount(stack.item(), stack.amount()));
-            diff.removed.forEach(item -> serverResourceManager.setItemAmount(item, 0));
+            diff.added.forEach(stack -> serverResourceManager.increaseItemAmount(stack.item(), stack.amount()));
+            diff.updated.forEach(stack -> serverResourceManager.increaseItemAmount(stack.item(), stack.amount()));
+            diff.removed.forEach(stack -> serverResourceManager.increaseItemAmount(stack.item(), -stack.amount()));
         }
     }
 
@@ -282,7 +285,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
     protected final class VirtualInventory {
 
-        private final Set<Item> itemsBefore;
+        private final Map<Item, Integer> itemsBefore;
         private final List<ItemStack> items;
 
         private int rowsOffset = 0;
@@ -291,8 +294,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
             this.items = new ArrayList<>(items.stream().filter(it -> !it.isEmpty()).toList());
             this.itemsBefore = this.items
                     .stream()
-                    .map(ItemStack::getItem)
-                    .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+                    .collect(Collectors.collectingAndThen(Collectors.toMap(ItemStack::getItem, ItemStack::getCount), Collections::unmodifiableMap));
         }
 
         boolean full() {
@@ -349,20 +351,22 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
                     .map(ItemStack::getItem)
                     .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
 
-            final var itemsToRemove = itemsBefore.stream()
-                    .filter(it -> !itemsAfter.contains(it))
+            final var itemsToRemove = itemsBefore.entrySet()
+                    .stream()
+                    .filter(it -> !itemsAfter.contains(it.getKey()))
+                    .map(it -> new ItemInfo(it.getKey(), it.getValue()))
                     .toList();
 
             final var itemsToAdd = items.stream()
                     .filter(it -> !it.isEmpty())
-                    .filter(it -> !itemsBefore.contains(it.getItem()))
+                    .filter(it -> !itemsBefore.containsKey(it.getItem()))
                     .map(it -> new ItemInfo(it.getItem(), it.getCount()))
                     .toList();
 
             final var itemsToUpdate = items.stream()
                     .filter(it -> !it.isEmpty())
-                    .filter(it -> itemsBefore.contains(it.getItem()))
-                    .map(it -> new ItemInfo(it.getItem(), it.getCount()))
+                    .filter(it -> itemsBefore.containsKey(it.getItem()))
+                    .map(it -> new ItemInfo(it.getItem(), it.getCount() - itemsBefore.get(it.getItem())))
                     .toList();
 
             return new InventoryDiff(itemsToAdd, itemsToUpdate, itemsToRemove);
@@ -370,6 +374,6 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
     }
 
-    protected static record InventoryDiff(List<ItemInfo> added, List<ItemInfo> updated, List<Item> removed) {}
+    protected static record InventoryDiff(List<ItemInfo> added, List<ItemInfo> updated, List<ItemInfo> removed) {}
 
 }
