@@ -34,3 +34,4 @@ accessible method net/minecraft/client/gui/screen/ingame/HandledScreen getSlotAt
 accessible field net/minecraft/block/entity/AbstractFurnaceBlockEntity propertyDelegate Lnet/minecraft/screen/PropertyDelegate;
 accessible method net/minecraft/block/entity/AbstractFurnaceBlockEntity isBurning ()Z
 accessible field net/minecraft/server/MinecraftServer session Lnet/minecraft/world/level/storage/LevelStorage$Session;
+accessible method net/minecraft/screen/ScreenHandler internalOnSlotClick (IILnet/minecraft/screen/slot/SlotActionType;Lnet/minecraft/entity/player/PlayerEntity;)V
