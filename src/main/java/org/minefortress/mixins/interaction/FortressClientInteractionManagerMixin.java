@@ -1,9 +1,7 @@
 package org.minefortress.mixins.interaction;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.tutorial.TutorialManager;
@@ -22,8 +20,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.fight.ClientFightManager;
-import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.SelectionManager;

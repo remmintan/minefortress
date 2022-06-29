@@ -4,7 +4,9 @@
   "package": "org.minefortress.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "entity.FortressTntEntityMixin"
+    "block.FortressAbstractBlockState",
+    "entity.FortressTntEntityMixin",
+    "renderer.gui.FortressScreenHandler"
   ],
   "client": [
     "FortressMinecraftClientMixin",
