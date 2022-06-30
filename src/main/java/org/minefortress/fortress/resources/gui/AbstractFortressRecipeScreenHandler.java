@@ -331,7 +331,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
             final var insertIndex = realIndex < itemsCount ? realIndex : (realIndex - itemsCount);
 
-            if(this.items.get(insertIndex).isEmpty() || stack.isEmpty())
+            if(this.items.get(insertIndex).isEmpty() || stack.isEmpty() || this.items.get(insertIndex).equals(stack))
                 this.items.set(insertIndex, stack);
             else
                 throw new IllegalStateException();
