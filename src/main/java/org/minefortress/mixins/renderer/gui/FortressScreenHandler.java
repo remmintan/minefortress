@@ -9,12 +9,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Set;
+
 @Mixin(ScreenHandler.class)
 public abstract class FortressScreenHandler {
 
+    private static final Set<SlotActionType> FORBIDDEN_SLOT_ACTIONS = Set.of(SlotActionType.CLONE, SlotActionType.SWAP);
+
     @Inject(method = "internalOnSlotClick", at = @At(value = "HEAD"), cancellable = true)
     void internalOnSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player, CallbackInfo ci) {
-        if(ModUtils.isFortressGamemode(player) && actionType == SlotActionType.CLONE) {
+        if(ModUtils.isFortressGamemode(player) && FORBIDDEN_SLOT_ACTIONS.contains(actionType)) {
             ci.cancel();
         }
     }
