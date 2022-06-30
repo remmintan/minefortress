@@ -19,4 +19,19 @@ public abstract class FortressScreenHandler {
         }
     }
 
+    @Inject(
+            method = "internalOnSlotClick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/player/PlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/entity/ItemEntity;",
+                    shift = At.Shift.BEFORE
+            ),
+            cancellable = true
+    )
+    void internalOnSlotClickDrop(int slotIndex, int button, SlotActionType actionType, PlayerEntity player, CallbackInfo ci) {
+        if(ModUtils.isFortressGamemode(player)) {
+            ci.cancel();
+        }
+    }
+
 }

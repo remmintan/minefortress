@@ -32,7 +32,7 @@ public abstract class FortressAbstractBlockState extends State<Block, BlockState
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
     void onUse(World world, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
         if(ModUtils.isFortressGamemode(player) && this.getBlock() instanceof BlockEntityProvider) {
-            cir.cancel();
+            cir.setReturnValue(ActionResult.PASS);
         }
     }
 
