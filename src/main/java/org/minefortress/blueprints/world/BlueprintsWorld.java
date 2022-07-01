@@ -162,21 +162,10 @@ public class BlueprintsWorld {
 
     public void putBlueprintInAWorld(final ServerPlayerEntity player) {
         final BlockState borderBlockState = Blocks.RED_WOOL.getDefaultState();
-        BlockPos.iterate(new BlockPos(-1, 15, -1), new BlockPos(16, 15, 16)).forEach(pos -> {
-            if(pos.getZ() == -1 || pos.getZ() == 16 || pos.getX() == -1 || pos.getX() == 16) {
-                world.setBlockState(pos, borderBlockState);
-                world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
-            }
-        });
-
-        BlockPos.iterate(new BlockPos(16, 15, 16), new BlockPos(16, 31, 16)).forEach(pos -> {
-            world.setBlockState(pos, borderBlockState);
-            world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
-        });
 
         final int defaultFloorLevel = 16;
         BlockPos
-                .iterate(new BlockPos(BlockPos.ZERO), new BlockPos(15, 32, 15))
+                .iterate(new BlockPos(-32, 0, -32), new BlockPos(32, 32, 32))
                 .forEach(pos -> {
                     BlockState blockState;
                     if(preparedBlueprintData.containsKey(pos.down(defaultFloorLevel - getWorld().getFloorLevel()))) {
@@ -194,6 +183,20 @@ public class BlueprintsWorld {
                     world.setBlockState(pos, blockState);
                     world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
                 });
+
+        BlockPos.iterate(new BlockPos(-1, 15, -1), new BlockPos(16, 15, 16)).forEach(pos -> {
+            if(pos.getZ() == -1 || pos.getZ() == 16 || pos.getX() == -1 || pos.getX() == 16) {
+                world.setBlockState(pos, borderBlockState);
+                world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
+            }
+        });
+
+        BlockPos.iterate(new BlockPos(16, 15, 16), new BlockPos(16, 31, 16)).forEach(pos -> {
+            world.setBlockState(pos, borderBlockState);
+            world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
+        });
+
+
     }
 
     public void closeSession() {

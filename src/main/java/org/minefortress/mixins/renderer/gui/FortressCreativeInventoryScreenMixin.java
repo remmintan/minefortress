@@ -21,6 +21,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.tag.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -32,6 +33,7 @@ import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
+import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -96,6 +98,13 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             return null;
         else {
             return instance.dropItem(itemStack, b);
+        }
+    }
+
+    @Inject(method = "onMouseClick", at = @At("HEAD"), cancellable = true)
+    void onCLickHead(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
+        if(ModUtils.isFortressGamemode(getClient().player) && actionType == SlotActionType.SWAP) {
+            ci.cancel();
         }
     }
 
