@@ -15,6 +15,9 @@
     "network.FortressServerPlayNetworkHandlerMixin",
     "renderer.gui.FortressSimpleInventoryMixin",
     "entity.player.FortressPlayerInventoryMixin",
+    "block.FortressAbstractBlockState",
+    "entity.FortressTntEntityMixin",
+    "renderer.gui.FortressScreenHandler"
   ],
   "client": [
     "FortressMinecraftClientMixin",
@@ -34,9 +37,7 @@
     "renderer.gui.FortressCreativeInventoryScreenMixin",
     "world.FortressClientWorldMixin"
   ],
-  "server": [
-
-  ],
+  "server": [],
   "injectors": {
     "defaultRequire": 1
   }
