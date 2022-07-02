@@ -6,6 +6,7 @@
   "mixins": [
     "block.FortressAbstractBlockState",
     "entity.FortressTntEntityMixin",
+    "network.FortressPacketByteBufMixin",
     "renderer.gui.FortressScreenHandler"
   ],
   "client": [
