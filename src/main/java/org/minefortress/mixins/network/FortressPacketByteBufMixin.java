@@ -48,7 +48,7 @@ public abstract class FortressPacketByteBufMixin extends ByteBuf {
         cir.setReturnValue((PacketByteBuf)(Object)this);
     }
 
-    @Inject(method = "readItemStack", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "readItemStack", at = @At("HEAD"), cancellable = true)
     public void readItemStack(CallbackInfoReturnable<ItemStack> cir) {
         if (!this.readBoolean()) {
             cir.setReturnValue(ItemStack.EMPTY);
