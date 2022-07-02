@@ -21,6 +21,7 @@ public class FortressFuelSlot extends Slot {
 
     @Override
     public int getMaxItemCount(ItemStack stack) {
-        return FurnaceFuelSlot.isBucket(stack) ? 1 : Integer.MAX_VALUE;
+        return FurnaceFuelSlot.isBucket(stack) ? 1 : 64;
     }
+
 }
