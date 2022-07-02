@@ -17,7 +17,6 @@ import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandl
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.minefortress.MineFortressMod.FORTRESS_FURNACE_SCREEN_HANDLER;
@@ -214,5 +213,14 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
             this.amount = 0;
         }
 
+        @Override
+        public int getMaxItemCount(ItemStack stack) {
+            return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public int getMaxItemCount() {
+            return Integer.MAX_VALUE;
+        }
     }
 }
