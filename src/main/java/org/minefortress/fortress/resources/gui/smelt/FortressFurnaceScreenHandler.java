@@ -12,6 +12,7 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
@@ -39,9 +40,9 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
         this.propertyDelegate = propertyDelegate;
         this.otherFurnaces = otherFurnaces;
 
-        this.addSlot(new FortressSlot(furnaceInventory, 0, 56, 17));
+        this.addSlot(new Slot(furnaceInventory, 0, 56, 17));
         this.addSlot(new FortressFuelSlot(this, furnaceInventory, 1, 56, 53));
-        this.addSlot(new FortressFurnaceOutputSlot(inventory.player, furnaceInventory, 2, 116, 35));
+        this.addSlot(new FurnaceOutputSlot(inventory.player, furnaceInventory, 2, 116, 35));
 
         super.createDefaultsScrollableSlots();
         this.addProperties(this.propertyDelegate);
