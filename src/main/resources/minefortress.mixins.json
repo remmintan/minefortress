@@ -17,6 +17,7 @@
     "entity.player.FortressPlayerInventoryMixin",
     "block.FortressAbstractBlockState",
     "entity.FortressTntEntityMixin",
+    "network.FortressPacketByteBufMixin",
     "renderer.gui.FortressScreenHandler"
   ],
   "client": [
