@@ -31,6 +31,7 @@ public class ToolsGui extends FortressGuiScreen {
     private final FortressItemButtonWidget treeCutter;
     private final FortressItemButtonWidget roadsBuilder;
     private final FortressItemButtonWidget combatMode;
+    private final FortressItemButtonWidget sleep;
     private final ButtonWidget questionButton;
     private final ButtonWidget selectionVisibilityButton;
 
@@ -145,6 +146,23 @@ public class ToolsGui extends FortressGuiScreen {
                 Text.of("")
         );
 
+        this.sleep = new FortressItemButtonWidget(
+                0,
+                0,
+                Items.RED_BED,
+                itemRenderer,
+                btn -> {
+                    final var player = MinecraftClient.getInstance().player;
+                    if(player != null && !player.isSleeping()) {
+                        player.trySleep(player.getBlockPos());
+                    }
+                },
+                (button, matrices, mouseX, mouseY) -> {
+                    ToolsGui.super.renderTooltip(matrices, new LiteralText("Skip Night"), mouseX, mouseY);
+                },
+                Text.of("")
+        );
+
         this.selectionVisibilityButton = new FortressSelectionVisibilityButtonWidget(
                 0,
                 0,
@@ -206,8 +224,11 @@ public class ToolsGui extends FortressGuiScreen {
                 btn.render(p, (int)mouseX, (int)mouseY, delta);
             }
 
+            this.sleep.setPos(screenWidth - 25, 130);
+            this.sleep.render(p, (int)mouseX, (int)mouseY, delta);
+
             this.questionButton.x = screenWidth - 25;
-            this.questionButton.y = 155;
+            this.questionButton.y = 180;
             this.questionButton.render(p, (int)mouseX, (int)mouseY, delta);
         }
 
@@ -233,7 +254,7 @@ public class ToolsGui extends FortressGuiScreen {
 
         if(!isInCombat(fortressClient)) {
             this.selectionVisibilityButton.x = screenWidth - 25;
-            this.selectionVisibilityButton.y = 130;
+            this.selectionVisibilityButton.y = 155;
             this.selectionVisibilityButton.render(p, (int)mouseX, (int)mouseY, delta);
         }
     }
@@ -247,7 +268,8 @@ public class ToolsGui extends FortressGuiScreen {
                 this.treeCutter.isHovered() ||
                 this.roadsBuilder.isHovered() ||
                 this.combatMode.isHovered() ||
-                this.selectionVisibilityButton.isHovered();
+                this.selectionVisibilityButton.isHovered() ||
+                this.sleep.isHovered();
 
     }
 
@@ -271,6 +293,9 @@ public class ToolsGui extends FortressGuiScreen {
 
         if(this.combatMode.isHovered())
             this.combatMode.onClick(mouseX, mouseY);
+
+        if(this.sleep.isHovered())
+            this.sleep.onClick(mouseX, mouseY);
 
         for (ButtonWidget btn : selectionButtons) {
             if (btn.visible && btn.isHovered())

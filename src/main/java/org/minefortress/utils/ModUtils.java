@@ -2,6 +2,7 @@ package org.minefortress.utils;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.MineFortressMod;
@@ -16,6 +17,13 @@ public class ModUtils {
             final var interactionManager = MinecraftClient.getInstance().interactionManager;
             if(interactionManager != null)
                 return interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
+        }
+        return false;
+    }
+
+    public static boolean isFortressGamemode(LivingEntity livingEntity) {
+        if(livingEntity instanceof PlayerEntity player) {
+            return isFortressGamemode(player);
         }
         return false;
     }

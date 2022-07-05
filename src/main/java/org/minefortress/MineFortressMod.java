@@ -3,11 +3,13 @@ package org.minefortress;
 
 import com.chocohead.mm.api.ClassTinkerers;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
@@ -21,6 +23,7 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.registries.FortressBlocks;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressItems;
+import org.minefortress.utils.ModUtils;
 
 public class MineFortressMod implements ModInitializer {
 
@@ -43,6 +46,7 @@ public class MineFortressMod implements ModInitializer {
         Registry.register(Registry.ITEM, new Identifier("minefortress", "colonist_spawn_egg"), FortressItems.COLONIST_SPAWN_EGG);
 
         CommandsManager.registerCommands();
+        registerEvents();
 
         // networking
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.NEW_SELECTION_TASK, ServerboundSimpleSelectionTaskPacket::new);
@@ -61,4 +65,14 @@ public class MineFortressMod implements ModInitializer {
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SELECT_COLONISTS, ServerboundSelectColonistsPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, ServerboundSelectFightTargetPacket::new);
     }
+
+    public static void registerEvents() {
+        EntitySleepEvents.ALLOW_BED.register((entity, sleepingPos, state, vanillaResult) -> {
+            if(ModUtils.isFortressGamemode(entity)) {
+                return ActionResult.SUCCESS;
+            }
+            return ActionResult.PASS;
+        });
+    }
+
 }
