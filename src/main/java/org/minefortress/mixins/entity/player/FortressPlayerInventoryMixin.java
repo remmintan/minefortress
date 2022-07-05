@@ -14,7 +14,7 @@ public abstract class FortressPlayerInventoryMixin {
 
     @Inject(method = "populateRecipeFinder", at = @At("HEAD"), cancellable = true)
     void populateFinder(RecipeMatcher finder, CallbackInfo ci) {
-        final var fortressClient = getFortressClient();
+        final var fortressClient = (FortressMinecraftClient) MinecraftClient.getInstance();
         final var fortressClientManager = fortressClient.getFortressClientManager();
         if(fortressClient.isFortressGamemode() && fortressClientManager.isSurvival()) {
             final var resourceManager = fortressClientManager.getResourceManager();
@@ -23,10 +23,6 @@ public abstract class FortressPlayerInventoryMixin {
             allStacks.forEach(it -> finder.addInput(it, Integer.MAX_VALUE));
             ci.cancel();
         }
-    }
-
-    private FortressMinecraftClient getFortressClient() {
-        return (FortressMinecraftClient) MinecraftClient.getInstance();
     }
 
 }

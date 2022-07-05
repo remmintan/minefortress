@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.MineFortressMod;
+import org.minefortress.interfaces.FortressMinecraftClient;
 
 public class ModUtils {
 
@@ -13,10 +14,8 @@ public class ModUtils {
         if(player instanceof ServerPlayerEntity serverPlayer) {
             return serverPlayer.interactionManager.getGameMode() == MineFortressMod.FORTRESS;
         }
-        if(player instanceof ClientPlayerEntity clientPlayer) {
-            final var interactionManager = MinecraftClient.getInstance().interactionManager;
-            if(interactionManager != null)
-                return interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
+        if(player instanceof ClientPlayerEntity) {
+            isClientInFortressGamemode();
         }
         return false;
     }
@@ -26,6 +25,15 @@ public class ModUtils {
             return isFortressGamemode(player);
         }
         return false;
+    }
+
+    public static FortressMinecraftClient getFortressClient() {
+        return (FortressMinecraftClient) MinecraftClient.getInstance();
+    }
+
+    public static boolean isClientInFortressGamemode() {
+        final var interactionManager = MinecraftClient.getInstance().interactionManager;
+        return interactionManager != null && interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
     }
 
 }

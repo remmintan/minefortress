@@ -1,6 +1,5 @@
 package org.minefortress.mixins.entity;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,7 +10,6 @@ import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameMode;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
@@ -23,8 +21,8 @@ import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.ClientboundFollowColonistPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.tasks.TaskManager;
 import org.minefortress.utils.FortressSpawnLocating;
+import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -98,8 +96,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
     public void attack(Entity target, CallbackInfo ci) {
-        final GameMode gameMode = this.interactionManager.getGameMode();
-        if(gameMode != MineFortressMod.FORTRESS) return;
+        if(!ModUtils.isFortressGamemode(this)) return;
 
         if(target instanceof Colonist colonist) {
             final int id = colonist.getId();
