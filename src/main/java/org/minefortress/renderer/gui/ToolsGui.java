@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundSetCombatStatePacket;
+import org.minefortress.network.ServerboundSleepPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
@@ -154,7 +155,7 @@ public class ToolsGui extends FortressGuiScreen {
                 btn -> {
                     final var player = MinecraftClient.getInstance().player;
                     if(player != null && !player.isSleeping()) {
-                        player.trySleep(player.getBlockPos());
+                        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SLEEP, new ServerboundSleepPacket());
                     }
                 },
                 (button, matrices, mouseX, mouseY) -> {

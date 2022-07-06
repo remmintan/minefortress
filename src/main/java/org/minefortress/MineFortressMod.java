@@ -11,12 +11,15 @@ import net.minecraft.block.Blocks;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameMode;
 import org.minefortress.commands.CommandsManager;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.*;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -64,11 +67,27 @@ public class MineFortressMod implements ModInitializer {
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SET_COMBAT_STATE, ServerboundSetCombatStatePacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SELECT_COLONISTS, ServerboundSelectColonistsPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, ServerboundSelectFightTargetPacket::new);
+        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SLEEP, ServerboundSleepPacket::new);
     }
 
     public static void registerEvents() {
         EntitySleepEvents.ALLOW_BED.register((entity, sleepingPos, state, vanillaResult) -> {
             if(ModUtils.isFortressGamemode(entity)) {
+                return ActionResult.SUCCESS;
+            }
+            return ActionResult.PASS;
+        });
+
+        EntitySleepEvents.MODIFY_SLEEPING_DIRECTION.register((entity, pos, dir) -> {
+            if(ModUtils.isFortressGamemode(entity)) {
+                final var rotationVector = entity.getRotationVector();
+                return Direction.getFacing(rotationVector.x, rotationVector.y, rotationVector.z);
+            }
+            return dir;
+        });
+
+        EntitySleepEvents.ALLOW_NEARBY_MONSTERS.register((player, pos, vanilla) -> {
+            if(ModUtils.isFortressGamemode(player)) {
                 return ActionResult.SUCCESS;
             }
             return ActionResult.PASS;
