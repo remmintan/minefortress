@@ -52,6 +52,8 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private boolean isInCombat;
 
+    private int maxColonistsCount;
+
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
         fightManager = new ClientFightManager(() -> this);
@@ -108,6 +110,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         this.fortressCenter = fortressCenter;
         this.gamemode = gamemode;
         this.id = fortressId;
+        this.maxColonistsCount = colonistsCount;
         initialized = true;
     }
 

@@ -15,12 +15,14 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
     private final BlockPos fortressPos;
     private final FortressGamemode fortressGamemode;
     private final UUID fortressId;
+    private final int maxColonistsCount;
 
-    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode, UUID fortressId) {
+    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode, UUID fortressId, int maxColonistsCount) {
         this.colonistsCount = colonistsCount;
         this.fortressPos = fortressPos;
         this.fortressGamemode = fortressGamemode;
         this.fortressId = fortressId;
+        this.maxColonistsCount = maxColonistsCount;
     }
 
     public ClientboundSyncFortressManagerPacket(PacketByteBuf buf) {
@@ -33,6 +35,7 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
 
         this.fortressGamemode = FortressGamemode.valueOf(buf.readString(100));
         this.fortressId = buf.readUuid();
+        this.maxColonistsCount = buf.readInt();
     }
 
     @Override
@@ -52,5 +55,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressClientPacke
 
         buf.writeString(fortressGamemode.name());
         buf.writeUuid(fortressId);
+        buf.writeInt(maxColonistsCount);
     }
 }
