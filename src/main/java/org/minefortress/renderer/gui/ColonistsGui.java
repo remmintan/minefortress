@@ -45,11 +45,11 @@ public class ColonistsGui extends FortressGuiScreen{
         this.manageColonistsButton = new ButtonWidget(
                 0,
                 0,
-                30,
+                20,
                 20,
                 new LiteralText(""),
                 btn -> client.setScreen(new ColonistsScreen()),
-                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Manage colonists"), mouseX, mouseY)
+                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Manage pawns"), mouseX, mouseY)
         );
         this.professionsButton = new FortressItemButtonWidget(
                 0,
@@ -196,7 +196,7 @@ public class ColonistsGui extends FortressGuiScreen{
         final int iconX = screenWidth / 2 - 91;
         final int iconY = screenHeight - 40;
         final float textX = screenWidth / 2f - 91 + 15;
-        final int textY = screenHeight - 35;
+        final int textY = screenHeight - 43;
 
         final int boundRightX = (int)textX + font.getWidth(colonistsCountString);
         final int boundBottomY = iconY + 20;
@@ -205,13 +205,14 @@ public class ColonistsGui extends FortressGuiScreen{
 
         super.itemRenderer.renderGuiItemIcon(new ItemStack(Items.PLAYER_HEAD), iconX, iconY);
 
-        this.furnaceButton.setPos((int)textX, textY);
-        this.furnaceButton.setMessage(new LiteralText(colonistsCountString));
-        this.furnaceButton.render(p, (int)mouseX, (int)mouseY, delta);
+        this.manageColonistsButton.x = (int)textX;
+        this.manageColonistsButton.y = textY;
+        this.manageColonistsButton.setMessage(new LiteralText(colonistsCountString));
+        this.manageColonistsButton.render(p, (int)mouseX, (int)mouseY, delta);
 
-        if(hovered) {
-            super.renderTooltip(p, Text.of("Your Pawns count"), (int) mouseX, (int) mouseY);
-        }
+//        if(hovered) {
+//            super.renderTooltip(p, Text.of("Your Pawns count"), (int) mouseX, (int) mouseY);
+//        }
 
         return hovered;
     }

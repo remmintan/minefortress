@@ -32,5 +32,6 @@ public class FortressChannelNames {
     public static final String FORTRESS_SELECT_COLONISTS = "fortress_select_colonists";
     public static final String FORTRESS_SELECT_FIGHT_TARGET = "fortress_select_fight_target";
     public static final String FORTRESS_SLEEP = "fortress_sleep";
+    public static final String FORTRESS_CHANGE_MAX_COLONISTS_COUNT = "fortress_change_max_colonists_count";
 
 }

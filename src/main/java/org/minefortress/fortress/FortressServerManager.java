@@ -184,11 +184,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         if(maxColonistsCount != -1 && getColonistsCount() > maxColonistsCount) {
-            final var aliveColonists = colonists.stream()
-                    .filter(LivingEntity::isAlive);
-            final var deltaColonists = Math.max(aliveColonists.count() - maxColonistsCount, 0);
+            final var deltaColonists = Math.max( colonists.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
 
-            aliveColonists
+            colonists.stream()
+                    .filter(LivingEntity::isAlive)
                     .limit(deltaColonists)
                     .forEach(it -> it.damage(DamageSource.OUT_OF_WORLD, 40f));
         }
@@ -250,9 +249,9 @@ public final class FortressServerManager extends AbstractFortressManager {
 
             final var colonistsCount = this.colonists.size();
 
-            final var spawnFactor = MathHelper.clampedLerp(85, 99, colonistsCount / 50f);
+            final var spawnFactor = MathHelper.clampedLerp(84, 99, colonistsCount / 50f);
 
-            if(maxColonistsCount != -1 && colonistsCount < maxColonistsCount) {
+            if(maxColonistsCount == -1 || colonistsCount < maxColonistsCount) {
                 if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) > spawnFactor) {
                     final var bedsCount = buildings.stream().map(FortressBuilding::getBedsCount).reduce(0, Integer::sum);
                     if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
