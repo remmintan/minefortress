@@ -178,8 +178,8 @@ public abstract class FortressClientInteractionManagerMixin {
                 ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);
                 final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
                 if(blockStateFromItem != null) {
-                    final ActionResult returnValue = clickBuild(useoncontext, blockStateFromItem);
-                    cir.setReturnValue(returnValue);
+                    clickBuild(useoncontext, blockStateFromItem);
+                    cir.setReturnValue(ActionResult.SUCCESS);
                     return;
                 }
                 final SelectionManager selectionManager = fortressClient.getSelectionManager();
@@ -220,14 +220,13 @@ public abstract class FortressClientInteractionManagerMixin {
             cir.setReturnValue(true);
     }
 
-    private ActionResult clickBuild(ItemUsageContext useOnContext, BlockState blockState) {
+    private void clickBuild(ItemUsageContext useOnContext, BlockState blockState) {
         BlockPos blockPos = useOnContext.getBlockPos();
         if(!BuildingManager.canPlaceBlock(useOnContext.getWorld(), blockPos)){
             blockPos = blockPos.offset(useOnContext.getSide());
         }
 
         ((FortressMinecraftClient)client).getSelectionManager().selectBlock(blockPos, blockState);
-        return ActionResult.SUCCESS;
     }
 
     private void setFortressMode() {

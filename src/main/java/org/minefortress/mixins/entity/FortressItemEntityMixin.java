@@ -3,7 +3,6 @@ package org.minefortress.mixins.entity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -27,23 +26,10 @@ import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
 @Mixin(ItemEntity.class)
 public abstract class FortressItemEntityMixin extends Entity {
 
-    @Shadow private int itemAge;
-
     @Shadow public abstract ItemStack getStack();
 
     public FortressItemEntityMixin(EntityType<?> type, World world) {
         super(type, world);
-    }
-
-    @Inject(method = "onPlayerCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/ItemEntity;getStack()Lnet/minecraft/item/ItemStack;", shift = At.Shift.BEFORE), cancellable = true)
-    void disablePickup(PlayerEntity player, CallbackInfo ci) {
-        final ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-        final ServerPlayerInteractionManager interactionManager = serverPlayer.interactionManager;
-        final boolean notBlueprintsWorld = !isBlueprintsWorld();
-        final boolean isFortressGamemode = isFortressGamemode(interactionManager);
-        if(isFortressGamemode && notBlueprintsWorld) {
-            ci.cancel();
-        }
     }
 
     @Inject(method = "tick", at =@At("RETURN"))
@@ -84,10 +70,6 @@ public abstract class FortressItemEntityMixin extends Entity {
             return serverProfessionManager.hasProfession("fisherman");
 
         return true;
-    }
-
-    private boolean isFortressGamemode(ServerPlayerInteractionManager interactionManager) {
-        return interactionManager.getGameMode() == MineFortressMod.FORTRESS;
     }
 
     private boolean isBlueprintsWorld() {

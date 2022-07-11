@@ -6,6 +6,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.HungerConstants;
@@ -29,6 +30,7 @@ import java.util.Optional;
 
 public class ColonistsGui extends FortressGuiScreen{
 
+    private final ButtonWidget manageColonistsButton;
     private final FortressItemButtonWidget professionsButton;
     private final FortressItemButtonWidget inventoryButton;
     private final FortressItemButtonWidget craftingButton;
@@ -40,6 +42,15 @@ public class ColonistsGui extends FortressGuiScreen{
 
     protected ColonistsGui(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
+        this.manageColonistsButton = new ButtonWidget(
+                0,
+                0,
+                20,
+                20,
+                new LiteralText(""),
+                btn -> client.setScreen(new ColonistsScreen()),
+                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Manage pawns"), mouseX, mouseY)
+        );
         this.professionsButton = new FortressItemButtonWidget(
                 0,
                 0,
@@ -101,7 +112,7 @@ public class ColonistsGui extends FortressGuiScreen{
         final FortressClientManager fortressManager = getFortressClientManager();
         if(!fortressManager.isInitialized()) return;
 
-        final boolean colonsitsCountHovered = renderColonistsCount(matrices, font, screenWidth, screenHeight, mouseX, mouseY);
+        final boolean colonsitsCountHovered = renderColonistsCount(matrices, font, screenWidth, screenHeight, mouseX, mouseY, delta);
 
         renderSelectedColonistInfo(matrices, font, screenHeight, fortressManager);
 
@@ -179,13 +190,13 @@ public class ColonistsGui extends FortressGuiScreen{
         DrawableHelper.drawTexture(matrices, iconX, iconY, 110, heartIconU, heartIconV, iconWidth, iconHeight, 256, 256);
     }
 
-    private boolean renderColonistsCount(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY) {
+    private boolean renderColonistsCount(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
         final String colonistsCountString = "x" + colonistsCount;
 
         final int iconX = screenWidth / 2 - 91;
         final int iconY = screenHeight - 40;
         final float textX = screenWidth / 2f - 91 + 15;
-        final int textY = screenHeight - 35;
+        final int textY = screenHeight - 43;
 
         final int boundRightX = (int)textX + font.getWidth(colonistsCountString);
         final int boundBottomY = iconY + 20;
@@ -193,11 +204,15 @@ public class ColonistsGui extends FortressGuiScreen{
         final boolean hovered = mouseX >= iconX && mouseX <= boundRightX && mouseY >= iconY && mouseY < boundBottomY;
 
         super.itemRenderer.renderGuiItemIcon(new ItemStack(Items.PLAYER_HEAD), iconX, iconY);
-        font.draw(p, colonistsCountString, textX, textY, 0xFFFFFF);
 
-        if(hovered) {
-            super.renderTooltip(p, Text.of("Your Pawns count"), (int) mouseX, (int) mouseY);
-        }
+        this.manageColonistsButton.x = (int)textX;
+        this.manageColonistsButton.y = textY;
+        this.manageColonistsButton.setMessage(new LiteralText(colonistsCountString));
+        this.manageColonistsButton.render(p, (int)mouseX, (int)mouseY, delta);
+
+//        if(hovered) {
+//            super.renderTooltip(p, Text.of("Your Pawns count"), (int) mouseX, (int) mouseY);
+//        }
 
         return hovered;
     }
@@ -213,7 +228,12 @@ public class ColonistsGui extends FortressGuiScreen{
 
     @Override
     boolean isHovered() {
-        return this.hovered || this.professionsButton.isHovered() || this.inventoryButton.isHovered() || this.craftingButton.isHovered() || this.furnaceButton.isHovered();
+        return this.hovered ||
+                this.professionsButton.isHovered() ||
+                this.inventoryButton.isHovered() ||
+                this.craftingButton.isHovered() ||
+                this.furnaceButton.isHovered() ||
+                this.manageColonistsButton.isHovered();
     }
 
     @Override
@@ -229,6 +249,9 @@ public class ColonistsGui extends FortressGuiScreen{
         }
         if (this.furnaceButton.isHovered()) {
             this.furnaceButton.onClick(mouseX, mouseY);
+        }
+        if(this.manageColonistsButton.isHovered()) {
+            this.manageColonistsButton.onClick(mouseX, mouseY);
         }
     }
 

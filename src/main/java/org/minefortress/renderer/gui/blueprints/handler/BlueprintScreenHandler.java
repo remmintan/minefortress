@@ -2,6 +2,7 @@ package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
@@ -109,7 +110,13 @@ public final class BlueprintScreenHandler {
 
     public void clickOnFocusedSlot() {
         if(focusedSlot == null) return;
-        if(!focusedSlot.isEnoughResources()) return;
+        if(!focusedSlot.isEnoughResources()){
+            final var player = MinecraftClient.getInstance().player;
+            if(player != null) {
+                player.sendMessage(Text.of("§cYou don't have enough resources to build this blueprint"), true);
+            }
+            return;
+        }
         fortressClient.getBlueprintManager().select(focusedSlot.getMetadata());
     }
 

@@ -6,7 +6,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
@@ -17,6 +19,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
@@ -28,7 +31,6 @@ import org.minefortress.fight.ServerFightManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
 import org.minefortress.network.ClientboundSyncBuildingsPacket;
 import org.minefortress.network.ClientboundSyncCombatStatePacket;
@@ -41,6 +43,7 @@ import org.minefortress.tasks.TaskManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class FortressServerManager extends AbstractFortressManager {
 
@@ -81,6 +84,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private boolean needSyncCombat = true;
 
     private BlockPos fortressCenter = null;
+    private int maxColonistsCount = -1;
 
     public FortressServerManager(MinecraftServer server) {
         this.server = server;
@@ -123,14 +127,14 @@ public final class FortressServerManager extends AbstractFortressManager {
         return taskManager;
     }
 
-    public void tick(@Nullable ServerPlayerEntity player) {
+    public void tick(@Nullable ServerPlayerEntity player, MinecraftServer server) {
         taskManager.tick(this, getWorld());
-        tickFortress(player);
+        tickFortress(player, server);
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
         serverFightManager.tick();
         if(!needSync || player == null) return;
-        final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode, this.id);
+        final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode, this.id, this.maxColonistsCount);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
             final ClientboundSyncBuildingsPacket syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
@@ -175,17 +179,26 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Optional.of(allBeds.get(getWorld().random.nextInt(allBeds.size())));
     }
 
-    public void tickFortress(@Nullable ServerPlayerEntity player) {
-        final List<Colonist> deadColonists = colonists.stream()
-                .filter(colonist -> !colonist.isAlive())
-                .collect(Collectors.toList());
-
+    public void tickFortress(@Nullable ServerPlayerEntity player, MinecraftServer server) {
         if(this.villageUnderAttack && player == null) {
             this.attackTicks++;
             if(this.attackTicks >= 60 * 20) {
                 this.setCombatMode(false, false);
             }
         }
+
+        if(maxColonistsCount != -1 && getColonistsCount() > maxColonistsCount) {
+            final var deltaColonists = Math.max( colonists.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
+
+            colonists.stream()
+                    .filter(LivingEntity::isAlive)
+                    .limit(deltaColonists)
+                    .forEach(it -> it.damage(DamageSource.OUT_OF_WORLD, 40f));
+        }
+
+        final List<Colonist> deadColonists = colonists.stream()
+                .filter(colonist -> !colonist.isAlive())
+                .collect(Collectors.toList());
 
         if(!deadColonists.isEmpty()) {
             for(Colonist colonist : deadColonists) {
@@ -197,7 +210,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         for (FortressBuilding building : buildings) {
-            building.tick();
+            building.tick(server);
         }
 
         if(!(specialBlocks.isEmpty() || blueprintsSpecialBlocks.isEmpty())  && getWorld() != null && getWorld().getDimension() == FortressDimensionTypeMixin.getOverworld()) {
@@ -238,14 +251,19 @@ public final class FortressServerManager extends AbstractFortressManager {
                     getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
             }
 
-            if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) > 85) {
-                final var colonistsCount = this.colonists.size();
-                final var bedsCount = buildings.stream().map(FortressBuilding::getBedsCount).reduce(0, Integer::sum);
-                if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
-                    final var colonistOpt = spawnPawnNearCampfire();
-                    if(player != null && colonistOpt.isPresent()) {
-                        final var colonist = colonistOpt.get();
-                        player.sendMessage(new LiteralText(colonist.getName().asString()+" appeared in the village."), false);
+            final var colonistsCount = this.colonists.size();
+
+            final var spawnFactor = MathHelper.clampedLerp(84, 99, colonistsCount / 50f);
+
+            if(maxColonistsCount == -1 || colonistsCount < maxColonistsCount) {
+                if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) > spawnFactor) {
+                    final var bedsCount = buildings.stream().map(FortressBuilding::getBedsCount).reduce(0, Integer::sum);
+                    if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
+                        final var colonistOpt = spawnPawnNearCampfire();
+                        if(player != null && colonistOpt.isPresent()) {
+                            final var colonist = colonistOpt.get();
+                            player.sendMessage(new LiteralText(colonist.getName().asString()+" appeared in the village."), false);
+                        }
                     }
                 }
             }
@@ -393,6 +411,9 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         tag.putString("gamemode", this.gamemode.name());
 
+        if(maxColonistsCount != -1) {
+            tag.putInt("maxColonistsCount", maxColonistsCount);
+        }
 
         this.serverResourceManager.write(tag);
     }
@@ -475,6 +496,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         this.serverResourceManager.read(tag);
+
+        if(tag.contains("maxColonistsCount")) {
+            this.maxColonistsCount = tag.getInt("maxColonistsCount");
+        }
 
         this.scheduleSync();
     }
@@ -639,4 +664,25 @@ public final class FortressServerManager extends AbstractFortressManager {
     private ServerWorld getWorld() {
         return this.server.getWorld(World.OVERWORLD);
     }
+
+    public void increaseMaxColonistsCount() {
+        if(maxColonistsCount == -1) return;
+        this.maxColonistsCount++;
+        if(this.maxColonistsCount >= getColonistsCount()) {
+            this.maxColonistsCount = -1;
+        }
+        this.scheduleSync();
+    }
+
+    public void decreaseMaxColonistsCount() {
+        if(maxColonistsCount == -1)
+            this.maxColonistsCount = getColonistsCount();
+
+        this.maxColonistsCount--;
+
+        if(this.maxColonistsCount <= 0)
+            this.maxColonistsCount = 1;
+        this.scheduleSync();
+    }
+
 }

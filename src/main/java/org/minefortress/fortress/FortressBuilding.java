@@ -2,9 +2,15 @@ package org.minefortress.fortress;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FortressBuilding {
@@ -17,7 +23,7 @@ public class FortressBuilding {
     public FortressBuilding(BlockPos start, BlockPos end, Set<FortressBedInfo> bedPositions, String requirementId) {
         this.start = start.toImmutable();
         this.end = end.toImmutable();
-        this.beds = Collections.unmodifiableSet(bedPositions);
+        this.beds = new HashSet<>(bedPositions);
         this.requirementId = requirementId;
     }
 
@@ -38,7 +44,7 @@ public class FortressBuilding {
             for (long bed : beds) {
                 bedsInfo.add(FortressBedInfo.fromLong(bed));
             }
-            this.beds = Collections.unmodifiableSet(bedsInfo);
+            this.beds = new HashSet<>(bedsInfo);
         } else {
             throw new IllegalArgumentException("Tag does not contain beds");
         }
@@ -57,7 +63,16 @@ public class FortressBuilding {
         return end;
     }
 
-    public void tick() {}
+    public void tick(MinecraftServer server) {
+        final var world = server.getWorld(World.OVERWORLD);
+        if (world != null && world.getTime() % 100 == 0) {
+            beds.removeIf(bed -> {
+                final BlockPos pos = bed.getPos();
+                final BlockState state = world.getBlockState(pos);
+                return !state.isIn(BlockTags.BEDS);
+            });
+        }
+    }
 
     public Optional<FortressBedInfo> getFreeBed() {
         return beds.stream().filter(b -> !b.isOccupied()).findFirst();
