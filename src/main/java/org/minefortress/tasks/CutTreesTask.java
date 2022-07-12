@@ -1,7 +1,7 @@
 package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
@@ -74,13 +74,13 @@ public class CutTreesTask implements Task {
                 final TreeBlocks tree = treeOpt.get();
                 tree.getTreeBlocks().forEach(blockPos -> {
                     DigControl.addDropToTheResourceManager(world, blockPos, colonist);
-                    world.breakBlock(blockPos, false, colonist);
+                    world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 3);
                     world.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
 
                 });
                 tree.getLeavesBlocks().forEach(blockPos -> {
                     DigControl.addDropToTheResourceManager(world, blockPos, colonist);
-                    world.breakBlock(blockPos, false, colonist);
+                    world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 3);
                     world.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
                 });
             }
