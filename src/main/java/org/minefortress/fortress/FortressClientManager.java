@@ -9,6 +9,7 @@ import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fight.ClientFightManager;
+import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -62,7 +63,10 @@ public final class FortressClientManager extends AbstractFortressManager {
     public void select(Colonist colonist) {
         if(isInCombat) {
             final var mouse = MinecraftClient.getInstance().mouse;
-            fightManager.getSelectionManager().startSelection(mouse.getX(), mouse.getY(), colonist.getPos());
+            final var selectionManager = fightManager.getSelectionManager();
+            selectionManager.startSelection(mouse.getX(), mouse.getY(), colonist.getPos());
+            selectionManager.updateSelection(mouse.getX(), mouse.getY(), colonist.getPos());
+            selectionManager.endSelection();
 
             selectedColonist = null;
             return;
