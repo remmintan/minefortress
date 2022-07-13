@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
@@ -188,14 +189,13 @@ public final class BlueprintsScreen extends Screen {
                     final var hasItem = resourceManager.hasItem(stack, stacks);
                     final var itemX = this.x - this.backgroundWidth/2 + 25 + i1%10 * 30;
                     final var itemY = i1/10 * 20 + this.backgroundHeight;
-                    itemRenderer.renderInGui(new ItemStack(stack.item()), itemX, itemY);
+                    final var convertedItem = convertItemIconInTheGUI(stack);
+                    itemRenderer.renderInGui(new ItemStack(convertedItem), itemX, itemY);
                     this.textRenderer.draw(matrices, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000);
                 }
             }
 
             this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
-
-
         }
 
         this.drawForeground(matrices);
@@ -219,6 +219,14 @@ public final class BlueprintsScreen extends Screen {
 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+    }
+
+    private Item convertItemIconInTheGUI(ItemInfo stack) {
+        final var originalItem = stack.item();
+        if(Items.FARMLAND.equals(originalItem)) {
+            return Items.DIRT;
+        }
+        return originalItem;
     }
 
     private FortressClientManager getFortressClientManager() {
@@ -271,8 +279,6 @@ public final class BlueprintsScreen extends Screen {
 
         return mouseX >= screenX + slotX && mouseX < screenX + slotX + 18 && mouseY >= screenY + slotY && mouseY < screenY + slotY + 18;
     }
-
-
 
     private void drawForeground(MatrixStack matrices) {
         final BlueprintGroup selectedGroup = this.handler.getSelectedGroup();
