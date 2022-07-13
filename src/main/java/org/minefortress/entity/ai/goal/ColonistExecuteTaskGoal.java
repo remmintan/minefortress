@@ -6,9 +6,9 @@ import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.TaskControl;
-import org.minefortress.utils.BuildingHelper;
 import org.minefortress.tasks.TaskType;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
+import org.minefortress.utils.BuildingHelper;
 
 public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
@@ -77,6 +77,13 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public void stop() {
+        if(!notInCombat()) {
+            final var id = getTaskControl().getTaskId();
+            colonist
+                    .getFortressServerManager()
+                    .getServerResourceManager()
+                    .returnReservedItems(id);
+        }
         getTaskControl().success();
         getMovementHelper().reset();
         this.colonist.resetControls();
