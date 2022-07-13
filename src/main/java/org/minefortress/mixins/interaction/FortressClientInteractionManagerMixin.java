@@ -23,7 +23,7 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.selections.SelectionManager;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.BlockUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -222,7 +222,7 @@ public abstract class FortressClientInteractionManagerMixin {
 
     private void clickBuild(ItemUsageContext useOnContext, BlockState blockState) {
         BlockPos blockPos = useOnContext.getBlockPos();
-        if(!BuildingManager.canPlaceBlock(useOnContext.getWorld(), blockPos)){
+        if(!BuildingHelper.canPlaceBlock(useOnContext.getWorld(), blockPos)){
             blockPos = blockPos.offset(useOnContext.getSide());
         }
 

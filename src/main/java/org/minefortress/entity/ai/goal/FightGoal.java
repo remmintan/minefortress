@@ -3,7 +3,7 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.controls.FightControl;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 public class FightGoal extends AbstractFortressGoal {
 
@@ -88,7 +88,7 @@ public class FightGoal extends AbstractFortressGoal {
     }
 
     private boolean correctMoveTarget(BlockPos target) {
-        return BuildingManager.canStayOnBlock(colonist.world, target);
+        return BuildingHelper.canStayOnBlock(colonist.world, target);
     }
 
 }

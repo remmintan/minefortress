@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.selections.ClickType;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -120,8 +120,8 @@ public class BuiltSelection implements BuiltModel {
     @NotNull
     private Predicate<BlockPos> getShouldRenderPosPredicate(ClickType clickType) {
         return pos ->
-                (clickType == ClickType.BUILD && BuildingManager.canPlaceBlock(getWorld(),pos)) ||
-                ((clickType == ClickType.REMOVE || clickType == ClickType.ROADS) && BuildingManager.canRemoveBlock(getWorld(),pos));
+                (clickType == ClickType.BUILD && BuildingHelper.canPlaceBlock(getWorld(),pos)) ||
+                ((clickType == ClickType.REMOVE || clickType == ClickType.ROADS) && BuildingHelper.canRemoveBlock(getWorld(),pos));
     }
 
     private void renderFluid(BlockBufferBuilderStorage blockBufferBuilderStorage, BlockPos pos, BlockState blockState) {

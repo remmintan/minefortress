@@ -9,7 +9,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.SampleType;
 import net.minecraft.world.chunk.ChunkCache;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
 
@@ -45,12 +45,12 @@ public class ColonistPathFinder extends PathNodeNavigator {
                 targetsMap.put(target, pos);
                 BlockPos targetPos = target.getBlockPos();
                 int colonistY = colonist.getBlockPos().getY();
-                if(!BuildingManager.canStayOnBlock(colonist.world, target.getBlockPos())) {
+                if(!BuildingHelper.canStayOnBlock(colonist.world, target.getBlockPos())) {
                     nodeMaker.setFakeWalkable(targetPos);
                 }
                 if(
-                        BuildingManager.doesNotHaveCollisions(colonist.world, targetPos.down()) &&
-                        BuildingManager.doesNotHaveCollisions(colonist.world, targetPos.down(2))
+                        BuildingHelper.doesNotHaveCollisions(colonist.world, targetPos.down()) &&
+                        BuildingHelper.doesNotHaveCollisions(colonist.world, targetPos.down(2))
                 ) {
                     BlockPos below = targetPos.down();
                     while (below.getY()>=colonistY) {

@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 import static org.minefortress.entity.colonist.ColonistHungerManager.PASSIVE_EXHAUSTION;
 import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
@@ -140,7 +140,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
                         this.blockPos,
                         20,
                         10,
-                        pos -> BuildingManager.canStayOnBlock(world, pos)
+                        pos -> BuildingHelper.canStayOnBlock(world, pos)
                 )
                 .ifPresentOrElse(pos -> this.blockPos = pos, () -> this.blockPos = null);
     }

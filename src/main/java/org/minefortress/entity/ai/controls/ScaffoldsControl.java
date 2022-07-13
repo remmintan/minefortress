@@ -6,7 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 import org.minefortress.registries.FortressBlocks;
 import org.minefortress.entity.Colonist;
 
@@ -38,7 +38,7 @@ public class ScaffoldsControl extends ActionControl {
         }
 
         final BlockPos placePosition = colonist.getBlockPos().down();
-        if(BuildingManager.canPlaceScaffold(colonist.world, placePosition)) {
+        if(BuildingHelper.canPlaceScaffold(colonist.world, placePosition)) {
             colonist.putItemInHand(SCAFFOLD_ITEM);
             colonist.world.setBlockState(placePosition, SCAFFOLD_BLOCK.getDefaultState(), 3);
             colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, placePosition);

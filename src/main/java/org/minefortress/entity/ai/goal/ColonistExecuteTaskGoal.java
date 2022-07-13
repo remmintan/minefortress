@@ -1,17 +1,14 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.TaskControl;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 import org.minefortress.tasks.TaskType;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
-
-import java.util.EnumSet;
 
 public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
@@ -109,9 +106,9 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         if(pos == null) return false;
         if(getTaskControl().is(TaskType.REMOVE)) {
             if(colonist.getFortressServerManager().getFortressCenter().equals(pos)) return false;
-            return BuildingManager.canRemoveBlock(world, pos);
+            return BuildingHelper.canRemoveBlock(world, pos);
         } else if(getTaskControl().is(TaskType.BUILD)) {
-            return BuildingManager.canPlaceBlock(world, pos);
+            return BuildingHelper.canPlaceBlock(world, pos);
         } else {
             throw new IllegalStateException();
         }

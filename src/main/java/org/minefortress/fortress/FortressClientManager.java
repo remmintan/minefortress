@@ -17,7 +17,7 @@ import org.minefortress.network.ServerboundSetGamemodePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ClientProfessionManager;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -147,10 +147,10 @@ public final class FortressClientManager extends AbstractFortressManager {
                 if(hoveredBlockPos.equals(oldPosAppropriateForCenter)) return;
 
                 BlockPos cursor = hoveredBlockPos;
-                while (!BuildingManager.canPlaceBlock(client.world, cursor))
+                while (!BuildingHelper.canPlaceBlock(client.world, cursor))
                     cursor = cursor.up();
 
-                while (BuildingManager.canPlaceBlock(client.world, cursor.down()))
+                while (BuildingHelper.canPlaceBlock(client.world, cursor.down()))
                     cursor = cursor.down();
 
                 posAppropriateForCenter = cursor.toImmutable();

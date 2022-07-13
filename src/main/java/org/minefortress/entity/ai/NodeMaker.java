@@ -9,7 +9,7 @@ import net.minecraft.entity.ai.pathing.TargetPathNode;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.*;
 import net.minecraft.world.chunk.ChunkCache;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -281,13 +281,13 @@ public class NodeMaker extends LandPathNodeMaker {
     private Optional<BlockPos> tryGetOpenBlockGoal() {
         return BlockPos.findClosest(
                 workGoal, 1, 1,
-                pos -> workGoal.getY()>pos.getY() && BuildingManager.canGoUpOnBlock(entity.world, pos) && notPlacingInMyHead(pos) && this.positionCloserThanWorkGoal(pos)
+                pos -> workGoal.getY()>pos.getY() && BuildingHelper.canGoUpOnBlock(entity.world, pos) && notPlacingInMyHead(pos) && this.positionCloserThanWorkGoal(pos)
         );
     }
 
     private boolean correctGoal(BlockPos pos) {
         return  workGoal.getY() >= pos.getY() &&
-                BuildingManager.canStayOnBlock(entity.world, pos) &&
+                BuildingHelper.canStayOnBlock(entity.world, pos) &&
                 notPlacingInMyHead(pos);// don't place blocks on you own head!
     }
 
