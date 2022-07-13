@@ -6,6 +6,9 @@
   "mixins": [
     "block.FortressAbstractBlockState",
     "entity.FortressTntEntityMixin",
+    "item.FortressBoneMealMixin",
+    "item.FortressBowItemMixin",
+    "item.FortressEggItemMixin",
     "network.FortressPacketByteBufMixin",
     "renderer.gui.FortressScreenHandler"
   ],
