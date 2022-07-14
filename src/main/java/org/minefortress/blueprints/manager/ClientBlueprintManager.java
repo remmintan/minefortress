@@ -10,16 +10,13 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.ServerboundBlueprintTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -83,7 +80,7 @@ public class ClientBlueprintManager {
         final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
                 .filter(blockPos -> blockPos.getY() >= floorLevel)
                 .map(pos -> pos.add(blueprintBuildPos.down(floorLevel)))
-                .anyMatch(pos -> !BuildingManager.canPlaceBlock(client.world, pos));
+                .anyMatch(pos -> !BuildingHelper.canPlaceBlock(client.world, pos));
 
         final boolean blueprintPartInTheAir = blueprintDataPositions.stream()
                 .filter(blockPos -> {
@@ -91,7 +88,7 @@ public class ClientBlueprintManager {
                     return y<=floorLevel;
                 })
                 .map(pos -> pos.add(blueprintBuildPos.down(floorLevel)))
-                .anyMatch(pos -> BuildingManager.canPlaceBlock(client.world, pos.down()));
+                .anyMatch(pos -> BuildingHelper.canPlaceBlock(client.world, pos.down()));
 
         cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
     }
@@ -114,7 +111,7 @@ public class ClientBlueprintManager {
     private BlockPos moveToStructureSize(BlockPos pos) {
         if(selectedStructure == null) return pos;
 
-        final boolean posSolid = !BuildingManager.doesNotHaveCollisions(client.world, pos);
+        final boolean posSolid = !BuildingHelper.doesNotHaveCollisions(client.world, pos);
         final BlueprintBlockData blockData = getBlockData();
         final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);

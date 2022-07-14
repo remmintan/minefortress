@@ -1,4 +1,4 @@
-package org.minefortress.tasks;
+package org.minefortress.utils;
 
 
 import net.minecraft.block.BlockState;
@@ -13,7 +13,7 @@ import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.registries.FortressBlocks;
 
-public class BuildingManager {
+public class BuildingHelper {
 
     public static boolean canPlaceBlock(@Nullable World level, BlockPos pos) {
         if (level == null) return false;

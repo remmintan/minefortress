@@ -1,6 +1,8 @@
 package org.minefortress.fight;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
@@ -37,8 +39,12 @@ public class ServerFightManager {
         return scaryMob.get(random.nextInt(scaryMob.size()));
     }
 
-    public void setMoveTarget(BlockPos pos) {
-        forEachSelectedColonist(c -> c.getFightControl().setMoveTarget(pos));
+    public void setMoveTarget(BlockPos pos, boolean setOnFire, BlockHitResult hit) {
+        if(setOnFire) {
+            forEachSelectedColonist(it -> it.getFightControl().setFireTarget(hit));
+        } else {
+            forEachSelectedColonist(c -> c.getFightControl().setMoveTarget(pos));
+        }
     }
 
     public void setAttackTarget(LivingEntity entity) {

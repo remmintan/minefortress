@@ -1,5 +1,6 @@
 package org.minefortress.entity.ai.controls;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.CreeperEntity;
@@ -9,12 +10,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class FightControl {
 
@@ -39,6 +39,7 @@ public class FightControl {
 
     private BlockPos moveTarget;
     private LivingEntity attackTarget;
+    private final Queue<BlockHitResult> fireGoals = new ArrayDeque<>();
     private boolean forcedToAttackCreeper;
 
     private float meleeAttackCooldown = 0;
@@ -217,6 +218,7 @@ public class FightControl {
     public void reset() {
         moveTarget = null;
         attackTarget = null;
+        fireGoals.clear();
         this.forcedToAttackCreeper = false;
         this.meleeAttackCooldown = 0;
         this.longRangeAttackTicks = 0;
@@ -234,6 +236,11 @@ public class FightControl {
         this.forcedToAttackCreeper = this.attackTarget instanceof CreeperEntity;
     }
 
+    public void setFireTarget(BlockHitResult pos) {
+        this.reset();
+        this.fireGoals.add(pos);
+    }
+
     public BlockPos getMoveTarget() {
         return moveTarget;
     }
@@ -244,6 +251,18 @@ public class FightControl {
 
     public boolean hasAttackTarget() {
         return attackTarget != null;
+    }
+
+    public boolean hasFireTarget() {
+        return !fireGoals.isEmpty();
+    }
+
+    public BlockHitResult getFireTarget() {
+        return fireGoals.peek();
+    }
+
+    public BlockHitResult removeFireTarget() {
+        return fireGoals.remove();
     }
 
     public boolean isDefender() {

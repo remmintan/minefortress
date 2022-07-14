@@ -12,10 +12,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vector4f;
 import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.selections.ClientSelection;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -64,8 +63,8 @@ public class BuiltTasks implements BuiltModel {
     private void render(BufferBuilder bufferBuilder) {
         final MatrixStack matrices = new MatrixStack();
 
-        final Function<BlockPos, Boolean> canBuild = pos -> BuildingManager.canPlaceBlock(getWorld(), pos);
-        final Function<BlockPos, Boolean> canRemove = pos -> BuildingManager.canRemoveBlock(getWorld(), pos);
+        final Function<BlockPos, Boolean> canBuild = pos -> BuildingHelper.canPlaceBlock(getWorld(), pos);
+        final Function<BlockPos, Boolean> canRemove = pos -> BuildingHelper.canRemoveBlock(getWorld(), pos);
 
         for(ClientSelection selection: buildTasks)
             renderBlock(bufferBuilder, matrices, canBuild, selection, BUILD_COLOR);

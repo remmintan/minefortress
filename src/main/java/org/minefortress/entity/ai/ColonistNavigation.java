@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 public class ColonistNavigation extends MobNavigation {
 
@@ -56,7 +56,7 @@ public class ColonistNavigation extends MobNavigation {
             needScaffold();
         } else if(flatHasReached(nextEntityPos) &&
                 neededY + 1 > currentY && this.colonist.fallDistance <= 1 &&
-                BuildingManager.doesNotHaveCollisions(this.colonist.world, new BlockPos(nextEntityPos).down())
+                BuildingHelper.doesNotHaveCollisions(this.colonist.world, new BlockPos(nextEntityPos).down())
         ) {
             needScaffold();
         }

@@ -3,8 +3,7 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressBedInfo;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 public class HideGoal extends AbstractFortressGoal{
 
@@ -64,9 +63,9 @@ public class HideGoal extends AbstractFortressGoal{
     }
 
     private BlockPos findCorrectGoal() {
-        if(BuildingManager.canStayOnBlock(colonist.world, shelterBlockPos)) return shelterBlockPos;
+        if(BuildingHelper.canStayOnBlock(colonist.world, shelterBlockPos)) return shelterBlockPos;
         for(BlockPos pos : BlockPos.iterateOutwards(shelterBlockPos, 3, 3, 3)) {
-            if(BuildingManager.canStayOnBlock(colonist.world, pos)) return pos;
+            if(BuildingHelper.canStayOnBlock(colonist.world, pos)) return pos;
         }
 
         return shelterBlockPos;

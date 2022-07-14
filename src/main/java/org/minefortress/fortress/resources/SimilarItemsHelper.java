@@ -59,6 +59,17 @@ public class SimilarItemsHelper {
             Items.PODZOL
     );
 
+    private static final List<Item> similarFenceGate = Arrays.asList(
+            Items.ACACIA_FENCE_GATE,
+            Items.BIRCH_FENCE_GATE,
+            Items.CRIMSON_FENCE_GATE,
+            Items.OAK_FENCE_GATE,
+            Items.JUNGLE_FENCE_GATE,
+            Items.DARK_OAK_FENCE_GATE,
+            Items.SPRUCE_FENCE_GATE,
+            Items.WARPED_FENCE_GATE
+    );
+
     public static boolean isIgnorable(Item it) {
         return BlueprintBlockData.IGNORED_ITEMS.contains(it) || SimilarItemsHelper.contains(ItemTags.BEDS, it) || SimilarItemsHelper.contains(ItemTags.DOORS, it);
     }
@@ -76,6 +87,10 @@ public class SimilarItemsHelper {
             return similarDirt.stream().filter(i -> i != item).toList();
         }
 
+        if(similarFenceGate.contains(item)) {
+            return similarFenceGate.stream().filter(i -> i != item).toList();
+        }
+
         return getItemTag(item)
                 .map(tag ->
                         getItems(tag)
@@ -84,6 +99,7 @@ public class SimilarItemsHelper {
                                 .filter(it -> !strippedLogs.contains(it))
                                 .filter(it -> !strippedWood.contains(it))
                                 .filter(it -> !similarDirt.contains(it))
+                                .filter(it -> !similarFenceGate.contains(it))
                                 .toList()
                 )
                 .orElse(Collections.emptyList());

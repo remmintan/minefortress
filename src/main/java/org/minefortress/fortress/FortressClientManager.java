@@ -9,6 +9,7 @@ import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fight.ClientFightManager;
+import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -17,7 +18,7 @@ import org.minefortress.network.ServerboundSetGamemodePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ClientProfessionManager;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,7 +63,10 @@ public final class FortressClientManager extends AbstractFortressManager {
     public void select(Colonist colonist) {
         if(isInCombat) {
             final var mouse = MinecraftClient.getInstance().mouse;
-            fightManager.getSelectionManager().startSelection(mouse.getX(), mouse.getY(), colonist.getPos());
+            final var selectionManager = fightManager.getSelectionManager();
+            selectionManager.startSelection(mouse.getX(), mouse.getY(), colonist.getPos());
+            selectionManager.updateSelection(mouse.getX(), mouse.getY(), colonist.getPos());
+            selectionManager.endSelection();
 
             selectedColonist = null;
             return;
@@ -147,10 +151,10 @@ public final class FortressClientManager extends AbstractFortressManager {
                 if(hoveredBlockPos.equals(oldPosAppropriateForCenter)) return;
 
                 BlockPos cursor = hoveredBlockPos;
-                while (!BuildingManager.canPlaceBlock(client.world, cursor))
+                while (!BuildingHelper.canPlaceBlock(client.world, cursor))
                     cursor = cursor.up();
 
-                while (BuildingManager.canPlaceBlock(client.world, cursor.down()))
+                while (BuildingHelper.canPlaceBlock(client.world, cursor.down()))
                     cursor = cursor.down();
 
                 posAppropriateForCenter = cursor.toImmutable();

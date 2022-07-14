@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressWorldRenderer;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
-import org.minefortress.tasks.BuildingManager;
+import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.BlockUtils;
 
 import java.util.*;
@@ -73,7 +73,7 @@ public class SelectionManager implements FortressWorldRenderer {
 
         BlockPos pickedPos;
         if (clickType == ClickType.BUILD) {
-            if (BuildingManager.canPlaceBlock(client.world, blockPos)) {
+            if (BuildingHelper.canPlaceBlock(client.world, blockPos)) {
                 pickedPos = blockPos;
             } else {
                 pickedPos = blockPos.offset(clickedFace);
