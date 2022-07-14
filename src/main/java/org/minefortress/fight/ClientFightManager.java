@@ -1,7 +1,10 @@
 package org.minefortress.fight;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -31,7 +34,8 @@ public class ClientFightManager {
     public void setTarget(HitResult hitResult) {
         if(hitResult instanceof BlockHitResult blockHitResult) {
             final var blockPos = blockHitResult.getBlockPos();
-            final var packet = new ServerboundSelectFightTargetPacket(blockPos);
+            final var mainHandStack = MinecraftClient.getInstance().player.getMainHandStack();
+            final var packet = new ServerboundSelectFightTargetPacket(blockPos, mainHandStack.getItem().equals(Items.FLINT_AND_STEEL), blockHitResult);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, packet);
         } else if (hitResult instanceof EntityHitResult entityHitResult) {
             final var entity = entityHitResult.getEntity();

@@ -1,8 +1,14 @@
 package org.minefortress.entity.ai.goal;
 
+import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.controls.FightControl;
+import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
+import org.minefortress.utils.BlockInfoUtils;
 import org.minefortress.utils.BuildingHelper;
 
 public class FightGoal extends AbstractFortressGoal {
@@ -44,6 +50,10 @@ public class FightGoal extends AbstractFortressGoal {
         }
 
         fightControl.attackTargetIfPossible();
+        if(colonist.getMovementHelper().hasReachedWorkGoal()) {
+            if(colonist.getFightControl().hasFireTarget())
+                colonist.getFightControl().removeFireTarget();
+        }
     }
 
     private void findMoveTarget() {
@@ -53,10 +63,25 @@ public class FightGoal extends AbstractFortressGoal {
             if (!moveTarget.equals(cachedMoveTarget)) {
                 cachedMoveTarget = moveTarget;
                 correctMoveTarget = findCorrectTarget(moveTarget);
+                colonist.resetControls();
+            }
+        } else if(fightControl.hasFireTarget()) {
+            BlockHitResult hit = fightControl.getFireTarget();
+            final var moveTarget = hit.getBlockPos();
+            if (!moveTarget.equals(cachedMoveTarget)) {
+                cachedMoveTarget = moveTarget;
+                correctMoveTarget = findCorrectTarget(moveTarget);
+                if(correctMoveTarget != null) {
+                    final var flintAndSteel = Items.FLINT_AND_STEEL;
+                    final var hitResult = new BlockHitResult(new Vec3d(correctMoveTarget.getX(), correctMoveTarget.getY(), correctMoveTarget.getZ()), hit.getSide(), correctMoveTarget, false);
+                    final var context = BlockInfoUtils.getUseOnContext(hitResult, flintAndSteel, correctMoveTarget.offset(hitResult.getSide()), (ServerWorld) colonist.world, colonist);
+                    colonist.setGoal(new ItemTaskBlockInfo(flintAndSteel, correctMoveTarget, context));
+                }
             }
         } else {
             this.cachedMoveTarget = null;
             this.correctMoveTarget = null;
+            colonist.resetControls();
         }
     }
 
@@ -70,6 +95,7 @@ public class FightGoal extends AbstractFortressGoal {
         colonist.putItemInHand(null);
         this.cachedMoveTarget = null;
         this.correctMoveTarget = null;
+        colonist.resetControls();
         colonist.getMovementHelper().reset();
     }
 
