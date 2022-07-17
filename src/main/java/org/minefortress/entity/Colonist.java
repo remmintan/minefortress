@@ -1,5 +1,7 @@
 package org.minefortress.entity;
 
+import baritone.api.BaritoneAPI;
+import baritone.api.IBaritone;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
@@ -10,7 +12,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -20,7 +21,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.HungerConstants;
@@ -30,7 +30,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -49,17 +48,17 @@ import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.colonist.ColonistHungerManager;
-import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.server.FortressModServerManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressServer;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiPredicate;
 
 public class Colonist extends PassiveEntity implements RangedAttackMob {
@@ -72,19 +71,20 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
     private static final String DEFAULT_PROFESSION_ID = "colonist";
 
-    public static final float WORK_REACH_DISTANCE = 4f;
+    public static final float WORK_REACH_DISTANCE = 2f;
 
     private final DigControl digControl;
     private final PlaceControl placeControl;
     private final ScaffoldsControl scaffoldsControl;
     private final TaskControl taskControl;
     private final MovementHelper movementHelper;
-    private final MLGControl mlgControl;
     private final FightControl fightControl;
     private final EatControl eatControl;
+    private final IBaritone baritone;
 
     private boolean allowToPlaceBlockFromFarAway = false;
     private final ColonistHungerManager hungerManager = new ColonistHungerManager();
+
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
         super(entityType, world);
@@ -93,17 +93,17 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             digControl = new DigControl(this, (ServerWorld) world);
             placeControl = new PlaceControl(this);
             scaffoldsControl = new ScaffoldsControl(this);
-            mlgControl = new MLGControl(this);
             taskControl = new TaskControl(this);
-            movementHelper = new MovementHelper((ColonistNavigation) this.getNavigation(), this);
+            baritone = BaritoneAPI.getProvider().getBaritone(this);
+            movementHelper = new MovementHelper(this);
             fightControl = new FightControl(this);
             eatControl = new EatControl(this);
         } else {
             digControl = null;
             placeControl = null;
             scaffoldsControl = null;
-            mlgControl = null;
             taskControl = null;
+            baritone = null;
             movementHelper = null;
             fightControl = null;
             eatControl = null;
@@ -115,6 +115,12 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         this.dataTracker.startTracking(HAS_TASK, false);
         this.dataTracker.startTracking(GUY_TYPE, world.random.nextInt(4));
         this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
+
+
+    }
+
+    public IBaritone getBaritone() {
+        return baritone;
     }
 
     @Override
@@ -244,7 +250,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return LivingEntity.createLivingAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2F)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 1F)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 20f)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED)
@@ -265,6 +271,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     }
 
     @Override
+    public float getMovementSpeed() {
+        return super.getMovementSpeed();
+    }
+
+    @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
         if(isFortressCreative()) {
             return !damageSource.isOutOfWorld();
@@ -275,22 +286,22 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     @Override
     protected void initGoals() {
-        this.goalSelector.add(1, new SwimGoal(this));
-        this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
-        this.goalSelector.add(3, new FortressEscapeDangerGoal(this, 1.75));
-        this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
-        this.goalSelector.add(4, new FightGoal(this));
-        this.goalSelector.add(4, new HideGoal(this));
-        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
+//        this.goalSelector.add(1, new SwimGoal(this));
+//        this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
+//        this.goalSelector.add(3, new FortressEscapeDangerGoal(this, 1.75));
+//        this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
+//        this.goalSelector.add(4, new FightGoal(this));
+//        this.goalSelector.add(4, new HideGoal(this));
+//        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
-        this.goalSelector.add(7, new ColonistEatGoal(this));
-        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
-        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
-        this.goalSelector.add(9, new ReturnToFireGoal(this));
-        this.goalSelector.add(10, new LookAroundGoal(this));
+//        this.goalSelector.add(7, new ColonistEatGoal(this));
+//        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
+//        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
+//        this.goalSelector.add(9, new ReturnToFireGoal(this));
+//        this.goalSelector.add(10, new LookAroundGoal(this));
 
-        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
+//        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
+//        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
     }
 
     @Nullable
@@ -396,25 +407,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         if(this.taskControl != null) {
             this.setHasTask(this.taskControl.hasTask() || this.taskControl.isDoingEverydayTasks());
         }
-        if(fallDistance > getSafeFallDistance()) {
-            BlockPos currentHitPos = getBlockPos().down().down();
-            if(!world.getBlockState(currentHitPos).isAir() && getMlgControl() != null) {
-                getMlgControl().needAction();
-            }
-        }
 
         if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping()) {
             this.getJumpControl().setActive();
             if(getScaffoldsControl() != null && world.getBlockState(getBlockPos().down()).isAir())
                 getScaffoldsControl().needAction();
-        }
-
-        if(this.isTouchingWater() || this.isInLava()) {
-            if(this.doesNotHaveTask())
-                getJumpControl().setActive();
-            if(getMlgControl() != null) {
-                getMlgControl().clearResults();
-            }
         }
 
         tickAllControls();
@@ -423,7 +420,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private void tickAllControls() {
         if(getDigControl() != null) getDigControl().tick();
         if(getPlaceControl() != null) getPlaceControl().tick();
-        if(getMlgControl() != null) getMlgControl().tick();
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();
         if(getFightControl() != null) getFightControl().tick();
         if(getEatControl() != null) getEatControl().tick();
@@ -476,10 +472,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     public FightControl getFightControl() {
         return fightControl;
-    }
-
-    public MLGControl getMlgControl() {
-        return mlgControl;
     }
 
     public void resetControls() {

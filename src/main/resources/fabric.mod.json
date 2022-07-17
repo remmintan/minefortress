@@ -26,6 +26,9 @@
     "server": [],
     "mm:early_risers": [
       "org.minefortress.earlyriser.GameModeEarlyRiser"
+    ],
+    "cardinal-components-entity": [
+      "org.minefortress.entity.ai.ColonistBaritoneComponent"
     ]
   },
   "mixins": [

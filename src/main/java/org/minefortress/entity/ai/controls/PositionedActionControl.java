@@ -34,7 +34,7 @@ abstract class PositionedActionControl  {
     }
 
     protected boolean canReachTheGoal(Colonist colonsit) {
-        return goal.isWithinDistance(colonsit.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE) || colonsit.isAllowToPlaceBlockFromFarAway();
+        return goal.isWithinDistance(colonsit.getBlockPos(), Colonist.WORK_REACH_DISTANCE) || colonsit.isAllowToPlaceBlockFromFarAway();
     }
 
 }

@@ -1,34 +1,25 @@
 package org.minefortress.entity.ai;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.ai.pathing.Path;
-import net.minecraft.tag.FluidTags;
+import baritone.api.IBaritone;
+import baritone.api.pathing.goals.GoalBlock;
+import baritone.api.pathing.goals.GoalNear;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 
 public class MovementHelper {
 
-    private final ColonistNavigation navigation;
     private final Colonist colonist;
+    private final IBaritone baritone;
     private BlockPos workGoal;
 
-    private boolean cantFindPath;
-
-    private int attemptsToCalcPath = 0;
-
-    private BlockPos lastPos;
-    private int stuckOnSamePosition = 0;
-
-    public MovementHelper(ColonistNavigation navigation, Colonist colonist) {
-        this.navigation = navigation;
+    public MovementHelper(Colonist colonist) {
         this.colonist = colonist;
+        this.baritone = colonist.getBaritone();
     }
 
     public void reset() {
-        this.navigation.stop();
         this.workGoal = null;
-        this.cantFindPath = false;
-        this.stuckOnSamePosition = 0;
+        this.baritone.getPathingBehavior().cancelEverything();
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
     }
 
@@ -39,83 +30,34 @@ public class MovementHelper {
     public void set(BlockPos goal) {
         if(goal != null && goal.equals(workGoal))
             this.colonist.getNavigation().stop();
-        this.workGoal = goal;
-        this.cantFindPath = false;
-        this.stuckOnSamePosition = 0;
 
+        this.workGoal = goal;
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
+        this.colonist.getNavigation().stop();
+        baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }
 
     public boolean hasReachedWorkGoal() {
         if(this.workGoal == null) return false;
 
         final boolean withinDistance =
-                this.workGoal.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE)
+                this.workGoal.isWithinDistance(this.colonist.getBlockPos(), Colonist.WORK_REACH_DISTANCE)
                 || this.colonist.isAllowToPlaceBlockFromFarAway();
 
-        return
-                withinDistance &&
-                this.navigation.isIdle() &&
-                colonist.fallDistance<=1;
-    }
-
-    public boolean stillTryingToReachGoal() {
-        return !this.navigation.isIdle();
+        return withinDistance && !baritone.getPathingBehavior().isPathing();
     }
 
     public void tick() {
-        if(workGoal == null || hasReachedWorkGoal()) return;
-        checkStuck();
-        if(colonist.isSubmergedIn(FluidTags.WATER) || colonist.world.getBlockState(colonist.getBlockPos().down()).isOf(Blocks.WATER)) {
-            colonist.getJumpControl().setActive();
-        }
-        if(!this.navigation.isIdle() || cantFindPath) return;
-
-        final NodeMaker nodeEvaluator = (NodeMaker) navigation.getNodeMaker();
-
-        nodeEvaluator.setWallClimbMode(true);
-        final Path path = navigation.findPathTo(workGoal, 3);
-        nodeEvaluator.setWallClimbMode(false);
-
-        if(path != null && (path.reachesTarget() || navigation.getCurrentPath() == null || !navigation.getCurrentPath().equals(path))) {
-            navigation.startMovingAlong(path, 1.75f / colonist.getHungerMultiplier());
-        }
-
-        if (path == null) {
-            attemptsToCalcPath++;
-            if(attemptsToCalcPath > 10) {
-                this.colonist.setAllowToPlaceBlockFromFarAway(true);
-            }
-        }
+        if(workGoal == null) return;
+        if(!baritone.getPathingBehavior().isPathing() && !this.hasReachedWorkGoal())
+            baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }
 
-    public void checkStuck() {
-        final BlockPos currentPos = colonist.getBlockPos();
-        if(currentPos.equals(lastPos)) {
-            stuckOnSamePosition++;
-        } else {
-            stuckOnSamePosition = 0;
-        }
-        lastPos = currentPos.toImmutable();
-
-        int maxStuckTime = colonist.isTouchingWater()? 200: 50;
-        if(stuckOnSamePosition > maxStuckTime) {
-            this.cantFindPath = true;
-            stuckOnSamePosition = 0;
-        }
-
-        if(navigation.isCantCreateScaffold()) {
-            this.cantFindPath = true;
-            stuckOnSamePosition = 0;
-        }
-
-        if(colonist.getPlaceControl().isCantPlaceUnderMyself()) {
-            this.cantFindPath = true;
-            stuckOnSamePosition = 0;
-        }
+    public boolean stillTryingToReachGoal() {
+        return baritone.getPathingBehavior().isPathing();
     }
 
     public boolean isCantFindPath() {
-        return cantFindPath;
+        return baritone.getPathingBehavior().hasPath();
     }
 }
