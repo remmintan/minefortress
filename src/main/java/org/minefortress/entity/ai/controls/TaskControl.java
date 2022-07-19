@@ -86,6 +86,7 @@ public class TaskControl {
     public boolean hasTask() {
         if(cancelled != null && cancelled.get()) {
             this.resetTask();
+            colonist.resetControls();
         }
         return task != null;
     }
