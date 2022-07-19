@@ -1,7 +1,6 @@
 package org.minefortress.entity.ai;
 
 import baritone.api.IBaritone;
-import baritone.api.pathing.goals.GoalBlock;
 import baritone.api.pathing.goals.GoalNear;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
