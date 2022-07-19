@@ -44,7 +44,7 @@ dependencies {
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.2.0")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.2.0")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.2.0")
-	modImplementation include(files("libs/automatone-0.7.0.jar"))
+	modImplementation include("io.github.ladysnake:automatone:0.7.0")
 	modImplementation include("com.jamieswhiteshirt:reach-entity-attributes:2.2.0")
 //	modCompileOnly files('libs/sodium-fabric-mc1.17.1-0.3.4+build.13.jar')
 }
