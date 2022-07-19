@@ -250,16 +250,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return LivingEntity.createLivingAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 1F)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5F)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 20f)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED)
                 .add(EntityAttributes.GENERIC_LUCK);
-    }
-
-    @Override
-    protected EntityNavigation createNavigation(World p_21480_) {
-        return new ColonistNavigation(this, p_21480_);
     }
 
     @Override
@@ -268,11 +263,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             return true;
         else
             return super.isInvulnerable();
-    }
-
-    @Override
-    public float getMovementSpeed() {
-        return super.getMovementSpeed();
     }
 
     @Override
@@ -408,11 +398,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             this.setHasTask(this.taskControl.hasTask() || this.taskControl.isDoingEverydayTasks());
         }
 
-        if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping()) {
-            this.getJumpControl().setActive();
-            if(getScaffoldsControl() != null && world.getBlockState(getBlockPos().down()).isAir())
-                getScaffoldsControl().needAction();
-        }
+//        if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping()) {
+//            this.getJumpControl().setActive();
+//            if(getScaffoldsControl() != null && world.getBlockState(getBlockPos().down()).isAir())
+//                getScaffoldsControl().needAction();
+//        }
 
         tickAllControls();
     }
