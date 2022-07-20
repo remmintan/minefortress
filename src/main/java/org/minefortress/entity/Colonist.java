@@ -250,7 +250,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return LivingEntity.createLivingAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5F)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.4F)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 20f)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED)
@@ -376,9 +376,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId)) {
             final ServerProfessionManager manager = getFortressServerManager().getServerProfessionManager();
-            manager.getProfessionsWithAvailablePlaces().ifPresent(p -> {
-                this.dataTracker.set(PROFESSION_ID, p);
-            });
+            manager.getProfessionsWithAvailablePlaces().ifPresent(p -> this.dataTracker.set(PROFESSION_ID, p));
         }
     }
 
@@ -398,11 +396,9 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             this.setHasTask(this.taskControl.hasTask() || this.taskControl.isDoingEverydayTasks());
         }
 
-//        if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping()) {
-//            this.getJumpControl().setActive();
-//            if(getScaffoldsControl() != null && world.getBlockState(getBlockPos().down()).isAir())
-//                getScaffoldsControl().needAction();
-//        }
+        if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping())
+            this.getJumpControl().setActive();
+
 
         tickAllControls();
     }
