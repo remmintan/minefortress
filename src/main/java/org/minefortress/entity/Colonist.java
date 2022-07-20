@@ -12,7 +12,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -43,10 +42,9 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.ai.ColonistNavigation;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
-import org.minefortress.entity.ai.goal.*;
+import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
 import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.server.FortressModServerManager;
@@ -59,7 +57,6 @@ import org.minefortress.tasks.block.info.TaskBlockInfo;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiPredicate;
 
 public class Colonist extends PassiveEntity implements RangedAttackMob {
 
@@ -169,13 +166,12 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         if(this.getFortressId() == null){
             throw new IllegalStateException("Fortress id is null");
         }
-        final FortressModServerManager fortressModServerManager = getFortressModServerManager();
         return getFortressModServerManager().getByFortressId(this.getFortressId());
     }
 
     @Override
     protected float getBaseMovementSpeedMultiplier() {
-        return this.taskControl.hasTask() ? 0.98f :  super.getBaseMovementSpeedMultiplier();
+        return super.getBaseMovementSpeedMultiplier() * (this.taskControl.hasTask() ? 1f : 0.25f);
     }
 
     public void putItemInHand(Item item) {
@@ -392,13 +388,12 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     @Override
     public void tick() {
         super.tick();
-        if(this.taskControl != null) {
+        if(this.taskControl != null)
             this.setHasTask(this.taskControl.hasTask() || this.taskControl.isDoingEverydayTasks());
-        }
+
 
         if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping())
             this.getJumpControl().setActive();
-
 
         tickAllControls();
     }
@@ -418,7 +413,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             Vec3d eyePosition = this.getEyePos();
             Vec3d legsPos = new Vec3d(eyePosition.x, eyePosition.y - 1, eyePosition.z);
             Box aabb = Box.of(legsPos, getWidth(), 1.0E-6D, getWidth());
-            BiPredicate<BlockState, BlockPos> collide = (p_20129_, p_20130_) -> !p_20129_.isAir();
             return this.world
                     .getBlockCollisions(this, aabb).iterator().hasNext();
         }
@@ -438,7 +432,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         if (this.noClip) {
             return false;
         } else {
-            Box aabb = Box.of(this.getEyePos(), (double)getWidth(), 1.0E-6D, (double)getWidth());
+            Box aabb = Box.of(this.getEyePos(), getWidth(), 1.0E-6D, getWidth());
             return this.world
                     .getBlockCollisions(this, aabb).iterator().hasNext();
         }
@@ -464,6 +458,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         digControl.reset();
         placeControl.reset();
         scaffoldsControl.clearResults();
+        movementHelper.reset();
     }
 
     public boolean diggingOrPlacing() {
@@ -484,10 +479,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     }
 
     public void lookAtGoal() {
-        getLookControl().lookAt(this.goal.getX(), this.goal.getY(), this.goal.getZ());
+        lookAt(this.goal);
     }
 
     public void lookAt(BlockPos pos) {
+        if(pos == null) return;
         getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
     }
 

@@ -1,14 +1,10 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.entity.ai.pathing.EntityNavigation;
-import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.NodeMaker;
 import org.minefortress.fortress.FortressBedInfo;
-import org.minefortress.fortress.FortressServerManager;
 
 import java.util.Optional;
 
@@ -59,14 +55,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
 
     private void moveToBed() {
         if(bedInfo == null) return;
-        final BlockPos pos = bedInfo.getPos();
-        final EntityNavigation navigation = colonist.getNavigation();
-        final NodeMaker colonistNodeMaker = (NodeMaker) navigation.getNodeMaker();
-        colonistNodeMaker.setWallClimbMode(true);
-        final Path pathTo = navigation.findPathTo(pos, 1);
-        colonistNodeMaker.setWallClimbMode(false);
-
-        navigation.startMovingAlong(pathTo, 1.5);
+        colonist.getMovementHelper().set(bedInfo.getPos());
     }
 
     private boolean hasReachedTheBed() {

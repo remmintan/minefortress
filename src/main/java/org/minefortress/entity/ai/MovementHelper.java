@@ -1,10 +1,8 @@
 package org.minefortress.entity.ai;
 
 import baritone.api.IBaritone;
-import baritone.api.behavior.IPathingBehavior;
-import baritone.api.event.events.BlockInteractEvent;
 import baritone.api.event.events.PathEvent;
-import baritone.api.event.listener.IGameEventListener;
+import baritone.api.event.listener.AbstractGameEventListener;
 import baritone.api.pathing.goals.GoalNear;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
@@ -67,17 +65,7 @@ public class MovementHelper {
         return stuck;
     }
 
-    private class StuckOnFailEventListener implements IGameEventListener {
-
-        @Override
-        public void onTickServer() {
-
-        }
-
-        @Override
-        public void onBlockInteract(BlockInteractEvent blockInteractEvent) {
-
-        }
+    private class StuckOnFailEventListener implements AbstractGameEventListener {
 
         @Override
         public void onPathEvent(PathEvent pathEvent) {
