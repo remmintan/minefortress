@@ -14,6 +14,10 @@ public class ColonistBaritoneComponent implements EntityComponentInitializer {
         globalSettings.allowSprint.set(true);
         globalSettings.allowSwimming.set(true);
         globalSettings.buildRepeatSneaky.set(true);
+        globalSettings.allowPlace.set(true);
+        globalSettings.allowBreak.set(false);
+        globalSettings.allowParkourPlace.set(true);
+        globalSettings.allowInventory.set(true);
 
         registry.registerFor(Colonist.class, IBaritone.KEY, BaritoneAPI.getProvider().componentFactory());
     }
