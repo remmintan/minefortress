@@ -72,7 +72,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
     private static final String DEFAULT_PROFESSION_ID = "colonist";
 
-    public static final float WORK_REACH_DISTANCE = 2f;
+    public static final float WORK_REACH_DISTANCE = 3f;
 
     private final DigControl digControl;
     private final PlaceControl placeControl;
