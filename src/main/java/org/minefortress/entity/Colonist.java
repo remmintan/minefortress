@@ -2,6 +2,7 @@ package org.minefortress.entity;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
+import baritone.api.minefortress.IMinefortressEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
@@ -12,6 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
+import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -24,6 +26,7 @@ import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -42,6 +45,7 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.entity.ai.MineFortressInventory;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
@@ -58,7 +62,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Colonist extends PassiveEntity implements RangedAttackMob {
+public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefortressEntity {
 
     private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
@@ -78,6 +82,9 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private final FightControl fightControl;
     private final EatControl eatControl;
     private final IBaritone baritone;
+    private final Inventory inventory;
+
+    private int selectedSlot = 0;
 
     private boolean allowToPlaceBlockFromFarAway = false;
     private final ColonistHungerManager hungerManager = new ColonistHungerManager();
@@ -95,6 +102,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             movementHelper = new MovementHelper(this);
             fightControl = new FightControl(this);
             eatControl = new EatControl(this);
+            inventory = new MineFortressInventory();
         } else {
             digControl = null;
             placeControl = null;
@@ -104,6 +112,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             movementHelper = null;
             fightControl = null;
             eatControl = null;
+            inventory = null;
         }
 
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
@@ -112,8 +121,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         this.dataTracker.startTracking(HAS_TASK, false);
         this.dataTracker.startTracking(GUY_TYPE, world.random.nextInt(4));
         this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
-
-
     }
 
     public IBaritone getBaritone() {
@@ -157,6 +164,17 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     }
 
     @Override
+    public void selectSlot(int i) {
+        this.selectedSlot = i;
+        this.setStackInHand(Hand.MAIN_HAND, this.getInventory().getStack(this.selectedSlot));
+    }
+
+    @Override
+    public int getSelectedSlot() {
+        return this.selectedSlot;
+    }
+
+    @Override
     public ItemStack eatFood(World world, ItemStack stack) {
         this.getHungerManager().eat(stack.getItem(), stack);
         return super.eatFood(world, stack);
@@ -167,11 +185,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             throw new IllegalStateException("Fortress id is null");
         }
         return getFortressModServerManager().getByFortressId(this.getFortressId());
-    }
-
-    @Override
-    protected float getBaseMovementSpeedMultiplier() {
-        return super.getBaseMovementSpeedMultiplier() * (this.taskControl.hasTask() ? 1f : 0.25f);
     }
 
     public void putItemInHand(Item item) {
@@ -246,8 +259,8 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return LivingEntity.createLivingAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.4F)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 20f)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5D)
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED)
                 .add(EntityAttributes.GENERIC_LUCK);
@@ -612,4 +625,13 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return this.dataTracker.get(FORTRESS_ID).orElse(null);
     }
 
+    @Override
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    @Override
+    public @Nullable ServerPlayerEntity getPlayer() {
+        return getMasterPlayer().orElse(null);
+    }
 }

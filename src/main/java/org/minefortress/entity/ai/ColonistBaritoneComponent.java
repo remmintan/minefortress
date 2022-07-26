@@ -11,12 +11,12 @@ public class ColonistBaritoneComponent implements EntityComponentInitializer {
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         final var globalSettings = BaritoneAPI.getGlobalSettings();
         globalSettings.allowParkour.set(true);
-        globalSettings.allowSprint.set(true);
+        globalSettings.allowSprint.set(false);
         globalSettings.allowSwimming.set(true);
         globalSettings.buildRepeatSneaky.set(true);
         globalSettings.allowPlace.set(true);
         globalSettings.allowBreak.set(false);
-        globalSettings.allowParkourPlace.set(true);
+        globalSettings.allowParkourPlace.set(false);
         globalSettings.allowInventory.set(true);
 
         registry.registerFor(Colonist.class, IBaritone.KEY, BaritoneAPI.getProvider().componentFactory());
