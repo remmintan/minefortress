@@ -25,6 +25,9 @@ public class ScaffoldsControl implements IBlockPosControl {
 
     public void tick() {
         blockTasks.removeIf(BlockTask::execute);
+        if(!colonist.getTaskControl().hasTask() && !results.isEmpty()) {
+            clearResults();
+        }
     }
 
     @Override
@@ -46,6 +49,7 @@ public class ScaffoldsControl implements IBlockPosControl {
     }
 
     public void clearResults() {
+        if(results.isEmpty()) return;
         final World level = colonist.world;
         for(BlockPos result : results) {
             if(level.getBlockState(result).isOf(SCAFFOLD_BLOCK)) {
@@ -53,6 +57,7 @@ public class ScaffoldsControl implements IBlockPosControl {
                 level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, result);
             }
         }
+        results.clear();
     }
 
     private static class BlockTask {

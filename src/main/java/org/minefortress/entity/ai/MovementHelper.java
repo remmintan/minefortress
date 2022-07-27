@@ -41,7 +41,7 @@ public class MovementHelper {
         this.workGoal = goal;
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
         this.colonist.getNavigation().stop();
-        baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE));
+        baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }
 
     public boolean hasReachedWorkGoal() {
