@@ -2,6 +2,7 @@ package org.minefortress.entity;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
+import baritone.api.minefortress.IFortressColonist;
 import baritone.api.minefortress.IMinefortressEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -13,7 +14,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -62,7 +62,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefortressEntity {
+public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist {
 
     private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
@@ -459,6 +459,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         return placeControl;
     }
 
+    @Override
     public ScaffoldsControl getScaffoldsControl() {
         return scaffoldsControl;
     }

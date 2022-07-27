@@ -46,6 +46,9 @@ public class MineFortressMod implements ModInitializer {
         FabricDefaultAttributeRegistry.register(FortressEntities.COLONIST_ENTITY_TYPE, Colonist.createAttributes());
         Registry.register(Registry.ITEM, new Identifier("minefortress", "colonist_spawn_egg"), FortressItems.COLONIST_SPAWN_EGG);
 
+        // items
+        Registry.register(Registry.ITEM, new Identifier("minefortress", "scaffold_oak_planks"), FortressItems.SCAFFOLD_OAK_PLANKS);
+
         CommandsManager.registerCommands();
         registerEvents();
 

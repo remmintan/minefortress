@@ -13,8 +13,13 @@ abstract class AbstractFortressGoal extends Goal {
     protected final Colonist colonist;
 
     protected AbstractFortressGoal(Colonist colonist) {
+        this(colonist, true);
+    }
+
+    protected AbstractFortressGoal(Colonist colonist, boolean setControls) {
         this.colonist = colonist;
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK,Goal.Control.JUMP));
+        if(setControls)
+            this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK,Goal.Control.JUMP));
         World level = this.colonist.world;
         if (!(level instanceof ServerWorld)) {
             throw new IllegalStateException("AI should run on the server entities!");

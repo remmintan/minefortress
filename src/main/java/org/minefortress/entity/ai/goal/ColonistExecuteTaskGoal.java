@@ -17,7 +17,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     private BlockPos workGoal =  null;
 
     public ColonistExecuteTaskGoal(Colonist colonist) {
-        super(colonist);
+        super(colonist, false);
         World level = this.colonist.world;
         if(level instanceof ServerWorld) {
             this.world = (ServerWorld) level;
