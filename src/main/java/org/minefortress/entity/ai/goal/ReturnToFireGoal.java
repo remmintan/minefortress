@@ -86,6 +86,6 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     @Override
     public void stop() {
         super.stop();
-        this.colonist.getBaritone().getPathingBehavior().cancelEverything();
+        colonist.getMovementHelper().reset();
     }
 }

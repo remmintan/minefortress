@@ -4,6 +4,7 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressBedInfo;
 
 import java.util.Optional;
@@ -38,7 +39,8 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
     @Override
     public void tick() {
         if(bedInfo == null) return;
-        if(colonist.getNavigation().isIdle()) {
+        final var movementHelper = colonist.getMovementHelper();
+        if(movementHelper.stillTryingToReachGoal() && !movementHelper.isStuck()) {
             if(hasReachedTheBed()) {
                 if(!colonist.isSleeping()) {
                     final BlockPos bedPos = this.bedInfo.getPos();
@@ -66,7 +68,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() && isNight() && bedInfo != null && !colonist.getTaskControl().hasTask();
+        return notInCombat() && isNight() && bedInfo != null && !colonist.getTaskControl().hasTask() && !colonist.getMovementHelper().isStuck();
     }
 
     @Override

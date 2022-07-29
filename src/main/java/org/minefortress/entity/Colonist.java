@@ -48,6 +48,8 @@ import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
 import org.minefortress.entity.ai.goal.ReturnToFireGoal;
+import org.minefortress.entity.ai.goal.SleepOnTheBedGoal;
+import org.minefortress.entity.ai.goal.WanderAroundTheFortressGoal;
 import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.server.FortressModServerManager;
@@ -293,8 +295,8 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
 //        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
 //        this.goalSelector.add(7, new ColonistEatGoal(this));
-//        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
-//        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
+        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
+        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
 
