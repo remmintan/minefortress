@@ -75,7 +75,7 @@ public class MovementHelper {
         return baritone.getPathingBehavior().isPathing();
     }
 
-    public boolean isCantFindPath() {
+    public boolean isStuck() {
         return stuck;
     }
 

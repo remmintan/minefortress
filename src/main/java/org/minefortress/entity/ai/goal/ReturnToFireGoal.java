@@ -79,7 +79,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
         return notInCombat() &&
                 isNight() &&
                 !colonist.getTaskControl().hasTask() &&
-                !colonist.getMovementHelper().isCantFindPath() &&
+                !colonist.getMovementHelper().isStuck() &&
                 isFarFromCenter();
     }
 

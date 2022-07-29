@@ -55,7 +55,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
         }
         movementHelper.tick();
 
-        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isCantFindPath())
+        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isStuck())
             colonist.teleport(this.blockPos.getX(), this.blockPos.getY(), this.blockPos.getZ());
     }
 

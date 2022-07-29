@@ -13,8 +13,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressBuilding;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;
@@ -110,7 +108,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         }
 
         movementHelper.tick();
-        if(movementHelper.getWorkGoal() != null && !movementHelper.hasReachedWorkGoal() && movementHelper.isCantFindPath()){
+        if(movementHelper.getWorkGoal() != null && !movementHelper.hasReachedWorkGoal() && movementHelper.isStuck()){
             final var workGoal = movementHelper.getWorkGoal().up();
             colonist.teleport(workGoal.getX(), workGoal.getY(), workGoal.getZ());
         }

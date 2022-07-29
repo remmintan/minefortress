@@ -58,7 +58,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         }
 
         getMovementHelper().tick();
-        if(getMovementHelper().isCantFindPath() || this.colonist.getPlaceControl().isCantPlaceUnderMyself()) {
+        if(getMovementHelper().isStuck() || this.colonist.getPlaceControl().isCantPlaceUnderMyself()) {
             getTaskControl().fail();
             this.colonist.resetControls();
         }

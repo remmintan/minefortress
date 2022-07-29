@@ -1,13 +1,9 @@
 package org.minefortress.entity.ai.goal;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-
-import java.util.Optional;
 
 public class ColonistEatGoal extends AbstractFortressGoal {
 
@@ -46,7 +42,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
         }
         movementHelper.tick();
 
-        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isCantFindPath())
+        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isStuck())
             colonist.teleport(this.goal.getX(), this.goal.getY(), this.goal.getZ());
     }
 
