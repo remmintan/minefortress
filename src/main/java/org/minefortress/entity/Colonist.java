@@ -11,7 +11,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
+import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -20,6 +22,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.HungerConstants;
@@ -283,13 +286,13 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
 
     @Override
     protected void initGoals() {
-//        this.goalSelector.add(1, new SwimGoal(this));
+        this.goalSelector.add(1, new SwimGoal(this));
 //        this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
-//        this.goalSelector.add(3, new FortressEscapeDangerGoal(this, 1.75));
-//        this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
-//        this.goalSelector.add(4, new FightGoal(this));
-//        this.goalSelector.add(4, new HideGoal(this));
-//        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
+        this.goalSelector.add(3, new FortressEscapeDangerGoal(this, 1.75));
+        this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
+        this.goalSelector.add(4, new FightGoal(this));
+        this.goalSelector.add(4, new HideGoal(this));
+        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
         this.goalSelector.add(7, new ColonistEatGoal(this));
         this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
@@ -297,8 +300,8 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
 
-//        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
-//        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
+        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
     }
 
     @Nullable
