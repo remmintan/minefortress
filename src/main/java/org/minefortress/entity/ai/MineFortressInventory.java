@@ -13,6 +13,7 @@ public class MineFortressInventory extends SimpleInventory {
         super.setStack(1, new ItemStack(FortressItems.SCAFFOLD_OAK_PLANKS, 64));
         super.setStack(2, new ItemStack(FortressItems.SCAFFOLD_OAK_PLANKS, 64));
         super.setStack(3, new ItemStack(Items.WATER_BUCKET));
+        super.setStack(4, new ItemStack(FortressItems.SCAFFOLD_OAK_PLANKS, 64));
     }
 
 }

@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -46,6 +47,7 @@ import org.minefortress.entity.ai.MineFortressInventory;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
+import org.minefortress.entity.ai.goal.ReturnToFireGoal;
 import org.minefortress.entity.colonist.ColonistHungerManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.server.FortressModServerManager;
@@ -293,8 +295,8 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
 //        this.goalSelector.add(7, new ColonistEatGoal(this));
 //        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
 //        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
-//        this.goalSelector.add(9, new ReturnToFireGoal(this));
-//        this.goalSelector.add(10, new LookAroundGoal(this));
+        this.goalSelector.add(9, new ReturnToFireGoal(this));
+        this.goalSelector.add(10, new LookAroundGoal(this));
 
 //        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
 //        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));

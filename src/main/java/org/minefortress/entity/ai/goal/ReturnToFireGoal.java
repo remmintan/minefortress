@@ -26,9 +26,12 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
             if(pos.isPresent()) return false;
         }
 
+        return !colonist.getTaskControl().hasTask() && isFarFromCenter();
+    }
+
+    private boolean isFarFromCenter() {
         final BlockPos fortressCenter = colonist.getFortressServerManager().getFortressCenter();
-        return !colonist.getTaskControl().hasTask() &&
-                fortressCenter != null &&
+        return fortressCenter != null &&
                 colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()) > Math.pow(getHomeOuterRadius(), 2);
     }
 
@@ -52,6 +55,11 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     @Override
     public void start() {
         super.start();
+        moveToTheFire();
+        this.colonist.setCurrentTaskDesc("Staying near campfire");
+    }
+
+    private void moveToTheFire() {
         final BlockPos fortressCenter = colonist.getFortressServerManager().getFortressCenter();
 
         final int x = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
@@ -64,17 +72,20 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
         if(colonist.isSleeping()) {
             colonist.wakeUp();
         }
-        this.colonist.setCurrentTaskDesc("Staying near campfire");
     }
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() && isNight() && !colonist.getTaskControl().hasTask() && !this.colonist.getNavigation().isIdle();
+        return notInCombat() &&
+                isNight() &&
+                !colonist.getTaskControl().hasTask() &&
+                !colonist.getMovementHelper().isCantFindPath() &&
+                isFarFromCenter();
     }
 
     @Override
     public void stop() {
         super.stop();
-        this.colonist.getNavigation().stop();
+        this.colonist.getBaritone().getPathingBehavior().cancelEverything();
     }
 }
