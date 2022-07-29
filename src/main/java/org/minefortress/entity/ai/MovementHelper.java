@@ -3,11 +3,15 @@ package org.minefortress.entity.ai;
 import baritone.api.IBaritone;
 import baritone.api.event.events.PathEvent;
 import baritone.api.event.listener.AbstractGameEventListener;
+import baritone.api.pathing.calc.IPath;
 import baritone.api.pathing.goals.GoalNear;
+import baritone.api.utils.BetterBlockPos;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 public class MovementHelper {
 
@@ -17,6 +21,7 @@ public class MovementHelper {
     private final IBaritone baritone;
     private BlockPos workGoal;
 
+    private int stuckTicks = 0;
     private boolean stuck = false;
 
     public MovementHelper(Colonist colonist) {
@@ -27,6 +32,7 @@ public class MovementHelper {
 
     public void reset() {
         this.workGoal = null;
+        this.stuckTicks = 0;
         this.stuck = false;
         this.baritone.getPathingBehavior().cancelEverything();
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
@@ -55,6 +61,14 @@ public class MovementHelper {
     }
 
     public void tick() {
+        if(workGoal == null) return;
+        if(!hasReachedWorkGoal()) {
+            if(stuckTicks++ > 5) {
+                stuck = true;
+                stuckTicks = 0;
+                baritone.getPathingBehavior().cancelEverything();
+            }
+        }
     }
 
     public boolean stillTryingToReachGoal() {
@@ -67,8 +81,33 @@ public class MovementHelper {
 
     private class StuckOnFailEventListener implements AbstractGameEventListener {
 
+        private BlockPos lastDestination;
+        private int stuckCounter = 0;
+
         @Override
         public void onPathEvent(PathEvent pathEvent) {
+            if(pathEvent == PathEvent.AT_GOAL && !hasReachedWorkGoal()) {
+                stuck = true;
+            }
+
+            if(pathEvent == PathEvent.CALC_FINISHED_NOW_EXECUTING){
+                final var dest = baritone.getPathingBehavior().getPath().map(IPath::getDest).orElse(BetterBlockPos.ORIGIN);
+                if(lastDestination != null) {
+                    if (dest.equals(lastDestination)) {
+                        stuckCounter++;
+                        if (stuckCounter > 1) {
+                            stuck = true;
+                            stuckCounter = 0;
+                            lastDestination = null;
+                            baritone.getPathingBehavior().cancelEverything();
+                        }
+                    } else {
+                        stuckCounter = 0;
+                    }
+                }
+                lastDestination = dest;
+            }
+
             if(pathEvent == PathEvent.CALC_FAILED) {
                 MovementHelper.LOGGER.warn("Can't find path");
                 MovementHelper.this.stuck = true;
