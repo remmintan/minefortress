@@ -64,7 +64,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
     public void stop() {
         this.foodInHand = null;
         this.goal = null;
-        this.colonist.getNavigation().stop();
+        colonist.getMovementHelper().reset();
         colonist.putItemInHand(this.foodInHand);
         colonist.getEatControl().reset();
     }
