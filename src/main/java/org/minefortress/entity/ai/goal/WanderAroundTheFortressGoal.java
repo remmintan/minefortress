@@ -46,7 +46,11 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() && isDay() && !colonist.getTaskControl().hasTask() && !colonist.getMovementHelper().isStuck();
+        return notInCombat() &&
+                isDay() &&
+                !colonist.getTaskControl().hasTask() &&
+                !colonist.getMovementHelper().isStuck() &&
+                colonist.getMovementHelper().stillTryingToReachGoal();
     }
 
     @Override
