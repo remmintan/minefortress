@@ -62,7 +62,7 @@ public class MovementHelper {
 
     public void tick() {
         if(workGoal == null) return;
-        if(!hasReachedWorkGoal()) {
+        if(!baritone.getPathingBehavior().isPathing() && !hasReachedWorkGoal()) {
             if(stuckTicks++ > 5) {
                 stuck = true;
                 stuckTicks = 0;
