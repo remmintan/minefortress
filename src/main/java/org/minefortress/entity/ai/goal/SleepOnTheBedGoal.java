@@ -40,24 +40,23 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
     public void tick() {
         if(bedInfo == null) return;
         final var movementHelper = colonist.getMovementHelper();
-        if(movementHelper.stillTryingToReachGoal() && !movementHelper.isStuck()) {
-            if(hasReachedTheBed()) {
-                if(!colonist.isSleeping()) {
-                    final BlockPos bedPos = this.bedInfo.getPos();
-                    if(colonist.world.getBlockState(bedPos).isIn(BlockTags.BEDS)) {
-                        colonist.sleep(bedPos);
-                        colonist.putItemInHand(null);
-                    }
+        if(movementHelper.stillTryingToReachGoal()) return;
+        if(hasReachedTheBed()) {
+            if(!colonist.isSleeping()) {
+                final BlockPos bedPos = this.bedInfo.getPos();
+                if(colonist.world.getBlockState(bedPos).isIn(BlockTags.BEDS)) {
+                    colonist.sleep(bedPos);
+                    colonist.putItemInHand(null);
                 }
-            } else {
-                moveToBed();
             }
+        } else if(movementHelper.isStuck()) {
+            moveToBed();
         }
     }
 
     private void moveToBed() {
         if(bedInfo == null) return;
-        colonist.getMovementHelper().set(bedInfo.getPos());
+        colonist.getMovementHelper().set(bedInfo.getPos(), Colonist.SLOW_MOVEMENT_SPEED);
     }
 
     private boolean hasReachedTheBed() {

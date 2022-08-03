@@ -34,7 +34,7 @@ public class HideGoal extends AbstractFortressGoal{
 
         if(shelterBlockPos == null) return;
         this.moveGoal = findCorrectGoal();
-        colonist.getMovementHelper().set(moveGoal);
+        colonist.getMovementHelper().set(moveGoal, Colonist.FAST_MOVEMENT_SPEED);
         this.hideTicks = 100;
     }
 

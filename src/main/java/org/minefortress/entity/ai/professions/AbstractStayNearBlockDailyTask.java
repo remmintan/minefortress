@@ -23,7 +23,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
     @Override
     public void start(Colonist colonist) {
         this.setupTablePos(colonist);
-        colonist.getMovementHelper().set(this.blockPos);
+        colonist.getMovementHelper().set(this.blockPos, Colonist.FAST_MOVEMENT_SPEED);
     }
 
     @Override

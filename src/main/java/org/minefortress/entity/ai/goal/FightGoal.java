@@ -41,7 +41,7 @@ public class FightGoal extends AbstractFortressGoal {
 
         findMoveTarget();
         if(correctMoveTarget != null) {
-            moveHelper.set(correctMoveTarget);
+            moveHelper.set(correctMoveTarget, Colonist.FAST_MOVEMENT_SPEED);
         } else {
             moveHelper.reset();
         }

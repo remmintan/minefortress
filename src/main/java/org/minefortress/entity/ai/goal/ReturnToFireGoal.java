@@ -67,7 +67,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
         BlockPos goal = new BlockPos(fortressCenter.getX() + x, fortressCenter.getY(), fortressCenter.getZ() + z);
 
-        colonist.getMovementHelper().set(goal);
+        colonist.getMovementHelper().set(goal, Colonist.FAST_MOVEMENT_SPEED);
 
         if(colonist.isSleeping()) {
             colonist.wakeUp();

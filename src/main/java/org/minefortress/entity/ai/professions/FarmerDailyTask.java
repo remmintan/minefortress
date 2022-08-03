@@ -36,7 +36,6 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     private Iterator<BlockPos> farmIterator;
     private BlockPos goal;
     private long stopTime = 0L;
-    private long workingTicks = 0L;
 
     @Override
     public boolean canStart(Colonist colonist) {
@@ -58,11 +57,10 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         if(this.goal == null) {
             findCorrectGoal(colonist);
             if(this.goal == null) return;
-            movementHelper.set(goal);
+            movementHelper.set(goal, Colonist.FAST_MOVEMENT_SPEED);
         }
 
         if(movementHelper.getWorkGoal() != null && movementHelper.hasReachedWorkGoal()) {
-            this.workingTicks++;
             final var goalBLockState = colonist.world.getBlockState(this.goal);
             if (goalBLockState.isOf(Blocks.DIRT) || goalBLockState.isOf(Blocks.GRASS_BLOCK)) {
                 colonist.putItemInHand(Items.WOODEN_HOE);
@@ -86,14 +84,14 @@ public class FarmerDailyTask implements ProfessionDailyTask{
                             final var wheatSeeds = (BlockItem) Items.WHEAT_SEEDS;
                             final var blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(wheatSeeds, aboveBlock, wheatSeeds.getBlock().getDefaultState());
                             colonist.setGoal(blockStateTaskBlockInfo);
-                            movementHelper.set(aboveBlock);
+                            movementHelper.set(aboveBlock, Colonist.FAST_MOVEMENT_SPEED);
                         } else {
                             final var seedsOpt = getSeeds(colonist);
                             if(seedsOpt.isPresent()) {
                                 final var blockItem = (BlockItem) seedsOpt.get();
                                 final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlock, blockItem.getBlock().getDefaultState());
                                 colonist.setGoal(bsTaskBlockInfo);
-                                movementHelper.set(aboveBlock);
+                                movementHelper.set(aboveBlock, Colonist.FAST_MOVEMENT_SPEED);
                             } else {
                                 this.goal = null;
                             }
@@ -119,7 +117,6 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         this.currentFarm = null;
         this.farmIterator = Collections.emptyIterator();
         this.stopTime = colonist.world.getTime();
-        this.workingTicks = 0;
         colonist.resetControls();
     }
 

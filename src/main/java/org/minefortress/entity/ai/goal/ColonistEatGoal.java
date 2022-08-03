@@ -29,7 +29,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
         final int z = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
 
         this.goal = new BlockPos(fortressCenter.getX() + x, fortressCenter.getY(), fortressCenter.getZ() + z);
-        colonist.getMovementHelper().set(goal);
+        colonist.getMovementHelper().set(goal, Colonist.FAST_MOVEMENT_SPEED);
         this.colonist.setCurrentTaskDesc("Looking for food");
     }
 

@@ -40,10 +40,11 @@ public class MovementHelper {
         return workGoal;
     }
 
-    public void set(BlockPos goal) {
+    public void set(BlockPos goal, float speed) {
         this.reset();
         this.workGoal = goal;
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
+        this.colonist.setMovementSpeed(speed);
         this.colonist.getNavigation().stop();
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }

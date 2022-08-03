@@ -10,11 +10,15 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.utils.BuildingHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.minefortress.entity.colonist.ColonistHungerManager.PASSIVE_EXHAUSTION;
 import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
 
 public class ForesterDailyTask implements ProfessionDailyTask{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ForesterDailyTask.class);
 
     private BlockPos blockPos;
     private int workingTicks;
@@ -30,7 +34,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     public void start(Colonist colonist) {
         colonist.setCurrentTaskDesc("Looking for food");
         this.setGoal(colonist);
-        colonist.getMovementHelper().set(this.blockPos);
+        colonist.getMovementHelper().set(this.blockPos, Colonist.FAST_MOVEMENT_SPEED);
     }
 
     @Override
@@ -46,7 +50,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
                 this.gatherItemAndAddToInventory(colonist);
                 if(this.interactionsCount > 2) {
                     this.setGoal(colonist);
-                    colonist.getMovementHelper().set(this.blockPos);
+                    colonist.getMovementHelper().set(this.blockPos, Colonist.FAST_MOVEMENT_SPEED);
                     this.interactionsCount = 0;
                 }
             }
@@ -95,9 +99,9 @@ public class ForesterDailyTask implements ProfessionDailyTask{
         final var closestLeavesOpt = BlockPos
                 .findClosest(
                         randPointAround,
-                        20,
-                        10,
-                        (BlockPos pos) -> SimilarItemsHelper.contains(BlockTags.LEAVES, world.getBlockState(pos).getBlock())
+                        21,
+                        21,
+                        (BlockPos pos) -> world.getBlockState(pos).isIn(BlockTags.LEAVES)
                 );
         if(closestLeavesOpt.isPresent()){
             this.blockPos = closestLeavesOpt.get();
@@ -107,9 +111,9 @@ public class ForesterDailyTask implements ProfessionDailyTask{
         final var closestHoeMineableOpt = BlockPos
                 .findClosest(
                         randPointAround,
-                        20,
-                        10,
-                        (BlockPos pos) -> SimilarItemsHelper.contains(BlockTags.HOE_MINEABLE, world.getBlockState(pos).getBlock())
+                        21,
+                        21,
+                        (BlockPos pos) -> world.getBlockState(pos).isIn(BlockTags.HOE_MINEABLE)
                 );
 
         if(closestHoeMineableOpt.isPresent()){
@@ -120,9 +124,9 @@ public class ForesterDailyTask implements ProfessionDailyTask{
         final var closestGrassBlockOpt = BlockPos
                 .findClosest(
                         randPointAround,
-                        20,
-                        10,
-                        (BlockPos pos) -> world.getBlockState(pos).getBlock() == Blocks.GRASS || world.getBlockState(pos).getBlock() == Blocks.TALL_GRASS
+                        21,
+                        21,
+                        (BlockPos pos) -> (world.getBlockState(pos).isOf(Blocks.GRASS) || world.getBlockState(pos).isOf(Blocks.TALL_GRASS))
                 );
 
         if(closestGrassBlockOpt.isPresent()){
@@ -137,11 +141,14 @@ public class ForesterDailyTask implements ProfessionDailyTask{
         BlockPos
                 .findClosest(
                         this.blockPos,
-                        20,
-                        10,
+                        21,
+                        21,
                         pos -> BuildingHelper.canStayOnBlock(world, pos)
                 )
-                .ifPresentOrElse(pos -> this.blockPos = pos, () -> this.blockPos = null);
+                .ifPresentOrElse(pos -> this.blockPos = pos.up(), () -> this.blockPos = null);
+        if(blockPos == null) {
+            LOGGER.error("Could not find a valid block to work on");
+        }
     }
 
 }

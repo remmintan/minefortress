@@ -104,7 +104,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         }
 
         if(workGoal == null || taskBlockInfo == null) return;
-        getMovementHelper().set(workGoal);
+        getMovementHelper().set(workGoal, Colonist.FAST_MOVEMENT_SPEED);
         colonist.setGoal(taskBlockInfo);
     }
 
