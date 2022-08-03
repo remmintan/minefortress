@@ -41,8 +41,6 @@ public class HideGoal extends AbstractFortressGoal{
     @Override
     public void tick() {
         final var movementHelper = colonist.getMovementHelper();
-        movementHelper.tick();
-
         if(movementHelper.hasReachedWorkGoal()) {
             this.hideTicks--;
         }

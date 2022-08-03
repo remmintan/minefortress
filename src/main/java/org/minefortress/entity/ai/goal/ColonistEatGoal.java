@@ -40,7 +40,6 @@ public class ColonistEatGoal extends AbstractFortressGoal {
             if(!colonist.getEatControl().isEating())
                 colonist.getEatControl().putFoodInHand();
         }
-        movementHelper.tick();
 
         if(!movementHelper.hasReachedWorkGoal() && movementHelper.isStuck())
             colonist.teleport(this.goal.getX(), this.goal.getY(), this.goal.getZ());

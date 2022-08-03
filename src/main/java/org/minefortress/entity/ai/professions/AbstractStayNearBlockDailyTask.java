@@ -39,7 +39,6 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
             colonist.lookAt(blockPos);
             workingTicks++;
         }
-        movementHelper.tick();
 
         if(!movementHelper.hasReachedWorkGoal() && movementHelper.isStuck() )
             colonist.teleport(this.blockPos.getX(), this.blockPos.getY(), this.blockPos.getZ());

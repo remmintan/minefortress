@@ -107,7 +107,6 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             }
         }
 
-        movementHelper.tick();
         if(movementHelper.getWorkGoal() != null && !movementHelper.hasReachedWorkGoal() && movementHelper.isStuck()){
             final var workGoal = movementHelper.getWorkGoal().up();
             colonist.teleport(workGoal.getX(), workGoal.getY(), workGoal.getZ());

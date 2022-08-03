@@ -433,6 +433,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();
         if(getFightControl() != null) getFightControl().tick();
         if(getEatControl() != null) getEatControl().tick();
+        if(getMovementHelper() != null) getMovementHelper().tick();
     }
 
     private boolean isHalfInWall() {

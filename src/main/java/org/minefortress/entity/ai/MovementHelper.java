@@ -11,8 +11,6 @@ import org.minefortress.entity.Colonist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
-
 public class MovementHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovementHelper.class);

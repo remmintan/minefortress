@@ -45,9 +45,6 @@ public class FightGoal extends AbstractFortressGoal {
         } else {
             moveHelper.reset();
         }
-        if (!fightControl.hasAttackTarget() || cachedMoveTarget == null || !cachedMoveTarget.isWithinDistance(colonist.getPos(), FightControl.DEFEND_RANGE)) {
-            moveHelper.tick();
-        }
 
         fightControl.attackTargetIfPossible();
         if(colonist.getMovementHelper().hasReachedWorkGoal()) {
