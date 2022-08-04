@@ -21,6 +21,7 @@ public class MovementHelper {
 
     private int stuckTicks = 0;
     private boolean stuck = false;
+    private BlockPos lastPos = null;
 
     public MovementHelper(Colonist colonist) {
         this.colonist = colonist;
@@ -30,6 +31,7 @@ public class MovementHelper {
 
     public void reset() {
         this.workGoal = null;
+        this.lastPos = null;
         this.stuckTicks = 0;
         this.stuck = false;
         this.baritone.getPathingBehavior().cancelEverything();
@@ -41,11 +43,14 @@ public class MovementHelper {
     }
 
     public void set(BlockPos goal, float speed) {
+        if(workGoal != null && workGoal.equals(goal)) return;
+
         this.reset();
         this.workGoal = goal;
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
         this.colonist.setMovementSpeed(speed);
         this.colonist.getNavigation().stop();
+        if(this.hasReachedWorkGoal()) return;
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }
 
@@ -61,13 +66,19 @@ public class MovementHelper {
 
     public void tick() {
         if(workGoal == null) return;
-        if(!baritone.getPathingBehavior().isPathing() && !hasReachedWorkGoal()) {
-            if(stuckTicks++ > 5) {
+
+        final var currentPos = colonist.getBlockPos();
+        if(currentPos.equals(lastPos)) {
+            stuckTicks++;
+            if(stuckTicks > 10) {
                 stuck = true;
                 stuckTicks = 0;
-                baritone.getPathingBehavior().cancelEverything();
             }
+        } else {
+            stuck = false;
+            stuckTicks = 0;
         }
+        lastPos = currentPos;
     }
 
     public boolean stillTryingToReachGoal() {

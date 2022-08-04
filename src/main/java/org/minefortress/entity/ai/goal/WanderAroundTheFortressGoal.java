@@ -1,6 +1,5 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
@@ -11,6 +10,8 @@ import static org.minefortress.entity.colonist.ColonistHungerManager.IDLE_EXHAUS
 
 public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
 
+    private BlockPos goal;
+
     public WanderAroundTheFortressGoal(Colonist colonist) {
         super(colonist);
     }
@@ -19,18 +20,18 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
     public boolean canStart() {
         if(!notInCombat() || !isDay() || colonist.getTaskControl().hasTask()) return false;
         final FortressServerManager fortressManager = colonist.getFortressServerManager();
-        final Optional<BlockPos> blockPos = fortressManager.randomSurfacePos((ServerWorld) colonist.world);
+        final Optional<BlockPos> blockPos = fortressManager.randomSurfacePos();
         return blockPos.isPresent();
     }
 
     @Override
     public void start() {
         final FortressServerManager fortressServerManager = colonist.getFortressServerManager();
-        final Optional<BlockPos> goalOpt = fortressServerManager.randomSurfacePos((ServerWorld) colonist.world);
+        final Optional<BlockPos> goalOpt = fortressServerManager.randomSurfacePos();
         if(goalOpt.isPresent()) {
             colonist.setCurrentTaskDesc("Wandering around");
             colonist.putItemInHand(null);
-            final BlockPos goal = goalOpt.get();
+            goal = goalOpt.get();
             colonist.getMovementHelper().set(goal, Colonist.SLOW_MOVEMENT_SPEED);
             if(colonist.isSleeping()) {
                 colonist.wakeUp();
@@ -42,6 +43,11 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
     public void tick() {
         super.tick();
         colonist.addExhaustion(IDLE_EXHAUSTION);
+        if(colonist.getMovementHelper().isStuck()) {
+            if(goal != null) {
+                colonist.teleport(goal.getX(), goal.getY(), goal.getZ());
+            }
+        }
     }
 
     @Override
@@ -55,6 +61,7 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
 
     @Override
     public void stop() {
+        goal = null;
         colonist.getMovementHelper().reset();
     }
 

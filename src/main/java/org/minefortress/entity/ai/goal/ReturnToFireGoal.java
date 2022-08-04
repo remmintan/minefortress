@@ -1,6 +1,5 @@
 package org.minefortress.entity.ai.goal;
 
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
@@ -22,7 +21,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
         if(!notInCombat()) return false;
         if(!isNight()) {
             final FortressServerManager serverManager = colonist.getFortressServerManager();
-            final Optional<BlockPos> pos = serverManager.randomSurfacePos((ServerWorld) colonist.world);
+            final Optional<BlockPos> pos = serverManager.randomSurfacePos();
             if(pos.isPresent()) return false;
         }
 
@@ -61,14 +60,13 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     private void moveToTheFire() {
         final BlockPos fortressCenter = colonist.getFortressServerManager().getFortressCenter();
-
+        if(fortressCenter == null) return;
         final int x = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
         final int z = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
 
         BlockPos goal = new BlockPos(fortressCenter.getX() + x, fortressCenter.getY(), fortressCenter.getZ() + z);
 
         colonist.getMovementHelper().set(goal, Colonist.FAST_MOVEMENT_SPEED);
-
         if(colonist.isSleeping()) {
             colonist.wakeUp();
         }

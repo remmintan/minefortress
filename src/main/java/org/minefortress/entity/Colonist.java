@@ -66,7 +66,7 @@ import java.util.UUID;
 public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist {
 
     public static final float FAST_MOVEMENT_SPEED = 0.2f;
-    public static final float SLOW_MOVEMENT_SPEED = 0.15f;
+    public static final float SLOW_MOVEMENT_SPEED = 0.05f;
 
     private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
@@ -281,16 +281,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     @Override
     public void setMovementSpeed(float movementSpeed) {
         super.setMovementSpeed(movementSpeed);
-    }
-
-    @Override
-    public float getMovementSpeed() {
-        return super.getMovementSpeed() / (shouldRun() ? 1f : 4f);
-    }
-
-    private boolean shouldRun() {
-        return taskControl != null && taskControl.hasTask() ||
-                getFortressServerManager() != null && getFortressServerManager().isCombatMode();
     }
 
     @Override

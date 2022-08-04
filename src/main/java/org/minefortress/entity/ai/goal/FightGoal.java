@@ -32,8 +32,6 @@ public class FightGoal extends AbstractFortressGoal {
 
     @Override
     public void tick() {
-//        colonist.addExhaustion(ACTIVE_EXHAUSTION);
-
         final var moveHelper = colonist.getMovementHelper();
 
         final var fightControl = colonist.getFightControl();

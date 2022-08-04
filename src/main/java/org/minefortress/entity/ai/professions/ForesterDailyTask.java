@@ -8,7 +8,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.utils.BuildingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
