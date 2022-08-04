@@ -279,11 +279,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     }
 
     @Override
-    public void setMovementSpeed(float movementSpeed) {
-        super.setMovementSpeed(movementSpeed);
-    }
-
-    @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
         if(isFortressCreative()) {
             return !damageSource.isOutOfWorld();
