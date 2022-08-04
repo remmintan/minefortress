@@ -15,7 +15,7 @@ public class ModUtils {
             return serverPlayer.interactionManager.getGameMode() == MineFortressMod.FORTRESS;
         }
         if(player instanceof ClientPlayerEntity) {
-            isClientInFortressGamemode();
+            return isClientInFortressGamemode();
         }
         return false;
     }
