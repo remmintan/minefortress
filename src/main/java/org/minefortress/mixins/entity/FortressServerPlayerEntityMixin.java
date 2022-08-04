@@ -101,7 +101,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         if(target instanceof Colonist colonist) {
             final int id = colonist.getId();
             final ClientboundFollowColonistPacket packet = new ClientboundFollowColonistPacket(id);
-            FortressServerNetworkHelper.send((ServerPlayerEntity) (Object)this, FortressChannelNames.FORTRESS_FOLLOW_COLONIST, packet);
+            FortressServerNetworkHelper.send((ServerPlayerEntity) (Object)this, FortressChannelNames.FORTRESS_SELECT_COLONIST, packet);
         }
 
         ci.cancel();
