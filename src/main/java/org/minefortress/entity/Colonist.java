@@ -27,7 +27,9 @@ import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -272,19 +274,19 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
 
     @Override
     public boolean isInvulnerable() {
-        if(isFortressCreative())
-            return true;
-        else
+//        if(isFortressCreative())
+//            return true;
+//        else
             return super.isInvulnerable();
     }
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        if(isFortressCreative()) {
-            return !damageSource.isOutOfWorld();
-        } else {
+//        if(isFortressCreative()) {
+//            return !damageSource.isOutOfWorld();
+//        } else {
             return super.isInvulnerableTo(damageSource);
-        }
+//        }
     }
 
     @Override
@@ -639,5 +641,10 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     @Override
     public @Nullable ServerPlayerEntity getPlayer() {
         return getMasterPlayer().orElse(null);
+    }
+
+    @Override
+    public Fluid getBucketFluid(BucketItem bucketItem) {
+        return bucketItem.fluid;
     }
 }
