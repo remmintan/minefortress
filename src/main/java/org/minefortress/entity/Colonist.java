@@ -274,19 +274,19 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
 
     @Override
     public boolean isInvulnerable() {
-//        if(isFortressCreative())
-//            return true;
-//        else
+        if(isFortressCreative())
+            return true;
+        else
             return super.isInvulnerable();
     }
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-//        if(isFortressCreative()) {
-//            return !damageSource.isOutOfWorld();
-//        } else {
+        if(isFortressCreative()) {
+            return !damageSource.isOutOfWorld();
+        } else {
             return super.isInvulnerableTo(damageSource);
-//        }
+        }
     }
 
     @Override
