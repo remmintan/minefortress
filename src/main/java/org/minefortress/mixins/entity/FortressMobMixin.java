@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
         ZombieEntity.class,
         BlazeEntity.class,
         CreeperEntity.class,
-        EndermanEntity.class,
         EndermiteEntity.class,
         IllagerEntity.class,
         IllusionerEntity.class,
@@ -35,8 +34,7 @@ public abstract class FortressMobMixin extends HostileEntity {
 
     @Inject(method="initGoals", at=@At("TAIL"))
     protected void initGoals(CallbackInfo ci) {
-        if(!((Object)this instanceof EndermanEntity))
-            super.targetSelector.add(2, new ActiveTargetGoal<>(this, Colonist.class, true));
+        super.targetSelector.add(2, new ActiveTargetGoal<>(this, Colonist.class, true));
     }
 
 }

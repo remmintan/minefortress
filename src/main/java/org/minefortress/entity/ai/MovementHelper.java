@@ -30,6 +30,9 @@ public class MovementHelper {
     }
 
     public void reset() {
+        final var hasWorkGoal = workGoal != null;
+        final var tryingToReachGoal = stillTryingToReachGoal();
+        LOGGER.info("{} movement helper reset [has work goal: {}, trying to reach the goal {}]", getColonistName(), hasWorkGoal, tryingToReachGoal);
         this.workGoal = null;
         this.lastPos = null;
         this.stuckTicks = 0;
@@ -38,19 +41,29 @@ public class MovementHelper {
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
     }
 
+    private String getColonistName() {
+        return colonist.getName().asString();
+    }
+
     public BlockPos getWorkGoal() {
         return workGoal;
     }
 
     public void set(BlockPos goal, float speed) {
-        if(workGoal != null && workGoal.equals(goal)) return;
-
+        if(workGoal != null && workGoal.equals(goal)){
+            LOGGER.info("{} trying to set new goal, but current goal is the same", getColonistName());
+            return;
+        }
+        LOGGER.info("{} set new goal {}. speed: {}", getColonistName(), goal, speed);
         this.reset();
         this.workGoal = goal;
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
         this.colonist.setMovementSpeed(speed);
         this.colonist.getNavigation().stop();
-        if(this.hasReachedWorkGoal()) return;
+        if(this.hasReachedWorkGoal()){
+            LOGGER.info("{} the goal {} is already reached", getColonistName(), goal);
+            return;
+        }
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }
 
@@ -70,7 +83,9 @@ public class MovementHelper {
         final var currentPos = colonist.getBlockPos();
         if(!hasReachedWorkGoal() && currentPos.equals(lastPos)) {
             stuckTicks++;
-            if(stuckTicks > 10) {
+            LOGGER.info("{} on the same place without reaching the goal for {} ticks. Goal: {}", getColonistName(), stuckTicks, workGoal);
+            if(stuckTicks > 20) {
+                LOGGER.info("{} on the same place for too long. Setting stuck to true. Goal: {}", getColonistName(), workGoal);
                 stuck = true;
                 stuckTicks = 0;
             }
@@ -97,6 +112,7 @@ public class MovementHelper {
         @Override
         public void onPathEvent(PathEvent pathEvent) {
             if(pathEvent == PathEvent.AT_GOAL && !hasReachedWorkGoal()) {
+                LOGGER.info("{} signaling at goal without actually reaching the goal {}. Setting stuck to true", getColonistName(), workGoal);
                 stuck = true;
             }
 
@@ -105,7 +121,9 @@ public class MovementHelper {
                 if(lastDestination != null) {
                     if (dest.equals(lastDestination)) {
                         stuckCounter++;
+                        LOGGER.info("{} Calculated destination is the same as previous for {} ticks (going in circles). [Goal: {}]", getColonistName(), stuckCounter, workGoal);
                         if (stuckCounter > 1) {
+                            LOGGER.info("{} going in circles for too much time {} [goal: {}]", getColonistName(), stuckCounter, workGoal);
                             stuck = true;
                             stuckCounter = 0;
                             lastDestination = null;
@@ -119,7 +137,7 @@ public class MovementHelper {
             }
 
             if(pathEvent == PathEvent.CALC_FAILED) {
-                MovementHelper.LOGGER.warn("Can't find path");
+                MovementHelper.LOGGER.warn("{} can't find path to {}", getColonistName(), workGoal);
                 MovementHelper.this.stuck = true;
             }
         }
