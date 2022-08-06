@@ -68,7 +68,7 @@ public class MovementHelper {
         if(workGoal == null) return;
 
         final var currentPos = colonist.getBlockPos();
-        if(currentPos.equals(lastPos)) {
+        if(!hasReachedWorkGoal() && currentPos.equals(lastPos)) {
             stuckTicks++;
             if(stuckTicks > 10) {
                 stuck = true;
