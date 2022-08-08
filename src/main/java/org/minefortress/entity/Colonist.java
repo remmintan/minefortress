@@ -67,7 +67,7 @@ import java.util.UUID;
 
 public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist {
 
-    public static final float FAST_MOVEMENT_SPEED = 0.2f;
+    public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;
 
     private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
@@ -265,7 +265,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         return LivingEntity.createLivingAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15D)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED)

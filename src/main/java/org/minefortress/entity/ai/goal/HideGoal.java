@@ -48,7 +48,7 @@ public class HideGoal extends AbstractFortressGoal{
 
     @Override
     public boolean shouldContinue() {
-        return shelterBlockPos!=null && (this.hideTicks > 0 || super.isHiding()) && !this.colonist.getMovementHelper().isStuck();
+        return shelterBlockPos!=null && (this.hideTicks > 0 || super.isHiding()) && !this.colonist.getMovementHelper().isStuck() && !isFighting();
     }
 
     @Override

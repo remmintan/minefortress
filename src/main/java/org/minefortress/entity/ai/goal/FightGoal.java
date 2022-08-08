@@ -49,6 +49,15 @@ public class FightGoal extends AbstractFortressGoal {
             if(colonist.getFightControl().hasFireTarget())
                 colonist.getFightControl().removeFireTarget();
         }
+
+        if(!moveHelper.hasReachedWorkGoal()) {
+            moveHelper.tick();
+            if(moveHelper.isStuck()) {
+                moveHelper.reset();
+                cachedMoveTarget = null;
+                correctMoveTarget = null;
+            }
+        }
     }
 
     private void findMoveTarget() {

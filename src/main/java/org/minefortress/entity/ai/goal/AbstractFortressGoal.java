@@ -1,5 +1,6 @@
 package org.minefortress.entity.ai.goal;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
@@ -34,7 +35,7 @@ abstract class AbstractFortressGoal extends Goal {
         return colonist.getFortressServerManager().isCombatMode();
     }
 
-    private boolean isVillageUnderAttack() {
+    protected boolean isVillageUnderAttack() {
         return colonist.getFortressServerManager().isVillageUnderAttack();
     }
 
@@ -48,7 +49,11 @@ abstract class AbstractFortressGoal extends Goal {
 
     protected boolean isScared() {
         final var fightControl = colonist.getFightControl();
-        return !fightControl.isWarrior() && fightControl.canSeeMonster() && !isFighting();
+        final var canSeeMonster = fightControl.canSeeMonster();
+        if(!canSeeMonster || fightControl.isWarrior() || isFighting()) return false;
+        final var target = colonist.getTarget();
+
+        return Math.sqrt(colonist.squaredDistanceTo(target)) <= 2;
     }
 
 }
