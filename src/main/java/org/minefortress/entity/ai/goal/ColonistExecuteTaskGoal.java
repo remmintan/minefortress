@@ -41,7 +41,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         final var notInCombat = notInCombat();
         final var hasTask = getTaskControl().hasTask();
         final var notStarving = !super.isStarving();
-        LOGGER.info("{} can executeTask [not in combat: {}, has task: {}, not starving: {}]", getColonistName(), notInCombat, hasTask, notStarving);
+        LOGGER.debug("{} can executeTask [not in combat: {}, has task: {}, not starving: {}]", getColonistName(), notInCombat, hasTask, notStarving);
         return notInCombat && hasTask && notStarving;
     }
 
@@ -51,7 +51,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public void start() {
-        LOGGER.info("{} start executing task", getColonistName());
+        LOGGER.debug("{} start executing task", getColonistName());
         if(colonist.isSleeping()) {
             colonist.wakeUp();
         }
@@ -62,16 +62,16 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     public void tick() {
         final var hasTask = getTaskControl().hasTask();
         if(this.workGoal == null || !hasTask){
-            LOGGER.info("{} don't have any work, but keep ticking [work goal {}, has task {}]", getColonistName(), workGoal, hasTask);
+            LOGGER.debug("{} don't have any work, but keep ticking [work goal {}, has task {}]", getColonistName(), workGoal, hasTask);
             return;
         }
 
         if(getMovementHelper().hasReachedWorkGoal()) {
-            LOGGER.info("{} reached work goal {} working", getColonistName(), workGoal);
+            LOGGER.debug("{} reached work goal {} working", getColonistName(), workGoal);
             boolean digSuccess = getTaskControl().is(TaskType.REMOVE) && colonist.getDigControl().isDone();
             boolean placeSuccess = getTaskControl().is(TaskType.BUILD) && colonist.getPlaceControl().isDone();
             if(digSuccess || placeSuccess) {
-                LOGGER.info("{} action successful moving to next block [digSuccess {}, placeSuccess {}]", getColonistName(), digSuccess, placeSuccess);
+                LOGGER.debug("{} action successful moving to next block [digSuccess {}, placeSuccess {}]", getColonistName(), digSuccess, placeSuccess);
                 moveToNextBlock();
             }
         }
@@ -79,7 +79,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         final var movementHelperStuck = getMovementHelper().isStuck();
         final var cantPlaceUnderMyself = this.colonist.getPlaceControl().isCantPlaceUnderMyself();
         if(movementHelperStuck || cantPlaceUnderMyself) {
-            LOGGER.info("{} stuck with moving or placing failing task [movement helper stuck: {}, cant place under myself: {}]", getColonistName(), movementHelperStuck, cantPlaceUnderMyself);
+            LOGGER.debug("{} stuck with moving or placing failing task [movement helper stuck: {}, cant place under myself: {}]", getColonistName(), movementHelperStuck, cantPlaceUnderMyself);
             getTaskControl().fail();
             this.colonist.resetControls();
         }
@@ -95,23 +95,23 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
                 !getTaskControl().finished() ||
                 colonist.diggingOrPlacing();
         final var shouldContinue = notInCombat && notStarving && hasTask && hasGoalTryingToReachOrWorking;
-        LOGGER.info("{} should continue task execution {} [not in combat {}, not starving {}, has task {}, has goal and working {}, digging or placing {}]", getColonistName(), shouldContinue, notInCombat, notStarving, hasTask, hasGoalTryingToReachOrWorking, colonist.diggingOrPlacing());
+        LOGGER.debug("{} should continue task execution {} [not in combat {}, not starving {}, has task {}, has goal and working {}, digging or placing {}]", getColonistName(), shouldContinue, notInCombat, notStarving, hasTask, hasGoalTryingToReachOrWorking, colonist.diggingOrPlacing());
         return shouldContinue;
     }
 
     @Override
     public void stop() {
-        LOGGER.info("{} stopping the task execution", getColonistName());
+        LOGGER.debug("{} stopping the task execution", getColonistName());
         if(!notInCombat()) {
             final var id = getTaskControl().getTaskId();
-            LOGGER.info("{} stopping task execution because of combat. Return reserved items for task {}", getColonistName(), id);
+            LOGGER.debug("{} stopping task execution because of combat. Return reserved items for task {}", getColonistName(), id);
             colonist
                     .getFortressServerManager()
                     .getServerResourceManager()
                     .returnReservedItems(id);
         }
         if(getTaskControl().hasTask()) {
-            LOGGER.info("{} finishing task successfully", getColonistName());
+            LOGGER.debug("{} finishing task successfully", getColonistName());
             getTaskControl().success();
         }
         this.colonist.resetControls();
@@ -119,38 +119,38 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     }
 
     private void moveToNextBlock() {
-        LOGGER.info("{} moving to next block", getColonistName());
+        LOGGER.debug("{} moving to next block", getColonistName());
         getMovementHelper().reset();
         workGoal = null;
         TaskBlockInfo taskBlockInfo = null;
         while (!getTaskControl().finished()) {
-            LOGGER.info("{} task is not finished yet", getColonistName());
+            LOGGER.debug("{} task is not finished yet", getColonistName());
             taskBlockInfo = getTaskControl().getNextBlock();
             if(taskBlockInfo == null){
-                LOGGER.info("{} next block is null. skipping", getColonistName());
+                LOGGER.debug("{} next block is null. skipping", getColonistName());
                 continue;
             }
             workGoal = taskBlockInfo.getPos();
-            LOGGER.info("{} set up new move goal {}", getColonistName(), workGoal);
+            LOGGER.debug("{} set up new move goal {}", getColonistName(), workGoal);
             if(blockInCorrectState(workGoal)){
-                LOGGER.info("{} block in in correct state, selecting it {}", getColonistName(), workGoal);
+                LOGGER.debug("{} block in in correct state, selecting it {}", getColonistName(), workGoal);
                 break; // skipping air blocks
             } else {
-                LOGGER.info("{} block is not in correct state, skipping it {}", getColonistName(), workGoal);
+                LOGGER.debug("{} block is not in correct state, skipping it {}", getColonistName(), workGoal);
             }
         }
         if(!blockInCorrectState(workGoal)){
-            LOGGER.info("{} task is finished and the last block is not in correct state {}", getColonistName(), workGoal);
+            LOGGER.debug("{} task is finished and the last block is not in correct state {}", getColonistName(), workGoal);
             this.workGoal = null;
         }
 
         if(workGoal == null || taskBlockInfo == null){
-            LOGGER.info("{} work goal [{}] or task block info [{}] is not set", getColonistName(), workGoal, taskBlockInfo);
+            LOGGER.debug("{} work goal [{}] or task block info [{}] is not set", getColonistName(), workGoal, taskBlockInfo);
             return;
         }
-        LOGGER.info("{} setting work goal {}", getColonistName(), taskBlockInfo);
+        LOGGER.debug("{} setting work goal {}", getColonistName(), taskBlockInfo);
         getMovementHelper().set(workGoal, Colonist.FAST_MOVEMENT_SPEED);
-        LOGGER.info("{} setting goal for colonist {}", getColonistName(), taskBlockInfo);
+        LOGGER.debug("{} setting goal for colonist {}", getColonistName(), taskBlockInfo);
         colonist.setGoal(taskBlockInfo);
     }
 
