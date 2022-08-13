@@ -6,13 +6,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.command.ServerCommandSource;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServer;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -46,7 +43,9 @@ public class DebugItemsCommand implements MineFortressCommand {
             Items.ORANGE_WOOL,
             Items.MAGENTA_WOOL,
             Items.LIGHT_BLUE_WOOL,
-            Items.OAK_BOAT
+            Items.OAK_BOAT,
+            Items.COAL,
+            Items.TORCH
     );
 
     @Override
