@@ -15,7 +15,7 @@ public class FortressEntities {
             new Identifier("minefortress", "colonist"),
             FabricEntityTypeBuilder
                     .create(SpawnGroup.CREATURE, Colonist::new)
-                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.8f))
                     .build()
     );
 

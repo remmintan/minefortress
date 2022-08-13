@@ -1,13 +1,9 @@
 package org.minefortress.entity.ai.goal;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-
-import java.util.Optional;
 
 public class ColonistEatGoal extends AbstractFortressGoal {
 
@@ -33,7 +29,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
         final int z = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
 
         this.goal = new BlockPos(fortressCenter.getX() + x, fortressCenter.getY(), fortressCenter.getZ() + z);
-        colonist.getMovementHelper().set(goal);
+        colonist.getMovementHelper().set(goal, Colonist.FAST_MOVEMENT_SPEED);
         this.colonist.setCurrentTaskDesc("Looking for food");
     }
 
@@ -44,9 +40,8 @@ public class ColonistEatGoal extends AbstractFortressGoal {
             if(!colonist.getEatControl().isEating())
                 colonist.getEatControl().putFoodInHand();
         }
-        movementHelper.tick();
 
-        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isCantFindPath())
+        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isStuck())
             colonist.teleport(this.goal.getX(), this.goal.getY(), this.goal.getZ());
     }
 
@@ -68,7 +63,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
     public void stop() {
         this.foodInHand = null;
         this.goal = null;
-        this.colonist.getNavigation().stop();
+        colonist.getMovementHelper().reset();
         colonist.putItemInHand(this.foodInHand);
         colonist.getEatControl().reset();
     }

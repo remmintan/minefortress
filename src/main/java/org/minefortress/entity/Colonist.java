@@ -1,17 +1,19 @@
 package org.minefortress.entity;
 
+import baritone.api.BaritoneAPI;
+import baritone.api.IBaritone;
+import baritone.api.minefortress.IFortressColonist;
+import baritone.api.minefortress.IMinefortressEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityData;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.ai.pathing.EntityNavigation;
+import net.minecraft.entity.ai.goal.ActiveTargetGoal;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -25,12 +27,14 @@ import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -44,25 +48,27 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.ai.ColonistNavigation;
+import org.minefortress.entity.ai.MineFortressInventory;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.colonist.ColonistHungerManager;
-import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.server.FortressModServerManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressServer;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-import java.util.*;
-import java.util.function.BiPredicate;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-public class Colonist extends PassiveEntity implements RangedAttackMob {
+public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist {
+
+    public static final float FAST_MOVEMENT_SPEED = 0.15f;
+    public static final float SLOW_MOVEMENT_SPEED = 0.05f;
 
     private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
@@ -72,19 +78,23 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
     private static final String DEFAULT_PROFESSION_ID = "colonist";
 
-    public static final float WORK_REACH_DISTANCE = 4f;
+    public static final float WORK_REACH_DISTANCE = 3f;
 
     private final DigControl digControl;
     private final PlaceControl placeControl;
     private final ScaffoldsControl scaffoldsControl;
     private final TaskControl taskControl;
     private final MovementHelper movementHelper;
-    private final MLGControl mlgControl;
     private final FightControl fightControl;
     private final EatControl eatControl;
+    private final IBaritone baritone;
+    private final Inventory inventory;
+
+    private int selectedSlot = 0;
 
     private boolean allowToPlaceBlockFromFarAway = false;
     private final ColonistHungerManager hungerManager = new ColonistHungerManager();
+
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
         super(entityType, world);
@@ -93,20 +103,22 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             digControl = new DigControl(this, (ServerWorld) world);
             placeControl = new PlaceControl(this);
             scaffoldsControl = new ScaffoldsControl(this);
-            mlgControl = new MLGControl(this);
             taskControl = new TaskControl(this);
-            movementHelper = new MovementHelper((ColonistNavigation) this.getNavigation(), this);
+            baritone = BaritoneAPI.getProvider().getBaritone(this);
+            movementHelper = new MovementHelper(this);
             fightControl = new FightControl(this);
             eatControl = new EatControl(this);
+            inventory = new MineFortressInventory();
         } else {
             digControl = null;
             placeControl = null;
             scaffoldsControl = null;
-            mlgControl = null;
             taskControl = null;
+            baritone = null;
             movementHelper = null;
             fightControl = null;
             eatControl = null;
+            inventory = null;
         }
 
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
@@ -115,6 +127,10 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         this.dataTracker.startTracking(HAS_TASK, false);
         this.dataTracker.startTracking(GUY_TYPE, world.random.nextInt(4));
         this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
+    }
+
+    public IBaritone getBaritone() {
+        return baritone;
     }
 
     @Override
@@ -154,6 +170,17 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     }
 
     @Override
+    public void selectSlot(int i) {
+        this.selectedSlot = i;
+        this.setStackInHand(Hand.MAIN_HAND, this.getInventory().getStack(this.selectedSlot));
+    }
+
+    @Override
+    public int getSelectedSlot() {
+        return this.selectedSlot;
+    }
+
+    @Override
     public ItemStack eatFood(World world, ItemStack stack) {
         this.getHungerManager().eat(stack.getItem(), stack);
         return super.eatFood(world, stack);
@@ -164,11 +191,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             throw new IllegalStateException("Fortress id is null");
         }
         return getFortressModServerManager().getByFortressId(this.getFortressId());
-    }
-
-    @Override
-    protected float getBaseMovementSpeedMultiplier() {
-        return this.taskControl.hasTask() ? 0.98f :  super.getBaseMovementSpeedMultiplier();
     }
 
     public void putItemInHand(Item item) {
@@ -243,16 +265,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return LivingEntity.createLivingAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2F)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 20f)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2D)
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED)
                 .add(EntityAttributes.GENERIC_LUCK);
-    }
-
-    @Override
-    protected EntityNavigation createNavigation(World p_21480_) {
-        return new ColonistNavigation(this, p_21480_);
     }
 
     @Override
@@ -265,6 +282,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
+        if(damageSource == DamageSource.FALL) return true;
         if(isFortressCreative()) {
             return !damageSource.isOutOfWorld();
         } else {
@@ -275,7 +293,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     @Override
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
-        this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
+//        this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
         this.goalSelector.add(3, new FortressEscapeDangerGoal(this, 1.75));
         this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
         this.goalSelector.add(4, new FightGoal(this));
@@ -374,9 +392,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId)) {
             final ServerProfessionManager manager = getFortressServerManager().getServerProfessionManager();
-            manager.getProfessionsWithAvailablePlaces().ifPresent(p -> {
-                this.dataTracker.set(PROFESSION_ID, p);
-            });
+            manager.getProfessionsWithAvailablePlaces().ifPresent(p -> this.dataTracker.set(PROFESSION_ID, p));
         }
     }
 
@@ -392,29 +408,12 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     @Override
     public void tick() {
         super.tick();
-        if(this.taskControl != null) {
+        if(this.taskControl != null)
             this.setHasTask(this.taskControl.hasTask() || this.taskControl.isDoingEverydayTasks());
-        }
-        if(fallDistance > getSafeFallDistance()) {
-            BlockPos currentHitPos = getBlockPos().down().down();
-            if(!world.getBlockState(currentHitPos).isAir() && getMlgControl() != null) {
-                getMlgControl().needAction();
-            }
-        }
 
-        if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping()) {
+
+        if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping())
             this.getJumpControl().setActive();
-            if(getScaffoldsControl() != null && world.getBlockState(getBlockPos().down()).isAir())
-                getScaffoldsControl().needAction();
-        }
-
-        if(this.isTouchingWater() || this.isInLava()) {
-            if(this.doesNotHaveTask())
-                getJumpControl().setActive();
-            if(getMlgControl() != null) {
-                getMlgControl().clearResults();
-            }
-        }
 
         tickAllControls();
     }
@@ -422,10 +421,10 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     private void tickAllControls() {
         if(getDigControl() != null) getDigControl().tick();
         if(getPlaceControl() != null) getPlaceControl().tick();
-        if(getMlgControl() != null) getMlgControl().tick();
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();
         if(getFightControl() != null) getFightControl().tick();
         if(getEatControl() != null) getEatControl().tick();
+        if(getMovementHelper() != null) getMovementHelper().tick();
     }
 
     private boolean isHalfInWall() {
@@ -435,7 +434,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
             Vec3d eyePosition = this.getEyePos();
             Vec3d legsPos = new Vec3d(eyePosition.x, eyePosition.y - 1, eyePosition.z);
             Box aabb = Box.of(legsPos, getWidth(), 1.0E-6D, getWidth());
-            BiPredicate<BlockState, BlockPos> collide = (p_20129_, p_20130_) -> !p_20129_.isAir();
             return this.world
                     .getBlockCollisions(this, aabb).iterator().hasNext();
         }
@@ -455,7 +453,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         if (this.noClip) {
             return false;
         } else {
-            Box aabb = Box.of(this.getEyePos(), (double)getWidth(), 1.0E-6D, (double)getWidth());
+            Box aabb = Box.of(this.getEyePos(), getWidth(), 1.0E-6D, getWidth());
             return this.world
                     .getBlockCollisions(this, aabb).iterator().hasNext();
         }
@@ -469,6 +467,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return placeControl;
     }
 
+    @Override
     public ScaffoldsControl getScaffoldsControl() {
         return scaffoldsControl;
     }
@@ -477,14 +476,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return fightControl;
     }
 
-    public MLGControl getMlgControl() {
-        return mlgControl;
-    }
-
     public void resetControls() {
         digControl.reset();
         placeControl.reset();
         scaffoldsControl.clearResults();
+        movementHelper.reset();
     }
 
     public boolean diggingOrPlacing() {
@@ -505,10 +501,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
     }
 
     public void lookAtGoal() {
-        getLookControl().lookAt(this.goal.getX(), this.goal.getY(), this.goal.getZ());
+        lookAt(this.goal);
     }
 
     public void lookAt(BlockPos pos) {
+        if(pos == null) return;
         getLookControl().lookAt(pos.getX(), pos.getY(), pos.getZ());
     }
 
@@ -637,4 +634,18 @@ public class Colonist extends PassiveEntity implements RangedAttackMob {
         return this.dataTracker.get(FORTRESS_ID).orElse(null);
     }
 
+    @Override
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    @Override
+    public @Nullable ServerPlayerEntity getPlayer() {
+        return getMasterPlayer().orElse(null);
+    }
+
+    @Override
+    public Fluid getBucketFluid(BucketItem bucketItem) {
+        return bucketItem.fluid;
+    }
 }

@@ -28,6 +28,7 @@ import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.registries.FortressEntities;
+import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -77,8 +78,9 @@ public class FortressServerPlayNetworkHandlerMixin {
     @Redirect(method = "onPlayerInteractEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;squaredDistanceTo(Lnet/minecraft/entity/Entity;)D"))
     public double playerInteractEntitySquareDistance(ServerPlayerEntity instance, Entity entity) {
         final double realDistance = instance.squaredDistanceTo(entity);
-        if(instance.interactionManager.getGameMode() != MineFortressMod.FORTRESS) return realDistance;
-        if(Math.sqrt(realDistance) < PICK_DISTANCE) return 1;
+        if(ModUtils.isFortressGamemode(instance)) {
+            if(Math.sqrt(realDistance) < PICK_DISTANCE) return 1;
+        }
         return realDistance;
     }
 

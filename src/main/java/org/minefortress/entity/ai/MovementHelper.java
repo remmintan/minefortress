@@ -1,121 +1,146 @@
 package org.minefortress.entity.ai;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.ai.pathing.Path;
-import net.minecraft.tag.FluidTags;
+import baritone.api.IBaritone;
+import baritone.api.event.events.PathEvent;
+import baritone.api.event.listener.AbstractGameEventListener;
+import baritone.api.pathing.calc.IPath;
+import baritone.api.pathing.goals.GoalNear;
+import baritone.api.utils.BetterBlockPos;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MovementHelper {
 
-    private final ColonistNavigation navigation;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MovementHelper.class);
+
     private final Colonist colonist;
+    private final IBaritone baritone;
     private BlockPos workGoal;
 
-    private boolean cantFindPath;
+    private int stuckTicks = 0;
+    private boolean stuck = false;
+    private BlockPos lastPos = null;
 
-    private int attemptsToCalcPath = 0;
-
-    private BlockPos lastPos;
-    private int stuckOnSamePosition = 0;
-
-    public MovementHelper(ColonistNavigation navigation, Colonist colonist) {
-        this.navigation = navigation;
+    public MovementHelper(Colonist colonist) {
         this.colonist = colonist;
+        this.baritone = colonist.getBaritone();
+        baritone.getGameEventHandler().registerEventListener(new StuckOnFailEventListener());
     }
 
     public void reset() {
-        this.navigation.stop();
+        final var hasWorkGoal = workGoal != null;
+        final var tryingToReachGoal = stillTryingToReachGoal();
+        LOGGER.debug("{} movement helper reset [has work goal: {}, trying to reach the goal {}]", getColonistName(), hasWorkGoal, tryingToReachGoal);
         this.workGoal = null;
-        this.cantFindPath = false;
-        this.stuckOnSamePosition = 0;
+        this.lastPos = null;
+        this.stuckTicks = 0;
+        this.stuck = false;
+        this.baritone.getPathingBehavior().cancelEverything();
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
+    }
+
+    private String getColonistName() {
+        return colonist.getName().asString();
     }
 
     public BlockPos getWorkGoal() {
         return workGoal;
     }
 
-    public void set(BlockPos goal) {
-        if(goal != null && goal.equals(workGoal))
-            this.colonist.getNavigation().stop();
+    public void set(BlockPos goal, float speed) {
+        if(workGoal != null && workGoal.equals(goal)){
+            LOGGER.debug("{} trying to set new goal, but current goal is the same", getColonistName());
+            return;
+        }
+        LOGGER.debug("{} set new goal {}. speed: {}", getColonistName(), goal, speed);
+        this.reset();
         this.workGoal = goal;
-        this.cantFindPath = false;
-        this.stuckOnSamePosition = 0;
-
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
+        this.colonist.setMovementSpeed(speed);
+        this.colonist.getNavigation().stop();
+        if(this.hasReachedWorkGoal()){
+            LOGGER.debug("{} the goal {} is already reached", getColonistName(), goal);
+            return;
+        }
+        baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }
 
     public boolean hasReachedWorkGoal() {
         if(this.workGoal == null) return false;
 
         final boolean withinDistance =
-                this.workGoal.isWithinDistance(this.colonist.getBlockPos().up(), Colonist.WORK_REACH_DISTANCE)
+                this.workGoal.isWithinDistance(this.colonist.getBlockPos(), Colonist.WORK_REACH_DISTANCE)
                 || this.colonist.isAllowToPlaceBlockFromFarAway();
 
-        return
-                withinDistance &&
-                this.navigation.isIdle() &&
-                colonist.fallDistance<=1;
-    }
-
-    public boolean stillTryingToReachGoal() {
-        return !this.navigation.isIdle();
+        return withinDistance && !baritone.getPathingBehavior().isPathing();
     }
 
     public void tick() {
-        if(workGoal == null || hasReachedWorkGoal()) return;
-        checkStuck();
-        if(colonist.isSubmergedIn(FluidTags.WATER) || colonist.world.getBlockState(colonist.getBlockPos().down()).isOf(Blocks.WATER)) {
-            colonist.getJumpControl().setActive();
+        if(workGoal == null) return;
+
+        final var currentPos = colonist.getBlockPos();
+        if(!hasReachedWorkGoal() && currentPos.equals(lastPos)) {
+            stuckTicks++;
+            LOGGER.debug("{} on the same place without reaching the goal for {} ticks. Goal: {}", getColonistName(), stuckTicks, workGoal);
+            if(stuckTicks > 20) {
+                LOGGER.debug("{} on the same place for too long. Setting stuck to true. Goal: {}", getColonistName(), workGoal);
+                stuck = true;
+                stuckTicks = 0;
+            }
+        } else {
+            stuck = false;
+            stuckTicks = 0;
         }
-        if(!this.navigation.isIdle() || cantFindPath) return;
+        lastPos = currentPos;
+    }
 
-        final NodeMaker nodeEvaluator = (NodeMaker) navigation.getNodeMaker();
+    public boolean stillTryingToReachGoal() {
+        return baritone.getPathingBehavior().isPathing();
+    }
 
-        nodeEvaluator.setWallClimbMode(true);
-        final Path path = navigation.findPathTo(workGoal, 3);
-        nodeEvaluator.setWallClimbMode(false);
+    public boolean isStuck() {
+        return stuck;
+    }
 
-        if(path != null && (path.reachesTarget() || navigation.getCurrentPath() == null || !navigation.getCurrentPath().equals(path))) {
-            navigation.startMovingAlong(path, 1.75f / colonist.getHungerMultiplier());
-        }
+    private class StuckOnFailEventListener implements AbstractGameEventListener {
 
-        if (path == null) {
-            attemptsToCalcPath++;
-            if(attemptsToCalcPath > 10) {
-                this.colonist.setAllowToPlaceBlockFromFarAway(true);
+        private BlockPos lastDestination;
+        private int stuckCounter = 0;
+
+        @Override
+        public void onPathEvent(PathEvent pathEvent) {
+            if(pathEvent == PathEvent.AT_GOAL && !hasReachedWorkGoal()) {
+                LOGGER.debug("{} signaling at goal without actually reaching the goal {}. Setting stuck to true", getColonistName(), workGoal);
+                stuck = true;
+            }
+
+            if(pathEvent == PathEvent.CALC_FINISHED_NOW_EXECUTING){
+                final var dest = baritone.getPathingBehavior().getPath().map(IPath::getDest).orElse(BetterBlockPos.ORIGIN);
+                if(lastDestination != null) {
+                    if (dest.equals(lastDestination)) {
+                        stuckCounter++;
+                        LOGGER.debug("{} Calculated destination is the same as previous for {} ticks (going in circles). [Goal: {}]", getColonistName(), stuckCounter, workGoal);
+                        if (stuckCounter > 1) {
+                            LOGGER.debug("{} going in circles for too much time {} [goal: {}]", getColonistName(), stuckCounter, workGoal);
+                            stuck = true;
+                            stuckCounter = 0;
+                            lastDestination = null;
+                            baritone.getPathingBehavior().cancelEverything();
+                        }
+                    } else {
+                        stuckCounter = 0;
+                    }
+                }
+                lastDestination = dest;
+            }
+
+            if(pathEvent == PathEvent.CALC_FAILED) {
+                MovementHelper.LOGGER.warn("{} can't find path to {}", getColonistName(), workGoal);
+                MovementHelper.this.stuck = true;
             }
         }
     }
 
-    public void checkStuck() {
-        final BlockPos currentPos = colonist.getBlockPos();
-        if(currentPos.equals(lastPos)) {
-            stuckOnSamePosition++;
-        } else {
-            stuckOnSamePosition = 0;
-        }
-        lastPos = currentPos.toImmutable();
-
-        int maxStuckTime = colonist.isTouchingWater()? 200: 50;
-        if(stuckOnSamePosition > maxStuckTime) {
-            this.cantFindPath = true;
-            stuckOnSamePosition = 0;
-        }
-
-        if(navigation.isCantCreateScaffold()) {
-            this.cantFindPath = true;
-            stuckOnSamePosition = 0;
-        }
-
-        if(colonist.getPlaceControl().isCantPlaceUnderMyself()) {
-            this.cantFindPath = true;
-            stuckOnSamePosition = 0;
-        }
-    }
-
-    public boolean isCantFindPath() {
-        return cantFindPath;
-    }
 }

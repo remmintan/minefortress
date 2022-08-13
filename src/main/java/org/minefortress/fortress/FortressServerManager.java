@@ -516,7 +516,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         return fortressCenter!=null?fortressCenter.toImmutable():null;
     }
 
-    public Optional<BlockPos> randomSurfacePos(ServerWorld world){
+    public Optional<BlockPos> randomSurfacePos(){
         if(minX == Integer.MAX_VALUE) return Optional.empty();
 
         int tires = 0;
@@ -535,7 +535,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         if(isFluid || isFluidAbove) return Optional.empty();
 
-        return Optional.of(fortressPos);
+        return Optional.of(fortressPos.up());
     }
 
     @Override

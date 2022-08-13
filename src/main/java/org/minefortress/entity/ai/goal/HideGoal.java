@@ -34,15 +34,13 @@ public class HideGoal extends AbstractFortressGoal{
 
         if(shelterBlockPos == null) return;
         this.moveGoal = findCorrectGoal();
-        colonist.getMovementHelper().set(moveGoal);
+        colonist.getMovementHelper().set(moveGoal, Colonist.FAST_MOVEMENT_SPEED);
         this.hideTicks = 100;
     }
 
     @Override
     public void tick() {
         final var movementHelper = colonist.getMovementHelper();
-        movementHelper.tick();
-
         if(movementHelper.hasReachedWorkGoal()) {
             this.hideTicks--;
         }
@@ -50,7 +48,7 @@ public class HideGoal extends AbstractFortressGoal{
 
     @Override
     public boolean shouldContinue() {
-        return shelterBlockPos!=null && (this.hideTicks > 0 || super.isHiding()) && !this.colonist.getMovementHelper().isCantFindPath();
+        return shelterBlockPos!=null && (this.hideTicks > 0 || super.isHiding()) && !this.colonist.getMovementHelper().isStuck() && !isFighting();
     }
 
     @Override

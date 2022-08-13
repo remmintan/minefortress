@@ -19,6 +19,19 @@ repositories {
 	maven {
 		url 'https://jitpack.io'
 	}
+	maven {
+		name = "Ladysnake Mods"
+		url = 'https://ladysnake.jfrog.io/artifactory/mods'
+	}
+	maven {
+		url "https://maven.jamieswhiteshirt.com/libs-release"
+		content {
+			includeGroup "com.jamieswhiteshirt"
+		}
+	}
+	flatDir {
+		dirs "../automatone/build/libs"
+	}
 }
 
 dependencies {
@@ -31,6 +44,11 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.2.0")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.2.0")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.2.0")
+	modImplementation include("automatone:automatone-0.7.0")
+	modImplementation include("com.jamieswhiteshirt:reach-entity-attributes:2.2.0")
 //	modCompileOnly files('libs/sodium-fabric-mc1.17.1-0.3.4+build.13.jar')
 }
 
@@ -44,7 +62,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 16
+	it.options.release = 17
 }
 
 java {

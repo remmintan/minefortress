@@ -32,8 +32,6 @@ public class FightGoal extends AbstractFortressGoal {
 
     @Override
     public void tick() {
-//        colonist.addExhaustion(ACTIVE_EXHAUSTION);
-
         final var moveHelper = colonist.getMovementHelper();
 
         final var fightControl = colonist.getFightControl();
@@ -41,18 +39,24 @@ public class FightGoal extends AbstractFortressGoal {
 
         findMoveTarget();
         if(correctMoveTarget != null) {
-            moveHelper.set(correctMoveTarget);
+            moveHelper.set(correctMoveTarget, Colonist.FAST_MOVEMENT_SPEED);
         } else {
             moveHelper.reset();
-        }
-        if (!fightControl.hasAttackTarget() || cachedMoveTarget == null || !cachedMoveTarget.isWithinDistance(colonist.getPos(), FightControl.DEFEND_RANGE)) {
-            moveHelper.tick();
         }
 
         fightControl.attackTargetIfPossible();
         if(colonist.getMovementHelper().hasReachedWorkGoal()) {
             if(colonist.getFightControl().hasFireTarget())
                 colonist.getFightControl().removeFireTarget();
+        }
+
+        if(!moveHelper.hasReachedWorkGoal()) {
+            moveHelper.tick();
+            if(moveHelper.isStuck()) {
+                moveHelper.reset();
+                cachedMoveTarget = null;
+                correctMoveTarget = null;
+            }
         }
     }
 
