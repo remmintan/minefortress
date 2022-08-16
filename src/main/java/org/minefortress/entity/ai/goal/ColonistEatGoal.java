@@ -2,8 +2,11 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Heightmap;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
+
+import java.util.Optional;
 
 public class ColonistEatGoal extends AbstractFortressGoal {
 
@@ -16,21 +19,21 @@ public class ColonistEatGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        return colonist.getEatControl().isHungryEnough() && colonist.getFortressServerManager().getFortressCenter() != null && colonist.getEatControl().hasEatableItem() && notInCombat();
+        return colonist.getEatControl().isHungryEnough() && getRandomPositionAroundCampfire().isPresent() && colonist.getEatControl().hasEatableItem() && notInCombat();
     }
 
     @Override
     public void start() {
-        super.start();
-        final BlockPos fortressCenter = colonist.getFortressServerManager().getFortressCenter();
+        final var randPos = getRandomPositionAroundCampfire();
+        if(randPos.isEmpty())return;
 
-        final var random = colonist.world.random;
-        final int x = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
-        final int z = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
-
-        this.goal = new BlockPos(fortressCenter.getX() + x, fortressCenter.getY(), fortressCenter.getZ() + z);
+        this.goal = randPos.get().up();
         colonist.getMovementHelper().set(goal, Colonist.FAST_MOVEMENT_SPEED);
         this.colonist.setCurrentTaskDesc("Looking for food");
+    }
+
+    private Optional<BlockPos> getRandomPositionAroundCampfire() {
+        return colonist.getFortressServerManager().getRandomPositionAroundCampfire();
     }
 
     @Override
@@ -66,14 +69,6 @@ public class ColonistEatGoal extends AbstractFortressGoal {
         colonist.getMovementHelper().reset();
         colonist.putItemInHand(this.foodInHand);
         colonist.getEatControl().reset();
-    }
-
-    private int getHomeOuterRadius() {
-        return 8;
-    }
-
-    private int getHomeInnerRadius() {
-        return 3;
     }
 
 }
