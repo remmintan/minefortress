@@ -44,9 +44,11 @@ public class FarmerDailyTask implements ProfessionDailyTask{
 
     @Override
     public void start(Colonist colonist) {
+        colonist.resetControls();
         colonist.setCurrentTaskDesc("Farming");
         getFarm(colonist).ifPresent(f -> this.currentFarm = f);
         initIterator();
+        colonist.getBaritone().settings().allowParkour.set(false);
     }
 
     @Override
@@ -57,7 +59,10 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         if(this.goal == null) {
             findCorrectGoal(colonist);
             if(this.goal == null) return;
-            movementHelper.set(goal, Colonist.FAST_MOVEMENT_SPEED);
+            movementHelper.set(goal.up(), Colonist.FAST_MOVEMENT_SPEED);
+        }
+        if(this.goal != null && movementHelper.getWorkGoal() == null) {
+            movementHelper.set(goal.up(), Colonist.FAST_MOVEMENT_SPEED);
         }
 
         if(movementHelper.getWorkGoal() != null && movementHelper.hasReachedWorkGoal()) {
@@ -117,6 +122,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         this.currentFarm = null;
         this.farmIterator = Collections.emptyIterator();
         this.stopTime = colonist.world.getTime();
+        colonist.getBaritone().settings().allowParkour.set(true);
         colonist.resetControls();
     }
 
@@ -158,9 +164,8 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private void findCorrectGoal(Colonist colonist) {
-        this.goal = null;
         while (farmIterator.hasNext()) {
-            final var possibleGoal = this.farmIterator.next();
+            final var possibleGoal = this.farmIterator.next().toImmutable();
             if(isCorrectGoal(colonist.world, possibleGoal)) {
                 this.goal = possibleGoal;
                 return;

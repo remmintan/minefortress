@@ -4,6 +4,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.util.Rarity;
 
 public class FortressItems {
 
@@ -16,7 +17,7 @@ public class FortressItems {
 
     public static final Item SCAFFOLD_OAK_PLANKS = new BlockItem(
             FortressBlocks.SCAFFOLD_OAK_PLANKS,
-            new Item.Settings().group(ItemGroup.BUILDING_BLOCKS)
+            new Item.Settings().rarity(Rarity.EPIC)
     );
 
 }

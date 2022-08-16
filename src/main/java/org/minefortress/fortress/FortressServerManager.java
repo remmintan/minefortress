@@ -267,11 +267,11 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     private Optional<Colonist> spawnPawnNearCampfire() {
-        final var world = getWorld();
-        final var randomSpawnPosition = getRandomSpawnPosition(world);
+        final var randomSpawnPosition = getRandomSpawnPosition();
         if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
             final var tag = getColonistInfoTag();
             EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
+            final var world = getWorld();
             final var spawnedPawn = (Colonist)colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
             if(villageUnderAttack) {
                 spawnedPawn.getFightControl().setMoveTarget(getFortressCenter());
@@ -309,7 +309,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         return nbtCompound;
     }
 
-    private BlockPos getRandomSpawnPosition(World world) {
+    private BlockPos getRandomSpawnPosition() {
         final var spawnX = fortressCenter.getX() + getWorld().random.nextInt(10) - 5;
         final var spawnZ = fortressCenter.getZ() + getWorld().random.nextInt(10) - 5;
         final var spawnY = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, spawnX, spawnZ);
@@ -533,6 +533,31 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         return Optional.of(fortressPos.up());
     }
+
+    public Optional<BlockPos> getRandomPositionAroundCampfire() {
+        final var fortressCenter = getFortressCenter();
+        if(fortressCenter == null) return Optional.empty();
+
+        final var random = getWorld().random;
+        final int x = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
+        final int z = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
+
+        final var blockX = fortressCenter.getX() + x;
+        final var blockZ = fortressCenter.getZ() + z;
+        final var blockY = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, blockX, blockZ);
+
+        return Optional.of(new BlockPos(blockX, blockY, blockZ));
+    }
+
+    public int getHomeOuterRadius() {
+        return Math.max(getColonistsCount(), 5) * 4 / 5;
+    }
+
+    private int getHomeInnerRadius() {
+        return Math.max(getColonistsCount(), 5) * 2 / 5;
+    }
+
+
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
