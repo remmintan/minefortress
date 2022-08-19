@@ -66,6 +66,10 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
             return;
         }
 
+        if(getMovementHelper().getWorkGoal() == null) {
+            getMovementHelper().set(workGoal, Colonist.FAST_MOVEMENT_SPEED);
+        }
+
         if(getMovementHelper().hasReachedWorkGoal()) {
             LOGGER.debug("{} reached work goal {} working", getColonistName(), workGoal);
             boolean digSuccess = getTaskControl().is(TaskType.REMOVE) && colonist.getDigControl().isDone();

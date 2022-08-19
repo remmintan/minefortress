@@ -94,7 +94,6 @@ public abstract class AbstractTask implements Task {
     @Override
     public void finishPart(TaskPart part, Colonist colonsit) {
         completedParts++;
-        ServerWorld world = (ServerWorld) colonsit.world;
         if(parts.isEmpty() && totalParts <= completedParts) {
             final var masterPlayerOpt = colonsit.getMasterPlayer();
             masterPlayerOpt.ifPresent(this::sendFinishTaskNotificationToPlayer);

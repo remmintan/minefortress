@@ -50,7 +50,12 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
                 }
             }
         } else if(movementHelper.isStuck()) {
-            moveToBed();
+            colonist.getFortressServerManager().getRandomPositionAroundCampfire().ifPresent(it -> {
+                final var pos = it.up();
+                colonist.resetControls();
+                colonist.teleport(pos.getX(), pos.getY(), pos.getZ());
+                moveToBed();
+            });
         }
     }
 

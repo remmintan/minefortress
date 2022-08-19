@@ -79,7 +79,7 @@ public class FortressModServerManager {
         }
         for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
             if (entry.getValue().getId().equals(fortressId)) {
-                return Optional.ofNullable(server.getOverworld().getRandomAlivePlayer());
+                return Optional.ofNullable(server.getOverworld().getPlayerByUuid(entry.getKey())).map(ServerPlayerEntity.class::cast);
             }
         }
         return Optional.empty();
