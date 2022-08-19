@@ -10,6 +10,7 @@ import org.minefortress.tasks.block.info.TaskBlockInfo;
 import org.minefortress.tasks.interfaces.Task;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -109,8 +110,8 @@ public class TaskControl {
         return !blocks.hasNext();
     }
 
-    public UUID getTaskId() {
-        return task.getId();
+    public Optional<UUID> getTaskId() {
+        return Optional.ofNullable(task).map(Task::getId);
     }
 
     @Nullable

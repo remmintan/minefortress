@@ -103,12 +103,18 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     public void stop() {
         LOGGER.debug("{} stopping the task execution", getColonistName());
         if(!notInCombat()) {
-            final var id = getTaskControl().getTaskId();
-            LOGGER.debug("{} stopping task execution because of combat. Return reserved items for task {}", getColonistName(), id);
-            colonist
-                    .getFortressServerManager()
-                    .getServerResourceManager()
-                    .returnReservedItems(id);
+            final var idOpt = getTaskControl().getTaskId();
+            if(idOpt.isPresent()) {
+                final var id = idOpt.get();
+                LOGGER.debug("{} stopping task execution because of combat. Return reserved items for task {}", getColonistName(), id);
+                colonist
+                        .getFortressServerManager()
+                        .getServerResourceManager()
+                        .returnReservedItems(id);
+            } else {
+                LOGGER.debug("{} stopping task execution because of combat. No task id found", getColonistName());
+            }
+            getTaskControl().fail();
         }
         if(getTaskControl().hasTask()) {
             LOGGER.debug("{} finishing task successfully", getColonistName());
