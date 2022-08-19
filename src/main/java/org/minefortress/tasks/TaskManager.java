@@ -115,7 +115,7 @@ public class TaskManager {
         return false;
     }
 
-    private boolean hasTask() {
+    public boolean hasTask() {
         return !tasks.isEmpty();
     }
 
