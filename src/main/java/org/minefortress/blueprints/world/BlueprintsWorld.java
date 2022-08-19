@@ -3,7 +3,6 @@ package org.minefortress.blueprints.world;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.resource.DataPackSettings;
 import net.minecraft.server.MinecraftServer;
@@ -13,7 +12,11 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.*;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -23,7 +26,10 @@ import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.gen.GeneratorOptions;
-import net.minecraft.world.gen.chunk.*;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.FlatChunkGenerator;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
@@ -31,7 +37,6 @@ import org.apache.logging.log4j.LogManager;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.interfaces.FortressServer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -160,16 +165,23 @@ public class BlueprintsWorld {
         world.setFloorLevel(floorLevel);
     }
 
-    public void putBlueprintInAWorld(final ServerPlayerEntity player) {
+    public void putBlueprintInAWorld(final ServerPlayerEntity player, Vec3i blueprintSize) {
         final BlockState borderBlockState = Blocks.RED_WOOL.getDefaultState();
+
+        final var xOffset = (16 - blueprintSize.getX()) / 2;
+        final var zOffset = (16 - blueprintSize.getZ()) / 2;
 
         final int defaultFloorLevel = 16;
         BlockPos
                 .iterate(new BlockPos(-32, 0, -32), new BlockPos(32, 32, 32))
                 .forEach(pos -> {
                     BlockState blockState;
-                    if(preparedBlueprintData.containsKey(pos.down(defaultFloorLevel - getWorld().getFloorLevel()))) {
-                        blockState = preparedBlueprintData.get(pos.down(defaultFloorLevel - getWorld().getFloorLevel()));
+                    final var offsetPos = pos
+                            .down(defaultFloorLevel - getWorld().getFloorLevel())
+                            .add(-xOffset, 0, -zOffset);
+
+                    if(preparedBlueprintData.containsKey(offsetPos)) {
+                        blockState = preparedBlueprintData.get(offsetPos);
                     } else if(pos.getY() >= defaultFloorLevel) {
                         blockState = Blocks.AIR.getDefaultState();
                     } else if(pos.getY() == 0) {

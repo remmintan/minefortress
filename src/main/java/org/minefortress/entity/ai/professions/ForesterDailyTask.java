@@ -95,17 +95,6 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     private void setGoal(Colonist colonist){
         final var world = colonist.world;
         final var randPointAround = BlockPos.iterateRandomly(world.random, 1, colonist.getBlockPos(), 20).iterator().next();
-        final var closestLeavesOpt = BlockPos
-                .findClosest(
-                        randPointAround,
-                        21,
-                        21,
-                        (BlockPos pos) -> world.getBlockState(pos).isIn(BlockTags.LEAVES)
-                );
-        if(closestLeavesOpt.isPresent()){
-            this.blockPos = closestLeavesOpt.get();
-            return;
-        }
 
         final var closestHoeMineableOpt = BlockPos
                 .findClosest(

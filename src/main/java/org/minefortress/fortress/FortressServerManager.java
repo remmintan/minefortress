@@ -9,10 +9,12 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -26,9 +28,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.controls.TaskControl;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fight.ServerFightManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
+import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
@@ -213,6 +217,13 @@ public final class FortressServerManager extends AbstractFortressManager {
             building.tick(server);
         }
 
+        if(pawnsDontHaveTask() && (!specialBlocks.containsKey(Blocks.CRAFTING_TABLE) || specialBlocks.get(Blocks.CRAFTING_TABLE).isEmpty())) {
+            final var ii = new ItemInfo(Items.CRAFTING_TABLE, 1);
+            if(!serverResourceManager.hasItems(Collections.singletonList(ii))) {
+                serverResourceManager.increaseItemAmount(Items.CRAFTING_TABLE, 1);
+            }
+        }
+
         if(!(specialBlocks.isEmpty() || blueprintsSpecialBlocks.isEmpty())  && getWorld() != null && getWorld().getDimension() == FortressDimensionTypeMixin.getOverworld()) {
             boolean needSync = false;
             for(var entry : new HashSet<>(specialBlocks.entrySet())) {
@@ -268,6 +279,16 @@ public final class FortressServerManager extends AbstractFortressManager {
                 }
             }
         }
+    }
+
+    private boolean pawnsDontHaveTask() {
+        for(Colonist colonist : colonists) {
+            final var taskControl = colonist.getTaskControl();
+            if(taskControl.hasTask()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Optional<Colonist> spawnPawnNearCampfire() {

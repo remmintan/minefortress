@@ -6,6 +6,7 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.*;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
@@ -58,7 +59,13 @@ public class BlockInfoUtils {
 
     public static ItemUsageContext getUseOnContext(HitResult hitResult, Item placingItem, BlockPos goal, ServerWorld world, Colonist colonist) {
         if(hitResult instanceof BlockHitResult) {
-            ServerPlayerEntity masterPlayer = colonist.getMasterPlayer().orElseThrow(() -> new IllegalStateException("Colonist has no master player"));
+            ServerPlayerEntity masterPlayer = colonist
+                    .getMasterPlayer()
+                    .or(() -> Optional
+                            .ofNullable(colonist.getServer())
+                            .map(MinecraftServer::getOverworld)
+                            .map(ServerWorld::getRandomAlivePlayer))
+                    .orElseThrow(() -> new IllegalStateException("Colonist has no master player"));
             final BlockHitResult movedHitResult = moveHitResult((BlockHitResult)hitResult,  goal);
             return new FortressUseOnContext(
                     world,
@@ -80,7 +87,12 @@ public class BlockInfoUtils {
 
     private static ItemPlacementContext getBlockPlaceContext(HitResult hitResult, Direction horizontalDirection, Item placingItem, BlockPos goal, Colonist colonist) {
         if(hitResult instanceof BlockHitResult) {
-            ServerPlayerEntity randomPlayer = colonist.getMasterPlayer().orElseThrow(() -> new IllegalStateException("Colonist has no master player"));
+            ServerPlayerEntity randomPlayer = colonist.getMasterPlayer()
+                    .or(() -> Optional
+                            .ofNullable(colonist.getServer())
+                            .map(MinecraftServer::getOverworld)
+                            .map(ServerWorld::getRandomAlivePlayer))
+                    .orElseThrow(() -> new IllegalStateException("Colonist has no master player"));
             final BlockHitResult movedHitResult = moveHitResult((BlockHitResult) hitResult, goal);
             if(horizontalDirection != null){
                 return new FortressBlockPlaceContext(

@@ -41,14 +41,15 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
             final BlueprintsWorld blueprintsWorld = fortressServer.getBlueprintsWorld();
 
             if(player instanceof FortressServerPlayerEntity fortressPlayer) {
-                final Map<BlockPos, BlockState> blueprintData = fortressPlayer
+                final var blockData = fortressPlayer
                         .getServerBlueprintManager()
                         .getBlockDataManager()
-                        .getBlockData(blueprintFileName, BlockRotation.NONE)
+                        .getBlockData(blueprintFileName, BlockRotation.NONE);
+                final Map<BlockPos, BlockState> blueprintData = blockData
                         .getLayer(BlueprintDataLayer.GENERAL);
 
                 blueprintsWorld.prepareBlueprint(blueprintData, blueprintFileName, floorLevel);
-                blueprintsWorld.putBlueprintInAWorld(player);
+                blueprintsWorld.putBlueprintInAWorld(player, blockData.getSize());
                 player.moveToWorld(blueprintsWorld.getWorld());
             }
         }

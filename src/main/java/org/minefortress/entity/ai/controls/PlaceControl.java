@@ -100,9 +100,9 @@ public class PlaceControl extends PositionedActionControl {
                         .getServerResourceManager()
                         .removeItemIfExists(item);
             } else {
-                fortressServerManager
+                taskControl.getTaskId().ifPresent(it -> fortressServerManager
                         .getServerResourceManager()
-                        .removeReservedItem(taskControl.getTaskId(), item);
+                        .removeReservedItem(it, item));
             }
         }
 

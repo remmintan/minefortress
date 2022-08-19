@@ -26,6 +26,8 @@ import java.util.stream.StreamSupport;
 
 public final class FortressClientManager extends AbstractFortressManager {
 
+    private static final Object KEY = new Object();
+
     private final ClientProfessionManager professionManager;
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
     private final ClientFightManager fightManager;
@@ -37,7 +39,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private BlockPos fortressCenter = null;
     private int colonistsCount = 0;
 
-    private FortressToast setCenterToast;
+    private volatile FortressToast setCenterToast;
 
     private BlockPos posAppropriateForCenter;
     private BlockPos oldPosAppropriateForCenter;
@@ -131,9 +133,11 @@ public final class FortressClientManager extends AbstractFortressManager {
                 client.interactionManager == null ||
                 client.interactionManager.getCurrentGameMode() != MineFortressMod.FORTRESS
         ) {
-            if(setCenterToast != null) {
-                setCenterToast.hide();
-                setCenterToast = null;
+            synchronized (KEY) {
+                if(setCenterToast != null) {
+                    setCenterToast.hide();
+                    setCenterToast = null;
+                }
             }
 
             posAppropriateForCenter = null;
@@ -141,9 +145,11 @@ public final class FortressClientManager extends AbstractFortressManager {
         }
         if(!initialized) return;
         if(isFortressInitializationNeeded()) {
-            if(setCenterToast == null) {
-                this.setCenterToast = new FortressToast("Set up your Fortress", "Right-click to place", Items.CAMPFIRE);
-                client.getToastManager().add(setCenterToast);
+            synchronized (KEY) {
+                if(setCenterToast == null) {
+                    this.setCenterToast = new FortressToast("Set up your Fortress", "Right-click to place", Items.CAMPFIRE);
+                    client.getToastManager().add(setCenterToast);
+                }
             }
 
             final BlockPos hoveredBlockPos = fortressClient.getHoveredBlockPos();
