@@ -17,10 +17,7 @@ import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class FarmerDailyTask implements ProfessionDailyTask{
 
@@ -157,7 +154,12 @@ public class FarmerDailyTask implements ProfessionDailyTask{
                 .filter(it -> !it.isEmpty())
                 .map(ItemStack::getItem)
                 .filter(FARMER_SEEDS::contains)
-                .findFirst();
+                .min(Comparator.comparingInt(it -> {
+                    if (it == Items.WHEAT_SEEDS) return 0;
+                    if (it == Items.POTATO) return 1;
+                    if (it == Items.CARROT) return 2;
+                    return 3;
+                }));
 
         itemOpt.ifPresent(serverResourceManager::removeItemIfExists);
         return itemOpt;
