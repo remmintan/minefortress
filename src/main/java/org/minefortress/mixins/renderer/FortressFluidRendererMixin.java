@@ -13,29 +13,32 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 @Mixin(FluidRenderer.class)
 public abstract class FortressFluidRendererMixin {
 
-    private boolean fortressFluid = false;
-    private BlockPos fortressFluidPos = null;
+
+    private final AtomicBoolean fortressFluid = new AtomicBoolean(false);
+    private volatile BlockPos fortressFluidPos = null;
 
     @Inject(method = "render", at = @At(value = "HEAD"))
     public void renderHead(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
         if(world instanceof SelectionBlockRenderView) {
-            this.fortressFluid = true;
+            this.fortressFluid.set(true);
             this.fortressFluidPos = pos;
         }
     }
 
     @Inject(method = "render", at = @At(value = "RETURN"))
     public void renderReturn(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
-        this.fortressFluid = false;
+        this.fortressFluid.set(false);
         this.fortressFluidPos = null;
     }
 
     @Inject(method="vertex", at = @At(value = "HEAD"), cancellable = true)
     void vertex(VertexConsumer vertexConsumer, double x, double y, double z, float red, float green, float blue, float u, float v, int light, CallbackInfo ci) {
-        if(this.fortressFluid) {
+        if(this.fortressFluid.get()) {
             final int x1 = fortressFluidPos.getX();
             final int y1 = fortressFluidPos.getY();
             final int z1 = fortressFluidPos.getZ();

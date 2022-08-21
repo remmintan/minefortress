@@ -17,9 +17,8 @@
     "entity.player.FortressPlayerInventoryMixin",
     "block.FortressAbstractBlockState",
     "entity.FortressTntEntityMixin",
-    "item.FortressBoneMealMixin",
-    "item.FortressBowItemMixin",
-    "item.FortressEggItemMixin",
+    "item.DisabledBlockItemMixin",
+    "item.DisableItemMixin",
     "network.FortressPacketByteBufMixin",
     "renderer.gui.FortressScreenHandler"
   ],
