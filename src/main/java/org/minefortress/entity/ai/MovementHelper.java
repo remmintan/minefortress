@@ -5,7 +5,9 @@ import baritone.api.event.events.PathEvent;
 import baritone.api.event.listener.AbstractGameEventListener;
 import baritone.api.pathing.calc.IPath;
 import baritone.api.pathing.goals.GoalNear;
+import baritone.api.pathing.movement.IMovement;
 import baritone.api.utils.BetterBlockPos;
+import baritone.pathing.movement.Movement;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.slf4j.Logger;
@@ -86,7 +88,7 @@ public class MovementHelper {
             LOGGER.debug("{} on the same place without reaching the goal for {} ticks. Goal: {}", getColonistName(), stuckTicks, workGoal);
             if(stuckTicks > 20) {
                 LOGGER.debug("{} on the same place for too long. Setting stuck to true. Goal: {}", getColonistName(), workGoal);
-                stuck = true;
+                colonist.setAllowToPlaceBlockFromFarAway(true);
                 stuckTicks = 0;
             }
         } else {
@@ -138,7 +140,6 @@ public class MovementHelper {
 
             if(pathEvent == PathEvent.CALC_FAILED) {
                 MovementHelper.LOGGER.warn("{} can't find path to {}", getColonistName(), workGoal);
-                MovementHelper.this.stuck = true;
                 MovementHelper.this.colonist.setAllowToPlaceBlockFromFarAway(true);
             }
         }
