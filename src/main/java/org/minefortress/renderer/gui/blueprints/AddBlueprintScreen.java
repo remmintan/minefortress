@@ -11,8 +11,11 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 public class AddBlueprintScreen extends Screen {
 
-    public AddBlueprintScreen() {
+    private final BlueprintGroup group;
+
+    public AddBlueprintScreen(BlueprintGroup group) {
         super(new LiteralText("Add new Blueprint"));
+        this.group = group;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class AddBlueprintScreen extends Screen {
                 button -> {
                     final var text = textField.getText();
                     if(Strings.isNotBlank(text)) {
-                        final var packet = ServerboundEditBlueprintPacket.add(text);
+                        final var packet = ServerboundEditBlueprintPacket.add(text, group);
                         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
                         if(this.client != null) this.client.setScreen(null);
 

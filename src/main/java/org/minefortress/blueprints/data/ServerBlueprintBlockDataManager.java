@@ -33,9 +33,14 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         return compound;
     }
 
-    public void update(String fileName, NbtCompound tag) {
+    public boolean update(String fileName, NbtCompound tag) {
+        final var alreadyIn = updatedStructures.containsKey(fileName);
         updatedStructures.put(fileName, tag);
         invalidateBlueprint(fileName);
+
+        final var id = getId(fileName);
+        final var defaultStructure = server.getStructureManager().getStructure(id).isPresent();
+        return alreadyIn || defaultStructure;
     }
 
     @Override

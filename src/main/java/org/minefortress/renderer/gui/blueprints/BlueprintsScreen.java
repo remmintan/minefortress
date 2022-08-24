@@ -90,7 +90,7 @@ public final class BlueprintsScreen extends Screen {
             if(this.handler.hasFocusedSlot()) {
                 if(this.handler.getFocusedSlot() == BlueprintSlot.EMPTY) {
                     if(this.client != null)
-                    this.client.setScreen(new AddBlueprintScreen());
+                    this.client.setScreen(new AddBlueprintScreen(handler.getSelectedGroup()));
                     return true;
                 }
 

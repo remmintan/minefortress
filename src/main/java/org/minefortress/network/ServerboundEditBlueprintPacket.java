@@ -12,6 +12,7 @@ import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,17 +22,20 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
     private final Type type;
     private final String blueprintFileName;
     private final int floorLevel;
+    private final BlueprintGroup blueprintGroup;
 
-    private ServerboundEditBlueprintPacket(String blueprintFileName, int floorLevel,  Type type) {
+    private ServerboundEditBlueprintPacket(String blueprintFileName, int floorLevel,  Type type, BlueprintGroup blueprintGroup) {
         this.blueprintFileName = blueprintFileName;
         this.floorLevel = floorLevel;
         this.type = type;
+        this.blueprintGroup = blueprintGroup;
     }
 
     public ServerboundEditBlueprintPacket(PacketByteBuf buf) {
         this.blueprintFileName = buf.readString();
         this.floorLevel = buf.readInt();
         this.type = buf.readEnumConstant(Type.class);
+        this.blueprintGroup = buf.readEnumConstant(BlueprintGroup.class);
     }
 
     @Override
@@ -39,6 +43,7 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
         buf.writeString(this.blueprintFileName);
         buf.writeInt(this.floorLevel);
         buf.writeEnumConstant(type);
+        buf.writeEnumConstant(blueprintGroup);
     }
 
     @Override
@@ -55,10 +60,10 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
                     final Map<BlockPos, BlockState> blueprintData = blockData
                             .getLayer(BlueprintDataLayer.GENERAL);
 
-                    blueprintsWorld.prepareBlueprint(blueprintData, blueprintFileName, floorLevel);
+                    blueprintsWorld.prepareBlueprint(blueprintData, blueprintFileName, floorLevel, blueprintGroup);
                     blueprintsWorld.putBlueprintInAWorld(player, blockData.getSize());
                 } else if(type == Type.CREATE) {
-                    blueprintsWorld.prepareBlueprint(new HashMap<>(), blueprintFileName, floorLevel);
+                    blueprintsWorld.prepareBlueprint(new HashMap<>(), blueprintFileName, floorLevel, blueprintGroup);
                     blueprintsWorld.putBlueprintInAWorld(player, new Vec3i(1, 1, 1));
                 }
                 player.moveToWorld(blueprintsWorld.getWorld());
@@ -66,12 +71,12 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
         }
     }
 
-    public static ServerboundEditBlueprintPacket edit(String name, int floorLevel) {
-        return new ServerboundEditBlueprintPacket(name, floorLevel, Type.EDIT);
+    public static ServerboundEditBlueprintPacket edit(String name, int floorLevel, BlueprintGroup group) {
+        return new ServerboundEditBlueprintPacket(name, floorLevel, Type.EDIT, group);
     }
 
-    public static ServerboundEditBlueprintPacket add(String name) {
-        return new ServerboundEditBlueprintPacket(name, 0, Type.CREATE);
+    public static ServerboundEditBlueprintPacket add(String name, BlueprintGroup group) {
+        return new ServerboundEditBlueprintPacket(name, 0, Type.CREATE, group);
     }
 
     private enum Type {

@@ -15,6 +15,7 @@ import org.minefortress.network.ClientboundResetBlueprintPacket;
 import org.minefortress.network.ClientboundUpdateBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.minefortress.network.interfaces.FortressClientPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
@@ -155,7 +156,7 @@ public class ServerBlueprintManager {
     private final Map<String, Integer> updatedFloorLevel = new HashMap<>();
 
     private final ServerBlueprintBlockDataManager blockDataManager;
-    private final Queue<ClientboundUpdateBlueprintPacket> scheduledEdits = new ArrayDeque<>();
+    private final Queue<FortressClientPacket> scheduledEdits = new ArrayDeque<>();
 
     public ServerBlueprintManager(MinecraftServer server) {
         this.blockDataManager = new ServerBlueprintBlockDataManager(server);
@@ -181,15 +182,22 @@ public class ServerBlueprintManager {
         }
 
         if(!scheduledEdits.isEmpty()) {
-            final ClientboundUpdateBlueprintPacket packet = scheduledEdits.remove();
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, packet);
+            final FortressClientPacket packet = scheduledEdits.remove();
+            if(packet instanceof ClientboundUpdateBlueprintPacket)
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, packet);
+            else if(packet instanceof ClientboundAddBlueprintPacket)
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
+            else
+                throw new IllegalStateException("Wrong blueprint update packet type: " + packet.getClass());
         }
     }
 
-    public void update(String fileName, NbtCompound updatedStructure, int newFloorLevel) {
-        blockDataManager.update(fileName, updatedStructure);
+    public void update(String fileName, NbtCompound updatedStructure, int newFloorLevel, BlueprintGroup group) {
+        final var existed = blockDataManager.update(fileName, updatedStructure);
         updatedFloorLevel.put(fileName, newFloorLevel);
-        final ClientboundUpdateBlueprintPacket packet = new ClientboundUpdateBlueprintPacket(fileName, newFloorLevel, updatedStructure);
+        final FortressClientPacket packet =
+                existed? new ClientboundUpdateBlueprintPacket(fileName, newFloorLevel, updatedStructure) :
+                        new ClientboundAddBlueprintPacket(group, fileName, fileName, updatedStructure, newFloorLevel, false);
         scheduledEdits.add(packet);
     }
 

@@ -92,7 +92,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
         if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
             final NbtCompound updatedStructure = new NbtCompound();
             structureToUpdate.writeNbt(updatedStructure);
-            fortressServerPlayer.getServerBlueprintManager().update(fileName, updatedStructure, newFloorLevel);
+            fortressServerPlayer.getServerBlueprintManager().update(fileName, updatedStructure, newFloorLevel, fortressServerWorld.getBlueprintGroup());
         }
 
 

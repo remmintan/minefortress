@@ -15,6 +15,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.spawner.Spawner;
+import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -28,6 +29,7 @@ public class FortressServerWorld extends ServerWorld {
 
     private String fileName;
     private int floorLevel;
+    private BlueprintGroup blueprintGroup;
 
     public FortressServerWorld(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, LevelProperties properties, RegistryKey<World> worldKey, RegistryEntry<DimensionType> dimensionType, WorldGenerationProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long seed, List<Spawner> spawners, boolean shouldTickTime) {
         super(server, workerExecutor, session, properties, worldKey, dimensionType, worldGenerationProgressListener, chunkGenerator, debugWorld, seed, spawners, shouldTickTime);
@@ -82,6 +84,14 @@ public class FortressServerWorld extends ServerWorld {
 
     public void setFloorLevel(int floorLevel) {
         this.floorLevel = floorLevel;
+    }
+
+    public BlueprintGroup getBlueprintGroup() {
+        return blueprintGroup;
+    }
+
+    public void setBlueprintGroup(BlueprintGroup blueprintGroup) {
+        this.blueprintGroup = blueprintGroup;
     }
 
     public void enableSaveStructureMode() {
