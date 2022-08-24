@@ -17,6 +17,9 @@ import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.ServerboundEditBlueprintPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 
@@ -28,6 +31,7 @@ public final class BlueprintsScreen extends Screen {
     private static final String BACKGROUND_TEXTURE = "textures/gui/container/creative_inventory/tab_items.png";
     private static final Identifier BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE = new Identifier("textures/gui/recipe_book.png");
     private static final LiteralText EDIT_BLUEPRINT_TEXT = new LiteralText("right click to edit");
+    private static final LiteralText ADD_BLUEPRINT_TEXT = new LiteralText("click to add blueprint");
 
     private final int backgroundWidth = 195;
     private final int backgroundHeight = 136;
@@ -84,6 +88,12 @@ public final class BlueprintsScreen extends Screen {
 
         if(button == 0 || button == 1) {
             if(this.handler.hasFocusedSlot()) {
+                if(this.handler.getFocusedSlot() == BlueprintSlot.EMPTY) {
+                    if(this.client != null)
+                    this.client.setScreen(new AddBlueprintScreen());
+                    return true;
+                }
+
                 if(button == 1) return true;
 
                 if(this.client != null){
@@ -166,14 +176,14 @@ public final class BlueprintsScreen extends Screen {
 
         final List<BlueprintSlot> currentSlots = this.handler.getCurrentSlots();
         final int currentSlotsSize = currentSlots.size();
-        for (int i = 0; i < currentSlotsSize; i++) {
+        for (int i = 0; i < 45; i++) {
             int slotColumn = i % 9;
             int slotRow = i / 9;
 
             int slotX = slotColumn * 18 + 9;
             int slotY = slotRow * 18 + 18;
 
-            final BlueprintSlot blueprintSlot = currentSlots.get(i);
+            final BlueprintSlot blueprintSlot = i<currentSlotsSize ? currentSlots.get(i) : BlueprintSlot.EMPTY;
             this.drawSlot(blueprintSlot, slotColumn, slotRow);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
@@ -182,27 +192,30 @@ public final class BlueprintsScreen extends Screen {
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(matrices, slotX, slotY, this.getZOffset());
 
-            if(fortressClientManager.isSurvival()) {
-                final var stacks = blueprintSlot.getBlockData().getStacks();
-                for (int i1 = 0; i1 < stacks.size(); i1++) {
-                    final ItemInfo stack = stacks.get(i1);
-                    final var hasItem = resourceManager.hasItem(stack, stacks);
-                    final var itemX = this.x - this.backgroundWidth/2 + 25 + i1%10 * 30;
-                    final var itemY = i1/10 * 20 + this.backgroundHeight;
-                    final var convertedItem = convertItemIconInTheGUI(stack);
-                    itemRenderer.renderInGui(new ItemStack(convertedItem), itemX, itemY);
-                    this.textRenderer.draw(matrices, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000);
+            if(blueprintSlot != BlueprintSlot.EMPTY) {
+                if(fortressClientManager.isSurvival()) {
+                    final var stacks = blueprintSlot.getBlockData().getStacks();
+                    for (int i1 = 0; i1 < stacks.size(); i1++) {
+                        final ItemInfo stack = stacks.get(i1);
+                        final var hasItem = resourceManager.hasItem(stack, stacks);
+                        final var itemX = this.x - this.backgroundWidth/2 + 25 + i1%10 * 30;
+                        final var itemY = i1/10 * 20 + this.backgroundHeight;
+                        final var convertedItem = convertItemIconInTheGUI(stack);
+                        itemRenderer.renderInGui(new ItemStack(convertedItem), itemX, itemY);
+                        this.textRenderer.draw(matrices, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000);
+                    }
                 }
-            }
 
-            this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
+                this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
+            }
         }
 
         this.drawForeground(matrices);
         if(this.handler.hasFocusedSlot()){
+            final var editText = handler.getFocusedSlot() != BlueprintSlot.EMPTY ? EDIT_BLUEPRINT_TEXT : ADD_BLUEPRINT_TEXT;
             this.textRenderer.draw(
                     matrices,
-                    EDIT_BLUEPRINT_TEXT,
+                    editText,
                     this.backgroundWidth + this.previewOffset + 3,
                     this.backgroundHeight - this.textRenderer.fontHeight - 3,
                     0xFFFFFF
@@ -291,35 +304,38 @@ public final class BlueprintsScreen extends Screen {
     private void drawSlot(BlueprintSlot slot, int slotColumn, int slotRow) {
         this.setZOffset(100);
         this.itemRenderer.zOffset = 100.0f;
-
         final float scaleParameter = 2f;
 
         RenderSystem.enableDepthTest();
-        final BlueprintMetadata metadata = slot.getMetadata();
-        final var enoughResources = !getFortressClientManager().isSurvival() || slot.isEnoughResources();
-        if(this.client != null){
-            this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
-        }
+        int slotX = slotColumn * 18 + 9 + 5;
+        int slotY = slotRow * 18 + 18 + 5;
+        if(slot == BlueprintSlot.EMPTY){
+            final var brickStack = new ItemStack(Items.BRICK);
+            this.itemRenderer.renderInGui(brickStack, (int)(slotX*scaleParameter), (int)(slotY*scaleParameter));
+        } else {
+            final BlueprintMetadata metadata = slot.getMetadata();
+            final var enoughResources = !getFortressClientManager().isSurvival() || slot.isEnoughResources();
+            if(this.client != null){
+                this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
+            }
 
-        if(client instanceof FortressMinecraftClient fortressClient){
-            if(metadata.isPremium() && !fortressClient.isSupporter()){
-                final MatrixStack matrices = RenderSystem.getModelViewStack();
-                matrices.push();
-                matrices.scale(1/scaleParameter, 1/scaleParameter, 1/scaleParameter);
-                RenderSystem.applyModelViewMatrix();
-                int slotX = slotColumn * 18 + 9 + 10;
-                int slotY = slotRow * 18 + 18 + 10;
-                this.itemRenderer.renderInGui(new ItemStack(Items.GOLD_INGOT), (int)(slotX*scaleParameter), (int)(slotY*scaleParameter));
-                matrices.pop();
-                RenderSystem.applyModelViewMatrix();
+            if(client instanceof FortressMinecraftClient fortressClient){
+                if(metadata.isPremium() && !fortressClient.isSupporter()){
+                    final MatrixStack matrices = RenderSystem.getModelViewStack();
+                    matrices.push();
+                    matrices.scale(1/scaleParameter, 1/scaleParameter, 1/scaleParameter);
+                    RenderSystem.applyModelViewMatrix();
+
+                    this.itemRenderer.renderInGui(new ItemStack(Items.GOLD_INGOT), (int)(slotX*scaleParameter), (int)(slotY*scaleParameter));
+                    matrices.pop();
+                    RenderSystem.applyModelViewMatrix();
+                }
             }
         }
 
         this.itemRenderer.zOffset = 0.0f;
         this.setZOffset(0);
     }
-
-
 
     private void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -408,7 +424,7 @@ public final class BlueprintsScreen extends Screen {
     }
 
     private void drawMouseoverTooltip(MatrixStack matrices, int x, int y) {
-        if (this.handler.hasFocusedSlot()) {
+        if (this.handler.hasFocusedSlot() && this.handler.getFocusedSlot() != BlueprintSlot.EMPTY) {
             this.renderTooltip(matrices, this.handler.getFocusedSlotName(), x, y);
         }
     }

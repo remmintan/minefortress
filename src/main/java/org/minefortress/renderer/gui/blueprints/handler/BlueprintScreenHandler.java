@@ -37,6 +37,10 @@ public final class BlueprintScreenHandler {
         this.scroll(0f);
     }
 
+    public BlueprintSlot getFocusedSlot() {
+        return focusedSlot;
+    }
+
     public void selectGroup(BlueprintGroup group){
         if(group == null) throw new IllegalArgumentException("Group cannot be null");
         this.selectedGroup = group;
@@ -85,7 +89,7 @@ public final class BlueprintScreenHandler {
         if(fortressClient.isSupporter() || !metadata.isPremium()) {
             final String file = metadata.getFile();
             final int floorLevel = metadata.getFloorLevel();
-            final ServerboundEditBlueprintPacket packet = new ServerboundEditBlueprintPacket(file, floorLevel);
+            final ServerboundEditBlueprintPacket packet = ServerboundEditBlueprintPacket.edit(file, floorLevel);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
         } else {
             this.client.setScreen(new BecomePatronScreen(parentScreen, "Editing this blueprint"));

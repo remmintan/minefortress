@@ -7,10 +7,19 @@ import org.minefortress.blueprints.manager.BlueprintMetadata;
 
 public class BlueprintSlot {
 
+    public static final BlueprintSlot EMPTY = new BlueprintSlot();
+
     private final BlueprintMetadata metadata;
     private final boolean enoughResources;
     private final Text tooltipText;
     private final BlueprintBlockData blockData;
+
+    private BlueprintSlot() {
+        metadata = null;
+        enoughResources = true;
+        tooltipText = new LiteralText("");
+        blockData = null;
+    }
 
     public BlueprintSlot(BlueprintMetadata metadata, boolean enoughResources, BlueprintBlockData blockData) {
         this.metadata = metadata;
