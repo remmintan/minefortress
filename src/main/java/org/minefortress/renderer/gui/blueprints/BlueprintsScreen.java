@@ -1,6 +1,7 @@
 package org.minefortress.renderer.gui.blueprints;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
@@ -22,6 +23,7 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
+import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ public final class BlueprintsScreen extends Screen {
     private static final Identifier BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE = new Identifier("textures/gui/recipe_book.png");
     private static final LiteralText EDIT_BLUEPRINT_TEXT = new LiteralText("right click to edit");
     private static final LiteralText ADD_BLUEPRINT_TEXT = new LiteralText("click to add blueprint");
+    private static final LiteralText DELETE_BLUEPRINT_TEXT = new LiteralText("right click to delete");
 
     private final int backgroundWidth = 195;
     private final int backgroundHeight = 136;
@@ -96,10 +99,15 @@ public final class BlueprintsScreen extends Screen {
 
                 if(button == 1) return true;
 
-                if(this.client != null){
-                    this.client.setScreen(null);
+                final var shiftPressed = MinecraftClient.getInstance().options.sneakKey.isPressed();
+                if(shiftPressed) {
+
+                } else {
+                    if(this.client != null){
+                        this.client.setScreen(null);
+                    }
+                    this.handler.clickOnFocusedSlot();
                 }
-                this.handler.clickOnFocusedSlot();
             }
         }
 
@@ -212,14 +220,26 @@ public final class BlueprintsScreen extends Screen {
 
         this.drawForeground(matrices);
         if(this.handler.hasFocusedSlot()){
-            final var editText = handler.getFocusedSlot() != BlueprintSlot.EMPTY ? EDIT_BLUEPRINT_TEXT : ADD_BLUEPRINT_TEXT;
-            this.textRenderer.draw(
-                    matrices,
-                    editText,
-                    this.backgroundWidth + this.previewOffset + 3,
-                    this.backgroundHeight - this.textRenderer.fontHeight - 3,
-                    0xFFFFFF
-            );
+            final var shiftPressed = MinecraftClient.getInstance().options.sneakKey.isPressed();
+            if(shiftPressed && handler.getFocusedSlot() != BlueprintSlot.EMPTY) {
+                this.textRenderer.draw(
+                        matrices,
+                        DELETE_BLUEPRINT_TEXT,
+                        this.backgroundWidth + this.previewOffset + 3,
+                        this.backgroundHeight - this.textRenderer.fontHeight - 3,
+                        0xFF0000
+                );
+            } else {
+                final var editText = handler.getFocusedSlot() != BlueprintSlot.EMPTY ? EDIT_BLUEPRINT_TEXT : ADD_BLUEPRINT_TEXT;
+                this.textRenderer.draw(
+                        matrices,
+                        editText,
+                        this.backgroundWidth + this.previewOffset + 3,
+                        this.backgroundHeight - this.textRenderer.fontHeight - 3,
+                        0xFFFFFF
+                );
+            }
+
         }
 
         matrixStack.pop();

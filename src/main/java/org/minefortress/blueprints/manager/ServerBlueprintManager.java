@@ -196,9 +196,16 @@ public class ServerBlueprintManager {
         final var existed = blockDataManager.update(fileName, updatedStructure);
         updatedFloorLevel.put(fileName, newFloorLevel);
         final FortressClientPacket packet =
-                existed? new ClientboundUpdateBlueprintPacket(fileName, newFloorLevel, updatedStructure) :
+                existed? ClientboundUpdateBlueprintPacket.edit(fileName, newFloorLevel, updatedStructure) :
                         new ClientboundAddBlueprintPacket(group, fileName, fileName, updatedStructure, newFloorLevel, false);
         scheduledEdits.add(packet);
+    }
+
+    public void remove(String name) {
+        blockDataManager.remove(name);
+        updatedFloorLevel.remove(name);
+        final var remove = ClientboundUpdateBlueprintPacket.remove(name);
+        scheduledEdits.add(remove);
     }
 
     public ServerBlueprintBlockDataManager getBlockDataManager() {

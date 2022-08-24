@@ -11,23 +11,30 @@ public class ClientboundUpdateBlueprintPacket implements FortressClientPacket {
     private final String file;
     private final int newFloorLevel;
     private final NbtCompound tag;
+    private final Type type;
 
-    public ClientboundUpdateBlueprintPacket(String file, int newFloorLevel, NbtCompound tag) {
+    private ClientboundUpdateBlueprintPacket(String file, int newFloorLevel, NbtCompound tag, Type type) {
         this.file = file;
         this.newFloorLevel = newFloorLevel;
         this.tag = tag;
+        this.type = type;
     }
 
     public ClientboundUpdateBlueprintPacket(PacketByteBuf buf) {
         file = buf.readString();
         newFloorLevel = buf.readInt();
         tag = buf.readNbt();
+        type = buf.readEnumConstant(Type.class);
     }
 
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getBlueprintManager().update(file, tag, newFloorLevel);
+            if(type == Type.UPDATE)
+                fortressClient.getBlueprintManager().update(file, tag, newFloorLevel);
+            else if(type == Type.REMOVE) {
+                fortressClient.getBlueprintManager().clearStructure();
+            }
         }
     }
 
@@ -36,5 +43,19 @@ public class ClientboundUpdateBlueprintPacket implements FortressClientPacket {
         buf.writeString(file);
         buf.writeInt(newFloorLevel);
         buf.writeNbt(tag);
+        buf.writeEnumConstant(type);
     }
+
+    public static ClientboundUpdateBlueprintPacket edit(String file, int newFloorLevel, NbtCompound tag) {
+        return new ClientboundUpdateBlueprintPacket(file, newFloorLevel, tag, Type.UPDATE);
+    }
+
+    public static ClientboundUpdateBlueprintPacket remove(String file) {
+        return new ClientboundUpdateBlueprintPacket(file, 0, new NbtCompound(), Type.REMOVE);
+    }
+
+    private enum Type {
+        UPDATE, REMOVE
+    }
+
 }

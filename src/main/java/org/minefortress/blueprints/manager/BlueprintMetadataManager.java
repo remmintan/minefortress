@@ -23,15 +23,6 @@ public final class BlueprintMetadataManager {
         return flatBlueprints().get(index);
     }
 
-//    public static BlueprintMetadata getByFile(String file) {
-//        for(BlueprintMetadata info : STRUCTURES) {
-//            if(info.getFile().equals(file)) {
-//                return info;
-//            }
-//        }
-//        return null;
-//    }
-
     public List<BlueprintMetadata> getAllForGroup(BlueprintGroup group) {
         return blueprintsMap.getOrDefault(group, Collections.emptyList());
     }
@@ -49,6 +40,12 @@ public final class BlueprintMetadataManager {
     public void reset() {
         this.blueprintsMap.clear();
         this.index = 0;
+    }
+
+    public void remove(String filename) {
+        blueprintsMap.forEach((k, v) -> {
+            v.removeIf(it -> it.getFile().equals(filename));
+        });
     }
 
     public void update(String fileName, int newFloorLevel) {

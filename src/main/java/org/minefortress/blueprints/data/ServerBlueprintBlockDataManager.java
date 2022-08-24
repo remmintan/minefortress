@@ -15,13 +15,16 @@ import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager{
 
     private final MinecraftServer server;
     private final Map<String, NbtCompound> updatedStructures = new HashMap<>();
+    private final Set<String> removedDefaultStructures = new HashSet<>();
 
     public ServerBlueprintBlockDataManager(MinecraftServer server) {
         this.server = server;
@@ -36,11 +39,21 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     public boolean update(String fileName, NbtCompound tag) {
         final var alreadyIn = updatedStructures.containsKey(fileName);
         updatedStructures.put(fileName, tag);
+        removedDefaultStructures.remove(fileName);
         invalidateBlueprint(fileName);
 
         final var id = getId(fileName);
         final var defaultStructure = server.getStructureManager().getStructure(id).isPresent();
         return alreadyIn || defaultStructure;
+    }
+
+    public void remove(String fileName) {
+        updatedStructures.remove(fileName);
+        final var id = getId(fileName);
+        final var defaultStructure = server.getStructureManager().getStructure(id).isPresent();
+        if(defaultStructure) {
+            removedDefaultStructures.add(fileName);
+        }
     }
 
     @Override

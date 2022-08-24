@@ -49,24 +49,27 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         if(server instanceof FortressServer fortressServer) {
-            final BlueprintsWorld blueprintsWorld = fortressServer.getBlueprintsWorld();
-
             if(player instanceof FortressServerPlayerEntity fortressPlayer) {
-                if(type == Type.EDIT) {
-                    final var blockData = fortressPlayer
-                            .getServerBlueprintManager()
-                            .getBlockDataManager()
-                            .getBlockData(blueprintFileName, BlockRotation.NONE);
-                    final Map<BlockPos, BlockState> blueprintData = blockData
-                            .getLayer(BlueprintDataLayer.GENERAL);
+                if(type == Type.REMOVE) {
+                    fortressPlayer.getServerBlueprintManager().remove(blueprintFileName);
+                } else {
+                    final BlueprintsWorld blueprintsWorld = fortressServer.getBlueprintsWorld();
+                    if(type == Type.EDIT) {
+                        final var blockData = fortressPlayer
+                                .getServerBlueprintManager()
+                                .getBlockDataManager()
+                                .getBlockData(blueprintFileName, BlockRotation.NONE);
+                        final Map<BlockPos, BlockState> blueprintData = blockData
+                                .getLayer(BlueprintDataLayer.GENERAL);
 
-                    blueprintsWorld.prepareBlueprint(blueprintData, blueprintFileName, floorLevel, blueprintGroup);
-                    blueprintsWorld.putBlueprintInAWorld(player, blockData.getSize());
-                } else if(type == Type.CREATE) {
-                    blueprintsWorld.prepareBlueprint(new HashMap<>(), blueprintFileName, floorLevel, blueprintGroup);
-                    blueprintsWorld.putBlueprintInAWorld(player, new Vec3i(1, 1, 1));
+                        blueprintsWorld.prepareBlueprint(blueprintData, blueprintFileName, floorLevel, blueprintGroup);
+                        blueprintsWorld.putBlueprintInAWorld(player, blockData.getSize());
+                    } else if(type == Type.CREATE) {
+                        blueprintsWorld.prepareBlueprint(new HashMap<>(), blueprintFileName, floorLevel, blueprintGroup);
+                        blueprintsWorld.putBlueprintInAWorld(player, new Vec3i(1, 1, 1));
+                    }
+                    player.moveToWorld(blueprintsWorld.getWorld());
                 }
-                player.moveToWorld(blueprintsWorld.getWorld());
             }
         }
     }
@@ -79,8 +82,12 @@ public class ServerboundEditBlueprintPacket implements FortressServerPacket {
         return new ServerboundEditBlueprintPacket(name, 0, Type.CREATE, group);
     }
 
+    public static ServerboundEditBlueprintPacket remove(String name) {
+        return new ServerboundEditBlueprintPacket(name, 0, Type.REMOVE, BlueprintGroup.LIVING_HOUSES);
+    }
+
     private enum Type {
-        EDIT, CREATE
+        EDIT, CREATE, REMOVE
     }
 
 }
