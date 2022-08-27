@@ -14,10 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,7 +29,8 @@ abstract class AbstractBlueprintBlockDataManager {
     public BlueprintBlockData getBlockData(String blueprintFileName, BlockRotation rotation, int floorLevel) {
         final String key = getKey(blueprintFileName, rotation);
         if(!blueprints.containsKey(key)) {
-            final Structure structure = getStructure(blueprintFileName);
+            final Structure structure = getStructure(blueprintFileName)
+                    .orElseThrow(() -> new IllegalStateException("Blueprint not found " + blueprintFileName));
             final BlueprintBlockData blueprintBlockData = buildBlueprint(structure, rotation, floorLevel);
             blueprints.put(key, blueprintBlockData);
         }
@@ -44,7 +42,7 @@ abstract class AbstractBlueprintBlockDataManager {
         new HashSet<>(blueprints.keySet()).stream().filter(key -> key.startsWith(fileName)).forEach(blueprints::remove);
     }
 
-    protected abstract Structure getStructure(String blueprintFileName);
+    protected abstract Optional<Structure> getStructure(String blueprintFileName);
     protected abstract BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation, int floorLevel);
 
     @NotNull

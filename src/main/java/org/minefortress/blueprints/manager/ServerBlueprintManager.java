@@ -169,10 +169,19 @@ public class ServerBlueprintManager {
             for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : PREDEFINED_BLUEPRINTS.entrySet()) {
                 for(BlueprintMetadata blueprintMetadata : entry.getValue()) {
                     final String file = blueprintMetadata.getFile();
-                    final int floorLevel = blockDataManager.getFloorLevel(file).orElse(blueprintMetadata.getFloorLevel());
-                    final NbtCompound structureNbt = blockDataManager.getStructureNbt(file);
-                    final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(entry.getKey(), blueprintMetadata.getName(), file, structureNbt, floorLevel, blueprintMetadata.isPremium());
-                    FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
+                    blockDataManager.getStructureNbt(file)
+                            .ifPresent(it -> {
+                                final int floorLevel = blockDataManager.getFloorLevel(file).orElse(blueprintMetadata.getFloorLevel());
+                                final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(
+                                        entry.getKey(),
+                                        blueprintMetadata.getName(),
+                                        file,
+                                        it,
+                                        floorLevel,
+                                        blueprintMetadata.isPremium()
+                                );
+                                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
+                            });
                 }
             }
 

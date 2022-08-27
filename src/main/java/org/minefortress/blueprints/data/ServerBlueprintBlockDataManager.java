@@ -36,10 +36,12 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         return Optional.ofNullable(updatedStructures.get(filename)).map(Blueprint::floorLevel);
     }
 
-    public NbtCompound getStructureNbt(String fileName) {
-        NbtCompound compound = new NbtCompound();
-        getStructure(fileName).writeNbt(compound);
-        return compound;
+    public Optional<NbtCompound> getStructureNbt(String fileName) {
+        return getStructure(fileName).map(it -> {
+            NbtCompound compound = new NbtCompound();
+            it.writeNbt(compound);
+            return compound;
+        });
     }
 
     public boolean update(String fileName, NbtCompound tag, int newFloorLevel) {
@@ -60,18 +62,17 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     }
 
     @Override
-    protected Structure getStructure(String blueprintFileName) {
+    protected Optional<Structure> getStructure(String blueprintFileName) {
         if(removedDefaultStructures.contains(blueprintFileName)) {
-            throw new IllegalArgumentException("Blueprint file not found: " + blueprintFileName);
+            return Optional.empty();
         }
         if(updatedStructures.containsKey(blueprintFileName)) {
             final NbtCompound structureTag = updatedStructures.get(blueprintFileName).tag();
             final Structure structure = new Structure();
             structure.readNbt(structureTag);
-            return structure;
+            return Optional.of(structure);
         } else {
-            return getDefaultStructure(blueprintFileName)
-                    .orElseThrow(() -> new IllegalArgumentException("Blueprint file not found: " + blueprintFileName));
+            return getDefaultStructure(blueprintFileName);
         }
     }
 

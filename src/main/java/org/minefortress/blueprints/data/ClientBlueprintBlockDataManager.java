@@ -5,23 +5,23 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.structure.Structure;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import org.minefortress.blueprints.interfaces.BlueprintsTagsKeeper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public final class ClientBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager implements BlueprintsTagsKeeper {
 
     private final Map<String, NbtCompound> blueprintTags = new HashMap<>();
 
     @Override
-    protected Structure getStructure(String blueprintFileName) {
-        if(!blueprintTags.containsKey(blueprintFileName)) throw new IllegalArgumentException("Blueprint file not found: " + blueprintFileName);
+    protected Optional<Structure> getStructure(String blueprintFileName) {
+        if(!blueprintTags.containsKey(blueprintFileName)) return Optional.empty();
         final NbtCompound blueprintTag = blueprintTags.get(blueprintFileName);
         final Structure structure = new Structure();
         structure.readNbt(blueprintTag);
-        return structure;
+        return Optional.of(structure);
     }
 
     @Override
