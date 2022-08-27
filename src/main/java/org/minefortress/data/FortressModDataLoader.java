@@ -1,20 +1,17 @@
 package org.minefortress.data;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.impl.resource.loader.FabricModResourcePack;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.impl.launch.FabricLauncher;
-import net.fabricmc.loader.impl.launch.FabricLauncherBase;
-import net.fabricmc.loader.impl.launch.knot.FabricGlobalPropertyService;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
+import java.util.*;
 
 public class FortressModDataLoader {
 
@@ -50,6 +47,42 @@ public class FortressModDataLoader {
         }
     }
 
+    public static boolean exists(String folderName, LevelStorage.Session session) {
+        return Files.exists(getModSaveDir(session).resolve(folderName));
+    }
+
+    @NotNull
+    private static Path getModSaveDir(LevelStorage.Session session) {
+        return getWorldSaveDir(session).resolve(MOD_DIR);
+    }
+
+    public static List<NbtCompound> readAllTags(String folderName, LevelStorage.Session session) {
+        final var files = Optional.ofNullable(
+                getModSaveDir(session)
+                .resolve(folderName)
+                .toFile()
+                .listFiles()
+        ).orElse(new File[]{});
+        return Arrays.stream(files)
+                .filter(it -> !it.isDirectory() && it.getAbsolutePath().endsWith(".nbt"))
+                .map(FortressModDataLoader::readNbt)
+                .toList();
+    }
+
+    public static void clearFolder(String folderName, LevelStorage.Session session) {
+        final var folder = getModSaveDir(session).resolve(folderName).toFile();
+        if(folder.exists()) {
+            final var files = Optional.ofNullable(folder.listFiles()).orElse(new File[]{});
+            for (File file : files) {
+                file.delete();
+            }
+        }
+    }
+
+    public static void writeAllTags(Map<String, NbtCompound> tags, LevelStorage.Session session) {
+        tags.forEach((k, v) -> saveNbt(v, k, session));
+    }
+
     public static void saveNbt(NbtCompound nbt, String fileName, LevelStorage.Session session) {
         final var file = getWorldSaveDir(session).resolve(fileName).toFile();
         try {
@@ -62,6 +95,10 @@ public class FortressModDataLoader {
 
     public static NbtCompound readNbt(String fileName, LevelStorage.Session session) {
         final var file = getWorldSaveDir(session).resolve(fileName).toFile();
+        return readNbt(file);
+    }
+
+    private static NbtCompound readNbt(File file) {
         if(file.exists()) {
             try {
                 return NbtIo.readCompressed(file);

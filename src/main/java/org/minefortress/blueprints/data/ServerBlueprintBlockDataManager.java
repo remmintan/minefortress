@@ -5,31 +5,33 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.Structure;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
+import org.minefortress.data.FortressModDataLoader;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager{
 
+    private static final String BLUEPRINTS_FOLDER = "blueprints";
+
     private final MinecraftServer server;
-    private final Map<String, NbtCompound> updatedStructures = new HashMap<>();
+    private final Map<String, Blueprint> updatedStructures = new HashMap<>();
     private final Set<String> removedDefaultStructures = new HashSet<>();
-    private final Map<String, Integer> updatedFloorLevel = new HashMap<>();
 
     public ServerBlueprintBlockDataManager(MinecraftServer server) {
         this.server = server;
     }
 
     public Optional<Integer> getFloorLevel(String filename) {
-        return Optional.ofNullable(updatedFloorLevel.get(filename));
+        return Optional.ofNullable(updatedStructures.get(filename)).map(Blueprint::floorLevel);
     }
 
     public NbtCompound getStructureNbt(String fileName) {
@@ -40,22 +42,17 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
     public boolean update(String fileName, NbtCompound tag, int newFloorLevel) {
         final var alreadyIn = updatedStructures.containsKey(fileName);
-        updatedStructures.put(fileName, tag);
-        updatedFloorLevel.put(fileName, newFloorLevel);
+        updatedStructures.put(fileName, new Blueprint(fileName, newFloorLevel, tag));
         removedDefaultStructures.remove(fileName);
         invalidateBlueprint(fileName);
 
-        final var id = getId(fileName);
-        final var defaultStructure = server.getStructureManager().getStructure(id).isPresent();
+        final var defaultStructure = getDefaultStructure(fileName).isPresent();
         return alreadyIn || defaultStructure;
     }
 
     public void remove(String fileName) {
         updatedStructures.remove(fileName);
-        updatedFloorLevel.remove(fileName);
-        final var id = getId(fileName);
-        final var defaultStructure = server.getStructureManager().getStructure(id).isPresent();
-        if(defaultStructure) {
+        if(getDefaultStructure(fileName).isPresent()) {
             removedDefaultStructures.add(fileName);
         }
     }
@@ -66,17 +63,21 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
             throw new IllegalArgumentException("Blueprint file not found: " + blueprintFileName);
         }
         if(updatedStructures.containsKey(blueprintFileName)) {
-            final NbtCompound structureTag = updatedStructures.get(blueprintFileName);
+            final NbtCompound structureTag = updatedStructures.get(blueprintFileName).tag();
             final Structure structure = new Structure();
             structure.readNbt(structureTag);
             return structure;
         } else {
-            final Identifier id = getId(blueprintFileName);
-            return server
-                    .getStructureManager()
-                    .getStructure(id)
+            return getDefaultStructure(blueprintFileName)
                     .orElseThrow(() -> new IllegalArgumentException("Blueprint file not found: " + blueprintFileName));
         }
+    }
+
+    private Optional<Structure> getDefaultStructure(String blueprintFileName) {
+        final Identifier id = new Identifier(MineFortressMod.MOD_ID, blueprintFileName);
+        return server
+                .getStructureManager()
+                .getStructure(id);
     }
 
     @Override
@@ -138,46 +139,81 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
                 .build();
     }
 
-    @NotNull
-    private Identifier getId(String fileName) {
-        return new Identifier(MineFortressMod.MOD_ID, fileName);
-    }
-
-    public void writeBlockDataManager(NbtCompound tag) {
+    public void writeBlockDataManager() {
+        FortressModDataLoader.clearFolder(BLUEPRINTS_FOLDER, server.session);
         if(updatedStructures.isEmpty()) return;
-        final NbtList nbtElements = new NbtList();
-        for(Map.Entry<String, NbtCompound> entry : updatedStructures.entrySet()) {
-            final NbtCompound mapEntry = new NbtCompound();
-            mapEntry.putString("fileName", entry.getKey());
-            mapEntry.put("structure", entry.getValue());
-            nbtElements.add(mapEntry);
-        }
-
-        tag.put("updatedStructures", nbtElements);
-
-        final NbtCompound floorLevel = new NbtCompound();
-        for(Map.Entry<String, Integer> entry : updatedFloorLevel.entrySet()) {
-            floorLevel.putInt(entry.getKey(), entry.getValue());
-        }
-        tag.put("floorLevel", floorLevel);
+        final var tags = new HashMap<String, NbtCompound>();
+        updatedStructures.forEach((k, v) -> {
+            final var tagFileName = BLUEPRINTS_FOLDER + "/" + k + ".nbt";
+            final var tag = v.toNbt();
+            tags.put(tagFileName, tag);
+        });
+        FortressModDataLoader.writeAllTags(tags, server.session);
     }
 
     public void readBlockDataManager(NbtCompound tag) {
+        if(FortressModDataLoader.exists(BLUEPRINTS_FOLDER, server.session)) {
+            updatedStructures.clear();
+            FortressModDataLoader
+                    .readAllTags(BLUEPRINTS_FOLDER, server.session)
+                    .stream()
+                    .map(Blueprint::fromNbt)
+                    .forEach(it -> updatedStructures.put(it.filename, it));
+        } else {
+            readLegacy(tag);
+        }
+    }
+
+    private void readLegacy(NbtCompound tag) {
         if(!tag.contains("updatedStructures")) return;
         updatedStructures.clear();
+
+        Map<String, NbtCompound> structuresMap = new HashMap<>();
         final NbtList nbtElements = tag.getList("updatedStructures", NbtType.COMPOUND);
         for (int i = 0; i < nbtElements.size(); i++) {
             final NbtCompound mapEntry = nbtElements.getCompound(i);
             final String fileName = mapEntry.getString("fileName");
             final NbtCompound structure = mapEntry.getCompound("structure");
-            updatedStructures.put(fileName, structure);
+            structuresMap.put(fileName, structure);
         }
 
+        Map<String, Integer> floorLevelsMap = new HashMap<>();
         if(tag.contains("floorLevel")) {
             final NbtCompound floorLevel = tag.getCompound("floorLevel");
             for(String key : floorLevel.getKeys()) {
-                updatedFloorLevel.put(key, floorLevel.getInt(key));
+                floorLevelsMap.put(key, floorLevel.getInt(key));
             }
+        }
+
+        structuresMap
+                .entrySet()
+                .stream()
+                .forEach(it -> {
+                    final var key = it.getKey();
+                    final var bp = new Blueprint(key, floorLevelsMap.getOrDefault(key, 0), it.getValue());
+                    updatedStructures.put(key, bp);
+                });
+    }
+
+    private static record Blueprint(
+            String filename,
+            int floorLevel,
+            NbtCompound tag
+    ){
+        NbtCompound toNbt() {
+            final var nbt = new NbtCompound();
+            nbt.putString("filename", filename);
+            nbt.put("tag", tag);
+            nbt.putInt("floorLevel", floorLevel);
+            return nbt;
+        }
+
+        static Blueprint fromNbt(NbtCompound nbt) {
+            final var filename = nbt.getString("filename");
+            final var tag = nbt.getCompound("tag");
+            final var floorLevel = nbt.getInt("floorLevel");
+
+            return new Blueprint(filename, floorLevel, tag);
         }
     }
 

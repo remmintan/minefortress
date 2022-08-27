@@ -235,7 +235,7 @@ public class ServerBlueprintManager {
     }
 
     public void writeToNbt(NbtCompound compound) {
-        blockDataManager.writeBlockDataManager(compound);
+        blockDataManager.writeBlockDataManager();
     }
 
     public void readFromNbt(NbtCompound compound) {
