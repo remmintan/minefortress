@@ -30,7 +30,7 @@ public class FortressModDataLoader {
         return instance;
     }
 
-    private static final String MOD_DIR = "minefortress";
+    public static final String MOD_DIR = "minefortress";
     private static final String WORLD_DIR_PREFIX = "blueprints";
 
     private final LevelStorage fortressLevelStorage;

@@ -12,6 +12,7 @@ import net.minecraft.structure.Structure;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 import org.minefortress.data.FortressModDataLoader;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager{
 
     private static final String BLUEPRINTS_FOLDER = "blueprints";
+    private static final String REMOVED_BLUEPRINTS_FILENAME = "removed_blueprints.nbt";
 
     private final MinecraftServer server;
     private final Map<String, Blueprint> updatedStructures = new HashMap<>();
@@ -141,6 +143,8 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
     public void writeBlockDataManager() {
         FortressModDataLoader.clearFolder(BLUEPRINTS_FOLDER, server.session);
+        saveRemovedBlueprints();
+
         if(updatedStructures.isEmpty()) return;
         final var tags = new HashMap<String, NbtCompound>();
         updatedStructures.forEach((k, v) -> {
@@ -151,16 +155,39 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         FortressModDataLoader.writeAllTags(tags, server.session);
     }
 
+    private void saveRemovedBlueprints() {
+        final var removedBlueprintsTag = new NbtCompound();
+        final var removedStructs = String.join(":", removedDefaultStructures);
+        removedBlueprintsTag.putString("removedDefaultBlueprints", removedStructs);
+        FortressModDataLoader.saveNbt(removedBlueprintsTag, getRemovedBlueprintsDefaultFileName(), server.session);
+    }
+
+    @NotNull
+    private String getRemovedBlueprintsDefaultFileName() {
+        return FortressModDataLoader.MOD_DIR + "/" + BLUEPRINTS_FOLDER+"/"+REMOVED_BLUEPRINTS_FILENAME;
+    }
+
     public void readBlockDataManager(NbtCompound tag) {
         if(FortressModDataLoader.exists(BLUEPRINTS_FOLDER, server.session)) {
             updatedStructures.clear();
+            removedDefaultStructures.clear();
             FortressModDataLoader
                     .readAllTags(BLUEPRINTS_FOLDER, server.session)
                     .stream()
                     .map(Blueprint::fromNbt)
                     .forEach(it -> updatedStructures.put(it.filename, it));
+
+            readRemovedBlueprints();
         } else {
             readLegacy(tag);
+        }
+    }
+
+    private void readRemovedBlueprints() {
+        final var removedBlueprintsTag = FortressModDataLoader.readNbt(getRemovedBlueprintsDefaultFileName(), server.session);
+        if(removedBlueprintsTag.contains("removedDefaultBlueprints")) {
+            final var remBlueprints = removedBlueprintsTag.getString("removedDefaultBlueprints");
+            removedDefaultStructures.addAll(Arrays.asList(remBlueprints.split(":")));
         }
     }
 
