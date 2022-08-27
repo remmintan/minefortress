@@ -14,10 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager{
@@ -25,9 +22,14 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     private final MinecraftServer server;
     private final Map<String, NbtCompound> updatedStructures = new HashMap<>();
     private final Set<String> removedDefaultStructures = new HashSet<>();
+    private final Map<String, Integer> updatedFloorLevel = new HashMap<>();
 
     public ServerBlueprintBlockDataManager(MinecraftServer server) {
         this.server = server;
+    }
+
+    public Optional<Integer> getFloorLevel(String filename) {
+        return Optional.ofNullable(updatedFloorLevel.get(filename));
     }
 
     public NbtCompound getStructureNbt(String fileName) {
@@ -36,9 +38,10 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         return compound;
     }
 
-    public boolean update(String fileName, NbtCompound tag) {
+    public boolean update(String fileName, NbtCompound tag, int newFloorLevel) {
         final var alreadyIn = updatedStructures.containsKey(fileName);
         updatedStructures.put(fileName, tag);
+        updatedFloorLevel.put(fileName, newFloorLevel);
         removedDefaultStructures.remove(fileName);
         invalidateBlueprint(fileName);
 
@@ -49,6 +52,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
     public void remove(String fileName) {
         updatedStructures.remove(fileName);
+        updatedFloorLevel.remove(fileName);
         final var id = getId(fileName);
         final var defaultStructure = server.getStructureManager().getStructure(id).isPresent();
         if(defaultStructure) {
@@ -58,6 +62,9 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
     @Override
     protected Structure getStructure(String blueprintFileName) {
+        if(removedDefaultStructures.contains(blueprintFileName)) {
+            throw new IllegalArgumentException("Blueprint file not found: " + blueprintFileName);
+        }
         if(updatedStructures.containsKey(blueprintFileName)) {
             final NbtCompound structureTag = updatedStructures.get(blueprintFileName);
             final Structure structure = new Structure();
@@ -70,8 +77,6 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
                     .getStructure(id)
                     .orElseThrow(() -> new IllegalArgumentException("Blueprint file not found: " + blueprintFileName));
         }
-
-
     }
 
     @Override
@@ -149,6 +154,12 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         }
 
         tag.put("updatedStructures", nbtElements);
+
+        final NbtCompound floorLevel = new NbtCompound();
+        for(Map.Entry<String, Integer> entry : updatedFloorLevel.entrySet()) {
+            floorLevel.putInt(entry.getKey(), entry.getValue());
+        }
+        tag.put("floorLevel", floorLevel);
     }
 
     public void readBlockDataManager(NbtCompound tag) {
@@ -161,29 +172,13 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
             final NbtCompound structure = mapEntry.getCompound("structure");
             updatedStructures.put(fileName, structure);
         }
+
+        if(tag.contains("floorLevel")) {
+            final NbtCompound floorLevel = tag.getCompound("floorLevel");
+            for(String key : floorLevel.getKeys()) {
+                updatedFloorLevel.put(key, floorLevel.getInt(key));
+            }
+        }
     }
 
 }
-
-
-//    final BlueprintMetadata blueprintMetadata = BlueprintMetadataManager.getByFile(fileName);
-//
-//    final Map<BlockPos, BlockState> structureEntityData = structureData.entrySet()
-//            .stream()
-//            .filter(entry -> entry.getValue().getBlock() instanceof BlockEntityProvider)
-//            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
-//
-//    final Map<BlockPos, BlockState> structureManualData = structureData.entrySet()
-//            .stream()
-//            .filter(entry -> !(entry.getValue().getBlock() instanceof BlockEntityProvider))
-//            .filter(ent -> blueprintMetadata == null || !blueprintMetadata.isPartOfAutomaticLayer(ent.getKey(), ent.getValue()))
-//            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
-//
-//    final Map<BlockPos, BlockState> structureAutomaticData = structureData.entrySet()
-//            .stream()
-//            .filter(entry -> !(entry.getValue().getBlock() instanceof BlockEntityProvider))
-//            .filter(ent -> blueprintMetadata != null && blueprintMetadata.isPartOfAutomaticLayer(ent.getKey(), ent.getValue()))
-//            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
-//
-//    BlueprintBlockData blockData = new BlueprintBlockData(structureData, size, standsOnGrass, structureEntityData, structureManualData, structureAutomaticData);
-//                blueprints.put(key, blockData);

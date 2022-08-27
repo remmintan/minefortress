@@ -153,8 +153,6 @@ public class ServerBlueprintManager {
 
     private boolean initialized = false;
 
-    private final Map<String, Integer> updatedFloorLevel = new HashMap<>();
-
     private final ServerBlueprintBlockDataManager blockDataManager;
     private final Queue<FortressClientPacket> scheduledEdits = new ArrayDeque<>();
 
@@ -171,7 +169,7 @@ public class ServerBlueprintManager {
             for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : PREDEFINED_BLUEPRINTS.entrySet()) {
                 for(BlueprintMetadata blueprintMetadata : entry.getValue()) {
                     final String file = blueprintMetadata.getFile();
-                    final int floorLevel = updatedFloorLevel.containsKey(file)?updatedFloorLevel.get(file):blueprintMetadata.getFloorLevel();
+                    final int floorLevel = blockDataManager.getFloorLevel(file).orElse(blueprintMetadata.getFloorLevel());
                     final NbtCompound structureNbt = blockDataManager.getStructureNbt(file);
                     final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(entry.getKey(), blueprintMetadata.getName(), file, structureNbt, floorLevel, blueprintMetadata.isPremium());
                     FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
@@ -193,8 +191,7 @@ public class ServerBlueprintManager {
     }
 
     public void update(String fileName, NbtCompound updatedStructure, int newFloorLevel, BlueprintGroup group) {
-        final var existed = blockDataManager.update(fileName, updatedStructure);
-        updatedFloorLevel.put(fileName, newFloorLevel);
+        final var existed = blockDataManager.update(fileName, updatedStructure, newFloorLevel);
         final FortressClientPacket packet =
                 existed? ClientboundUpdateBlueprintPacket.edit(fileName, newFloorLevel, updatedStructure) :
                         new ClientboundAddBlueprintPacket(group, fileName, fileName, updatedStructure, newFloorLevel, false);
@@ -203,7 +200,6 @@ public class ServerBlueprintManager {
 
     public void remove(String name) {
         blockDataManager.remove(name);
-        updatedFloorLevel.remove(name);
         final var remove = ClientboundUpdateBlueprintPacket.remove(name);
         scheduledEdits.add(remove);
     }
@@ -234,29 +230,16 @@ public class ServerBlueprintManager {
         return new BlueprintDigTask(uuid, startPos, endPos);
     }
 
-    private BlockPos getEndPos(BlockPos startPos, Vec3i size) {
+    private static BlockPos getEndPos(BlockPos startPos, Vec3i size) {
         return startPos.add(new Vec3i(size.getX()-1, size.getY()-1, size.getZ()-1));
     }
 
     public void writeToNbt(NbtCompound compound) {
         blockDataManager.writeBlockDataManager(compound);
-
-        final NbtCompound floorLevel = new NbtCompound();
-        for(Map.Entry<String, Integer> entry : updatedFloorLevel.entrySet()) {
-            floorLevel.putInt(entry.getKey(), entry.getValue());
-        }
-        compound.put("floorLevel", floorLevel);
     }
 
     public void readFromNbt(NbtCompound compound) {
         blockDataManager.readBlockDataManager(compound);
-
-        if(compound.contains("floorLevel")) {
-            final NbtCompound floorLevel = compound.getCompound("floorLevel");
-            for(String key : floorLevel.getKeys()) {
-                updatedFloorLevel.put(key, floorLevel.getInt(key));
-            }
-        }
     }
 
     private Optional<String> findRequirementIdByFileName(String fileName){
