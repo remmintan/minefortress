@@ -49,7 +49,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressServerPacke
 
         final String fileName = fortressServerWorld.getFileName();
 
-        final Identifier updatedStructureIdentifier = new Identifier(MineFortressMod.MOD_ID, fileName);
+        final Identifier updatedStructureIdentifier = new Identifier(MineFortressMod.MOD_ID, fileName.replaceAll("[^a-z0-9/._-]", "_"));
         final StructureManager structureManager = server.getStructureManager();
         final Structure structureToUpdate = structureManager.getStructureOrBlank(updatedStructureIdentifier);
         fortressServerWorld.enableSaveStructureMode();

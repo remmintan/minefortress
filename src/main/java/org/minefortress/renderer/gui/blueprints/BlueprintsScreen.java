@@ -23,7 +23,6 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
-import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 
@@ -101,7 +100,8 @@ public final class BlueprintsScreen extends Screen {
 
                 final var shiftPressed = MinecraftClient.getInstance().options.sneakKey.isPressed();
                 if(shiftPressed) {
-
+                    final var packet = ServerboundEditBlueprintPacket.remove(this.handler.getFocusedSlot().getMetadata().getFile());
+                    FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, packet);
                 } else {
                     if(this.client != null){
                         this.client.setScreen(null);
@@ -324,14 +324,12 @@ public final class BlueprintsScreen extends Screen {
     private void drawSlot(BlueprintSlot slot, int slotColumn, int slotRow) {
         this.setZOffset(100);
         this.itemRenderer.zOffset = 100.0f;
-        final float scaleParameter = 2f;
 
         RenderSystem.enableDepthTest();
         int slotX = slotColumn * 18 + 9 + 5;
         int slotY = slotRow * 18 + 18 + 5;
         if(slot == BlueprintSlot.EMPTY){
-            final var brickStack = new ItemStack(Items.BRICK);
-            this.itemRenderer.renderInGui(brickStack, (int)(slotX*scaleParameter), (int)(slotY*scaleParameter));
+            renderScaledItemStack(slotX, slotY, Items.BRICK);
         } else {
             final BlueprintMetadata metadata = slot.getMetadata();
             final var enoughResources = !getFortressClientManager().isSurvival() || slot.isEnoughResources();
@@ -341,20 +339,24 @@ public final class BlueprintsScreen extends Screen {
 
             if(client instanceof FortressMinecraftClient fortressClient){
                 if(metadata.isPremium() && !fortressClient.isSupporter()){
-                    final MatrixStack matrices = RenderSystem.getModelViewStack();
-                    matrices.push();
-                    matrices.scale(1/scaleParameter, 1/scaleParameter, 1/scaleParameter);
-                    RenderSystem.applyModelViewMatrix();
-
-                    this.itemRenderer.renderInGui(new ItemStack(Items.GOLD_INGOT), (int)(slotX*scaleParameter), (int)(slotY*scaleParameter));
-                    matrices.pop();
-                    RenderSystem.applyModelViewMatrix();
+                    renderScaledItemStack(slotX, slotY, Items.GOLD_INGOT);
                 }
             }
         }
 
         this.itemRenderer.zOffset = 0.0f;
         this.setZOffset(0);
+    }
+
+    private void renderScaledItemStack(int slotX, int slotY, Item goldIngot) {
+        final float scaleParameter = 2f;
+        final MatrixStack matrices = RenderSystem.getModelViewStack();
+        matrices.push();
+        matrices.scale(1/ scaleParameter, 1/ scaleParameter, 1/ scaleParameter);
+        RenderSystem.applyModelViewMatrix();
+        this.itemRenderer.renderInGui(new ItemStack(goldIngot), (int)(slotX * scaleParameter), (int)(slotY * scaleParameter));
+        matrices.pop();
+        RenderSystem.applyModelViewMatrix();
     }
 
     private void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {

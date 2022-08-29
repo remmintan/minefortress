@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.Structure;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
@@ -77,7 +78,12 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     }
 
     private Optional<Structure> getDefaultStructure(String blueprintFileName) {
-        final Identifier id = new Identifier(MineFortressMod.MOD_ID, blueprintFileName);
+        final Identifier id;
+        try {
+            id = new Identifier(MineFortressMod.MOD_ID, blueprintFileName);
+        }catch (InvalidIdentifierException exp) {
+            return Optional.empty();
+        }
         return server
                 .getStructureManager()
                 .getStructure(id);
@@ -144,6 +150,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
     public void writeBlockDataManager() {
         FortressModDataLoader.clearFolder(BLUEPRINTS_FOLDER, server.session);
+        FortressModDataLoader.createFolder(BLUEPRINTS_FOLDER, server.session);
         saveRemovedBlueprints();
 
         if(updatedStructures.isEmpty()) return;
@@ -165,7 +172,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
     @NotNull
     private String getRemovedBlueprintsDefaultFileName() {
-        return FortressModDataLoader.MOD_DIR + "/" + BLUEPRINTS_FOLDER+"/"+REMOVED_BLUEPRINTS_FILENAME;
+        return  BLUEPRINTS_FOLDER+"/"+REMOVED_BLUEPRINTS_FILENAME;
     }
 
     public void readBlockDataManager(NbtCompound tag) {

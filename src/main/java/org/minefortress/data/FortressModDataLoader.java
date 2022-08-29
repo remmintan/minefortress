@@ -5,7 +5,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,17 +47,12 @@ public class FortressModDataLoader {
     }
 
     public static boolean exists(String folderName, LevelStorage.Session session) {
-        return Files.exists(getModSaveDir(session).resolve(folderName));
-    }
-
-    @NotNull
-    private static Path getModSaveDir(LevelStorage.Session session) {
-        return getWorldSaveDir(session).resolve(MOD_DIR);
+        return Files.exists(getWorldSaveDir(session).resolve(folderName));
     }
 
     public static List<NbtCompound> readAllTags(String folderName, LevelStorage.Session session) {
         final var files = Optional.ofNullable(
-                getModSaveDir(session)
+                getWorldSaveDir(session)
                 .resolve(folderName)
                 .toFile()
                 .listFiles()
@@ -70,12 +64,19 @@ public class FortressModDataLoader {
     }
 
     public static void clearFolder(String folderName, LevelStorage.Session session) {
-        final var folder = getModSaveDir(session).resolve(folderName).toFile();
+        final var folder = getWorldSaveDir(session).resolve(folderName).toFile();
         if(folder.exists()) {
             final var files = Optional.ofNullable(folder.listFiles()).orElse(new File[]{});
             for (File file : files) {
                 file.delete();
             }
+        }
+    }
+
+    public static void createFolder(String folderName, LevelStorage.Session session) {
+        final var folder = getWorldSaveDir(session).resolve(folderName).toFile();
+        if(!folder.exists()) {
+            folder.mkdir();
         }
     }
 
