@@ -231,7 +231,7 @@ public class ServerBlueprintManager {
 
     public BlueprintTask createTask(UUID taskId, String structureFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
         final String requirementId = this.findRequirementIdByFileName(structureFile)
-                .orElseThrow(() -> new IllegalArgumentException("Structure file not found: " + structureFile));
+                .orElse("custom");
         final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation, floorLevel);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
