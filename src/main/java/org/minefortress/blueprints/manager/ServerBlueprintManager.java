@@ -157,7 +157,15 @@ public class ServerBlueprintManager {
     private final Queue<FortressClientPacket> scheduledEdits = new ArrayDeque<>();
 
     public ServerBlueprintManager(MinecraftServer server) {
-        this.blockDataManager = new ServerBlueprintBlockDataManager(server);
+        this.blockDataManager = new ServerBlueprintBlockDataManager(server, ServerBlueprintManager::convertFilenameToGroup);
+    }
+
+    private static Optional<BlueprintGroup> convertFilenameToGroup(String filename) {
+        for (Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : PREDEFINED_BLUEPRINTS.entrySet()) {
+            if(entry.getValue().stream().anyMatch(it -> it.getFile().equals(filename)))
+                return Optional.of(entry.getKey());
+        }
+        return Optional.empty();
     }
 
     public void tick(ServerPlayerEntity player) {
@@ -185,6 +193,9 @@ public class ServerBlueprintManager {
                 }
             }
 
+            final var initPackets = blockDataManager.getInitPackets();
+            scheduledEdits.addAll(initPackets);
+
             initialized = true;
         }
 
@@ -200,7 +211,7 @@ public class ServerBlueprintManager {
     }
 
     public void update(String fileName, NbtCompound updatedStructure, int newFloorLevel, BlueprintGroup group) {
-        final var existed = blockDataManager.update(fileName, updatedStructure, newFloorLevel);
+        final var existed = blockDataManager.update(fileName, updatedStructure, newFloorLevel, group);
         final FortressClientPacket packet =
                 existed? ClientboundUpdateBlueprintPacket.edit(fileName, newFloorLevel, updatedStructure) :
                         new ClientboundAddBlueprintPacket(group, fileName, fileName, updatedStructure, newFloorLevel, false);

@@ -16,8 +16,13 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 import org.minefortress.data.FortressModDataLoader;
+import org.minefortress.network.ClientboundAddBlueprintPacket;
+import org.minefortress.network.ClientboundUpdateBlueprintPacket;
+import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager{
@@ -28,9 +33,11 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     private final MinecraftServer server;
     private final Map<String, Blueprint> updatedStructures = new HashMap<>();
     private final Set<String> removedDefaultStructures = new HashSet<>();
+    private final Function<String, Optional<BlueprintGroup>> filenameToGroupConverter;
 
-    public ServerBlueprintBlockDataManager(MinecraftServer server) {
+    public ServerBlueprintBlockDataManager(MinecraftServer server, Function<String, Optional<BlueprintGroup>> filenameToGroupConverter) {
         this.server = server;
+        this.filenameToGroupConverter = filenameToGroupConverter;
     }
 
     public Optional<Integer> getFloorLevel(String filename) {
@@ -45,14 +52,31 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         });
     }
 
-    public boolean update(String fileName, NbtCompound tag, int newFloorLevel) {
+    public boolean update(String fileName, NbtCompound tag, int newFloorLevel, BlueprintGroup group) {
+        if(group == null) {
+            throw new IllegalArgumentException("Group can't be null");
+        }
         final var alreadyIn = updatedStructures.containsKey(fileName);
-        updatedStructures.put(fileName, new Blueprint(fileName, newFloorLevel, tag));
+        updatedStructures.put(fileName, new Blueprint(fileName, newFloorLevel, tag, group));
         removedDefaultStructures.remove(fileName);
         invalidateBlueprint(fileName);
 
         final var defaultStructure = getDefaultStructure(fileName).isPresent();
         return alreadyIn || defaultStructure;
+    }
+
+    public List<FortressClientPacket> getInitPackets() {
+        return updatedStructures.values()
+                .stream()
+                .map(it -> {
+                    final var group = filenameToGroupConverter.apply(it.filename);
+                    if(group.isPresent()) {
+                        return ClientboundUpdateBlueprintPacket.edit(it.filename, it.floorLevel, it.tag);
+                    } else {
+                        return new ClientboundAddBlueprintPacket(it.group, it.filename, it.filename, it.tag, it.floorLevel, false);
+                    }
+                })
+                .toList();
     }
 
     public void remove(String fileName) {
@@ -222,10 +246,11 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
         structuresMap
                 .entrySet()
-                .stream()
                 .forEach(it -> {
                     final var key = it.getKey();
-                    final var bp = new Blueprint(key, floorLevelsMap.getOrDefault(key, 0), it.getValue());
+                    final var groupOpt = filenameToGroupConverter.apply(key);
+                    final var group = groupOpt.orElseThrow(() -> new IllegalStateException("Can't find group for blueprint " + key));
+                    final var bp = new Blueprint(key, floorLevelsMap.getOrDefault(key, 0), it.getValue(), group);
                     updatedStructures.put(key, bp);
                 });
     }
@@ -233,13 +258,15 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     private static record Blueprint(
             String filename,
             int floorLevel,
-            NbtCompound tag
+            NbtCompound tag,
+            BlueprintGroup group
     ){
         NbtCompound toNbt() {
             final var nbt = new NbtCompound();
             nbt.putString("filename", filename);
             nbt.put("tag", tag);
             nbt.putInt("floorLevel", floorLevel);
+            nbt.putString("group", group.toString());
             return nbt;
         }
 
@@ -247,8 +274,9 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
             final var filename = nbt.getString("filename");
             final var tag = nbt.getCompound("tag");
             final var floorLevel = nbt.getInt("floorLevel");
+            final var group = BlueprintGroup.valueOf(nbt.getString("group"));
 
-            return new Blueprint(filename, floorLevel, tag);
+            return new Blueprint(filename, floorLevel, tag, group);
         }
     }
 
