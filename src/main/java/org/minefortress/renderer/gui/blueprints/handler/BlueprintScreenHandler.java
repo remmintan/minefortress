@@ -84,6 +84,11 @@ public final class BlueprintScreenHandler {
         this.needScrollbar = this.totalSize > 9 * 5;
     }
 
+    public void sendRemovePacket() {
+        final var packet = ServerboundEditBlueprintPacket.remove(getFocusedSlot().getMetadata().getFile());
+        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
+    }
+
     public void sendEditPacket(Screen parentScreen) {
         final BlueprintMetadata metadata = this.focusedSlot.getMetadata();
         if(fortressClient.isSupporter() || !metadata.isPremium()) {

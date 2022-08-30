@@ -25,6 +25,7 @@ import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 
 import java.util.List;
+import java.util.Optional;
 
 public final class BlueprintsScreen extends Screen {
 
@@ -40,6 +41,7 @@ public final class BlueprintsScreen extends Screen {
 
     private final int previewWidth = 120;
     private final int previewOffset = 4;
+    private boolean sneakButtonDown = false;
 
     private BlueprintRenderer blueprintRenderer;
 
@@ -98,16 +100,10 @@ public final class BlueprintsScreen extends Screen {
 
                 if(button == 1) return true;
 
-                final var shiftPressed = MinecraftClient.getInstance().options.sneakKey.isPressed();
-                if(shiftPressed) {
-                    final var packet = ServerboundEditBlueprintPacket.remove(this.handler.getFocusedSlot().getMetadata().getFile());
-                    FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, packet);
-                } else {
-                    if(this.client != null){
-                        this.client.setScreen(null);
-                    }
-                    this.handler.clickOnFocusedSlot();
+                if(this.client != null){
+                    this.client.setScreen(null);
                 }
+                this.handler.clickOnFocusedSlot();
             }
         }
 
@@ -142,10 +138,14 @@ public final class BlueprintsScreen extends Screen {
 
         if(button == 1) {
             if(this.handler.hasFocusedSlot()) {
-                if(client != null) {
-                    this.client.setScreen(null);
+                if(sneakButtonDown) {
+                    this.handler.sendRemovePacket();
+                } else {
+                    this.handler.sendEditPacket(this);
+                    if(client != null) {
+                        this.client.setScreen(null);
+                    }
                 }
-                this.handler.sendEditPacket(this);
             }
         }
 
@@ -162,6 +162,10 @@ public final class BlueprintsScreen extends Screen {
         this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
         this.handler.scroll(scrollPosition);
         return true;
+    }
+
+    public void updateSlots() {
+        this.handler.scroll(scrollPosition);
     }
 
     @Override
@@ -220,8 +224,7 @@ public final class BlueprintsScreen extends Screen {
 
         this.drawForeground(matrices);
         if(this.handler.hasFocusedSlot()){
-            final var shiftPressed = MinecraftClient.getInstance().options.sneakKey.isPressed();
-            if(shiftPressed && handler.getFocusedSlot() != BlueprintSlot.EMPTY) {
+            if(this.sneakButtonDown && handler.getFocusedSlot() != BlueprintSlot.EMPTY) {
                 this.textRenderer.draw(
                         matrices,
                         DELETE_BLUEPRINT_TEXT,
@@ -277,6 +280,26 @@ public final class BlueprintsScreen extends Screen {
         super.removed();
         if(this.client!=null)
             this.client.keyboard.setRepeatEvents(false);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if(isSneak(keyCode, scanCode)) {
+            this.sneakButtonDown = true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if(isSneak(keyCode,scanCode)) {
+            this.sneakButtonDown = false;
+        }
+        return super.keyReleased(keyCode, scanCode, modifiers);
+    }
+
+    private boolean isSneak(int keyCode, int scanCode) {
+        return MinecraftClient.getInstance().options.sneakKey.matchesKey(keyCode, scanCode);
     }
 
     private boolean isClickInTab(BlueprintGroup group, double mouseX, double mouseY) {

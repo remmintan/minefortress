@@ -214,9 +214,6 @@ public class ClientBlueprintManager {
         blueprintMetadataManager.remove(filename);
         blockDataManager.removeBlueprint(filename);
         blockDataManager.invalidateBlueprint(filename);
-        if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().invalidateBlueprint(filename);
-        }
     }
 
     public void reset() {
