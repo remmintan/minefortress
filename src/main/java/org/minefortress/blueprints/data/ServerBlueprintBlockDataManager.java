@@ -13,6 +13,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 import org.minefortress.data.FortressModDataLoader;
@@ -23,6 +24,7 @@ import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager{
@@ -34,10 +36,12 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     private final Map<String, Blueprint> updatedStructures = new HashMap<>();
     private final Set<String> removedDefaultStructures = new HashSet<>();
     private final Function<String, Optional<BlueprintGroup>> filenameToGroupConverter;
+    private final Supplier<UUID> userIdProvider;
 
-    public ServerBlueprintBlockDataManager(MinecraftServer server, Function<String, Optional<BlueprintGroup>> filenameToGroupConverter) {
+    public ServerBlueprintBlockDataManager(MinecraftServer server, Function<String, Optional<BlueprintGroup>> filenameToGroupConverter, Supplier<UUID> userIdProvider) {
         this.server = server;
         this.filenameToGroupConverter = filenameToGroupConverter;
+        this.userIdProvider = userIdProvider;
     }
 
     public Optional<Integer> getFloorLevel(String filename) {
@@ -61,7 +65,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         removedDefaultStructures.remove(fileName);
         invalidateBlueprint(fileName);
 
-        final var defaultStructure = getDefaultStructure(fileName).isPresent();
+        final var defaultStructure = filenameToGroupConverter.apply(fileName).isPresent();
         return alreadyIn || defaultStructure;
     }
 
@@ -81,7 +85,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
     public void remove(String fileName) {
         updatedStructures.remove(fileName);
-        if(getDefaultStructure(fileName).isPresent()) {
+        if(filenameToGroupConverter.apply(fileName).isPresent()) {
             removedDefaultStructures.add(fileName);
         }
     }
@@ -173,18 +177,23 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     }
 
     public void writeBlockDataManager() {
-        FortressModDataLoader.clearFolder(BLUEPRINTS_FOLDER, server.session);
-        FortressModDataLoader.createFolder(BLUEPRINTS_FOLDER, server.session);
+        FortressModDataLoader.clearFolder(getBlueprintsFolder(), server.session);
+        FortressModDataLoader.createFolder(getBlueprintsFolder(), server.session);
         saveRemovedBlueprints();
 
         if(updatedStructures.isEmpty()) return;
         final var tags = new HashMap<String, NbtCompound>();
         updatedStructures.forEach((k, v) -> {
-            final var tagFileName = BLUEPRINTS_FOLDER + "/" + k + ".nbt";
+            final var tagFileName = getBlueprintsFolder() + "/" + k + ".nbt";
             final var tag = v.toNbt();
             tags.put(tagFileName, tag);
         });
         FortressModDataLoader.writeAllTags(tags, server.session);
+    }
+
+    @NotNull
+    private String getBlueprintsFolder() {
+        return BLUEPRINTS_FOLDER + "/" + this.userIdProvider.get();
     }
 
     private void saveRemovedBlueprints() {
@@ -196,15 +205,15 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
     @NotNull
     private String getRemovedBlueprintsDefaultFileName() {
-        return  BLUEPRINTS_FOLDER+"/"+REMOVED_BLUEPRINTS_FILENAME;
+        return  getBlueprintsFolder() +"/"+REMOVED_BLUEPRINTS_FILENAME;
     }
 
     public void readBlockDataManager(NbtCompound tag) {
-        if(FortressModDataLoader.exists(BLUEPRINTS_FOLDER, server.session)) {
+        if(FortressModDataLoader.exists(getBlueprintsFolder(), server.session)) {
             updatedStructures.clear();
             removedDefaultStructures.clear();
             FortressModDataLoader
-                    .readAllTags(BLUEPRINTS_FOLDER, server.session)
+                    .readAllTags(getBlueprintsFolder(), server.session, Collections.singletonList(REMOVED_BLUEPRINTS_FILENAME))
                     .stream()
                     .map(Blueprint::fromNbt)
                     .forEach(it -> updatedStructures.put(it.filename, it));
@@ -274,7 +283,8 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
             final var filename = nbt.getString("filename");
             final var tag = nbt.getCompound("tag");
             final var floorLevel = nbt.getInt("floorLevel");
-            final var group = BlueprintGroup.valueOf(nbt.getString("group"));
+            final var groupStr = nbt.getString("group");
+            final var group = BlueprintGroup.valueOf(groupStr);
 
             return new Blueprint(filename, floorLevel, tag, group);
         }

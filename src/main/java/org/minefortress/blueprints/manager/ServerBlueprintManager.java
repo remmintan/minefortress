@@ -22,6 +22,7 @@ import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import static java.util.Map.entry;
 
@@ -156,8 +157,8 @@ public class ServerBlueprintManager {
     private final ServerBlueprintBlockDataManager blockDataManager;
     private final Queue<FortressClientPacket> scheduledEdits = new ArrayDeque<>();
 
-    public ServerBlueprintManager(MinecraftServer server) {
-        this.blockDataManager = new ServerBlueprintBlockDataManager(server, ServerBlueprintManager::convertFilenameToGroup);
+    public ServerBlueprintManager(MinecraftServer server, Supplier<UUID> userIdProvider) {
+        this.blockDataManager = new ServerBlueprintBlockDataManager(server, ServerBlueprintManager::convertFilenameToGroup, userIdProvider);
     }
 
     private static Optional<BlueprintGroup> convertFilenameToGroup(String filename) {

@@ -56,7 +56,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method="<init>", at=@At("RETURN"))
     public void init(MinecraftServer server, ServerWorld world, GameProfile profile, CallbackInfo ci) {
-        serverBlueprintManager = new ServerBlueprintManager(server);
+        serverBlueprintManager = new ServerBlueprintManager(server, this::getUuid);
     }
 
     @Inject(method="tick", at=@At("TAIL"))

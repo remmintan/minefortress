@@ -50,7 +50,7 @@ public class FortressModDataLoader {
         return Files.exists(getWorldSaveDir(session).resolve(folderName));
     }
 
-    public static List<NbtCompound> readAllTags(String folderName, LevelStorage.Session session) {
+    public static List<NbtCompound> readAllTags(String folderName, LevelStorage.Session session, Collection<String> excludedFiles) {
         final var files = Optional.ofNullable(
                 getWorldSaveDir(session)
                 .resolve(folderName)
@@ -58,7 +58,7 @@ public class FortressModDataLoader {
                 .listFiles()
         ).orElse(new File[]{});
         return Arrays.stream(files)
-                .filter(it -> !it.isDirectory() && it.getAbsolutePath().endsWith(".nbt"))
+                .filter(it -> !it.isDirectory() && it.getAbsolutePath().endsWith(".nbt") && !excludedFiles.contains(it.getName()))
                 .map(FortressModDataLoader::readNbt)
                 .toList();
     }
@@ -76,7 +76,7 @@ public class FortressModDataLoader {
     public static void createFolder(String folderName, LevelStorage.Session session) {
         final var folder = getWorldSaveDir(session).resolve(folderName).toFile();
         if(!folder.exists()) {
-            folder.mkdir();
+            folder.mkdirs();
         }
     }
 
