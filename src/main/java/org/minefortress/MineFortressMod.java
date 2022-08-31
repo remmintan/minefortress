@@ -47,7 +47,7 @@ public class MineFortressMod implements ModInitializer {
         Registry.register(Registry.ITEM, new Identifier("minefortress", "colonist_spawn_egg"), FortressItems.COLONIST_SPAWN_EGG);
 
         // items
-        Registry.register(Registry.ITEM, new Identifier("minefortress", "scaffold_oak_planks_b_1_0_1"), FortressItems.SCAFFOLD_OAK_PLANKS);
+        Registry.register(Registry.ITEM, new Identifier("minefortress", "scaffold_oak_planks_b_1_1_0"), FortressItems.SCAFFOLD_OAK_PLANKS);
 
         CommandsManager.registerCommands();
         registerEvents();
