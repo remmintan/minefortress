@@ -111,6 +111,10 @@ public class FortressModDataLoader {
         }
     }
 
+    public static String getFolderAbsolutePath(String folder, LevelStorage.Session session) {
+        return getWorldSaveDir(session).resolve(folder).toAbsolutePath().toString();
+    }
+
     private static Path getWorldSaveDir(LevelStorage.Session session) {
         final var worldDirectory = session.getWorldDirectory(World.OVERWORLD);
         final var modDirectory = worldDirectory.resolve(MOD_DIR);

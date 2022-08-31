@@ -192,7 +192,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     }
 
     @NotNull
-    private String getBlueprintsFolder() {
+    public String getBlueprintsFolder() {
         return BLUEPRINTS_FOLDER + "/" + this.userIdProvider.get();
     }
 

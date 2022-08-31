@@ -70,6 +70,7 @@ public class MineFortressMod implements ModInitializer {
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, ServerboundSelectFightTargetPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SLEEP, ServerboundSleepPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_CHANGE_MAX_COLONISTS_COUNT, ServerboundChangeMaxColonistsCountPacket::new);
+        FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_OPEN_BLUEPRINTS_FOLDER, ServerboundOpenBlueprintsFolderPacket::new);
     }
 
     public static void registerEvents() {
