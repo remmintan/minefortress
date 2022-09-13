@@ -14,16 +14,16 @@ public class ClientboundAddBlueprintPacket implements FortressClientPacket {
     private final String name;
     private final String fileName;
     private final int floorLevel;
-    private final boolean premium;
+    private final String requirementId;
     private final NbtCompound tag;
 
-    public ClientboundAddBlueprintPacket(BlueprintGroup group, String name, String fileName, NbtCompound tag, int floorLevel, boolean premium) {
+    public ClientboundAddBlueprintPacket(BlueprintGroup group, String name, String fileName, int floorLevel, String requirementId, NbtCompound tag) {
         this.group = group;
         this.name = name;
         this.fileName = fileName;
         this.tag = tag;
         this.floorLevel = floorLevel;
-        this.premium = premium;
+        this.requirementId = requirementId;
     }
 
     public ClientboundAddBlueprintPacket(PacketByteBuf buf) {
@@ -32,14 +32,14 @@ public class ClientboundAddBlueprintPacket implements FortressClientPacket {
         this.fileName = buf.readString();
         this.tag = buf.readNbt();
         this.floorLevel = buf.readInt();
-        this.premium = buf.readBoolean();
+        this.requirementId = buf.readString();
     }
 
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressMinecraftClient) {
             final ClientBlueprintManager blueprintManager = fortressMinecraftClient.getBlueprintManager();
-            blueprintManager.add(group, name, fileName, floorLevel, tag, premium);
+            blueprintManager.add(group, name, fileName, floorLevel, requirementId, tag);
         }
     }
 
@@ -50,6 +50,6 @@ public class ClientboundAddBlueprintPacket implements FortressClientPacket {
         buf.writeString(fileName);
         buf.writeNbt(tag);
         buf.writeInt(floorLevel);
-        buf.writeBoolean(premium);
+        buf.writeString(requirementId);
     }
 }

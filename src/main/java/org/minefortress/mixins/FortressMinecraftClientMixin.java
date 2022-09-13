@@ -266,10 +266,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return this.clientBlueprintManager;
     }
 
-    @Override
-    public boolean isSupporter() {
-        return true;
-    }
 
     @Inject(method = "close", at = @At("HEAD"))
     public void close(CallbackInfo ci) {

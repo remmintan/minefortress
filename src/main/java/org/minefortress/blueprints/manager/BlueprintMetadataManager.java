@@ -3,10 +3,8 @@ package org.minefortress.blueprints.manager;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public final class BlueprintMetadataManager {
-
 
     private final Map<BlueprintGroup, List<BlueprintMetadata>> blueprintsMap = new HashMap<>();
     private int index = 0;
@@ -27,12 +25,12 @@ public final class BlueprintMetadataManager {
         return blueprintsMap.getOrDefault(group, Collections.emptyList());
     }
 
-    public BlueprintMetadata add(BlueprintGroup group, String name, String file, int floorLevel, boolean premium) {
+    public BlueprintMetadata add(BlueprintGroup group, String name, String file, int floorLevel, String requirementId) {
         if (isContainsBlueprint(name, file)) {
             throw new IllegalArgumentException("Blueprint with name " + name + " and file " + file + " already exists");
         }
 
-        final BlueprintMetadata metadata = new BlueprintMetadata(name, file, floorLevel, premium);
+        final BlueprintMetadata metadata = new BlueprintMetadata(name, file, floorLevel, requirementId);
         blueprintsMap.computeIfAbsent(group, k -> new ArrayList<>()).add(metadata);
         return metadata;
     }
@@ -60,7 +58,7 @@ public final class BlueprintMetadataManager {
     }
 
     private List<BlueprintMetadata> flatBlueprints() {
-        return blueprintsMap.entrySet().stream().flatMap(e -> e.getValue().stream()).collect(Collectors.toList());
+        return blueprintsMap.values().stream().flatMap(Collection::stream).toList();
     }
 
 }

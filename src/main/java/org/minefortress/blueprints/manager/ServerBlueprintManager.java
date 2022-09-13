@@ -61,9 +61,9 @@ public class ServerBlueprintManager {
                                         entry.getKey(),
                                         blueprintMetadata.getName(),
                                         file,
-                                        it,
                                         floorLevel,
-                                        blueprintMetadata.isPremium()
+                                        blueprintMetadata.getRequirementId(),
+                                        it
                                 );
                                 FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
                             });
@@ -91,7 +91,7 @@ public class ServerBlueprintManager {
         final var existed = blockDataManager.update(fileName, updatedStructure, newFloorLevel, group);
         final FortressClientPacket packet =
                 existed? ClientboundUpdateBlueprintPacket.edit(fileName, newFloorLevel, updatedStructure) :
-                        new ClientboundAddBlueprintPacket(group, fileName, fileName, updatedStructure, newFloorLevel, false);
+                        new ClientboundAddBlueprintPacket(group, fileName, fileName,  newFloorLevel, "custom", updatedStructure);
         scheduledEdits.add(packet);
     }
 

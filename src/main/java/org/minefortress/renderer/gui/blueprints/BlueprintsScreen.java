@@ -157,7 +157,7 @@ public final class BlueprintsScreen extends Screen {
                 if(sneakButtonDown) {
                     this.handler.sendRemovePacket();
                 } else {
-                    this.handler.sendEditPacket(this);
+                    this.handler.sendEditPacket();
                     if(client != null) {
                         this.client.setScreen(null);
                     }
@@ -374,12 +374,6 @@ public final class BlueprintsScreen extends Screen {
             final var enoughResources = !getFortressClientManager().isSurvival() || slot.isEnoughResources();
             if(this.client != null){
                 this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
-            }
-
-            if(client instanceof FortressMinecraftClient fortressClient){
-                if(metadata.isPremium() && !fortressClient.isSupporter()){
-                    renderScaledItemStack(slotX, slotY, Items.GOLD_INGOT);
-                }
             }
         }
 

@@ -2,42 +2,22 @@ package org.minefortress.blueprints.manager;
 
 import net.minecraft.util.BlockRotation;
 
+import java.util.Optional;
+
 public class BlueprintMetadata {
 
     private final String name;
     private final String file;
-    private String requirementId;
-    private final boolean premium;
+    private final String requirementId;
     private int floorLevel;
 
     private BlockRotation rotation = BlockRotation.NONE;
 
-    public BlueprintMetadata(String name, String file) {
-        this.name = name;
-        this.file = file;
-        this.floorLevel = 0;
-        this.premium = false;
-    }
-
-    public BlueprintMetadata(String name, String file, boolean premium) {
-        this.name = name;
-        this.file = file;
-        this.floorLevel = 0;
-        this.premium = premium;
-    }
-
-    public BlueprintMetadata(String name, String file, int floorLevel) {
+    public BlueprintMetadata(String name, String file, int floorLevel, String requirementId) {
         this.name = name;
         this.file = file;
         this.floorLevel = floorLevel;
-        this.premium = false;
-    }
-
-    public BlueprintMetadata(String name, String file, int floorLevel,  boolean premium) {
-        this.name = name;
-        this.file = file;
-        this.floorLevel = floorLevel;
-        this.premium = premium;
+        this.requirementId = requirementId;
     }
 
     public String getName() {
@@ -49,7 +29,7 @@ public class BlueprintMetadata {
     }
 
     public String getRequirementId() {
-        return requirementId;
+        return Optional.ofNullable(requirementId).orElse("none");
     }
 
     public String getId() {
@@ -77,12 +57,4 @@ public class BlueprintMetadata {
         return rotation;
     }
 
-    public boolean isPremium() {
-        return premium;
-    }
-
-    BlueprintMetadata setRequirementId(String requirementId) {
-        this.requirementId = requirementId;
-        return this;
-    }
 }

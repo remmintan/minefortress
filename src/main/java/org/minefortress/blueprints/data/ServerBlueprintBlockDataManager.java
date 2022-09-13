@@ -77,7 +77,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
                     if(group.isPresent()) {
                         return ClientboundUpdateBlueprintPacket.edit(it.filename, it.floorLevel, it.tag);
                     } else {
-                        return new ClientboundAddBlueprintPacket(it.group, it.filename, it.filename, it.tag, it.floorLevel, false);
+                        return new ClientboundAddBlueprintPacket(it.group, it.filename, it.filename, it.floorLevel, "custom", it.tag);
                     }
                 })
                 .toList();
