@@ -8,17 +8,19 @@ import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BlueprintMetadataReader {
 
     private static final Identifier PREDEFINED_BLUEPRINTS_ID = new Identifier(MineFortressMod.MOD_ID, "predefined_blueprints");
     private final Map<BlueprintGroup, List<BlueprintMetadata>> predefinedBlueprints = new HashMap<>();
+    private final MinecraftServer server;
 
-    void read(MinecraftServer server) {
+    public BlueprintMetadataReader(MinecraftServer server) {
+        this.server = server;
+    }
+
+    void read() {
         final var resourceManager = server.getResourceManager();
         try (
                 final var resource = resourceManager.getResource(PREDEFINED_BLUEPRINTS_ID);
@@ -41,6 +43,10 @@ public class BlueprintMetadataReader {
         }
     }
 
+    Map<BlueprintGroup, List<BlueprintMetadata>> getPredefinedBlueprints() {
+        return Map.copyOf(predefinedBlueprints);
+    }
+
     private BlueprintMetadata readBlueprintMetadata(JsonReader jsonReader) throws IOException {
         jsonReader.beginObject();
         String name = null;
@@ -59,6 +65,14 @@ public class BlueprintMetadataReader {
         }
         jsonReader.endObject();
         return new BlueprintMetadata(name, file, floorLevel, requirementId);
+    }
+
+    public Optional<BlueprintGroup> convertFilenameToGroup(String filename) {
+        for (Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : predefinedBlueprints.entrySet()) {
+            if(entry.getValue().stream().anyMatch(it -> it.getFile().equals(filename)))
+                return Optional.of(entry.getKey());
+        }
+        return Optional.empty();
     }
 
 }

@@ -26,32 +26,25 @@ import java.util.function.Supplier;
 
 public class ServerBlueprintManager {
 
-    private static final Map<BlueprintGroup, List<BlueprintMetadata>> PREDEFINED_BLUEPRINTS = Collections.emptyMap();
-
     private boolean initialized = false;
 
     private final ServerBlueprintBlockDataManager blockDataManager;
+    private final BlueprintMetadataReader blueprintMetadataReader;
     private final Queue<FortressClientPacket> scheduledEdits = new ArrayDeque<>();
 
     public ServerBlueprintManager(MinecraftServer server, Supplier<UUID> userIdProvider) {
-        this.blockDataManager = new ServerBlueprintBlockDataManager(server, ServerBlueprintManager::convertFilenameToGroup, userIdProvider);
-    }
-
-    private static Optional<BlueprintGroup> convertFilenameToGroup(String filename) {
-        for (Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : PREDEFINED_BLUEPRINTS.entrySet()) {
-            if(entry.getValue().stream().anyMatch(it -> it.getFile().equals(filename)))
-                return Optional.of(entry.getKey());
-        }
-        return Optional.empty();
+        this.blueprintMetadataReader = new BlueprintMetadataReader(server);
+        this.blockDataManager = new ServerBlueprintBlockDataManager(server, blueprintMetadataReader::convertFilenameToGroup, userIdProvider);
     }
 
     public void tick(ServerPlayerEntity player) {
         if(!initialized) {
+            blueprintMetadataReader.read();
             scheduledEdits.clear();
             final ClientboundResetBlueprintPacket resetpacket = new ClientboundResetBlueprintPacket();
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESET_BLUEPRINT, resetpacket);
 
-            for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : PREDEFINED_BLUEPRINTS.entrySet()) {
+            for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : blueprintMetadataReader.getPredefinedBlueprints().entrySet()) {
                 for(BlueprintMetadata blueprintMetadata : entry.getValue()) {
                     final String file = blueprintMetadata.getFile();
                     blockDataManager.getStructureNbt(file)
@@ -140,7 +133,7 @@ public class ServerBlueprintManager {
     }
 
     private Optional<String> findRequirementIdByFileName(String fileName){
-        return PREDEFINED_BLUEPRINTS.values().stream().flatMap(Collection::stream)
+        return blueprintMetadataReader.getPredefinedBlueprints().values().stream().flatMap(Collection::stream)
                 .filter(blueprintMetadata -> blueprintMetadata.getFile().equals(fileName))
                 .findFirst()
                 .map(BlueprintMetadata::getRequirementId);
