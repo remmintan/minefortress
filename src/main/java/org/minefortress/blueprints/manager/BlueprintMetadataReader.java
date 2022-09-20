@@ -12,7 +12,7 @@ import java.util.*;
 
 public class BlueprintMetadataReader {
 
-    private static final Identifier PREDEFINED_BLUEPRINTS_ID = new Identifier(MineFortressMod.MOD_ID, "predefined_blueprints");
+    private static final Identifier PREDEFINED_BLUEPRINTS_ID = new Identifier(MineFortressMod.MOD_ID, "predefined_blueprints.json");
     private final Map<BlueprintGroup, List<BlueprintMetadata>> predefinedBlueprints = new HashMap<>();
     private final MinecraftServer server;
 
