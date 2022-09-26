@@ -14,6 +14,11 @@ public class ClientProfessionManager extends ProfessionManager {
         super(fortressManagerSupplier);
     }
 
+    public void initProfessions(List<ProfessionFullInfo> fullInfos) {
+        getProfessions().clear();
+        fullInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
+    }
+
     @Override
     public void increaseAmount(String professionId) {
         if("colonist".equals(professionId)) return;

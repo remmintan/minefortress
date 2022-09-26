@@ -7,6 +7,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.ClientboundProfessionSyncPacket;
+import org.minefortress.network.ClientboundProfessionsInitPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 
@@ -18,7 +19,8 @@ import java.util.stream.Collectors;
 
 public class ServerProfessionManager extends ProfessionManager{
 
-    private boolean needsUpdate = true;
+    private boolean initialized = false;
+    private boolean needsUpdate = false;
 
     public ServerProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
         super(fortressManagerSupplier);
@@ -51,7 +53,18 @@ public class ServerProfessionManager extends ProfessionManager{
     }
 
     public void tick(@Nullable ServerPlayerEntity player) {
-        for(Profession prof : professions.values()) {
+        if(player == null) return;
+        if(!initialized) {
+            getProfessions().clear();
+            final var professionsReader = new ProfessionsReader(player.server);
+            final var professionFullInfos = professionsReader.readProfessions();
+            professionFullInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
+            final var packet = new ClientboundProfessionsInitPacket(professionFullInfos);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
+            initialized = true;
+        }
+
+        for(Profession prof : getProfessions().values()) {
             if(prof.getAmount() > 0) {
                 final boolean unlocked = this.isRequirementsFulfilled(prof);
                 if(!unlocked) {
@@ -63,14 +76,14 @@ public class ServerProfessionManager extends ProfessionManager{
 
         tickRemoveFromProfession();
         if(player != null && needsUpdate) {
-            ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(this.professions);
+            ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(getProfessions());
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             needsUpdate = false;
         }
     }
 
     private void tickRemoveFromProfession() {
-        for(Map.Entry<String, Profession> entry : professions.entrySet()) {
+        for(Map.Entry<String, Profession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
             final Profession profession = entry.getValue();
             final List<Colonist> colonistsWithProfession = this.getColonistsWithProfession(professionId);
@@ -89,7 +102,7 @@ public class ServerProfessionManager extends ProfessionManager{
     }
 
     public void writeToNbt(NbtCompound tag){
-        professions.forEach((key, value) -> tag.put(key, value.toNbt()));
+        getProfessions().forEach((key, value) -> tag.put(key, value.toNbt()));
     }
 
     public void readFromNbt(NbtCompound tag){
@@ -102,7 +115,7 @@ public class ServerProfessionManager extends ProfessionManager{
     }
 
     public Optional<String> getProfessionsWithAvailablePlaces() {
-        for(Map.Entry<String, Profession> entry : professions.entrySet()) {
+        for(Map.Entry<String, Profession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
             final Profession profession = entry.getValue();
             if(profession.getAmount() > 0) {

@@ -1,0 +1,317 @@
+[
+  {
+    "key": "colonist",
+    "title": "Colonist",
+    "icon": "minecraft:player_head",
+    "description": "Can do any type of work, but is not very good at it.\nCan use only wooden tools.\nCan't fall tall trees\nCan't provide any food.",
+    "unlockMessage": "",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "miner1",
+    "title": "Miner - LVL1",
+    "icon": "minecraft:stone_pickaxe",
+    "description": "Can work in mine and quarry.\nCan use stone shovel and pickaxe.",
+    "unlockMessage": "Build 'Wooden Miner's house' to unlock",
+    "unlockMoreMessage": "Build more 'Wooden Miner's houses' to unlock more",
+    "requirements": {
+      "building": "miner_wooden"
+    }
+  },
+  {
+    "key": "miner2",
+    "title": "Miner - LVL2",
+    "icon": "minecraft:iron_pickaxe",
+    "description": "Can work in mine and quarry.\nCan use iron shovel and pickaxe.",
+    "unlockMessage": "Build 'Stone Miner's house' to unlock",
+    "unlockMoreMessage": "Build more 'Stone Miner's houses' to unlock more",
+    "requirements": {
+      "building": "miner_stone"
+    }
+  },
+  {
+    "key": "miner3",
+    "title": "Miner - LVL3",
+    "icon": "minecraft:diamond_pickaxe",
+    "description": "Can work in mine and quarry.\nCan use diamond shovel and pickaxe.",
+    "unlockMessage": "Build 'Miners' guild house' to unlock",
+    "unlockMoreMessage": "Build more 'Miners' guild houses' to unlock more",
+    "requirements": {
+      "building": "miners_guild"
+    }
+  },
+  {
+    "key": "lumberjack1",
+    "title": "Lumberjack - LVL1",
+    "icon": "minecraft:stone_axe",
+    "description": "Can fall tall trees.\nCan use stone axe.\nCollects saplings.",
+    "unlockMessage": "Build 'Wooden Lumberjack's house' to unlock",
+    "unlockMoreMessage": "Build more 'Wooden Lumberjack's houses' to unlock more",
+    "requirements": {
+      "building": "lumberjack_wooden"
+    }
+  },
+  {
+    "key": "lumberjack2",
+    "title": "Lumberjack - LVL2",
+    "icon": "minecraft:iron_axe",
+    "description": "Can fall tall trees.\nCan use iron axe.\nCan plant saplings.",
+    "unlockMessage": "Build 'Stone Lumberjack's house' to unlock",
+    "unlockMoreMessage": "Build more 'Stone Lumberjack's houses' to unlock more",
+    "requirements": {
+      "building": "lumberjack_stone"
+    }
+  },
+  {
+    "key": "lumberjack3",
+    "title": "Lumberjack - LVL3",
+    "icon": "minecraft:diamond_axe",
+    "description": "Can fall tall trees.\nCan use diamond axe.\nCan plant saplings.",
+    "unlockMessage": "Build 'Lumberjack's guild house' to unlock",
+    "unlockMoreMessage": "Build more 'Lumberjack's guild houses' to unlock more",
+    "requirements": {
+      "building": "lumberjack_guild"
+    }
+  },
+  {
+    "key": "forester",
+    "title": "Forester",
+    "icon": "minecraft:apple",
+    "description": "Collects seeds, apples and some other basic food\nWhile working every tick has small chance of getting food.\nCollects saplings and sticks.",
+    "unlockMessage": "Brings food. Build 'Forester's house' to unlock",
+    "unlockMoreMessage": "Build more 'Forester's houses' to unlock more",
+    "requirements": {
+      "building": "forester"
+    }
+  },
+  {
+    "key": "hunter",
+    "title": "Hunter",
+    "icon": "minecraft:bow",
+    "description": "Can use bow.\nDefends village from monsters.\nHunts monsters.\nCan work at night",
+    "unlockMessage": "Will be available in future updates",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "fisherman",
+    "title": "Fisherman",
+    "icon": "minecraft:fishing_rod",
+    "description": "Catches fish in ponds\nCooks fish",
+    "unlockMessage": "Will be available in future updates",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "farmer",
+    "title": "Farmer",
+    "icon": "minecraft:wheat",
+    "description": "Plants any kind of seeds including wheat, watermelon and pumpkin",
+    "unlockMessage": "Build any farm to unlock",
+    "unlockMoreMessage": "Build more farms to hire more",
+    "requirements": {
+      "building": "farmer"
+    }
+  },
+  {
+    "key": "baker",
+    "title": "Baker",
+    "icon": "minecraft:bread",
+    "description": "Bakes bread, cakes and other food",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "shepherd",
+    "title": "Shepherd",
+    "icon": "minecraft:carrot_on_a_stick",
+    "description": "Brings pigs, sheeps and cows to the village.\nProvides milks, wool and meat",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "stableman",
+    "title": "Stableman",
+    "icon": "minecraft:lead",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "butcher",
+    "title": "Butcher",
+    "icon": "minecraft:beef",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "cook",
+    "title": "Cook",
+    "icon": "minecraft:cooked_beef",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "crafter",
+    "title": "Craftsman",
+    "icon": "minecraft:crafting_table",
+    "description": "Can craft any item that doesn't need smelting.\nCan't use redstone or nether blocks/items",
+    "unlockMessage": "Build crafting table to unlock",
+    "unlockMoreMessage": "Build more crafting tables to unlock more",
+    "requirements": {
+      "block": {
+        "id": "minecraft:crafting_table",
+        "inBlueprint": false
+      }
+    }
+  },
+  {
+    "key": "leather_worker1",
+    "title": "Leather Worker - LVL1",
+    "icon": "minecraft:leather",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "leather_worker2",
+    "title": "Leather Worker - LVL2",
+    "icon": "minecraft:leather_horse_armor",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "blacksmith",
+    "title": "Blacksmith",
+    "icon": "minecraft:iron_ingot",
+    "description": "Can smelt ores and cook food in furnace",
+    "unlockMessage": "Build any blueprint with a Furnace to unlock",
+    "unlockMoreMessage": "Build more blueprints with Furnaces to unlock more",
+    "requirements": {
+      "block": {
+        "id": "minecraft:furnace",
+        "inBlueprint": true
+      }
+    }
+  },
+  {
+    "key": "armorer",
+    "title": "Armorer",
+    "icon": "minecraft:iron_chestplate",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "weaver",
+    "title": "Weaver",
+    "icon": "minecraft:string",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "tailor",
+    "title": "Tailor",
+    "icon": "minecraft:white_banner",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "warrior1",
+    "title": "Warrior - LVL1",
+    "icon": "minecraft:stone_sword",
+    "description": "Defends the village, can use stone sword and leather armor [1 stone sword for each]",
+    "unlockMessage": "Build Small Warrior's house to unlock",
+    "unlockMoreMessage": "You need more stone swords or build another Small Warrior's house to hire more!",
+    "requirements": {
+      "building": "warrior1",
+      "items": [
+        {
+          "id": "minecraft:stone_sword",
+          "count": 1
+        }
+      ]
+    }
+  },
+  {
+    "key": "warrior2",
+    "title": "Warrior - LVL2",
+    "icon": "minecraft:iron_sword",
+    "description": "Defends the village, can use iron sword and iron armor [1 iron sword for each, 1 iron armor set for each]",
+    "unlockMessage": "Build Medium Warrior's house to unlock",
+    "unlockMoreMessage": "You need more iron swords/armors or build another Medium Warrior's house to hire more!",
+    "requirements": {
+      "building": "warrior2",
+      "items": [
+        {
+          "id": "minecraft:iron_sword",
+          "count": 1
+        },
+        {
+          "id": "minecraft:iron_chestplate",
+          "count": 1
+        },
+        {
+          "id": "minecraft:iron_leggings",
+          "count": 1
+        },
+        {
+          "id": "minecraft:iron_boots",
+          "count": 1
+        },
+        {
+          "id": "minecraft:iron_helmet",
+          "count": 1
+        }
+      ]
+    }
+  },
+  {
+    "key": "archer1",
+    "title": "Archer",
+    "icon": "minecraft:bow",
+    "description": "Defends the village, ranged fighter [1 bow, 32 arrow for each]",
+    "unlockMessage": "Build Shooting gallery to unlock",
+    "unlockMoreMessage": "You need more bows/arrows to hire more!",
+    "requirements": {
+      "building": "shooting_gallery",
+      "items": [
+        {
+          "id": "minecraft:bow",
+          "count": 1
+        },
+        {
+          "id": "minecraft:arrow",
+          "count": 32
+        }
+      ]
+    }
+  },
+  {
+    "key": "archer2",
+    "title": "Archer - LVL2",
+    "icon": "minecraft:crossbow",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "knight1",
+    "title": "Knight - LVL1",
+    "icon": "minecraft:iron_horse_armor",
+    "description": "Will be available in future releases",
+    "unlockMessage": "",
+    "unlockMoreMessage": ""
+  },
+  {
+    "key": "knight2",
+    "title": "Knight - LVL2",
+    "icon": "minecraft:diamond_horse_armor",
+    "description": "Will be available in future releases",
+    "unlockMessage": "",
+    "unlockMoreMessage": ""
+  }
+]

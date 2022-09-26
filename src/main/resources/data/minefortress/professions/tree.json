@@ -1,0 +1,48 @@
+{
+  "colonist": {
+    "miner1": {
+      "miner2": {
+         "miner3": {}
+      }
+    },
+    "lumberjack1": {
+      "lumberjack2": {
+        "lumberjack3": {}
+      }
+    },
+    "forester": {
+      "hunter": {
+        "archer1": {
+          "archer2": {}
+        },
+        "knight1": {
+          "knight2": {}
+        }
+      },
+      "fisherman": {},
+      "farmer": {
+        "baker": {},
+        "shepherd": {
+          "stableman": {},
+          "butcher": {
+            "cook": {}
+          }
+        }
+      },
+      "warrior1": {
+        "warrior2": {}
+      }
+    },
+    "crafter": {
+      "blacksmith": {
+        "leather_worker1": {
+          "leather_worker2": {}
+        },
+        "weaver": {
+          "tailor": {}
+        },
+        "armorer": {}
+      }
+    }
+  }
+}
