@@ -6,6 +6,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 public final class ProfessionsReader {
 
     private final Identifier professionsResourceId = new Identifier("minefortress", "professions/list.json");
+    private final Identifier professionTreeId = new Identifier("minefortress", "professions/tree.json");
 
     private final MinecraftServer server;
 
@@ -41,6 +43,20 @@ public final class ProfessionsReader {
         }
 
         return professions;
+    }
+
+    String readTreeJson() {
+        final var resourceManager = server.getResourceManager();
+        try(
+                final var resource = resourceManager.getResource(professionTreeId);
+                final var is = resource.getInputStream();
+                final var isr = new InputStreamReader(is);
+                final var br = new BufferedReader(isr)
+        ) {
+            return br.lines().reduce("", (a, b) -> a + b);
+        }catch (IOException e) {
+            throw new RuntimeException("Failed to read professions tree string", e);
+        }
     }
 
     private ProfessionFullInfo readProfession(JsonReader jsonReader) throws IOException {

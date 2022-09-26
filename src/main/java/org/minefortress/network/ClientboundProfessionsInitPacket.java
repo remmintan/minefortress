@@ -11,19 +11,22 @@ import java.util.List;
 public class ClientboundProfessionsInitPacket implements FortressClientPacket {
 
     private final List<ProfessionFullInfo> professions;
+    private final String treeJson;
 
-    public ClientboundProfessionsInitPacket(List<ProfessionFullInfo> professions) {
+    public ClientboundProfessionsInitPacket(List<ProfessionFullInfo> professions, String treeJson) {
         this.professions = professions;
+        this.treeJson = treeJson;
     }
 
     public ClientboundProfessionsInitPacket(PacketByteBuf buf) {
         professions = buf.readList(ProfessionFullInfo::read);
+        treeJson = buf.readString();
     }
 
     @Override
     public void handle(MinecraftClient client) {
         final var professionManager = ModUtils.getFortressClient().getFortressClientManager().getProfessionManager();
-        professionManager.initProfessions(this.professions);
+        professionManager.initProfessions(this.professions, this.treeJson);
     }
 
     @Override
@@ -32,5 +35,6 @@ public class ClientboundProfessionsInitPacket implements FortressClientPacket {
         for (ProfessionFullInfo profession : professions) {
             profession.write(buf);
         }
+        buf.writeString(this.treeJson);
     }
 }

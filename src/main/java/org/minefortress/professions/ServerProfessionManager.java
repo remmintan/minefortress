@@ -58,8 +58,9 @@ public class ServerProfessionManager extends ProfessionManager{
             getProfessions().clear();
             final var professionsReader = new ProfessionsReader(player.server);
             final var professionFullInfos = professionsReader.readProfessions();
+            final var treeJsonString = professionsReader.readTreeJson();
             professionFullInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
-            final var packet = new ClientboundProfessionsInitPacket(professionFullInfos);
+            final var packet = new ClientboundProfessionsInitPacket(professionFullInfos, treeJsonString);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             initialized = true;
         }

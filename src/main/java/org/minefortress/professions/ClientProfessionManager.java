@@ -14,9 +14,10 @@ public class ClientProfessionManager extends ProfessionManager {
         super(fortressManagerSupplier);
     }
 
-    public void initProfessions(List<ProfessionFullInfo> fullInfos) {
+    public void initProfessions(List<ProfessionFullInfo> fullInfos, String treeJson) {
         getProfessions().clear();
         fullInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
+        super.createProfessionTree(treeJson);
     }
 
     @Override

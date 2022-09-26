@@ -1,18 +1,15 @@
 package org.minefortress.professions;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import org.apache.logging.log4j.util.Strings;
 import org.minefortress.fortress.AbstractFortressManager;
-import org.minefortress.fortress.resources.ItemInfo;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import java.util.function.Supplier;
-
-import static java.util.Map.entry;
 
 public abstract class ProfessionManager {
 
@@ -35,12 +32,11 @@ public abstract class ProfessionManager {
             Items.GLOW_INK_SAC
     );
 
-    private final Profession root;
+    private Profession root;
     private final Map<String, Profession> professions = new HashMap<>();
     protected final Supplier<AbstractFortressManager> fortressManagerSupplier;
 
     public ProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
-        this.root = this.createProfessionTree();
         this.fortressManagerSupplier = fortressManagerSupplier;
     }
 
@@ -98,115 +94,43 @@ public abstract class ProfessionManager {
         return getProfessions().containsKey(name) && getProfessions().get(name).getAmount() > 0;
     }
 
-    /**
-     * colonist -> miner1, lumberjack1, forester, crafter
-     * miner1 -> miner2
-     * lumberjack1 -> lumberjack2
-     * forester -> hunter, fisherman, farmer, warrior1
-     * crafter -> blacksmith
-     * miner2 -> miner3
-     * lumberjack2 -> lumberjack3
-     * hunter -> archer1, knight1
-     * farmer -> baker, shepherd
-     * blacksmith -> leather_worker1, weaver
-     * leather_worker1 -> leather_worker2
-     * warrior1 -> warrior2
-     * archer1 -> archer2
-     * knight1 -> knight2
-     * shepherd -> stableman, butcher
-     * blacksmith -> armorer
-     * weaver -> tailor
-     * butcher -> cook
-     */
-    private Profession createProfessionTree() {
-        Profession colonist = getProfession("colonist");
+    protected void createProfessionTree(String treeJson) {
+        try (
+            var sr = new StringReader(treeJson);
+            var jsonReader = new JsonReader(sr)
+        ) {
+            jsonReader.beginObject();
 
-        // colonist -> miner1, lumberjack1, forester, crafter
-        Profession miner1 = getProfession("miner1");
-        Profession lumberjack1 = getProfession("lumberjack1");
-        Profession forester = getProfession("forester");
-        Profession crafter = getProfession("crafter");
-        addChildren(colonist, miner1, lumberjack1, forester, crafter);
+            final var rootProfessionName = jsonReader.nextName();
+            this.root = getProfession(rootProfessionName);
+            readChildren(jsonReader, this.root);
 
-        // miner1 -> miner2
-        Profession miner2 = getProfession("miner2");
-        addChildren(miner1, miner2);
+            if(jsonReader.hasNext()) {
+                throw new IllegalStateException("Expected end of object, but found more.");
+            }
 
-        // lumberjack1 -> lumberjack2
-        Profession lumberjack2 = getProfession("lumberjack2");
-        addChildren(lumberjack1, lumberjack2);
-
-        // forester -> warrior1, hunter, fisherman, farmer
-        Profession warrior1 = getProfession("warrior1");
-        Profession hunter = getProfession("hunter");
-        Profession fisherman = getProfession("fisherman");
-        Profession farmer = getProfession("farmer");
-        addChildren(forester, warrior1, hunter, fisherman, farmer);
-
-        // crafter -> blacksmith
-        Profession blacksmith = getProfession("blacksmith");
-        addChildren(crafter, blacksmith);
-
-        // miner2 -> miner3
-        Profession miner3 = getProfession("miner3");
-        addChildren(miner2, miner3);
-
-        // lumberjack2 -> lumberjack3
-        Profession lumberjack3 = getProfession("lumberjack3");
-        addChildren(lumberjack2, lumberjack3);
-
-        // hunter -> archer1, knight1
-        Profession knight1 = getProfession("knight1");
-        addChildren(hunter, knight1);
-
-        // farmer -> baker, shepherd
-        Profession baker = getProfession("baker");
-        Profession shepherd = getProfession("shepherd");
-        addChildren(farmer, baker, shepherd);
-
-        // blacksmith -> leather_worker1, weaver
-        Profession leather_worker1 = getProfession("leather_worker1");
-        Profession weaver = getProfession("weaver");
-        addChildren(blacksmith, leather_worker1, weaver);
-
-        // leather_worker1 -> leather_worker2
-        Profession leather_worker2 = getProfession("leather_worker2");
-        addChildren(leather_worker1, leather_worker2);
-
-        // warrior1 -> warrior2
-        Profession warrior2 = getProfession("warrior2");
-        Profession archer1 = getProfession("archer1");
-        addChildren(warrior1, warrior2, archer1);
-
-        // archer1 -> archer2
-        Profession archer2 = getProfession("archer2");
-        addChildren(archer1, archer2);
-
-        // knight1 -> knight2
-        Profession knight2 = getProfession("knight2");
-        addChildren(knight1, knight2);
-
-        // shepherd -> stableman, butcher
-        Profession stableman = getProfession("stableman");
-        Profession butcher = getProfession("butcher");
-        addChildren(shepherd, stableman, butcher);
-
-        // blacksmith -> armorer
-        Profession armorer = getProfession("armorer");
-        addChildren(blacksmith, armorer);
-
-        // weaver -> tailor
-        Profession tailor = getProfession("tailor");
-        addChildren(weaver, tailor);
-
-        // butcher -> cook
-        Profession cook = getProfession("cook");
-        addChildren(butcher, cook);
-
-        return colonist;
+            jsonReader.endObject();
+        } catch (IOException exception) {
+            throw new RuntimeException("cannot create profession tree", exception);
+        }
     }
 
-    private void addChildren(Profession parent, Profession... children) {
+    private void readChildren(JsonReader reader, Profession parent) throws IOException {
+        final var childrenProfession = new ArrayList<Profession>();
+        reader.beginObject();
+        while (reader.hasNext()) {
+            final var childName = reader.nextName();
+            final var childProfession = getProfession(childName);
+            readChildren(reader, childProfession);
+            childrenProfession.add(childProfession);
+        }
+        reader.endObject();
+        if(!childrenProfession.isEmpty()) {
+            addChildren(parent, childrenProfession);
+        }
+    }
+
+    private void addChildren(Profession parent, List<Profession> children) {
         for (Profession child : children) {
             parent.addChild(child);
             child.setParent(parent);
