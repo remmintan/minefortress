@@ -61,7 +61,7 @@ public final class ProfessionsReader {
 
     private ProfessionFullInfo readProfession(JsonReader jsonReader) throws IOException {
         jsonReader.beginObject();
-        String name = null;
+        String key = null;
 
         String title = null;
         Item icon = null;
@@ -73,7 +73,7 @@ public final class ProfessionsReader {
         while (jsonReader.hasNext()) {
             final var propertyName = jsonReader.nextName();
             switch (propertyName) {
-                case "name" -> name = jsonReader.nextString();
+                case "key" -> key = jsonReader.nextString();
                 case "title" -> title = jsonReader.nextString();
                 case "icon" -> icon = decodeIcon(jsonReader);
                 case "description" -> description = jsonReader.nextString();
@@ -84,7 +84,7 @@ public final class ProfessionsReader {
         }
         jsonReader.endObject();
 
-        return new ProfessionFullInfo(name, title, icon, description, unlockMessage, unlockMoreMessage, requirements);
+        return new ProfessionFullInfo(key, title, icon, description, unlockMessage, unlockMoreMessage, requirements);
     }
 
     private Item decodeIcon(JsonReader reader) throws IOException {
@@ -118,7 +118,7 @@ public final class ProfessionsReader {
         while (reader.hasNext()) {
             final var propertyName = reader.nextName();
             switch (propertyName) {
-                case "block" -> blockName = reader.nextString();
+                case "id" -> blockName = reader.nextString();
                 case "inBlueprint" -> inBlueprint = reader.nextBoolean();
             }
         }
@@ -147,7 +147,7 @@ public final class ProfessionsReader {
         while (reader.hasNext()) {
             final var propertyName = reader.nextName();
             switch (propertyName) {
-                case "item" -> itemName = reader.nextString();
+                case "id" -> itemName = reader.nextString();
                 case "count" -> count = reader.nextInt();
             }
         }

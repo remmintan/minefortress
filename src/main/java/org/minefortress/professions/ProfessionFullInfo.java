@@ -6,8 +6,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.registry.Registry;
-import org.minefortress.fortress.resources.ItemInfo;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -29,13 +29,25 @@ public record ProfessionFullInfo(
         packet.writeString(description);
         packet.writeString(unlockMessage);
         packet.writeString(unlockMoreMessage);
-        packet.writeString(requirements.building());
-        final var blockRequirement = requirements.block();
-        packet.writeIdentifier(Registry.BLOCK.getId(blockRequirement.block()));
-        packet.writeBoolean(blockRequirement.inBlueprint());
-        packet.writeInt(requirements.items().size());
-        for (var itemReq : requirements.items()) {
-            packet.writeItemStack(itemReq.toStack());
+        if(requirements != null) {
+            packet.writeString(requirements.building());
+            final var blockRequirement = requirements.block();
+            if(blockRequirement != null) {
+                packet.writeIdentifier(Registry.BLOCK.getId(blockRequirement.block()));
+                packet.writeBoolean(blockRequirement.inBlueprint());
+            } else {
+                packet.writeIdentifier(Registry.BLOCK.getId(Blocks.AIR));
+                packet.writeBoolean(false);
+            }
+            packet.writeInt(requirements.items().size());
+            for (var itemReq : requirements.items()) {
+                packet.writeItemStack(itemReq.toStack());
+            }
+        } else {
+            packet.writeString("_");
+            packet.writeIdentifier(Registry.BLOCK.getId(Blocks.AIR));
+            packet.writeBoolean(false);
+            packet.writeInt(0);
         }
     }
 
@@ -49,7 +61,12 @@ public record ProfessionFullInfo(
         final var building = packet.readString();
         final var block = Registry.BLOCK.get(packet.readIdentifier());
         final var inBlueprint = packet.readBoolean();
-        final var items = packet.readList(PacketByteBuf::readItemStack).stream().map(ItemRequirement::fromStack).toList();
+        final var itemRequirementsSize = packet.readVarInt();
+        var items = new ArrayList<ItemRequirement>(itemRequirementsSize);
+        for (int i = 0; i < itemRequirementsSize; i++) {
+            items.add(ItemRequirement.fromStack(packet.readItemStack()));
+        }
+
         final var requirements = new Requirements(building, new BlockRequirement(block, inBlueprint), items);
         return new ProfessionFullInfo(key, title, icon, description, unlockMessage, unlockMoreMessage, requirements);
     }

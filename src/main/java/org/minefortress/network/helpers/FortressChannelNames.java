@@ -23,6 +23,7 @@ public class FortressChannelNames {
     public static final String FORTRESS_SPECIAL_BLOCKS_SYNC = "fortress_blocks_sync";
     public static final String FORTRESS_PROFESSION_STATE_CHANGE = "fortress_profession_state_change";
     public static final String FORTRESS_PROFESSION_SYNC = "fortress_profession_sync";
+    public static final String FORTRESS_PROFESSION_INIT = "fortress_profession_init";
     public static final String FORTRESS_SET_GAMEMODE = "fortress_set_gamemode";
     public static final String FORTRESS_RESOURCES_SYNC = "fortress_resources_sync";
     public static final String FORTRESS_OPEN_CRAFTING_TABLE = "fortress_open_crafting_table";

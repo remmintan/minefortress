@@ -40,21 +40,31 @@ public class Profession {
         this.title = fullInfo.title();
         this.icon = new ItemStack(fullInfo.icon());
 
-        buildingRequirement = fullInfo.requirements().building();
-        final var blockRequirement = fullInfo.requirements().block();
-        if(!Blocks.AIR.equals(blockRequirement.block())) {
-            this.blockRequirement = blockRequirement.block();
-            blueprint = blockRequirement.inBlueprint();
-        } else {
-            this.blockRequirement = null;
-            blueprint = false;
-        }
+        final var requirements = fullInfo.requirements();
 
-        this.itemsRequirement = fullInfo.requirements()
-                .items()
-                .stream()
-                .map(it -> new ItemInfo(it.item(), it.count()))
-                .toList();
+        if(requirements != null) {
+            buildingRequirement = requirements.building();
+
+            final var blockRequirement = requirements.block();
+            if(blockRequirement != null && !Blocks.AIR.equals(blockRequirement.block())) {
+                this.blockRequirement = blockRequirement.block();
+                blueprint = blockRequirement.inBlueprint();
+            } else {
+                this.blockRequirement = null;
+                blueprint = false;
+            }
+
+            this.itemsRequirement = requirements
+                    .items()
+                    .stream()
+                    .map(it -> new ItemInfo(it.item(), it.count()))
+                    .toList();
+        } else {
+            buildingRequirement = "_";
+            blockRequirement = null;
+            blueprint = false;
+            itemsRequirement = Collections.emptyList();
+        }
 
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             this.description = GuiUtils.splitTextInWordsForLength(fullInfo.description(), MAX_WIDTH);

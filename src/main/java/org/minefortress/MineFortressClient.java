@@ -66,6 +66,6 @@ public class MineFortressClient implements ClientModInitializer {
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_RESOURCES_SYNC, ClientboundSyncItemsPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_COMBAT_STATE_SYNC, ClientboundSyncCombatStatePacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_OPEN_BLUEPRINTS_FOLDER, ClientboundOpenBlueprintsFolderPacket::new);
-        FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_SYNC, ClientboundProfessionsInitPacket::new);
+        FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_INIT, ClientboundProfessionsInitPacket::new);
     }
 }
