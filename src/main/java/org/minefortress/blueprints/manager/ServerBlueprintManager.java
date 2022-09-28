@@ -124,7 +124,7 @@ public class ServerBlueprintManager {
         return startPos.add(new Vec3i(size.getX()-1, size.getY()-1, size.getZ()-1));
     }
 
-    public void writeToNbt(NbtCompound compound) {
+    public void writeToNbt() {
         blockDataManager.writeBlockDataManager();
     }
 

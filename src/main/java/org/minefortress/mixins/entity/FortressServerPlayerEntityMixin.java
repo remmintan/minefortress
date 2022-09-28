@@ -69,7 +69,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         if(fortressUUID != null) {
             nbt.putUuid("fortressUuid", fortressUUID);
         }
-        serverBlueprintManager.writeToNbt(nbt);
+        serverBlueprintManager.writeToNbt();
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
