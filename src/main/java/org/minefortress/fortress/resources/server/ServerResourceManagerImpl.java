@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.logging.log4j.LogManager;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -24,10 +25,12 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
     private final ItemStacksManager resources = new ItemStacksManager();
     private final Map<UUID, ItemStacksManager> reservedResources = new HashMap<>();
 
-    public ServerResourceManagerImpl() {
-        resources.getStack(Items.OAK_PLANKS).increaseBy(12);
-        resources.getStack(Items.CRAFTING_TABLE).increaseBy(1);
-        resources.getStack(Items.APPLE).increaseBy(5);
+    public ServerResourceManagerImpl(MinecraftServer server) {
+        final var reader = new ServerStartingInventoryReader(server);
+        final var inventoryStartingSlots = reader.readStartingSlots();
+        for(var slot : inventoryStartingSlots) {
+            resources.getStack(slot.item()).increaseBy(slot.amount());
+        }
         this.syncAll();
     }
 

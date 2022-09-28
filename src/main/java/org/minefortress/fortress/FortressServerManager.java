@@ -63,7 +63,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
     
     private final ServerProfessionManager serverProfessionManager;
-    private final ServerResourceManager serverResourceManager = new ServerResourceManagerImpl();
+    private final ServerResourceManager serverResourceManager;
     private final ServerFightManager serverFightManager = new ServerFightManager();
     private final TaskManager taskManager = new TaskManager();
     
@@ -93,6 +93,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     public FortressServerManager(MinecraftServer server) {
         this.server = server;
         serverProfessionManager = new ServerProfessionManager(() -> this);
+        serverResourceManager = new ServerResourceManagerImpl(server);
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             this.gamemode = FortressGamemode.SURVIVAL;
         }

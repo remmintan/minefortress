@@ -6,7 +6,6 @@ import org.minefortress.network.interfaces.FortressClientPacket;
 import org.minefortress.professions.ProfessionFullInfo;
 import org.minefortress.utils.ModUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClientboundProfessionsInitPacket implements FortressClientPacket {
@@ -21,11 +20,7 @@ public class ClientboundProfessionsInitPacket implements FortressClientPacket {
 
     public ClientboundProfessionsInitPacket(PacketByteBuf buf) {
         treeJson = buf.readString();
-        final var profListSize = buf.readInt();
-        professions = new ArrayList<>(profListSize);
-        for (int i = 0; i < profListSize; i++) {
-            professions.add(ProfessionFullInfo.read(buf));
-        }
+        professions = buf.readList(ProfessionFullInfo::read);
     }
 
     @Override
@@ -37,7 +32,7 @@ public class ClientboundProfessionsInitPacket implements FortressClientPacket {
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeString(this.treeJson);
-        buf.writeInt(this.professions.size());
+        buf.writeVarInt(this.professions.size());
         for (ProfessionFullInfo profession : professions) {
             profession.write(buf);
         }

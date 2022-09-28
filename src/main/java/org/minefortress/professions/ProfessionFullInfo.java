@@ -6,6 +6,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.registry.Registry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +23,8 @@ public record ProfessionFullInfo(
         String unlockMoreMessage,
         Requirements requirements
 ) {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionFullInfo.class);
 
     public void write(PacketByteBuf packet) {
         packet.writeString(key);
@@ -39,7 +43,7 @@ public record ProfessionFullInfo(
                 packet.writeIdentifier(Registry.BLOCK.getId(Blocks.AIR));
                 packet.writeBoolean(false);
             }
-            packet.writeInt(requirements.items().size());
+            packet.writeVarInt(requirements.items().size());
             for (var itemReq : requirements.items()) {
                 packet.writeItemStack(itemReq.toStack());
             }
@@ -47,7 +51,7 @@ public record ProfessionFullInfo(
             packet.writeString("_");
             packet.writeIdentifier(Registry.BLOCK.getId(Blocks.AIR));
             packet.writeBoolean(false);
-            packet.writeInt(0);
+            packet.writeVarInt(0);
         }
     }
 
@@ -61,11 +65,11 @@ public record ProfessionFullInfo(
         final var building = packet.readString();
         final var block = Registry.BLOCK.get(packet.readIdentifier());
         final var inBlueprint = packet.readBoolean();
-        final var itemRequirementsSize = packet.readVarInt();
-        var items = new ArrayList<ItemRequirement>(itemRequirementsSize);
-        for (int i = 0; i < itemRequirementsSize; i++) {
-            items.add(ItemRequirement.fromStack(packet.readItemStack()));
-        }
+        var items = packet
+                .readList(PacketByteBuf::readItemStack)
+                .stream()
+                .map(ItemRequirement::fromStack)
+                .toList();
 
         final var requirements = new Requirements(building, new BlockRequirement(block, inBlueprint), items);
         return new ProfessionFullInfo(key, title, icon, description, unlockMessage, unlockMoreMessage, requirements);
