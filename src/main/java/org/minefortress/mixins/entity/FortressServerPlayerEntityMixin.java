@@ -69,7 +69,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         if(fortressUUID != null) {
             nbt.putUuid("fortressUuid", fortressUUID);
         }
-        serverBlueprintManager.writeToNbt();
+        serverBlueprintManager.write();
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
@@ -82,7 +82,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
             fortressServerManager = new FortressServerManager(server);
             fortressServerManager.readFromNbt(fortressManagerTag);
         }
-        serverBlueprintManager.readFromNbt(nbt);
+        serverBlueprintManager.read(nbt);
     }
 
     public FortressServerManager getFortressServerManager() {

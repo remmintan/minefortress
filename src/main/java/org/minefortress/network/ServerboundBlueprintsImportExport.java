@@ -12,32 +12,46 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.interfaces.FortressServerPacket;
 import org.minefortress.renderer.gui.blueprints.NetworkActionType;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class ServerboundBlueprintsImportExport implements FortressServerPacket {
 
     private final NetworkActionType type;
     private final String path;
+    private final byte[] bytes;
 
-    public ServerboundBlueprintsImportExport(NetworkActionType type, String path) {
-        this.type = type;
+    public ServerboundBlueprintsImportExport(String path) {
+        this.type = NetworkActionType.EXPORT;
         this.path = path;
+        this.bytes = new byte[0];
+    }
+
+    public ServerboundBlueprintsImportExport(byte[] bytes) {
+        this.type = NetworkActionType.IMPORT;
+        this.path = "";
+        this.bytes = bytes;
     }
 
     public ServerboundBlueprintsImportExport(PacketByteBuf buf) {
         this.type = buf.readEnumConstant(NetworkActionType.class);
         this.path = buf.readString();
+        this.bytes = buf.readByteArray();
     }
 
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeEnumConstant(type);
         buf.writeString(path);
+        buf.writeByteArray(bytes);
     }
 
     @Override
@@ -47,18 +61,65 @@ public class ServerboundBlueprintsImportExport implements FortressServerPacket {
         if(player instanceof FortressServerPlayerEntity serverPlayer) {
             switch (type) {
                 case EXPORT -> handleExport(server, player, serverPlayer);
+                case IMPORT -> handleImport(server, player, serverPlayer);
             }
         }
     }
 
     private void handleExport(MinecraftServer server, ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
-        final var sbm = serverPlayer.getServerBlueprintManager();
-        sbm.writeToNbt();
-        final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
-        final var blueprintsPath = FortressModDataLoader.getFolderAbsolutePath(blueprintsFolderPath, server.session);
-        final var bytes = zipBlueprintsFolderToByteArray(blueprintsPath);
-        final var packet = new ClientboundBlueprintsImportExport(type, path, bytes);
-        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_IMPORT_EXPORT, packet);
+        byte[] bytes;
+        try {
+            final var sbm = serverPlayer.getServerBlueprintManager();
+            sbm.write();
+            final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
+            final var blueprintsPath = FortressModDataLoader.getFolderAbsolutePath(blueprintsFolderPath, server.session);
+            bytes = zipBlueprintsFolderToByteArray(blueprintsPath);
+        }catch (RuntimeException exp) {
+            exp.printStackTrace();
+            final var packet = new ClientboundBlueprintsProcessImportExportPacket(ClientboundBlueprintsProcessImportExportPacket.CurrentScreenAction.FAILURE);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, packet);
+            return;
+        }
+
+        final var packet = new ClientboundBlueprintsProcessImportExportPacket(path, bytes);
+        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, packet);
+    }
+
+    private void handleImport(MinecraftServer server, ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
+        try {
+            final var sbm = serverPlayer.getServerBlueprintManager();
+            final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
+            final var pathString = FortressModDataLoader.getFolderAbsolutePath(blueprintsFolderPath, server.session);
+            final var path = Paths.get(pathString);
+            Files.deleteIfExists(path);
+            final var target = path.toFile();
+            target.mkdirs();
+            try (
+                final var bais = new ByteArrayInputStream(bytes);
+                final var zis = new ZipInputStream(bais)
+            ){
+                while (zis.available() == 1) {
+                    final var nextEntry = zis.getNextEntry();
+                    final var file = new File(target, nextEntry.getName());
+                    if (!file.toPath().normalize().startsWith(target.toPath())) {
+                        throw new IOException("Bad zip entry");
+                    }
+
+                    if (nextEntry.isDirectory()) {
+                        file.mkdirs();
+                    } else {
+                        Files.write(file.toPath(), zis.readAllBytes());
+                    }
+                }
+            }
+            sbm.read();
+            final var packet = new ClientboundBlueprintsProcessImportExportPacket(ClientboundBlueprintsProcessImportExportPacket.CurrentScreenAction.SUCCESS);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, packet);
+        }catch (IOException | RuntimeException e) {
+            e.printStackTrace();
+            final var packet = new ClientboundBlueprintsProcessImportExportPacket(ClientboundBlueprintsProcessImportExportPacket.CurrentScreenAction.FAILURE);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, packet);
+        }
     }
 
     private byte[] zipBlueprintsFolderToByteArray(String pathStr) {

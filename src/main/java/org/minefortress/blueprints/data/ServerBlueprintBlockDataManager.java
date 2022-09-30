@@ -15,6 +15,7 @@ import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.network.ClientboundAddBlueprintPacket;
@@ -208,7 +209,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         return  getBlueprintsFolder() +"/"+REMOVED_BLUEPRINTS_FILENAME;
     }
 
-    public void readBlockDataManager(NbtCompound tag) {
+    public void readBlockDataManager(@Nullable NbtCompound tag) {
         if(FortressModDataLoader.exists(getBlueprintsFolder(), server.session)) {
             updatedStructures.clear();
             removedDefaultStructures.clear();
@@ -220,6 +221,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
 
             readRemovedBlueprints();
         } else {
+            if(tag == null) throw new IllegalStateException("Blueprints folder does not exist and no default data is provided");
             readLegacy(tag);
         }
     }
