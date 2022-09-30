@@ -19,16 +19,10 @@ import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.ServerboundEditBlueprintPacket;
-import org.minefortress.network.ServerboundOpenBlueprintsFolderPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 
 import java.util.List;
-import java.util.Optional;
 
 public final class BlueprintsScreen extends Screen {
 
@@ -78,11 +72,8 @@ public final class BlueprintsScreen extends Screen {
                                 this.y - 22,
                                 120,
                                 20,
-                                new LiteralText("Open blueprints folder"),
-                                btn -> {
-                                    final var packet = new ServerboundOpenBlueprintsFolderPacket();
-                                    FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_BLUEPRINTS_FOLDER, packet);
-                                }
+                                new LiteralText("Import / Export"),
+                                btn -> client.setScreen(new ImportExportBlueprintsScreen())
                         )
                 );
             } else {
