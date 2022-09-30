@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import org.minefortress.network.ServerboundBlueprintsImportExport;
+import org.minefortress.network.ServerboundBlueprintsImportExportPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.utils.ModOSUtils;
@@ -65,7 +65,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                     setState(ScreenState.EXPORTING);
                     final var path = ModOSUtils.showSaveDialog("zip", "blueprints.zip");
                     if (path.isPresent()) {
-                        final var packet = new ServerboundBlueprintsImportExport(path.get());
+                        final var packet = new ServerboundBlueprintsImportExportPacket(path.get());
                         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_BLUEPRINTS_IMPORT_EXPORT, packet);
                     } else {
                         setState(ScreenState.DEFAULT);
@@ -85,7 +85,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                     if (path.isPresent()) {
                         final var bytesOpt = readFile(path.get());
                         if(bytesOpt.isPresent()) {
-                            final var packet = new ServerboundBlueprintsImportExport(bytesOpt.get());
+                            final var packet = new ServerboundBlueprintsImportExportPacket(bytesOpt.get());
                             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_BLUEPRINTS_IMPORT_EXPORT, packet);
                         } else {
                             setState(ScreenState.IMPORT_FAILURE);

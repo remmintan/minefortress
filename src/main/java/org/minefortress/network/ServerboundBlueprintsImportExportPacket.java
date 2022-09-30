@@ -23,25 +23,25 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class ServerboundBlueprintsImportExport implements FortressServerPacket {
+public class ServerboundBlueprintsImportExportPacket implements FortressServerPacket {
 
     private final NetworkActionType type;
     private final String path;
     private final byte[] bytes;
 
-    public ServerboundBlueprintsImportExport(String path) {
+    public ServerboundBlueprintsImportExportPacket(String path) {
         this.type = NetworkActionType.EXPORT;
         this.path = path;
         this.bytes = new byte[0];
     }
 
-    public ServerboundBlueprintsImportExport(byte[] bytes) {
+    public ServerboundBlueprintsImportExportPacket(byte[] bytes) {
         this.type = NetworkActionType.IMPORT;
         this.path = "";
         this.bytes = bytes;
     }
 
-    public ServerboundBlueprintsImportExport(PacketByteBuf buf) {
+    public ServerboundBlueprintsImportExportPacket(PacketByteBuf buf) {
         this.type = buf.readEnumConstant(NetworkActionType.class);
         this.path = buf.readString();
         this.bytes = buf.readByteArray();
