@@ -29,6 +29,7 @@ import org.minefortress.utils.ModUtils;
 public class MineFortressMod implements ModInitializer {
 
     public static final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+    public static final String BLUEPRINTS_FOLDER_NAME = "minefortress-blueprints";
     public static final String MOD_ID = "minefortress";
 
     private static final Identifier FORTRESS_CRAFTING_SCREEN_HANDLER_ID = new Identifier(MOD_ID, "fortress_crafting_handler");
