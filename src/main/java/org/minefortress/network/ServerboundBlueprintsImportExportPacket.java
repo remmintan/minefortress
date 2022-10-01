@@ -5,6 +5,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.apache.logging.log4j.util.Strings;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -74,7 +75,7 @@ public class ServerboundBlueprintsImportExportPacket implements FortressServerPa
             final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
             final var blueprintsPath = FortressModDataLoader.getFolderAbsolutePath(blueprintsFolderPath, server.session);
             bytes = zipBlueprintsFolderToByteArray(blueprintsPath);
-        }catch (RuntimeException exp) {
+        }catch (RuntimeException | IOException exp) {
             exp.printStackTrace();
             final var packet = new ClientboundBlueprintsProcessImportExportPacket(ClientboundBlueprintsProcessImportExportPacket.CurrentScreenAction.FAILURE);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, packet);
@@ -122,7 +123,7 @@ public class ServerboundBlueprintsImportExportPacket implements FortressServerPa
         }
     }
 
-    private byte[] zipBlueprintsFolderToByteArray(String pathStr) {
+    private byte[] zipBlueprintsFolderToByteArray(String pathStr) throws IOException {
         final var path = Path.of(pathStr);
         if(!Files.isDirectory(path)) {
             throw new RuntimeException("Path is not directory: " + pathStr);
@@ -132,21 +133,18 @@ public class ServerboundBlueprintsImportExportPacket implements FortressServerPa
                 final var byteArrayOutputStream = new ByteArrayOutputStream();
                 final var zipOS = new ZipOutputStream(byteArrayOutputStream);
         ) {
-            Files.walk(path).forEach(it -> {
-                try {
-                    final var relative = path.relativize(it);
-                    final var zipEntry = new ZipEntry(relative.toString());
-                    zipOS.putNextEntry(zipEntry);
-                    final var bytes = Files.readAllBytes(it);
-                    zipOS.write(bytes, 0, bytes.length);
-                    zipOS.closeEntry();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            for (Path it : Files.walk(path).toList()) {
+                final var relative = path.relativize(it);
+                final var relativePathStr = relative.toString();
+                if (Strings.isEmpty(relativePathStr)) continue;
+                final var zipEntry = new ZipEntry(relativePathStr);
+                zipOS.putNextEntry(zipEntry);
+                final var bytes = Files.readAllBytes(it);
+                zipOS.write(bytes, 0, bytes.length);
+                zipOS.closeEntry();
+            }
+
             return byteArrayOutputStream.toByteArray();
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
         }
     }
 

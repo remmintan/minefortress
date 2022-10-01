@@ -1,41 +1,43 @@
 package org.minefortress.network;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.network.interfaces.FortressClientPacket;
 import org.minefortress.renderer.gui.blueprints.ImportExportBlueprintsScreen;
 import org.minefortress.renderer.gui.blueprints.NetworkActionType;
+import org.minefortress.utils.ModUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ClientboundBlueprintsProcessImportExportPacket implements FortressClientPacket {
 
     private final CurrentScreenAction action;
     private final NetworkActionType type;
-    private final String path;
+    private final String name;
     private final byte[] bytes;
 
     public ClientboundBlueprintsProcessImportExportPacket(CurrentScreenAction action) {
         this.action = action;
         this.type = NetworkActionType.IMPORT;
-        this.path = "";
+        this.name = "";
         this.bytes = new byte[0];
     }
 
-    public ClientboundBlueprintsProcessImportExportPacket(String path, byte[] bytes) {
+    public ClientboundBlueprintsProcessImportExportPacket(String name, byte[] bytes) {
         this.action = CurrentScreenAction.SUCCESS;
         this.type = NetworkActionType.EXPORT;
-        this.path = path;
+        this.name = name;
         this.bytes = bytes;
     }
 
     public ClientboundBlueprintsProcessImportExportPacket(PacketByteBuf buf) {
         this.action = buf.readEnumConstant(CurrentScreenAction.class);
         this.type = buf.readEnumConstant(NetworkActionType.class);
-        this.path = buf.readString();
+        this.name = buf.readString();
         this.bytes = buf.readByteArray();
     }
 
@@ -57,24 +59,21 @@ public class ClientboundBlueprintsProcessImportExportPacket implements FortressC
     }
 
     private void handleExport() {
-        final var path = Paths.get(this.path);
+        final var blueprintsFolder = ModUtils.getBlueprintsFolder();
+        if(!blueprintsFolder.toFile().exists()) {
+            blueprintsFolder.toFile().mkdirs();
+        }
+        final var path = blueprintsFolder.resolve(name);
         final var file = path.toFile();
         if(!file.exists()) {
             try {
                 file.createNewFile();
+                Files.write(path, bytes);
             } catch (IOException e) {
                 e.printStackTrace();
                 this.fail();
                 return;
             }
-        }
-
-        try(var fos = new FileOutputStream(file)) {
-            fos.write(bytes);
-        } catch (IOException e) {
-            e.printStackTrace();
-            this.fail();
-            return;
         }
 
         this.success();
@@ -98,7 +97,7 @@ public class ClientboundBlueprintsProcessImportExportPacket implements FortressC
     public void write(PacketByteBuf buf) {
         buf.writeEnumConstant(action);
         buf.writeEnumConstant(type);
-        buf.writeString(path);
+        buf.writeString(name);
         buf.writeByteArray(bytes);
     }
 
