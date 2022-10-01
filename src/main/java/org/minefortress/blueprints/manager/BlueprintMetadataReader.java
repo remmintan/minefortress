@@ -21,6 +21,7 @@ public class BlueprintMetadataReader {
     }
 
     void read() {
+        predefinedBlueprints.clear();
         final var resourceManager = server.getResourceManager();
         try (
                 final var resource = resourceManager.getResource(PREDEFINED_BLUEPRINTS_ID);

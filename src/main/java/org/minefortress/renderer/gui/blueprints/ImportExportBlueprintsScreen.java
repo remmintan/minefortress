@@ -8,6 +8,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
+import org.minefortress.MineFortressMod;
 import org.minefortress.network.ServerboundBlueprintsImportExportPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -180,7 +181,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                     final var text = exportName.getText();
 
                     // add .zip if not present
-                    final var fileName = text.endsWith(".zip") ? text : text + ".zip";
+                    final var fileName = text.endsWith(MineFortressMod.BLUEPRINTS_EXTENSION) ? text : text + MineFortressMod.BLUEPRINTS_EXTENSION;
                     final var packet = new ServerboundBlueprintsImportExportPacket(fileName);
                     FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_BLUEPRINTS_IMPORT_EXPORT, packet);
                 }
@@ -405,6 +406,11 @@ public class ImportExportBlueprintsScreen extends Screen {
         label = IMPORT_SUCCESS;
     }
 
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
+
     private void setExportSuccessState() {
         backButton.visible = true;
         exportButton.visible = false;
@@ -471,7 +477,7 @@ public class ImportExportBlueprintsScreen extends Screen {
             final var blueprintsFolder = ModUtils.getBlueprintsFolder();
             final var fileNamesList = Files.list(blueprintsFolder)
                     .filter(Files::isRegularFile)
-                    .filter(path -> path.toString().endsWith(".zip"))
+                    .filter(path -> path.toString().endsWith(MineFortressMod.BLUEPRINTS_EXTENSION))
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .map(it -> new BlueprintListEntry(it, this.textRenderer, importsList))
