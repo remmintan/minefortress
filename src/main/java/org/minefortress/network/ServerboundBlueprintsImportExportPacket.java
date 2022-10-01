@@ -6,6 +6,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -100,17 +101,19 @@ public class ServerboundBlueprintsImportExportPacket implements FortressServerPa
                 final var bais = new ByteArrayInputStream(bytes);
                 final var zis = new ZipInputStream(bais)
             ){
-                while (zis.available() == 1) {
-                    final var nextEntry = zis.getNextEntry();
+                ZipEntry nextEntry;
+                while ((nextEntry = zis.getNextEntry()) != null) {
                     final var file = new File(target, nextEntry.getName());
                     if (!file.toPath().normalize().startsWith(target.toPath())) {
-                        throw new IOException("Bad zip entry");
+                        continue;
                     }
 
                     if (nextEntry.isDirectory()) {
                         file.mkdirs();
                     } else {
-                        Files.write(file.toPath(), zis.readAllBytes());
+                        try (final var fos = Files.newOutputStream(file.toPath())) {
+                            IOUtils.copy(zis, fos);
+                        }
                     }
                 }
             }

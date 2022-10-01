@@ -8,6 +8,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
+import org.apache.commons.io.FileUtils;
 import org.minefortress.MineFortressMod;
 import org.minefortress.network.ServerboundBlueprintsImportExportPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -475,6 +476,9 @@ public class ImportExportBlueprintsScreen extends Screen {
     private void refreshImportsList() {
         try {
             final var blueprintsFolder = ModUtils.getBlueprintsFolder();
+            if(Files.notExists(blueprintsFolder)) {
+                Files.createDirectories(blueprintsFolder);
+            }
             final var fileNamesList = Files.list(blueprintsFolder)
                     .filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(MineFortressMod.BLUEPRINTS_EXTENSION))
