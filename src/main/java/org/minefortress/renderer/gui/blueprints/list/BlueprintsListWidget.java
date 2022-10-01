@@ -19,4 +19,8 @@ public class BlueprintsListWidget extends AlwaysSelectedEntryListWidget<Blueprin
         return this.right - 6;
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
 }

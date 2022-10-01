@@ -5,6 +5,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -92,8 +93,8 @@ public class ServerboundBlueprintsImportExportPacket implements FortressServerPa
             final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
             final var pathString = FortressModDataLoader.getFolderAbsolutePath(blueprintsFolderPath, server.session);
             final var path = Paths.get(pathString);
-            Files.deleteIfExists(path);
             final var target = path.toFile();
+            FileUtils.deleteDirectory(target);
             target.mkdirs();
             try (
                 final var bais = new ByteArrayInputStream(bytes);

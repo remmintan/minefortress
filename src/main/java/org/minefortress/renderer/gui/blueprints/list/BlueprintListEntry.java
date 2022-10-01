@@ -11,11 +11,13 @@ public class BlueprintListEntry extends AlwaysSelectedEntryListWidget.Entry<Blue
     private final String value;
     private final TextRenderer textRenderer;
     private final Text text;
+    private final BlueprintsListWidget widget;
 
-    public BlueprintListEntry(String value, TextRenderer textRenderer) {
+    public BlueprintListEntry(String value, TextRenderer textRenderer, BlueprintsListWidget widget) {
         this.value = value;
         this.text = new LiteralText(value);
         this.textRenderer = textRenderer;
+        this.widget = widget;
     }
 
 
@@ -26,10 +28,16 @@ public class BlueprintListEntry extends AlwaysSelectedEntryListWidget.Entry<Blue
 
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        this.textRenderer.drawWithShadow(matrices, text, (float)(x + 2), (float)(y + 1), 0xFFFFFF);
+        this.textRenderer.drawWithShadow(matrices, text, (float)(x + 2), (float)(y + 3), 0xFFFFFF);
     }
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        this.widget.setSelected(this);
+        return true;
     }
 }

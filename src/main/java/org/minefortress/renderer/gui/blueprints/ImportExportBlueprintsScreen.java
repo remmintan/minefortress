@@ -103,8 +103,6 @@ public class ImportExportBlueprintsScreen extends Screen {
                             e.printStackTrace();
                             setState(ScreenState.IMPORT_FAILURE);
                         }
-                    } else {
-                        setState(ScreenState.IMPORT_FAILURE);
                     }
                 }
         );
@@ -365,6 +363,8 @@ public class ImportExportBlueprintsScreen extends Screen {
         importCancel.visible = true;
 
         label = IMPORT_PROMPT_LABEL;
+
+        importConfirm.active = importsList.getSelectedOrNull() != null;
     }
 
     private void setImportingState() {
@@ -474,11 +474,18 @@ public class ImportExportBlueprintsScreen extends Screen {
                     .filter(path -> path.toString().endsWith(".zip"))
                     .map(Path::getFileName)
                     .map(Path::toString)
-                    .map(it -> new BlueprintListEntry(it, this.textRenderer))
+                    .map(it -> new BlueprintListEntry(it, this.textRenderer, importsList))
                     .toList();
 
             importsList.children().clear();
             importsList.children().addAll(fileNamesList);
+
+            if (!importsList.children().isEmpty()) {
+                importsList.setSelected(importsList.children().get(0));
+            } else {
+                importsList.setSelected(null);
+            }
+
         }catch (Exception e) {
 
             fail();
