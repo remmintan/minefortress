@@ -15,17 +15,14 @@ import org.minefortress.renderer.gui.blueprints.list.BlueprintListEntry;
 import org.minefortress.renderer.gui.blueprints.list.BlueprintsListWidget;
 import org.minefortress.utils.ModUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 public class ImportExportBlueprintsScreen extends Screen {
 
     private static final LiteralText DEFAULT_LABEL = new LiteralText("Import/Export Blueprints");
     private static final LiteralText IMPORT_LABEL = new LiteralText("Importing...");
-    private static final LiteralText IMPORT_PROMPT_LABEL = new LiteralText("Select to import");
+    private static final LiteralText IMPORT_PROMPT_LABEL = new LiteralText("Select blueprints to import");
     private static final LiteralText EXPORT_LABEL = new LiteralText("Exporting...");
     private static final LiteralText EXPORT_PROMPT_LABEL = new LiteralText("Enter file name:");
     private static final LiteralText IMPORT_SUCCESS = new LiteralText("Imported successfully!");
@@ -49,7 +46,7 @@ public class ImportExportBlueprintsScreen extends Screen {
     private ButtonWidget importRefresh;
     private ButtonWidget importCancel;
 
-    private LiteralText label;
+    private LiteralText label = DEFAULT_LABEL;
 
     public ImportExportBlueprintsScreen() {
         super(new LiteralText("Import/Export Blueprints"));
@@ -73,20 +70,21 @@ public class ImportExportBlueprintsScreen extends Screen {
     }
 
     private void initImportPrompt(int x, int y, int width, int height, int step) {
-        final var listHeight = 150;
+        final var listHeight = 100;
+        final var listInternalPadding = 5;
         importsList = new BlueprintsListWidget(
                 this.client,
-                this.width,
-                listHeight,
-                y,
-                listHeight - 32,
-                this.height
+                width,
+                this.height,
+                y - 10 - listInternalPadding,
+                y + listHeight - listInternalPadding,
+                height
         );
         importsList.setLeftPos(-1000);
 
         importConfirm = new ButtonWidget(
                 x,
-                y + listHeight + step,
+                y + listHeight,
                 width,
                 height,
                 new LiteralText("Import"),
@@ -114,29 +112,18 @@ public class ImportExportBlueprintsScreen extends Screen {
 
         importOpenFolder = new ButtonWidget(
                 x,
-                y + listHeight + step * 2,
-                width,
+                y + listHeight + step,
+                width/2 - 1,
                 height,
                 new LiteralText("Open Folder"),
-                (button) -> {
-                    try {
-                        final var blueprintsFolder = ModUtils.getBlueprintsFolder().toFile();
-                        if(!blueprintsFolder.exists()){
-                            blueprintsFolder.mkdirs();
-                        }
-                        Util.getOperatingSystem().open(blueprintsFolder);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        setState(ScreenState.IMPORT_FAILURE);
-                    }
-                }
+                (button) -> openBlueprintsFolder()
         );
         importOpenFolder.visible = false;
 
         importRefresh = new ButtonWidget(
-                x,
-                y + listHeight + step * 3,
-                width,
+                x + width/2 + 2,
+                y + listHeight + step,
+                width/2 - 1,
                 height,
                 new LiteralText("Refresh list"),
                 (button) -> refreshImportsList()
@@ -145,7 +132,7 @@ public class ImportExportBlueprintsScreen extends Screen {
 
         importCancel = new ButtonWidget(
                 x,
-                y + listHeight + step * 4,
+                y + listHeight + step * 2,
                 width,
                 height,
                 new LiteralText("Cancel"),
@@ -158,6 +145,19 @@ public class ImportExportBlueprintsScreen extends Screen {
         this.addDrawableChild(importOpenFolder);
         this.addDrawableChild(importRefresh);
         this.addDrawableChild(importCancel);
+    }
+
+    private void openBlueprintsFolder() {
+        try {
+            final var blueprintsFolder = ModUtils.getBlueprintsFolder().toFile();
+            if(!blueprintsFolder.exists()){
+                blueprintsFolder.mkdirs();
+            }
+            Util.getOperatingSystem().open(blueprintsFolder);
+        } catch (Exception e) {
+            e.printStackTrace();
+            setState(ScreenState.IMPORT_FAILURE);
+        }
     }
 
     private void initExportPrompt(int x, int y, int width, int height, int step) {
@@ -240,20 +240,6 @@ public class ImportExportBlueprintsScreen extends Screen {
         this.addDrawableChild(importButton);
     }
 
-
-    private Optional<byte[]> readFile(String pathStr) {
-        final var path = Paths.get(pathStr);
-        if(!Files.exists(path)) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(Files.readAllBytes(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
-    }
-
     @Override
     public void tick() {
         switch (state) {
@@ -272,8 +258,8 @@ public class ImportExportBlueprintsScreen extends Screen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.renderBackground(matrices);
-        GameMenuScreen.drawCenteredText(matrices, this.textRenderer, this.label, this.width / 2, 40, 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);
+        GameMenuScreen.drawCenteredText(matrices, this.textRenderer, this.label, this.width / 2, 40, 0xFFFFFF);
     }
 
     @Override
@@ -294,7 +280,10 @@ public class ImportExportBlueprintsScreen extends Screen {
     public void success() {
         switch (state) {
             case IMPORTING, IMPORT_PROMPT -> setState(ScreenState.IMPORT_SUCCESS);
-            case EXPORTING, EXPORT_PROMPT -> setState(ScreenState.EXPORT_SUCCESS);
+            case EXPORTING, EXPORT_PROMPT -> {
+                openBlueprintsFolder();
+                setState(ScreenState.EXPORT_SUCCESS);
+            }
             default -> setState(ScreenState.DEFAULT);
         }
     }
