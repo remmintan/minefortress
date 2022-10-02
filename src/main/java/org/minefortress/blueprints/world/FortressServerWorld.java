@@ -40,7 +40,7 @@ public class FortressServerWorld extends ServerWorld {
 
     @Override
     public long getSeed() {
-        return levelProperties.getGeneratorOptions().getSeed();
+        return levelProperties != null ? levelProperties.getGeneratorOptions().getSeed() : 0;
     }
 
     @Override
