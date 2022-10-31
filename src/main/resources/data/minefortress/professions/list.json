@@ -90,7 +90,10 @@
     "icon": "minecraft:bow",
     "description": "Can use bow.\nDefends village from monsters.\nHunts monsters.\nCan work at night",
     "unlockMessage": "Will be available in future updates",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "fisherman",
@@ -98,7 +101,10 @@
     "icon": "minecraft:fishing_rod",
     "description": "Catches fish in ponds\nCooks fish",
     "unlockMessage": "Will be available in future updates",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "farmer",
@@ -117,7 +123,10 @@
     "icon": "minecraft:bread",
     "description": "Bakes bread, cakes and other food",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "shepherd",
@@ -125,7 +134,10 @@
     "icon": "minecraft:carrot_on_a_stick",
     "description": "Brings pigs, sheeps and cows to the village.\nProvides milks, wool and meat",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "stableman",
@@ -133,7 +145,10 @@
     "icon": "minecraft:lead",
     "description": "",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "butcher",
@@ -141,7 +156,10 @@
     "icon": "minecraft:beef",
     "description": "",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "cook",
@@ -149,7 +167,10 @@
     "icon": "minecraft:cooked_beef",
     "description": "",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "crafter",
@@ -171,7 +192,10 @@
     "icon": "minecraft:leather",
     "description": "",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "leather_worker2",
@@ -179,7 +203,10 @@
     "icon": "minecraft:leather_horse_armor",
     "description": "",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "blacksmith",
@@ -201,7 +228,10 @@
     "icon": "minecraft:iron_chestplate",
     "description": "",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "weaver",
@@ -209,7 +239,10 @@
     "icon": "minecraft:string",
     "description": "",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "tailor",
@@ -217,7 +250,10 @@
     "icon": "minecraft:white_banner",
     "description": "",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "warrior1",
@@ -296,7 +332,10 @@
     "icon": "minecraft:crossbow",
     "description": "",
     "unlockMessage": "Will be available in future releases",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "knight1",
@@ -304,7 +343,10 @@
     "icon": "minecraft:iron_horse_armor",
     "description": "Will be available in future releases",
     "unlockMessage": "",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   },
   {
     "key": "knight2",
@@ -312,6 +354,9 @@
     "icon": "minecraft:diamond_horse_armor",
     "description": "Will be available in future releases",
     "unlockMessage": "",
-    "unlockMoreMessage": ""
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
   }
 ]

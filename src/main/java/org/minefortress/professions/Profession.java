@@ -60,7 +60,7 @@ public class Profession {
                     .map(it -> new ItemInfo(it.item(), it.count()))
                     .toList();
         } else {
-            buildingRequirement = "_";
+            buildingRequirement = "";
             blockRequirement = null;
             blueprint = false;
             itemsRequirement = Collections.emptyList();

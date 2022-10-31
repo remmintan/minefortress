@@ -48,7 +48,7 @@ public record ProfessionFullInfo(
                 packet.writeItemStack(itemReq.toStack());
             }
         } else {
-            packet.writeString("_");
+            packet.writeString("");
             packet.writeIdentifier(Registry.BLOCK.getId(Blocks.AIR));
             packet.writeBoolean(false);
             packet.writeVarInt(0);
