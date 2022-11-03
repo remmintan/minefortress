@@ -2,14 +2,11 @@ package org.minefortress.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.command.ServerCommandSource;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +71,14 @@ public class DebugItemsCommand extends MineFortressCommand {
             Items.OAK_TRAPDOOR,
             Items.WHITE_WOOL,
             Items.YELLOW_WOOL,
-            Items.YELLOW_CARPET
+            Items.YELLOW_CARPET,
+            Items.STONE_SWORD,
+            Items.IRON_SWORD,
+            Items.IRON_HELMET,
+            Items.IRON_CHESTPLATE,
+            Items.IRON_LEGGINGS,
+            Items.IRON_BOOTS
+
     );
 
     @Override
