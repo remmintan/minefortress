@@ -278,6 +278,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
     }
 
+    public void killAllPawns() {
+        colonists.forEach(it -> it.damage(DamageSource.OUT_OF_WORLD, 40f));
+    }
+
     private boolean pawnsDontHaveTask() {
         for(Colonist colonist : colonists) {
             final var taskControl = colonist.getTaskControl();
@@ -288,7 +292,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         return true;
     }
 
-    private Optional<Colonist> spawnPawnNearCampfire() {
+    public Optional<Colonist> spawnPawnNearCampfire() {
         final var randomSpawnPosition = getRandomSpawnPosition();
         if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
             final var tag = getColonistInfoTag();
