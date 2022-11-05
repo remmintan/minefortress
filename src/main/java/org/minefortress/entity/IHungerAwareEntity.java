@@ -1,20 +1,10 @@
 package org.minefortress.entity;
 
 import net.minecraft.entity.player.HungerManager;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
 
-public interface IHungerAwareEntity {
+public interface IHungerAwareEntity extends IItemUsingEntity {
 
     float getHealth();
-    ItemStack getActiveItem();
-    int getItemUseTimeLeft();
-    boolean isUsingItem();
-    void setCurrentHand(Hand hand);
-    ItemStack getStackInHand(Hand hand);
-    void setStackInHand(Hand hand, ItemStack stack);
-
     HungerManager getHungerManager();
     int getCurrentFoodLevel();
 
@@ -27,18 +17,6 @@ public interface IHungerAwareEntity {
         if(foodLevel  < 5) return 3f;
         if(foodLevel  < 10) return 1.5f;
         return 1f;
-    }
-
-    default void putItemInHand(Item item) {
-        ItemStack stackInHand = getStackInHand(Hand.MAIN_HAND);
-        if(item == null) {
-            if(stackInHand != ItemStack.EMPTY)
-                setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
-        } else {
-            Item itemInHand = stackInHand.getItem();
-            if(item.equals(itemInHand)) return;
-            setStackInHand(Hand.MAIN_HAND, new ItemStack(item));
-        }
     }
 
 }
