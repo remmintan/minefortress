@@ -1,24 +1,20 @@
 package org.minefortress.entity.ai.controls;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
-
-import java.util.Optional;
+import org.minefortress.entity.IHungerAwareEntity;
 
 public class EatControl {
 
-    private final Colonist colonist;
+    private final IHungerAwareEntity colonist;
     private Item foodInHand;
     private boolean wasUsingFoodInHand;
 
-    public EatControl(Colonist colonist) {
+    public EatControl(IHungerAwareEntity colonist) {
         this.colonist = colonist;
     }
 
-    public boolean isHungryEnough() {
+    public boolean isHungry() {
         return colonist.getCurrentFoodLevel() < 12 || (colonist.getHealth() <= 10 && colonist.getCurrentFoodLevel() < 20);
     }
 
@@ -26,7 +22,6 @@ public class EatControl {
         if(this.foodInHand != null && wasUsingFoodInHand && colonist.getActiveItem().isEmpty() && colonist.getItemUseTimeLeft() <= 0) {
             reset();
         } else if(this.foodInHand != null && !colonist.getActiveItem().getItem().equals(foodInHand)) {
-            this.colonist.setCurrentTaskDesc("Eating...");
             colonist.putItemInHand(this.foodInHand);
             if(!colonist.isUsingItem()) {
                 colonist.setCurrentHand(Hand.MAIN_HAND);
@@ -41,35 +36,13 @@ public class EatControl {
         wasUsingFoodInHand = false;
     }
 
-    public void putFoodInHand() {
-        this.getEatableItem().ifPresent(item -> {
-            final var fortressServerManager = colonist.getFortressServerManager().orElseThrow();
-            if(!fortressServerManager.isVillageUnderAttack())
-                fortressServerManager.getServerResourceManager().increaseItemAmount(item.getItem(), -1);
-            this.foodInHand = item.getItem();
-        });
-    }
-
-    private Optional<ItemStack> getEatableItem() {
-        return colonist.getFortressServerManager()
-                .orElseThrow()
-                .getServerResourceManager()
-                .getAllItems()
-                .stream()
-                .filter(this::isEatableItem)
-                .findFirst();
-    }
-
-    public boolean hasEatableItem() {
-        return getEatableItem().isPresent();
+    public void eatFood(Item food) {
+        if(!food.isFood()) throw new IllegalArgumentException("Item is not food!" + food);
+        this.foodInHand = food;
     }
 
     public boolean isEating() {
         return this.foodInHand != null;
-    }
-
-    private boolean isEatableItem(ItemStack st) {
-        return !st.isEmpty() && st.getItem().isFood();
     }
 
 }

@@ -68,8 +68,6 @@ public class FightControl {
         }
 
         if(moveTargetNotReached()) return;
-        final var eatControl = colonist.getEatControl();
-        if(eatControl.isEating()) return;
 
         if(attackTarget == null){
             final var serverFightManager = colonist.getFortressServerManager().orElseThrow().getServerFightManager();
@@ -87,19 +85,6 @@ public class FightControl {
                 this.attackTarget = target;
             } else {
                 this.attackTarget = null;
-            }
-        }
-
-        if(this.moveTarget != null && this.attackTarget == null) {
-            if(eatControl.isHungryEnough() && eatControl.hasEatableItem()) {
-                final var fortressServerManager = colonist.getFortressServerManager().orElseThrow();
-                final var fortressCenter = fortressServerManager.getFortressCenter();
-                if(fortressCenter != null) {
-                    final var isWithinCampfireRange = fortressCenter.isWithinDistance(colonist.getPos(), DEFEND_RANGE);
-                    if(isWithinCampfireRange) {
-                        eatControl.putFoodInHand();
-                    }
-                }
             }
         }
     }
@@ -293,7 +278,7 @@ public class FightControl {
     }
 
     public void checkAndPutCorrectItemInHand() {
-        if (!colonist.getEatControl().isEating() && (colonist.getActiveItem() == null || !colonist.getActiveItem().getItem().equals(getCorrectItem()))) {
+        if (colonist.getActiveItem() == null || !colonist.getActiveItem().getItem().equals(getCorrectItem())) {
             putCorrectSwordInHand();
         }
     }

@@ -9,7 +9,9 @@ import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
+import org.minefortress.entity.ai.controls.EatControl;
 import org.minefortress.entity.colonist.FakeHungerManager;
 import org.minefortress.entity.colonist.FortressHungerManager;
 import org.minefortress.entity.colonist.IFortressHungerManager;
@@ -20,18 +22,30 @@ public abstract class HungryColonistEntity extends BaritonableEntity implements 
     private static final String HUNGER_MANAGER_NBT_KEY = "hunger";
 
     private final IFortressHungerManager fortHungMan;
+    private final EatControl eatControl;
 
     protected HungryColonistEntity(EntityType<? extends PathAwareEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world);
         fortHungMan = enableHunger ? new FortressHungerManager() : new FakeHungerManager();
+
+        if(world instanceof ServerWorld) {
+            eatControl = new EatControl(this);
+        } else {
+            eatControl = null;
+        }
+
+        this.dataTracker.startTracking(CURRENT_FOOD_LEVEL, HungerConstants.FULL_FOOD_LEVEL);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if(eatControl != null) eatControl.tick();
     }
 
     @Override
     protected void mobTick() {
         super.mobTick();
-
-        this.dataTracker.startTracking(CURRENT_FOOD_LEVEL, HungerConstants.FULL_FOOD_LEVEL);
-
         fortHungMan.update(this);
         if(this.getCurrentFoodLevel() != getHungerManager().getFoodLevel()) {
             sendHungerMessage();
@@ -44,25 +58,9 @@ public abstract class HungryColonistEntity extends BaritonableEntity implements 
         return fortHungMan.toHungerManager();
     }
 
-    private void updateCurrentFoodLevel() {
-        this.dataTracker.set(CURRENT_FOOD_LEVEL, this.fortHungMan.toHungerManager().getFoodLevel());
-    }
-
     @Override
     public final int getCurrentFoodLevel() {
         return this.dataTracker.get(CURRENT_FOOD_LEVEL);
-    }
-    private void sendHungerMessage() {
-        if(this instanceof IFortressAwareEntity fae) {
-            final HungerManager hungerManager = getHungerManager();
-            if(hungerManager.prevFoodLevel > 0 && hungerManager.getFoodLevel() <= 0) {
-                fae.sendMessageToMasterPlayer(getName().asString() + "is starving! Do something!");
-            } else if(hungerManager.prevFoodLevel >= 5 && hungerManager.foodLevel < 5) {
-                fae.sendMessageToMasterPlayer(getName().asString() + " is very hungry! Bring some food to the village!");
-            } else if(hungerManager.prevFoodLevel >= 10 && hungerManager.foodLevel < 10) {
-                fae.sendMessageToMasterPlayer(getName().asString() + " is hungry. It's time to eat something!");
-            }
-        }
     }
 
     @Override
@@ -86,5 +84,22 @@ public abstract class HungryColonistEntity extends BaritonableEntity implements 
     public final ItemStack eatFood(World world, ItemStack stack) {
         this.getHungerManager().eat(stack.getItem(), stack);
         return super.eatFood(world, stack);
+    }
+
+    private void sendHungerMessage() {
+        if(this instanceof IFortressAwareEntity fae) {
+            final HungerManager hungerManager = getHungerManager();
+            if(hungerManager.prevFoodLevel > 0 && hungerManager.getFoodLevel() <= 0) {
+                fae.sendMessageToMasterPlayer(getName().asString() + "is starving! Do something!");
+            } else if(hungerManager.prevFoodLevel >= 5 && hungerManager.foodLevel < 5) {
+                fae.sendMessageToMasterPlayer(getName().asString() + " is very hungry! Bring some food to the village!");
+            } else if(hungerManager.prevFoodLevel >= 10 && hungerManager.foodLevel < 10) {
+                fae.sendMessageToMasterPlayer(getName().asString() + " is hungry. It's time to eat something!");
+            }
+        }
+    }
+
+    private void updateCurrentFoodLevel() {
+        this.dataTracker.set(CURRENT_FOOD_LEVEL, this.fortHungMan.toHungerManager().getFoodLevel());
     }
 }
