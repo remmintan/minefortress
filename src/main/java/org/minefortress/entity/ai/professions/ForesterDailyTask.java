@@ -12,7 +12,7 @@ import org.minefortress.utils.BuildingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.minefortress.entity.colonist.ColonistHungerManager.PASSIVE_EXHAUSTION;
+import static org.minefortress.entity.colonist.FortressHungerManager.PASSIVE_EXHAUSTION;
 import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
 
 public class ForesterDailyTask implements ProfessionDailyTask{

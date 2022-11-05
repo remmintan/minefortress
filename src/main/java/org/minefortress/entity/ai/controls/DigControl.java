@@ -13,9 +13,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.AbstractFortressManager;
 
-import static org.minefortress.entity.colonist.ColonistHungerManager.ACTIVE_EXHAUSTION;
+import static org.minefortress.entity.colonist.FortressHungerManager.ACTIVE_EXHAUSTION;
 
 public class DigControl extends PositionedActionControl {
 

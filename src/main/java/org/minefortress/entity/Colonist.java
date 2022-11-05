@@ -52,7 +52,7 @@ import org.minefortress.entity.ai.MineFortressInventory;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
-import org.minefortress.entity.colonist.ColonistHungerManager;
+import org.minefortress.entity.colonist.FortressHungerManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.server.FortressModServerManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -93,7 +93,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     private int selectedSlot = 0;
 
     private boolean allowToPlaceBlockFromFarAway = false;
-    private final ColonistHungerManager hungerManager = new ColonistHungerManager();
+    private final FortressHungerManager hungerManager = new FortressHungerManager();
 
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
@@ -165,7 +165,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         this.hungerManager.addExhaustion(exhaustion);
     }
 
-    public ColonistHungerManager getHungerManager() {
+    public FortressHungerManager getHungerManager() {
         return hungerManager;
     }
 

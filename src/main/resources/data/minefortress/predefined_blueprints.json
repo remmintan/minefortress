@@ -126,7 +126,7 @@
       "name": "Medium Warrior's house",
       "file": "warrior_2",
       "requirementId": "warrior2",
-      "floorLevel": 0
+      "floorLevel": 1
     },
     {
       "name": "Shooting gallery",

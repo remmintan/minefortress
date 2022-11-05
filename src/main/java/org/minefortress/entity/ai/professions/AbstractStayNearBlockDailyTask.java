@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 
-import static org.minefortress.entity.colonist.ColonistHungerManager.PASSIVE_EXHAUSTION;
+import static org.minefortress.entity.colonist.FortressHungerManager.PASSIVE_EXHAUSTION;
 
 abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
 

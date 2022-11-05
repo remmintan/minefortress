@@ -6,7 +6,7 @@ import org.minefortress.fortress.FortressServerManager;
 
 import java.util.Optional;
 
-import static org.minefortress.entity.colonist.ColonistHungerManager.IDLE_EXHAUSTION;
+import static org.minefortress.entity.colonist.FortressHungerManager.IDLE_EXHAUSTION;
 
 public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
 
