@@ -23,14 +23,13 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BaseColonistEntity extends HungryColonistEntity implements IFortressAwareEntity {
+public class BasePawnEntity extends HungryEntity implements IFortressAwareEntity {
 
     private static final String FORTRESS_ID_KEY = "playerId";
-    private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(BaseColonistEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
 
-    protected BaseColonistEntity(EntityType<? extends BaseColonistEntity> entityType, World world, boolean enableHunger) {
+    protected BasePawnEntity(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world, enableHunger);
-
         this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
     }
 

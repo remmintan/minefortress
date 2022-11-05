@@ -16,15 +16,15 @@ import org.minefortress.entity.colonist.FakeHungerManager;
 import org.minefortress.entity.colonist.FortressHungerManager;
 import org.minefortress.entity.colonist.IFortressHungerManager;
 
-public abstract class HungryColonistEntity extends BaritonableEntity implements IHungerAwareEntity{
+public abstract class HungryEntity extends BaritonableEntity implements IHungerAwareEntity{
 
-    private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(HungryColonistEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(HungryEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final String HUNGER_MANAGER_NBT_KEY = "hunger";
 
     private final IFortressHungerManager fortHungMan;
     private final EatControl eatControl;
 
-    protected HungryColonistEntity(EntityType<? extends PathAwareEntity> entityType, World world, boolean enableHunger) {
+    protected HungryEntity(EntityType<? extends PathAwareEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world);
         fortHungMan = enableHunger ? new FortressHungerManager() : new FakeHungerManager();
 

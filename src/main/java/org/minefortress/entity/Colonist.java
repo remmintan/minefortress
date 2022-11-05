@@ -48,7 +48,7 @@ import org.minefortress.tasks.block.info.TaskBlockInfo;
 import java.util.List;
 import java.util.Optional;
 
-public class Colonist extends BaseColonistEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
+public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
 
     public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;
