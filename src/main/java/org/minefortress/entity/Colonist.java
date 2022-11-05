@@ -9,7 +9,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityData;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
@@ -24,12 +27,8 @@ import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.SlimeEntity;
-import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -52,11 +51,8 @@ import org.minefortress.entity.ai.MineFortressInventory;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
-import org.minefortress.entity.colonist.FortressHungerManager;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.server.FortressModServerManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
@@ -65,7 +61,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist {
+public class Colonist extends BaseColonistEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
 
     public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;
@@ -88,16 +84,11 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     private final FightControl fightControl;
     private final EatControl eatControl;
     private final IBaritone baritone;
-    private final Inventory inventory;
-
-    private int selectedSlot = 0;
 
     private boolean allowToPlaceBlockFromFarAway = false;
-    private final FortressHungerManager hungerManager = new FortressHungerManager();
-
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
-        super(entityType, world);
+        super(entityType, world, true);
 
         if(world instanceof ServerWorld) {
             digControl = new DigControl(this, (ServerWorld) world);
@@ -108,7 +99,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
             movementHelper = new MovementHelper(this);
             fightControl = new FightControl(this);
             eatControl = new EatControl(this);
-            inventory = new MineFortressInventory();
         } else {
             digControl = null;
             placeControl = null;
@@ -118,7 +108,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
             movementHelper = null;
             fightControl = null;
             eatControl = null;
-            inventory = null;
         }
 
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
@@ -133,64 +122,28 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         return baritone;
     }
 
+    public ServerWorld getServerWorld() {
+        return (ServerWorld) this.world;
+    }
+
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-        if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
-        this.setFortressId(entityNbt.getUuid("fortressUUID"));
-        if(this.getFortressId() == null) throw new IllegalStateException("Fortress UUID cannot be null for colonist");
-        getFortressServerManager().addColonist(this);
+        final var initResult = super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
         this.setCustomNameIfNeeded();
-
-        return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+        return initResult;
     }
 
     public MovementHelper getMovementHelper() {
         return movementHelper;
     }
 
-    public float getHungerMultiplier() {
-        final var foodLevel = this.hungerManager.getFoodLevel();
-        if(foodLevel  < 5) return 3f;
-        if(foodLevel  < 10) return 1.5f;
-        return 1f;
-    }
-
     private void setCustomNameIfNeeded() {
-        if(!this.hasCustomName()) {
-            this.setCustomName(new LiteralText(getFortressServerManager().getNameGenerator().generateRandomName()));
-        }
-    }
+        getFortressServerManager().ifPresent(it -> {
+            if(!this.hasCustomName()) {
+                this.setCustomName(new LiteralText(it.getNameGenerator().generateRandomName()));
+            }
+        });
 
-    public void addExhaustion(float exhaustion) {
-        this.hungerManager.addExhaustion(exhaustion);
-    }
-
-    public FortressHungerManager getHungerManager() {
-        return hungerManager;
-    }
-
-    @Override
-    public void selectSlot(int i) {
-        this.selectedSlot = i;
-        this.setStackInHand(Hand.MAIN_HAND, this.getInventory().getStack(this.selectedSlot));
-    }
-
-    @Override
-    public int getSelectedSlot() {
-        return this.selectedSlot;
-    }
-
-    @Override
-    public ItemStack eatFood(World world, ItemStack stack) {
-        this.getHungerManager().eat(stack.getItem(), stack);
-        return super.eatFood(world, stack);
-    }
-
-    public FortressServerManager getFortressServerManager() {
-        if(this.getFortressId() == null){
-            throw new IllegalStateException("Fortress id is null");
-        }
-        return getFortressModServerManager().getByFortressId(this.getFortressId());
     }
 
     public void putItemInHand(Item item) {
@@ -310,12 +263,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
     }
 
-    @Nullable
-    @Override
-    public PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
-        return null;
-    }
-
     @Override
     public void tickMovement() {
         super.tickHandSwing();
@@ -352,13 +299,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         if(target != null && !target.isAlive()) {
             this.setTarget(null);
         }
-
-        this.hungerManager.update(this);
-
-        if(this.getCurrentFoodLevel() != this.hungerManager.getFoodLevel()) {
-            sendHungerMessage();
-            this.updateCurrentFoodLevel();
-        }
     }
 
     public void sendMessageToMasterPlayer(String message) {
@@ -373,26 +313,12 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
                 .orElse(false);
     }
 
-    private void sendHungerMessage() {
-        if(hungerManager.prevFoodLevel > 0 && this.hungerManager.getFoodLevel() <= 0) {
-            sendMessageToMasterPlayer(getName().asString() + "is starving! Do something!");
-        } else if(this.hungerManager.prevFoodLevel >= 5 && this.hungerManager.foodLevel < 5) {
-            sendMessageToMasterPlayer(getName().asString() + " is very hungry! Bring some food to the village!");
-        } else if(this.hungerManager.prevFoodLevel >= 10 && this.hungerManager.foodLevel < 10) {
-            sendMessageToMasterPlayer(getName().asString() + " is hungry. It's time to eat something!");
-        }
-    }
-
-    public Optional<ServerPlayerEntity> getMasterPlayer() {
-        if(this.getFortressId() == null) throw new IllegalStateException("Fortress ID is null");
-        return getFortressModServerManager().getPlayerByFortressId(this.getFortressId());
-    }
-
     private void tickProfessionCheck() {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId)) {
-            final ServerProfessionManager manager = getFortressServerManager().getServerProfessionManager();
-            manager.getProfessionsWithAvailablePlaces().ifPresent(p -> this.dataTracker.set(PROFESSION_ID, p));
+            getFortressServerManager().map(FortressServerManager::getServerProfessionManager)
+                    .flatMap(ServerProfessionManager::getProfessionsWithAvailablePlaces)
+                    .ifPresent(p -> this.dataTracker.set(PROFESSION_ID, p));
         }
     }
 
@@ -401,7 +327,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
             final var client = (FortressMinecraftClient) MinecraftClient.getInstance();
             return client.getFortressClientManager().isCreative();
         } else {
-            return getFortressServerManager().isCreative();
+            return getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
         }
     }
 
@@ -517,11 +443,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putUuid("playerId", this.getFortressId());
-
-        final NbtCompound hunger = new NbtCompound();
-        this.hungerManager.writeNbt(hunger);
-        nbt.put("hunger", hunger);
+        this.getFortressId().ifPresent(it -> nbt.putUuid("playerId", it));
 
         final String professionId = this.getProfessionId();
         if(!DEFAULT_PROFESSION_ID.equals(professionId)) {
@@ -545,10 +467,7 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         super.readCustomDataFromNbt(nbt);
         if(nbt == null) return;
         this.setFortressId(nbt.getUuid("playerId"));
-        if(nbt.contains("hunger")) {
-            this.hungerManager.readNbt(nbt.getCompound("hunger"));
-        }
-        getFortressServerManager().addColonist(this);
+        getFortressServerManager().ifPresent(it -> it.addColonist(this));
 
         if(nbt.contains("professionId")) {
             final String professionId = nbt.getString("professionId");
@@ -558,12 +477,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         if (nbt.contains("guyType")) {
             this.dataTracker.set(GUY_TYPE, nbt.getInt("guyType"));
         }
-    }
-
-    private FortressModServerManager getFortressModServerManager() {
-        final var server = super.getServer();
-        if(!(server instanceof FortressServer fortressServer)) throw new IllegalStateException("FortressServerManager is only available on FortressServer");
-        return fortressServer.getFortressModServerManager();
     }
 
     public boolean isAllowToPlaceBlockFromFarAway() {
@@ -580,14 +493,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
 
     public String getCurrentTaskDesc() {
         return this.dataTracker.get(CURRENT_TASK_DECRIPTION);
-    }
-
-    public void updateCurrentFoodLevel() {
-        this.dataTracker.set(CURRENT_FOOD_LEVEL, this.hungerManager.getFoodLevel());
-    }
-
-    public int getCurrentFoodLevel() {
-        return this.dataTracker.get(CURRENT_FOOD_LEVEL);
     }
 
     public void setProfession(String professionId) {
@@ -630,22 +535,4 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         this.dataTracker.set(FORTRESS_ID, Optional.ofNullable(id));
     }
 
-    public UUID getFortressId() {
-        return this.dataTracker.get(FORTRESS_ID).orElse(null);
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return inventory;
-    }
-
-    @Override
-    public @Nullable ServerPlayerEntity getPlayer() {
-        return getMasterPlayer().orElse(null);
-    }
-
-    @Override
-    public Fluid getBucketFluid(BucketItem bucketItem) {
-        return bucketItem.fluid;
-    }
 }

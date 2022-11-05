@@ -1,6 +1,6 @@
 package org.minefortress.fight;
 
-import org.minefortress.entity.Colonist;
+import org.minefortress.entity.IWarriorPawn;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,9 +8,9 @@ import java.util.List;
 
 public class ServerFightSelectionManager {
 
-    private List<Colonist> selectedColonists = new ArrayList<>();
+    private List<IWarriorPawn> selectedColonists = new ArrayList<>();
 
-    public void selectColonists(List<Colonist> colonists) {
+    public void selectColonists(List<IWarriorPawn> colonists) {
         selectedColonists = colonists;
     }
 
@@ -18,7 +18,7 @@ public class ServerFightSelectionManager {
         selectedColonists = Collections.emptyList();
     }
 
-    public List<Colonist> getSelectedColonists() {
+    public List<IWarriorPawn> getSelectedColonists() {
         return selectedColonists;
     }
 }

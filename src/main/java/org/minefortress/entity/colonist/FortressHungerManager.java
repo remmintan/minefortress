@@ -8,12 +8,9 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.IFortressAwareEntity;
 import org.minefortress.fortress.FortressServerManager;
 
-public class FortressHungerManager extends HungerManager {
+public class FortressHungerManager extends HungerManager implements IFortressHungerManager {
 
-    public static final float ACTIVE_EXHAUSTION = 0.005f;
-    public static final float PASSIVE_EXHAUSTION = 0.0035f;
-    public static final float IDLE_EXHAUSTION = 0.002f;
-
+    @Override
     public void update(LivingEntity livingEntity) {
         if(livingEntity instanceof IFortressAwareEntity fae) {
             final var creative = fae.getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
@@ -58,5 +55,10 @@ public class FortressHungerManager extends HungerManager {
         } else {
             this.foodTickTimer = 0;
         }
+    }
+
+    @Override
+    public HungerManager toHungerManager() {
+        return this;
     }
 }

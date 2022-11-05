@@ -49,19 +49,19 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
 
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
-        final FortressServerManager fortressManager = colonist.getFortressServerManager();
-        Optional<BlockPos> tablePosOpt = fortressManager.getSpecialBlocksByType(Blocks.CRAFTING_TABLE, true)
-                .stream()
-                .findFirst();
-
-        if(tablePosOpt.isEmpty()) {
-            tablePosOpt = fortressManager.getSpecialBlocksByType(Blocks.CRAFTING_TABLE, false)
-                    .stream()
-                    .findFirst();
-        }
-
-        if(tablePosOpt.isEmpty()) return null;
-        return tablePosOpt.get();
+         return colonist
+                    .getFortressServerManager()
+                    .map(it -> it
+                            .getSpecialBlocksByType(Blocks.CRAFTING_TABLE, true)
+                            .stream()
+                            .findFirst()
+                            .orElseGet(() -> it
+                                    .getSpecialBlocksByType(Blocks.CRAFTING_TABLE, false)
+                                    .stream()
+                                    .findFirst()
+                                    .orElse(null)
+                            )
+                    ).orElse(null);
     }
 
     private boolean craftingTableMenuOpened(Colonist colonsit) {

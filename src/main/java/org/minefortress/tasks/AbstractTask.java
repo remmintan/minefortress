@@ -6,6 +6,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.IFortressAwareEntity;
+import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.network.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -92,11 +94,10 @@ public abstract class AbstractTask implements Task {
     }
 
     @Override
-    public void finishPart(TaskPart part, Colonist colonsit) {
+    public void finishPart(TaskPart part, IWorkerPawn colonsit) {
         completedParts++;
         if(parts.isEmpty() && totalParts <= completedParts) {
-            final var masterPlayerOpt = colonsit.getMasterPlayer();
-            masterPlayerOpt.ifPresent(this::sendFinishTaskNotificationToPlayer);
+            colonsit.getMasterPlayer().ifPresent(this::sendFinishTaskNotificationToPlayer);
             taskFinishListeners.forEach(Runnable::run);
         }
     }

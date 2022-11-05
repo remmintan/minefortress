@@ -33,7 +33,7 @@ public class ColonistEatGoal extends AbstractFortressGoal {
     }
 
     private Optional<BlockPos> getRandomPositionAroundCampfire() {
-        return colonist.getFortressServerManager().getRandomPositionAroundCampfire();
+        return colonist.getFortressServerManager().orElseThrow().getRandomPositionAroundCampfire();
     }
 
     @Override

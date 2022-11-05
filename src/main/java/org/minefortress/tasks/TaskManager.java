@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.tasks.interfaces.Task;
@@ -22,16 +23,16 @@ public class TaskManager {
     public void tick(FortressServerManager manager, ServerWorld world) {
         if(!hasTask()) return;
         final Task task = this.getTask();
-        final List<Colonist> freeColonists = manager.getFreeColonists();
+        final List<IWorkerPawn> freeColonists = manager.getFreeColonists();
         if(freeColonists.isEmpty()) return;
         final TaskType taskType = task.getTaskType();
         if(taskType == TaskType.BUILD) {
-            final List<Colonist> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
+            final List<IWorkerPawn> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
 
             boolean fullyCompleted = setPawnsToTask(world, task, completelyFreePawns);
             if(fullyCompleted) return;
 
-            final List<Colonist> otherPawns = freeColonists
+            final List<IWorkerPawn> otherPawns = freeColonists
                     .stream()
                     .filter(c -> isBuilderProfession(c.getProfessionId()))
                     .filter(c -> c.getTaskControl().canStartTask(task))
@@ -41,7 +42,7 @@ public class TaskManager {
             setPawnsToTask(world, task, otherPawns);
         } else {
             final List<String> professions = getProfessionIdFromTask(task);
-            final List<Colonist> professionals = freeColonists
+            final List<IWorkerPawn> professionals = freeColonists
                     .stream()
                     .filter(c -> professions.contains(c.getProfessionId()))
                     .filter(c -> c.getTaskControl().canStartTask(task))
@@ -50,7 +51,7 @@ public class TaskManager {
             boolean fullyCompleted = setPawnsToTask(world, task, professionals);
             if(fullyCompleted) return;
 
-            final List<Colonist> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
+            final List<IWorkerPawn> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
             setPawnsToTask(world, task, completelyFreePawns);
         }
     }
@@ -83,7 +84,7 @@ public class TaskManager {
     }
 
     @NotNull
-    private List<Colonist> getCompletelyFreePawns(Task task, List<Colonist> freeColonists) {
+    private List<IWorkerPawn> getCompletelyFreePawns(Task task, List<IWorkerPawn> freeColonists) {
         return freeColonists
                 .stream()
                 .filter(c -> isBuilderProfession(c.getProfessionId()))
@@ -103,8 +104,8 @@ public class TaskManager {
         return BUILDER_PROFESSIONS.contains(professionId);
     }
 
-    private boolean setPawnsToTask(ServerWorld world, Task task, List<Colonist> completelyFreePawns) {
-        for(Colonist c : completelyFreePawns) {
+    private boolean setPawnsToTask(ServerWorld world, Task task, List<IWorkerPawn> completelyFreePawns) {
+        for(IWorkerPawn c : completelyFreePawns) {
             if(!task.hasAvailableParts()) break;
             c.getTaskControl().setTask(task, task.getNextPart(world, c), this::returnTaskPart, () -> this.isCancelled(task.getId()));
         }

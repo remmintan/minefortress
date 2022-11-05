@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.FortressServerManager;
 
 import static org.minefortress.entity.colonist.FortressHungerManager.ACTIVE_EXHAUSTION;
 
@@ -42,7 +43,7 @@ public class DigControl extends PositionedActionControl {
     private boolean act() {
         putProperItemInHand();
 
-        colonist.addExhaustion(ACTIVE_EXHAUSTION);
+        colonist.addHunger(ACTIVE_EXHAUSTION);
         if(destroyProgress >= 1.0f){
             this.destroyProgress = 0f;
             addDropToTheResourceManager(level, goal, colonist);
@@ -64,7 +65,7 @@ public class DigControl extends PositionedActionControl {
         final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(g, blockState) : null;
         final var drop = Block.getDroppedStacks(blockState, w, g, blockEntity);
 
-        final var fortressServerManager = c.getFortressServerManager();
+        final var fortressServerManager = c.getFortressServerManager().orElseThrow();
         if(fortressServerManager.isSurvival()) {
             final var serverResourceManager = fortressServerManager.getServerResourceManager();
             for (ItemStack itemStack : drop) {
@@ -76,7 +77,7 @@ public class DigControl extends PositionedActionControl {
     }
 
     private void putProperItemInHand() {
-        final var creative = colonist.getFortressServerManager().isCreative();
+        final var creative = colonist.getFortressServerManager().orElseThrow().isCreative();
 
         final BlockState blockState = level.getBlockState(goal);
         Item item = null;
@@ -131,7 +132,7 @@ public class DigControl extends PositionedActionControl {
     }
 
     private float getDestroyProgress(BlockState p_60466_, Colonist p_60467_, StructureWorldAccess p_60468_, BlockPos p_60469_) {
-        final boolean creative = colonist.getFortressServerManager().isCreative();
+        final boolean creative = colonist.getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
         if(creative) return 1.0f;
 
         float f = p_60466_.getHardness(p_60468_, p_60469_);

@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.tasks.TaskPart;
 import org.minefortress.tasks.TaskType;
 
@@ -16,8 +17,8 @@ public interface Task {
     default void prepareTask() {}
 
     boolean hasAvailableParts();
-    TaskPart getNextPart(ServerWorld level, Colonist colonist);
+    TaskPart getNextPart(ServerWorld level, IWorkerPawn colonist);
     void returnPart(Pair<BlockPos, BlockPos> partStartAndEnd);
-    void finishPart(TaskPart part, Colonist colonist);
+    void finishPart(TaskPart part, IWorkerPawn colonist);
 
 }

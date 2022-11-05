@@ -2,10 +2,12 @@ package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.entity.ai.controls.DigControl;
 import org.minefortress.network.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -48,7 +50,7 @@ public class CutTreesTask implements Task {
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld level, Colonist colonist) {
+    public TaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
         if(!treeRoots.isEmpty()) {
             final BlockPos root = treeRoots.remove();
             final TaskBlockInfo rootBlockInfo = new DigTaskBlockInfo( root);
@@ -65,23 +67,23 @@ public class CutTreesTask implements Task {
     }
 
     @Override
-    public void finishPart(TaskPart part, Colonist colonist) {
-        final ServerWorld world = (ServerWorld) colonist.world;
+    public void finishPart(TaskPart part, IWorkerPawn colonist) {
+        final ServerWorld world = colonist.getServerWorld();
         if(part != null && part.getStartAndEnd() != null && part.getStartAndEnd().getFirst() != null) {
             final BlockPos root = part.getStartAndEnd().getFirst();
             final Optional<TreeBlocks> treeOpt = TreeHelper.getTreeBlocks(root.up(), world);
             if(treeOpt.isPresent()) {
                 final TreeBlocks tree = treeOpt.get();
                 tree.getTreeBlocks().forEach(blockPos -> {
-                    DigControl.addDropToTheResourceManager(world, blockPos, colonist);
+                    DigControl.addDropToTheResourceManager(world, blockPos, (Colonist) colonist);
                     world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 3);
-                    world.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
+                    world.emitGameEvent((Entity) colonist, GameEvent.BLOCK_DESTROY, blockPos);
 
                 });
                 tree.getLeavesBlocks().forEach(blockPos -> {
-                    DigControl.addDropToTheResourceManager(world, blockPos, colonist);
+                    DigControl.addDropToTheResourceManager(world, blockPos, (Colonist) colonist);
                     world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 3);
-                    world.emitGameEvent(colonist, GameEvent.BLOCK_DESTROY, blockPos);
+                    world.emitGameEvent((Entity) colonist, GameEvent.BLOCK_DESTROY, blockPos);
                 });
             }
         }

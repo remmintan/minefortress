@@ -4,11 +4,12 @@ import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.IFortressAwareEntity;
 import org.minefortress.fortress.FortressServerManager;
 
 public class FortressEscapeDangerGoal extends EscapeDangerGoal {
 
-    private final Colonist colonist;
+    private final IFortressAwareEntity colonist;
 
     public FortressEscapeDangerGoal(Colonist mob, double speed) {
         super(mob, speed);
@@ -17,26 +18,26 @@ public class FortressEscapeDangerGoal extends EscapeDangerGoal {
 
     @Override
     public boolean canStart() {
-        return super.canStart() && !isFighting() && !colonist.getFightControl().isWarrior();
+        return super.canStart() && !isFighting();
     }
 
     @Override
     public void start() {
         super.start();
-        final var it = colonist.getFortressServerManager();
-        if(it.isCombatMode()) return;
-        it.setCombatMode(true, true);
-        colonist.sendMessageToMasterPlayer("§a Village is under attack!  Defend it!§a");
-        it.getServerFightManager().addScaryMob(this.colonist.getAttacker());
-
+        colonist.getFortressServerManager().ifPresent(it -> {
+            if(it.isCombatMode()) return;
+            it.setCombatMode(true, true);
+//            colonist.sendMessageToMasterPlayer("§a Village is under attack!  Defend it!§a");
+//            it.getServerFightManager().addScaryMob(this.colonist.getAttacker());
+        });
     }
 
     protected boolean isFighting() {
-        return isFortressInCombatMode() && colonist.getFightControl().isDefender();
+        return isFortressInCombatMode();
     }
 
     private boolean isFortressInCombatMode() {
-        return colonist.getFortressServerManager().isCombatMode();
+        return colonist.getFortressServerManager().map(FortressServerManager::isCombatMode).orElse(false);
     }
 
 }

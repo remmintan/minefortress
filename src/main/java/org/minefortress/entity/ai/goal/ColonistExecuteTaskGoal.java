@@ -113,6 +113,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
                 LOGGER.debug("{} stopping task execution because of combat. Return reserved items for task {}", getColonistName(), id);
                 colonist
                         .getFortressServerManager()
+                        .orElseThrow()
                         .getServerResourceManager()
                         .returnReservedItems(id);
             } else {
@@ -167,7 +168,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     private boolean blockInCorrectState(BlockPos pos) {
         if(pos == null) return false;
         if(getTaskControl().is(TaskType.REMOVE)) {
-            if(colonist.getFortressServerManager().getFortressCenter().equals(pos)) return false;
+            if(pos.equals(colonist.getFortressServerManager().orElseThrow().getFortressCenter())) return false;
             return BuildingHelper.canRemoveBlock(world, pos);
         } else if(getTaskControl().is(TaskType.BUILD)) {
             return BuildingHelper.canPlaceBlock(world, pos);

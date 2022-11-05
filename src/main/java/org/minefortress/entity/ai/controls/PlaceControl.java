@@ -56,7 +56,7 @@ public class PlaceControl extends PositionedActionControl {
 
         if (placeCooldown <= 0) {
             this.colonist.swingHand(Hand.MAIN_HAND);
-            colonist.addExhaustion(ACTIVE_EXHAUSTION);
+            colonist.addHunger(ACTIVE_EXHAUSTION);
 
             if(taskBlockInfo instanceof ItemTaskBlockInfo)
                 place((ItemTaskBlockInfo) taskBlockInfo);
@@ -92,7 +92,7 @@ public class PlaceControl extends PositionedActionControl {
     }
 
     private void decreaseResourcesAndAddSpecialBlocksAmount() {
-        final var fortressServerManager = colonist.getFortressServerManager();
+        final var fortressServerManager = colonist.getFortressServerManager().orElseThrow();
         final var taskControl = colonist.getTaskControl();
         if(fortressServerManager.isSurvival()) {
             if (isIgnorable(item) || !taskControl.hasTask()) {

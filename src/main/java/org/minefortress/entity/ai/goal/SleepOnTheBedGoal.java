@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressBedInfo;
+import org.minefortress.fortress.FortressServerManager;
 
 import java.util.Optional;
 
@@ -50,12 +51,13 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
                 }
             }
         } else if(movementHelper.isStuck()) {
-            colonist.getFortressServerManager().getRandomPositionAroundCampfire().ifPresent(it -> {
-                final var pos = it.up();
-                colonist.resetControls();
-                colonist.teleport(pos.getX(), pos.getY(), pos.getZ());
-                moveToBed();
-            });
+            colonist.getFortressServerManager().flatMap(FortressServerManager::getRandomPositionAroundCampfire)
+                    .ifPresent(it -> {
+                        final var pos = it.up();
+                        colonist.resetControls();
+                        colonist.teleport(pos.getX(), pos.getY(), pos.getZ());
+                        moveToBed();
+                    });
         }
     }
 
@@ -87,7 +89,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
 
     @NotNull
     private Optional<FortressBedInfo> getFreeBed() {
-        return colonist.getFortressServerManager().getFreeBed();
+        return colonist.getFortressServerManager().flatMap(FortressServerManager::getFreeBed);
     }
 
     private boolean isNight() {

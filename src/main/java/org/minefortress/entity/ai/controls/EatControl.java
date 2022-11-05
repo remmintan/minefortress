@@ -43,7 +43,7 @@ public class EatControl {
 
     public void putFoodInHand() {
         this.getEatableItem().ifPresent(item -> {
-            final var fortressServerManager = colonist.getFortressServerManager();
+            final var fortressServerManager = colonist.getFortressServerManager().orElseThrow();
             if(!fortressServerManager.isVillageUnderAttack())
                 fortressServerManager.getServerResourceManager().increaseItemAmount(item.getItem(), -1);
             this.foodInHand = item.getItem();
@@ -52,6 +52,7 @@ public class EatControl {
 
     private Optional<ItemStack> getEatableItem() {
         return colonist.getFortressServerManager()
+                .orElseThrow()
                 .getServerResourceManager()
                 .getAllItems()
                 .stream()

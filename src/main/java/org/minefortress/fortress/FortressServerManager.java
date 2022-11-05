@@ -14,7 +14,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -28,7 +27,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.controls.TaskControl;
+import org.minefortress.entity.IWarriorPawn;
+import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fight.ServerFightManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
@@ -56,7 +56,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     
     private final MinecraftServer server;
     
-    private final Set<Colonist> colonists = new HashSet<>();
+    private final Set<LivingEntity> colonists = new HashSet<>();
     private final Set<FortressBuilding> buildings = new HashSet<>();
 
     private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
@@ -118,7 +118,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Optional.empty();
     }
 
-    public void addColonist(Colonist colonist) {
+    public void addColonist(LivingEntity colonist) {
         colonists.add(colonist);
         scheduleSync();
     }
@@ -197,14 +197,16 @@ public final class FortressServerManager extends AbstractFortressManager {
                     .forEach(it -> it.damage(DamageSource.OUT_OF_WORLD, 40f));
         }
 
-        final List<Colonist> deadColonists = colonists.stream()
+        final List<LivingEntity> deadColonists = colonists.stream()
                 .filter(colonist -> !colonist.isAlive())
                 .collect(Collectors.toList());
 
         if(!deadColonists.isEmpty()) {
-            for(Colonist colonist : deadColonists) {
-                final String professionId = colonist.getProfessionId();
-                serverProfessionManager.decreaseAmount(professionId);
+            for(LivingEntity colonist : deadColonists) {
+                if(colonist instanceof IWorkerPawn craftsmanPawn) {
+                    final String professionId = craftsmanPawn.getProfessionId();
+                    serverProfessionManager.decreaseAmount(professionId);
+                }
                 colonists.remove(colonist);
             }
             scheduleSync();
@@ -282,14 +284,14 @@ public final class FortressServerManager extends AbstractFortressManager {
         colonists.forEach(it -> it.damage(DamageSource.OUT_OF_WORLD, 40f));
     }
 
+    private Stream<IWorkerPawn> getWorkersStream() {
+        return colonists.stream()
+                .filter(it -> it instanceof IWorkerPawn)
+                .map(it -> (IWorkerPawn) it);
+    }
+
     private boolean pawnsDontHaveTask() {
-        for(Colonist colonist : colonists) {
-            final var taskControl = colonist.getTaskControl();
-            if(taskControl.hasTask()) {
-                return false;
-            }
-        }
-        return true;
+        return getWorkersStream().noneMatch(it -> it.getTaskControl().hasTask());
     }
 
     public Optional<Colonist> spawnPawnNearCampfire() {
@@ -362,7 +364,11 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.scheduleSync();
     }
 
-    public Set<Colonist> getColonists() {
+    public Set<IWorkerPawn> getWorkers() {
+        return getWorkersStream().collect(Collectors.toUnmodifiableSet());
+    }
+
+    public Set<LivingEntity> getColonists() {
         return Collections.unmodifiableSet(colonists);
     }
 
@@ -628,8 +634,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         return serverProfessionManager;
     }
 
-    public List<Colonist> getFreeColonists() {
-        return this.colonists.stream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
+    public List<IWorkerPawn> getFreeColonists() {
+        return getWorkersStream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
     }
 
     public List<BlockPos> getSpecialBlocksByType(Block block, boolean blueprint) {
@@ -666,6 +672,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         return villageUnderAttack;
     }
 
+    private Stream<IWarriorPawn> getWarriorsStream() {
+        return getWorkersStream().filter(IWarriorPawn.class::isInstance).map(IWarriorPawn.class::cast);
+    }
+
     public void setCombatMode(boolean combatMode, boolean villageUnderAttack) {
         this.attackTicks = 0;
         if(this.combatMode == combatMode) {
@@ -675,15 +685,17 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.combatMode = combatMode;
         this.villageUnderAttack = villageUnderAttack;
         this.scheduleSyncCombat();
-        for(Colonist colonist : this.colonists) {
-            if(!colonist.getFightControl().isDefender()) continue;
-            final var fightControl = colonist.getFightControl();
-            if(this.combatMode) {
-                fightControl.setMoveTarget(this.fortressCenter);
-            } else {
-                fightControl.reset();
+
+        getWarriorsStream().forEach(colonist -> {
+            if(!colonist.getFightControl().isDefender()) {
+                final var fightControl = colonist.getFightControl();
+                if(this.combatMode) {
+                    fightControl.setMoveTarget(this.fortressCenter);
+                } else {
+                    fightControl.reset();
+                }
             }
-        }
+        });
     }
 
     public void selectColonists(List<Integer> selectedIds) {
@@ -693,7 +705,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             return;
         }
 
-        final var selectedColonists = this.colonists.stream()
+        final var selectedColonists = getWarriorsStream()
                 .filter(c -> selectedIds.contains(c.getId()))
                 .filter(c -> c.getFightControl().isDefender())
                 .toList();

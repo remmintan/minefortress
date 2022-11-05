@@ -4,6 +4,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.ClientboundProfessionSyncPacket;
@@ -87,14 +88,14 @@ public class ServerProfessionManager extends ProfessionManager{
         for(Map.Entry<String, Profession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
             final Profession profession = entry.getValue();
-            final List<Colonist> colonistsWithProfession = this.getColonistsWithProfession(professionId);
+            final List<IWorkerPawn> colonistsWithProfession = this.getColonistsWithProfession(professionId);
             final int redundantProfCount = colonistsWithProfession.size() - profession.getAmount();
             if(redundantProfCount <= 0) continue;
 
-            final List<Colonist> colonistsToRemove = colonistsWithProfession.stream()
+            final List<IWorkerPawn> colonistsToRemove = colonistsWithProfession.stream()
                     .limit(redundantProfCount)
                     .collect(Collectors.toList());
-            colonistsToRemove.forEach(Colonist::resetProfession);
+            colonistsToRemove.forEach(IWorkerPawn::resetProfession);
         }
     }
 
@@ -132,16 +133,16 @@ public class ServerProfessionManager extends ProfessionManager{
     private long countColonistsWithProfession(String professionId) {
         final FortressServerManager fortressServerManager = (FortressServerManager) super.fortressManagerSupplier.get();
         return fortressServerManager
-                .getColonists()
+                .getWorkers()
                 .stream()
                 .filter(colonist -> colonist.getProfessionId().equals(professionId))
                 .count();
     }
 
-    private List<Colonist> getColonistsWithProfession(String professionId) {
+    private List<IWorkerPawn> getColonistsWithProfession(String professionId) {
         final FortressServerManager fortressServerManager = (FortressServerManager) super.fortressManagerSupplier.get();
         return fortressServerManager
-                .getColonists()
+                .getWorkers()
                 .stream()
                 .filter(colonist -> colonist.getProfessionId().equals(professionId))
                 .collect(Collectors.toList());

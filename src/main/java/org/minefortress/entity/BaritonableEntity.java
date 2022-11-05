@@ -1,4 +1,4 @@
-package org.minefortress.entity.ai;
+package org.minefortress.entity;
 
 import baritone.api.minefortress.IMinefortressEntity;
 import net.minecraft.entity.EntityType;
@@ -11,6 +11,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.BucketItem;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
+import org.minefortress.entity.ai.MineFortressInventory;
 
 public abstract class BaritonableEntity extends PathAwareEntity implements IMinefortressEntity {
 
@@ -26,22 +27,22 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IMine
     }
 
     @Override
-    public Inventory getInventory() {
+    public final Inventory getInventory() {
         return fakeInventory;
     }
 
     @Override
-    public void selectSlot(int i) {
+    public final void selectSlot(int i) {
         this.dataTracker.set(SELECTED_SLOT_ID, i);
     }
 
     @Override
-    public int getSelectedSlot() {
+    public final int getSelectedSlot() {
         return this.dataTracker.get(SELECTED_SLOT_ID);
     }
 
     @Override
-    public Fluid getBucketFluid(BucketItem bucketItem) {
+    public final Fluid getBucketFluid(BucketItem bucketItem) {
         return bucketItem.fluid;
     }
 

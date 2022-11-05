@@ -44,7 +44,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
             if(workingTicks % 10 * colonist.getHungerMultiplier() == 0) {
                 colonist.swingHand(colonist.world.random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
                 colonist.putItemInHand(Items.WOODEN_HOE);
-                colonist.addExhaustion(PASSIVE_EXHAUSTION);
+                colonist.addHunger(PASSIVE_EXHAUSTION);
                 this.interactionsCount++;
                 this.gatherItemAndAddToInventory(colonist);
                 if(this.interactionsCount > 2) {
@@ -76,9 +76,9 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     private void gatherItemAndAddToInventory(Colonist colonist) {
         if(isSuccess(colonist)){
             final var item = getRandomForesterItem(colonist);
-            colonist.getFortressServerManager()
-                    .getServerResourceManager()
-                    .increaseItemAmount(item, 1);
+            colonist.getFortressServerManager().ifPresent(
+                    it -> it.getServerResourceManager().increaseItemAmount(item, 1)
+            );
         }
     }
 

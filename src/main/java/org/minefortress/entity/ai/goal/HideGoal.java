@@ -22,15 +22,18 @@ public class HideGoal extends AbstractFortressGoal{
 
     @Override
     public void start() {
-        final var fortressServerManager = colonist
-                .getFortressServerManager();
-        fortressServerManager
-                .getServerFightManager()
-                .addScaryMob(colonist.getTarget());
-        shelterBlockPos = fortressServerManager
-                .getRandomBed()
-                .map(FortressBedInfo::getPos)
-                .orElse(fortressServerManager.getFortressCenter());
+         colonist
+                .getFortressServerManager()
+                .ifPresent(it -> {
+                    it
+                            .getServerFightManager()
+                            .addScaryMob(colonist.getTarget());
+                    shelterBlockPos = it
+                            .getRandomBed()
+                            .map(FortressBedInfo::getPos)
+                            .orElse(it.getFortressCenter());
+                });
+
 
         if(shelterBlockPos == null) return;
         this.moveGoal = findCorrectGoal();

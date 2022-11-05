@@ -72,7 +72,7 @@ public class FightControl {
         if(eatControl.isEating()) return;
 
         if(attackTarget == null){
-            final var serverFightManager = colonist.getFortressServerManager().getServerFightManager();
+            final var serverFightManager = colonist.getFortressServerManager().orElseThrow().getServerFightManager();
             if(serverFightManager.hasAnyScaryMob()) {
                 final var randomScaryMob = serverFightManager.getRandomScaryMob(colonist.world.random);
                 if(isTargetAcceptable(randomScaryMob)) {
@@ -92,7 +92,7 @@ public class FightControl {
 
         if(this.moveTarget != null && this.attackTarget == null) {
             if(eatControl.isHungryEnough() && eatControl.hasEatableItem()) {
-                final var fortressServerManager = colonist.getFortressServerManager();
+                final var fortressServerManager = colonist.getFortressServerManager().orElseThrow();
                 final var fortressCenter = fortressServerManager.getFortressCenter();
                 if(fortressCenter != null) {
                     final var isWithinCampfireRange = fortressCenter.isWithinDistance(colonist.getPos(), DEFEND_RANGE);

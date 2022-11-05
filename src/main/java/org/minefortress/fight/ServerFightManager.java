@@ -6,6 +6,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.IWarriorPawn;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -51,7 +52,7 @@ public class ServerFightManager {
         forEachSelectedColonist(c -> c.getFightControl().setAttackTarget(entity));
     }
 
-    private void forEachSelectedColonist(Consumer<Colonist> consumer) {
+    private void forEachSelectedColonist(Consumer<IWarriorPawn> consumer) {
         final var selectedColonists = serverFightSelectionManager.getSelectedColonists();
         selectedColonists.forEach(consumer);
     }
