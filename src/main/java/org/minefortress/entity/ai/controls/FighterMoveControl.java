@@ -57,6 +57,10 @@ public class FighterMoveControl {
         stuck = false;
     }
 
+    public boolean isStuck() {
+        return stuck;
+    }
+
     private Optional<BlockPos> getTargetPos() {
         return Optional.ofNullable(moveTarget).or(() -> Optional.ofNullable(followTarget).map(LivingEntity::getBlockPos));
     }

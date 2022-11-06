@@ -13,7 +13,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import org.minefortress.entity.ai.MineFortressInventory;
 
-public abstract class BaritonableEntity extends PathAwareEntity implements IMinefortressEntity {
+public abstract class BaritonableEntity extends PathAwareEntity implements IBaritonableEntity {
 
     private final TrackedData<Integer> SELECTED_SLOT_ID = DataTracker.registerData(BaritonableEntity.class, TrackedDataHandlerRegistry.INTEGER);
 

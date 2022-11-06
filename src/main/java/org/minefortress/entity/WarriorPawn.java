@@ -7,14 +7,19 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.entity.ai.controls.FighterMoveControl;
+import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 
 public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
+
+    private FighterMoveControl moveControl;
 
     private LivingEntity attackTarget;
     private BlockPos moveTarget;
 
     protected WarriorPawn(EntityType<? extends BasePawnEntity> entityType, World world) {
         super(entityType, world, false);
+        moveControl = new FighterMoveControl(this);
     }
 
     @Override
@@ -24,6 +29,8 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
 
     @Override
     protected void initGoals() {
+        this.goalSelector.add(2, new MoveToBlockGoal(this));
+
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, false));
     }
 
@@ -49,6 +56,11 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     @Nullable
     public BlockPos getMoveTarget() {
         return moveTarget;
+    }
+
+    @Override
+    public FighterMoveControl getFighterMoveControl() {
+        return moveControl;
     }
 
     private void resetTargets() {
