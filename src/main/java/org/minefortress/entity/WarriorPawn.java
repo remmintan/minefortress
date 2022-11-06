@@ -1,10 +1,10 @@
 package org.minefortress.entity;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -42,12 +42,14 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     @Override
     public void setAttackTarget(@Nullable LivingEntity entity) {
         this.resetTargets();
+        this.putItemInHand(Items.IRON_SWORD);
         this.attackTarget = entity;
     }
 
     @Override
     public void setMoveTarget(@Nullable BlockPos pos) {
         this.resetTargets();
+        this.putItemInHand(Items.IRON_SWORD);
         this.moveTarget = pos;
     }
 
