@@ -1,6 +1,5 @@
 package org.minefortress.entity.ai.controls;
 
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.CreeperEntity;

@@ -46,6 +46,10 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IMine
         return bucketItem.fluid;
     }
 
+    public float getReachRange() {
+        return 4f;
+    }
+
     @Override
     public void onTrackedDataSet(TrackedData<?> data) {
         if(data.equals(SELECTED_SLOT_ID)) {

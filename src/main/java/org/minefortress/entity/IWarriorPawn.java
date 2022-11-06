@@ -1,12 +1,16 @@
 package org.minefortress.entity;
 
 import net.minecraft.entity.LivingEntity;
-import org.minefortress.entity.ai.controls.FightControl;
+import net.minecraft.util.math.BlockPos;
 
 public interface IWarriorPawn extends IFortressAwareEntity {
 
     int getId();
-    FightControl getFightControl();
     LivingEntity getTarget();
+
+    void setAttackTarget(LivingEntity entity);
+    void setMoveTarget(BlockPos pos);
+    LivingEntity getAttackTarget();
+    BlockPos getMoveTarget();
 
 }
