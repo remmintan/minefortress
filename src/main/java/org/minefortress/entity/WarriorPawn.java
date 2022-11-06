@@ -1,5 +1,6 @@
 package org.minefortress.entity;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
@@ -8,6 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.controls.FighterMoveControl;
+import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
+import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 
 public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
@@ -29,7 +32,9 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
 
     @Override
     protected void initGoals() {
+        this.goalSelector.add(1, new MeleeAttackGoal(this));
         this.goalSelector.add(2, new MoveToBlockGoal(this));
+        this.goalSelector.add(2, new FollowLivingEntityGoal(this));
 
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, false));
     }
