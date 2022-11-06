@@ -33,6 +33,11 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
 
     protected BasePawnEntity(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world, enableHunger);
+    }
+
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
         this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
     }
 

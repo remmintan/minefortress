@@ -1,6 +1,5 @@
 package org.minefortress.entity;
 
-import baritone.api.minefortress.IMinefortressEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -15,7 +14,7 @@ import org.minefortress.entity.ai.MineFortressInventory;
 
 public abstract class BaritonableEntity extends PathAwareEntity implements IBaritonableEntity {
 
-    private final TrackedData<Integer> SELECTED_SLOT_ID = DataTracker.registerData(BaritonableEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private final TrackedData<Integer> SELECTED_SLOT = DataTracker.registerData(BaritonableEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     private final Inventory fakeInventory;
 
@@ -23,7 +22,12 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IBari
         super(entityType, world);
 
         this.fakeInventory = new MineFortressInventory();
-        this.dataTracker.startTracking(SELECTED_SLOT_ID, 0);
+    }
+
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        this.dataTracker.startTracking(SELECTED_SLOT, 0);
     }
 
     @Override
@@ -33,12 +37,12 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IBari
 
     @Override
     public final void selectSlot(int i) {
-        this.dataTracker.set(SELECTED_SLOT_ID, i);
+        this.dataTracker.set(SELECTED_SLOT, i);
     }
 
     @Override
     public final int getSelectedSlot() {
-        return this.dataTracker.get(SELECTED_SLOT_ID);
+        return this.dataTracker.get(SELECTED_SLOT);
     }
 
     @Override
@@ -52,8 +56,8 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IBari
 
     @Override
     public void onTrackedDataSet(TrackedData<?> data) {
-        if(data.equals(SELECTED_SLOT_ID)) {
-            final var selectedSlot = this.dataTracker.get(SELECTED_SLOT_ID);
+        if(data.equals(SELECTED_SLOT)) {
+            final var selectedSlot = this.dataTracker.get(SELECTED_SLOT);
             this.setStackInHand(Hand.MAIN_HAND, this.getInventory().getStack(selectedSlot));
         }
 

@@ -59,10 +59,11 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
     public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;
 
-    private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
+    private static final TrackedData<String> CURRENT_TASK_DESCRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> PROFESSION_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> HAS_TASK = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> GUY_TYPE = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
+
     private static final String DEFAULT_PROFESSION_ID = "colonist";
 
     public static final float WORK_REACH_DISTANCE = 3f;
@@ -94,8 +95,12 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
             baritone = null;
             movementHelper = null;
         }
+    }
 
-        this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        this.dataTracker.startTracking(CURRENT_TASK_DESCRIPTION, "");
         this.dataTracker.startTracking(PROFESSION_ID, DEFAULT_PROFESSION_ID);
         this.dataTracker.startTracking(HAS_TASK, false);
         this.dataTracker.startTracking(GUY_TYPE, world.random.nextInt(4));
@@ -413,11 +418,11 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
     }
 
     public void setCurrentTaskDesc(String currentTaskDesc) {
-        this.dataTracker.set(CURRENT_TASK_DECRIPTION, currentTaskDesc);
+        this.dataTracker.set(CURRENT_TASK_DESCRIPTION, currentTaskDesc);
     }
 
     public String getCurrentTaskDesc() {
-        return this.dataTracker.get(CURRENT_TASK_DECRIPTION);
+        return this.dataTracker.get(CURRENT_TASK_DESCRIPTION);
     }
 
     public void setProfession(String professionId) {

@@ -33,7 +33,11 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
         } else {
             eatControl = null;
         }
+    }
 
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
         this.dataTracker.startTracking(CURRENT_FOOD_LEVEL, HungerConstants.FULL_FOOD_LEVEL);
     }
 

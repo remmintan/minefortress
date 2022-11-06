@@ -28,7 +28,11 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
         moveControl = new FighterMoveControl(this);
+    }
 
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
         dataTracker.startTracking(MOVE_TARGET, Optional.empty());
         dataTracker.startTracking(ATTACK_TARGET, -1);
     }

@@ -27,7 +27,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.IWarriorPawn;
 import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fortress.resources.FortressResourceManager;
@@ -130,15 +129,15 @@ public final class FortressServerManager extends AbstractFortressManager {
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
         if(!needSync || player == null) return;
-        final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode, this.id, this.maxColonistsCount);
+        final var packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode, this.id, this.maxColonistsCount);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
-            final ClientboundSyncBuildingsPacket syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
+            final var syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
             needSyncBuildings = false;
         }
         if(needSyncSpecialBlocks){
-            final ClientboundSyncSpecialBlocksPacket syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks, blueprintsSpecialBlocks);
+            final var syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks, blueprintsSpecialBlocks);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, syncBlocks);
             needSyncSpecialBlocks = false;
         }
