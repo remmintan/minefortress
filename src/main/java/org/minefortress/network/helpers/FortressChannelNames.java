@@ -30,8 +30,6 @@ public class FortressChannelNames {
     public static final String SCROLL_CURRENT_SCREEN = "scroll_current_screen";
     public static final String FORTRESS_COMBAT_STATE_SYNC = "fortress_combat_state_sync";
     public static final String FORTRESS_SET_COMBAT_STATE = "fortress_set_combat_state";
-    public static final String FORTRESS_SELECT_COLONISTS = "fortress_select_colonists";
-    public static final String FORTRESS_SELECT_FIGHT_TARGET = "fortress_select_fight_target";
     public static final String FORTRESS_SLEEP = "fortress_sleep";
     public static final String FORTRESS_CHANGE_MAX_COLONISTS_COUNT = "fortress_change_max_colonists_count";
     public static final String FORTRESS_BLUEPRINTS_IMPORT_EXPORT = "fortress_blueprints_import_export";

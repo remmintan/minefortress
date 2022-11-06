@@ -1,12 +1,17 @@
 package org.minefortress.registries;
 
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.WarriorPawn;
+import org.minefortress.entity.renderer.PawnRenderer;
 
 public class FortressEntities {
 
@@ -18,5 +23,24 @@ public class FortressEntities {
                     .dimensions(EntityDimensions.fixed(0.6f, 1.8f))
                     .build()
     );
+
+    public static final EntityType<WarriorPawn> WARRIOR_PAWN_ENTITY_TYPE = Registry.register(
+            Registry.ENTITY_TYPE,
+            new Identifier("minefortress", "warrior_pawn"),
+            FabricEntityTypeBuilder
+                    .create(SpawnGroup.CREATURE, WarriorPawn::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.8f))
+                    .build()
+    );
+
+    public static void register() {
+        FabricDefaultAttributeRegistry.register(FortressEntities.COLONIST_ENTITY_TYPE, BasePawnEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, BasePawnEntity.createAttributes());
+    }
+
+    public static void registerRenderers() {
+        EntityRendererRegistry.register(FortressEntities.COLONIST_ENTITY_TYPE, PawnRenderer::new);
+        EntityRendererRegistry.register(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, PawnRenderer::new);
+    }
 
 }

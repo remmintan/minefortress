@@ -33,16 +33,15 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return super.isStarving() || super.isScared() || super.isFighting() || super.isHiding();
+        return super.isStarving();
     }
 
     @Override
     public boolean canStart() {
-        final var notInCombat = notInCombat();
         final var hasTask = getTaskControl().hasTask();
         final var notStarving = !super.isStarving();
-        LOGGER.debug("{} can executeTask [not in combat: {}, has task: {}, not starving: {}]", getColonistName(), notInCombat, hasTask, notStarving);
-        return notInCombat && hasTask && notStarving;
+        LOGGER.debug("{} can executeTask [ has task: {}, not starving: {}]", getColonistName(), hasTask, notStarving);
+        return  hasTask && notStarving;
     }
 
     private String getColonistName() {
@@ -91,36 +90,33 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        final var notInCombat = notInCombat();
         final var notStarving = !super.isStarving();
         final var hasTask = getTaskControl().hasTask();
         final var hasGoalTryingToReachOrWorking = getMovementHelper().stillTryingToReachGoal() ||
                 workGoal != null ||
                 !getTaskControl().finished() ||
                 colonist.diggingOrPlacing();
-        final var shouldContinue = notInCombat && notStarving && hasTask && hasGoalTryingToReachOrWorking;
-        LOGGER.debug("{} should continue task execution {} [not in combat {}, not starving {}, has task {}, has goal and working {}, digging or placing {}]", getColonistName(), shouldContinue, notInCombat, notStarving, hasTask, hasGoalTryingToReachOrWorking, colonist.diggingOrPlacing());
+        final var shouldContinue = notStarving && hasTask && hasGoalTryingToReachOrWorking;
+        LOGGER.debug("{} should continue task execution {} [not starving {}, has task {}, has goal and working {}, digging or placing {}]", getColonistName(), shouldContinue, notStarving, hasTask, hasGoalTryingToReachOrWorking, colonist.diggingOrPlacing());
         return shouldContinue;
     }
 
     @Override
     public void stop() {
         LOGGER.debug("{} stopping the task execution", getColonistName());
-        if(!notInCombat()) {
-            final var idOpt = getTaskControl().getTaskId();
-            if(idOpt.isPresent()) {
-                final var id = idOpt.get();
-                LOGGER.debug("{} stopping task execution because of combat. Return reserved items for task {}", getColonistName(), id);
-                colonist
-                        .getFortressServerManager()
-                        .orElseThrow()
-                        .getServerResourceManager()
-                        .returnReservedItems(id);
-            } else {
-                LOGGER.debug("{} stopping task execution because of combat. No task id found", getColonistName());
-            }
-            getTaskControl().fail();
+        final var idOpt = getTaskControl().getTaskId();
+        if(idOpt.isPresent()) {
+            final var id = idOpt.get();
+            LOGGER.debug("{} stopping task execution because of combat. Return reserved items for task {}", getColonistName(), id);
+            colonist
+                    .getFortressServerManager()
+                    .orElseThrow()
+                    .getServerResourceManager()
+                    .returnReservedItems(id);
+        } else {
+            LOGGER.debug("{} stopping task execution because of combat. No task id found", getColonistName());
         }
+        getTaskControl().fail();
         if(getTaskControl().hasTask()) {
             LOGGER.debug("{} finishing task successfully", getColonistName());
             getTaskControl().success();

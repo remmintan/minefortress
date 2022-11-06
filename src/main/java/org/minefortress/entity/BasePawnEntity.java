@@ -5,7 +5,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -23,7 +26,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BasePawnEntity extends HungryEntity implements IFortressAwareEntity {
+public abstract class BasePawnEntity extends HungryEntity implements IFortressAwareEntity {
 
     private static final String FORTRESS_ID_KEY = "playerId";
     private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
@@ -32,6 +35,23 @@ public class BasePawnEntity extends HungryEntity implements IFortressAwareEntity
         super(entityType, world, enableHunger);
         this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
     }
+
+    public static DefaultAttributeContainer.Builder createAttributes() {
+        return LivingEntity.createLivingAttributes()
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2D)
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
+                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
+                .add(EntityAttributes.GENERIC_ATTACK_SPEED)
+                .add(EntityAttributes.GENERIC_LUCK);
+    }
+
+    public int getBodyTextureId() {
+        return 0;
+    }
+
+    public abstract String getClothingId();
 
     @Nullable
     @Override

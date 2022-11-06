@@ -30,14 +30,12 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.IWarriorPawn;
 import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
-import org.minefortress.fight.ServerFightManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
 import org.minefortress.network.ClientboundSyncBuildingsPacket;
-import org.minefortress.network.ClientboundSyncCombatStatePacket;
 import org.minefortress.network.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -64,7 +62,6 @@ public final class FortressServerManager extends AbstractFortressManager {
     
     private final ServerProfessionManager serverProfessionManager;
     private final ServerResourceManager serverResourceManager;
-    private final ServerFightManager serverFightManager = new ServerFightManager();
     private final TaskManager taskManager = new TaskManager();
     
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
@@ -78,14 +75,9 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private UUID id = UUID.randomUUID();
 
-    private boolean combatMode;
-    private boolean villageUnderAttack;
-    private int attackTicks = 0;
-
     private boolean needSync = true;
     private boolean needSyncBuildings = true;
     private boolean needSyncSpecialBlocks = true;
-    private boolean needSyncCombat = true;
 
     private BlockPos fortressCenter = null;
     private int maxColonistsCount = -1;
@@ -137,7 +129,6 @@ public final class FortressServerManager extends AbstractFortressManager {
         tickFortress(player, server);
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
-        serverFightManager.tick();
         if(!needSync || player == null) return;
         final ClientboundSyncFortressManagerPacket packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode, this.id, this.maxColonistsCount);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
@@ -150,11 +141,6 @@ public final class FortressServerManager extends AbstractFortressManager {
             final ClientboundSyncSpecialBlocksPacket syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks, blueprintsSpecialBlocks);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, syncBlocks);
             needSyncSpecialBlocks = false;
-        }
-        if(needSyncCombat) {
-            final ClientboundSyncCombatStatePacket syncCombatState = new ClientboundSyncCombatStatePacket(combatMode);
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_COMBAT_STATE_SYNC, syncCombatState);
-            needSyncCombat = false;
         }
         needSync = false;
     }
@@ -178,14 +164,6 @@ public final class FortressServerManager extends AbstractFortressManager {
     public void tickFortress(@Nullable ServerPlayerEntity player, MinecraftServer server) {
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             throw new IllegalStateException("Tick should not be called on server");
-        }
-
-
-        if(this.villageUnderAttack && player == null) {
-            this.attackTicks++;
-            if(this.attackTicks >= 60 * 20) {
-                this.setCombatMode(false, false);
-            }
         }
 
         if(maxColonistsCount != -1 && getColonistsCount() > maxColonistsCount) {
@@ -301,9 +279,6 @@ public final class FortressServerManager extends AbstractFortressManager {
             EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
             final var world = getWorld();
             final var spawnedPawn = (Colonist)colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
-            if(villageUnderAttack) {
-                spawnedPawn.getFightControl().setMoveTarget(getFortressCenter());
-            }
             return Optional.ofNullable(spawnedPawn);
         }
         return Optional.empty();
@@ -356,11 +331,6 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private void scheduleSyncSpecialBlocks() {
         needSyncSpecialBlocks = true;
-        this.scheduleSync();
-    }
-
-    private void scheduleSyncCombat() {
-        needSyncCombat = true;
         this.scheduleSync();
     }
 
@@ -662,58 +632,6 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public ServerResourceManager getServerResourceManager() {
         return serverResourceManager;
-    }
-
-    public boolean isCombatMode() {
-        return combatMode;
-    }
-
-    public boolean isVillageUnderAttack() {
-        return villageUnderAttack;
-    }
-
-    private Stream<IWarriorPawn> getWarriorsStream() {
-        return getWorkersStream().filter(IWarriorPawn.class::isInstance).map(IWarriorPawn.class::cast);
-    }
-
-    public void setCombatMode(boolean combatMode, boolean villageUnderAttack) {
-        this.attackTicks = 0;
-        if(this.combatMode == combatMode) {
-            this.villageUnderAttack = villageUnderAttack;
-            return;
-        }
-        this.combatMode = combatMode;
-        this.villageUnderAttack = villageUnderAttack;
-        this.scheduleSyncCombat();
-
-        getWarriorsStream().forEach(colonist -> {
-            if(!colonist.getFightControl().isDefender()) {
-                final var fightControl = colonist.getFightControl();
-                if(this.combatMode) {
-                    fightControl.setMoveTarget(this.fortressCenter);
-                } else {
-                    fightControl.reset();
-                }
-            }
-        });
-    }
-
-    public void selectColonists(List<Integer> selectedIds) {
-        final var selectionManager = serverFightManager.getServerFightSelectionManager();
-        if(selectedIds.isEmpty()){
-            selectionManager.clearSelection();
-            return;
-        }
-
-        final var selectedColonists = getWarriorsStream()
-                .filter(c -> selectedIds.contains(c.getId()))
-                .filter(c -> c.getFightControl().isDefender())
-                .toList();
-        selectionManager.selectColonists(selectedColonists);
-    }
-
-    public ServerFightManager getServerFightManager() {
-        return serverFightManager;
     }
 
     public UUID getId() {

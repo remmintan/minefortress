@@ -1,6 +1,5 @@
 package org.minefortress.entity.renderer;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.RenderLayer;
@@ -9,7 +8,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
@@ -25,28 +23,28 @@ import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
-import org.minefortress.entity.Colonist;
+import org.minefortress.entity.BasePawnEntity;
+import org.minefortress.entity.WarriorPawn;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
-import java.awt.*;
 import java.util.Optional;
 
-public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityModel<Colonist>> {
+public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, BipedEntityModel<BasePawnEntity>> {
 
     private static final Identifier GUY = new Identifier("minefortress", "textures/skins/guy.png");
     private static final Identifier GUY2 = new Identifier("minefortress", "textures/skins/guy2.png");
     private static final Identifier GUY3 = new Identifier("minefortress", "textures/skins/guy3.png");
     private static final Identifier GUY4 = new Identifier("minefortress", "textures/skins/guy4.png");
 
-    public ColonistRenderer(EntityRendererFactory.Context context) {
+    public PawnRenderer(EntityRendererFactory.Context context) {
         super(context, new PlayerEntityModel<>(context.getPart(EntityModelLayers.PLAYER), false), 0.5f);
         this.addFeature(new ColonistClothesFeature(this));
     }
 
     @Override
-    public Identifier getTexture(Colonist colonist) {
-        final var guyType = colonist.getGuyType();
+    public Identifier getTexture(BasePawnEntity pawn) {
+        final var guyType = pawn.getBodyTextureId();
         return switch (guyType) {
             case 0 -> GUY;
             case 1 -> GUY2;
@@ -56,14 +54,14 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
     }
 
     @Override
-    protected boolean hasLabel(Colonist colonist) {
+    protected boolean hasLabel(BasePawnEntity colonist) {
         return colonist.hasCustomName();
     }
 
     @Override
-    public void render(Colonist colonist, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
-        setClothesVilibility(colonist);
-        super.render(colonist, f, g, matrixStack, vertexConsumerProvider, i);
+    public void render(BasePawnEntity pawn, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
+        setClothesVilibility(pawn);
+        super.render(pawn, f, g, matrixStack, vertexConsumerProvider, i);
 
         final MinecraftClient client = getClient();
         final GameMode currentGamemode = Optional
@@ -72,10 +70,10 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
                 .orElse(GameMode.DEFAULT);
 
         if(currentGamemode == MineFortressMod.FORTRESS) {
-            final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == colonist;
-            final var fightSelecting = getFortressClientManager().getFightManager().getSelectionManager().isSelected(colonist);
-            final boolean selecting = getFortressClientManager().getSelectedColonist() == colonist;
-            var color = getHealthFoodLevelColor(colonist);
+            final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == pawn;
+            final var fightSelecting = selectedAsWarrior(pawn);
+            final boolean selecting = getFortressClientManager().getSelectedColonist() == pawn;
+            var color = getHealthFoodLevelColor(pawn);
             if(hovering || selecting || color != null || fightSelecting) {
                 final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
                 if(color != null && (hovering || fightSelecting)) {
@@ -89,12 +87,16 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
                     }
                 }
 
-                ColonistRenderer.renderRhombus(matrixStack, buffer, colonist, color);
+                PawnRenderer.renderRhombus(matrixStack, buffer, pawn, color);
             }
         }
     }
 
-    private float getHealthFoodLevel(Colonist colonist) {
+    private boolean selectedAsWarrior(BasePawnEntity pawn) {
+        return pawn instanceof WarriorPawn wp && getFortressClientManager().getFightManager().getSelectionManager().isSelected(wp);
+    }
+
+    private float getHealthFoodLevel(BasePawnEntity colonist) {
         final var health = colonist.getHealth();
         final var foodLevel = colonist.getCurrentFoodLevel();
 
@@ -102,7 +104,7 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
     }
 
     @Nullable
-    private Vec3f getHealthFoodLevelColor(Colonist colonist) {
+    private Vec3f getHealthFoodLevelColor(BasePawnEntity colonist) {
         final var healthFoodLevel = getHealthFoodLevel(colonist);
         final var maxLevelOfEachColor = (float)0xFF;
         if(healthFoodLevel > 10) return null;
@@ -120,7 +122,7 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
 
     @Nullable
     @Override
-    protected RenderLayer getRenderLayer(Colonist entity, boolean showBody, boolean translucent, boolean showOutline) {
+    protected RenderLayer getRenderLayer(BasePawnEntity entity, boolean showBody, boolean translucent, boolean showOutline) {
         return super.getRenderLayer(entity, showBody, translucent, showOutline);
     }
 
@@ -137,7 +139,7 @@ public class ColonistRenderer extends BipedEntityRenderer<Colonist, BipedEntityM
     }
 
     private void setClothesVilibility(MobEntity colonist) {
-        final PlayerEntityModel colonistModel = (PlayerEntityModel)this.getModel();
+        final var colonistModel = (PlayerEntityModel<BasePawnEntity>)this.getModel();
         colonistModel.hat.visible = true;
         colonistModel.jacket.visible = !colonist.isSleeping();
         colonistModel.leftPants.visible = !colonist.isSleeping();

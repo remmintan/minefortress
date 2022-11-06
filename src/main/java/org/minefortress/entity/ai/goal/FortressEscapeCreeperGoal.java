@@ -12,9 +12,4 @@ public class FortressEscapeCreeperGoal extends FleeEntityGoal {
         super(colonist, CreeperEntity.class, 4, 1.25, 1.75);
         this.colonist = colonist;
     }
-
-    @Override
-    public boolean canStart() {
-        return super.canStart() && !colonist.getFightControl().isForcedToAttackCreeper();
-    }
 }

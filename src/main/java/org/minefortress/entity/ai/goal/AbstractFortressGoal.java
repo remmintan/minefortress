@@ -23,37 +23,10 @@ abstract class AbstractFortressGoal extends Goal {
         }
     }
 
-    protected boolean isFighting() {
-        return isFortressInCombatMode() && colonist.getFightControl().isDefender();
-    }
-
-    protected boolean isHiding() {
-        return isFortressInCombatMode() && !colonist.getFightControl().isDefender() && isVillageUnderAttack();
-    }
-
-    private boolean isFortressInCombatMode() {
-        return colonist.getFortressServerManager().orElseThrow().isCombatMode();
-    }
-
-    protected boolean isVillageUnderAttack() {
-        return colonist.getFortressServerManager().map(FortressServerManager::isVillageUnderAttack).orElse(false);
-    }
-
-    protected boolean notInCombat() {
-        return !isFighting() && !isHiding();
-    }
-
     protected boolean isStarving() {
         return colonist.getCurrentFoodLevel() <= 0;
     }
 
-    protected boolean isScared() {
-        final var fightControl = colonist.getFightControl();
-        final var canSeeMonster = fightControl.canSeeMonster();
-        if(!canSeeMonster || fightControl.isWarrior() || isFighting()) return false;
-        final var target = colonist.getTarget();
 
-        return Math.sqrt(colonist.squaredDistanceTo(target)) <= 2;
-    }
 
 }

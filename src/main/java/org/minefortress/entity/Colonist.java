@@ -104,6 +104,16 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
     }
 
     @Override
+    public int getBodyTextureId() {
+        return getGuyType();
+    }
+
+    @Override
+    public String getClothingId() {
+        return getProfessionId();
+    }
+
+    @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         final var initResult = super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
         this.setCustomNameIfNeeded();
@@ -176,17 +186,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
         }
 
         return f;
-    }
-
-    public static DefaultAttributeContainer.Builder createAttributes() {
-        return LivingEntity.createLivingAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2D)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
-                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
-                .add(EntityAttributes.GENERIC_ATTACK_SPEED)
-                .add(EntityAttributes.GENERIC_LUCK);
     }
 
     @Override
@@ -285,7 +284,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
         if(getDigControl() != null) getDigControl().tick();
         if(getPlaceControl() != null) getPlaceControl().tick();
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();
-        if(getFightControl() != null) getFightControl().tick();
         if(getMovementHelper() != null) getMovementHelper().tick();
     }
 

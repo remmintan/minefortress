@@ -4,8 +4,6 @@ import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 
-import java.util.Optional;
-
 import static org.minefortress.entity.colonist.FortressHungerManager.IDLE_EXHAUSTION;
 
 public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
@@ -18,7 +16,7 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(!notInCombat() || !isDay() || colonist.getTaskControl().hasTask()) return false;
+        if(!isDay() || colonist.getTaskControl().hasTask()) return false;
         return colonist.getFortressServerManager()
                 .flatMap(FortressServerManager::randomSurfacePos)
                 .isPresent();
@@ -52,8 +50,7 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() &&
-                isDay() &&
+        return isDay() &&
                 !colonist.getTaskControl().hasTask() &&
                 !colonist.getMovementHelper().isStuck() &&
                 colonist.getMovementHelper().stillTryingToReachGoal();

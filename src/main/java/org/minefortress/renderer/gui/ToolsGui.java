@@ -11,7 +11,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.ServerboundSetCombatStatePacket;
 import org.minefortress.network.ServerboundSleepPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -133,9 +132,13 @@ public class ToolsGui extends FortressGuiScreen {
                 Items.DIAMOND_SWORD,
                 itemRenderer,
                 btn -> {
-                    final var inCombat = isInCombat(fortressClient);
-                    final var packet = new ServerboundSetCombatStatePacket(!inCombat);
-                    FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_COMBAT_STATE, packet);
+                    final var shouldGoInCombat = !isInCombat(fortressClient);
+                    fortressClient.getFortressClientManager().setInCombat(shouldGoInCombat);
+                    if(shouldGoInCombat) {
+                        fortressClient.getBlueprintManager().clearStructure();
+                        fortressClient.getSelectionManager().resetSelection();
+                        fortressClient.getSelectionManager().setSelectionType(SelectionType.SQUARES);
+                    }
                 },
                 (button, matrices, mouseX, mouseY) -> {
                     if(isInCombat(fortressClient)) {

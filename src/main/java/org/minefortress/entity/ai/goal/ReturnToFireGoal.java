@@ -15,7 +15,6 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(!notInCombat()) return false;
         if(!isNight()) {
             final Optional<BlockPos> pos = colonist.getFortressServerManager()
                     .flatMap(FortressServerManager::randomSurfacePos);
@@ -58,8 +57,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() &&
-                isNight() &&
+        return isNight() &&
                 !colonist.getTaskControl().hasTask() &&
                 !colonist.getMovementHelper().isStuck() &&
                 (isFarFromCenter() || colonist.getMovementHelper().stillTryingToReachGoal());

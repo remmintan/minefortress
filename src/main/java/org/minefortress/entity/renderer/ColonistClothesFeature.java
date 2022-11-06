@@ -11,9 +11,10 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
 
-public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntityModel<Colonist>> {
+public class ColonistClothesFeature extends FeatureRenderer<BasePawnEntity, BipedEntityModel<BasePawnEntity>> {
 
     private static final Identifier ARCHER = new Identifier("minefortress", "textures/skins/archer.png");
     private static final Identifier ARMORER = new Identifier("minefortress", "textures/skins/armorer.png");
@@ -62,20 +63,20 @@ public class ColonistClothesFeature extends FeatureRenderer<Colonist, BipedEntit
     private static final Identifier SOLDIER_YELLOW = new Identifier("minefortress", "textures/skins/soldier/soldier_yellow.png");
 
     public ColonistClothesFeature(
-            FeatureRendererContext<Colonist, BipedEntityModel<Colonist>> context
+            FeatureRendererContext<BasePawnEntity, BipedEntityModel<BasePawnEntity>> context
     ) {
         super(context);
     }
 
 
     @Override
-    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, Colonist entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, BasePawnEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
         if(entity.isSleeping()) return;
-        final var professionId = entity.getProfessionId();
-        if(isWarrior(professionId)) {
+        final var clothingId = entity.getClothingId();
+        if(isWarrior(clothingId)) {
             ColonistClothesFeature.renderModel(this.getContextModel(), SOLDIER_BLUE, matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
         }
-        ColonistClothesFeature.renderModel(this.getContextModel(), this.getArmorTexture(professionId), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+        ColonistClothesFeature.renderModel(this.getContextModel(), this.getArmorTexture(clothingId), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
 
     }
 

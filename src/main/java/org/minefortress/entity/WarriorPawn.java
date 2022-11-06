@@ -20,7 +20,7 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     private LivingEntity attackTarget;
     private BlockPos moveTarget;
 
-    protected WarriorPawn(EntityType<? extends BasePawnEntity> entityType, World world) {
+    public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
         moveControl = new FighterMoveControl(this);
     }
@@ -37,6 +37,11 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
         this.goalSelector.add(2, new FollowLivingEntityGoal(this));
 
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, false));
+    }
+
+    @Override
+    public String getClothingId() {
+        return null;
     }
 
     @Override

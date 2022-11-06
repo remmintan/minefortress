@@ -3,18 +3,12 @@ package org.minefortress.fight;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.network.ServerboundSelectFightTargetPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class ClientFightManager {
@@ -35,8 +29,7 @@ public class ClientFightManager {
         if(hitResult instanceof BlockHitResult blockHitResult) {
             final var blockPos = blockHitResult.getBlockPos();
             final var mainHandStack = MinecraftClient.getInstance().player.getMainHandStack();
-            final var packet = new ServerboundSelectFightTargetPacket(blockPos, mainHandStack.getItem().equals(Items.FLINT_AND_STEEL), blockHitResult);
-            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, packet);
+// select fight target
         } else if (hitResult instanceof EntityHitResult entityHitResult) {
             final var entity = entityHitResult.getEntity();
             if(!(entity instanceof LivingEntity livingEntity)) return;
@@ -45,8 +38,7 @@ public class ClientFightManager {
                 if(colonistFortressId != null && colonistFortressId.equals(fortressClientManagerSupplier.get().getId()))
                     return;
             }
-            final var packet = new ServerboundSelectFightTargetPacket(livingEntity);
-            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, packet);
+// select fight target
         }
     }
 
@@ -57,7 +49,6 @@ public class ClientFightManager {
             if(colonistFortressId != null && colonistFortressId.equals(fortressClientManagerSupplier.get().getId()))
                 return;
         }
-        final var packet = new ServerboundSelectFightTargetPacket(livingEntity);
-        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SELECT_FIGHT_TARGET, packet);
+// select fight target
     }
 }

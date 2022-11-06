@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.minecraft.client.world.ClientWorld;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.entity.renderer.ColonistRenderer;
+import org.minefortress.entity.renderer.PawnRenderer;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreen;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreen;
 import org.minefortress.interfaces.FortressClientWorld;
@@ -25,7 +25,8 @@ public class MineFortressClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        EntityRendererRegistry.register(FortressEntities.COLONIST_ENTITY_TYPE, ColonistRenderer::new);
+        FortressEntities.registerRenderers();
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
@@ -64,7 +65,6 @@ public class MineFortressClient implements ClientModInitializer {
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, ClientboundSyncSpecialBlocksPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_SYNC, ClientboundProfessionSyncPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_RESOURCES_SYNC, ClientboundSyncItemsPacket::new);
-        FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_COMBAT_STATE_SYNC, ClientboundSyncCombatStatePacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_INIT, ClientboundProfessionsInitPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, ClientboundBlueprintsProcessImportExportPacket::new);
     }
