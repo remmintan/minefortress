@@ -66,7 +66,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
     private final ScaffoldsControl scaffoldsControl;
     private final TaskControl taskControl;
     private final MovementHelper movementHelper;
-    private final FightControl fightControl;
     private final IBaritone baritone;
 
     private boolean allowToPlaceBlockFromFarAway = false;
@@ -81,7 +80,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
             taskControl = new TaskControl(this);
             baritone = BaritoneAPI.getProvider().getBaritone(this);
             movementHelper = new MovementHelper(this);
-            fightControl = new FightControl(this);
         } else {
             digControl = null;
             placeControl = null;
@@ -89,7 +87,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
             taskControl = null;
             baritone = null;
             movementHelper = null;
-            fightControl = null;
         }
 
         this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
@@ -335,10 +332,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
     @Override
     public ScaffoldsControl getScaffoldsControl() {
         return scaffoldsControl;
-    }
-
-    public FightControl getFightControl() {
-        return fightControl;
     }
 
     public void resetControls() {

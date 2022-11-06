@@ -5,7 +5,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.controls.FightControl;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.network.ServerboundSelectColonistsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -65,7 +64,7 @@ public class ClientFightSelectionManager {
                             final var colonist = (Colonist) it;
                             final var clientFortressId = fortressClientManagerSupplier.get().getId();
                             final var colonistFortressId = colonist.getFortressId();
-                            return colonistFortressId != null && colonistFortressId.equals(clientFortressId) && FightControl.isDefender(colonist);
+                            return colonistFortressId.isPresent() && colonistFortressId.equals(clientFortressId);
                         })
                         .stream()
                         .map(it -> (Colonist)it)
