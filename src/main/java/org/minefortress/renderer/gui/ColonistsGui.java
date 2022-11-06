@@ -102,7 +102,7 @@ public class ColonistsGui extends FortressGuiScreen{
     @Override
     void tick() {
         final FortressClientManager fortressManager = getFortressClientManager();
-        if(!fortressManager.isInitialized()) return;
+        if(fortressManager.notInitialized()) return;
 
         colonistsCount = fortressManager.getColonistsCount();
     }
@@ -110,7 +110,7 @@ public class ColonistsGui extends FortressGuiScreen{
     @Override
     void render(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
         final FortressClientManager fortressManager = getFortressClientManager();
-        if(!fortressManager.isInitialized()) return;
+        if(fortressManager.notInitialized()) return;
 
         final boolean colonsitsCountHovered = renderColonistsCount(matrices, font, screenWidth, screenHeight, mouseX, mouseY, delta);
 

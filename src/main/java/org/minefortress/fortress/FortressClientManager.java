@@ -9,7 +9,6 @@ import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fight.ClientFightManager;
-import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -18,6 +17,7 @@ import org.minefortress.network.ServerboundSetGamemodePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ClientProfessionManager;
+import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
@@ -173,8 +173,8 @@ public final class FortressClientManager extends AbstractFortressManager {
         return posAppropriateForCenter;
     }
 
-    public boolean isInitialized() {
-        return initialized;
+    public boolean notInitialized() {
+        return !initialized;
     }
 
     public boolean isFortressInitializationNeeded() {
@@ -216,7 +216,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         for(EssentialBuildingInfo building : buildings){
             final BlockPos start = building.getStart();
             final BlockPos end = building.getEnd();
-            if(isPosBetween(pos, start, end)){
+            if(BlockUtils.isPosBetween(pos, start, end)){
                 return StreamSupport
                         .stream(BlockPos.iterate(start, end).spliterator(), false)
                         .map(BlockPos::toImmutable)
@@ -279,12 +279,6 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public ClientResourceManager getResourceManager() {
         return resourceManager;
-    }
-
-    private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
-        return pos.getX() >= start.getX() && pos.getX() <= end.getX() &&
-                pos.getY() >= start.getY() && pos.getY() <= end.getY() &&
-                pos.getZ() >= start.getZ() && pos.getZ() <= end.getZ();
     }
 
     public boolean isInCombat() {

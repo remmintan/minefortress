@@ -8,6 +8,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.util.math.BlockPos;
 
 public class BlockUtils {
 
@@ -30,9 +31,13 @@ public class BlockUtils {
         final var block = state.getBlock();
         if(block == Blocks.FIRE) return false;
         if(block == Blocks.AIR) return false;
-        if(block == Blocks.BARRIER) return false;
+        return block != Blocks.BARRIER;
+    }
 
-        return true;
+    public static boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
+        return pos.getX() >= start.getX() && pos.getX() <= end.getX() &&
+                pos.getY() >= start.getY() && pos.getY() <= end.getY() &&
+                pos.getZ() >= start.getZ() && pos.getZ() <= end.getZ();
     }
 
 }

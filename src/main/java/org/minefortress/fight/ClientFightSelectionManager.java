@@ -9,6 +9,7 @@ import org.minefortress.registries.FortressEntities;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ClientFightSelectionManager {
@@ -20,7 +21,7 @@ public class ClientFightSelectionManager {
     private MousePos selectionCurPos;
     private Vec3d selectionCurBlock;
 
-    private List<WarriorPawn> selectedColonists = Collections.emptyList();
+    private List<WarriorPawn> selectedPawns = Collections.emptyList();
 
     private Vec3d cachedBlockPos;
 
@@ -42,7 +43,7 @@ public class ClientFightSelectionManager {
     }
 
     public boolean hasSelected() {
-        return !this.selectedColonists.isEmpty();
+        return !this.selectedPawns.isEmpty();
     }
 
     public void updateSelection(double x, double y, Vec3d endBlock) {
@@ -56,7 +57,7 @@ public class ClientFightSelectionManager {
             final var world = MinecraftClient.getInstance().world;
             if(world != null) {
                 final var clientFortressId = fortressClientManagerSupplier.get().getId();
-                selectedColonists = world
+                selectedPawns = world
                         .getEntitiesByType(type, selectionBox, it ->{
                             final var colonistFortressId = it.getFortressId();
                             return colonistFortressId.map(id -> id.equals(clientFortressId)).orElse(false);
@@ -73,7 +74,7 @@ public class ClientFightSelectionManager {
         this.selectionStartBlock = null;
         this.selectionCurPos = null;
         this.selectionCurBlock = null;
-        this.selectedColonists = Collections.emptyList();
+        this.selectedPawns = Collections.emptyList();
     }
 
     public boolean isSelecting() {
@@ -82,6 +83,10 @@ public class ClientFightSelectionManager {
 
     public boolean isSelectionStarted() {
         return this.selectionStartPos != null && this.selectionStartBlock != null;
+    }
+
+    public void forEachSelected(Consumer<WarriorPawn> action) {
+        selectedPawns.forEach(action);
     }
 
     public MousePos getSelectionStartPos() {
@@ -93,7 +98,7 @@ public class ClientFightSelectionManager {
     }
 
     public boolean isSelected(WarriorPawn colonist) {
-        return this.selectedColonists != null && this.selectedColonists.contains(colonist);
+        return this.selectedPawns != null && this.selectedPawns.contains(colonist);
     }
 
     public record MousePos(double x, double y) {

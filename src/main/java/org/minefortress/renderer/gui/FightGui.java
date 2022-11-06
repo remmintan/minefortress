@@ -25,8 +25,6 @@ class FightGui extends FortressGuiScreen{
         final var widthScaleFactor = (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
         final var heightScaleFactor = (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
 
-
-
         final var selectionStartX = (int) (selectionStartPos.x() * widthScaleFactor);
         final var selectionStartY = (int) (selectionStartPos.y() * heightScaleFactor);
         final var selectionCurX = (int) (selectionCurPos.x() * widthScaleFactor);
