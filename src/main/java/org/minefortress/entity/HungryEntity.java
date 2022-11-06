@@ -40,17 +40,17 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
     @Override
     public void tick() {
         super.tick();
-        if(eatControl != null) eatControl.tick();
-    }
-
-    @Override
-    protected void mobTick() {
-        super.mobTick();
         fortHungMan.update(this);
         if(this.getCurrentFoodLevel() != getHungerManager().getFoodLevel()) {
             sendHungerMessage();
             this.updateCurrentFoodLevel();
         }
+    }
+
+    @Override
+    protected void mobTick() {
+        super.mobTick();
+        if(eatControl != null) eatControl.tick();
     }
 
     @Override
