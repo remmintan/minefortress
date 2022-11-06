@@ -11,13 +11,15 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.ai.goal.ActiveTargetGoal;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
@@ -39,7 +41,11 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.entity.ai.controls.*;
+import org.minefortress.entity.ai.controls.DigControl;
+import org.minefortress.entity.ai.controls.PlaceControl;
+import org.minefortress.entity.ai.controls.ScaffoldsControl;
+import org.minefortress.entity.ai.controls.TaskControl;
+import org.minefortress.entity.ai.goal.*;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.professions.ServerProfessionManager;
@@ -190,22 +196,18 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
 
     @Override
     protected void initGoals() {
-//        this.goalSelector.add(1, new SwimGoal(this));
-////        this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
-//        this.goalSelector.add(3, new FortressEscapeDangerGoal(this, 1.75));
-//        this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
-//        this.goalSelector.add(4, new FightGoal(this));
-//        this.goalSelector.add(4, new HideGoal(this));
-//        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
-//        this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
+        this.goalSelector.add(1, new SwimGoal(this));
+        this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
+        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
+        this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
 //        this.goalSelector.add(7, new ColonistEatGoal(this));
-//        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
-//        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
-//        this.goalSelector.add(9, new ReturnToFireGoal(this));
-//        this.goalSelector.add(10, new LookAroundGoal(this));
-//
-//        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
-//        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
+        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
+        this.goalSelector.add(8, new SleepOnTheBedGoal(this));
+        this.goalSelector.add(9, new ReturnToFireGoal(this));
+        this.goalSelector.add(10, new LookAroundGoal(this));
+
+        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
     }
 
     @Override

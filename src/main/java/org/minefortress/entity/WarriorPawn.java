@@ -3,6 +3,9 @@ package org.minefortress.entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
@@ -13,21 +16,29 @@ import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
 import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 
+import java.util.Optional;
+
 public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
 
-    private FighterMoveControl moveControl;
+    private static final TrackedData<Optional<BlockPos>> MOVE_TARGET = DataTracker.registerData(WarriorPawn.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
+    private static final TrackedData<Integer> ATTACK_TARGET = DataTracker.registerData(WarriorPawn.class, TrackedDataHandlerRegistry.INTEGER);
 
-    private LivingEntity attackTarget;
-    private BlockPos moveTarget;
+    private final FighterMoveControl moveControl;
 
     public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
         moveControl = new FighterMoveControl(this);
+
+        dataTracker.startTracking(MOVE_TARGET, Optional.empty());
+        dataTracker.startTracking(ATTACK_TARGET, -1);
     }
 
     @Override
     protected void mobTick() {
         super.mobTick();
+        if(getMoveTarget() != null || getAttackTarget() != null) {
+            this.putItemInHand(Items.IRON_SWORD);
+        }
     }
 
     @Override
@@ -41,33 +52,40 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
 
     @Override
     public String getClothingId() {
-        return null;
+        return "warrior1";
     }
 
     @Override
     public void setAttackTarget(@Nullable LivingEntity entity) {
         this.resetTargets();
-        this.putItemInHand(Items.IRON_SWORD);
-        this.attackTarget = entity;
+        if(entity != null) {
+            dataTracker.set(ATTACK_TARGET, entity.getId());
+        } else {
+            dataTracker.set(ATTACK_TARGET, -1);
+        }
+
     }
 
     @Override
     public void setMoveTarget(@Nullable BlockPos pos) {
         this.resetTargets();
-        this.putItemInHand(Items.IRON_SWORD);
-        this.moveTarget = pos;
+        dataTracker.set(MOVE_TARGET, Optional.ofNullable(pos));
     }
 
     @Override
     @Nullable
     public LivingEntity getAttackTarget() {
-        return attackTarget;
+        var id = dataTracker.get(ATTACK_TARGET);
+        if(id == -1) {
+            return null;
+        }
+        return (LivingEntity) world.getEntityById(id);
     }
 
     @Override
     @Nullable
     public BlockPos getMoveTarget() {
-        return moveTarget;
+        return dataTracker.get(MOVE_TARGET).orElse(null);
     }
 
     @Override
@@ -76,8 +94,8 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     }
 
     private void resetTargets() {
-        this.moveTarget = null;
-        this.attackTarget = null;
+        dataTracker.set(MOVE_TARGET, Optional.empty());
+        dataTracker.set(ATTACK_TARGET, -1);
     }
 
 }

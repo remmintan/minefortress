@@ -1,12 +1,11 @@
 package org.minefortress.fight;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import org.minefortress.entity.Colonist;
 import org.minefortress.entity.WarriorPawn;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.registries.FortressEntities;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +20,7 @@ public class ClientFightSelectionManager {
     private MousePos selectionCurPos;
     private Vec3d selectionCurBlock;
 
-    private List<Colonist> selectedColonists = Collections.emptyList();
+    private List<WarriorPawn> selectedColonists = Collections.emptyList();
 
     private Vec3d cachedBlockPos;
 
@@ -52,19 +51,17 @@ public class ClientFightSelectionManager {
         this.selectionCurBlock = endBlock;
 
         if(!this.selectionCurBlock.equals(this.cachedBlockPos)) {
-            final EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
+            final var type = FortressEntities.WARRIOR_PAWN_ENTITY_TYPE;
             final var selectionBox = new Box(selectionStartBlock.getX(), -64, selectionStartBlock.getZ(), selectionCurBlock.getX(), 256, selectionCurBlock.getZ());
             final var world = MinecraftClient.getInstance().world;
             if(world != null) {
+                final var clientFortressId = fortressClientManagerSupplier.get().getId();
                 selectedColonists = world
-                        .getEntitiesByType(colonistType, selectionBox, it ->{
-                            final var colonist = (Colonist) it;
-                            final var clientFortressId = fortressClientManagerSupplier.get().getId();
-                            final var colonistFortressId = colonist.getFortressId();
-                            return colonistFortressId.isPresent() && colonistFortressId.equals(clientFortressId);
+                        .getEntitiesByType(type, selectionBox, it ->{
+                            final var colonistFortressId = it.getFortressId();
+                            return colonistFortressId.map(id -> id.equals(clientFortressId)).orElse(false);
                         })
                         .stream()
-                        .map(it -> (Colonist)it)
                         .toList();
             }
             this.cachedBlockPos = selectionCurBlock;

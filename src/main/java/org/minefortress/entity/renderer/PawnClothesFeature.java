@@ -12,9 +12,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.entity.Colonist;
 
-public class ColonistClothesFeature extends FeatureRenderer<BasePawnEntity, BipedEntityModel<BasePawnEntity>> {
+public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, BipedEntityModel<BasePawnEntity>> {
 
     private static final Identifier ARCHER = new Identifier("minefortress", "textures/skins/archer.png");
     private static final Identifier ARMORER = new Identifier("minefortress", "textures/skins/armorer.png");
@@ -62,7 +61,7 @@ public class ColonistClothesFeature extends FeatureRenderer<BasePawnEntity, Bipe
     private static final Identifier SOLDIER_WHITE = new Identifier("minefortress", "textures/skins/soldier/soldier_white.png");
     private static final Identifier SOLDIER_YELLOW = new Identifier("minefortress", "textures/skins/soldier/soldier_yellow.png");
 
-    public ColonistClothesFeature(
+    public PawnClothesFeature(
             FeatureRendererContext<BasePawnEntity, BipedEntityModel<BasePawnEntity>> context
     ) {
         super(context);
@@ -74,9 +73,9 @@ public class ColonistClothesFeature extends FeatureRenderer<BasePawnEntity, Bipe
         if(entity.isSleeping()) return;
         final var clothingId = entity.getClothingId();
         if(isWarrior(clothingId)) {
-            ColonistClothesFeature.renderModel(this.getContextModel(), SOLDIER_BLUE, matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+            PawnClothesFeature.renderModel(this.getContextModel(), SOLDIER_BLUE, matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
         }
-        ColonistClothesFeature.renderModel(this.getContextModel(), this.getArmorTexture(clothingId), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+        PawnClothesFeature.renderModel(this.getContextModel(), this.getArmorTexture(clothingId), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
 
     }
 

@@ -39,7 +39,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, BipedEntit
 
     public PawnRenderer(EntityRendererFactory.Context context) {
         super(context, new PlayerEntityModel<>(context.getPart(EntityModelLayers.PLAYER), false), 0.5f);
-        this.addFeature(new ColonistClothesFeature(this));
+        this.addFeature(new PawnClothesFeature(this));
     }
 
     @Override
