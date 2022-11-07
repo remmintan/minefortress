@@ -14,7 +14,7 @@ import org.minefortress.entity.ai.MineFortressInventory;
 
 public abstract class BaritonableEntity extends PathAwareEntity implements IBaritonableEntity {
 
-    private final TrackedData<Integer> SELECTED_SLOT = DataTracker.registerData(BaritonableEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> SELECTED_SLOT = DataTracker.registerData(BaritonableEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     private final Inventory fakeInventory;
 

@@ -1,5 +1,6 @@
 {
   "item.minefortress.colonist_spawn_egg": "Colonist Spawn Egg",
+  "item.minefortress.warrior_pawn_spawn_egg": "Warrior Spawn Egg",
   "entity.minefortress.colonist": "Colonist",
   "gameMode.fortress": "Fortress",
   "key.minefortress.switch_selection": "Switch Selection",

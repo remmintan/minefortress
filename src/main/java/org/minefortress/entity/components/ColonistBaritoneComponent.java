@@ -1,4 +1,4 @@
-package org.minefortress.entity.ai;
+package org.minefortress.entity.components;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
@@ -9,16 +9,7 @@ import org.minefortress.entity.Colonist;
 public class ColonistBaritoneComponent implements EntityComponentInitializer {
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        final var globalSettings = BaritoneAPI.getGlobalSettings();
-        globalSettings.allowParkour.set(true);
-        globalSettings.allowSprint.set(true);
-        globalSettings.allowSwimming.set(true);
-        globalSettings.buildRepeatSneaky.set(true);
-        globalSettings.allowPlace.set(true);
-        globalSettings.allowBreak.set(false);
-        globalSettings.allowParkourPlace.set(true);
-        globalSettings.allowInventory.set(true);
-
+        AbstractBaritoneComponent.registerGlobalSettings();
         registry.registerFor(Colonist.class, IBaritone.KEY, BaritoneAPI.getProvider().componentFactory());
     }
 }

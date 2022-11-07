@@ -28,7 +28,8 @@
       "org.minefortress.earlyriser.GameModeEarlyRiser"
     ],
     "cardinal-components-entity": [
-      "org.minefortress.entity.ai.ColonistBaritoneComponent"
+      "org.minefortress.entity.components.ColonistBaritoneComponent",
+      "org.minefortress.entity.components.WarriorPawnBaritoneComponent"
     ]
   },
   "mixins": [
