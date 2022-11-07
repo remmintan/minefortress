@@ -8,6 +8,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +28,7 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
 
     public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
-        moveControl = new FighterMoveControl(this);
+        moveControl = world instanceof ServerWorld ? new FighterMoveControl(this) : null;
     }
 
     @Override

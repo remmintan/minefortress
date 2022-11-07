@@ -2,6 +2,7 @@ package org.minefortress.mixins.network;
 
 import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.MessageType;
@@ -95,7 +96,8 @@ public class FortressServerPlayNetworkHandlerMixin {
     private void addCustomNbtToStack(ItemStack stack) {
         if(stack == null) return;
         if(stack.getItem() instanceof SpawnEggItem eggItem) {
-            if(eggItem.getEntityType(stack.getNbt()) != FortressEntities.COLONIST_ENTITY_TYPE) return;
+            final EntityType<?> entityType = eggItem.getEntityType(stack.getNbt());
+            if(!FortressEntities.isFortressAwareEntityType(entityType)) return;
             if(stack.getNbt() == null) stack.setNbt(new NbtCompound());
 
             final var fortressServer = (FortressServer) this.server;
