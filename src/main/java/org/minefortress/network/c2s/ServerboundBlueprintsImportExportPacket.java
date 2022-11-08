@@ -12,7 +12,7 @@ import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.network.s2c.ClientboundBlueprintsProcessImportExportPacket;
 import org.minefortress.renderer.gui.blueprints.NetworkActionType;
 
@@ -27,7 +27,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class ServerboundBlueprintsImportExportPacket implements FortressServerPacket {
+public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacket {
 
     private final NetworkActionType type;
     private final String path;

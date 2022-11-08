@@ -5,7 +5,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServer;
 
-public interface FortressServerPacket extends FortressPacket {
+public interface FortressC2SPacket extends FortressPacket {
 
     void handle(MinecraftServer server, ServerPlayerEntity player);
 

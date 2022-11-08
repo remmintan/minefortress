@@ -3,9 +3,9 @@ package org.minefortress.network.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 
-public class ClientboundResetBlueprintPacket implements FortressClientPacket {
+public class ClientboundResetBlueprintPacket implements FortressS2CPacket {
 
     public ClientboundResetBlueprintPacket() {}
     public ClientboundResetBlueprintPacket(PacketByteBuf buf) {}

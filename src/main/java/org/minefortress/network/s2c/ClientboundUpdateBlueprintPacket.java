@@ -4,10 +4,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 
-public class ClientboundUpdateBlueprintPacket implements FortressClientPacket {
+public class ClientboundUpdateBlueprintPacket implements FortressS2CPacket {
 
     private final String file;
     private final int newFloorLevel;

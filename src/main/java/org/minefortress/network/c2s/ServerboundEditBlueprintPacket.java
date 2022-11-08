@@ -11,13 +11,13 @@ import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerboundEditBlueprintPacket implements FortressServerPacket {
+public class ServerboundEditBlueprintPacket implements FortressC2SPacket {
 
     private final Type type;
     private final String blueprintFileName;

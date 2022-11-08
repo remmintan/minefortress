@@ -3,7 +3,7 @@ package org.minefortress.network.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.Profession;
 import org.minefortress.professions.ProfessionEssentialInfo;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ClientboundProfessionSyncPacket implements FortressClientPacket {
+public class ClientboundProfessionSyncPacket implements FortressS2CPacket {
 
     private final List<ProfessionEssentialInfo> professions = new ArrayList<>();
 

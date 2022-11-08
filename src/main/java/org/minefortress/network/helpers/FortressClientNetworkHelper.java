@@ -4,15 +4,15 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import org.minefortress.network.interfaces.FortressClientPacket;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.network.s2c.*;
 
 import java.util.function.Function;
 
 public class FortressClientNetworkHelper {
 
-    public static void send(String channelName, FortressServerPacket packet) {
+    public static void send(String channelName, FortressC2SPacket packet) {
         final PacketByteBuf packetByteBuf = PacketByteBufs.create();
         packet.write(packetByteBuf);
         ClientPlayNetworking.send(new Identifier(FortressChannelNames.NAMESPACE, channelName), packetByteBuf);
@@ -33,7 +33,7 @@ public class FortressClientNetworkHelper {
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, ClientboundBlueprintsProcessImportExportPacket::new);
     }
 
-    private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressClientPacket> packetConstructor) {
+    private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressS2CPacket> packetConstructor) {
         ClientPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName),
                 (client, handler, buf, sender) -> packetConstructor.apply(buf).handle(client));
     }

@@ -2,18 +2,15 @@ package org.minefortress.network.s2c;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.ImportExportBlueprintsScreen;
 import org.minefortress.renderer.gui.blueprints.NetworkActionType;
 import org.minefortress.utils.ModUtils;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-public class ClientboundBlueprintsProcessImportExportPacket implements FortressClientPacket {
+public class ClientboundBlueprintsProcessImportExportPacket implements FortressS2CPacket {
 
     private final CurrentScreenAction action;
     private final NetworkActionType type;

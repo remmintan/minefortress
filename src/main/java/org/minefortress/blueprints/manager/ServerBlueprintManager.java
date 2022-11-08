@@ -15,7 +15,7 @@ import org.minefortress.network.s2c.ClientboundResetBlueprintPacket;
 import org.minefortress.network.s2c.ClientboundUpdateBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
@@ -30,7 +30,7 @@ public class ServerBlueprintManager {
 
     private final ServerBlueprintBlockDataManager blockDataManager;
     private final BlueprintMetadataReader blueprintMetadataReader;
-    private final Queue<FortressClientPacket> scheduledEdits = new ArrayDeque<>();
+    private final Queue<FortressS2CPacket> scheduledEdits = new ArrayDeque<>();
 
     public ServerBlueprintManager(MinecraftServer server, Supplier<UUID> userIdProvider) {
         this.blueprintMetadataReader = new BlueprintMetadataReader(server);
@@ -70,7 +70,7 @@ public class ServerBlueprintManager {
         }
 
         if(!scheduledEdits.isEmpty()) {
-            final FortressClientPacket packet = scheduledEdits.remove();
+            final FortressS2CPacket packet = scheduledEdits.remove();
             if(packet instanceof ClientboundUpdateBlueprintPacket)
                 FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, packet);
             else if(packet instanceof ClientboundAddBlueprintPacket)
@@ -82,7 +82,7 @@ public class ServerBlueprintManager {
 
     public void update(String fileName, NbtCompound updatedStructure, int newFloorLevel, BlueprintGroup group) {
         final var existed = blockDataManager.update(fileName, updatedStructure, newFloorLevel, group);
-        final FortressClientPacket packet =
+        final FortressS2CPacket packet =
                 existed? ClientboundUpdateBlueprintPacket.edit(fileName, newFloorLevel, updatedStructure) :
                         new ClientboundAddBlueprintPacket(group, fileName, fileName,  newFloorLevel, "custom", updatedStructure);
         scheduledEdits.add(packet);

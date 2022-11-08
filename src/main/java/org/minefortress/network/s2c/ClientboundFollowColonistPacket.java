@@ -3,13 +3,12 @@ package org.minefortress.network.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 
-public class ClientboundFollowColonistPacket implements FortressClientPacket {
+public class ClientboundFollowColonistPacket implements FortressS2CPacket {
 
     private final int entityId;
 

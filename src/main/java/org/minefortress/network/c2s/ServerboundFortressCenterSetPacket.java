@@ -4,11 +4,9 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 
-public class ServerboundFortressCenterSetPacket implements FortressServerPacket {
+public class ServerboundFortressCenterSetPacket implements FortressC2SPacket {
 
     private final BlockPos pos;
 

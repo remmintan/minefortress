@@ -4,9 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.tasks.CutTreesTask;
 import org.minefortress.tasks.TaskManager;
 
@@ -14,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ServerboundCutTreesTaskPacket implements FortressServerPacket {
+public class ServerboundCutTreesTaskPacket implements FortressC2SPacket {
 
     private final UUID uuid;
     private final List<BlockPos> treeRoots;

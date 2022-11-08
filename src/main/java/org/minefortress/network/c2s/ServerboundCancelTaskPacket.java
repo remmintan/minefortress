@@ -3,14 +3,12 @@ package org.minefortress.network.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.tasks.TaskManager;
 
 import java.util.UUID;
 
-public class ServerboundCancelTaskPacket implements FortressServerPacket {
+public class ServerboundCancelTaskPacket implements FortressC2SPacket {
 
     private final UUID taskId;
 

@@ -10,14 +10,14 @@ import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
 
 import java.util.UUID;
 
-public class ServerboundBlueprintTaskPacket implements FortressServerPacket {
+public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
     private final UUID taskId;
     private final String blueprintId;

@@ -3,10 +3,10 @@ package org.minefortress.network.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.renderer.gui.interfaces.ScrollableHandler;
 
-public class ServerboundScrollCurrentScreenPacket implements FortressServerPacket {
+public class ServerboundScrollCurrentScreenPacket implements FortressC2SPacket {
 
     private final float scrollPosition;
 

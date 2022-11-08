@@ -6,9 +6,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandlerFactory;
 import org.minefortress.fortress.resources.gui.smelt.FurnaceScreenHandlerFactory;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 
-public class ServerboundOpenCraftingScreenPacket implements FortressServerPacket {
+public class ServerboundOpenCraftingScreenPacket implements FortressC2SPacket {
 
     private final ScreenType screenType;
     private final BlockPos blockPos;

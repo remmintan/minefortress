@@ -5,10 +5,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
-public class ClientboundAddBlueprintPacket implements FortressClientPacket {
+public class ClientboundAddBlueprintPacket implements FortressS2CPacket {
 
     private final BlueprintGroup group;
     private final String name;

@@ -18,7 +18,7 @@ import org.minefortress.MineFortressMod;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.network.s2c.ClientboundAddBlueprintPacket;
 import org.minefortress.network.s2c.ClientboundUpdateBlueprintPacket;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.*;
@@ -68,7 +68,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         return alreadyIn || defaultStructure;
     }
 
-    public List<FortressClientPacket> getInitPackets() {
+    public List<FortressS2CPacket> getInitPackets() {
         return updatedStructures.values()
                 .stream()
                 .map(it -> {

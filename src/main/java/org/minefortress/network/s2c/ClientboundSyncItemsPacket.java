@@ -4,18 +4,16 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.tag.ItemTags;
-import org.apache.commons.logging.Log;
 import org.apache.logging.log4j.LogManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ClientboundSyncItemsPacket implements FortressClientPacket {
+public class ClientboundSyncItemsPacket implements FortressS2CPacket {
 
     private final List<ItemInfo> itemInfo;
     private final boolean needReset;

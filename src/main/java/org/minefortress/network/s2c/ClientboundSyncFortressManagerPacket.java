@@ -5,11 +5,11 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.FortressGamemode;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 
 import java.util.UUID;
 
-public class ClientboundSyncFortressManagerPacket implements FortressClientPacket {
+public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
 
     private final int colonistsCount;
     private final BlockPos fortressPos;

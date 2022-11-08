@@ -3,11 +3,10 @@ package org.minefortress.network.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.professions.ServerProfessionManager;
 
-public class ServerboundChangeProfessionStatePacket implements FortressServerPacket {
+public class ServerboundChangeProfessionStatePacket implements FortressC2SPacket {
 
     private final String professionId;
     private final AmountChange amountChange;

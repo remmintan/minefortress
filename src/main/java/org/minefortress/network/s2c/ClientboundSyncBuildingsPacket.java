@@ -6,14 +6,14 @@ import org.minefortress.fortress.EssentialBuildingInfo;
 import org.minefortress.fortress.FortressBuilding;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ClientboundSyncBuildingsPacket implements FortressClientPacket {
+public class ClientboundSyncBuildingsPacket implements FortressS2CPacket {
 
     private final List<EssentialBuildingInfo> houses;
 

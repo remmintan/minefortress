@@ -15,9 +15,9 @@ import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.world.FortressServerWorld;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 
-public class ServerboundFinishEditBlueprintPacket implements FortressServerPacket {
+public class ServerboundFinishEditBlueprintPacket implements FortressC2SPacket {
 
     private final boolean shouldSave;
 

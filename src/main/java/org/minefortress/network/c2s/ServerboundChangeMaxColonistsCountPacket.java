@@ -3,11 +3,10 @@ package org.minefortress.network.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServer;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 
-public class ServerboundChangeMaxColonistsCountPacket implements FortressServerPacket {
+public class ServerboundChangeMaxColonistsCountPacket implements FortressC2SPacket {
 
     private final ActionType actionType;
 

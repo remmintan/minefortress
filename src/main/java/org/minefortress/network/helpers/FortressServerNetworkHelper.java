@@ -6,23 +6,23 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.minefortress.network.c2s.*;
-import org.minefortress.network.interfaces.FortressClientPacket;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 
 import java.util.function.Function;
 
 public class FortressServerNetworkHelper {
 
-    public static void send(ServerPlayerEntity player, String channelName, FortressClientPacket packet) {
+    public static void send(ServerPlayerEntity player, String channelName, FortressS2CPacket packet) {
         final PacketByteBuf packetByteBuf = PacketByteBufs.create();
         packet.write(packetByteBuf);
 
         ServerPlayNetworking.send(player, new Identifier(FortressChannelNames.NAMESPACE, channelName), packetByteBuf);
     }
 
-    private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressServerPacket> packetConstructor) {
+    private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {
         ServerPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName), (server, player, handler, buf, sender) -> {
-            final FortressServerPacket packet = packetConstructor.apply(buf);
+            final FortressC2SPacket packet = packetConstructor.apply(buf);
             server.execute(() -> packet.handle(server, player));
         });
     }

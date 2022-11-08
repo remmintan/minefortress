@@ -8,9 +8,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.selections.SelectionType;
 import org.minefortress.selections.ServerSelectionType;
 import org.minefortress.tasks.SimpleSelectionTask;
@@ -20,7 +18,7 @@ import org.minefortress.tasks.TaskType;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ServerboundSimpleSelectionTaskPacket implements FortressServerPacket {
+public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
 
     private final UUID id;
     private final TaskType taskType;

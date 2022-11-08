@@ -9,11 +9,11 @@ import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.interfaces.FortressClientPacket;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 
 import java.util.*;
 
-public class ClientboundSyncSpecialBlocksPacket implements FortressClientPacket {
+public class ClientboundSyncSpecialBlocksPacket implements FortressS2CPacket {
 
     private final Map<Block, List<BlockPos>> basicSpecialBlocks;
     private final Map<Block, List<BlockPos>> blueprintSpecialBlocks;
