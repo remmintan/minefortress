@@ -11,7 +11,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.ServerboundSleepPacket;
+import org.minefortress.network.c2s.ServerboundSleepPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;

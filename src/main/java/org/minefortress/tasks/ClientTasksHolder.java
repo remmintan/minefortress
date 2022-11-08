@@ -3,7 +3,7 @@ package org.minefortress.tasks;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.network.ServerboundCancelTaskPacket;
+import org.minefortress.network.c2s.ServerboundCancelTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.selections.ClientSelection;

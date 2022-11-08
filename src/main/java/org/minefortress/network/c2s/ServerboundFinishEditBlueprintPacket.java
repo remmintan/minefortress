@@ -1,4 +1,4 @@
-package org.minefortress.network;
+package org.minefortress.network.c2s;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

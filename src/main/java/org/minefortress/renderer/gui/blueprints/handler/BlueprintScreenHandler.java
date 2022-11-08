@@ -5,7 +5,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.ServerboundEditBlueprintPacket;
+import org.minefortress.network.c2s.ServerboundEditBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;

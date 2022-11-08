@@ -18,7 +18,7 @@ import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.ClientboundFollowColonistPacket;
+import org.minefortress.network.s2c.ClientboundFollowColonistPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.utils.FortressSpawnLocating;

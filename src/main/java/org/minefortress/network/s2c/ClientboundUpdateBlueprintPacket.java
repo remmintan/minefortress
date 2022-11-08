@@ -1,13 +1,11 @@
-package org.minefortress.network;
+package org.minefortress.network.s2c;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressClientPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
-import org.minefortress.utils.ModUtils;
 
 public class ClientboundUpdateBlueprintPacket implements FortressClientPacket {
 

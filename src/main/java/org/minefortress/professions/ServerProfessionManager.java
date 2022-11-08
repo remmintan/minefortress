@@ -3,12 +3,11 @@ package org.minefortress.professions;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.Colonist;
 import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.network.ClientboundProfessionSyncPacket;
-import org.minefortress.network.ClientboundProfessionsInitPacket;
+import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;
+import org.minefortress.network.s2c.ClientboundProfessionsInitPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 

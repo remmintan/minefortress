@@ -1,7 +1,7 @@
 package org.minefortress.professions;
 
 import org.minefortress.fortress.AbstractFortressManager;
-import org.minefortress.network.ServerboundChangeProfessionStatePacket;
+import org.minefortress.network.c2s.ServerboundChangeProfessionStatePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 

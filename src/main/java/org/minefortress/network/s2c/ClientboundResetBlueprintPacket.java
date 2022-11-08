@@ -1,4 +1,4 @@
-package org.minefortress.network;
+package org.minefortress.network.s2c;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;

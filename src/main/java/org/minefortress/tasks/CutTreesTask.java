@@ -9,7 +9,7 @@ import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.IWorkerPawn;
 import org.minefortress.entity.ai.controls.DigControl;
-import org.minefortress.network.ClientboundTaskExecutedPacket;
+import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;

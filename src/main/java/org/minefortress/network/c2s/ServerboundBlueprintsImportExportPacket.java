@@ -1,4 +1,4 @@
-package org.minefortress.network;
+package org.minefortress.network.c2s;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -13,6 +13,7 @@ import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.interfaces.FortressServerPacket;
+import org.minefortress.network.s2c.ClientboundBlueprintsProcessImportExportPacket;
 import org.minefortress.renderer.gui.blueprints.NetworkActionType;
 
 import java.io.ByteArrayInputStream;

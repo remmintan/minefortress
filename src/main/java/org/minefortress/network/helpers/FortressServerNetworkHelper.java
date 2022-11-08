@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import org.minefortress.network.*;
+import org.minefortress.network.c2s.*;
 import org.minefortress.network.interfaces.FortressClientPacket;
 import org.minefortress.network.interfaces.FortressServerPacket;
 

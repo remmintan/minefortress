@@ -1,13 +1,12 @@
 package org.minefortress.renderer.gui.blueprints;
 
-import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import org.apache.logging.log4j.util.Strings;
-import org.minefortress.network.ServerboundEditBlueprintPacket;
+import org.minefortress.network.c2s.ServerboundEditBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 

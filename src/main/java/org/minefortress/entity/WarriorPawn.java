@@ -7,14 +7,14 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.controls.FighterMoveControl;
-import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
-import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 
 import java.util.Optional;
@@ -43,14 +43,16 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
         super.mobTick();
         if(getMoveTarget() != null || getAttackTarget() != null) {
             this.putItemInHand(Items.IRON_SWORD);
+        } else {
+            setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
         }
     }
 
     @Override
     protected void initGoals() {
-        this.goalSelector.add(1, new MeleeAttackGoal(this));
+//        this.goalSelector.add(1, new MeleeAttackGoal(this));
         this.goalSelector.add(2, new MoveToBlockGoal(this));
-        this.goalSelector.add(2, new FollowLivingEntityGoal(this));
+//        this.goalSelector.add(2, new FollowLivingEntityGoal(this));
 
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, false));
     }
@@ -74,7 +76,11 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     @Override
     public void setMoveTarget(@Nullable BlockPos pos) {
         this.resetTargets();
-        dataTracker.set(MOVE_TARGET, Optional.ofNullable(pos));
+        if(pos != null) {
+            dataTracker.set(MOVE_TARGET, Optional.of(pos.toImmutable()));
+        } else {
+            dataTracker.set(MOVE_TARGET, Optional.empty());
+        }
     }
 
     @Override
