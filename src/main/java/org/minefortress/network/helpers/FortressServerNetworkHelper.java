@@ -43,6 +43,8 @@ public class FortressServerNetworkHelper {
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_SLEEP, ServerboundSleepPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_CHANGE_MAX_COLONISTS_COUNT, ServerboundChangeMaxColonistsCountPacket::new);
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_BLUEPRINTS_IMPORT_EXPORT, ServerboundBlueprintsImportExportPacket::new);
+        FortressServerNetworkHelper.registerReceiver(C2SMoveTargetPacket.CHANNEL, C2SMoveTargetPacket::new);
+        FortressServerNetworkHelper.registerReceiver(C2SFollowTargetPacket.CHANNEL, C2SFollowTargetPacket::new);
     }
 
 }

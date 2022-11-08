@@ -3,9 +3,6 @@ package org.minefortress.entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -16,15 +13,16 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.controls.FighterMoveControl;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
-
-import java.util.Optional;
+import org.minefortress.network.c2s.C2SFollowTargetPacket;
+import org.minefortress.network.c2s.C2SMoveTargetPacket;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
 
-    private static final TrackedData<Optional<BlockPos>> MOVE_TARGET = DataTracker.registerData(WarriorPawn.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
-    private static final TrackedData<Integer> ATTACK_TARGET = DataTracker.registerData(WarriorPawn.class, TrackedDataHandlerRegistry.INTEGER);
-
     private final FighterMoveControl moveControl;
+
+    private BlockPos moveTarget;
+    private LivingEntity attackTarget;
 
     public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
@@ -34,8 +32,6 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        dataTracker.startTracking(MOVE_TARGET, Optional.empty());
-        dataTracker.startTracking(ATTACK_TARGET, -1);
     }
 
     @Override
@@ -62,42 +58,57 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
         return "warrior1";
     }
 
-    @Override
-    public void setAttackTarget(@Nullable LivingEntity entity) {
-        this.resetTargets();
-        if(entity != null) {
-            dataTracker.set(ATTACK_TARGET, entity.getId());
-        } else {
-            dataTracker.set(ATTACK_TARGET, -1);
-        }
 
-    }
 
     @Override
     public void setMoveTarget(@Nullable BlockPos pos) {
-        this.resetTargets();
         if(pos != null) {
-            dataTracker.set(MOVE_TARGET, Optional.of(pos.toImmutable()));
+            if(world.isClient) {
+                final var packet = new C2SMoveTargetPacket(pos, this.getId());
+                FortressClientNetworkHelper.send(C2SMoveTargetPacket.CHANNEL, packet);
+            } else {
+                this.resetTargets();
+                moveTarget = pos;
+            }
         } else {
-            dataTracker.set(MOVE_TARGET, Optional.empty());
+            throw new IllegalArgumentException("Move target cannot be null");
+        }
+    }
+
+    @Override
+    @Nullable
+    public BlockPos getMoveTarget() {
+        if(world.isClient) {
+            throw new IllegalStateException("Cannot get move target on client");
+        }
+        return moveTarget;
+    }
+
+    @Override
+    public void setAttackTarget(@Nullable LivingEntity entity) {
+        if(entity != null) {
+            if(world.isClient) {
+                final var followPacket = new C2SFollowTargetPacket(entity.getId(), this.getId());
+                FortressClientNetworkHelper.send(C2SFollowTargetPacket.CHANNEL, followPacket);
+            } else {
+                this.resetTargets();
+                attackTarget = entity;
+            }
+
+        } else {
+            throw new IllegalArgumentException("Attack target cannot be null");
         }
     }
 
     @Override
     @Nullable
     public LivingEntity getAttackTarget() {
-        var id = dataTracker.get(ATTACK_TARGET);
-        if(id == -1) {
-            return null;
+        if(world.isClient) {
+            throw new IllegalStateException("Cannot get attack target on client");
         }
-        return (LivingEntity) world.getEntityById(id);
+        return attackTarget;
     }
 
-    @Override
-    @Nullable
-    public BlockPos getMoveTarget() {
-        return dataTracker.get(MOVE_TARGET).orElse(null);
-    }
 
     @Override
     public FighterMoveControl getFighterMoveControl() {
@@ -105,8 +116,8 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     }
 
     private void resetTargets() {
-        dataTracker.set(MOVE_TARGET, Optional.empty());
-        dataTracker.set(ATTACK_TARGET, -1);
+        this.moveTarget = null;
+        this.attackTarget = null;
     }
 
 }
