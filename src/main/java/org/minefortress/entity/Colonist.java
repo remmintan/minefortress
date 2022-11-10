@@ -253,18 +253,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
         }
     }
 
-    public void sendMessageToMasterPlayer(String message) {
-        final Optional<ServerPlayerEntity> player = getMasterPlayer();
-        player.ifPresent(p -> p.sendMessage(new LiteralText(message), false));
-    }
-
-    public boolean isScreenOpen(Class<? extends ScreenHandler> screenHandlerClass) {
-        return getMasterPlayer()
-                .map(it -> it.currentScreenHandler)
-                .map(screenHandlerClass::isInstance)
-                .orElse(false);
-    }
-
     private void tickProfessionCheck() {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId)) {
