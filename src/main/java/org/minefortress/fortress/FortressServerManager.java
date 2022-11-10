@@ -40,6 +40,7 @@ import org.minefortress.network.s2c.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.professions.ServerProfessionManager;
+import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.TaskManager;
 
 import java.util.*;
@@ -275,9 +276,9 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var randomSpawnPosition = getRandomSpawnPosition();
         if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
             final var tag = getColonistInfoTag();
-            EntityType<?> colonistType = EntityType.get("minefortress:colonist").orElseThrow();
+            final var colonistType = FortressEntities.COLONIST_ENTITY_TYPE;
             final var world = getWorld();
-            final var spawnedPawn = (Colonist)colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+            final var spawnedPawn = colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
             return Optional.ofNullable(spawnedPawn);
         }
         return Optional.empty();
