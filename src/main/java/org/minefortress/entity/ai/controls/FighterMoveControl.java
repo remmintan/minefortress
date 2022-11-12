@@ -18,7 +18,7 @@ import java.util.Optional;
 public class FighterMoveControl {
 
     private final IBaritone baritone;
-    private final float reachRange;
+    private final double reachRange;
     private final BaritonableEntity baritonableEntity;
 
     private BlockPos moveTarget;

@@ -4,6 +4,6 @@ import baritone.api.minefortress.IMinefortressEntity;
 
 public interface IBaritonableEntity extends IMinefortressEntity {
 
-    float getReachRange();
+    double getReachRange();
 
 }

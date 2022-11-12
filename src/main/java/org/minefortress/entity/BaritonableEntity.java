@@ -1,6 +1,7 @@
 package org.minefortress.entity;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -50,8 +51,8 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IBari
         return bucketItem.fluid;
     }
 
-    public float getReachRange() {
-        return 2.5f;
+    public double getReachRange() {
+        return this.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
     }
 
     @Override
