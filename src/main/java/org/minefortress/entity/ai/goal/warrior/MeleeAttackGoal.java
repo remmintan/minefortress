@@ -2,7 +2,9 @@ package org.minefortress.entity.ai.goal.warrior;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
+import org.minefortress.entity.IItemUsingEntity;
 import org.minefortress.entity.IWarriorPawn;
 
 import java.util.Optional;
@@ -18,6 +20,14 @@ public class MeleeAttackGoal extends Goal {
     @Override
     public boolean canStart() {
         return isNearTarget();
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        if(this.pawn instanceof IItemUsingEntity be) {
+            be.putItemInHand(Items.IRON_SWORD);
+        }
     }
 
     @Override
