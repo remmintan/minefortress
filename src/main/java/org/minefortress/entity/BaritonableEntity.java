@@ -51,7 +51,7 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IBari
     }
 
     public float getReachRange() {
-        return 4f;
+        return 2.5f;
     }
 
     @Override
