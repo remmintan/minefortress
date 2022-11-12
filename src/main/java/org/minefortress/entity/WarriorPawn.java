@@ -57,15 +57,17 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
         this.goalSelector.add(9, new LookAtEntityGoal(this, LivingEntity.class, 4f));
         this.goalSelector.add(10, new LookAroundGoal(this));
 
-        this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, false));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, LivingEntity.class, false, this::canAttack));
+    }
+
+    private boolean canAttack(LivingEntity it) {
+        return it.isAlive() && it instanceof HostileEntity && it.equals(getAttackTarget());
     }
 
     @Override
     public String getClothingId() {
         return "warrior1";
     }
-
-
 
     @Override
     public void setMoveTarget(@Nullable BlockPos pos) {

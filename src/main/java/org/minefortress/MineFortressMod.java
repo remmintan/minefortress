@@ -4,6 +4,7 @@ package org.minefortress;
 import com.chocohead.mm.api.ClassTinkerers;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.ActionResult;
@@ -13,6 +14,7 @@ import net.minecraft.world.GameMode;
 import org.minefortress.commands.CommandsManager;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
+import org.minefortress.interfaces.FortressServer;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.registries.FortressBlocks;
 import org.minefortress.registries.FortressEntities;
@@ -63,6 +65,12 @@ public class MineFortressMod implements ModInitializer {
                 return ActionResult.SUCCESS;
             }
             return ActionResult.PASS;
+        });
+
+        // initialising the fortress server on join
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            final var fortressServer = (FortressServer) server;
+            fortressServer.getFortressModServerManager().getByPlayer(handler.player);
         });
     }
 
