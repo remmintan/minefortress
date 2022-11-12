@@ -44,7 +44,7 @@ public class MeleeAttackGoal extends Goal {
     }
 
     private Optional<LivingEntity> getTarget() {
-        return Optional.ofNullable(pawn.getAttackTarget()).or(() -> Optional.ofNullable(pawn.getTarget()));
+        return Optional.ofNullable(pawn.getTarget());
     }
 
 }
