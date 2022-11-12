@@ -1,10 +1,10 @@
 package org.minefortress.entity;
 
-import baritone.api.minefortress.IBlockPosControl;
-import baritone.api.minefortress.IFortressColonist;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
+import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -14,6 +14,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.controls.FighterMoveControl;
+import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
+import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 import org.minefortress.network.c2s.C2SFollowTargetPacket;
 import org.minefortress.network.c2s.C2SMoveTargetPacket;
@@ -49,9 +51,11 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
 
     @Override
     protected void initGoals() {
-//        this.goalSelector.add(1, new MeleeAttackGoal(this));
+        this.goalSelector.add(1, new MeleeAttackGoal(this));
         this.goalSelector.add(2, new MoveToBlockGoal(this));
-//        this.goalSelector.add(2, new FollowLivingEntityGoal(this));
+        this.goalSelector.add(2, new FollowLivingEntityGoal(this));
+        this.goalSelector.add(9, new LookAtEntityGoal(this, LivingEntity.class, 4f));
+        this.goalSelector.add(10, new LookAroundGoal(this));
 
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, false));
     }
