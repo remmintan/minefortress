@@ -244,16 +244,16 @@ public final class FortressServerManager extends AbstractFortressManager {
             final var spawnFactor = MathHelper.clampedLerp(84, 99, colonistsCount / 50f);
 
             if(maxColonistsCount == -1 || colonistsCount < maxColonistsCount) {
-                if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) > spawnFactor) {
-                    final var bedsCount = buildings.stream().map(FortressBuilding::getBedsCount).reduce(0, Integer::sum);
-                    if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
-                        final var colonistOpt = spawnPawnNearCampfire();
-                        if(player != null && colonistOpt.isPresent()) {
-                            final var colonist = colonistOpt.get();
-                            player.sendMessage(new LiteralText(colonist.getName().asString()+" appeared in the village."), false);
-                        }
-                    }
-                }
+//                if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) > spawnFactor) {
+//                    final var bedsCount = buildings.stream().map(FortressBuilding::getBedsCount).reduce(0, Integer::sum);
+//                    if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
+//                        final var colonistOpt = spawnPawnNearCampfire();
+//                        if(player != null && colonistOpt.isPresent()) {
+//                            final var colonist = colonistOpt.get();
+//                            player.sendMessage(new LiteralText(colonist.getName().asString()+" appeared in the village."), false);
+//                        }
+//                    }
+//                }
             }
         }
     }

@@ -1,8 +1,5 @@
 package org.minefortress.entity;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -20,8 +17,6 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressConstants;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -108,12 +103,4 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         return super.isInvulnerableTo(damageSource);
     }
 
-    private boolean isFortressCreative() {
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            final var client = (FortressMinecraftClient) MinecraftClient.getInstance();
-            return client.getFortressClientManager().isCreative();
-        } else {
-            return getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
-        }
-    }
 }
