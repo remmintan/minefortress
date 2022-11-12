@@ -8,6 +8,7 @@ import baritone.api.pathing.calc.IPath;
 import baritone.api.pathing.goals.GoalNear;
 import baritone.api.utils.BetterBlockPos;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.BaritonableEntity;
@@ -34,6 +35,7 @@ public class FighterMoveControl {
 
     public void moveTo(@NotNull BlockPos pos) {
         this.reset();
+        this.baritonableEntity.setMovementSpeed((float)this.baritonableEntity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
         this.moveTarget = pos;
         final var goal = new GoalNear(pos, (int) Math.floor(reachRange));
         baritone.getCustomGoalProcess().setGoalAndPath(goal);
