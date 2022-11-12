@@ -47,6 +47,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0d)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15d)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 2.0d)
+                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED)
                 .add(EntityAttributes.GENERIC_LUCK);
     }
