@@ -44,8 +44,8 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     public static DefaultAttributeContainer.Builder createAttributes() {
         return LivingEntity.createLivingAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0f)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2f)
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0d)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2d)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
                 .add(EntityAttributes.GENERIC_ATTACK_SPEED)
