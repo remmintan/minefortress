@@ -61,7 +61,7 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     }
 
     private boolean canAttack(LivingEntity it) {
-        return it.isAlive() && it instanceof HostileEntity && it.equals(getAttackTarget());
+        return it.isAlive() && (it instanceof HostileEntity || it.equals(getAttackTarget()));
     }
 
     @Override
