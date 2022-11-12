@@ -1,5 +1,6 @@
 package org.minefortress.entity.ai.goal.warrior;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import org.minefortress.entity.IWarriorPawn;
 
@@ -8,10 +9,11 @@ import java.util.EnumSet;
 public class FollowLivingEntityGoal extends Goal {
 
     private final IWarriorPawn pawn;
+    private LivingEntity target;
 
     public FollowLivingEntityGoal(IWarriorPawn pawn) {
         this.pawn = pawn;
-        this.setControls(EnumSet.of(Control.MOVE));
+        this.setControls(EnumSet.of(Control.MOVE, Control.JUMP));
     }
 
     @Override
@@ -21,12 +23,13 @@ public class FollowLivingEntityGoal extends Goal {
 
     @Override
     public void start() {
-        pawn.getFighterMoveControl().moveTo(pawn.getAttackTarget());
+        target = pawn.getAttackTarget();
+        pawn.getFighterMoveControl().moveTo(target);
     }
 
     @Override
     public boolean shouldContinue() {
-        return hasAttackTarget() && !pawn.getFighterMoveControl().isStuck();
+        return hasAttackTarget() && sameAttackTarget() && !pawn.getFighterMoveControl().isStuck();
     }
 
     @Override
@@ -41,6 +44,10 @@ public class FollowLivingEntityGoal extends Goal {
 
     private boolean hasAttackTarget() {
         return pawn.getAttackTarget() != null;
+    }
+
+    private boolean sameAttackTarget() {
+        return target != null && target.equals(pawn.getAttackTarget());
     }
 
 }
