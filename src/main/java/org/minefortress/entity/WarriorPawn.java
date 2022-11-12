@@ -34,16 +34,6 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     }
 
     @Override
-    protected void mobTick() {
-        super.mobTick();
-        if(getMoveTarget() != null || getAttackTarget() != null) {
-            this.putItemInHand(Items.IRON_SWORD);
-        } else {
-            setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
-        }
-    }
-
-    @Override
     public void tickMovement() {
         super.tickMovement();
         super.tickHandSwing();
