@@ -1,5 +1,7 @@
 package org.minefortress.entity;
 
+import baritone.api.minefortress.IBlockPosControl;
+import baritone.api.minefortress.IFortressColonist;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
@@ -30,11 +32,6 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-    }
-
-    @Override
     protected void mobTick() {
         super.mobTick();
         if(getMoveTarget() != null || getAttackTarget() != null) {
@@ -42,6 +39,12 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
         } else {
             setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
         }
+    }
+
+    @Override
+    public void tickMovement() {
+        super.tickMovement();
+        super.tickHandSwing();
     }
 
     @Override
@@ -88,7 +91,7 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     public void setAttackTarget(@Nullable LivingEntity entity) {
         if(entity != null) {
             if(world.isClient) {
-                final var followPacket = new C2SFollowTargetPacket(entity.getId(), this.getId());
+                final var followPacket = new C2SFollowTargetPacket(this.getId(), entity.getId());
                 FortressClientNetworkHelper.send(C2SFollowTargetPacket.CHANNEL, followPacket);
             } else {
                 this.resetTargets();
