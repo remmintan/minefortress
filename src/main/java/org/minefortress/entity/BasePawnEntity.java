@@ -102,22 +102,10 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         }
     }
 
-//    @Override
-//    public final boolean isInvulnerable() {
-//        if(isFortressCreative())
-//            return true;
-//        else
-//            return super.isInvulnerable();
-//    }
-
     @Override
     public final boolean isInvulnerableTo(DamageSource damageSource) {
         if(damageSource == DamageSource.FALL) return true;
-        if(isFortressCreative()) {
-            return !damageSource.isOutOfWorld();
-        } else {
-            return super.isInvulnerableTo(damageSource);
-        }
+        return super.isInvulnerableTo(damageSource);
     }
 
     private boolean isFortressCreative() {
