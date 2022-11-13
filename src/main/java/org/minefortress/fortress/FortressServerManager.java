@@ -100,12 +100,13 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.scheduleSyncBuildings();
     }
 
-    public Optional<FortressBedInfo> getFreeBed(){
-        for(FortressBuilding building : buildings){
-            final Optional<FortressBedInfo> freeBed = building.getFreeBed();
-            if(freeBed.isPresent()) return freeBed;
-        }
-        return Optional.empty();
+    public Optional<BlockPos> getFreeBed(){
+        return buildings
+                .stream()
+                .map(it -> it.getFreeBed(server.getWorld(World.OVERWORLD)))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
     }
 
     public void addColonist(LivingEntity colonist) {
@@ -131,7 +132,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode, this.id, this.maxColonistsCount);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
-            final var syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
+            final var houses = buildings.stream()
+                    .map(h -> new EssentialBuildingInfo(h.getStart(), h.getEnd(), h.getRequirementId(), h.getBedsCount(getWorld())))
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
             needSyncBuildings = false;
         }
@@ -149,14 +153,6 @@ public final class FortressServerManager extends AbstractFortressManager {
                 .toList();
         if(buildings.isEmpty()) return Optional.empty();
         return Optional.of(buildings.get(random.nextInt(buildings.size())));
-    }
-
-    public Optional<FortressBedInfo> getRandomBed() {
-        final var allBeds = this.buildings.stream()
-                .flatMap(building -> building.getBeds().stream())
-                .toList();
-        if(allBeds.isEmpty()) return Optional.empty();
-        return Optional.of(allBeds.get(getWorld().random.nextInt(allBeds.size())));
     }
 
     public void tickFortress(@Nullable ServerPlayerEntity player, MinecraftServer server) {
@@ -564,7 +560,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
             return buildings.stream()
                     .filter(b -> b.getRequirementId().equals(requirementId))
-                    .mapToInt(FortressBuilding::getBedsCount)
+                    .mapToLong(it -> it.getBedsCount(getWorld()))
                     .sum() > minCount;
         }
         if(requirementId.equals("shooting_gallery"))
