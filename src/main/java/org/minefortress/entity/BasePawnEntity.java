@@ -103,4 +103,14 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         return super.isInvulnerableTo(damageSource);
     }
 
+    @Override
+    public boolean canImmediatelyDespawn(double distanceSquared) {
+        return false;
+    }
+
+    @Override
+    public boolean cannotDespawn() {
+        return true;
+    }
+
 }

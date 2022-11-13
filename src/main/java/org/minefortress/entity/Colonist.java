@@ -12,6 +12,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
+import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.data.DataTracker;
@@ -26,8 +27,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
@@ -52,7 +51,6 @@ import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.List;
-import java.util.Optional;
 
 public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
 
@@ -169,21 +167,12 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
         }
 
         if (this.hasStatusEffect(StatusEffects.MINING_FATIGUE)) {
-            float f1;
-            switch(this.getStatusEffect(StatusEffects.MINING_FATIGUE).getAmplifier()) {
-                case 0:
-                    f1 = 0.3F;
-                    break;
-                case 1:
-                    f1 = 0.09F;
-                    break;
-                case 2:
-                    f1 = 0.0027F;
-                    break;
-                case 3:
-                default:
-                    f1 = 8.1E-4F;
-            }
+            float f1 = switch (this.getStatusEffect(StatusEffects.MINING_FATIGUE).getAmplifier()) {
+                case 0 -> 0.3F;
+                case 1 -> 0.09F;
+                case 2 -> 0.0027F;
+                default -> 8.1E-4F;
+            };
 
             f *= f1;
         }
@@ -202,7 +191,7 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
     @Override
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
-        this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
+        this.goalSelector.add(3, new FleeEntityGoal<>(this, HostileEntity.class, 3, 1.0D, 1.2D));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
 //        this.goalSelector.add(7, new ColonistEatGoal(this));
@@ -211,8 +200,7 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
 
-        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, true));
     }
 
     @Override
@@ -223,16 +211,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
         Box boundingBox = getBoundingBox();
         List<SlimeEntity> touchingSlimes = world.getEntitiesByClass(SlimeEntity.class, boundingBox, slimeEntity -> true);
         touchingSlimes.forEach(s -> ((FortressSlimeEntity)s).touchColonist(this));
-    }
-
-    @Override
-    public boolean canImmediatelyDespawn(double distanceSquared) {
-        return false;
-    }
-
-    @Override
-    public boolean cannotDespawn() {
-        return true;
     }
 
     @Override
