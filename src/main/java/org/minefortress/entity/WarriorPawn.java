@@ -19,7 +19,7 @@ import org.minefortress.network.c2s.C2SFollowTargetPacket;
 import org.minefortress.network.c2s.C2SMoveTargetPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
-public final class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
+public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
 
     private final FighterMoveControl moveControl;
 

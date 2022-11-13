@@ -6,10 +6,8 @@ import baritone.api.minefortress.IFortressColonist;
 import baritone.api.minefortress.IMinefortressEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
@@ -29,15 +27,11 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.DigControl;
 import org.minefortress.entity.ai.controls.PlaceControl;
@@ -49,7 +43,7 @@ import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-public final class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
+public final class Colonist extends NamedPawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
 
     public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;
@@ -119,23 +113,8 @@ public final class Colonist extends BasePawnEntity implements RangedAttackMob, I
         return getProfessionId();
     }
 
-    @Override
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-        final var initResult = super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
-        this.setCustomNameIfNeeded();
-        return initResult;
-    }
-
     public MovementHelper getMovementHelper() {
         return movementHelper;
-    }
-
-    private void setCustomNameIfNeeded() {
-        getFortressServerManager().ifPresent(it -> {
-            if(!this.hasCustomName()) {
-                this.setCustomName(new LiteralText(it.getNameGenerator().generateRandomName()));
-            }
-        });
     }
 
     public float getDestroySpeed(BlockState state) {
