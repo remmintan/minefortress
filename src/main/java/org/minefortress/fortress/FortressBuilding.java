@@ -3,7 +3,6 @@ package org.minefortress.fortress;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -49,8 +48,6 @@ public class FortressBuilding {
     public BlockPos getEnd() {
         return end;
     }
-
-    public void tick(MinecraftServer server) {}
 
     public Optional<BlockPos> getFreeBed(World world) {
         return streamBeds(world)

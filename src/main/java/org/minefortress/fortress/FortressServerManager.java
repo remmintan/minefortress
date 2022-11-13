@@ -184,10 +184,6 @@ public final class FortressServerManager extends AbstractFortressManager {
             scheduleSync();
         }
 
-        for (FortressBuilding building : buildings) {
-            building.tick(server);
-        }
-
         if(pawnsDontHaveTask() && (!specialBlocks.containsKey(Blocks.CRAFTING_TABLE) || specialBlocks.get(Blocks.CRAFTING_TABLE).isEmpty())) {
             final var ii = new ItemInfo(Items.CRAFTING_TABLE, 1);
             if(!serverResourceManager.hasItems(Collections.singletonList(ii))) {
