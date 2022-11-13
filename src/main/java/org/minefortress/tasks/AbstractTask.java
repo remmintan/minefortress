@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import org.minefortress.entity.IWorkerPawn;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;

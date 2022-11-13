@@ -1,6 +1,5 @@
-package org.minefortress.entity;
+package org.minefortress.entity.interfaces;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;

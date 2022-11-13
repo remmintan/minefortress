@@ -10,7 +10,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.IWorkerPawn;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.selections.ServerSelectionType;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;

@@ -1,4 +1,4 @@
-package org.minefortress.entity;
+package org.minefortress.entity.interfaces;
 
 import net.minecraft.server.world.ServerWorld;
 import org.minefortress.entity.ai.controls.TaskControl;

@@ -1,4 +1,4 @@
-package org.minefortress.entity;
+package org.minefortress.entity.interfaces;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

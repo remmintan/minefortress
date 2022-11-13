@@ -5,7 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.entity.IWorkerPawn;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;

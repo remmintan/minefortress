@@ -4,8 +4,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.world.GameRules;
-import org.minefortress.entity.Colonist;
-import org.minefortress.entity.IFortressAwareEntity;
+import org.minefortress.entity.interfaces.IFortressAwareEntity;
 import org.minefortress.fortress.FortressServerManager;
 
 public class FortressHungerManager extends HungerManager implements IFortressHungerManager {

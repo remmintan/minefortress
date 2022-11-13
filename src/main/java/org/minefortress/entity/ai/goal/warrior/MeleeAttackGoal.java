@@ -4,8 +4,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
-import org.minefortress.entity.IItemUsingEntity;
-import org.minefortress.entity.IWarriorPawn;
+import org.minefortress.entity.interfaces.IItemUsingEntity;
+import org.minefortress.entity.interfaces.IWarriorPawn;
 
 import java.util.Optional;
 

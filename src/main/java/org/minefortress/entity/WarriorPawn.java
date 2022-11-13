@@ -14,6 +14,7 @@ import org.minefortress.entity.ai.goal.SelectTargetToAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
 import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
+import org.minefortress.entity.interfaces.IWarriorPawn;
 import org.minefortress.network.c2s.C2SFollowTargetPacket;
 import org.minefortress.network.c2s.C2SMoveTargetPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;

@@ -44,6 +44,7 @@ import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.controls.TaskControl;
 import org.minefortress.entity.ai.goal.*;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.tasks.block.info.TaskBlockInfo;

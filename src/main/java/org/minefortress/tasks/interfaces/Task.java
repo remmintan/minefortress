@@ -3,8 +3,7 @@ package org.minefortress.tasks.interfaces;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.entity.Colonist;
-import org.minefortress.entity.IWorkerPawn;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.tasks.TaskPart;
 import org.minefortress.tasks.TaskType;
 

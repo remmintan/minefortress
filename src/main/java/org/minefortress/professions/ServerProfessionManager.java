@@ -3,7 +3,7 @@ package org.minefortress.professions;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.IWorkerPawn;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;

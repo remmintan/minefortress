@@ -15,8 +15,10 @@ import org.minefortress.entity.ai.controls.EatControl;
 import org.minefortress.entity.colonist.FakeHungerManager;
 import org.minefortress.entity.colonist.FortressHungerManager;
 import org.minefortress.entity.colonist.IFortressHungerManager;
+import org.minefortress.entity.interfaces.IFortressAwareEntity;
+import org.minefortress.entity.interfaces.IHungerAwareEntity;
 
-public abstract class HungryEntity extends BaritonableEntity implements IHungerAwareEntity{
+public abstract class HungryEntity extends BaritonableEntity implements IHungerAwareEntity {
 
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(HungryEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final String HUNGER_MANAGER_NBT_KEY = "hunger";

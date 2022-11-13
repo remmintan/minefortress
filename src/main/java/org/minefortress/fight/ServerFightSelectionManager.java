@@ -1,6 +1,6 @@
 package org.minefortress.fight;
 
-import org.minefortress.entity.IWarriorPawn;
+import org.minefortress.entity.interfaces.IWarriorPawn;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -12,6 +12,7 @@ import net.minecraft.item.BucketItem;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import org.minefortress.entity.ai.MineFortressInventory;
+import org.minefortress.entity.interfaces.IBaritonableEntity;
 
 public abstract class BaritonableEntity extends PathAwareEntity implements IBaritonableEntity {
 

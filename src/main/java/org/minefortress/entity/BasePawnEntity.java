@@ -19,6 +19,7 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressConstants;
+import org.minefortress.entity.interfaces.IFortressAwareEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 
 import java.util.List;

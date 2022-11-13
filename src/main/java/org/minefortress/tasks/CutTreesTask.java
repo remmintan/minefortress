@@ -7,7 +7,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.IWorkerPawn;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.entity.ai.controls.DigControl;
 import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;

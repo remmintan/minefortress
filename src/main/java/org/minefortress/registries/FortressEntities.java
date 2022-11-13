@@ -11,7 +11,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.IFortressAwareEntity;
 import org.minefortress.entity.WarriorPawn;
 import org.minefortress.entity.renderer.PawnRenderer;
 

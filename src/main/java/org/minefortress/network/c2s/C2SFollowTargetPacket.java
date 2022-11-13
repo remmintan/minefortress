@@ -4,7 +4,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.entity.IWarriorPawn;
+import org.minefortress.entity.interfaces.IWarriorPawn;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 
 public class C2SFollowTargetPacket implements FortressC2SPacket {
