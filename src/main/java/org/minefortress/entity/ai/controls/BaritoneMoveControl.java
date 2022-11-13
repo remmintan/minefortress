@@ -15,7 +15,7 @@ import org.minefortress.entity.BaritonableEntity;
 
 import java.util.Optional;
 
-public class FighterMoveControl {
+public class BaritoneMoveControl {
 
     private final IBaritone baritone;
     private final double reachRange;
@@ -26,7 +26,7 @@ public class FighterMoveControl {
 
     private boolean stuck = false;
 
-    public FighterMoveControl(BaritonableEntity baritonableEntity) {
+    public BaritoneMoveControl(BaritonableEntity baritonableEntity) {
         this.baritonableEntity = baritonableEntity;
         this.baritone = BaritoneAPI.getProvider().getBaritone(baritonableEntity);
         this.baritone.getGameEventHandler().registerEventListener(new StuckOnFailEventListener());

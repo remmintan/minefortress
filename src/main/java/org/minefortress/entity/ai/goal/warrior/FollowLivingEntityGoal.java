@@ -24,17 +24,17 @@ public class FollowLivingEntityGoal extends Goal {
     @Override
     public void start() {
         target = pawn.getAttackTarget();
-        pawn.getFighterMoveControl().moveTo(target);
+        pawn.getFortressMoveControl().moveTo(target);
     }
 
     @Override
     public boolean shouldContinue() {
-        return hasAttackTarget() && sameAttackTarget() && !pawn.getFighterMoveControl().isStuck();
+        return hasAttackTarget() && sameAttackTarget() && !pawn.getFortressMoveControl().isStuck();
     }
 
     @Override
     public void stop() {
-        pawn.getFighterMoveControl().reset();
+        pawn.getFortressMoveControl().reset();
     }
 
     @Override

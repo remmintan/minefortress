@@ -9,7 +9,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.ai.controls.FighterMoveControl;
+import org.minefortress.entity.ai.controls.BaritoneMoveControl;
 import org.minefortress.entity.ai.goal.SelectTargetToAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
 import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
@@ -21,14 +21,14 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
 
-    private final FighterMoveControl moveControl;
+    private final BaritoneMoveControl moveControl;
 
     private BlockPos moveTarget;
     private LivingEntity attackTarget;
 
     public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
-        moveControl = world instanceof ServerWorld ? new FighterMoveControl(this) : null;
+        moveControl = world instanceof ServerWorld ? new BaritoneMoveControl(this) : null;
     }
 
     @Override
@@ -102,7 +102,7 @@ public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
 
 
     @Override
-    public FighterMoveControl getFighterMoveControl() {
+    public BaritoneMoveControl getFortressMoveControl() {
         return moveControl;
     }
 

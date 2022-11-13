@@ -24,12 +24,12 @@ public class MoveToBlockGoal extends Goal {
     @Override
     public void start() {
         target = pawn.getMoveTarget();
-        pawn.getFighterMoveControl().moveTo(target);
+        pawn.getFortressMoveControl().moveTo(target);
     }
 
     @Override
     public boolean shouldContinue() {
-        return hasMoveTarget() && stillOnTheSameTarget() && farFromMoveTarget() && !pawn.getFighterMoveControl().isStuck();
+        return hasMoveTarget() && stillOnTheSameTarget() && farFromMoveTarget() && !pawn.getFortressMoveControl().isStuck();
     }
 
     @Override
@@ -39,7 +39,7 @@ public class MoveToBlockGoal extends Goal {
 
     @Override
     public void stop() {
-        pawn.getFighterMoveControl().reset();
+        pawn.getFortressMoveControl().reset();
         target = null;
     }
 
