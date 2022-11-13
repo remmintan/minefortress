@@ -18,7 +18,7 @@ import org.minefortress.network.c2s.C2SFollowTargetPacket;
 import org.minefortress.network.c2s.C2SMoveTargetPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
-public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
+public final class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
 
     private final FighterMoveControl moveControl;
 
@@ -28,17 +28,6 @@ public class WarriorPawn extends BasePawnEntity implements IWarriorPawn {
     public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
         moveControl = world instanceof ServerWorld ? new FighterMoveControl(this) : null;
-    }
-
-    @Override
-    public void tickMovement() {
-        super.tickMovement();
-        super.tickHandSwing();
-    }
-
-    @Override
-    public boolean canTakeDamage() {
-        return super.canTakeDamage();
     }
 
     @Override

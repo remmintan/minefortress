@@ -21,7 +21,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -46,13 +45,10 @@ import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.controls.TaskControl;
 import org.minefortress.entity.ai.goal.*;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-import java.util.List;
-
-public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
+public final class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
 
     public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;
@@ -141,17 +137,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
         });
     }
 
-    @Override
-    public void setAttacking(boolean aggressive) {
-        super.setAttacking(aggressive);
-
-        if(aggressive) {
-            this.putItemInHand(Items.IRON_SWORD);
-        } else {
-            this.putItemInHand(null);
-        }
-    }
-
     public float getDestroySpeed(BlockState state) {
         float f = getStackInHand(Hand.MAIN_HAND).getMiningSpeedMultiplier(state);
         if (f > 1.0F) {
@@ -201,16 +186,6 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
         this.goalSelector.add(10, new LookAroundGoal(this));
 
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, true));
-    }
-
-    @Override
-    public void tickMovement() {
-        super.tickHandSwing();
-        super.tickMovement();
-
-        Box boundingBox = getBoundingBox();
-        List<SlimeEntity> touchingSlimes = world.getEntitiesByClass(SlimeEntity.class, boundingBox, slimeEntity -> true);
-        touchingSlimes.forEach(s -> ((FortressSlimeEntity)s).touchColonist(this));
     }
 
     @Override
@@ -423,7 +398,7 @@ public class Colonist extends BasePawnEntity implements RangedAttackMob, IMinefo
         double f = target.getZ() - this.getZ();
         double g = Math.sqrt(d * d + f * f);
         arrow.setVelocity(d, e + g * (double)0.2f, f, 1.6f, 4);
-        this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+        this.playSound(SoundEvents.ENTITY_ARROW_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
         this.world.spawnEntity(arrow);
     }
 

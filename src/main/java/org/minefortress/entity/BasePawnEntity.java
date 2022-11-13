@@ -10,14 +10,18 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressConstants;
+import org.minefortress.interfaces.FortressSlimeEntity;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -111,6 +115,16 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     @Override
     public boolean cannotDespawn() {
         return true;
+    }
+
+    @Override
+    public void tickMovement() {
+        super.tickHandSwing();
+        super.tickMovement();
+
+        Box boundingBox = this.getBoundingBox();
+        List<SlimeEntity> touchingSlimes = world.getEntitiesByClass(SlimeEntity.class, boundingBox, slimeEntity -> true);
+        touchingSlimes.forEach(s -> ((FortressSlimeEntity)s).touchPawn(this));
     }
 
 }
