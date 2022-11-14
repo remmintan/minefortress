@@ -40,6 +40,7 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IBari
     @Override
     public final void selectSlot(int i) {
         this.dataTracker.set(SELECTED_SLOT, i);
+        this.setStackInHand(Hand.MAIN_HAND, this.getInventory().getStack(i));
     }
 
     @Override

@@ -50,7 +50,7 @@ public class MovementHelper {
     }
 
     public void set(BlockPos goal, float speed) {
-        if(workGoal != null && workGoal.equals(goal)){
+        if(workGoal != null && workGoal.equals(goal)) {
             LOGGER.debug("{} trying to set new goal, but current goal is the same", getColonistName());
             return;
         }
