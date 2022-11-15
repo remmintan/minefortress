@@ -9,7 +9,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
@@ -37,7 +36,10 @@ import org.minefortress.entity.ai.controls.DigControl;
 import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.controls.TaskControl;
-import org.minefortress.entity.ai.goal.*;
+import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
+import org.minefortress.entity.ai.goal.ReturnToFireGoal;
+import org.minefortress.entity.ai.goal.SleepOnTheBedGoal;
+import org.minefortress.entity.ai.goal.WanderAroundTheFortressGoal;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.professions.ServerProfessionManager;
@@ -157,15 +159,13 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(3, new FleeEntityGoal<>(this, HostileEntity.class, 3, 1.0D, 1.2D));
-        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
+//        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
 //        this.goalSelector.add(7, new ColonistEatGoal(this));
         this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
         this.goalSelector.add(8, new SleepOnTheBedGoal(this));
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
-
-        this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, true));
     }
 
     @Override

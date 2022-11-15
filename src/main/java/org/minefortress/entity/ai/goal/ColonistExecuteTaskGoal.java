@@ -2,7 +2,6 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.TaskControl;
@@ -22,18 +21,11 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     public ColonistExecuteTaskGoal(Colonist colonist) {
         super(colonist);
-        World level = this.colonist.world;
-        if(level instanceof ServerWorld) {
-            this.world = (ServerWorld) level;
+        if(colonist.world instanceof ServerWorld sw) {
+            this.world = sw;
         } else {
             throw new IllegalStateException("AI should run on the server entities!");
         }
-
-    }
-
-    @Override
-    public boolean canStop() {
-        return super.isStarving();
     }
 
     @Override
@@ -44,9 +36,6 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         return  hasTask && notStarving;
     }
 
-    private String getColonistName() {
-        return colonist.getName().asString();
-    }
 
     @Override
     public void start() {
@@ -94,7 +83,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         final var hasTask = getTaskControl().hasTask();
         final var hasGoalTryingToReachOrWorking = getMovementHelper().stillTryingToReachGoal() ||
                 workGoal != null ||
-                !getTaskControl().finished() ||
+                getTaskControl().partHasMoreBlocks() ||
                 colonist.diggingOrPlacing();
         final var shouldContinue = notStarving && hasTask && hasGoalTryingToReachOrWorking;
         LOGGER.debug("{} should continue task execution {} [not starving {}, has task {}, has goal and working {}, digging or placing {}]", getColonistName(), shouldContinue, notStarving, hasTask, hasGoalTryingToReachOrWorking, colonist.diggingOrPlacing());
@@ -104,22 +93,15 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     @Override
     public void stop() {
         LOGGER.debug("{} stopping the task execution", getColonistName());
-        final var idOpt = getTaskControl().getTaskId();
-        if(idOpt.isPresent()) {
-            final var id = idOpt.get();
-            LOGGER.debug("{} stopping task execution because of combat. Return reserved items for task {}", getColonistName(), id);
-            colonist
-                    .getFortressServerManager()
-                    .orElseThrow()
-                    .getServerResourceManager()
-                    .returnReservedItems(id);
-        } else {
-            LOGGER.debug("{} stopping task execution because of combat. No task id found", getColonistName());
-        }
-        getTaskControl().fail();
-        if(getTaskControl().hasTask()) {
-            LOGGER.debug("{} finishing task successfully", getColonistName());
-            getTaskControl().success();
+        final var taskControl = getTaskControl();
+        if(taskControl.hasTask()) {
+            if(taskControl.partHasMoreBlocks()) {
+                LOGGER.debug("{} failing task part", getColonistName());
+               taskControl.fail();
+            } else {
+                LOGGER.debug("{} finishing task successfully", getColonistName());
+                taskControl.success();
+            }
         }
         this.colonist.resetControls();
         this.workGoal = null;
@@ -130,7 +112,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         getMovementHelper().reset();
         workGoal = null;
         TaskBlockInfo taskBlockInfo = null;
-        while (!getTaskControl().finished()) {
+        while (getTaskControl().partHasMoreBlocks()) {
             LOGGER.debug("{} task is not finished yet", getColonistName());
             taskBlockInfo = getTaskControl().getNextBlock();
             if(taskBlockInfo == null){

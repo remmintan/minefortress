@@ -105,9 +105,9 @@ public class TaskControl {
         return task.getTaskType() == type;
     }
 
-    public boolean finished() {
-        if(!hasTask()) return true;
-        return !blocks.hasNext();
+    public boolean partHasMoreBlocks() {
+        if(!hasTask()) return false;
+        return blocks.hasNext();
     }
 
     public Optional<UUID> getTaskId() {
