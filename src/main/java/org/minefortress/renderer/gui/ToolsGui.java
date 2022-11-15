@@ -98,7 +98,7 @@ public class ToolsGui extends FortressGuiScreen {
                     if(treeCutterSelected(fortressClient)) {
                         ToolsGui.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
                     } else {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Cut the trees"), mouseX, mouseY);
+                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Chop trees"), mouseX, mouseY);
                     }
                 },
                 Text.of("")
