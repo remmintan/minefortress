@@ -44,8 +44,8 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, BipedEntit
 
     @Override
     public Identifier getTexture(BasePawnEntity pawn) {
-        final var guyType = pawn.getBodyTextureId();
-        return switch (guyType) {
+        final var bodyTextureId = pawn.getBodyTextureId();
+        return switch (bodyTextureId) {
             case 0 -> GUY;
             case 1 -> GUY2;
             case 2 -> GUY3;

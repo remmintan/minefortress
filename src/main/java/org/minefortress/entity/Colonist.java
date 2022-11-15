@@ -53,7 +53,6 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
     private static final TrackedData<String> CURRENT_TASK_DESCRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> PROFESSION_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> HAS_TASK = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Integer> GUY_TYPE = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
 
     private static final String DEFAULT_PROFESSION_ID = "colonist";
 
@@ -94,7 +93,6 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
         this.dataTracker.startTracking(CURRENT_TASK_DESCRIPTION, "");
         this.dataTracker.startTracking(PROFESSION_ID, DEFAULT_PROFESSION_ID);
         this.dataTracker.startTracking(HAS_TASK, false);
-        this.dataTracker.startTracking(GUY_TYPE, world.random.nextInt(4));
     }
 
     public IBaritone getBaritone() {
@@ -103,11 +101,6 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
 
     public ServerWorld getServerWorld() {
         return (ServerWorld) this.world;
-    }
-
-    @Override
-    public int getBodyTextureId() {
-        return getGuyType();
     }
 
     @Override
@@ -307,9 +300,6 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
         if(!DEFAULT_PROFESSION_ID.equals(professionId)) {
             nbt.putString("professionId", professionId);
         }
-
-        final var guyType = this.getGuyType();
-        nbt.putInt("guyType", guyType);
     }
 
     public String getProfessionId() {
@@ -323,10 +313,6 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
         if(nbt.contains("professionId")) {
             final String professionId = nbt.getString("professionId");
             this.setProfession(professionId);
-        }
-
-        if (nbt.contains("guyType")) {
-            this.dataTracker.set(GUY_TYPE, nbt.getInt("guyType"));
         }
     }
 
@@ -348,10 +334,6 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
 
     public void setProfession(String professionId) {
         this.dataTracker.set(PROFESSION_ID, professionId);
-    }
-
-    public int getGuyType() {
-        return this.dataTracker.get(GUY_TYPE);
     }
 
     public void resetProfession() {

@@ -75,7 +75,7 @@ public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, BipedEnt
         if(isWarrior(clothingId)) {
             PawnClothesFeature.renderModel(this.getContextModel(), SOLDIER_BLUE, matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
         }
-        PawnClothesFeature.renderModel(this.getContextModel(), this.getArmorTexture(clothingId), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+        PawnClothesFeature.renderModel(this.getContextModel(), this.getClothesTexture(clothingId), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
 
     }
 
@@ -85,7 +85,7 @@ public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, BipedEnt
     }
 
 
-    private Identifier getArmorTexture(String professionId) {
+    private Identifier getClothesTexture(String professionId) {
         return switch (professionId) {
             case "miner1" -> MINER;
             case "miner2" -> MINER_T2;

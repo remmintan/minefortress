@@ -24,12 +24,16 @@ import org.minefortress.interfaces.FortressSlimeEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 public abstract class BasePawnEntity extends HungryEntity implements IFortressAwareEntity {
 
-    private static final String FORTRESS_ID_KEY = "playerId";
+    private static final String FORTRESS_NBT_KEY = "fortress_id";
+    private static final String BODY_TEXTURE_ID_NBT_KEY = "body_texture_id";
+
     private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    private static final TrackedData<Integer> BODY_TEXTURE_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     protected BasePawnEntity(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world, enableHunger);
@@ -39,6 +43,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
+        this.dataTracker.startTracking(BODY_TEXTURE_ID, new Random().nextInt(4));
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
@@ -53,7 +58,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     }
 
     public int getBodyTextureId() {
-        return 0;
+        return this.dataTracker.get(BODY_TEXTURE_ID);
     }
 
     public abstract String getClothingId();
@@ -89,16 +94,21 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        this.getFortressId().ifPresent(it -> nbt.putUuid(FORTRESS_ID_KEY, it));
+        this.getFortressId().ifPresent(it -> nbt.putUuid(FORTRESS_NBT_KEY, it));
+        nbt.putInt(BODY_TEXTURE_ID_NBT_KEY, this.getBodyTextureId());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        if(nbt.contains(FORTRESS_ID_KEY)) {
-            final var fortressId = nbt.getUuid(FORTRESS_ID_KEY);
+        if(nbt.contains(FORTRESS_NBT_KEY)) {
+            final var fortressId = nbt.getUuid(FORTRESS_NBT_KEY);
             this.setFortressId(fortressId);
             addThisPawnToFortress();
+        }
+        if(nbt.contains(BODY_TEXTURE_ID_NBT_KEY)) {
+            final var bodyTexId = nbt.getInt(BODY_TEXTURE_ID_NBT_KEY);
+            this.dataTracker.set(BODY_TEXTURE_ID, bodyTexId);
         }
     }
 

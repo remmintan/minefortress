@@ -5,8 +5,6 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.*;
-import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.UserCache;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
@@ -21,7 +19,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -34,11 +31,8 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Shadow private Profiler profiler;
     @Shadow private int ticks;
     @Shadow private PlayerManager playerManager;
-
     @Shadow @Final private WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory;
-
     @Shadow protected abstract boolean shouldKeepTicking();
-
     @Shadow public abstract PlayerManager getPlayerManager();
 
     private BlueprintsWorld blueprintsWorld;
@@ -52,11 +46,6 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     public void init(Thread serverThread, LevelStorage.Session session, ResourcePackManager dataPackManager, SaveLoader saveLoader, Proxy proxy, DataFixer dataFixer, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepo, UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory, CallbackInfo ci) {
         blueprintsWorld = new BlueprintsWorld((MinecraftServer) (Object)this);
         fortressModServerManager = new FortressModServerManager((MinecraftServer)(Object)this);
-    }
-
-    @Inject(method = "loadWorld", at = @At("HEAD"))
-    public void loadWorld(CallbackInfo ci) {
-        fortressModServerManager.load();
     }
 
     @Inject(method = "tickWorlds", at = @At("TAIL"))
@@ -92,12 +81,6 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
                 cir.setReturnValue(true);
             }
         }
-    }
-
-    @Inject(method="shutdown", at=@At("TAIL"))
-    public void shutdown(CallbackInfo ci) {
-        fortressModServerManager.save();
-        getBlueprintsWorld().closeSession();
     }
 
     @Override

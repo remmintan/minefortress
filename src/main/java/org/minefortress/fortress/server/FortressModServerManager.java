@@ -9,7 +9,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.logging.log4j.LogManager;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,30 +30,7 @@ public class FortressModServerManager {
             return null;
         }
         final var playerId = player.getUuid();
-        final var manager = serverManagers.get(playerId);
-        if(manager == null) {
-            final var fortressPlayer = (FortressServerPlayerEntity) player;
-            final var fortressServerManager = fortressPlayer.getFortressServerManager();
-            // migrating exising fortress to new system
-            if (fortressServerManager != null) {
-                fortressServerManager.setId(fortressPlayer.getFortressUuid());
-                final var fortressPlayerIdOpt = getPlayerIdByFortressId(fortressServerManager.getId());
-                if(fortressPlayerIdOpt.isPresent()) {
-                    final var fortressPlayerId = fortressPlayerIdOpt.get();
-                    // move all colonists from existing fortress to players one
-                    final var existingFortress = serverManagers.get(fortressPlayerId);
-                    existingFortress.getColonists()
-                            .forEach(fortressServerManager::addColonist);
-                    existingFortress.clearColonists();
-
-                    serverManagers.remove(fortressPlayerId);
-                }
-                serverManagers.put(playerId, fortressServerManager);
-            }
-            return serverManagers.computeIfAbsent(playerId, (it) -> new FortressServerManager(server));
-        }
-
-        return manager;
+        return serverManagers.computeIfAbsent(playerId, (it) -> new FortressServerManager(server));
     }
 
     public FortressServerManager getByFortressId(UUID uuid) {
@@ -80,15 +56,6 @@ public class FortressModServerManager {
         for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
             if (entry.getValue().getId().equals(fortressId)) {
                 return Optional.ofNullable(server.getOverworld().getPlayerByUuid(entry.getKey())).map(ServerPlayerEntity.class::cast);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public Optional<UUID> getPlayerIdByFortressId(UUID fortressId) {
-        for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
-            if (entry.getValue().getId().equals(fortressId)) {
-                return Optional.ofNullable(entry.getKey());
             }
         }
         return Optional.empty();
