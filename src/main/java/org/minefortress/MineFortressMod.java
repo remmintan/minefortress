@@ -5,6 +5,7 @@ import com.chocohead.mm.api.ClassTinkerers;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
@@ -84,6 +85,12 @@ public class MineFortressMod implements ModInitializer {
             if(server instanceof FortressServer fortressServer) {
                 fortressServer.getFortressModServerManager().save();
                 fortressServer.getBlueprintsWorld().closeSession();
+            }
+        });
+
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if(server instanceof FortressServer fortressServer) {
+                fortressServer.getFortressModServerManager().tick(server.getPlayerManager());
             }
         });
     }

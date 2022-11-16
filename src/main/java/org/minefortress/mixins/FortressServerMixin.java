@@ -33,7 +33,6 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Shadow private PlayerManager playerManager;
     @Shadow @Final private WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory;
     @Shadow protected abstract boolean shouldKeepTicking();
-    @Shadow public abstract PlayerManager getPlayerManager();
 
     private BlueprintsWorld blueprintsWorld;
     private FortressModServerManager fortressModServerManager;
@@ -46,11 +45,6 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     public void init(Thread serverThread, LevelStorage.Session session, ResourcePackManager dataPackManager, SaveLoader saveLoader, Proxy proxy, DataFixer dataFixer, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepo, UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory, CallbackInfo ci) {
         blueprintsWorld = new BlueprintsWorld((MinecraftServer) (Object)this);
         fortressModServerManager = new FortressModServerManager((MinecraftServer)(Object)this);
-    }
-
-    @Inject(method = "tickWorlds", at = @At("TAIL"))
-    public void tickWorld(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-        fortressModServerManager.tick(getPlayerManager());
     }
 
     @Inject(method = "tickWorlds", at = @At(value="INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", ordinal = 1, shift = At.Shift.BEFORE))
