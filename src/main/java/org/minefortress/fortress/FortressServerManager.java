@@ -24,27 +24,30 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
 import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundSyncBuildingsPacket;
 import org.minefortress.network.s2c.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.s2c.ClientboundSyncSpecialBlocksPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.TaskManager;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@ParametersAreNonnullByDefault
 public final class FortressServerManager extends AbstractFortressManager {
 
     private static final BlockState DEFAULT_STATE_ABOVE_CAMPFIRE = Blocks.BARRIER.getDefaultState();
@@ -71,8 +74,6 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private FortressGamemode gamemode = FortressGamemode.NONE;
 
-    private UUID id = UUID.randomUUID();
-
     private boolean needSync = true;
     private boolean needSyncBuildings = true;
     private boolean needSyncSpecialBlocks = true;
@@ -82,8 +83,8 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public FortressServerManager(MinecraftServer server) {
         this.server = server;
-        serverProfessionManager = new ServerProfessionManager(() -> this);
-        serverResourceManager = new ServerResourceManagerImpl(server);
+        this.serverProfessionManager = new ServerProfessionManager(() -> this);
+        this.serverResourceManager = new ServerResourceManagerImpl(server);
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             this.gamemode = FortressGamemode.SURVIVAL;
         }
@@ -129,7 +130,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
         if(!needSync || player == null) return;
-        final var packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, this.gamemode, this.id, this.maxColonistsCount);
+        final var packet = new ClientboundSyncFortressManagerPacket(colonists.size(), fortressCenter, gamemode, maxColonistsCount);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
             final var houses = buildings.stream()
@@ -262,10 +263,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         return getWorkersStream().noneMatch(it -> it.getTaskControl().hasTask());
     }
 
-    public Optional<Colonist> spawnPawnNearCampfire() {
+    public Optional<Colonist> spawnPawnNearCampfire(UUID masterPlayerId) {
         final var randomSpawnPosition = getRandomSpawnPosition();
         if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
-            final var tag = getColonistInfoTag();
+            final var tag = getColonistInfoTag(masterPlayerId);
             final var colonistType = FortressEntities.COLONIST_ENTITY_TYPE;
             final var world = getWorld();
             final var spawnedPawn = colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
@@ -290,15 +291,15 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(maxZ < this.fortressCenter.getZ()+10) maxZ = this.fortressCenter.getZ()+10;
 
         for (int i = 0; i < 5; i++) {
-            spawnPawnNearCampfire();
+            spawnPawnNearCampfire(player.getUuid());
         }
 
         this.scheduleSync();
     }
 
-    private NbtCompound getColonistInfoTag() {
+    private NbtCompound getColonistInfoTag(UUID masterPlayerId) {
         final NbtCompound nbtCompound = new NbtCompound();
-        nbtCompound.putUuid("fortressUUID", id);
+        nbtCompound.putUuid(BasePawnEntity.FORTRESS_ID_NBT_KEY, masterPlayerId);
         return nbtCompound;
     }
 
@@ -328,19 +329,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         return getWorkersStream().collect(Collectors.toUnmodifiableSet());
     }
 
-    public Set<LivingEntity> getColonists() {
-        return Collections.unmodifiableSet(colonists);
-    }
-
-    public void clearColonists() {
-        colonists.clear();
-    }
-
     public void writeToNbt(NbtCompound tag) {
-        if(id != null) {
-            tag.putUuid("id", id);
-        }
-
         if(fortressCenter != null) {
             tag.putInt("centerX", fortressCenter.getX());
             tag.putInt("centerY", fortressCenter.getY());
@@ -406,16 +395,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.serverResourceManager.write(tag);
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-        this.scheduleSync();
-    }
-
     public void readFromNbt(NbtCompound tag) {
-        if(tag.contains("id")) {
-            this.id = tag.getUuid("id");
-        }
-
         final int centerX = tag.getInt("centerX");
         final int centerY = tag.getInt("centerY");
         final int centerZ = tag.getInt("centerZ");
@@ -622,10 +602,6 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public ServerResourceManager getServerResourceManager() {
         return serverResourceManager;
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     private ServerWorld getWorld() {

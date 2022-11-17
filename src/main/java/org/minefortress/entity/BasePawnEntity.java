@@ -18,7 +18,6 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.MineFortressConstants;
 import org.minefortress.entity.interfaces.IFortressAwareEntity;
 import org.minefortress.interfaces.FortressSlimeEntity;
 
@@ -29,10 +28,10 @@ import java.util.UUID;
 
 public abstract class BasePawnEntity extends HungryEntity implements IFortressAwareEntity {
 
-    private static final String FORTRESS_NBT_KEY = "fortress_id";
+    public static final String FORTRESS_ID_NBT_KEY = "fortress_id";
     private static final String BODY_TEXTURE_ID_NBT_KEY = "body_texture_id";
 
-    private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    private static final TrackedData<Optional<UUID>> MASTER_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
     private static final TrackedData<Integer> BODY_TEXTURE_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     protected BasePawnEntity(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
@@ -42,7 +41,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
+        this.dataTracker.startTracking(MASTER_ID, Optional.empty());
         this.dataTracker.startTracking(BODY_TEXTURE_ID, new Random().nextInt(4));
     }
 
@@ -67,8 +66,8 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
-        final var fortressId = entityNbt.getUuid(MineFortressConstants.FORTRESS_ID_KEY);
-        this.setFortressId(fortressId);
+        final var masterPlayerId = entityNbt.getUuid(FORTRESS_ID_NBT_KEY);
+        this.setMasterId(masterPlayerId);
         addThisPawnToFortress();
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
@@ -77,13 +76,13 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         getFortressServerManager().ifPresent(fsm -> fsm.addColonist(this));
     }
 
-    private void setFortressId(UUID fortressId) {
-        this.dataTracker.set(FORTRESS_ID, Optional.ofNullable(fortressId));
+    private void setMasterId(UUID fortressId) {
+        this.dataTracker.set(MASTER_ID, Optional.ofNullable(fortressId));
     }
 
     @Override
-    public Optional<UUID> getFortressId() {
-        return this.dataTracker.get(FORTRESS_ID);
+    public Optional<UUID> getMasterId() {
+        return this.dataTracker.get(MASTER_ID);
     }
 
     @Override
@@ -94,16 +93,16 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        this.getFortressId().ifPresent(it -> nbt.putUuid(FORTRESS_NBT_KEY, it));
+        this.getMasterId().ifPresent(it -> nbt.putUuid(FORTRESS_ID_NBT_KEY, it));
         nbt.putInt(BODY_TEXTURE_ID_NBT_KEY, this.getBodyTextureId());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        if(nbt.contains(FORTRESS_NBT_KEY)) {
-            final var fortressId = nbt.getUuid(FORTRESS_NBT_KEY);
-            this.setFortressId(fortressId);
+        if(nbt.contains(FORTRESS_ID_NBT_KEY)) {
+            final var fortressId = nbt.getUuid(FORTRESS_ID_NBT_KEY);
+            this.setMasterId(fortressId);
             addThisPawnToFortress();
         }
         if(nbt.contains(BODY_TEXTURE_ID_NBT_KEY)) {

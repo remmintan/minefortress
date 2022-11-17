@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface IFortressAwareEntity {
 
     MinecraftServer getServer();
-    Optional<UUID> getFortressId();
+    Optional<UUID> getMasterId();
 
     default Optional<FortressModServerManager> getFortressModServerManager() {
         final var server = getServer();
@@ -26,7 +26,7 @@ public interface IFortressAwareEntity {
     }
 
     default Optional<ServerPlayerEntity> getMasterPlayer() {
-        return getFortressModServerManager().flatMap(it -> getFortressId().flatMap(it::getPlayerByFortressId));
+        return getMasterId().map(it -> getServer().getPlayerManager().getPlayer(it));
     }
 
     default void sendMessageToMasterPlayer(String message) {
@@ -41,7 +41,7 @@ public interface IFortressAwareEntity {
     }
 
     default Optional<FortressServerManager> getFortressServerManager() {
-        return getFortressId().flatMap(it -> getFortressModServerManager().map(fms -> fms.getByFortressId(it)));
+        return getMasterId().flatMap(it -> getFortressModServerManager().map(fms -> fms.getByPlayerId(it)));
     }
 
 }

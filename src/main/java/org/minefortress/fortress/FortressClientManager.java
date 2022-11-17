@@ -32,8 +32,6 @@ public final class FortressClientManager extends AbstractFortressManager {
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
     private final ClientFightManager fightManager;
 
-    private UUID id;
-
     private boolean initialized = false;
 
     private BlockPos fortressCenter = null;
@@ -111,17 +109,12 @@ public final class FortressClientManager extends AbstractFortressManager {
         return colonistsCount;
     }
 
-    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, UUID fortressId, int maxColonistsCount) {
+    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, int maxColonistsCount) {
         this.colonistsCount = colonistsCount;
         this.fortressCenter = fortressCenter;
         this.gamemode = gamemode;
-        this.id = fortressId;
         this.maxColonistsCount = maxColonistsCount;
-        initialized = true;
-    }
-
-    public UUID getId() {
-        return id;
+        this.initialized = true;
     }
 
     public void tick(FortressMinecraftClient fortressClient) {

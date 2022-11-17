@@ -6,6 +6,7 @@ import net.minecraft.util.math.Vec3d;
 import org.minefortress.entity.WarriorPawn;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.registries.FortressEntities;
+import org.minefortress.utils.ModUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -56,12 +57,9 @@ public class ClientFightSelectionManager {
             final var selectionBox = new Box(selectionStartBlock.getX(), -64, selectionStartBlock.getZ(), selectionCurBlock.getX(), 256, selectionCurBlock.getZ());
             final var world = MinecraftClient.getInstance().world;
             if(world != null) {
-                final var clientFortressId = fortressClientManagerSupplier.get().getId();
+                final var playerId = ModUtils.getCurrentPlayerUUID();
                 selectedPawns = world
-                        .getEntitiesByType(type, selectionBox, it ->{
-                            final var colonistFortressId = it.getFortressId();
-                            return colonistFortressId.map(id -> id.equals(clientFortressId)).orElse(false);
-                        })
+                        .getEntitiesByType(type, selectionBox, it -> it.getMasterId().map(playerId::equals).orElse(false))
                         .stream()
                         .toList();
             }

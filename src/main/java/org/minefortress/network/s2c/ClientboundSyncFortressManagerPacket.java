@@ -7,21 +7,17 @@ import org.minefortress.fortress.FortressGamemode;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressS2CPacket;
 
-import java.util.UUID;
-
 public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
 
     private final int colonistsCount;
     private final BlockPos fortressPos;
     private final FortressGamemode fortressGamemode;
-    private final UUID fortressId;
     private final int maxColonistsCount;
 
-    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode, UUID fortressId, int maxColonistsCount) {
+    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode,  int maxColonistsCount) {
         this.colonistsCount = colonistsCount;
         this.fortressPos = fortressPos;
         this.fortressGamemode = fortressGamemode;
-        this.fortressId = fortressId;
         this.maxColonistsCount = maxColonistsCount;
     }
 
@@ -34,14 +30,13 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
             this.fortressPos = null;
 
         this.fortressGamemode = FortressGamemode.valueOf(buf.readString(100));
-        this.fortressId = buf.readUuid();
         this.maxColonistsCount = buf.readInt();
     }
 
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.fortressId, this.maxColonistsCount);
+            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.maxColonistsCount);
         }
     }
 
@@ -54,7 +49,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
             buf.writeBlockPos(fortressPos);
 
         buf.writeString(fortressGamemode.name());
-        buf.writeUuid(fortressId);
         buf.writeInt(maxColonistsCount);
     }
 }

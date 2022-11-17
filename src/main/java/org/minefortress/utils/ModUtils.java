@@ -6,11 +6,14 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
 import java.nio.file.Path;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ModUtils {
 
@@ -31,6 +34,10 @@ public class ModUtils {
         return false;
     }
 
+    public static boolean isFortressGamemode(GameMode gameMode) {
+        return gameMode == MineFortressMod.FORTRESS;
+    }
+
     public static FortressMinecraftClient getFortressClient() {
         return (FortressMinecraftClient) MinecraftClient.getInstance();
     }
@@ -45,6 +52,13 @@ public class ModUtils {
         return FabricLoader.getInstance()
                 .getGameDir()
                 .resolve(MineFortressMod.BLUEPRINTS_FOLDER_NAME);
+    }
+
+    public static UUID getCurrentPlayerUUID() {
+        return Optional
+                .ofNullable(MinecraftClient.getInstance().player)
+                .map(ClientPlayerEntity::getUuid)
+                .orElseThrow(() -> new IllegalStateException("Player is null"));
     }
 
 }

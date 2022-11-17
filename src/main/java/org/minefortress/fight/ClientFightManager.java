@@ -33,7 +33,7 @@ public class ClientFightManager {
             final var entity = entityHitResult.getEntity();
             if(!(entity instanceof LivingEntity livingEntity)) return;
             if(entity instanceof Colonist col) {
-                final var colonistFortressId = col.getFortressId();
+                final var colonistFortressId = col.getMasterId();
                 if(colonistFortressId.map(it -> it.equals(fortressClientManagerSupplier.get().getId())).orElse(false))
                     return;
             }
@@ -44,7 +44,7 @@ public class ClientFightManager {
     public void setTarget(Entity entity) {
         if(!(entity instanceof LivingEntity livingEntity)) return;
         if(entity instanceof Colonist col) {
-            final var colonistFortressId = col.getFortressId();
+            final var colonistFortressId = col.getMasterId();
             if(colonistFortressId.map(it -> it.equals(fortressClientManagerSupplier.get().getId())).orElse(false))
                 return;
         }

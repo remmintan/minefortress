@@ -19,7 +19,8 @@ public class DebugPawnsCommand extends MineFortressCommand {
                                             int num = IntegerArgumentType.getInteger(context, "num");
                                             final var fortressServerManager = getFortressServerManager(context);
                                             for (int i = 0; i < num; i++) {
-                                                fortressServerManager.spawnPawnNearCampfire();
+                                                final var playerId = context.getSource().getPlayer().getUuid();
+                                                fortressServerManager.spawnPawnNearCampfire(playerId);
                                             }
                                             return 1;
                                         })
