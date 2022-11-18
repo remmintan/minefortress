@@ -7,7 +7,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -22,10 +21,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.interfaces.FortressServer;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.utils.ModUtils;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -42,7 +40,6 @@ public class FortressServerPlayNetworkHandlerMixin {
 
     @Shadow private @Nullable Vec3d requestedTeleportPos;
 
-    @Shadow @Final private MinecraftServer server;
 
     @Inject(method = "onPlayerInteractBlock", at = @At(value = "INVOKE", target="Lnet/minecraft/server/network/ServerPlayerEntity;updateLastActionTime()V", shift = At.Shift.AFTER), cancellable = true)
     public void onPlayerInteractBlock(PlayerInteractBlockC2SPacket packet, CallbackInfo ci) {
@@ -94,11 +91,8 @@ public class FortressServerPlayNetworkHandlerMixin {
             if(!FortressEntities.isFortressAwareEntityType(entityType)) return;
             if(stack.getNbt() == null) stack.setNbt(new NbtCompound());
 
-            final var fortressServer = (FortressServer) this.server;
-            final var fortressManager = fortressServer.getFortressModServerManager().getByPlayer(player);
-
             final NbtCompound nbt = stack.getNbt();
-            nbt.putUuid("fortressUUID", fortressManager.getId());
+            nbt.putUuid(BasePawnEntity.FORTRESS_ID_NBT_KEY, player.getUuid());
         }
     }
 
