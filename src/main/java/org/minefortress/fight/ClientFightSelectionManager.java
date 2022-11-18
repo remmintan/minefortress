@@ -4,18 +4,15 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.entity.WarriorPawn;
-import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class ClientFightSelectionManager {
 
-    private final Supplier<FortressClientManager> fortressClientManagerSupplier;
 
     private MousePos selectionStartPos;
     private Vec3d selectionStartBlock;
@@ -25,10 +22,6 @@ public class ClientFightSelectionManager {
     private List<WarriorPawn> selectedPawns = Collections.emptyList();
 
     private Vec3d cachedBlockPos;
-
-    public ClientFightSelectionManager(Supplier<FortressClientManager> fortressClientManagerSupplier) {
-        this.fortressClientManagerSupplier = fortressClientManagerSupplier;
-    }
 
     public void startSelection(double x, double y, Vec3d startBlock) {
         this.resetSelection();

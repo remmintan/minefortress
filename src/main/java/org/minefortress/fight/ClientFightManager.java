@@ -6,19 +6,11 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressClientManager;
-
-import java.util.function.Supplier;
+import org.minefortress.utils.ModUtils;
 
 public class ClientFightManager {
 
-    private final ClientFightSelectionManager selectionManager;
-    private final Supplier<FortressClientManager> fortressClientManagerSupplier;
-
-    public ClientFightManager(Supplier<FortressClientManager> fortressClientManagerSupplier) {
-         selectionManager = new ClientFightSelectionManager(fortressClientManagerSupplier);
-        this.fortressClientManagerSupplier = fortressClientManagerSupplier;
-    }
+    private final ClientFightSelectionManager selectionManager = new ClientFightSelectionManager();
 
     public ClientFightSelectionManager getSelectionManager() {
         return selectionManager;
@@ -33,8 +25,8 @@ public class ClientFightManager {
             final var entity = entityHitResult.getEntity();
             if(!(entity instanceof LivingEntity livingEntity)) return;
             if(entity instanceof Colonist col) {
-                final var colonistFortressId = col.getMasterId();
-                if(colonistFortressId.map(it -> it.equals(fortressClientManagerSupplier.get().getId())).orElse(false))
+                final var masterPlayerId = col.getMasterId();
+                if(masterPlayerId.map(it -> it.equals(ModUtils.getCurrentPlayerUUID())).orElse(false))
                     return;
             }
             selectionManager.forEachSelected(it -> it.setAttackTarget(livingEntity));
@@ -44,8 +36,9 @@ public class ClientFightManager {
     public void setTarget(Entity entity) {
         if(!(entity instanceof LivingEntity livingEntity)) return;
         if(entity instanceof Colonist col) {
-            final var colonistFortressId = col.getMasterId();
-            if(colonistFortressId.map(it -> it.equals(fortressClientManagerSupplier.get().getId())).orElse(false))
+            final var masterPlayerId = col.getMasterId();
+            final var playerId= ModUtils.getCurrentPlayerUUID();
+            if(masterPlayerId.map(it -> it.equals(playerId)).orElse(false))
                 return;
         }
         selectionManager.forEachSelected(it -> it.setAttackTarget(livingEntity));

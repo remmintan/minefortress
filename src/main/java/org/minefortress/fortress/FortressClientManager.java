@@ -30,7 +30,7 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private final ClientProfessionManager professionManager;
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
-    private final ClientFightManager fightManager;
+    private final ClientFightManager fightManager = new ClientFightManager();
 
     private boolean initialized = false;
 
@@ -57,7 +57,7 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
-        fightManager = new ClientFightManager(() -> this);
+
     }
 
     public void select(Colonist colonist) {
