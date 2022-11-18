@@ -40,7 +40,7 @@ public class FortressEvents {
             fortressServer.getFortressModServerManager().getByPlayer(handler.player);
         });
 
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             if(server instanceof FortressServer fortressServer) {
                 fortressServer.getFortressModServerManager().load();
             }
