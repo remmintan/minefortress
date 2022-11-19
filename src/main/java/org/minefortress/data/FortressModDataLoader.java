@@ -30,7 +30,7 @@ public class FortressModDataLoader {
     }
 
     public static final String MOD_DIR = "minefortress";
-    private static final String WORLD_DIR_PREFIX = "blueprints";
+    private static final String WORLD_DIR_PREFIX = "blueprints-customization-world";
 
     private final LevelStorage fortressLevelStorage;
 
@@ -40,7 +40,7 @@ public class FortressModDataLoader {
 
     public LevelStorage.Session getBlueprintsWorldSession() {
         try {
-            return fortressLevelStorage.createSession(WORLD_DIR_PREFIX+ UUID.randomUUID());
+            return fortressLevelStorage.createSession(WORLD_DIR_PREFIX);
         }catch (IOException e) {
             throw new RuntimeException(e);
         }
