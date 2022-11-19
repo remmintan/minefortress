@@ -10,17 +10,23 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.minefortress.renderer.gui.hud.IHudButton;
+import org.minefortress.renderer.gui.hud.IItemButton;
 
-public class FortressItemButtonWidget extends TexturedButtonWidget {
+public class FortressItemButtonWidget extends TexturedButtonWidget implements IHudButton, IItemButton {
 
     private static final Identifier FORTRESS_BUTTON_TEXTURE = new Identifier("minefortress","textures/gui/button.png");
     private static final Identifier ARROWS_TEXTURE = new Identifier("textures/gui/recipe_book.png");
 
     protected final ItemStack itemStack;
+    private final int anchorX;
+    private final int anchorY;
 
     public boolean checked = false;
 
-    public FortressItemButtonWidget(Item item, PressAction clickAction, String tooltipText) {
+    private ItemRenderer itemRenderer;
+
+    public FortressItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, String tooltipText) {
         super(
                 0,
                 0,
@@ -37,13 +43,19 @@ public class FortressItemButtonWidget extends TexturedButtonWidget {
                 Text.of("")
         );
         this.itemStack = new ItemStack(item);
+        this.anchorX = anchorX;
+        this.anchorY = anchorY;
+    }
+
+    @Override
+    public void setItemRenderer(ItemRenderer renderer) {
+        this.itemRenderer = renderer;
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
         itemRenderer.renderInGui(itemStack, x+2, y+2);
-
 
         RenderSystem.setShaderTexture(0, ARROWS_TEXTURE);
         if(this.checked)
@@ -57,4 +69,13 @@ public class FortressItemButtonWidget extends TexturedButtonWidget {
         super.onClick(mouseX, mouseY);
     }
 
+    @Override
+    public int getX() {
+        return anchorX;
+    }
+
+    @Override
+    public int getY() {
+        return anchorY;
+    }
 }

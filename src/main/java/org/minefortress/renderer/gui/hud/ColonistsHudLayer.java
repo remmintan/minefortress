@@ -33,10 +33,6 @@ import java.util.Optional;
 public class ColonistsHudLayer extends AbstractHudLayer {
 
     private final ButtonWidget manageColonistsButton;
-    private final FortressItemButtonWidget professionsButton;
-    private final FortressItemButtonWidget inventoryButton;
-    private final FortressItemButtonWidget craftingButton;
-    private final FortressItemButtonWidget furnaceButton;
 
     private int colonistsCount = 0;
     private boolean hovered;
@@ -53,35 +49,44 @@ public class ColonistsHudLayer extends AbstractHudLayer {
                 btn -> client.setScreen(new ColonistsScreen()),
                 "Manage pawns"
         );
-        this.professionsButton = new FortressItemButtonWidget(
+
+        this.addButton(
+            new FortressItemButtonWidget(
                 Items.PLAYER_HEAD,
-                btn -> client.setScreen(new ProfessionsScreen(getFortressClient())),
+                btn -> client.setScreen(new ProfessionsScreen(ModUtils.getFortressClient())),
                 "Manage professions"
+            )
         );
-        this.inventoryButton = new FortressItemButtonWidget(
-                Items.CHEST,
-                btn -> client.setScreen(new CreativeInventoryScreen(client.player)),
-                "Inventory"
+        this.addButton(
+                new FortressItemButtonWidget(
+                        Items.CHEST,
+                        btn -> client.setScreen(new CreativeInventoryScreen(client.player)),
+                        "Inventory"
+                )
         );
-        this.craftingButton = new FortressItemButtonWidget(
-                Items.CRAFTING_TABLE,
-                btn -> {
-                    if(hasProfessionInAVillage("crafter"))
-                        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.CRAFTING));
-                    else
-                        this.client.setScreen(new MissingCraftsmanScreen());
-                },
-                "Crafting"
+        this.addButton(
+            new FortressItemButtonWidget(
+                    Items.CRAFTING_TABLE,
+                    btn -> {
+                        if(hasProfessionInAVillage("crafter"))
+                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.CRAFTING));
+                        else
+                            this.client.setScreen(new MissingCraftsmanScreen());
+                    },
+                    "Crafting"
+            )
         );
-        this.furnaceButton = new FortressItemButtonWidget(
-                Items.FURNACE,
-                btn -> {
-                    if(hasProfessionInAVillage("blacksmith"))
-                        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE));
-                    else
-                        this.client.setScreen(new MissingBlacksmithScreen());
-                },
-                "Furnace"
+        this.addButton(
+            new FortressItemButtonWidget(
+                    Items.FURNACE,
+                    btn -> {
+                        if(hasProfessionInAVillage("blacksmith"))
+                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE));
+                        else
+                            this.client.setScreen(new MissingBlacksmithScreen());
+                    },
+                    "Furnace"
+            )
         );
     }
 
@@ -95,28 +100,13 @@ public class ColonistsHudLayer extends AbstractHudLayer {
 
         final boolean colonsitsCountHovered = renderColonistsCount(matrices, font, screenWidth, screenHeight, mouseX, mouseY, delta);
 
-        renderSelectedColonistInfo(matrices, font, screenHeight, fortressManager);
+        renderSelectedColonistInfo(matrices, font, screenHeight);
 
         this.hovered = colonsitsCountHovered;
-
-        if(isCombat()) return;
-        this.professionsButton.setPos(screenWidth / 2 - 91 + 35, screenHeight - 43);
-        this.professionsButton.render(matrices, (int)mouseX, (int)mouseY, delta);
-
-        this.inventoryButton.setPos(screenWidth / 2 - 91 + 35 + 20, screenHeight - 43);
-        this.inventoryButton.render(matrices, (int)mouseX, (int)mouseY, delta);
-
-
-        if(isSurvival()) {
-            this.craftingButton.setPos(screenWidth / 2 - 91 + 35 + 40, screenHeight - 43);
-            this.craftingButton.render(matrices, (int)mouseX, (int)mouseY, delta);
-
-            this.furnaceButton.setPos(screenWidth / 2 - 91 + 35 + 60, screenHeight - 43);
-            this.furnaceButton.render(matrices, (int)mouseX, (int)mouseY, delta);
-        }
     }
 
-    private void renderSelectedColonistInfo(MatrixStack matrices, TextRenderer font, int screenHeight, FortressClientManager fortressManager) {
+    private void renderSelectedColonistInfo(MatrixStack matrices, TextRenderer font, int screenHeight) {
+        final var fortressManager = ModUtils.getFortressClientManager();
         if(fortressManager.isSelectingColonist()){
             final Colonist selectedColonist = fortressManager.getSelectedColonist();
 
@@ -171,10 +161,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
         final float textX = screenWidth / 2f - 91 + 15;
         final int textY = screenHeight - 43;
 
-        final int boundRightX = (int)textX + font.getWidth(colonistsCountString);
-        final int boundBottomY = iconY + 20;
 
-        final boolean hovered = mouseX >= iconX && mouseX <= boundRightX && mouseY >= iconY && mouseY < boundBottomY;
 
         super.itemRenderer.renderGuiItemIcon(new ItemStack(Items.PLAYER_HEAD), iconX, iconY);
 
@@ -183,11 +170,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
         this.manageColonistsButton.setMessage(new LiteralText(colonistsCountString));
         this.manageColonistsButton.render(p, (int)mouseX, (int)mouseY, delta);
 
-//        if(hovered) {
-//            super.renderTooltip(p, Text.of("Your Pawns count"), (int) mouseX, (int) mouseY);
-//        }
-
-        return hovered;
+        return manageColonistsButton.isHovered();
     }
 
 
