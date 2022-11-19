@@ -1,4 +1,4 @@
-package org.minefortress.renderer.gui;
+package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -9,9 +9,9 @@ import net.minecraft.world.World;
 
 import java.util.Optional;
 
-public class TimeGui extends FortressGuiScreen {
+public class TimeHudLayer extends AbstractHudLayer {
 
-    TimeGui(MinecraftClient client, ItemRenderer itemRenderer) {
+    TimeHudLayer(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
     }
 
@@ -27,7 +27,7 @@ public class TimeGui extends FortressGuiScreen {
         final int timeMinutes = (int) Math.floor(timeOfDayTicks / 16.66667);
 
         final String timeText = String.format("Day: %d | %02d:%02d", timeDays, timeHours, timeMinutes);
-        TimeGui.drawStringWithShadow(p, font, timeText, screenWidth - font.getWidth(timeText) - 5, screenHeight - 15, 0xFFFFFF);
+        TimeHudLayer.drawStringWithShadow(p, font, timeText, screenWidth - font.getWidth(timeText) - 5, screenHeight - 15, 0xFFFFFF);
     }
 
     @Override

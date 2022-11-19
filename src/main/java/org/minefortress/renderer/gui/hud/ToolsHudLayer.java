@@ -1,4 +1,4 @@
-package org.minefortress.renderer.gui;
+package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -14,6 +14,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.c2s.ServerboundSleepPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.renderer.gui.FortressBookContents;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.widget.*;
 import org.minefortress.selections.SelectionType;
@@ -24,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class ToolsGui extends FortressGuiScreen {
+public class ToolsHudLayer extends AbstractHudLayer {
 
     private final FortressItemButtonWidget selectionType;
     private final FortressItemButtonWidget blueprints;
@@ -37,7 +38,7 @@ public class ToolsGui extends FortressGuiScreen {
 
     private final List<ButtonWidget> selectionButtons = new ArrayList<>();
 
-    protected ToolsGui(MinecraftClient client, ItemRenderer itemRenderer) {
+    protected ToolsHudLayer(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
         this.selectionType = new FortressItemButtonWidget(
                 0,
@@ -51,7 +52,7 @@ public class ToolsGui extends FortressGuiScreen {
                 (button, matrices, mouseX, mouseY) -> {
                     final FortressItemButtonWidget fortressButton = (FortressItemButtonWidget) button;
                     if(!fortressButton.checked) {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Selection Type"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Selection Type"), mouseX, mouseY);
                     }
                 },
                 Text.of("")
@@ -74,9 +75,9 @@ public class ToolsGui extends FortressGuiScreen {
                 },
                 (button, matrices, mouseX, mouseY) -> {
                     if (blueprintSelected(fortressClient)) {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
                     } else {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Blueprints"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Blueprints"), mouseX, mouseY);
                     }
                 },
                 Text.of("")
@@ -96,9 +97,9 @@ public class ToolsGui extends FortressGuiScreen {
                 },
                 (button, matrices, mouseX, mouseY) -> {
                     if(treeCutterSelected(fortressClient)) {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
                     } else {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Chop trees"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Chop trees"), mouseX, mouseY);
                     }
                 },
                 Text.of("")
@@ -118,9 +119,9 @@ public class ToolsGui extends FortressGuiScreen {
                 },
                 (button, matrices, mouseX, mouseY) -> {
                     if(roadsSelected(fortressClient)) {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
                     } else {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Build roads"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Build roads"), mouseX, mouseY);
                     }
                 },
                 Text.of("")
@@ -142,9 +143,9 @@ public class ToolsGui extends FortressGuiScreen {
                 },
                 (button, matrices, mouseX, mouseY) -> {
                     if(isInCombat(fortressClient)) {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Cancel"), mouseX, mouseY);
                     } else {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Fight"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Fight"), mouseX, mouseY);
                     }
                 },
                 Text.of("")
@@ -162,7 +163,7 @@ public class ToolsGui extends FortressGuiScreen {
                     }
                 },
                 (button, matrices, mouseX, mouseY) -> {
-                    ToolsGui.super.renderTooltip(matrices, new LiteralText("Skip Night"), mouseX, mouseY);
+                    ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Skip Night"), mouseX, mouseY);
                 },
                 Text.of("")
         );
@@ -172,9 +173,9 @@ public class ToolsGui extends FortressGuiScreen {
                 0,
                 (button, matrices, mouseX, mouseY) -> {
                     if (clientTasksHolderOpt.isPresent() && clientTasksHolderOpt.get().isSelectionHidden()) {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Show Tasks outline"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Show Tasks outline"), mouseX, mouseY);
                     } else {
-                        ToolsGui.super.renderTooltip(matrices, new LiteralText("Hide Tasks outline"), mouseX, mouseY);
+                        ToolsHudLayer.super.renderTooltip(matrices, new LiteralText("Hide Tasks outline"), mouseX, mouseY);
                     }
                 },
                 itemRenderer

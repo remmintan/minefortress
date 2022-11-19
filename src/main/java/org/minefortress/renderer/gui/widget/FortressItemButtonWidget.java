@@ -7,6 +7,7 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -16,30 +17,38 @@ public class FortressItemButtonWidget extends TexturedButtonWidget {
     private static final Identifier ARROWS_TEXTURE = new Identifier("textures/gui/recipe_book.png");
 
     protected final ItemStack itemStack;
-    protected final ItemRenderer itemRenderer;
 
     public boolean checked = false;
 
-    public FortressItemButtonWidget(int x, int y, Item item, ItemRenderer itemRenderer, PressAction clickAction, ButtonWidget.TooltipSupplier tooltipSupplier, Text text) {
-        super(x, y, 20, 20, 0, 0, 20, FORTRESS_BUTTON_TEXTURE, 32, 64, clickAction, tooltipSupplier, text);
+    public FortressItemButtonWidget(Item item, PressAction clickAction, String tooltipText) {
+        super(
+                0,
+                0,
+                20,
+                20,
+                0,
+                0,
+                20,
+                FORTRESS_BUTTON_TEXTURE,
+                32,
+                64,
+                clickAction,
+                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText(tooltipText), mouseX, mouseY),
+                Text.of("")
+        );
         this.itemStack = new ItemStack(item);
-        this.itemRenderer = itemRenderer;
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
-        renderItem(matrices);
+        itemRenderer.renderInGui(itemStack, x+2, y+2);
 
 
         RenderSystem.setShaderTexture(0, ARROWS_TEXTURE);
         if(this.checked)
             this.drawTexture(matrices, x-15, y+2, 12, 208, 14, 18);
 
-    }
-
-    protected void renderItem(MatrixStack matrices) {
-        itemRenderer.renderInGui(itemStack, x+2, y+2);
     }
 
     @Override

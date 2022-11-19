@@ -1,4 +1,4 @@
-package org.minefortress.renderer.gui;
+package org.minefortress.renderer.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -23,12 +23,14 @@ import org.minefortress.network.c2s.ServerboundOpenCraftingScreenPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.Profession;
+import org.minefortress.renderer.gui.ColonistsScreen;
 import org.minefortress.renderer.gui.professions.ProfessionsScreen;
 import org.minefortress.renderer.gui.widget.FortressItemButtonWidget;
+import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;
 
-public class ColonistsGui extends FortressGuiScreen{
+public class ColonistsHudLayer extends AbstractHudLayer {
 
     private final ButtonWidget manageColonistsButton;
     private final FortressItemButtonWidget professionsButton;
@@ -40,7 +42,7 @@ public class ColonistsGui extends FortressGuiScreen{
     private boolean hovered;
 
 
-    protected ColonistsGui(MinecraftClient client, ItemRenderer itemRenderer) {
+    protected ColonistsHudLayer(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
         this.manageColonistsButton = new ButtonWidget(
                 0,
@@ -49,68 +51,47 @@ public class ColonistsGui extends FortressGuiScreen{
                 20,
                 new LiteralText(""),
                 btn -> client.setScreen(new ColonistsScreen()),
-                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Manage pawns"), mouseX, mouseY)
+                "Manage pawns"
         );
         this.professionsButton = new FortressItemButtonWidget(
-                0,
-                0,
                 Items.PLAYER_HEAD,
-                itemRenderer,
                 btn -> client.setScreen(new ProfessionsScreen(getFortressClient())),
-                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Manage professions"), mouseX, mouseY),
-                Text.of("")
+                "Manage professions"
         );
         this.inventoryButton = new FortressItemButtonWidget(
-                0,
-                0,
                 Items.CHEST,
-                itemRenderer,
                 btn -> client.setScreen(new CreativeInventoryScreen(client.player)),
-                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Inventory"), mouseX, mouseY),
-                Text.of("")
+                "Inventory"
         );
         this.craftingButton = new FortressItemButtonWidget(
-                0,
-                0,
                 Items.CRAFTING_TABLE,
-                itemRenderer,
                 btn -> {
                     if(hasProfessionInAVillage("crafter"))
                         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.CRAFTING));
                     else
                         this.client.setScreen(new MissingCraftsmanScreen());
                 },
-                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Crafting"), mouseX, mouseY),
-                Text.of("")
+                "Crafting"
         );
         this.furnaceButton = new FortressItemButtonWidget(
-                0,
-                0,
                 Items.FURNACE,
-                itemRenderer,
                 btn -> {
                     if(hasProfessionInAVillage("blacksmith"))
                         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE));
                     else
                         this.client.setScreen(new MissingBlacksmithScreen());
                 },
-                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText("Furnace"), mouseX, mouseY),
-                Text.of("")
+                "Furnace"
         );
     }
 
     @Override
     void tick() {
-        final FortressClientManager fortressManager = getFortressClientManager();
-        if(fortressManager.notInitialized()) return;
-
-        colonistsCount = fortressManager.getColonistsCount();
     }
 
     @Override
     void render(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
-        final FortressClientManager fortressManager = getFortressClientManager();
-        if(fortressManager.notInitialized()) return;
+        if(ModUtils.getFortressClientManager().notInitialized()) return;
 
         final boolean colonsitsCountHovered = renderColonistsCount(matrices, font, screenWidth, screenHeight, mouseX, mouseY, delta);
 
@@ -133,14 +114,6 @@ public class ColonistsGui extends FortressGuiScreen{
             this.furnaceButton.setPos(screenWidth / 2 - 91 + 35 + 60, screenHeight - 43);
             this.furnaceButton.render(matrices, (int)mouseX, (int)mouseY, delta);
         }
-    }
-
-    private boolean isSurvival() {
-        return getFortressClient().isFortressGamemode() && getFortressClientManager().isSurvival();
-    }
-
-    private boolean isCombat() {
-        return getFortressClient().getFortressClientManager().isInCombat();
     }
 
     private void renderSelectedColonistInfo(MatrixStack matrices, TextRenderer font, int screenHeight, FortressClientManager fortressManager) {
@@ -217,14 +190,6 @@ public class ColonistsGui extends FortressGuiScreen{
         return hovered;
     }
 
-    private FortressClientManager getFortressClientManager() {
-        final FortressMinecraftClient fortressClient = getFortressClient();
-        return fortressClient.getFortressClientManager();
-    }
-
-    private FortressMinecraftClient getFortressClient() {
-        return (FortressMinecraftClient) this.client;
-    }
 
     @Override
     boolean isHovered() {
@@ -256,12 +221,8 @@ public class ColonistsGui extends FortressGuiScreen{
     }
 
     private boolean hasProfessionInAVillage(String crafter) {
-        final var fortressClient = getClient();
-        final var clientManager = fortressClient.getFortressClientManager();
-        return fortressClient.isFortressGamemode() && clientManager.getProfessionManager().hasProfession(crafter);
+
+        return ModUtils.isClientInFortressGamemode() && ModUtils.getProfessionManager().hasProfession(crafter);
     }
 
-    private FortressMinecraftClient getClient() {
-        return (FortressMinecraftClient) MinecraftClient.getInstance();
-    }
 }

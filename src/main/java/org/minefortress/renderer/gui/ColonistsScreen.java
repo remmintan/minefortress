@@ -15,7 +15,7 @@ public class ColonistsScreen extends Screen {
 
     private static final Text MANAGE_COLONISTS_COUNT_TEXT = new LiteralText("Manage Villagers");
 
-    protected ColonistsScreen() {
+    public ColonistsScreen() {
         super(new LiteralText("Colonists"));
     }
 

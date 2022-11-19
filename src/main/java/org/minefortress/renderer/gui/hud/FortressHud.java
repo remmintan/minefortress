@@ -1,4 +1,4 @@
-package org.minefortress.renderer.gui;
+package org.minefortress.renderer.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -23,19 +23,19 @@ public class FortressHud {
    private final static boolean SHOW_WATER_MARKS = false;
    private final static boolean REDDIT_WATERMARKS_ENABLED = false;
 
-   private final ColonistsGui colonistsGui;
-   private final ToolsGui toolsGui;
-   private final TimeGui timeGui;
-   private final FightGui fightGui;
+   private final ColonistsHudLayer colonistsHudLayer;
+   private final ToolsHudLayer toolsHudLayer;
+   private final TimeHudLayer timeHudLayer;
+   private final FightHudLayer fightHudLayer;
 
    private boolean isHovered = false;
 
     public FortressHud(MinecraftClient client) {
         this.client = client;
-        this.colonistsGui = new ColonistsGui(client, client.getItemRenderer());
-        this.toolsGui = new ToolsGui(client, client.getItemRenderer());
-        this.timeGui = new TimeGui(client, client.getItemRenderer());
-        this.fightGui = new FightGui(client, client.getItemRenderer());
+        this.colonistsHudLayer = new ColonistsHudLayer(client, client.getItemRenderer());
+        this.toolsHudLayer = new ToolsHudLayer(client, client.getItemRenderer());
+        this.timeHudLayer = new TimeHudLayer(client, client.getItemRenderer());
+        this.fightHudLayer = new FightHudLayer(client, client.getItemRenderer());
     }
 
     private SelectionManager getSelectionManager() {
@@ -71,11 +71,11 @@ public class FortressHud {
         } else {
             renderHints(p, scaledHeight, font);
             renderSelectTypeName(p, font);
-            this.colonistsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
-            this.toolsGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
-            this.timeGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+            this.colonistsHudLayer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+            this.toolsHudLayer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+            this.timeHudLayer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             if(fortressManager.isInCombat())
-                fightGui.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+                fightHudLayer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
         }
     }
 
@@ -186,10 +186,10 @@ public class FortressHud {
     }
 
     public void tick() {
-        this.colonistsGui.tick();
-        this.toolsGui.tick();
+        this.colonistsHudLayer.tick();
+        this.toolsHudLayer.tick();
 
-        this.isHovered = this.colonistsGui.isHovered() || this.toolsGui.isHovered() || this.timeGui.isHovered();
+        this.isHovered = this.colonistsHudLayer.isHovered() || this.toolsHudLayer.isHovered() || this.timeHudLayer.isHovered();
     }
 
     public boolean isHovered() {
@@ -199,9 +199,9 @@ public class FortressHud {
 
     public void onClick(double mouseX, double mouseY) {
         if(isHudHidden()) return;
-        this.toolsGui.onClick(mouseX, mouseY);
-        this.colonistsGui.onClick(mouseX, mouseY);
-        this.timeGui.onClick(mouseX, mouseY);
+        this.toolsHudLayer.onClick(mouseX, mouseY);
+        this.colonistsHudLayer.onClick(mouseX, mouseY);
+        this.timeHudLayer.onClick(mouseX, mouseY);
     }
 
     private TextRenderer getTextRenderer() {

@@ -6,15 +6,18 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
-import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.professions.ProfessionManager;
 
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 
+@MethodsReturnNonnullByDefault
 public class ModUtils {
 
     public static boolean isFortressGamemode(PlayerEntity player) {
@@ -47,7 +50,6 @@ public class ModUtils {
         return interactionManager != null && interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
     }
 
-    @NotNull
     public static Path getBlueprintsFolder() {
         return FabricLoader.getInstance()
                 .getGameDir()
@@ -59,6 +61,14 @@ public class ModUtils {
                 .ofNullable(MinecraftClient.getInstance().player)
                 .map(ClientPlayerEntity::getUuid)
                 .orElseThrow(() -> new IllegalStateException("Player is null"));
+    }
+
+    public static FortressClientManager getFortressClientManager() {
+        return getFortressClient().getFortressClientManager();
+    }
+
+    public static ProfessionManager getProfessionManager() {
+        return getFortressClientManager().getProfessionManager();
     }
 
 }

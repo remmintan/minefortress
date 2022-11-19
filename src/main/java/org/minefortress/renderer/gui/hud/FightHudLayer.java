@@ -1,4 +1,4 @@
-package org.minefortress.renderer.gui;
+package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -7,11 +7,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
-class FightGui extends FortressGuiScreen{
+class FightHudLayer extends AbstractHudLayer {
 
     private static final int SELECTION_COLOR = 0xFF00FF00;
 
-    FightGui(MinecraftClient client, ItemRenderer itemRenderer) {
+    FightHudLayer(MinecraftClient client, ItemRenderer itemRenderer) {
         super(client, itemRenderer);
     }
 
