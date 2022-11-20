@@ -1,8 +1,8 @@
-package org.minefortress.renderer.gui.hud;
+package org.minefortress.renderer.gui.hud.interfaces;
 
 import net.minecraft.client.render.item.ItemRenderer;
 
-public interface IItemButton {
+public interface IItemHudElement {
 
     void setItemRenderer(ItemRenderer renderer);
 

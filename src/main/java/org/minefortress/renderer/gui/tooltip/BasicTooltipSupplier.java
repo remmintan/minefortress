@@ -29,7 +29,7 @@ public class BasicTooltipSupplier extends DrawableHelper implements ButtonWidget
 
     @Override
     public void onTooltip(ButtonWidget button, MatrixStack matrices, int mouseX, int mouseY) {
-
+        this.renderTooltip(matrices, mouseX, mouseY);
     }
 
     private void renderTooltip(MatrixStack matrices, int x, int y) {

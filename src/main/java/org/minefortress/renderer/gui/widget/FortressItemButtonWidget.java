@@ -1,19 +1,18 @@
 package org.minefortress.renderer.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.minefortress.renderer.gui.hud.IHudButton;
-import org.minefortress.renderer.gui.hud.IItemButton;
+import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
+import org.minefortress.renderer.gui.hud.interfaces.IItemHudElement;
+import org.minefortress.renderer.gui.tooltip.BasicTooltipSupplier;
 
-public class FortressItemButtonWidget extends TexturedButtonWidget implements IHudButton, IItemButton {
+public class FortressItemButtonWidget extends TexturedButtonWidget implements IHudButton, IItemHudElement {
 
     private static final Identifier FORTRESS_BUTTON_TEXTURE = new Identifier("minefortress","textures/gui/button.png");
     private static final Identifier ARROWS_TEXTURE = new Identifier("textures/gui/recipe_book.png");
@@ -39,7 +38,7 @@ public class FortressItemButtonWidget extends TexturedButtonWidget implements IH
                 32,
                 64,
                 clickAction,
-                (button, matrices, mouseX, mouseY) -> super.renderTooltip(matrices, new LiteralText(tooltipText), mouseX, mouseY),
+                new BasicTooltipSupplier(tooltipText),
                 Text.of("")
         );
         this.itemStack = new ItemStack(item);
@@ -70,12 +69,12 @@ public class FortressItemButtonWidget extends TexturedButtonWidget implements IH
     }
 
     @Override
-    public int getX() {
+    public int getAnchorX() {
         return anchorX;
     }
 
     @Override
-    public int getY() {
+    public int getAnchorY() {
         return anchorY;
     }
 }

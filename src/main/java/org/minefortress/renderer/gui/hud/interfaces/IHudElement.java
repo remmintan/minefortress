@@ -1,18 +1,20 @@
-package org.minefortress.renderer.gui.hud;
+package org.minefortress.renderer.gui.hud.interfaces;
 
 import net.minecraft.client.util.math.MatrixStack;
 
-public interface IHudButton {
+public interface IHudElement {
 
     void setPos(int x, int y);
-    int getX();
-    int getY();
+    int getAnchorX();
+    int getAnchorY();
     default void setPosBasedOn(int basepointX, int basepointY) {
-        setPos(basepointX + getX(), basepointY + getY());
+        setPos(basepointX + getAnchorX(), basepointY + getAnchorY());
     }
     void render(MatrixStack matrices, int mouseX, int mouseY, float delta);
     default boolean shouldRender(boolean isCreative) {
         return true;
     }
+    default void tick() {}
+    boolean isHovered();
 
 }
