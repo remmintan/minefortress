@@ -10,9 +10,13 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
 import org.minefortress.selections.ClickType;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.selections.SelectionType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FortressHud {
 
@@ -23,19 +27,17 @@ public class FortressHud {
    private final static boolean SHOW_WATER_MARKS = false;
    private final static boolean REDDIT_WATERMARKS_ENABLED = false;
 
-   private final ColonistsHudLayer colonistsHudLayer;
-   private final ToolsHudLayer toolsHudLayer;
-   private final TimeHudLayer timeHudLayer;
-   private final FightHudLayer fightHudLayer;
+   private final List<IHudLayer> layers = new ArrayList<>();
 
-   private boolean isHovered = false;
+   private HudState state = HudState.BUILD;
 
     public FortressHud(MinecraftClient client) {
         this.client = client;
-        this.colonistsHudLayer = new ColonistsHudLayer(client, client.getItemRenderer());
-        this.toolsHudLayer = new ToolsHudLayer(client, client.getItemRenderer());
-        this.timeHudLayer = new TimeHudLayer(client, client.getItemRenderer());
-        this.fightHudLayer = new FightHudLayer(client, client.getItemRenderer());
+        layers.add(new ColonistsHudLayer(client));
+        layers.add(new SelectedColonistHudLayer(client));
+        layers.add(new ToolsHudLayer(client));
+        layers.add(new TimeHudLayer(client));
+        layers.add(new FightHudLayer(client));
     }
 
     private SelectionManager getSelectionManager() {
@@ -71,11 +73,11 @@ public class FortressHud {
         } else {
             renderHints(p, scaledHeight, font);
             renderSelectTypeName(p, font);
-            this.colonistsHudLayer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
-            this.toolsHudLayer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
-            this.timeHudLayer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
-            if(fortressManager.isInCombat())
-                fightHudLayer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+            for(IHudLayer layer : layers) {
+                if(layer.shouldRender(state)) {
+                    layer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+                }
+            }
         }
     }
 
@@ -186,22 +188,28 @@ public class FortressHud {
     }
 
     public void tick() {
-        this.colonistsHudLayer.tick();
-        this.toolsHudLayer.tick();
-
-        this.isHovered = this.colonistsHudLayer.isHovered() || this.toolsHudLayer.isHovered() || this.timeHudLayer.isHovered();
+        for(IHudLayer layer : layers) {
+            if(layer.shouldRender(state)) {
+                layer.tick();
+            }
+        }
     }
 
     public boolean isHovered() {
         if(isHudHidden()) return false;
-        return this.isHovered;
+        for (IHudLayer layer : layers) {
+            if(layer.shouldRender(state) && layer.isHovered()) return true;
+        }
+        return false;
     }
 
     public void onClick(double mouseX, double mouseY) {
         if(isHudHidden()) return;
-        this.toolsHudLayer.onClick(mouseX, mouseY);
-        this.colonistsHudLayer.onClick(mouseX, mouseY);
-        this.timeHudLayer.onClick(mouseX, mouseY);
+        for(IHudLayer layer : this.layers) {
+            if(layer.shouldRender(state)) {
+                layer.onClick(mouseX, mouseY);
+            }
+        }
     }
 
     private TextRenderer getTextRenderer() {

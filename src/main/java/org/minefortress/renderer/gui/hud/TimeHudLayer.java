@@ -2,21 +2,20 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.World;
 
 import java.util.Optional;
 
-public class TimeHudLayer extends AbstractHudLayer {
+class TimeHudLayer extends AbstractHudLayer {
 
-    TimeHudLayer(MinecraftClient client, ItemRenderer itemRenderer) {
-        super(client, itemRenderer);
+    TimeHudLayer(MinecraftClient client) {
+        super(client);
     }
 
     @Override
-    void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
+    protected void renderHud(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight) {
         final Optional<ClientWorld> world = Optional.ofNullable(this.client.world);
         final long timeTicks = world.map(World::getTime).orElse(0L) + 6500L;
         long timeOfDayTicks = (world.map(World::getTimeOfDay).orElse(0L) + 6500L) % 24000L;
@@ -31,13 +30,7 @@ public class TimeHudLayer extends AbstractHudLayer {
     }
 
     @Override
-    boolean isHovered() {
-        return false;
+    public boolean shouldRender(HudState hudState) {
+        return hudState != HudState.INITIALIZING;
     }
-
-    @Override
-    void onClick(double mouseX, double mouseY) {
-        super.onClick(mouseX, mouseY);
-    }
-
 }

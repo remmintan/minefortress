@@ -2,21 +2,20 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import org.minefortress.fight.ClientFightSelectionManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.utils.ModUtils;
 
 class FightHudLayer extends AbstractHudLayer {
 
     private static final int SELECTION_COLOR = 0xFF00FF00;
 
-    FightHudLayer(MinecraftClient client, ItemRenderer itemRenderer) {
-        super(client, itemRenderer);
+    FightHudLayer(MinecraftClient client) {
+        super(client);
     }
 
     @Override
-    void render(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
+    protected void renderHud(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight) {
         final var fightSelectionManager = getFightSelectionManager();
         if(!fightSelectionManager.isSelecting()) return;
         final var selectionStartPos = fightSelectionManager.getSelectionStartPos();
@@ -36,12 +35,12 @@ class FightHudLayer extends AbstractHudLayer {
         super.drawVerticalLine(matrices, selectionStartX, selectionStartY, selectionCurY, SELECTION_COLOR);
     }
 
-    @Override
-    boolean isHovered() {
-        return false;
+    private ClientFightSelectionManager getFightSelectionManager() {
+        return ModUtils.getFortressClientManager().getFightManager().getSelectionManager();
     }
 
-    private ClientFightSelectionManager getFightSelectionManager() {
-        return ((FortressMinecraftClient)this.client).getFortressClientManager().getFightManager().getSelectionManager();
+    @Override
+    public boolean shouldRender(HudState hudState) {
+        return hudState == HudState.COMBAT;
     }
 }

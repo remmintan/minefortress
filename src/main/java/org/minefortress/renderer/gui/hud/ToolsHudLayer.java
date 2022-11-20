@@ -38,8 +38,8 @@ public class ToolsHudLayer extends AbstractHudLayer {
 
     private final List<ButtonWidget> selectionButtons = new ArrayList<>();
 
-    protected ToolsHudLayer(MinecraftClient client, ItemRenderer itemRenderer) {
-        super(client, itemRenderer);
+    protected ToolsHudLayer(MinecraftClient client) {
+        super(client);
         this.selectionType = new FortressItemButtonWidget(
                 0,
                 0,

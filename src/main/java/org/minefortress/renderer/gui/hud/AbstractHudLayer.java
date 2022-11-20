@@ -7,13 +7,14 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.hud.interfaces.IHudElement;
+import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
 import org.minefortress.renderer.gui.hud.interfaces.IItemHudElement;
 import org.minefortress.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class AbstractHudLayer extends DrawableHelper {
+abstract class AbstractHudLayer extends DrawableHelper implements IHudLayer {
 
     private final List<IHudElement> fortressHudElements = new ArrayList<>();
 
@@ -26,9 +27,9 @@ abstract class AbstractHudLayer extends DrawableHelper {
     private boolean centeredX;
     private boolean centeredY;
 
-    protected AbstractHudLayer(MinecraftClient client, ItemRenderer itemRenderer) {
+    protected AbstractHudLayer(MinecraftClient client) {
         this.client = client;
-        this.itemRenderer = itemRenderer;
+        this.itemRenderer = client.getItemRenderer();
         this.textRenderer = client.textRenderer;
     }
 
@@ -45,13 +46,14 @@ abstract class AbstractHudLayer extends DrawableHelper {
         fortressHudElements.add(button);
     }
 
-    void tick() {
+    public void tick() {
         for(IHudElement button : fortressHudElements)
             button.tick();
     }
 
-    final void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
+    final public void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
         if(basepointX == null || basepointY == null) throw new IllegalStateException("Basepoint not set!");
+        this.renderHud(p, font, screenWidth, screenHeight);
 
         final var baseX = centeredX ? screenWidth / 2 : screenWidth + basepointX;
         final var baseY = centeredY ? screenHeight / 2 : screenHeight + basepointY;
@@ -64,13 +66,16 @@ abstract class AbstractHudLayer extends DrawableHelper {
             }
         }
     }
-    final boolean isHovered() {
+
+    protected void renderHud(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight) {}
+
+    final public boolean isHovered() {
         for (IHudElement fortressHudButton : fortressHudElements) {
             if(fortressHudButton.isHovered()) return true;
         }
         return false;
     }
-    final void onClick(double mouseX, double mouseY) {
+    final public void onClick(double mouseX, double mouseY) {
         for (IHudElement elem : fortressHudElements) {
             if(elem instanceof IHudButton btn && elem.isHovered()) {
                 btn.onClick(mouseX, mouseY);
