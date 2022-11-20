@@ -14,7 +14,7 @@ import org.minefortress.utils.ModUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class AbstractHudLayer extends DrawableHelper implements IHudLayer {
+public abstract class AbstractHudLayer extends DrawableHelper implements IHudLayer {
 
     private final List<IHudElement> fortressHudElements = new ArrayList<>();
 
