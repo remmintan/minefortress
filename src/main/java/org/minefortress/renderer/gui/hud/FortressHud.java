@@ -62,7 +62,6 @@ public class FortressHud {
         final FortressMinecraftClient fortressClient = getFortressClient();
         final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
-        renderWatermarks(p, font, scaledWidth, scaledHeight);
 
         if (fortressManager.isFortressInitializationNeeded()) {
             DrawableHelper.drawStringWithShadow(p, font, "Choose where to place your Fortress", 5, scaledHeight - font.fontHeight - 35, MOD_GUI_COLOR);
@@ -161,18 +160,7 @@ public class FortressHud {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
     }
 
-    private void renderWatermarks(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight) {
-        int y = screenHeight - font.fontHeight - 5;
 
-        if(SHOW_WATER_MARKS) {
-            if(REDDIT_WATERMARKS_ENABLED) {
-                DrawableHelper.drawStringWithShadow(p, font, "/u/remmintan", 5, y, MOD_GUI_COLOR);
-            } else {
-                DrawableHelper.drawStringWithShadow(p, font, "Minecraft Fortress Mod", 5, y, MOD_GUI_COLOR);
-                DrawableHelper.drawStringWithShadow(p, font, "minecraftfortress.org", screenWidth - font.getWidth("minecraftfortress.org") - 5, y, MOD_GUI_COLOR);
-            }
-        }
-    }
 
     private void renderSelectTypeName(MatrixStack p, TextRenderer font) {
         if(getFortressClient().getFortressClientManager().isInCombat()) return;
