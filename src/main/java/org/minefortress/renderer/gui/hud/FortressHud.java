@@ -24,8 +24,6 @@ public class FortressHud {
     private SelectionManager selectionManager;
 
    private final static int MOD_GUI_COLOR = 0xf0f0f0;
-   private final static boolean SHOW_WATER_MARKS = false;
-   private final static boolean REDDIT_WATERMARKS_ENABLED = false;
 
    private final List<IHudLayer> layers = new ArrayList<>();
 
