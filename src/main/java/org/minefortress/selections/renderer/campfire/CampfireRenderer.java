@@ -35,7 +35,7 @@ public final class CampfireRenderer extends AbstractCustomRenderer {
 
     @Override
     protected boolean shouldRender() {
-        return getClientManager().isFortressInitializationNeeded();
+        return getClientManager().isCenterNotSet();
     }
 
     @Override

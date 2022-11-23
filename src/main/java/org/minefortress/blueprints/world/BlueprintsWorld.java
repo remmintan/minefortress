@@ -34,6 +34,7 @@ import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
@@ -225,6 +226,10 @@ public class BlueprintsWorld {
 
     public boolean hasWorld() {
         return world != null;
+    }
+
+    public static boolean isBlueprintsWorld(@Nullable World world) {
+        return world != null && world.getRegistryKey().equals(BLUEPRINTS_WORLD_REGISTRY_KEY);
     }
 
 }

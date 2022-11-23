@@ -83,7 +83,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                     fightSelectionManager.resetSelection();
                 }
 
-                if(fortressClientManager.isFortressInitializationNeeded()) {
+                if(fortressClientManager.isCenterNotSet()) {
                     resetSelection(selectionManager);
                     fortressClientManager.updateRenderer(client.worldRenderer);
                     return;

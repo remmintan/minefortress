@@ -137,7 +137,7 @@ public final class FortressClientManager extends AbstractFortressManager {
             return;
         }
         if(!initialized) return;
-        if(isFortressInitializationNeeded()) {
+        if(isCenterNotSet()) {
             synchronized (KEY) {
                 if(setCenterToast == null) {
                     this.setCenterToast = new FortressToast("Set up your Fortress", "Right-click to place", Items.CAMPFIRE);
@@ -170,7 +170,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         return !initialized;
     }
 
-    public boolean isFortressInitializationNeeded() {
+    public boolean isCenterNotSet() {
         return initialized && fortressCenter == null && this.gamemode != FortressGamemode.NONE;
     }
 

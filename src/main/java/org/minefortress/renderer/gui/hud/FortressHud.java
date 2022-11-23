@@ -5,9 +5,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.renderer.gui.hud.hints.*;
 import org.minefortress.renderer.gui.hud.interfaces.IHintsLayer;
 import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
+import org.minefortress.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +99,15 @@ public class FortressHud {
     }
 
     private HudState getState() {
+        final var fortressClientManager = ModUtils.getFortressClientManager();
+        if(fortressClientManager.notInitialized()) return HudState.BLANK;
+        if(fortressClientManager.isCenterNotSet()) return HudState.INITIALIZING;
+
+        if(ModUtils.getBlueprintManager().hasSelectedBlueprint()) return HudState.BLUEPRINT;
+        if(BlueprintsWorld.isBlueprintsWorld(client.world)) return HudState.BLUEPRINT_EDITING;
+
+        if(ModUtils.getFortressClientManager().isInCombat()) return HudState.COMBAT;
+
         return HudState.BUILD;
     }
 

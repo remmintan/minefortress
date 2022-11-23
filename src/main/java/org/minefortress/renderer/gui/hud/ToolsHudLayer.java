@@ -175,6 +175,11 @@ public class ToolsHudLayer extends AbstractHudLayer {
         }
     }
 
+    @Override
+    public boolean shouldRender(HudState hudState) {
+        return hudState == HudState.BUILD;
+    }
+
     private boolean treeCutterSelected() {
         return ModUtils.getFortressClient().getSelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
     }
@@ -191,8 +196,5 @@ public class ToolsHudLayer extends AbstractHudLayer {
         return ModUtils.getFortressClientManager().isInCombat();
     }
 
-    @Override
-    public boolean shouldRender(HudState hudState) {
-        return hudState == HudState.BUILD;
-    }
+
 }

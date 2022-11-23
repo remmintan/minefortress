@@ -2,6 +2,7 @@ package org.minefortress.renderer.gui.hud;
 
 public enum HudState {
 
+    BLANK,
     INITIALIZING,
     BUILD,
     BLUEPRINT,
