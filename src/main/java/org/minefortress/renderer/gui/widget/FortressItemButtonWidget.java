@@ -11,6 +11,10 @@ import net.minecraft.util.Identifier;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.hud.interfaces.IItemHudElement;
 import org.minefortress.renderer.gui.tooltip.BasicTooltipSupplier;
+import org.minefortress.renderer.gui.tooltip.OptionalTooltipSupplier;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 public class FortressItemButtonWidget extends TexturedButtonWidget implements IHudButton, IItemHudElement {
 
@@ -23,7 +27,7 @@ public class FortressItemButtonWidget extends TexturedButtonWidget implements IH
 
     public boolean checked = false;
 
-    private ItemRenderer itemRenderer;
+    protected ItemRenderer itemRenderer;
 
     public FortressItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, String tooltipText) {
         super(
@@ -46,20 +50,50 @@ public class FortressItemButtonWidget extends TexturedButtonWidget implements IH
         this.anchorY = anchorY;
     }
 
+    public FortressItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, Function<FortressItemButtonWidget, Optional<String>> optTooltip) {
+        super(
+                0,
+                0,
+                20,
+                20,
+                0,
+                0,
+                20,
+                FORTRESS_BUTTON_TEXTURE,
+                32,
+                64,
+                clickAction,
+                new OptionalTooltipSupplier(),
+                Text.of("")
+        );
+        ((OptionalTooltipSupplier)super.tooltipSupplier).provideTooltipText(() -> optTooltip.apply(this));
+        this.itemStack = new ItemStack(item);
+        this.anchorX = anchorX;
+        this.anchorY = anchorY;
+    }
+
     @Override
     public void setItemRenderer(ItemRenderer renderer) {
         this.itemRenderer = renderer;
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public final void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
-        itemRenderer.renderInGui(itemStack, x+2, y+2);
+        renderItem(matrices);
 
         RenderSystem.setShaderTexture(0, ARROWS_TEXTURE);
         if(this.checked)
             this.drawTexture(matrices, x-15, y+2, 12, 208, 14, 18);
 
+    }
+
+    protected void renderItem(MatrixStack m) {
+        renderBareItem();
+    }
+
+    protected final void renderBareItem() {
+        itemRenderer.renderInGui(itemStack, x+2, y+2);
     }
 
     @Override

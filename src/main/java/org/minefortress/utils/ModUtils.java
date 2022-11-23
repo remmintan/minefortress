@@ -9,9 +9,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
 import org.minefortress.MineFortressMod;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ProfessionManager;
+import org.minefortress.selections.SelectionManager;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -69,6 +71,14 @@ public class ModUtils {
 
     public static ProfessionManager getProfessionManager() {
         return getFortressClientManager().getProfessionManager();
+    }
+
+    public static ClientBlueprintManager getBlueprintManager() {
+        return getFortressClient().getBlueprintManager();
+    }
+
+    public static SelectionManager getSelectionManager() {
+        return getFortressClient().getSelectionManager();
     }
 
 }

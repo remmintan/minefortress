@@ -81,7 +81,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
                 )
         );
 
-        this.setBasepoint(-91, -43, true, false);
+        this.setBasepoint(-91, -43, PositionX.CENTER, PositionY.BOTTOM);
     }
 
     private String getColonistsCountText() {

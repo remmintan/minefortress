@@ -24,8 +24,8 @@ public abstract class AbstractHudLayer extends DrawableHelper implements IHudLay
 
     private Integer basepointX;
     private Integer basepointY;
-    private boolean centeredX;
-    private boolean centeredY;
+    private PositionX positionX;
+    private PositionY positionY;
 
     protected AbstractHudLayer(MinecraftClient client) {
         this.client = client;
@@ -33,11 +33,11 @@ public abstract class AbstractHudLayer extends DrawableHelper implements IHudLay
         this.textRenderer = client.textRenderer;
     }
 
-    protected final void setBasepoint(int x, int y, boolean centeredX, boolean centeredY) {
+    protected final void setBasepoint(int x, int y, PositionX positionX, PositionY positionY) {
         this.basepointX = x;
         this.basepointY = y;
-        this.centeredX = centeredX;
-        this.centeredY = centeredY;
+        this.positionX = positionX;
+        this.positionY = positionY;
     }
 
     protected final void addElement(IHudElement button) {
@@ -55,8 +55,17 @@ public abstract class AbstractHudLayer extends DrawableHelper implements IHudLay
         if(basepointX == null || basepointY == null) throw new IllegalStateException("Basepoint not set!");
         this.renderHud(p, font, screenWidth, screenHeight);
 
-        final var baseX = centeredX ? screenWidth / 2 : screenWidth + basepointX;
-        final var baseY = centeredY ? screenHeight / 2 : screenHeight + basepointY;
+        final var baseX = switch (positionX) {
+            case LEFT -> basepointX;
+            case RIGHT -> screenWidth + basepointX;
+            case CENTER -> screenWidth / 2 + basepointX;
+        };
+
+        final var baseY = switch (positionY) {
+            case TOP -> basepointY;
+            case BOTTOM -> screenHeight + basepointY;
+            case CENTER -> screenHeight / 2 + basepointY;
+        };
 
         boolean creative = ModUtils.getFortressClientManager().isCreative();
         for (IHudElement fortressHudButton : fortressHudElements) {
@@ -82,5 +91,13 @@ public abstract class AbstractHudLayer extends DrawableHelper implements IHudLay
                 return;
             }
         }
+    }
+
+    public enum PositionX {
+        LEFT, RIGHT, CENTER
+    }
+
+    public enum PositionY {
+        TOP, BOTTOM, CENTER
     }
 }
