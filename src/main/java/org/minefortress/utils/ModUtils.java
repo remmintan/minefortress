@@ -11,9 +11,11 @@ import net.minecraft.world.GameMode;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ProfessionManager;
 import org.minefortress.selections.SelectionManager;
+import org.minefortress.tasks.ClientTasksHolder;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -79,6 +81,16 @@ public class ModUtils {
 
     public static SelectionManager getSelectionManager() {
         return getFortressClient().getSelectionManager();
+    }
+
+    public static Optional<FortressClientWorld> getFortressClientWorld() {
+        return Optional.ofNullable(MinecraftClient.getInstance())
+                .map(it -> it.world)
+                .map(FortressClientWorld.class::cast);
+    }
+
+    public static Optional<ClientTasksHolder> getClientTasksHolder() {
+        return getFortressClientWorld().map(FortressClientWorld::getClientTasksHolder);
     }
 
 }

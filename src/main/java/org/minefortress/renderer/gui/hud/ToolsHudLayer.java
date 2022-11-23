@@ -3,7 +3,6 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.BookScreen;
 import net.minecraft.item.Items;
-import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.network.c2s.ServerboundSleepPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -91,7 +90,8 @@ public class ToolsHudLayer extends AbstractHudLayer {
             )
         );
 
-        new ItemToggleWidget(
+        this.addElement(
+            new ItemToggleWidget(
                 0,
                 100,
                 Items.DIAMOND_SWORD,
@@ -107,6 +107,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                 (button) -> Optional.of(isInCombat() ? "Cancel" : "Fight"),
                 this::isInCombat,
                 () -> !blueprintSelected() && !treeCutterSelected() && !roadsSelected()
+            )
         );
 
         this.addElement(
@@ -124,17 +125,16 @@ public class ToolsHudLayer extends AbstractHudLayer {
             )
         );
 
-        final Optional<ClientTasksHolder> clientTasksHolderOpt = Optional.ofNullable((FortressClientWorld) client.world)
-                .map(FortressClientWorld::getClientTasksHolder);
+
         this.addElement(
             new ItemToggleOtherItemWidget(
                 0,
                 150,
                 Items.ENDER_EYE,
-                (btn) -> clientTasksHolderOpt.ifPresent(ClientTasksHolder::toggleSelectionVisibility),
-                (button) -> clientTasksHolderOpt.map(ClientTasksHolder::isSelectionHidden)
+                (btn) -> ModUtils.getClientTasksHolder().ifPresent(ClientTasksHolder::toggleSelectionVisibility),
+                (button) -> ModUtils.getClientTasksHolder().map(ClientTasksHolder::isSelectionHidden)
                         .map(it -> it?"Show Tasks outline":"Hide Tasks outline"),
-                () -> clientTasksHolderOpt.map(ClientTasksHolder::isSelectionHidden).orElse(false),
+                () -> ModUtils.getClientTasksHolder().map(ClientTasksHolder::isSelectionHidden).orElse(false),
                 () -> !blueprintSelected() && !treeCutterSelected() && !roadsSelected() && !isInCombat(),
                 Items.ENDER_PEARL
             )
