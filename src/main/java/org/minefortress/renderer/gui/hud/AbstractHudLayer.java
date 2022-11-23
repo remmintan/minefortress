@@ -52,7 +52,9 @@ public abstract class AbstractHudLayer extends DrawableHelper implements IHudLay
     }
 
     final public void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
-        if(basepointX == null || basepointY == null) throw new IllegalStateException("Basepoint not set!");
+        if(basepointX == null || basepointY == null){
+            throw new IllegalStateException("Basepoint not set!");
+        }
         this.renderHud(p, font, screenWidth, screenHeight);
 
         final var baseX = switch (positionX) {

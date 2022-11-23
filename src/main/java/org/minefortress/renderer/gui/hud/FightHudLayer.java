@@ -12,6 +12,7 @@ class FightHudLayer extends AbstractHudLayer {
 
     FightHudLayer(MinecraftClient client) {
         super(client);
+        this.setBasepoint(0, 0, PositionX.LEFT, PositionY.TOP);
     }
 
     @Override

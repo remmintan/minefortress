@@ -18,6 +18,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
 
     protected SelectedColonistHudLayer(MinecraftClient client) {
         super(client);
+        this.setBasepoint(0, 0, PositionX.RIGHT, PositionY.TOP);
     }
 
     @Override

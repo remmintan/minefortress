@@ -12,6 +12,7 @@ class TimeHudLayer extends AbstractHudLayer {
 
     TimeHudLayer(MinecraftClient client) {
         super(client);
+        this.setBasepoint(0, 0, PositionX.LEFT, PositionY.TOP);
     }
 
     @Override

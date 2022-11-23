@@ -17,6 +17,7 @@ abstract class AbstractHintsLayer  extends AbstractHudLayer implements IHintsLay
 
     public AbstractHintsLayer() {
         super(MinecraftClient.getInstance());
+        this.setBasepoint(0, 0, PositionX.LEFT, PositionY.TOP);
     }
 
     protected abstract List<String> getHints();
