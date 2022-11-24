@@ -5,12 +5,11 @@ import net.minecraft.text.LiteralText;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.tooltip.BasicTooltipSupplier;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class DynamicTextButtonWidget extends ButtonWidget implements IHudButton {
 
-    private final Integer anchorX, anchorY;
+    private final int anchorX, anchorY;
     private final Supplier<String> textSupplier;
 
     public DynamicTextButtonWidget(int anchorX, int anchorY, int width, int height, PressAction pressAction, String tooltipText, Supplier<String> textSupplier) {
@@ -27,15 +26,17 @@ public class DynamicTextButtonWidget extends ButtonWidget implements IHudButton 
 
     @Override
     public void setPos(int x, int y) {
-        this.x = x + anchorX;
-        this.y = y + anchorY;
+        this.x = x;
+        this.y = y;
     }
 
+    @Override
     public int getAnchorX() {
-        return Optional.ofNullable(anchorX).orElseThrow(() -> new IllegalStateException("Anchor X is null"));
+        return anchorX;
     }
 
+    @Override
     public int getAnchorY() {
-        return Optional.ofNullable(anchorY).orElseThrow(() -> new IllegalStateException("Anchor Y is null"));
+        return anchorY;
     }
 }
