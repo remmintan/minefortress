@@ -37,30 +37,27 @@ public class ToolsHudLayer extends AbstractHudLayer {
 
 
         this.addElement(
-            new ItemToggleWidget(
-                0,
-                25,
-                Items.OAK_DOOR,
-                btn -> {
-                    if(blueprintSelected())
-                        ModUtils.getBlueprintManager().clearStructure();
-                    else {
-                        this.client.setScreen(new BlueprintsScreen());
-                    }
-                },
-                (button) -> Optional.of(blueprintSelected() ? "Cancel" : "Blueprints"),
-                this::blueprintSelected,
-                () -> !treeCutterSelected() && !roadsSelected() && !isInCombat()
-            )
-        );
-
-        this.addElement(
+                new ItemToggleWidget(
+                        0,
+                        25,
+                        Items.OAK_DOOR,
+                        btn -> {
+                            if (blueprintSelected())
+                                ModUtils.getBlueprintManager().clearStructure();
+                            else {
+                                this.client.setScreen(new BlueprintsScreen());
+                            }
+                        },
+                        (button) -> Optional.of(blueprintSelected() ? "Cancel" : "Blueprints"),
+                        this::blueprintSelected,
+                        () -> !treeCutterSelected() && !roadsSelected()
+                ),
                 new ItemToggleWidget(
                         0,
                         50,
                         Items.DIAMOND_AXE,
                         btn -> {
-                            if(treeCutterSelected()) {
+                            if (treeCutterSelected()) {
                                 ModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
                             } else {
                                 ModUtils.getSelectionManager().setSelectionType(SelectionType.TREE);
@@ -68,89 +65,58 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         },
                         (button) -> Optional.of(treeCutterSelected() ? "Cancel" : "Chop trees"),
                         this::treeCutterSelected,
-                        () -> !blueprintSelected() && !roadsSelected() && !isInCombat()
+                        () -> !blueprintSelected() && !roadsSelected()
+                ),
+                new ItemToggleWidget(
+                        0,
+                        75,
+                        Items.DIAMOND_SHOVEL,
+                        btn -> {
+                            if (roadsSelected()) {
+                                ModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
+                            } else {
+                                ModUtils.getSelectionManager().setSelectionType(SelectionType.ROADS);
+                            }
+                        },
+                        (button) -> Optional.of(roadsSelected() ? "Cancel" : "Build roads"),
+                        this::roadsSelected,
+                        () -> !blueprintSelected() && !treeCutterSelected()
+                ),
+                new ItemButtonWidget(
+                        0,
+                        125,
+                        Items.RED_BED,
+                        btn -> {
+                            final var player = MinecraftClient.getInstance().player;
+                            if (player != null && !player.isSleeping()) {
+                                FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SLEEP, new ServerboundSleepPacket());
+                            }
+                        },
+                        "Skip Night"
                 )
         );
 
         this.addElement(
-            new ItemToggleWidget(
-                0,
-                75,
-                Items.DIAMOND_SHOVEL,
-                btn -> {
-                    if(roadsSelected()) {
-                        ModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
-                    } else {
-                        ModUtils.getSelectionManager().setSelectionType(SelectionType.ROADS);
-                    }
-                },
-                (button) -> Optional.of(roadsSelected() ? "Cancel" : "Build roads"),
-                this::roadsSelected,
-                () -> !blueprintSelected() && !treeCutterSelected() && !isInCombat()
-            )
+                new ItemToggleOtherItemWidget(
+                        0,
+                        150,
+                        Items.ENDER_EYE,
+                        (btn) -> ModUtils.getClientTasksHolder().ifPresent(ClientTasksHolder::toggleSelectionVisibility),
+                        (button) -> ModUtils.getClientTasksHolder().map(ClientTasksHolder::isSelectionHidden)
+                                .map(it -> it ? "Show Tasks outline" : "Hide Tasks outline"),
+                        () -> ModUtils.getClientTasksHolder().map(ClientTasksHolder::isSelectionHidden).orElse(false),
+                        () -> !blueprintSelected() && !treeCutterSelected() && !roadsSelected(),
+                        Items.ENDER_PEARL
+                ),
+                new TextButtonWidget(
+                        0, 175, 20, 20, "?",
+                        btn -> {
+                            final BookScreen questionsScreen = new BookScreen(new FortressBookContents(FortressBookContents.HELP_BOOK));
+                            this.client.setScreen(questionsScreen);
+                        },
+                        "Help"
+                )
         );
-
-        this.addElement(
-            new ItemToggleWidget(
-                0,
-                100,
-                Items.DIAMOND_SWORD,
-                btn -> {
-                    final var shouldGoInCombat = !isInCombat();
-                    ModUtils.getFortressClientManager().setInCombat(shouldGoInCombat);
-                    if(shouldGoInCombat) {
-                        ModUtils.getBlueprintManager().clearStructure();
-                        ModUtils.getSelectionManager().resetSelection();
-                        ModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
-                    }
-                },
-                (button) -> Optional.of(isInCombat() ? "Cancel" : "Fight"),
-                this::isInCombat,
-                () -> !blueprintSelected() && !treeCutterSelected() && !roadsSelected()
-            )
-        );
-
-        this.addElement(
-            new ItemButtonWidget(
-                0,
-                125,
-                Items.RED_BED,
-                btn -> {
-                    final var player = MinecraftClient.getInstance().player;
-                    if(player != null && !player.isSleeping()) {
-                        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SLEEP, new ServerboundSleepPacket());
-                    }
-                },
-                "Skip Night"
-            )
-        );
-
-
-        this.addElement(
-            new ItemToggleOtherItemWidget(
-                0,
-                150,
-                Items.ENDER_EYE,
-                (btn) -> ModUtils.getClientTasksHolder().ifPresent(ClientTasksHolder::toggleSelectionVisibility),
-                (button) -> ModUtils.getClientTasksHolder().map(ClientTasksHolder::isSelectionHidden)
-                        .map(it -> it?"Show Tasks outline":"Hide Tasks outline"),
-                () -> ModUtils.getClientTasksHolder().map(ClientTasksHolder::isSelectionHidden).orElse(false),
-                () -> !blueprintSelected() && !treeCutterSelected() && !roadsSelected() && !isInCombat(),
-                Items.ENDER_PEARL
-            )
-        );
-
-        this.addElement(
-            new TextButtonWidget(
-                0, 175, 20, 20,"?",
-                btn -> {
-                    final BookScreen questionsScreen = new BookScreen(new FortressBookContents(FortressBookContents.HELP_BOOK));
-                    this.client.setScreen(questionsScreen);
-                },
-                "Help"
-            )
-        );
-
 
         final SelectionType[] values = Arrays
                 .stream(SelectionType.values())
@@ -159,7 +125,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                 .toArray(SelectionType[]::new);
 
         var i = 0;
-        for(final SelectionType type : values) {
+        for (final SelectionType type : values) {
             this.addElement(
                     new HideableButtonWidget(
                             -35,
@@ -191,10 +157,5 @@ public class ToolsHudLayer extends AbstractHudLayer {
     private boolean blueprintSelected() {
         return ModUtils.getFortressClient().getBlueprintManager().hasSelectedBlueprint();
     }
-
-    private boolean isInCombat() {
-        return ModUtils.getFortressClientManager().isInCombat();
-    }
-
 
 }
