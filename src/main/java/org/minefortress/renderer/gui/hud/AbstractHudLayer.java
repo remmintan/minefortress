@@ -40,10 +40,12 @@ public abstract class AbstractHudLayer extends DrawableHelper implements IHudLay
         this.positionY = positionY;
     }
 
-    protected final void addElement(IHudElement button) {
-        if(button instanceof IItemHudElement itemButton)
-            itemButton.setItemRenderer(itemRenderer);
-        fortressHudElements.add(button);
+    protected final void addElement(IHudElement... buttons) {
+        for(IHudElement button : buttons) {
+            if(button instanceof IItemHudElement itemButton)
+                itemButton.setItemRenderer(itemRenderer);
+            fortressHudElements.add(button);
+        }
     }
 
     public void tick() {

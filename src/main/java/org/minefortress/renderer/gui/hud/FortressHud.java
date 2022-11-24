@@ -33,6 +33,7 @@ public class FortressHud {
         hintsLayers.add(new ChopTreesHintsLayer());
         hintsLayers.add(new CombatHintsLayer());
 
+        hudLayers.add(new ModeHudLayer(client));
         hudLayers.add(new ColonistsHudLayer(client));
         hudLayers.add(new SelectedColonistHudLayer(client));
         hudLayers.add(new ToolsHudLayer(client));
