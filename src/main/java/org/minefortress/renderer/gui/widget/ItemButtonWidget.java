@@ -18,7 +18,7 @@ import java.util.function.Function;
 
 public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton, IItemHudElement {
 
-    private static final Identifier FORTRESS_BUTTON_TEXTURE = new Identifier("minefortress","textures/gui/button.png");
+    protected static final Identifier FORTRESS_BUTTON_TEXTURE = new Identifier("minefortress","textures/gui/button.png");
     private static final Identifier ARROWS_TEXTURE = new Identifier("textures/gui/recipe_book.png");
 
     protected final ItemStack itemStack;

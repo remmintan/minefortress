@@ -13,7 +13,7 @@ public class ModeHudLayer extends AbstractHudLayer{
         this.setBasepoint(0, 5, PositionX.CENTER, PositionY.TOP);
         this.addElement(
                 new ModeButtonWidget(
-                        -10,
+                        -12,
                         0,
                         Items.STONE_SWORD,
                         (btn) -> this.enableCombatModeIfDisabled(),
@@ -21,7 +21,7 @@ public class ModeHudLayer extends AbstractHudLayer{
                         () -> ModUtils.getFortressClientManager().isInCombat()
                 ),
                 new ModeButtonWidget(
-                        10,
+                        12,
                         0,
                         Items.STONE_SHOVEL,
                         (btn) -> this.disableCombatModIfEnabled(),
