@@ -16,7 +16,7 @@ import org.minefortress.renderer.gui.tooltip.OptionalTooltipSupplier;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class FortressItemButtonWidget extends TexturedButtonWidget implements IHudButton, IItemHudElement {
+public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton, IItemHudElement {
 
     private static final Identifier FORTRESS_BUTTON_TEXTURE = new Identifier("minefortress","textures/gui/button.png");
     private static final Identifier ARROWS_TEXTURE = new Identifier("textures/gui/recipe_book.png");
@@ -29,7 +29,7 @@ public class FortressItemButtonWidget extends TexturedButtonWidget implements IH
 
     protected ItemRenderer itemRenderer;
 
-    public FortressItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, String tooltipText) {
+    public ItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, String tooltipText) {
         super(
                 0,
                 0,
@@ -50,7 +50,7 @@ public class FortressItemButtonWidget extends TexturedButtonWidget implements IH
         this.anchorY = anchorY;
     }
 
-    public FortressItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, Function<FortressItemButtonWidget, Optional<String>> optTooltip) {
+    public ItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, Function<ItemButtonWidget, Optional<String>> optTooltip) {
         super(
                 0,
                 0,
@@ -82,10 +82,10 @@ public class FortressItemButtonWidget extends TexturedButtonWidget implements IH
         super.render(matrices, mouseX, mouseY, delta);
         renderItem(matrices);
 
-        RenderSystem.setShaderTexture(0, ARROWS_TEXTURE);
-        if(this.checked)
+        if(this.checked){
+            RenderSystem.setShaderTexture(0, ARROWS_TEXTURE);
             this.drawTexture(matrices, x-15, y+2, 12, 208, 14, 18);
-
+        }
     }
 
     protected void renderItem(MatrixStack m) {

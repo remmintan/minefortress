@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class ItemToggleWidget extends FortressItemButtonWidget {
+public class ItemToggleWidget extends ItemButtonWidget {
 
     protected final Supplier<Boolean> toggledSupplier;
     private final Supplier<Boolean> shouldRenderSupplier;
 
-    public ItemToggleWidget(int anchorX, int anchorY, Item item, PressAction clickAction, Function<FortressItemButtonWidget, Optional<String>> optTooltip,
+    public ItemToggleWidget(int anchorX, int anchorY, Item item, PressAction clickAction, Function<ItemButtonWidget, Optional<String>> optTooltip,
                             Supplier<Boolean> toggledSupplier, Supplier<Boolean> shouldRenderSupplier) {
         super(anchorX, anchorY, item, clickAction, optTooltip);
         this.toggledSupplier = toggledSupplier;

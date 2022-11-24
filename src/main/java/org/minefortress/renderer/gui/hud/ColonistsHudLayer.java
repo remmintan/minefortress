@@ -11,7 +11,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.ColonistsScreen;
 import org.minefortress.renderer.gui.professions.ProfessionsScreen;
 import org.minefortress.renderer.gui.widget.DynamicTextButtonWidget;
-import org.minefortress.renderer.gui.widget.FortressItemButtonWidget;
+import org.minefortress.renderer.gui.widget.ItemButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemHudElement;
 import org.minefortress.utils.ModUtils;
 
@@ -32,7 +32,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
         );
 
         this.addElement(
-            new FortressItemButtonWidget(
+            new ItemButtonWidget(
                     35, 0,
                 Items.PLAYER_HEAD,
                 btn -> client.setScreen(new ProfessionsScreen(ModUtils.getFortressClient())),
@@ -40,7 +40,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
             )
         );
         this.addElement(
-                new FortressItemButtonWidget(
+                new ItemButtonWidget(
                         35+20, 0,
                         Items.CHEST,
                         btn -> client.setScreen(new CreativeInventoryScreen(client.player)),
@@ -48,7 +48,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
                 )
         );
         this.addElement(
-            new FortressItemButtonWidget(
+            new ItemButtonWidget(
                     35+40, 0,
                     Items.CRAFTING_TABLE,
                     btn -> {
@@ -61,7 +61,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
             )
         );
         this.addElement(
-            new FortressItemButtonWidget(
+            new ItemButtonWidget(
                     35+60, 0,
                     Items.FURNACE,
                     btn -> {

@@ -5,12 +5,12 @@ import net.minecraft.text.LiteralText;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.tooltip.BasicTooltipSupplier;
 
-public class FortressTextButtonWidget extends ButtonWidget implements IHudButton {
+public class TextButtonWidget extends ButtonWidget implements IHudButton {
 
     private final int anchorX;
     private final int anchorY;
 
-    public FortressTextButtonWidget(int anchorX, int anchorY, int width, int height, String message, PressAction onPress, String tooltipText) {
+    public TextButtonWidget(int anchorX, int anchorY, int width, int height, String message, PressAction onPress, String tooltipText) {
         super(0, 0, width, height, new LiteralText(message), onPress, new BasicTooltipSupplier(tooltipText));
         this.anchorX = anchorX;
         this.anchorY = anchorY;

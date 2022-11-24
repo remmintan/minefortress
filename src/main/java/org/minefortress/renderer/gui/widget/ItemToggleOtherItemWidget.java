@@ -12,7 +12,7 @@ public class ItemToggleOtherItemWidget extends ItemToggleWidget {
 
     private final ItemStack otherState;
 
-    public ItemToggleOtherItemWidget(int anchorX, int anchorY, Item item, PressAction clickAction, Function<FortressItemButtonWidget, Optional<String>> optTooltip,
+    public ItemToggleOtherItemWidget(int anchorX, int anchorY, Item item, PressAction clickAction, Function<ItemButtonWidget, Optional<String>> optTooltip,
                                      Supplier<Boolean> toggledSupplier, Supplier<Boolean> shouldRenderSupplier, Item otherItem) {
         super(anchorX, anchorY, item, clickAction, optTooltip, toggledSupplier, shouldRenderSupplier);
         this.otherState = new ItemStack(otherItem);

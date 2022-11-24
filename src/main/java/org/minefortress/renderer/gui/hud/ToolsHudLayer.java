@@ -18,17 +18,17 @@ import java.util.Optional;
 
 public class ToolsHudLayer extends AbstractHudLayer {
 
-    private final FortressItemButtonWidget selection;
+    private final ItemButtonWidget selection;
 
     protected ToolsHudLayer(MinecraftClient client) {
         super(client);
         this.setBasepoint(-25, 5, PositionX.RIGHT, PositionY.TOP);
-        selection = new FortressItemButtonWidget(
+        selection = new ItemButtonWidget(
                 0,
                 0,
                 Items.DIAMOND_PICKAXE,
                 btn -> {
-                    final FortressItemButtonWidget fortressBtn = (FortressItemButtonWidget) btn;
+                    final ItemButtonWidget fortressBtn = (ItemButtonWidget) btn;
                     fortressBtn.checked = !fortressBtn.checked;
                 },
                 (button) -> button.checked ? Optional.empty() : Optional.of("Selection Type")
@@ -111,7 +111,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
         );
 
         this.addElement(
-            new FortressItemButtonWidget(
+            new ItemButtonWidget(
                 0,
                 125,
                 Items.RED_BED,
@@ -141,7 +141,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
         );
 
         this.addElement(
-            new FortressTextButtonWidget(
+            new TextButtonWidget(
                 0, 175, 20, 20,"?",
                 btn -> {
                     final BookScreen questionsScreen = new BookScreen(new FortressBookContents(FortressBookContents.HELP_BOOK));
@@ -161,7 +161,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
         var i = 0;
         for(final SelectionType type : values) {
             this.addElement(
-                    new FortressDynamicVisibilityButtonWidget(
+                    new HideableButtonWidget(
                             -35,
                             25 * i++,
                             20,
