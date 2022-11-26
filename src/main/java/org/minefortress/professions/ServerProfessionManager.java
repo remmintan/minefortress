@@ -6,10 +6,10 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;
-import org.minefortress.network.s2c.ClientboundProfessionsInitPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;
+import org.minefortress.network.s2c.ClientboundProfessionsInitPacket;
 
 import java.util.List;
 import java.util.Map;
