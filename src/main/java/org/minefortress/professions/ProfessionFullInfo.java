@@ -6,10 +6,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.registry.Registry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +21,6 @@ public record ProfessionFullInfo(
         Requirements requirements
 ) {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionFullInfo.class);
 
     public void write(PacketByteBuf packet) {
         packet.writeString(key);
