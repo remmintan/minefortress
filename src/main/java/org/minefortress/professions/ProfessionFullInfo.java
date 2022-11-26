@@ -18,6 +18,7 @@ public record ProfessionFullInfo(
         String description,
         String unlockMessage,
         String unlockMoreMessage,
+        boolean cantRemove,
         Requirements requirements
 ) {
 
@@ -29,6 +30,7 @@ public record ProfessionFullInfo(
         packet.writeString(description);
         packet.writeString(unlockMessage);
         packet.writeString(unlockMoreMessage);
+        packet.writeBoolean(cantRemove);
         if(requirements != null) {
             packet.writeString(requirements.building());
             final var blockRequirement = requirements.block();
@@ -58,6 +60,7 @@ public record ProfessionFullInfo(
         final var description = packet.readString();
         final var unlockMessage = packet.readString();
         final var unlockMoreMessage = packet.readString();
+        final var cantRemove = packet.readBoolean();
         final var building = packet.readString();
         final var block = Registry.BLOCK.get(packet.readIdentifier());
         final var inBlueprint = packet.readBoolean();
@@ -68,7 +71,7 @@ public record ProfessionFullInfo(
                 .toList();
 
         final var requirements = new Requirements(building, new BlockRequirement(block, inBlueprint), items);
-        return new ProfessionFullInfo(key, title, icon, description, unlockMessage, unlockMoreMessage, requirements);
+        return new ProfessionFullInfo(key, title, icon, description, unlockMessage, unlockMoreMessage, cantRemove, requirements);
     }
 
     record BlockRequirement(Block block, boolean inBlueprint) {

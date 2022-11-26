@@ -1,11 +1,14 @@
 package org.minefortress.professions;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.LiteralText;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.network.c2s.ServerboundChangeProfessionStatePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class ClientProfessionManager extends ProfessionManager {
@@ -35,6 +38,14 @@ public class ClientProfessionManager extends ProfessionManager {
     @Override
     public void decreaseAmount(String professionId) {
         if("colonist".equals(professionId)) return;
+        final var profession = this.getProfession(professionId);
+        final var cantRemove = profession.isCantRemove();
+        if(cantRemove){
+            final var message = new LiteralText("Can't remove pawn from profession: " + profession.getTitle());
+            Optional.ofNullable(MinecraftClient.getInstance().player)
+                    .ifPresent(it -> it.sendMessage(message, true));
+            return;
+        }
         final ServerboundChangeProfessionStatePacket.AmountChange change =
                 ServerboundChangeProfessionStatePacket.AmountChange.REMOVE;
         final ServerboundChangeProfessionStatePacket packet =

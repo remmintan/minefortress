@@ -270,7 +270,8 @@
           "count": 1
         }
       ]
-    }
+    },
+    "cantRemove": true
   },
   {
     "key": "warrior2",
@@ -303,7 +304,8 @@
           "count": 1
         }
       ]
-    }
+    },
+    "cantRemove": true
   },
   {
     "key": "archer1",
@@ -324,7 +326,8 @@
           "count": 32
         }
       ]
-    }
+    },
+    "cantRemove": true
   },
   {
     "key": "archer2",
@@ -335,7 +338,8 @@
     "unlockMoreMessage": "",
     "requirements": {
       "building": "_"
-    }
+    },
+    "cantRemove": true
   },
   {
     "key": "knight1",

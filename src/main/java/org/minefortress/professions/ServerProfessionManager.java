@@ -45,7 +45,7 @@ public class ServerProfessionManager extends ProfessionManager{
     @Override
     public void decreaseAmount(String professionId) {
         final Profession profession = super.getProfession(professionId);
-        if(profession == null) return;
+        if(profession == null || profession.isCantRemove()) return;
         if(profession.getAmount() <= 0) return;
 
         profession.setAmount(profession.getAmount() - 1);
@@ -76,7 +76,7 @@ public class ServerProfessionManager extends ProfessionManager{
         }
 
         tickRemoveFromProfession();
-        if(player != null && needsUpdate) {
+        if(needsUpdate) {
             ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(getProfessions());
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             needsUpdate = false;
@@ -98,7 +98,7 @@ public class ServerProfessionManager extends ProfessionManager{
         }
     }
 
-    public void scheduleSync() {
+    private void scheduleSync() {
         needsUpdate = true;
     }
 

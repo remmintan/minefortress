@@ -68,6 +68,7 @@ public final class ProfessionsReader {
         String description = null;
         String unlockMessage = null;
         String unlockMoreMessage = null;
+        boolean cantRemove = false;
         ProfessionFullInfo.Requirements requirements = null;
 
         while (jsonReader.hasNext()) {
@@ -79,12 +80,13 @@ public final class ProfessionsReader {
                 case "description" -> description = jsonReader.nextString();
                 case "unlockMessage" -> unlockMessage = jsonReader.nextString();
                 case "unlockMoreMessage" -> unlockMoreMessage = jsonReader.nextString();
+                case "cantRemove" -> cantRemove = jsonReader.nextBoolean();
                 case "requirements" -> requirements = readRequirements(jsonReader);
             }
         }
         jsonReader.endObject();
 
-        return new ProfessionFullInfo(key, title, icon, description, unlockMessage, unlockMoreMessage, requirements);
+        return new ProfessionFullInfo(key, title, icon, description,  unlockMessage, unlockMoreMessage, cantRemove, requirements);
     }
 
     private Item decodeIcon(JsonReader reader) throws IOException {

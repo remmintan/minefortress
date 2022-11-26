@@ -5,7 +5,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -31,6 +30,7 @@ public class Profession {
     private final String buildingRequirement;
     private final Block blockRequirement;
     private final List<ItemInfo> itemsRequirement;
+    private final boolean cantRemove;
     private final boolean blueprint;
 
     private Profession parent;
@@ -39,6 +39,7 @@ public class Profession {
     public Profession(ProfessionFullInfo fullInfo) {
         this.title = fullInfo.title();
         this.icon = new ItemStack(fullInfo.icon());
+        this.cantRemove = fullInfo.cantRemove();
 
         final var requirements = fullInfo.requirements();
 
@@ -75,6 +76,10 @@ public class Profession {
             this.unlockMessage = null;
             this.unlockMoreMessage = null;
         }
+    }
+
+    public boolean isCantRemove() {
+        return cantRemove;
     }
 
     public String getTitle() {
