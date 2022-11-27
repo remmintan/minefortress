@@ -43,6 +43,7 @@ import org.minefortress.entity.ai.goal.WanderAroundTheFortressGoal;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.professions.ServerProfessionManager;
+import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 public final class Colonist extends NamedPawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
@@ -184,7 +185,7 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
         if(DEFAULT_PROFESSION_ID.equals(professionId)) {
             getFortressServerManager().map(FortressServerManager::getServerProfessionManager)
                     .flatMap(ServerProfessionManager::getProfessionsWithAvailablePlaces)
-                    .ifPresent(p -> this.dataTracker.set(PROFESSION_ID, p));
+                    .ifPresent(this::setProfession);
         }
     }
 
@@ -294,8 +295,6 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-
-
         final String professionId = this.getProfessionId();
         if(!DEFAULT_PROFESSION_ID.equals(professionId)) {
             nbt.putString("professionId", professionId);
@@ -333,11 +332,20 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
     }
 
     public void setProfession(String professionId) {
-        this.dataTracker.set(PROFESSION_ID, professionId);
+        getFortressServerManager().ifPresent(it -> {
+            final var spm = it.getServerProfessionManager();
+            final var type = spm.getEntityTypeForProfession(professionId);
+            if(type == FortressEntities.COLONIST_ENTITY_TYPE) {
+                this.dataTracker.set(PROFESSION_ID, professionId);
+            } else if (type == FortressEntities.WARRIOR_PAWN_ENTITY_TYPE){
+                it.replaceColonistWithWarrior(this, professionId);
+            }
+        });
+
     }
 
     public void resetProfession() {
-        this.dataTracker.set(PROFESSION_ID, DEFAULT_PROFESSION_ID);
+        this.setProfession(DEFAULT_PROFESSION_ID);
     }
 
     public TaskControl getTaskControl() {

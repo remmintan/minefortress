@@ -8,15 +8,17 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressWorldRenderer;
-import org.minefortress.mixins.interfaces.FortressDimensionTypeMixin;
-import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.BlockUtils;
+import org.minefortress.utils.BuildingHelper;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class SelectionManager implements FortressWorldRenderer {
 
@@ -180,13 +182,7 @@ public class SelectionManager implements FortressWorldRenderer {
 
     private boolean isNotOverworld() {
         final ClientWorld level = client.world;
-        if (level == null) {
-            return true;
-        } else {
-            final DimensionType dimension = level.getDimension();
-            return dimension.equals(FortressDimensionTypeMixin.getNether()) ||
-                    dimension.equals(FortressDimensionTypeMixin.getEnd());
-        }
+        return level == null || level.getRegistryKey() != World.OVERWORLD;
     }
 
     public boolean isSelecting() {

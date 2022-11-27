@@ -4,6 +4,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -47,8 +48,18 @@ public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
     }
 
     @Override
-    public String getClothingId() {
+    public String getProfessionId() {
         return "warrior1";
+    }
+
+    @Override
+    public String getClothingId() {
+        return getProfessionId();
+    }
+
+    @Override
+    public void resetProfession() {
+        this.damage(DamageSource.OUT_OF_WORLD, 40f);
     }
 
     @Override

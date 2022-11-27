@@ -159,5 +159,5 @@ public class Profession {
             amount = 0;
     }
 
-    public static record BlockRequirement(Block block, boolean blueprint) {}
+    public record BlockRequirement(Block block, boolean blueprint) {}
 }

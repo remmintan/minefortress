@@ -1,9 +1,12 @@
 package org.minefortress.professions;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.interfaces.IWorkerPawn;
+import org.minefortress.entity.BasePawnEntity;
+import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -17,11 +20,11 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+@MethodsReturnNonnullByDefault
 public class ServerProfessionManager extends ProfessionManager{
-
+    private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
     private boolean initialized = false;
     private boolean needsUpdate = false;
-
     public ServerProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
         super(fortressManagerSupplier);
     }
@@ -60,6 +63,7 @@ public class ServerProfessionManager extends ProfessionManager{
             final var professionFullInfos = professionsReader.readProfessions();
             final var treeJsonString = professionsReader.readTreeJson();
             professionFullInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
+            profToEntityMapper.read(player.server);
             final var packet = new ClientboundProfessionsInitPacket(professionFullInfos, treeJsonString);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_INIT, packet);
             initialized = true;
@@ -83,18 +87,22 @@ public class ServerProfessionManager extends ProfessionManager{
         }
     }
 
+    public EntityType<? extends BasePawnEntity> getEntityTypeForProfession(String professionId) {
+        return profToEntityMapper.getEntityTypeForProfession(professionId);
+    }
+
     private void tickRemoveFromProfession() {
         for(Map.Entry<String, Profession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
             final Profession profession = entry.getValue();
-            final List<IWorkerPawn> colonistsWithProfession = this.getColonistsWithProfession(professionId);
-            final int redundantProfCount = colonistsWithProfession.size() - profession.getAmount();
+            final List<IProfessional> pawnsWithProf = this.getPawnsWithProfession(professionId);
+            final int redundantProfCount = pawnsWithProf.size() - profession.getAmount();
             if(redundantProfCount <= 0) continue;
 
-            final List<IWorkerPawn> colonistsToRemove = colonistsWithProfession.stream()
+            pawnsWithProf
+                    .stream()
                     .limit(redundantProfCount)
-                    .collect(Collectors.toList());
-            colonistsToRemove.forEach(IWorkerPawn::resetProfession);
+                    .forEach(IProfessional::resetProfession);
         }
     }
 
@@ -120,7 +128,7 @@ public class ServerProfessionManager extends ProfessionManager{
             final String professionId = entry.getKey();
             final Profession profession = entry.getValue();
             if(profession.getAmount() > 0) {
-                final long colonistsWithProfession = countColonistsWithProfession(professionId);
+                final long colonistsWithProfession = countPawnsWithProfession(professionId);
                 if(colonistsWithProfession < profession.getAmount()) {
                     return Optional.of(professionId);
                 }
@@ -129,19 +137,19 @@ public class ServerProfessionManager extends ProfessionManager{
         return Optional.empty();
     }
 
-    private long countColonistsWithProfession(String professionId) {
-        final FortressServerManager fortressServerManager = (FortressServerManager) super.fortressManagerSupplier.get();
+    private long countPawnsWithProfession(String professionId) {
+        final var fortressServerManager = (FortressServerManager) super.fortressManagerSupplier.get();
         return fortressServerManager
-                .getWorkers()
+                .getProfessionals()
                 .stream()
                 .filter(colonist -> colonist.getProfessionId().equals(professionId))
                 .count();
     }
 
-    private List<IWorkerPawn> getColonistsWithProfession(String professionId) {
+    private List<IProfessional> getPawnsWithProfession(String professionId) {
         final FortressServerManager fortressServerManager = (FortressServerManager) super.fortressManagerSupplier.get();
         return fortressServerManager
-                .getWorkers()
+                .getProfessionals()
                 .stream()
                 .filter(colonist -> colonist.getProfessionId().equals(professionId))
                 .collect(Collectors.toList());
