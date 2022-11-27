@@ -159,7 +159,8 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void replaceColonistWithWarrior(Colonist colonist, String warriorId) {
-        final var pos = colonist.getBlockPos();
+//        final var pos = colonist.getBlockPos();
+        final var pos = getRandomSpawnPosition();
         final var world = (ServerWorld) colonist.getEntityWorld();
         final var masterId = colonist.getMasterId().orElseThrow(() -> new IllegalStateException("Colonist has no master!"));
         final var name = colonist.getName();
@@ -279,14 +280,12 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public Optional<Colonist> spawnPawnNearCampfire(UUID masterPlayerId) {
         final var randomSpawnPosition = getRandomSpawnPosition();
-        if(randomSpawnPosition.getX() != fortressCenter.getX() && randomSpawnPosition.getZ() != fortressCenter.getZ()) {
-            final var tag = getColonistInfoTag(masterPlayerId);
-            final var colonistType = FortressEntities.COLONIST_ENTITY_TYPE;
-            final var world = getWorld();
-            final var spawnedPawn = colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
-            return Optional.ofNullable(spawnedPawn);
-        }
-        return Optional.empty();
+
+        final var tag = getColonistInfoTag(masterPlayerId);
+        final var colonistType = FortressEntities.COLONIST_ENTITY_TYPE;
+        final var world = getWorld();
+        final var spawnedPawn = colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+        return Optional.ofNullable(spawnedPawn);
     }
 
     public void setupCenter(@NotNull BlockPos fortressCenter, World world, ServerPlayerEntity player) {
@@ -317,9 +316,12 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     private BlockPos getRandomSpawnPosition() {
-        final var spawnX = fortressCenter.getX() + getWorld().random.nextInt(10) - 5;
-        final var spawnZ = fortressCenter.getZ() + getWorld().random.nextInt(10) - 5;
-        final var spawnY = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, spawnX, spawnZ);
+        int spawnX, spawnZ, spawnY;
+        do {
+            spawnX = fortressCenter.getX() + getWorld().random.nextInt(10) - 5;
+            spawnZ = fortressCenter.getZ() + getWorld().random.nextInt(10) - 5;
+            spawnY = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, spawnX, spawnZ);
+        } while (spawnX == fortressCenter.getX() && spawnZ == fortressCenter.getZ());
 
         return new BlockPos(spawnX, spawnY, spawnZ);
     }
