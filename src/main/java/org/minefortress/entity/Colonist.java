@@ -15,6 +15,7 @@ import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
@@ -36,15 +37,14 @@ import org.minefortress.entity.ai.controls.DigControl;
 import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.controls.TaskControl;
-import org.minefortress.entity.ai.goal.ColonistExecuteTaskGoal;
-import org.minefortress.entity.ai.goal.ReturnToFireGoal;
-import org.minefortress.entity.ai.goal.SleepOnTheBedGoal;
-import org.minefortress.entity.ai.goal.WanderAroundTheFortressGoal;
+import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
+
+import java.util.Optional;
 
 public final class Colonist extends NamedPawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
 
@@ -128,7 +128,7 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
         }
 
         if (this.hasStatusEffect(StatusEffects.MINING_FATIGUE)) {
-            float f1 = switch (this.getStatusEffect(StatusEffects.MINING_FATIGUE).getAmplifier()) {
+            float f1 = switch (Optional.ofNullable(this.getStatusEffect(StatusEffects.MINING_FATIGUE)).map(StatusEffectInstance::getAmplifier).orElse(3)) {
                 case 0 -> 0.3F;
                 case 1 -> 0.09F;
                 case 2 -> 0.0027F;
@@ -153,9 +153,8 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
     protected void initGoals() {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(3, new FleeEntityGoal<>(this, HostileEntity.class, 3, 1.0D, 1.2D));
-//        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
+        this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
-//        this.goalSelector.add(7, new ColonistEatGoal(this));
         this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
         this.goalSelector.add(8, new SleepOnTheBedGoal(this));
         this.goalSelector.add(9, new ReturnToFireGoal(this));

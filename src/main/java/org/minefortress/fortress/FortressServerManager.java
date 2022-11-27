@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.WarriorPawn;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.entity.interfaces.IWorkerPawn;
@@ -166,7 +167,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var name = colonist.getName();
 
         final var infoTag = getColonistInfoTag(masterId);
-        infoTag.putString("warriorId", warriorId);
+        infoTag.putString(WarriorPawn.WARRIOR_PROFESSION_NBT_TAG, warriorId);
 
         final var newWarrior = FortressEntities.WARRIOR_PAWN_ENTITY_TYPE.spawn(world, infoTag, name, null, pos, SpawnReason.EVENT, true, false);
         colonist.damage(DamageSource.OUT_OF_WORLD, Float.MAX_VALUE);

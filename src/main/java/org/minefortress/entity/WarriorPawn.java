@@ -1,13 +1,21 @@
 package org.minefortress.entity;
 
+import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.controls.BaritoneMoveControl;
@@ -22,6 +30,10 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
 
+    private static final TrackedData<String> WARRIOR_PROFESSION_KEY = DataTracker.registerData(WarriorPawn.class, TrackedDataHandlerRegistry.STRING);
+
+    public static final String WARRIOR_PROFESSION_NBT_TAG = "professionId";
+
     private final BaritoneMoveControl moveControl;
 
     private BlockPos moveTarget;
@@ -30,6 +42,21 @@ public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
     public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
         moveControl = world instanceof ServerWorld ? new BaritoneMoveControl(this) : null;
+    }
+
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        this.dataTracker.startTracking(WARRIOR_PROFESSION_KEY, "warrior1");
+    }
+
+    @Override
+    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
+        if(entityNbt != null) {
+            final var warriorProf = entityNbt.getString(WARRIOR_PROFESSION_NBT_TAG);
+            this.dataTracker.set(WARRIOR_PROFESSION_KEY, warriorProf);
+        }
+        return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
 
     @Override
@@ -49,7 +76,7 @@ public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
 
     @Override
     public String getProfessionId() {
-        return "warrior1";
+        return dataTracker.get(WARRIOR_PROFESSION_KEY);
     }
 
     @Override
@@ -122,4 +149,15 @@ public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
         this.attackTarget = null;
     }
 
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        nbt.putString(WARRIOR_PROFESSION_NBT_TAG, getProfessionId());
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        this.dataTracker.set(WARRIOR_PROFESSION_KEY, nbt.getString(WARRIOR_PROFESSION_NBT_TAG));
+    }
 }
