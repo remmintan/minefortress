@@ -4,7 +4,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.HungerManager;
 
 public interface IFortressHungerManager {
-    float ACTIVE_EXHAUSTION = 0.005f;
+    float ACTIVE_EXHAUSTION = 0.1f;
     float PASSIVE_EXHAUSTION = 0.0035f;
     float IDLE_EXHAUSTION = 0.002f;
 

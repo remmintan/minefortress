@@ -1,12 +1,17 @@
 package org.minefortress.entity.interfaces;
 
 import net.minecraft.entity.player.HungerManager;
+import org.minefortress.entity.ai.controls.EatControl;
+
+import java.util.Optional;
 
 public interface IHungerAwareEntity extends IItemUsingEntity {
 
     float getHealth();
     HungerManager getHungerManager();
     int getCurrentFoodLevel();
+
+    default Optional<EatControl> getEatControl() {return Optional.empty();}
 
     default void addHunger(float hunger) {
         getHungerManager().addExhaustion(hunger);

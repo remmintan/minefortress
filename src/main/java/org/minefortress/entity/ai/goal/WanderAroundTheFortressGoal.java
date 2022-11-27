@@ -2,6 +2,7 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.controls.EatControl;
 import org.minefortress.fortress.FortressServerManager;
 
 import static org.minefortress.entity.colonist.FortressHungerManager.IDLE_EXHAUSTION;
@@ -16,6 +17,7 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
+        if(colonist.getEatControl().map(EatControl::isEating).orElse(false)) return false;
         if(!isDay() || colonist.getTaskControl().hasTask()) return false;
         return colonist.getFortressServerManager()
                 .flatMap(FortressServerManager::randomSurfacePos)

@@ -33,10 +33,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.entity.ai.controls.DigControl;
-import org.minefortress.entity.ai.controls.PlaceControl;
-import org.minefortress.entity.ai.controls.ScaffoldsControl;
-import org.minefortress.entity.ai.controls.TaskControl;
+import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
@@ -151,6 +148,7 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
 
     @Override
     protected void initGoals() {
+        super.initGoals();
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(3, new FleeEntityGoal<>(this, HostileEntity.class, 3, 1.0D, 1.2D));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
@@ -202,6 +200,7 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
     }
 
     private void tickAllControls() {
+        if(getEatControl().map(EatControl::isEating).orElse(false)) return;
         if(getDigControl() != null) getDigControl().tick();
         if(getPlaceControl() != null) getPlaceControl().tick();
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();

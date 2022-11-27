@@ -61,6 +61,7 @@ public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
 
     @Override
     protected void initGoals() {
+        super.initGoals();
         this.goalSelector.add(1, new MeleeAttackGoal(this));
         this.goalSelector.add(2, new MoveToBlockGoal(this));
         this.goalSelector.add(2, new FollowLivingEntityGoal(this));

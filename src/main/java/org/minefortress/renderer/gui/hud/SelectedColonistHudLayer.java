@@ -31,7 +31,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
             final int colonistWinY = screenHeight - 85;
             int width = 120;
             final int height = 85;
-            DrawableHelper.fillGradient(matrices, colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, 100);
+            DrawableHelper.fillGradient(matrices, colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, -1000);
 
             final String name = Optional.ofNullable(selectedColonist.getCustomName()).map(Text::asString).orElse("");
             final String healthString = String.format("%.0f/%.0f", selectedColonist.getHealth(), selectedColonist.getMaxHealth());
@@ -49,11 +49,11 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
 
             int heartIconX = colonistWinX + 5;
             int heartIconY = colonistWinY + textRenderer.fontHeight + 10;
-            renderIcon(matrices, heartIconX, heartIconY, 8, 8, 52, 0);
+            renderIcon(matrices, heartIconX, heartIconY, 0);
             textRenderer.draw(matrices, healthString, heartIconX + 10, heartIconY + 2, 0xFFFFFF);
 
             int hungerIconX = colonistWinX + width/2 + 5;
-            renderIcon(matrices, hungerIconX, heartIconY, 8, 8, 52, 28);
+            renderIcon(matrices, hungerIconX, heartIconY, 28);
             textRenderer.draw(matrices, hungerString, hungerIconX + 10, heartIconY + 2, 0xFFFFFF);
 
             textRenderer.draw(matrices, "Profession:", colonistWinX + 5, heartIconY + textRenderer.fontHeight + 5, 0xFFFFFF);
@@ -64,10 +64,10 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
         }
     }
 
-    private void renderIcon(MatrixStack matrices, int iconX, int iconY, int iconWidth, int iconHeight, int heartIconU, int heartIconV) {
+    private void renderIcon(MatrixStack matrices, int iconX, int iconY, int heartIconV) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShaderTexture(0, GUI_ICONS_TEXTURE);
-        DrawableHelper.drawTexture(matrices, iconX, iconY, 110, heartIconU, heartIconV, iconWidth, iconHeight, 256, 256);
+        DrawableHelper.drawTexture(matrices, iconX, iconY, 110, 52, heartIconV, 8, 8, 256, 256);
     }
 
     @Override

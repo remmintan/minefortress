@@ -12,23 +12,26 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.minefortress.entity.ai.controls.EatControl;
+import org.minefortress.entity.ai.goal.EatGoal;
 import org.minefortress.entity.colonist.FakeHungerManager;
 import org.minefortress.entity.colonist.FortressHungerManager;
 import org.minefortress.entity.colonist.IFortressHungerManager;
 import org.minefortress.entity.interfaces.IFortressAwareEntity;
 import org.minefortress.entity.interfaces.IHungerAwareEntity;
 
+import java.util.Optional;
+
 public abstract class HungryEntity extends BaritonableEntity implements IHungerAwareEntity {
 
     private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(HungryEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final String HUNGER_MANAGER_NBT_KEY = "hunger";
 
-    private final IFortressHungerManager fortHungMan;
+    private final IFortressHungerManager hungerManager;
     private final EatControl eatControl;
 
     protected HungryEntity(EntityType<? extends PathAwareEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world);
-        fortHungMan = enableHunger ? new FortressHungerManager() : new FakeHungerManager();
+        hungerManager = enableHunger ? new FortressHungerManager() : new FakeHungerManager();
 
         if(world instanceof ServerWorld) {
             eatControl = new EatControl(this);
@@ -44,12 +47,10 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
     }
 
     @Override
-    public void tick() {
-        super.tick();
-        fortHungMan.update(this);
-        if(this.getCurrentFoodLevel() != getHungerManager().getFoodLevel()) {
-            sendHungerMessage();
-            this.updateCurrentFoodLevel();
+    protected void initGoals() {
+        super.initGoals();
+        if(!(hungerManager instanceof FakeHungerManager)) {
+            this.goalSelector.add(7, new EatGoal(this));
         }
     }
 
@@ -57,11 +58,16 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
     protected void mobTick() {
         super.mobTick();
         if(eatControl != null) eatControl.tick();
+        hungerManager.update(this);
+        if(this.getCurrentFoodLevel() != getHungerManager().getFoodLevel()) {
+            sendHungerMessage();
+            this.updateCurrentFoodLevel();
+        }
     }
 
     @Override
     public final HungerManager getHungerManager() {
-        return fortHungMan.toHungerManager();
+        return hungerManager.toHungerManager();
     }
 
     @Override
@@ -105,7 +111,12 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
         }
     }
 
+    @Override
+    public Optional<EatControl> getEatControl() {
+        return Optional.ofNullable(eatControl);
+    }
+
     private void updateCurrentFoodLevel() {
-        this.dataTracker.set(CURRENT_FOOD_LEVEL, this.fortHungMan.toHungerManager().getFoodLevel());
+        this.dataTracker.set(CURRENT_FOOD_LEVEL, this.hungerManager.toHungerManager().getFoodLevel());
     }
 }
