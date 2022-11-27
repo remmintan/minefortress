@@ -193,7 +193,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             for(LivingEntity pawn : deadPawns) {
                 if(pawn instanceof IProfessional professional) {
                     final String professionId = professional.getProfessionId();
-                    serverProfessionManager.decreaseAmount(professionId);
+                    serverProfessionManager.decreaseAmount(professionId, true);
                 }
                 pawns.remove(pawn);
             }

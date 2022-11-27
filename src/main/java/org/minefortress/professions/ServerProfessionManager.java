@@ -47,9 +47,14 @@ public class ServerProfessionManager extends ProfessionManager{
 
     @Override
     public void decreaseAmount(String professionId) {
+        decreaseAmount(professionId, false);
+    }
+
+    public void decreaseAmount(String professionId, boolean force) {
         final Profession profession = super.getProfession(professionId);
-        if(profession == null || profession.isCantRemove()) return;
+        if(profession == null) return;
         if(profession.getAmount() <= 0) return;
+        if(profession.isCantRemove() && !force) return;
 
         profession.setAmount(profession.getAmount() - 1);
         scheduleSync();

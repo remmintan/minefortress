@@ -41,7 +41,8 @@ public class ClientProfessionManager extends ProfessionManager {
         final var profession = this.getProfession(professionId);
         final var cantRemove = profession.isCantRemove();
         if(cantRemove){
-            final var message = new LiteralText("Can't remove pawn from profession: " + profession.getTitle());
+            final var message = new LiteralText("§cCan't remove pawn from profession: " + profession.getTitle());
+            MinecraftClient.getInstance().setScreen(null);
             Optional.ofNullable(MinecraftClient.getInstance().player)
                     .ifPresent(it -> it.sendMessage(message, true));
             return;
