@@ -27,7 +27,6 @@
     "interaction.FortressKeyboardInputMixin",
     "interaction.FortressMouseMixin",
     "interaction.FortressTutorialManagerMixin",
-    "interfaces.FortressDimensionTypeMixin",
     "network.FortressClientPlayNetworkHandlerMixin",
     "network.FortressServerPlayNetworkHandlerMixin",
     "renderer.FortressCreateWorldScreenMixin",
