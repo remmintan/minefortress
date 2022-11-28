@@ -116,4 +116,9 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
     public boolean isHovered() {
         return super.isHovered();
     }
+
+    @Override
+    public void setPos(int x, int y) {
+        super.setPos(x, y);
+    }
 }

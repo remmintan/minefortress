@@ -10,6 +10,7 @@ import net.minecraft.entity.player.HungerManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import org.minefortress.entity.ai.controls.EatControl;
 import org.minefortress.entity.ai.goal.EatGoal;
@@ -66,6 +67,11 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
     }
 
     @Override
+    public float getHealth() {
+        return super.getHealth();
+    }
+
+    @Override
     public final HungerManager getHungerManager() {
         return hungerManager.toHungerManager();
     }
@@ -118,5 +124,35 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
 
     private void updateCurrentFoodLevel() {
         this.dataTracker.set(CURRENT_FOOD_LEVEL, this.hungerManager.toHungerManager().getFoodLevel());
+    }
+
+    @Override
+    public ItemStack getActiveItem() {
+        return super.getActiveItem();
+    }
+
+    @Override
+    public int getItemUseTimeLeft() {
+        return super.getItemUseTimeLeft();
+    }
+
+    @Override
+    public boolean isUsingItem() {
+        return super.isUsingItem();
+    }
+
+    @Override
+    public void setCurrentHand(Hand hand) {
+        super.setCurrentHand(hand);
+    }
+
+    @Override
+    public ItemStack getStackInHand(Hand hand) {
+        return super.getStackInHand(hand);
+    }
+
+    @Override
+    public void setStackInHand(Hand hand, ItemStack stack) {
+        super.setStackInHand(hand, stack);
     }
 }

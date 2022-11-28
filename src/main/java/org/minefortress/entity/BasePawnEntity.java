@@ -10,6 +10,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
@@ -134,4 +135,9 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         touchingSlimes.forEach(s -> ((FortressSlimeEntity)s).touchPawn(this));
     }
 
+    @Nullable
+    @Override
+    public MinecraftServer getServer() {
+        return super.getServer();
+    }
 }

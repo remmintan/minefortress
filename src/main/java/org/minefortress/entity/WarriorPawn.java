@@ -14,6 +14,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
@@ -160,5 +161,21 @@ public final class WarriorPawn extends NamedPawnEntity implements IWarriorPawn {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(WARRIOR_PROFESSION_KEY, nbt.getString(WARRIOR_PROFESSION_NBT_TAG));
+    }
+
+    @Override
+    public Vec3d getPos() {
+        return super.getPos();
+    }
+
+    @Override
+    public int getId() {
+        return super.getId();
+    }
+
+    @Nullable
+    @Override
+    public LivingEntity getTarget() {
+        return super.getTarget();
     }
 }
