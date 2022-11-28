@@ -8,7 +8,7 @@ import net.minecraft.item.Item;
 
 import java.util.function.Supplier;
 
-public class ModeButtonWidget extends ItemButtonWidget{
+public class ModeButtonWidget extends ItemButtonWidget {
 
     private final Supplier<Boolean> isActiveSupplier;
 

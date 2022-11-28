@@ -111,4 +111,9 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
     public int getAnchorY() {
         return anchorY;
     }
+
+    @Override
+    public boolean isHovered() {
+        return super.isHovered();
+    }
 }
