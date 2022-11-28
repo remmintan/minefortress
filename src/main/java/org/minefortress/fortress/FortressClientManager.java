@@ -229,7 +229,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
             return buildings.stream()
                     .filter(b -> b.getRequirementId().equals(requirementId))
-                    .mapToLong(EssentialBuildingInfo::getBedsCount)
+                    .mapToLong(it -> it.getBedsCount() * 10)
                     .sum() > minCount;
         }
         if(requirementId.equals("shooting_gallery"))
