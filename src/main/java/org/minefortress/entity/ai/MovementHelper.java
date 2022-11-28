@@ -64,6 +64,9 @@ public class MovementHelper {
             LOGGER.debug("{} the goal {} is already reached", getColonistName(), goal);
             return;
         }
+        if(colonist.isSleeping()) {
+            colonist.wakeUp();
+        }
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }
 

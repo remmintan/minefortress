@@ -34,7 +34,7 @@ public class BaritoneMoveControl {
     }
 
     public void moveTo(@NotNull BlockPos pos) {
-        this.reset();
+        this.reset(true);
         this.baritonableEntity.setMovementSpeed((float)this.baritonableEntity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
         this.moveTarget = pos;
         final var goal = new GoalNear(pos, (int) Math.floor(reachRange));
@@ -42,13 +42,20 @@ public class BaritoneMoveControl {
     }
 
     public void moveTo(@NotNull LivingEntity entity) {
-        this.reset();
+        this.reset(true);
         this.followTarget = entity;
         this.baritonableEntity.setMovementSpeed((float)this.baritonableEntity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
         baritone.getFollowProcess().follow(it -> it.equals(entity));
     }
 
     public void reset() {
+        reset(false);
+    }
+
+    private void reset(boolean startMoving) {
+        if(startMoving && baritonableEntity.isSleeping()) {
+            baritonableEntity.wakeUp();
+        }
         baritone.getFollowProcess().cancel();
         baritone.getPathingBehavior().cancelEverything();
         moveTarget = null;
