@@ -2,6 +2,7 @@ package org.minefortress.professions;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.Nullable;
@@ -23,10 +24,15 @@ import java.util.stream.Collectors;
 @MethodsReturnNonnullByDefault
 public class ServerProfessionManager extends ProfessionManager{
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
-    private boolean initialized = false;
+    private final MinecraftServer server;
+    private boolean professionsRead = false;
+    private boolean professionsSent = false;
+    private List<ProfessionFullInfo> professionsInfos;
+    private String professionsTree;
     private boolean needsUpdate = false;
-    public ServerProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
+    public ServerProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier, MinecraftServer server) {
         super(fortressManagerSupplier);
+        this.server = server;
     }
 
     @Override
@@ -62,16 +68,11 @@ public class ServerProfessionManager extends ProfessionManager{
 
     public void tick(@Nullable ServerPlayerEntity player) {
         if(player == null) return;
-        if(!initialized) {
-            getProfessions().clear();
-            final var professionsReader = new ProfessionsReader(player.server);
-            final var professionFullInfos = professionsReader.readProfessions();
-            final var treeJsonString = professionsReader.readTreeJson();
-            professionFullInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
-            profToEntityMapper.read(player.server);
-            final var packet = new ClientboundProfessionsInitPacket(professionFullInfos, treeJsonString);
+        if(!professionsSent) {
+            initProfessionsIfNeeded();
+            final var packet = new ClientboundProfessionsInitPacket(professionsInfos, professionsTree);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_INIT, packet);
-            initialized = true;
+            professionsSent = true;
         }
 
         for(Profession prof : getProfessions().values()) {
@@ -89,6 +90,18 @@ public class ServerProfessionManager extends ProfessionManager{
             ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(getProfessions());
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             needsUpdate = false;
+        }
+    }
+
+    private void initProfessionsIfNeeded() {
+        if(!professionsRead) {
+            getProfessions().clear();
+            final var professionsReader = new ProfessionsReader(server);
+            professionsInfos = professionsReader.readProfessions();
+            professionsTree = professionsReader.readTreeJson();
+            professionsInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
+            profToEntityMapper.read(server);
+            professionsRead = true;
         }
     }
 
@@ -119,7 +132,8 @@ public class ServerProfessionManager extends ProfessionManager{
         getProfessions().forEach((key, value) -> tag.put(key, value.toNbt()));
     }
 
-    public void readFromNbt(NbtCompound tag){
+    public void readFromNbt(NbtCompound tag) {
+        initProfessionsIfNeeded();
         for(String key : tag.getKeys()){
             final Profession profession = super.getProfession(key);
             if(profession == null) continue;

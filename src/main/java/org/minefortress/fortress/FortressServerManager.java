@@ -86,7 +86,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public FortressServerManager(MinecraftServer server) {
         this.server = server;
-        this.serverProfessionManager = new ServerProfessionManager(() -> this);
+        this.serverProfessionManager = new ServerProfessionManager(() -> this, server);
         this.serverResourceManager = new ServerResourceManagerImpl(server);
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             this.gamemode = FortressGamemode.SURVIVAL;
