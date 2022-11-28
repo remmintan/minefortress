@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.function.Predicate;
 
 public final class SelectTargetToAttackGoal extends TrackTargetGoal {
@@ -56,8 +55,7 @@ public final class SelectTargetToAttackGoal extends TrackTargetGoal {
     private void findClosestTarget() {
         final var searchBox = this.getSearchBox(this.getFollowRange());
         final var targetEntitiesNearYou = this.mob.world.getEntitiesByClass(this.targetClass, searchBox, ALWAYS_TRUE);
-        final var closestEntity = this.mob.world.getClosestEntity(targetEntitiesNearYou, this.targetPredicate, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
-        this.targetEntity = closestEntity;
+        this.targetEntity = this.mob.world.getClosestEntity(targetEntitiesNearYou, this.targetPredicate, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
     }
 
 }

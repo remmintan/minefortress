@@ -44,11 +44,8 @@ public class BaritoneMoveControl {
     public void moveTo(@NotNull LivingEntity entity) {
         this.reset();
         this.followTarget = entity;
+        this.baritonableEntity.setMovementSpeed((float)this.baritonableEntity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
         baritone.getFollowProcess().follow(it -> it.equals(entity));
-    }
-
-    public boolean tryingToReachTheGoal() {
-        return !baritone.getFollowProcess().following().isEmpty() || baritone.getCustomGoalProcess().isActive();
     }
 
     public void reset() {

@@ -11,13 +11,14 @@ final class AbstractBaritoneComponent {
     static void registerGlobalSettings() {
         final var globalSettings = BaritoneAPI.getGlobalSettings();
         globalSettings.allowParkour.set(true);
-        globalSettings.allowSprint.set(true);
+        globalSettings.allowSprint.set(false);
         globalSettings.allowSwimming.set(true);
         globalSettings.buildRepeatSneaky.set(true);
         globalSettings.allowPlace.set(true);
         globalSettings.allowBreak.set(false);
         globalSettings.allowParkourPlace.set(true);
         globalSettings.allowInventory.set(true);
+        globalSettings.followRadius.set(1);
     }
 
 }

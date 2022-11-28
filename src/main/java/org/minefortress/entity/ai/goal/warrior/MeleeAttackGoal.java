@@ -19,7 +19,7 @@ public class MeleeAttackGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        return isNearTarget();
+        return getTarget().map(LivingEntity::isAlive).orElse(false);
     }
 
     @Override
@@ -39,18 +39,8 @@ public class MeleeAttackGoal extends Goal {
     }
 
     @Override
-    public boolean shouldContinue() {
-        return isNearTarget();
-    }
-
-    @Override
     public boolean canStop() {
         return true;
-    }
-
-    private boolean isNearTarget() {
-        final var reachRange = pawn.getReachRange();
-        return getTarget().map(it -> it.squaredDistanceTo(pawn.getPos()) < reachRange * reachRange).orElse(false);
     }
 
     private Optional<LivingEntity> getTarget() {
