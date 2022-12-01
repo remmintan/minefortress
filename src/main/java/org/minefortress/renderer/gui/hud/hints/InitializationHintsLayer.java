@@ -10,7 +10,9 @@ public class InitializationHintsLayer extends AbstractHintsLayer {
     protected List<String> getHints() {
         return List.of(
                 "Choose where to place your Fortress",
-                "right click - set fortress center"
+                "right click - set fortress center",
+                "",
+                ""
         );
     }
 
