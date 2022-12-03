@@ -36,6 +36,7 @@
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
     "renderer.gui.FortressCreativeInventoryScreenMixin",
+    "renderer.gui.FortressHandledScreenMixin",
     "renderer.gui.FortressSimpleInventoryMixin",
     "world.FortressClientWorldMixin"
   ],
