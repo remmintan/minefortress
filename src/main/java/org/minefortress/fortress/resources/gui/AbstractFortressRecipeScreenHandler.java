@@ -32,7 +32,6 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     private final ServerResourceManager serverResourceManager;
 
     private int clientCurrentRow = 5;
-    private float lastScrollPosition = 0;
 
     protected final PlayerEntity player;
     protected final World world;
@@ -203,7 +202,6 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         }
 
         this.virtualInventory.setRowsOffset(rowOffset);
-        this.lastScrollPosition = position;
     }
 
     public VirtualInventory getVirtualInventory() {
