@@ -1,7 +1,6 @@
 package org.minefortress.mixins.entity;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -15,13 +14,8 @@ import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
-import org.minefortress.entity.Colonist;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundFollowColonistPacket;
 import org.minefortress.utils.FortressSpawnLocating;
-import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -72,19 +66,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Override
     public ServerBlueprintManager getServerBlueprintManager() {
         return serverBlueprintManager;
-    }
-
-    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
-    public void attack(Entity target, CallbackInfo ci) {
-        if(!ModUtils.isFortressGamemode(this)) return;
-
-        if(target instanceof Colonist colonist) {
-            final int id = colonist.getId();
-            final ClientboundFollowColonistPacket packet = new ClientboundFollowColonistPacket(id);
-            FortressServerNetworkHelper.send((ServerPlayerEntity) (Object)this, FortressChannelNames.FORTRESS_SELECT_COLONIST, packet);
-        }
-
-        ci.cancel();
     }
 
     @Inject(method = "copyFrom", at = @At("TAIL"))

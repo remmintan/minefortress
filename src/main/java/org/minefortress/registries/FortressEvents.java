@@ -3,10 +3,16 @@ package org.minefortress.registries;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.interfaces.FortressServer;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.minefortress.network.s2c.ClientboundFollowColonistPacket;
 import org.minefortress.utils.ModUtils;
 
 public class FortressEvents {
@@ -57,6 +63,19 @@ public class FortressEvents {
             if(server instanceof FortressServer fortressServer) {
                 fortressServer.getFortressModServerManager().tick(server.getPlayerManager());
             }
+        });
+
+        AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+            if(ModUtils.isFortressGamemode(player)) {
+                if (player instanceof ServerPlayerEntity serverPlayer && entity instanceof BasePawnEntity pawn) {
+                    final var id = pawn.getId();
+                    final var packet = new ClientboundFollowColonistPacket(id);
+                    FortressServerNetworkHelper.send(serverPlayer, FortressChannelNames.FORTRESS_SELECT_COLONIST, packet);
+                }
+
+                return ActionResult.SUCCESS;
+            }
+            return ActionResult.PASS;
         });
     }
 
