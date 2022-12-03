@@ -14,13 +14,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.util.math.Matrix4f;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.stream.Collectors;
 
 abstract class BaseTooltipSupplier extends DrawableHelper implements ButtonWidget.TooltipSupplier {
 
-    @Nonnull
     protected abstract List<OrderedText> getTooltip();
 
     @Override
@@ -61,10 +59,6 @@ abstract class BaseTooltipSupplier extends DrawableHelper implements ButtonWidge
             tooltipComponent = getClientWindow().getScaledHeight() - m - 6;
         }
         matrices.push();
-        int n = -267386864;
-        int o = 0x505000FF;
-        int p = 1344798847;
-        int q = 400;
         float f = this.getItemRenderer().zOffset;
         this.getItemRenderer().zOffset = 400.0f;
         Tessellator tessellator = Tessellator.getInstance();

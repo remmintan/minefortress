@@ -4,7 +4,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 public class BasicTooltipSupplier extends BaseTooltipSupplier {
@@ -16,7 +15,6 @@ public class BasicTooltipSupplier extends BaseTooltipSupplier {
     }
 
     @Override
-    @Nonnull
     protected List<OrderedText> getTooltip() {
         return List.of(text.asOrderedText());
     }
