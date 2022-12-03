@@ -7,7 +7,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
-import org.minefortress.entity.Colonist;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
@@ -19,6 +19,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
+import org.minefortress.utils.ModUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private BlockPos posAppropriateForCenter;
     private BlockPos oldPosAppropriateForCenter;
 
-    private Colonist selectedColonist;
+    private BasePawnEntity selectedPawn;
     private Vec3d selectedColonistDelta;
 
     private List<EssentialBuildingInfo> buildings = new ArrayList<>();
@@ -60,7 +61,7 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     }
 
-    public void select(Colonist colonist) {
+    public void select(BasePawnEntity colonist) {
         if(isInCombat) {
             final var mouse = MinecraftClient.getInstance().mouse;
             final var selectionManager = fightManager.getSelectionManager();
@@ -68,12 +69,12 @@ public final class FortressClientManager extends AbstractFortressManager {
             selectionManager.updateSelection(mouse.getX(), mouse.getY(), colonist.getPos());
             selectionManager.endSelection();
 
-            selectedColonist = null;
+            selectedPawn = null;
             return;
         }
-        this.selectedColonist = colonist;
+        this.selectedPawn = colonist;
         final Vec3d entityPos = colonist.getPos();
-        final Vec3d playerPos = MinecraftClient.getInstance().player.getPos();
+        final Vec3d playerPos = ModUtils.getClientPlayer().getPos();
 
         selectedColonistDelta = entityPos.subtract(playerPos);
     }
@@ -88,21 +89,21 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public boolean isSelectingColonist() {
-        return selectedColonist != null && !isInCombat;
+        return selectedPawn != null && !isInCombat;
     }
 
-    public Colonist getSelectedColonist() {
-        return selectedColonist;
+    public BasePawnEntity getSelectedPawn() {
+        return selectedPawn;
     }
 
     public void stopSelectingColonist() {
-        this.selectedColonist = null;
+        this.selectedPawn = null;
         this.selectedColonistDelta = null;
     }
 
     public Vec3d getProperCameraPosition() {
         if(!isSelectingColonist()) throw new IllegalStateException("No colonist selected");
-        return this.selectedColonist.getPos().subtract(selectedColonistDelta);
+        return this.selectedPawn.getPos().subtract(selectedColonistDelta);
     }
 
     public int getColonistsCount() {
@@ -118,7 +119,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public void tick(FortressMinecraftClient fortressClient) {
-        if(isSelectingColonist() && selectedColonist.isDead()) stopSelectingColonist();
+        if(isSelectingColonist() && selectedPawn.isDead()) stopSelectingColonist();
 
         final MinecraftClient client = (MinecraftClient) fortressClient;
         if(

@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
@@ -18,6 +19,7 @@ import org.minefortress.selections.SelectionManager;
 import org.minefortress.tasks.ClientTasksHolder;
 
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -91,6 +93,11 @@ public class ModUtils {
 
     public static Optional<ClientTasksHolder> getClientTasksHolder() {
         return getFortressClientWorld().map(FortressClientWorld::getClientTasksHolder);
+    }
+
+    @NotNull
+    public static ClientPlayerEntity getClientPlayer() {
+        return Objects.requireNonNull(MinecraftClient.getInstance().player);
     }
 
 }

@@ -72,7 +72,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, BipedEntit
         if(currentGamemode == MineFortressMod.FORTRESS) {
             final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == pawn;
             final var fightSelecting = selectedAsWarrior(pawn);
-            final boolean selecting = getFortressClientManager().getSelectedColonist() == pawn;
+            final boolean selecting = getFortressClientManager().getSelectedPawn() == pawn;
             var color = getHealthFoodLevelColor(pawn);
             if(hovering || selecting || color != null || fightSelecting) {
                 final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
