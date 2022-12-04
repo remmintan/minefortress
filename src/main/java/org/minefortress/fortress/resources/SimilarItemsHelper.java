@@ -71,7 +71,11 @@ public class SimilarItemsHelper {
     );
 
     public static boolean isIgnorable(Item it) {
-        return BlueprintBlockData.IGNORED_ITEMS.contains(it) || SimilarItemsHelper.contains(ItemTags.BEDS, it) || SimilarItemsHelper.contains(ItemTags.DOORS, it);
+        final var defaultStack = it.getDefaultStack();
+        return BlueprintBlockData.IGNORED_ITEMS.contains(it) ||
+                defaultStack.isIn(ItemTags.BEDS) ||
+                defaultStack.isIn(ItemTags.DOORS) ||
+                defaultStack.isIn(ItemTags.BANNERS);
     }
 
     public static List<Item> getSimilarItems(Item item) {
@@ -106,24 +110,8 @@ public class SimilarItemsHelper {
     }
 
     private static Optional<TagKey<Item>> getItemTag(Item item) {
-        for(var tag: tags) {
-            if(contains(tag, item)) {
-                return Optional.of(tag);
-            }
-        }
-        return Optional.empty();
-    }
-
-
-
-
-    public static boolean contains(TagKey<Item> tag, Item item) {
-        for(var it: Registry.ITEM.iterateEntries(tag)) {
-            if(it.value() == item) {
-                return true;
-            }
-        }
-        return false;
+        final var defaultStack = item.getDefaultStack();
+        return defaultStack.streamTags().filter(tags::contains).findFirst();
     }
 
     public static boolean contains(TagKey<Block> tag, Block block) {
