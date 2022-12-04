@@ -6,12 +6,10 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.world.BlueprintsWorld;
-import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.professions.ServerProfessionManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -60,7 +58,7 @@ public abstract class FortressItemEntityMixin extends Entity {
     }
 
     private boolean shouldCollectInInventory(ServerProfessionManager serverProfessionManager, Item item) {
-        if(SimilarItemsHelper.contains(ItemTags.SAPLINGS, item))
+        if(item.getDefaultStack().isIn(ItemTags.SAPLINGS))
             return serverProfessionManager.hasProfession("forester");
 
         if(FORESTER_ITEMS.contains(item))
