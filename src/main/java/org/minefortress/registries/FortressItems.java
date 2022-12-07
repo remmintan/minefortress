@@ -24,6 +24,13 @@ public class FortressItems {
             new Item.Settings().group(ItemGroup.MISC)
     );
 
+    public static final Item ARCHER_PAWN_SPAWN_EGG = new SpawnEggItem(
+            FortressEntities.ARCHER_PAWN_ENTITY_TYPE,
+            0x563c33,
+            0x7f7f7f,
+            new Item.Settings().group(ItemGroup.MISC)
+    );
+
     public static final Item SCAFFOLD_OAK_PLANKS = new BlockItem(
             FortressBlocks.SCAFFOLD_OAK_PLANKS,
             new Item.Settings().rarity(Rarity.EPIC)
@@ -33,6 +40,7 @@ public class FortressItems {
         Registry.register(Registry.ITEM, new Identifier("minefortress", "scaffold_oak_planks_b_1_1_0"), FortressItems.SCAFFOLD_OAK_PLANKS);
         Registry.register(Registry.ITEM, new Identifier("minefortress", "colonist_spawn_egg"), FortressItems.COLONIST_SPAWN_EGG);
         Registry.register(Registry.ITEM, new Identifier("minefortress", "warrior_pawn_spawn_egg"), FortressItems.WARRIOR_PAWN_SPAWN_EGG);
+        Registry.register(Registry.ITEM, new Identifier("minefortress", "archer_pawn_spawn_egg"), FortressItems.ARCHER_PAWN_SPAWN_EGG);
     }
 
 }

@@ -69,11 +69,6 @@ public final class WarriorPawn extends TargetedPawn implements IProfessional {
     }
 
     @Override
-    public String getClothingId() {
-        return getProfessionId();
-    }
-
-    @Override
     public void resetProfession() {
         this.damage(DamageSource.OUT_OF_WORLD, 40f);
     }

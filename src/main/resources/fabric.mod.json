@@ -29,7 +29,8 @@
     ],
     "cardinal-components-entity": [
       "org.minefortress.entity.components.ColonistBaritoneComponent",
-      "org.minefortress.entity.components.WarriorPawnBaritoneComponent"
+      "org.minefortress.entity.components.WarriorPawnBaritoneComponent",
+      "org.minefortress.entity.components.ArcherPawnBaritoneComponent"
     ]
   },
   "mixins": [

@@ -13,7 +13,7 @@ import org.minefortress.network.c2s.C2SFollowTargetPacket;
 import org.minefortress.network.c2s.C2SMoveTargetPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
-abstract class TargetedPawn extends NamedPawnEntity implements ITargetedPawn {
+public abstract class TargetedPawn extends NamedPawnEntity implements ITargetedPawn {
     protected final BaritoneMoveControl moveControl;
     private BlockPos moveTarget;
     private LivingEntity attackTarget;

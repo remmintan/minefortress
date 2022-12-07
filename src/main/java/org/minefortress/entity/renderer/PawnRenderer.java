@@ -24,7 +24,7 @@ import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.entity.WarriorPawn;
+import org.minefortress.entity.interfaces.ITargetedPawn;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
@@ -71,7 +71,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, BipedEntit
 
         if(currentGamemode == MineFortressMod.FORTRESS) {
             final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == pawn;
-            final var fightSelecting = selectedAsWarrior(pawn);
+            final var fightSelecting = selectedAsTargeted(pawn);
             final boolean selecting = getFortressClientManager().getSelectedPawn() == pawn;
             var color = getHealthFoodLevelColor(pawn);
             if(hovering || selecting || color != null || fightSelecting) {
@@ -92,8 +92,8 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, BipedEntit
         }
     }
 
-    private boolean selectedAsWarrior(BasePawnEntity pawn) {
-        return pawn instanceof WarriorPawn wp && getFortressClientManager().getFightManager().getSelectionManager().isSelected(wp);
+    private boolean selectedAsTargeted(BasePawnEntity pawn) {
+        return pawn instanceof ITargetedPawn tp && getFortressClientManager().getFightManager().getSelectionManager().isSelected(tp);
     }
 
     private float getHealthFoodLevel(BasePawnEntity colonist) {

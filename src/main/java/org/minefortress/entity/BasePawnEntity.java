@@ -17,6 +17,7 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.interfaces.IFortressAwareEntity;
+import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.interfaces.FortressSlimeEntity;
 
 import java.util.List;
@@ -58,7 +59,12 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         return this.dataTracker.get(BODY_TEXTURE_ID);
     }
 
-    public abstract String getClothingId();
+    public String getClothingId() {
+        if(this instanceof IProfessional prof) {
+            return prof.getProfessionId();
+        }
+        return "colonist";
+    }
 
     @Nullable
     @Override
