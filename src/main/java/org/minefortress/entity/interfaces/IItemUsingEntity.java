@@ -25,4 +25,8 @@ public interface IItemUsingEntity {
         }
     }
 
+    default boolean isItemInHand(Item item) {
+        return getStackInHand(Hand.MAIN_HAND).getItem().equals(item);
+    }
+
 }

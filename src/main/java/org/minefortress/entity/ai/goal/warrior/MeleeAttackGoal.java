@@ -1,26 +1,16 @@
 package org.minefortress.entity.ai.goal.warrior;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.interfaces.IProfessional;
 
-import java.util.Optional;
+public class MeleeAttackGoal extends AttackGoal {
 
-public class MeleeAttackGoal extends Goal {
-
-    private final BasePawnEntity pawn;
 
     public MeleeAttackGoal(BasePawnEntity pawn) {
-        this.pawn = pawn;
-    }
-
-    @Override
-    public boolean canStart() {
-        return getTarget().map(LivingEntity::isAlive).orElse(false);
+        super(pawn);
     }
 
     @Override
@@ -46,15 +36,6 @@ public class MeleeAttackGoal extends Goal {
             pawn.swingHand(Hand.MAIN_HAND);
             pawn.tryAttack(it);
         });
-    }
-
-    @Override
-    public boolean canStop() {
-        return true;
-    }
-
-    private Optional<LivingEntity> getTarget() {
-        return Optional.ofNullable(pawn.getTarget());
     }
 
 }
