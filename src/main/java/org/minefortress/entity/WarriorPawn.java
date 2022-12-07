@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -21,8 +22,9 @@ import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
 import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 import org.minefortress.entity.interfaces.IProfessional;
+import org.minefortress.entity.interfaces.IWarrior;
 
-public final class WarriorPawn extends TargetedPawn implements IProfessional {
+public final class WarriorPawn extends TargetedPawn implements IProfessional, IWarrior {
 
     private static final TrackedData<String> WARRIOR_PROFESSION_KEY = DataTracker.registerData(WarriorPawn.class, TrackedDataHandlerRegistry.STRING);
 
@@ -84,6 +86,11 @@ public final class WarriorPawn extends TargetedPawn implements IProfessional {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(WARRIOR_PROFESSION_KEY, nbt.getString(WARRIOR_PROFESSION_NBT_TAG));
+    }
+
+    @Override
+    public double getAttackRange() {
+        return this.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
     }
 
 }

@@ -12,39 +12,43 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.BaritonableEntity;
+import org.minefortress.entity.interfaces.ITargetedPawn;
+import org.minefortress.entity.interfaces.IWarrior;
 
 import java.util.Optional;
 
 public class BaritoneMoveControl {
 
     private final IBaritone baritone;
-    private final double reachRange;
-    private final BaritonableEntity baritonableEntity;
+    private final BaritonableEntity entity;
 
     private BlockPos moveTarget;
     private LivingEntity followTarget;
 
     private boolean stuck = false;
+    private double currentReachRange = 0;
 
-    public BaritoneMoveControl(BaritonableEntity baritonableEntity) {
-        this.baritonableEntity = baritonableEntity;
-        this.baritone = BaritoneAPI.getProvider().getBaritone(baritonableEntity);
+    public BaritoneMoveControl(BaritonableEntity entity) {
+        this.entity = entity;
+        this.baritone = BaritoneAPI.getProvider().getBaritone(entity);
         this.baritone.getGameEventHandler().registerEventListener(new StuckOnFailEventListener());
-        this.reachRange = baritonableEntity.getReachRange();
     }
 
     public void moveTo(@NotNull BlockPos pos) {
         this.reset(true);
-        this.baritonableEntity.setMovementSpeed((float)this.baritonableEntity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
+        this.updateReachRange(false);
+        this.entity.setMovementSpeed((float)this.entity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
         this.moveTarget = pos;
-        final var goal = new GoalNear(pos, (int) Math.floor(reachRange));
+        final var goal = new GoalNear(pos, (int) Math.floor(currentReachRange));
         baritone.getCustomGoalProcess().setGoalAndPath(goal);
     }
 
     public void moveTo(@NotNull LivingEntity entity) {
         this.reset(true);
+        this.updateReachRange(true);
+        this.baritone.settings().followRadius.set((int)Math.floor(currentReachRange));
         this.followTarget = entity;
-        this.baritonableEntity.setMovementSpeed((float)this.baritonableEntity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
+        this.entity.setMovementSpeed((float)this.entity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
         baritone.getFollowProcess().follow(it -> it.equals(entity));
     }
 
@@ -53,14 +57,15 @@ public class BaritoneMoveControl {
     }
 
     private void reset(boolean startMoving) {
-        if(startMoving && baritonableEntity.isSleeping()) {
-            baritonableEntity.wakeUp();
+        if(startMoving && entity.isSleeping()) {
+            entity.wakeUp();
         }
         baritone.getFollowProcess().cancel();
         baritone.getPathingBehavior().cancelEverything();
         moveTarget = null;
         followTarget = null;
         stuck = false;
+        currentReachRange = 0;
     }
 
     public boolean isStuck() {
@@ -72,7 +77,23 @@ public class BaritoneMoveControl {
     }
 
     private boolean moveTargetInRange() {
-        return getTargetPos().map(it -> it.isWithinDistance(baritonableEntity.getPos(), reachRange)).orElse(false);
+        return getTargetPos().map(it -> it.isWithinDistance(entity.getPos(), currentReachRange)).orElse(false);
+    }
+
+    private void updateReachRange(boolean follow) {
+        if(follow) {
+            if(entity instanceof IWarrior warrior) {
+                currentReachRange = warrior.getAttackRange();
+                return;
+            }
+        }
+
+        if(entity instanceof ITargetedPawn targeted) {
+            currentReachRange = targeted.getTargetMoveRange();
+            return;
+        }
+
+        currentReachRange = entity.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
     }
 
     private class StuckOnFailEventListener implements AbstractGameEventListener {

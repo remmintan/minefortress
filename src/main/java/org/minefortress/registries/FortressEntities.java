@@ -57,7 +57,7 @@ public class FortressEntities {
     public static void register() {
         FabricDefaultAttributeRegistry.register(FortressEntities.COLONIST_ENTITY_TYPE, BasePawnEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, BasePawnEntity.createAttributes());
-        FabricDefaultAttributeRegistry.register(FortressEntities.ARCHER_PAWN_ENTITY_TYPE, BasePawnEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(FortressEntities.ARCHER_PAWN_ENTITY_TYPE, ArcherPawn.createAttributes());
     }
 
     public static void registerRenderers() {

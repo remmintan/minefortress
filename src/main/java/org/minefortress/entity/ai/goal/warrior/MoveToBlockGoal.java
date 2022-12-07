@@ -52,7 +52,7 @@ public class MoveToBlockGoal extends Goal {
     }
 
     private boolean farFromMoveTarget() {
-        return !pawn.getMoveTarget().isWithinDistance(pawn.getPos(), pawn.getReachRange());
+        return !pawn.getMoveTarget().isWithinDistance(pawn.getPos(), pawn.getTargetMoveRange());
     }
 
 }

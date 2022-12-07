@@ -1,7 +1,7 @@
 package org.minefortress.entity;
 
+import baritone.api.minefortress.IMinefortressEntity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -12,9 +12,8 @@ import net.minecraft.item.BucketItem;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import org.minefortress.entity.ai.MineFortressInventory;
-import org.minefortress.entity.interfaces.IBaritonableEntity;
 
-public abstract class BaritonableEntity extends PathAwareEntity implements IBaritonableEntity {
+public abstract class BaritonableEntity extends PathAwareEntity implements IMinefortressEntity {
 
     private static final TrackedData<Integer> SELECTED_SLOT = DataTracker.registerData(BaritonableEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
@@ -51,10 +50,6 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IBari
     @Override
     public final Fluid getBucketFluid(BucketItem bucketItem) {
         return bucketItem.fluid;
-    }
-
-    public double getReachRange() {
-        return this.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
     }
 
     @Override
