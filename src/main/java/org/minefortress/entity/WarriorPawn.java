@@ -12,37 +12,24 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.ai.controls.BaritoneMoveControl;
 import org.minefortress.entity.ai.goal.SelectTargetToAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
 import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
-import org.minefortress.entity.interfaces.ITargetedPawn;
-import org.minefortress.network.c2s.C2SFollowTargetPacket;
-import org.minefortress.network.c2s.C2SMoveTargetPacket;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.entity.interfaces.IProfessional;
 
-public final class WarriorPawn extends NamedPawnEntity implements ITargetedPawn {
+public final class WarriorPawn extends TargetedPawn implements IProfessional {
 
     private static final TrackedData<String> WARRIOR_PROFESSION_KEY = DataTracker.registerData(WarriorPawn.class, TrackedDataHandlerRegistry.STRING);
 
     public static final String WARRIOR_PROFESSION_NBT_TAG = "professionId";
 
-    private final BaritoneMoveControl moveControl;
-
-    private BlockPos moveTarget;
-    private LivingEntity attackTarget;
-
     public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
-        moveControl = world instanceof ServerWorld ? new BaritoneMoveControl(this) : null;
     }
 
     @Override
@@ -91,65 +78,6 @@ public final class WarriorPawn extends NamedPawnEntity implements ITargetedPawn 
         this.damage(DamageSource.OUT_OF_WORLD, 40f);
     }
 
-    @Override
-    public void setMoveTarget(@Nullable BlockPos pos) {
-        if(pos != null) {
-            if(world.isClient) {
-                final var packet = new C2SMoveTargetPacket(pos, this.getId());
-                FortressClientNetworkHelper.send(C2SMoveTargetPacket.CHANNEL, packet);
-            } else {
-                this.resetTargets();
-                moveTarget = pos;
-            }
-        } else {
-            throw new IllegalArgumentException("Move target cannot be null");
-        }
-    }
-
-    @Override
-    @Nullable
-    public BlockPos getMoveTarget() {
-        if(world.isClient) {
-            throw new IllegalStateException("Cannot get move target on client");
-        }
-        return moveTarget;
-    }
-
-    @Override
-    public void setAttackTarget(@Nullable LivingEntity entity) {
-        if(entity != null) {
-            if(world.isClient) {
-                final var followPacket = new C2SFollowTargetPacket(this.getId(), entity.getId());
-                FortressClientNetworkHelper.send(C2SFollowTargetPacket.CHANNEL, followPacket);
-            } else {
-                this.resetTargets();
-                attackTarget = entity;
-            }
-
-        } else {
-            throw new IllegalArgumentException("Attack target cannot be null");
-        }
-    }
-
-    @Override
-    @Nullable
-    public LivingEntity getAttackTarget() {
-        if(world.isClient) {
-            throw new IllegalStateException("Cannot get attack target on client");
-        }
-        return attackTarget;
-    }
-
-
-    @Override
-    public BaritoneMoveControl getFortressMoveControl() {
-        return moveControl;
-    }
-
-    private void resetTargets() {
-        this.moveTarget = null;
-        this.attackTarget = null;
-    }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
@@ -163,19 +91,4 @@ public final class WarriorPawn extends NamedPawnEntity implements ITargetedPawn 
         this.dataTracker.set(WARRIOR_PROFESSION_KEY, nbt.getString(WARRIOR_PROFESSION_NBT_TAG));
     }
 
-    @Override
-    public Vec3d getPos() {
-        return super.getPos();
-    }
-
-    @Override
-    public int getId() {
-        return super.getId();
-    }
-
-    @Nullable
-    @Override
-    public LivingEntity getTarget() {
-        return super.getTarget();
-    }
 }
