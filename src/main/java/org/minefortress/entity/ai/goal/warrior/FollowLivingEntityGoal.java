@@ -2,16 +2,16 @@ package org.minefortress.entity.ai.goal.warrior;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import org.minefortress.entity.interfaces.IWarriorPawn;
+import org.minefortress.entity.interfaces.ITargetedPawn;
 
 import java.util.EnumSet;
 
 public class FollowLivingEntityGoal extends Goal {
 
-    private final IWarriorPawn pawn;
+    private final ITargetedPawn pawn;
     private LivingEntity target;
 
-    public FollowLivingEntityGoal(IWarriorPawn pawn) {
+    public FollowLivingEntityGoal(ITargetedPawn pawn) {
         this.pawn = pawn;
         this.setControls(EnumSet.of(Control.MOVE, Control.JUMP));
     }

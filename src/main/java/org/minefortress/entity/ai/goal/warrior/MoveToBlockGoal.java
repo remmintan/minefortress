@@ -2,16 +2,16 @@ package org.minefortress.entity.ai.goal.warrior;
 
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.entity.interfaces.IWarriorPawn;
+import org.minefortress.entity.interfaces.ITargetedPawn;
 
 import java.util.EnumSet;
 
 public class MoveToBlockGoal extends Goal {
 
-    private final IWarriorPawn pawn;
+    private final ITargetedPawn pawn;
     private BlockPos target;
 
-    public MoveToBlockGoal(IWarriorPawn pawn) {
+    public MoveToBlockGoal(ITargetedPawn pawn) {
         this.pawn = pawn;
         setControls(EnumSet.of(Control.MOVE, Control.JUMP));
     }

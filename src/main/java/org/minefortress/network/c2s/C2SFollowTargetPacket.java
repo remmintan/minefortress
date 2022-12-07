@@ -4,7 +4,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.entity.interfaces.IWarriorPawn;
+import org.minefortress.entity.interfaces.ITargetedPawn;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 
 public class C2SFollowTargetPacket implements FortressC2SPacket {
@@ -28,7 +28,7 @@ public class C2SFollowTargetPacket implements FortressC2SPacket {
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final var entity = player.world.getEntityById(id);
         final var target = player.world.getEntityById(targetId);
-        if(entity instanceof IWarriorPawn pawn && target instanceof LivingEntity targetEntity) {
+        if(entity instanceof ITargetedPawn pawn && target instanceof LivingEntity targetEntity) {
             pawn.setAttackTarget(targetEntity);
         }
     }
