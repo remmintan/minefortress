@@ -36,3 +36,5 @@ accessible method net/minecraft/block/entity/AbstractFurnaceBlockEntity isBurnin
 accessible field net/minecraft/server/MinecraftServer session Lnet/minecraft/world/level/storage/LevelStorage$Session;
 accessible method net/minecraft/screen/ScreenHandler internalOnSlotClick (IILnet/minecraft/screen/slot/SlotActionType;Lnet/minecraft/entity/player/PlayerEntity;)V
 accessible field net/minecraft/item/BucketItem fluid Lnet/minecraft/fluid/Fluid;
+accessible method net/minecraft/entity/projectile/ProjectileEntity <init> (Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/World;)V
+accessible method net/minecraft/entity/projectile/PersistentProjectileEntity getEntityCollision (Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/hit/EntityHitResult;

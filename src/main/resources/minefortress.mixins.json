@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "block.FortressAbstractBlockState",
+    "entity.ArrowEntityMixin",
     "entity.FortressTntEntityMixin",
     "item.DisabledBlockItemMixin",
     "item.DisableItemMixin",
