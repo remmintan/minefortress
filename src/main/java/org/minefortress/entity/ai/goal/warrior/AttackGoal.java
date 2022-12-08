@@ -15,6 +15,12 @@ abstract class AttackGoal extends Goal {
     }
 
     @Override
+    public void start() {
+        super.start();
+        pawn.setAttacking(true);
+    }
+
+    @Override
     public boolean canStart() {
         return getTarget().map(LivingEntity::isAlive).orElse(false);
     }
@@ -22,6 +28,12 @@ abstract class AttackGoal extends Goal {
     @Override
     public boolean canStop() {
         return true;
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        pawn.setAttacking(false);
     }
 
     protected Optional<LivingEntity> getTarget() {

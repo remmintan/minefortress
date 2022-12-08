@@ -8,8 +8,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -30,7 +28,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 
 import java.util.Optional;
 
-public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, BipedEntityModel<BasePawnEntity>> {
+public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel> {
 
     private static final Identifier GUY = new Identifier("minefortress", "textures/skins/guy.png");
     private static final Identifier GUY2 = new Identifier("minefortress", "textures/skins/guy2.png");
@@ -38,7 +36,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, BipedEntit
     private static final Identifier GUY4 = new Identifier("minefortress", "textures/skins/guy4.png");
 
     public PawnRenderer(EntityRendererFactory.Context context) {
-        super(context, new PlayerEntityModel<>(context.getPart(EntityModelLayers.PLAYER), false), 0.5f);
+        super(context, new PawnModel(context), 0.5f);
         this.addFeature(new PawnClothesFeature(this));
     }
 
@@ -92,7 +90,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, BipedEntit
         }
     }
 
-    private boolean selectedAsTargeted(BasePawnEntity pawn) {
+    private boolean selectedAsTargeted (BasePawnEntity pawn) {
         return pawn instanceof ITargetedPawn tp && getFortressClientManager().getFightManager().getSelectionManager().isSelected(tp);
     }
 

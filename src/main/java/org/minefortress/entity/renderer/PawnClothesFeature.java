@@ -6,14 +6,13 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
-import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import org.minefortress.entity.BasePawnEntity;
 
-public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, BipedEntityModel<BasePawnEntity>> {
+public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, PawnModel> {
 
     private static final Identifier ARCHER = new Identifier("minefortress", "textures/skins/archer.png");
     private static final Identifier ARMORER = new Identifier("minefortress", "textures/skins/armorer.png");
@@ -62,7 +61,7 @@ public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, BipedEnt
     private static final Identifier SOLDIER_YELLOW = new Identifier("minefortress", "textures/skins/soldier/soldier_yellow.png");
 
     public PawnClothesFeature(
-            FeatureRendererContext<BasePawnEntity, BipedEntityModel<BasePawnEntity>> context
+            FeatureRendererContext<BasePawnEntity, PawnModel> context
     ) {
         super(context);
     }

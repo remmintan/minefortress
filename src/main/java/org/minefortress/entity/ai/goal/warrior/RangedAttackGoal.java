@@ -19,6 +19,7 @@ public class RangedAttackGoal extends AttackGoal {
 
     @Override
     public void start() {
+        super.start();
         pawn.putItemInHand(Items.BOW);
     }
 
