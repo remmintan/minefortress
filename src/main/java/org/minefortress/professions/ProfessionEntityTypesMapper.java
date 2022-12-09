@@ -52,10 +52,11 @@ final class ProfessionEntityTypesMapper {
     }
 
     private EntityType<? extends BasePawnEntity> convert(String entityType) {
-        if (entityType.equals("warrior")) {
-            return FortressEntities.WARRIOR_PAWN_ENTITY_TYPE;
-        }
-        return FortressEntities.COLONIST_ENTITY_TYPE;
+        return switch (entityType) {
+            case "warrior" -> FortressEntities.WARRIOR_PAWN_ENTITY_TYPE;
+            case "archer" -> FortressEntities.ARCHER_PAWN_ENTITY_TYPE;
+            default -> FortressEntities.COLONIST_ENTITY_TYPE;
+        };
     }
 
 }

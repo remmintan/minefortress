@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
 public class ServerProfessionManager extends ProfessionManager{
+
+    public static final String PROFESSION_NBT_TAG = "professionId";
+
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
     private final MinecraftServer server;
     private boolean professionsRead = false;

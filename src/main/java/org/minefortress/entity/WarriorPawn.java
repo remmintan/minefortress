@@ -23,13 +23,11 @@ import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.entity.interfaces.IWarrior;
+import org.minefortress.professions.ServerProfessionManager;
 
 public final class WarriorPawn extends TargetedPawn implements IProfessional, IWarrior {
 
     private static final TrackedData<String> WARRIOR_PROFESSION_KEY = DataTracker.registerData(WarriorPawn.class, TrackedDataHandlerRegistry.STRING);
-
-    public static final String WARRIOR_PROFESSION_NBT_TAG = "professionId";
-
     public WarriorPawn(EntityType<? extends WarriorPawn> entityType, World world) {
         super(entityType, world, false);
     }
@@ -43,7 +41,7 @@ public final class WarriorPawn extends TargetedPawn implements IProfessional, IW
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         if(entityNbt != null) {
-            final var warriorProf = entityNbt.getString(WARRIOR_PROFESSION_NBT_TAG);
+            final var warriorProf = entityNbt.getString(ServerProfessionManager.PROFESSION_NBT_TAG);
             this.dataTracker.set(WARRIOR_PROFESSION_KEY, warriorProf);
         }
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
@@ -79,13 +77,13 @@ public final class WarriorPawn extends TargetedPawn implements IProfessional, IW
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putString(WARRIOR_PROFESSION_NBT_TAG, getProfessionId());
+        nbt.putString(ServerProfessionManager.PROFESSION_NBT_TAG, getProfessionId());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.dataTracker.set(WARRIOR_PROFESSION_KEY, nbt.getString(WARRIOR_PROFESSION_NBT_TAG));
+        this.dataTracker.set(WARRIOR_PROFESSION_KEY, nbt.getString(ServerProfessionManager.PROFESSION_NBT_TAG));
     }
 
     @Override

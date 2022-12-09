@@ -5,6 +5,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
@@ -28,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.WarriorPawn;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.entity.interfaces.IWorkerPawn;
@@ -157,17 +157,16 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Optional.of(buildings.get(random.nextInt(buildings.size())));
     }
 
-    public void replaceColonistWithWarrior(Colonist colonist, String warriorId) {
-//        final var pos = colonist.getBlockPos();
+    public void replaceColonistWithTypedPawn(Colonist colonist, String warriorId, EntityType<? extends BasePawnEntity> entityType) {
         final var pos = getRandomSpawnPosition();
         final var world = (ServerWorld) colonist.getEntityWorld();
         final var masterId = colonist.getMasterId().orElseThrow(() -> new IllegalStateException("Colonist has no master!"));
         final var name = colonist.getName();
 
         final var infoTag = getColonistInfoTag(masterId);
-        infoTag.putString(WarriorPawn.WARRIOR_PROFESSION_NBT_TAG, warriorId);
+        infoTag.putString(ServerProfessionManager.PROFESSION_NBT_TAG, warriorId);
 
-        final var newWarrior = FortressEntities.WARRIOR_PAWN_ENTITY_TYPE.spawn(world, infoTag, name, null, pos, SpawnReason.EVENT, true, false);
+        final var newWarrior = entityType.spawn(world, infoTag, name, null, pos, SpawnReason.EVENT, true, false);
         colonist.damage(DamageSource.OUT_OF_WORLD, Float.MAX_VALUE);
         pawns.remove(colonist);
         pawns.add(newWarrior);

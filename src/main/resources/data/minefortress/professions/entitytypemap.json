@@ -2,9 +2,11 @@
   "warrior": [
     "warrior1",
     "warrior2",
-    "archer1",
-    "archer2",
     "knight1",
     "knight2"
+  ],
+  "archer": [
+    "archer1",
+    "archer2"
   ]
 }

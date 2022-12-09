@@ -335,11 +335,10 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
             final var type = spm.getEntityTypeForProfession(professionId);
             if(type == FortressEntities.COLONIST_ENTITY_TYPE) {
                 this.dataTracker.set(PROFESSION_ID, professionId);
-            } else if (type == FortressEntities.WARRIOR_PAWN_ENTITY_TYPE){
-                it.replaceColonistWithWarrior(this, professionId);
+            } else if (type == FortressEntities.WARRIOR_PAWN_ENTITY_TYPE || type == FortressEntities.ARCHER_PAWN_ENTITY_TYPE) {
+                it.replaceColonistWithTypedPawn(this, professionId, type);
             }
         });
-
     }
 
     public void resetProfession() {

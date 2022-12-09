@@ -7,6 +7,7 @@ import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
@@ -17,9 +18,10 @@ import org.minefortress.entity.ai.goal.SelectTargetToAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 import org.minefortress.entity.ai.goal.warrior.RangedAttackGoal;
+import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.entity.interfaces.IWarrior;
 
-public class ArcherPawn extends TargetedPawn implements IWarrior, RangedAttackMob {
+public class ArcherPawn extends TargetedPawn implements IWarrior, RangedAttackMob, IProfessional {
 
     public ArcherPawn(EntityType<? extends BasePawnEntity> entityType, World world) {
         super(entityType, world, false);
@@ -39,11 +41,6 @@ public class ArcherPawn extends TargetedPawn implements IWarrior, RangedAttackMo
 
     private boolean canAttack(LivingEntity it) {
         return it.isAlive() && (it instanceof HostileEntity || it.equals(getAttackTarget()));
-    }
-
-    @Override
-    public String getClothingId() {
-        return "archer1";
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
@@ -77,13 +74,13 @@ public class ArcherPawn extends TargetedPawn implements IWarrior, RangedAttackMo
 
 
 
-    //    @Override
-//    public String getProfessionId() {
-//        return "archer1";
-//    }
-//
-//    @Override
-//    public void resetProfession() {
-//        this.damage(DamageSource.OUT_OF_WORLD, 40f);
-//    }
+    @Override
+    public String getProfessionId() {
+        return "archer1";
+    }
+
+    @Override
+    public void resetProfession() {
+        this.damage(DamageSource.OUT_OF_WORLD, 40f);
+    }
 }

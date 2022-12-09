@@ -312,10 +312,10 @@
     "title": "Archer",
     "icon": "minecraft:bow",
     "description": "Defends the village, ranged fighter [1 bow, 32 arrow for each]",
-    "unlockMessage": "Archer is temporarily locked in this version",
+    "unlockMessage": "Build Shooting gallery to unlock",
     "unlockMoreMessage": "You need more bows/arrows to hire more!",
     "requirements": {
-      "building": "_",
+      "building": "shooting_gallery",
       "items": [
         {
           "id": "minecraft:bow",
