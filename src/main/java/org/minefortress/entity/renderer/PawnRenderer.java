@@ -74,7 +74,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
             var color = getHealthFoodLevelColor(pawn);
             if(hovering || selecting || color != null || fightSelecting) {
                 final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-                if(color != null && (hovering || fightSelecting)) {
+                if(color != null && !(hovering || fightSelecting)) {
                     color.scale(0.7f);
                 }
 
