@@ -11,14 +11,7 @@
       }
     },
     "forester": {
-      "hunter": {
-        "archer1": {
-          "archer2": {}
-        },
-        "knight1": {
-          "knight2": {}
-        }
-      },
+      "hunter": {},
       "fisherman": {},
       "farmer": {
         "baker": {},
@@ -30,7 +23,13 @@
         }
       },
       "warrior1": {
-        "warrior2": {}
+        "warrior2": {},
+        "archer1": {
+          "archer2": {}
+        },
+        "knight1": {
+          "knight2": {}
+        }
       }
     },
     "crafter": {
