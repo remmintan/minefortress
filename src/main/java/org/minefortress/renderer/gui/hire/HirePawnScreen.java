@@ -26,7 +26,7 @@ public class HirePawnScreen extends WindowScreen {
         final var startY = getScreenTopY() + 25;
         var i = 0;
         for(final String profId : professions) {
-            final var rowY = startY + i * 10;
+            final var rowY = startY + i * 25;
             this.addDrawable(new ProgressArrowWidget(getScreenCenterX(), rowY, () -> this.handler.getHireProgress(profId)));
             this.addDrawable(new CostsWidget(getScreenLeftX() + 10, rowY, this.handler.getCost(profId)));
             this.addDrawableChild(

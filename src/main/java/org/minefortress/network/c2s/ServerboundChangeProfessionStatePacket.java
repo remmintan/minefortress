@@ -31,7 +31,11 @@ public class ServerboundChangeProfessionStatePacket implements FortressC2SPacket
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final ServerProfessionManager manager = this.getFortressServerManager(server, player).getServerProfessionManager();
         if (amountChange == AmountChange.ADD) {
-            manager.increaseAmount(professionId);
+            if(ServerProfessionManager.HIREABLE_PROFESSIONS.contains(professionId)) {
+                manager.openHireMenu(professionId, player);
+            } else {
+                manager.increaseAmount(professionId);
+            }
         } else {
             manager.decreaseAmount(professionId);
         }

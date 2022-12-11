@@ -31,6 +31,7 @@ public class FortressClientNetworkHelper {
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_RESOURCES_SYNC, ClientboundSyncItemsPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_INIT, ClientboundProfessionsInitPacket::new);
         FortressClientNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, ClientboundBlueprintsProcessImportExportPacket::new);
+        FortressClientNetworkHelper.registerReceiver(S2COpenHireMenuPacket.CHANNEL, S2COpenHireMenuPacket::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressS2CPacket> packetConstructor) {
