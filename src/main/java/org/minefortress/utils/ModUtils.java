@@ -14,7 +14,7 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.ProfessionManager;
+import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.tasks.ClientTasksHolder;
 
@@ -73,7 +73,7 @@ public class ModUtils {
         return getFortressClient().getFortressClientManager();
     }
 
-    public static ProfessionManager getProfessionManager() {
+    public static ClientProfessionManager getProfessionManager() {
         return getFortressClientManager().getProfessionManager();
     }
 

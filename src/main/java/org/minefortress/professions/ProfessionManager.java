@@ -82,8 +82,8 @@ public abstract class ProfessionManager {
         return satisfied;
     }
 
-    public Profession getProfession(String name) {
-        return getProfessions().get(name);
+    public Profession getProfession(String id) {
+        return getProfessions().get(id);
     }
 
     protected Map<String, Profession> getProfessions(){

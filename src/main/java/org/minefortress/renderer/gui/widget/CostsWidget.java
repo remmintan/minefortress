@@ -29,9 +29,11 @@ public class CostsWidget implements Drawable, Element {
         for(var ent : costs.entrySet()) {
             final var stack = ent.getKey().getDefaultStack();
             final var count = ent.getValue();
-            itemRenderer.renderGuiItemIcon(stack, x + i * 18, y);
-            itemRenderer.renderGuiItemOverlay(getTextRenderer(), stack, x + i * 18, y, count > 1 ? String.valueOf(count) : null);
-            i++;
+            itemRenderer.renderGuiItemIcon(stack, x + i, y);
+            final var countLabel = count > 1 ? count + "/100" : "";
+            final var countLabelWidth = getTextRenderer().getWidth(countLabel)/2;
+            itemRenderer.renderGuiItemOverlay(getTextRenderer(), stack, x + i + countLabelWidth, y, countLabel);
+            i+=24 + countLabelWidth;
         }
     }
 

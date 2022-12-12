@@ -41,13 +41,13 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
     private static class FakeHireScreenHandler implements IHireScreenHandler {
 
         @Override
-        public String getName() {
+        public String getScreenName() {
             return "Hire Pawn";
         }
 
         @Override
         public List<String> getProfessions() {
-            return List.of("test1", "test2");
+            return List.of("warrior1", "warrior2");
         }
 
         @Override
@@ -61,11 +61,6 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
                     Items.DIAMOND, 10,
                     Items.EMERALD, 20
             );
-        }
-
-        @Override
-        public Item getProfessionalHeadItem(String professionId) {
-            return Items.PLAYER_HEAD;
         }
 
         @Override
