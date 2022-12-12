@@ -1,7 +1,6 @@
 package org.minefortress.selections;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -13,7 +12,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.network.ServerboundRoadsTaskPacket;
+import org.minefortress.network.c2s.ServerboundRoadsTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.tasks.ClientTasksHolder;

@@ -12,7 +12,7 @@ import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.ServerboundBlueprintTaskPacket;
+import org.minefortress.network.c2s.ServerboundBlueprintTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
@@ -194,8 +194,8 @@ public class ClientBlueprintManager {
         return blockDataManager;
     }
 
-    public void add(BlueprintGroup group, String name, String file, int floorLevel, NbtCompound tag, boolean premium) {
-        final BlueprintMetadata metadata = this.blueprintMetadataManager.add(group, name, file, floorLevel, premium);
+    public void add(BlueprintGroup group, String name, String file, int floorLevel, String requirementId, NbtCompound tag) {
+        final BlueprintMetadata metadata = this.blueprintMetadataManager.add(group, name, file, floorLevel, requirementId);
         blockDataManager.setBlueprint(metadata.getFile(), tag);
         blockDataManager.invalidateBlueprint(metadata.getFile());
     }
@@ -208,6 +208,12 @@ public class ClientBlueprintManager {
         if(client instanceof FortressMinecraftClient fortressClient) {
             fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().invalidateBlueprint(fileName);
         }
+    }
+
+    public void remove(String filename) {
+        blueprintMetadataManager.remove(filename);
+        blockDataManager.removeBlueprint(filename);
+        blockDataManager.invalidateBlueprint(filename);
     }
 
     public void reset() {

@@ -4,7 +4,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.mob.*;
 import net.minecraft.world.World;
-import org.minefortress.entity.Colonist;
+import org.minefortress.entity.BasePawnEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,7 +34,7 @@ public abstract class FortressMobMixin extends HostileEntity {
 
     @Inject(method="initGoals", at=@At("TAIL"))
     protected void initGoals(CallbackInfo ci) {
-        super.targetSelector.add(2, new ActiveTargetGoal<>(this, Colonist.class, true));
+        super.targetSelector.add(2, new ActiveTargetGoal<>(this, BasePawnEntity.class, true));
     }
 
 }

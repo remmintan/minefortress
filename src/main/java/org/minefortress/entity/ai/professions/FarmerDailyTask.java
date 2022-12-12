@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressBuilding;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;
@@ -131,7 +132,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     private Optional<FortressBuilding> getFarm(Colonist colonist) {
         return colonist
             .getFortressServerManager()
-            .getRandomBuilding("farmer", colonist.world.random);
+            .flatMap(it -> it.getRandomBuilding("farmer", colonist.world.random));
     }
 
     private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {
@@ -147,7 +148,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private Optional<Item> getSeeds(Colonist colonist) {
-        final var serverResourceManager = colonist.getFortressServerManager().getServerResourceManager();
+        final var serverResourceManager = colonist.getFortressServerManager().orElseThrow().getServerResourceManager();
         final var itemOpt = serverResourceManager
                 .getAllItems()
                 .stream()
@@ -184,6 +185,6 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private boolean isCreative(Colonist colonist) {
-        return colonist.getFortressServerManager().isCreative();
+        return colonist.getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
     }
 }

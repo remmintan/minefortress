@@ -1,0 +1,99 @@
+package org.minefortress.renderer.gui.hud;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.item.Items;
+import org.minefortress.fortress.resources.gui.craft.MissingCraftsmanScreen;
+import org.minefortress.fortress.resources.gui.smelt.MissingBlacksmithScreen;
+import org.minefortress.network.c2s.ServerboundOpenCraftingScreenPacket;
+import org.minefortress.network.helpers.FortressChannelNames;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.renderer.gui.ColonistsScreen;
+import org.minefortress.renderer.gui.professions.ProfessionsScreen;
+import org.minefortress.renderer.gui.widget.DynamicTextButtonWidget;
+import org.minefortress.renderer.gui.widget.ItemButtonWidget;
+import org.minefortress.renderer.gui.widget.ItemHudElement;
+import org.minefortress.utils.ModUtils;
+
+public class ColonistsHudLayer extends AbstractHudLayer {
+
+    protected ColonistsHudLayer(MinecraftClient client) {
+        super(client);
+        this.addElement(
+                new DynamicTextButtonWidget(
+                        15,
+                        0,
+                        20,
+                        20,
+                        btn -> client.setScreen(new ColonistsScreen()),
+                        "Manage pawns",
+                        this::getColonistsCountText
+                )
+        );
+
+        this.addElement(
+            new ItemButtonWidget(
+                    35, 0,
+                Items.PLAYER_HEAD,
+                btn -> client.setScreen(new ProfessionsScreen(ModUtils.getFortressClient())),
+                "Manage professions"
+            )
+        );
+        this.addElement(
+                new ItemButtonWidget(
+                        35+20, 0,
+                        Items.CHEST,
+                        btn -> client.setScreen(new CreativeInventoryScreen(client.player)),
+                        "Inventory"
+                )
+        );
+        this.addElement(
+            new ItemButtonWidget(
+                    35+40, 0,
+                    Items.CRAFTING_TABLE,
+                    btn -> {
+                        if(hasProfessionInAVillage("crafter"))
+                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.CRAFTING));
+                        else
+                            this.client.setScreen(new MissingCraftsmanScreen());
+                    },
+                    "Crafting"
+            )
+        );
+        this.addElement(
+            new ItemButtonWidget(
+                    35+60, 0,
+                    Items.FURNACE,
+                    btn -> {
+                        if(hasProfessionInAVillage("blacksmith"))
+                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE));
+                        else
+                            this.client.setScreen(new MissingBlacksmithScreen());
+                    },
+                    "Furnace"
+            )
+        );
+
+        this.addElement(
+                new ItemHudElement(
+                        0, 3,
+                        Items.PLAYER_HEAD
+                )
+        );
+
+        this.setBasepoint(-91, -43, PositionX.CENTER, PositionY.BOTTOM);
+    }
+
+    private String getColonistsCountText() {
+        return "x" + ModUtils.getFortressClientManager().getColonistsCount();
+    }
+
+    private boolean hasProfessionInAVillage(String crafter) {
+        return ModUtils.isClientInFortressGamemode() && ModUtils.getProfessionManager().hasProfession(crafter);
+    }
+
+    @Override
+    public boolean shouldRender(HudState hudState) {
+        return hudState == HudState.BUILD;
+    }
+}

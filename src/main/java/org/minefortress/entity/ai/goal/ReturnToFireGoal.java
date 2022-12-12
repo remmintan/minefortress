@@ -15,10 +15,9 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(!notInCombat()) return false;
         if(!isNight()) {
-            final FortressServerManager serverManager = colonist.getFortressServerManager();
-            final Optional<BlockPos> pos = serverManager.randomSurfacePos();
+            final Optional<BlockPos> pos = colonist.getFortressServerManager()
+                    .flatMap(FortressServerManager::randomSurfacePos);
             if(pos.isPresent()) return false;
         }
 
@@ -26,7 +25,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     }
 
     private boolean isFarFromCenter() {
-        final var serverManager = colonist.getFortressServerManager();
+        final var serverManager = colonist.getFortressServerManager().orElseThrow();
         final BlockPos fortressCenter = serverManager.getFortressCenter();
         return fortressCenter != null &&
                 colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()) > Math.pow(serverManager.getHomeOuterRadius(), 2);
@@ -45,7 +44,8 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     }
 
     private void moveToTheFire() {
-        final var randPos = colonist.getFortressServerManager().getRandomPositionAroundCampfire();
+        final var randPos = colonist.getFortressServerManager()
+                .flatMap(FortressServerManager::getRandomPositionAroundCampfire);
         if(randPos.isEmpty()) return;
 
 
@@ -57,8 +57,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() &&
-                isNight() &&
+        return isNight() &&
                 !colonist.getTaskControl().hasTask() &&
                 !colonist.getMovementHelper().isStuck() &&
                 (isFarFromCenter() || colonist.getMovementHelper().stillTryingToReachGoal());

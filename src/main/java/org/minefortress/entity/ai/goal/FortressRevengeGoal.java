@@ -28,7 +28,7 @@ public class FortressRevengeGoal extends RevengeGoal {
     private boolean fromTheSameFortress(Entity entity) {
         final var thisColonist = (Colonist) this.mob;
         if(entity instanceof Colonist colonist) {
-            return colonist.getFortressId() != null && colonist.getFortressId().equals(thisColonist.getFortressId());
+            return colonist.getMasterId() != null && colonist.getMasterId().equals(thisColonist.getMasterId());
         }
         return false;
     }

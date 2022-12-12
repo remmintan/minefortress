@@ -1,25 +1,24 @@
 package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.enums.BedPart;
 import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressBedInfo;
+import org.minefortress.entity.interfaces.IFortressAwareEntity;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressBuilding;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class BlueprintTask extends AbstractTask {
 
@@ -28,8 +27,6 @@ public class BlueprintTask extends AbstractTask {
     private final Map<BlockPos, BlockState> blueprintAutomaticData;
     private final float floorLevel;
     private final String requirementId;
-
-    private final Set<FortressBedInfo> beds;
 
     public BlueprintTask(
             UUID id,
@@ -46,25 +43,11 @@ public class BlueprintTask extends AbstractTask {
         this.blueprintEntityData = blueprintEntityData;
         this.blueprintAutomaticData = blueprintAutomaticData;
         this.floorLevel = floorLevel;
-
-        Set<FortressBedInfo> allBeds = new HashSet<>();
-
-        for (Map.Entry<BlockPos, BlockState> entry : blueprintAutomaticData.entrySet()) {
-            BlockState state = entry.getValue();
-            if (state.isIn(BlockTags.BEDS)) {
-                final BedPart bedPart = state.get(BedBlock.PART);
-                if (bedPart == BedPart.HEAD) {
-                    allBeds.add(new FortressBedInfo(entry.getKey().add(startingBlock)));
-                }
-            }
-        }
-
-        this.beds = Collections.unmodifiableSet(allBeds);
         this.requirementId = requirementId;
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld level, Colonist colonist) {
+    public TaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
         final Pair<BlockPos, BlockPos> partStartAndEnd = parts.poll();
         List<TaskBlockInfo> blockInfos = getTaskBlockInfos(partStartAndEnd);
         return new TaskPart(partStartAndEnd, blockInfos, this);
@@ -87,8 +70,8 @@ public class BlueprintTask extends AbstractTask {
     }
 
     @Override
-    public void finishPart(TaskPart part, Colonist colonist) {
-        final ServerWorld world = (ServerWorld) colonist.world;
+    public void finishPart(TaskPart part, IWorkerPawn colonist) {
+        final ServerWorld world = colonist.getServerWorld();
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
             if(blueprintEntityData != null) {
                 blueprintEntityData.forEach((pos, state) -> {
@@ -110,18 +93,18 @@ public class BlueprintTask extends AbstractTask {
                     });
             }
 
-            final FortressBuilding fortressBuilding = new FortressBuilding(startingBlock, endingBlock, beds, requirementId);
-            colonist.getFortressServerManager().addBuilding(fortressBuilding);
+            final FortressBuilding fortressBuilding = new FortressBuilding(startingBlock, endingBlock, requirementId);
+            colonist.getFortressServerManager().orElseThrow().addBuilding(fortressBuilding);
         }
         super.finishPart(part, colonist);
     }
 
-    private void addSpecialBlueprintBlock(Colonist colonist, Block block, BlockPos pos) {
-        colonist.getFortressServerManager().addSpecialBlocks(block, pos, true);
+    private void addSpecialBlueprintBlock(IWorkerPawn colonist, Block block, BlockPos pos) {
+        colonist.getFortressServerManager().orElseThrow().addSpecialBlocks(block, pos, true);
     }
 
-    private void removeReservedItem(Colonist colonist, Item item) {
-        final var fortressManager = colonist.getFortressServerManager();
+    private void removeReservedItem(IFortressAwareEntity colonist, Item item) {
+        final var fortressManager = colonist.getFortressServerManager().orElseThrow();
         if(fortressManager.isSurvival()) {
             if (SimilarItemsHelper.isIgnorable(item)) {
                 fortressManager

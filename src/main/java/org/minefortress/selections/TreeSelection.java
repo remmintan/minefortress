@@ -1,7 +1,6 @@
 package org.minefortress.selections;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -11,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.network.ServerboundCutTreesTaskPacket;
+import org.minefortress.network.c2s.ServerboundCutTreesTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.tasks.TaskType;

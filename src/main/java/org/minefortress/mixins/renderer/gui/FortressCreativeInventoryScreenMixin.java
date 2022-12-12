@@ -1,6 +1,5 @@
 package org.minefortress.mixins.renderer.gui;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
@@ -26,12 +25,8 @@ import net.minecraft.tag.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.MineFortressMod;
-import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -44,7 +39,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 @Mixin(CreativeInventoryScreen.class)
@@ -74,7 +68,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Shadow protected abstract boolean renderTabTooltipIfHovered(MatrixStack matrices, ItemGroup group, int mouseX, int mouseY);
 
-    @Shadow @Final private static SimpleInventory INVENTORY;
+    @Shadow @Final static SimpleInventory INVENTORY;
 
     public FortressCreativeInventoryScreenMixin(CreativeInventoryScreen.CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {
         super(screenHandler, playerInventory, text);
@@ -82,19 +76,17 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Inject(method = "<init>", at = @At("RETURN"))
     void init(PlayerEntity player, CallbackInfo ci) {
-        if(isFortressGamemode() && isNotCreative()){
+        if(isFortressSurvival()){
             super.handler = new FortressSurvivalInventoryScreenHandler(player, INVENTORY);
             player.currentScreenHandler = super.handler;
         }
     }
 
-    private boolean isNotCreative() {
-        return !getClientManager().isCreative();
-    }
+
 
     @Redirect(method = "onMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/entity/ItemEntity;"))
     ItemEntity dropItem(ClientPlayerEntity instance, ItemStack itemStack, boolean b) {
-        if(isFortressGamemode())
+        if(ModUtils.isClientInFortressGamemode())
             return null;
         else {
             return instance.dropItem(itemStack, b);
@@ -110,14 +102,14 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Redirect(method = "onMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;dropCreativeStack(Lnet/minecraft/item/ItemStack;)V"))
     void dropCreativeStack(ClientPlayerInteractionManager instance, ItemStack stack) {
-        if(!isFortressGamemode()) {
+        if(!ModUtils.isClientInFortressGamemode()) {
             instance.dropCreativeStack(stack);
         }
     }
 
     @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
     public void mouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if(isFortressGamemode() && isNotCreative()) {
+        if(isFortressSurvival()) {
             if (button == 0) {
                 double d = mouseX - (double)this.x;
                 double e = mouseY - (double)this.y;
@@ -134,7 +126,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if(isFortressGamemode() && isNotCreative()) {
+        if(isFortressSurvival()) {
             this.renderBackground(matrices);
             super.render(matrices, mouseX, mouseY, delta);
             for (ItemGroup itemGroup : getResourceManager().getGroups()) {
@@ -153,7 +145,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Inject(method = "drawBackground", at = @At("HEAD"), cancellable = true)
     public void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY, CallbackInfo ci) {
-        if(isFortressGamemode() && isNotCreative()) {
+        if(isFortressSurvival()) {
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             ItemGroup itemGroup = ItemGroup.GROUPS[selectedTab];
             for (ItemGroup itemGroup2 : getResourceManager().getGroups()) {
@@ -177,7 +169,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             }
             this.renderTabIcon(matrices, itemGroup);
             if (itemGroup == ItemGroup.INVENTORY) {
-                InventoryScreen.drawEntity(this.x + 88, this.y + 45, 20, this.x + 88 - mouseX, this.y + 45 - 30 - mouseY, this.client.player);
+                InventoryScreen.drawEntity(this.x + 88, this.y + 45, 20, this.x + 88 - mouseX, this.y + 45 - 30 - mouseY, ModUtils.getClientPlayer());
             }
 
             ci.cancel();
@@ -186,7 +178,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Inject(method = "setSelectedTab", at = @At("HEAD"), cancellable = true)
     public void setSelectedTabInj(ItemGroup group, CallbackInfo ci) {
-        if(isFortressGamemode() && isNotCreative()){
+        if(isFortressSurvival()){
             selectedTab = group.getIndex();
             this.cursorDragSlots.clear();
 
@@ -202,9 +194,11 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         }
     }
 
+
+
     @Inject(method = "search", at = @At("HEAD"), cancellable = true)
     public void search(CallbackInfo ci) {
-        if(isFortressGamemode() && isNotCreative()) {
+        if(isFortressSurvival()) {
             this.searchResultTags.clear();
             String string = this.searchBox.getText();
             if (string.isEmpty()) {
@@ -215,10 +209,10 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
                 SearchableContainer<ItemStack> searchable;
                 if (string.startsWith("#")) {
                     string = string.substring(1);
-                    searchable = this.client.getSearchableContainer(SearchManager.ITEM_TAG);
+                    searchable = getClient().getSearchableContainer(SearchManager.ITEM_TAG);
                     this.searchForTags(string);
                 } else {
-                    searchable = this.client.getSearchableContainer(SearchManager.ITEM_TOOLTIP);
+                    searchable = getClient().getSearchableContainer(SearchManager.ITEM_TOOLTIP);
                 }
                 this.handler.itemList.addAll(searchable.findAll(string.toLowerCase(Locale.ROOT)));
             }
@@ -229,20 +223,16 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         }
     }
 
-    private boolean isFortressGamemode() {
-        return getClient().interactionManager != null && getClient().interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
-    }
-
     private MinecraftClient getClient() {
         return MinecraftClient.getInstance();
     }
 
-    private FortressClientManager getClientManager() {
-        return ((FortressMinecraftClient) getClient()).getFortressClientManager();
+    private static boolean isFortressSurvival() {
+        return ModUtils.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative();
     }
 
-    private ClientResourceManager getResourceManager() {
-        return getClientManager().getResourceManager();
+    private static ClientResourceManager getResourceManager() {
+        return ModUtils.getFortressClientManager().getResourceManager();
     }
 
 }

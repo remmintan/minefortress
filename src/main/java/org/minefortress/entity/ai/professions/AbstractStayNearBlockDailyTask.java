@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 
-import static org.minefortress.entity.colonist.ColonistHungerManager.PASSIVE_EXHAUSTION;
+import static org.minefortress.entity.colonist.FortressHungerManager.PASSIVE_EXHAUSTION;
 
 abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
 
@@ -34,7 +34,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
             if(workingTicks % 10 * colonist.getHungerMultiplier() == 0) {
                 colonist.swingHand(colonist.world.random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
                 colonist.putItemInHand(getWorkingItem());
-                colonist.addExhaustion(PASSIVE_EXHAUSTION);
+                colonist.addHunger(PASSIVE_EXHAUSTION);
             }
             colonist.lookAt(blockPos);
             workingTicks++;

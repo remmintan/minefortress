@@ -2,7 +2,6 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.TaskControl;
@@ -22,32 +21,21 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     public ColonistExecuteTaskGoal(Colonist colonist) {
         super(colonist);
-        World level = this.colonist.world;
-        if(level instanceof ServerWorld) {
-            this.world = (ServerWorld) level;
+        if(colonist.world instanceof ServerWorld sw) {
+            this.world = sw;
         } else {
             throw new IllegalStateException("AI should run on the server entities!");
         }
-
-    }
-
-    @Override
-    public boolean canStop() {
-        return super.isStarving() || super.isScared() || super.isFighting() || super.isHiding();
     }
 
     @Override
     public boolean canStart() {
-        final var notInCombat = notInCombat();
         final var hasTask = getTaskControl().hasTask();
         final var notStarving = !super.isStarving();
-        LOGGER.debug("{} can executeTask [not in combat: {}, has task: {}, not starving: {}]", getColonistName(), notInCombat, hasTask, notStarving);
-        return notInCombat && hasTask && notStarving;
+        LOGGER.debug("{} can executeTask [ has task: {}, not starving: {}]", getColonistName(), hasTask, notStarving);
+        return  hasTask && notStarving;
     }
 
-    private String getColonistName() {
-        return colonist.getName().asString();
-    }
 
     @Override
     public void start() {
@@ -91,38 +79,29 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        final var notInCombat = notInCombat();
         final var notStarving = !super.isStarving();
         final var hasTask = getTaskControl().hasTask();
         final var hasGoalTryingToReachOrWorking = getMovementHelper().stillTryingToReachGoal() ||
                 workGoal != null ||
-                !getTaskControl().finished() ||
+                getTaskControl().partHasMoreBlocks() ||
                 colonist.diggingOrPlacing();
-        final var shouldContinue = notInCombat && notStarving && hasTask && hasGoalTryingToReachOrWorking;
-        LOGGER.debug("{} should continue task execution {} [not in combat {}, not starving {}, has task {}, has goal and working {}, digging or placing {}]", getColonistName(), shouldContinue, notInCombat, notStarving, hasTask, hasGoalTryingToReachOrWorking, colonist.diggingOrPlacing());
+        final var shouldContinue = notStarving && hasTask && hasGoalTryingToReachOrWorking;
+        LOGGER.debug("{} should continue task execution {} [not starving {}, has task {}, has goal and working {}, digging or placing {}]", getColonistName(), shouldContinue, notStarving, hasTask, hasGoalTryingToReachOrWorking, colonist.diggingOrPlacing());
         return shouldContinue;
     }
 
     @Override
     public void stop() {
         LOGGER.debug("{} stopping the task execution", getColonistName());
-        if(!notInCombat()) {
-            final var idOpt = getTaskControl().getTaskId();
-            if(idOpt.isPresent()) {
-                final var id = idOpt.get();
-                LOGGER.debug("{} stopping task execution because of combat. Return reserved items for task {}", getColonistName(), id);
-                colonist
-                        .getFortressServerManager()
-                        .getServerResourceManager()
-                        .returnReservedItems(id);
+        final var taskControl = getTaskControl();
+        if(taskControl.hasTask()) {
+            if(taskControl.partHasMoreBlocks()) {
+                LOGGER.debug("{} failing task part", getColonistName());
+               taskControl.fail();
             } else {
-                LOGGER.debug("{} stopping task execution because of combat. No task id found", getColonistName());
+                LOGGER.debug("{} finishing task successfully", getColonistName());
+                taskControl.success();
             }
-            getTaskControl().fail();
-        }
-        if(getTaskControl().hasTask()) {
-            LOGGER.debug("{} finishing task successfully", getColonistName());
-            getTaskControl().success();
         }
         this.colonist.resetControls();
         this.workGoal = null;
@@ -133,7 +112,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         getMovementHelper().reset();
         workGoal = null;
         TaskBlockInfo taskBlockInfo = null;
-        while (!getTaskControl().finished()) {
+        while (getTaskControl().partHasMoreBlocks()) {
             LOGGER.debug("{} task is not finished yet", getColonistName());
             taskBlockInfo = getTaskControl().getNextBlock();
             if(taskBlockInfo == null){
@@ -167,7 +146,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     private boolean blockInCorrectState(BlockPos pos) {
         if(pos == null) return false;
         if(getTaskControl().is(TaskType.REMOVE)) {
-            if(colonist.getFortressServerManager().getFortressCenter().equals(pos)) return false;
+            if(pos.equals(colonist.getFortressServerManager().orElseThrow().getFortressCenter())) return false;
             return BuildingHelper.canRemoveBlock(world, pos);
         } else if(getTaskControl().is(TaskType.BUILD)) {
             return BuildingHelper.canPlaceBlock(world, pos);

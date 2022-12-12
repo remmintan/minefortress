@@ -6,7 +6,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.network.ServerboundChangeMaxColonistsCountPacket;
+import org.minefortress.network.c2s.ServerboundChangeMaxColonistsCountPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.utils.ModUtils;
@@ -15,7 +15,7 @@ public class ColonistsScreen extends Screen {
 
     private static final Text MANAGE_COLONISTS_COUNT_TEXT = new LiteralText("Manage Villagers");
 
-    protected ColonistsScreen() {
+    public ColonistsScreen() {
         super(new LiteralText("Colonists"));
     }
 

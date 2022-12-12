@@ -1,11 +1,13 @@
 package org.minefortress.entity.ai.professions;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
@@ -31,16 +33,16 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     }
 
     @Override
+    @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
-        final FortressServerManager fortressManager = colonist.getFortressServerManager();
-        Optional<BlockPos> tablePosOpt = fortressManager.getSpecialBlocksByType(Blocks.FURNACE, true)
-                .stream()
-                .findFirst();
-
-        if(tablePosOpt.isEmpty()) return null;
-        return tablePosOpt.get();
+        return colonist.getFortressServerManager()
+                .flatMap(it -> it
+                        .getSpecialBlocksByType(Blocks.FURNACE, true)
+                        .stream()
+                        .findFirst()
+                )
+                .orElse(null);
     }
-
 
     @Override
     protected Item getWorkingItem() {
@@ -52,15 +54,18 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     }
 
     private boolean atLeastOneFurnaceIsBurning(Colonist colonist){
-        final FortressServerManager fortressManager = colonist.getFortressServerManager();
-        final var furnaces = fortressManager.getSpecialBlocksByType(Blocks.FURNACE, true);
-        for(BlockPos pos : furnaces){
-            final var furnace = colonist.world.getBlockEntity(pos);
-            if(furnace instanceof FurnaceBlockEntity furnaceBlockEntity && furnaceBlockEntity.isBurning()){
-                return true;
-            }
-        }
-        return false;
+        return colonist.getFortressServerManager()
+                .map(it -> {
+                    final var furnaces = it.getSpecialBlocksByType(Blocks.FURNACE, true);
+                    for(BlockPos pos : furnaces){
+                        final var furnace = colonist.world.getBlockEntity(pos);
+                        if(furnace instanceof FurnaceBlockEntity furnaceBlockEntity && furnaceBlockEntity.isBurning()){
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .orElse(false);
     }
 
     private boolean furnaceScreenIsOpen(Colonist colonist){

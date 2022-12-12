@@ -4,7 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.block.Block;
-import net.minecraft.item.Item;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -24,34 +24,62 @@ public class Profession {
     private final ItemStack icon;
     private int amount = 0;
     private final AdvancementFrame type = AdvancementFrame.TASK;
-    private final List<Text> unlockedDescription;
-    private final List<Text> notEnoughBuildingsDescription;
-    private final List<Text> lockedDescription;
+    private final List<Text> description;
+    private final List<Text> unlockMoreMessage;
+    private final List<Text> unlockMessage;
     private final String buildingRequirement;
-    private Block blockRequirement = null;
-    private List<ItemInfo> itemsRequirement = null;
-    private boolean blueprint = false;
+    private final Block blockRequirement;
+    private final List<ItemInfo> itemsRequirement;
+    private final boolean cantRemove;
+    private final boolean blueprint;
 
     private Profession parent;
     private final List<Profession> children = new ArrayList<>();
 
-    public Profession(String title, Item icon, String unlockedDescription, String lockedDescription, String notEnoughBuildingDescription) {
-        this(title, icon, unlockedDescription, lockedDescription, notEnoughBuildingDescription, null);
-    }
-    public Profession(String title, Item icon, String unlockedDescription, String lockedDescription, String notEnoughBuildingDescription, String buildingRequirement) {
-        this.title = title;
-        this.icon = new ItemStack(icon);
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            this.unlockedDescription = GuiUtils.splitTextInWordsForLength(unlockedDescription, MAX_WIDTH);
-            this.lockedDescription = GuiUtils.splitTextInWordsForLength(lockedDescription, MAX_WIDTH);
-            this.notEnoughBuildingsDescription = GuiUtils.splitTextInWordsForLength(notEnoughBuildingDescription, MAX_WIDTH);
+    public Profession(ProfessionFullInfo fullInfo) {
+        this.title = fullInfo.title();
+        this.icon = new ItemStack(fullInfo.icon());
+        this.cantRemove = fullInfo.cantRemove();
+
+        final var requirements = fullInfo.requirements();
+
+        if(requirements != null) {
+            buildingRequirement = requirements.building();
+
+            final var blockRequirement = requirements.block();
+            if(blockRequirement != null && !Blocks.AIR.equals(blockRequirement.block())) {
+                this.blockRequirement = blockRequirement.block();
+                blueprint = blockRequirement.inBlueprint();
+            } else {
+                this.blockRequirement = null;
+                blueprint = false;
+            }
+
+            this.itemsRequirement = requirements
+                    .items()
+                    .stream()
+                    .map(it -> new ItemInfo(it.item(), it.count()))
+                    .toList();
         } else {
-            this.unlockedDescription = null;
-            this.lockedDescription = null;
-            this.notEnoughBuildingsDescription = null;
+            buildingRequirement = "";
+            blockRequirement = null;
+            blueprint = false;
+            itemsRequirement = Collections.emptyList();
         }
 
-        this.buildingRequirement = buildingRequirement;
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            this.description = GuiUtils.splitTextInWordsForLength(fullInfo.description(), MAX_WIDTH);
+            this.unlockMessage = GuiUtils.splitTextInWordsForLength(fullInfo.unlockMessage(), MAX_WIDTH);
+            this.unlockMoreMessage = GuiUtils.splitTextInWordsForLength(fullInfo.unlockMoreMessage(), MAX_WIDTH);
+        } else {
+            this.description = null;
+            this.unlockMessage = null;
+            this.unlockMoreMessage = null;
+        }
+    }
+
+    public boolean isCantRemove() {
+        return cantRemove;
     }
 
     public String getTitle() {
@@ -88,31 +116,20 @@ public class Profession {
         return Collections.unmodifiableList(children);
     }
 
-    public List<Text> getUnlockedDescription() {
-        return unlockedDescription;
+    public List<Text> getDescription() {
+        return description;
     }
 
-    public List<Text> getLockedDescription() {
-        return lockedDescription;
+    public List<Text> getUnlockMessage() {
+        return unlockMessage;
     }
 
-    public List<Text> getNotEnoughBuildingsDescription() {
-        return notEnoughBuildingsDescription;
+    public List<Text> getUnlockMoreMessage() {
+        return unlockMoreMessage;
     }
 
     public Profession getParent() {
         return parent;
-    }
-
-    public Profession setBlockRequirement(Block block, boolean blueprint) {
-        this.blockRequirement = block;
-        this.blueprint = blueprint;
-        return this;
-    }
-
-    public Profession setItemsRequirement(List<ItemInfo> itemStacks) {
-        this.itemsRequirement = Collections.unmodifiableList(itemStacks);
-        return this;
     }
 
     public List<ItemInfo> getItemsRequirement() {
@@ -142,5 +159,5 @@ public class Profession {
             amount = 0;
     }
 
-    public static record BlockRequirement(Block block, boolean blueprint) {}
+    public record BlockRequirement(Block block, boolean blueprint) {}
 }

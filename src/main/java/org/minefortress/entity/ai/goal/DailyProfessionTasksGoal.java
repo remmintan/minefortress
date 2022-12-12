@@ -19,25 +19,19 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     private ProfessionDailyTask currentTask;
 
-    private final WarriorDailyTask warriorTask;
-
     public DailyProfessionTasksGoal(Colonist colonist) {
         super(colonist);
-        this.warriorTask = new WarriorDailyTask();
     }
 
     @Override
     public boolean canStart() {
-        if(!notInCombat()) return false;
         if(this.isStarving()) return false;
         final TaskControl taskControl = getTaskControl();
         if(taskControl.hasTask()) return false;
         final String professionId = colonist.getProfessionId();
-        final var warriorProfession = professionId.startsWith("warrior") || professionId.startsWith("archer");
-        if(!dailyTasks.containsKey(professionId) && !warriorProfession) return false;
 
-        this.currentTask = warriorProfession ? warriorTask : dailyTasks.get(professionId);
-        return this.currentTask.canStart(colonist);
+        this.currentTask =  dailyTasks.get(professionId);
+        return currentTask != null && this.currentTask.canStart(colonist);
     }
 
     @Override
@@ -53,7 +47,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return notInCombat() && !isStarving() && this.dailyTasks.containsKey(colonist.getProfessionId())
+        return  !isStarving() && this.dailyTasks.containsKey(colonist.getProfessionId())
                 && this.currentTask.shouldContinue(colonist)
                 && !getTaskControl().hasTask();
     }
@@ -66,7 +60,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return this.isStarving() || this.isScared() || super.isFighting() || super.isHiding();
+        return this.isStarving();
     }
 
     private TaskControl getTaskControl() {

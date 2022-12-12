@@ -10,7 +10,7 @@ public enum BlueprintGroup {
     LIVING_HOUSES(true, Items.OAK_PLANKS, "Living Houses"),
     WORKSHOPS(true, Items.IRON_AXE, "Workshops"),
     FARMS(true, Items.WHEAT, "Farms"),
-    SOCIAL_BUOLDINGS(true, Items.BOOKSHELF, "Social Buildings"),
+    SOCIAL_BUILDINGS(true, Items.BOOKSHELF, "Social Buildings"),
     DECORATION(true, Items.ROSE_BUSH, "Decoration");
 
     private final boolean topRow;

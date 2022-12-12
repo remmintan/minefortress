@@ -10,187 +10,88 @@ import net.minecraft.util.math.Vec3i;
 import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.ServerBlueprintBlockDataManager;
-import org.minefortress.network.ClientboundAddBlueprintPacket;
-import org.minefortress.network.ClientboundResetBlueprintPacket;
-import org.minefortress.network.ClientboundUpdateBlueprintPacket;
+import org.minefortress.network.s2c.ClientboundAddBlueprintPacket;
+import org.minefortress.network.s2c.ClientboundResetBlueprintPacket;
+import org.minefortress.network.s2c.ClientboundUpdateBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
 
 import java.util.*;
-
-import static java.util.Map.entry;
+import java.util.function.Supplier;
 
 public class ServerBlueprintManager {
 
-    private static final Map<BlueprintGroup, List<BlueprintMetadata>> PREDEFINED_BLUEPRINTS = Map.ofEntries(
-            entry(
-                    BlueprintGroup.LIVING_HOUSES,
-                    Arrays.asList(
-                            //wooden_miner_house.nbt
-                            new BlueprintMetadata("Small House 1", "small_house_1").setRequirementId("house"),
-                            //small_house_2.nbt
-                            new BlueprintMetadata("Small House 2", "small_house_2").setRequirementId("house"),
-                            //small_house_3.nbt
-                            new BlueprintMetadata("Small House 3", "small_house_3").setRequirementId("house"),
-                            //small_house_4.nbt
-                            new BlueprintMetadata("Small House 4", "small_house_4").setRequirementId("house"),
-                            //small_house_5.nbt
-                            new BlueprintMetadata("Small House 5", "small_house_5", 1).setRequirementId("house"),
-                            //small_house_6.nbt
-                            new BlueprintMetadata("Small House 6", "small_house_6").setRequirementId("house"),
-                            //small_house_7.nbt
-                            new BlueprintMetadata("Small House 7", "small_house_7").setRequirementId("house"),
-                            //small_house_8.nbt
-                            new BlueprintMetadata("Small House 8", "small_house_8", 2).setRequirementId("house"),
-                            //medium_house_1.nbt
-                            new BlueprintMetadata("Medium House 1", "medium_house_1", 1, true).setRequirementId("house"),
-                            //medium_house_2.nbt
-                            new BlueprintMetadata("Medium House 2", "medium_house_2", true).setRequirementId("house"),
-                            //big_house_1.nbt
-                            new BlueprintMetadata("Big House 1", "big_house_1", 1, true).setRequirementId("house")
-                    )
-            ),
-            entry(
-                    BlueprintGroup.WORKSHOPS,
-                    Arrays.asList(
-                            new BlueprintMetadata("Wooden Miner's House", "miner_house_wooden").setRequirementId("miner_wooden"),
-                            new BlueprintMetadata("Stone Miner's house", "miner_house_stone").setRequirementId("miner_stone"),
-                            new BlueprintMetadata("Miners' guild house", "miner_house_guild").setRequirementId("miners_guild"),
-
-                            new BlueprintMetadata("Wooden Lumberjack's house", "lumberjack_house_wooden").setRequirementId("lumberjack_wooden"),
-                            new BlueprintMetadata("Stone Lumberjack's house", "lumberjack_house_stone").setRequirementId("lumberjack_stone"),
-                            new BlueprintMetadata("Lumberjack's guild house", "lumberjack_house_guild").setRequirementId("lumberjack_guild"),
-
-                            new BlueprintMetadata("Blacksmith's house", "small_house_3_with_furnace").setRequirementId("blacksmith"),
-                            new BlueprintMetadata("Forester's house", "forester_house").setRequirementId("forester"),
-
-                            new BlueprintMetadata("Small Warrior's house", "warrior_1").setRequirementId("warrior1"),
-                            new BlueprintMetadata("Medium Warrior's house", "warrior_2").setRequirementId("warrior2"),
-
-                            new BlueprintMetadata("Shooting gallery", "shooting_gallery").setRequirementId("shooting_gallery"),
-
-                            //armorer_house_1.nbt
-                            new BlueprintMetadata("Armorer House 1", "armorer_house_1").setRequirementId("armorer"),
-                            //butcher_shop_1.nbt
-                            new BlueprintMetadata("Butcher Shop 1", "butcher_shop_1").setRequirementId("butcher"),
-                            //butcher_shop_2.nbt
-                            new BlueprintMetadata("Butcher Shop 2", "butcher_shop_2", 1).setRequirementId("butcher"),
-                            //cartographer_1.nbt
-                            new BlueprintMetadata("Cartographer 1", "cartographer_1", 1).setRequirementId("cartographer"),
-                            //fisher_cottage_1.nbt
-                            new BlueprintMetadata("Fisher Cottage 1", "fisher_cottage_1", 2).setRequirementId("fisher"),
-                            //fletcher_house_1.nbt
-                            new BlueprintMetadata("Fletcher House 1", "fletcher_house_1", 1).setRequirementId("fletcher"),
-                            //masons_house_1.nbt
-                            new BlueprintMetadata("Masons House 1", "masons_house_1").setRequirementId("masons"),
-                            //shepherds_house_1.nbt
-                            new BlueprintMetadata("Shepherds House 1", "shepherds_house_1", 1).setRequirementId("shepherd"),
-                            //tannery_1.nbt
-                            new BlueprintMetadata("Tannery 1", "tannery_1").setRequirementId("tanner"),
-                            //tool_smith_1.nbt
-                            new BlueprintMetadata("Tool Smith 1", "tool_smith_1").setRequirementId("crafter"),
-                            //weaponsmith_1.nbt
-                            new BlueprintMetadata("Weaponsmith 1", "weaponsmith_1").setRequirementId("blacksmith")
-                    )
-            ),
-            entry(
-                    BlueprintGroup.SOCIAL_BUOLDINGS,
-                    Arrays.asList(
-                            //library_1.nbt
-                            new BlueprintMetadata("Library 1", "library_1").setRequirementId("social"),
-                            //library_2.nbt
-                            new BlueprintMetadata("Library 2", "library_2", 1, true).setRequirementId("social"),
-                            //temple_3.nbt
-                            new BlueprintMetadata("Temple 3", "temple_3", true).setRequirementId("social"),
-                            //temple_4.nbt
-                            new BlueprintMetadata("Temple 4", "temple_4", true).setRequirementId("social")
-                    )
-            ),
-            entry(
-                    BlueprintGroup.FARMS,
-                    Arrays.asList(
-                            //animal_pen_1.nbt
-                            new BlueprintMetadata("Animal Pen 1", "animal_pen_1", 1).setRequirementId("shepherd"),
-                            //animal_pen_2.nbt
-                            new BlueprintMetadata("Animal Pen 2", "animal_pen_2", 1, true).setRequirementId("shepherd"),
-                            //animal_pen_3.nbt
-                            new BlueprintMetadata("Animal Pen 3", "animal_pen_3", 1, true).setRequirementId("shepherd"),
-                            //small_farm_1.nbt
-                            new BlueprintMetadata("Small Farm 1", "small_farm_1", true).setRequirementId("farmer"),
-                            //large_farm_1.nbt
-                            new BlueprintMetadata("Large Farm 1", "large_farm_1", true).setRequirementId("farmer"),
-                            //stable_1.nbt
-                            new BlueprintMetadata("Stable 1", "stable_1", 1, true).setRequirementId("stableman"),
-                            //stable_2.nbt
-                            new BlueprintMetadata("Stable 2", "stable_2", 1, true).setRequirementId("stableman")
-                    )
-            ),
-            entry(
-                    BlueprintGroup.DECORATION,
-                    Arrays.asList(
-                            //accessory_1.nbt
-                            new BlueprintMetadata("Accessory 1", "accessory_1").setRequirementId("decor"),
-                            //fountain_01.nbt
-                            new BlueprintMetadata("Fountain 01", "fountain_01", 1, true).setRequirementId("decor"),
-                            //meeting_point_1.nbt
-                            new BlueprintMetadata("Meeting Point 1", "meeting_point_1", 1, true).setRequirementId("decor"),
-                            //meeting_point_2.nbt
-                            new BlueprintMetadata("Meeting Point 2", "meeting_point_2", 1, true).setRequirementId("decor"),
-                            //meeting_point_3.nbt
-                            new BlueprintMetadata("Meeting Point 3", "meeting_point_3", 1, true).setRequirementId("decor"),
-                            //meeting_point_4.nbt
-                            new BlueprintMetadata("Meeting Point 4", "meeting_point_4", 1, true).setRequirementId("decor"),
-                            //meeting_point_5.nbt
-                            new BlueprintMetadata("Meeting Point 5", "meeting_point_5", 1, true).setRequirementId("decor")
-                    )
-            )
-    );
-
     private boolean initialized = false;
 
-    private final Map<String, Integer> updatedFloorLevel = new HashMap<>();
-
     private final ServerBlueprintBlockDataManager blockDataManager;
-    private final Queue<ClientboundUpdateBlueprintPacket> scheduledEdits = new ArrayDeque<>();
+    private final BlueprintMetadataReader blueprintMetadataReader;
+    private final Queue<FortressS2CPacket> scheduledEdits = new ArrayDeque<>();
 
-    public ServerBlueprintManager(MinecraftServer server) {
-        this.blockDataManager = new ServerBlueprintBlockDataManager(server);
+    public ServerBlueprintManager(MinecraftServer server, Supplier<UUID> userIdProvider) {
+        this.blueprintMetadataReader = new BlueprintMetadataReader(server);
+        this.blockDataManager = new ServerBlueprintBlockDataManager(server, blueprintMetadataReader::convertFilenameToGroup, userIdProvider);
     }
 
     public void tick(ServerPlayerEntity player) {
         if(!initialized) {
+            blueprintMetadataReader.read();
             scheduledEdits.clear();
             final ClientboundResetBlueprintPacket resetpacket = new ClientboundResetBlueprintPacket();
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESET_BLUEPRINT, resetpacket);
 
-            for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : PREDEFINED_BLUEPRINTS.entrySet()) {
+            for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : blueprintMetadataReader.getPredefinedBlueprints().entrySet()) {
                 for(BlueprintMetadata blueprintMetadata : entry.getValue()) {
                     final String file = blueprintMetadata.getFile();
-                    final int floorLevel = updatedFloorLevel.containsKey(file)?updatedFloorLevel.get(file):blueprintMetadata.getFloorLevel();
-                    final NbtCompound structureNbt = blockDataManager.getStructureNbt(file);
-                    final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(entry.getKey(), blueprintMetadata.getName(), file, structureNbt, floorLevel, blueprintMetadata.isPremium());
-                    FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
+                    blockDataManager.getStructureNbt(file)
+                            .ifPresent(it -> {
+                                final int floorLevel = blockDataManager.getFloorLevel(file).orElse(blueprintMetadata.getFloorLevel());
+                                final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(
+                                        entry.getKey(),
+                                        blueprintMetadata.getName(),
+                                        file,
+                                        floorLevel,
+                                        blueprintMetadata.getRequirementId(),
+                                        it
+                                );
+                                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
+                            });
                 }
             }
+
+            final var initPackets = blockDataManager.getInitPackets();
+            scheduledEdits.addAll(initPackets);
 
             initialized = true;
         }
 
         if(!scheduledEdits.isEmpty()) {
-            final ClientboundUpdateBlueprintPacket packet = scheduledEdits.remove();
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, packet);
+            final FortressS2CPacket packet = scheduledEdits.remove();
+            if(packet instanceof ClientboundUpdateBlueprintPacket)
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, packet);
+            else if(packet instanceof ClientboundAddBlueprintPacket)
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
+            else
+                throw new IllegalStateException("Wrong blueprint update packet type: " + packet.getClass());
         }
     }
 
-    public void update(String fileName, NbtCompound updatedStructure, int newFloorLevel) {
-        blockDataManager.update(fileName, updatedStructure);
-        updatedFloorLevel.put(fileName, newFloorLevel);
-        final ClientboundUpdateBlueprintPacket packet = new ClientboundUpdateBlueprintPacket(fileName, newFloorLevel, updatedStructure);
+    public void update(String fileName, NbtCompound updatedStructure, int newFloorLevel, BlueprintGroup group) {
+        final var existed = blockDataManager.update(fileName, updatedStructure, newFloorLevel, group);
+        final FortressS2CPacket packet =
+                existed? ClientboundUpdateBlueprintPacket.edit(fileName, newFloorLevel, updatedStructure) :
+                        new ClientboundAddBlueprintPacket(group, fileName, fileName,  newFloorLevel, "custom", updatedStructure);
         scheduledEdits.add(packet);
+    }
+
+    public void remove(String name) {
+        blockDataManager.remove(name);
+        final var remove = ClientboundUpdateBlueprintPacket.remove(name);
+        scheduledEdits.add(remove);
     }
 
     public ServerBlueprintBlockDataManager getBlockDataManager() {
@@ -199,7 +100,7 @@ public class ServerBlueprintManager {
 
     public BlueprintTask createTask(UUID taskId, String structureFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
         final String requirementId = this.findRequirementIdByFileName(structureFile)
-                .orElseThrow(() -> new IllegalArgumentException("Structure file not found: " + structureFile));
+                .orElse("custom");
         final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation, floorLevel);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
@@ -219,33 +120,25 @@ public class ServerBlueprintManager {
         return new BlueprintDigTask(uuid, startPos, endPos);
     }
 
-    private BlockPos getEndPos(BlockPos startPos, Vec3i size) {
+    private static BlockPos getEndPos(BlockPos startPos, Vec3i size) {
         return startPos.add(new Vec3i(size.getX()-1, size.getY()-1, size.getZ()-1));
     }
 
-    public void writeToNbt(NbtCompound compound) {
-        blockDataManager.writeBlockDataManager(compound);
-
-        final NbtCompound floorLevel = new NbtCompound();
-        for(Map.Entry<String, Integer> entry : updatedFloorLevel.entrySet()) {
-            floorLevel.putInt(entry.getKey(), entry.getValue());
-        }
-        compound.put("floorLevel", floorLevel);
+    public void write() {
+        blockDataManager.writeBlockDataManager();
     }
 
-    public void readFromNbt(NbtCompound compound) {
-        blockDataManager.readBlockDataManager(compound);
+    public void read() {
+        read(null);
+        initialized = false;
+    }
 
-        if(compound.contains("floorLevel")) {
-            final NbtCompound floorLevel = compound.getCompound("floorLevel");
-            for(String key : floorLevel.getKeys()) {
-                updatedFloorLevel.put(key, floorLevel.getInt(key));
-            }
-        }
+    public void read(NbtCompound compound) {
+        blockDataManager.readBlockDataManager(compound);
     }
 
     private Optional<String> findRequirementIdByFileName(String fileName){
-        return PREDEFINED_BLUEPRINTS.values().stream().flatMap(Collection::stream)
+        return blueprintMetadataReader.getPredefinedBlueprints().values().stream().flatMap(Collection::stream)
                 .filter(blueprintMetadata -> blueprintMetadata.getFile().equals(fileName))
                 .findFirst()
                 .map(BlueprintMetadata::getRequirementId);

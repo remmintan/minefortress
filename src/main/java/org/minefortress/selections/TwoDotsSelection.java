@@ -3,7 +3,6 @@ package org.minefortress.selections;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -14,7 +13,7 @@ import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.network.ServerboundSimpleSelectionTaskPacket;
+import org.minefortress.network.c2s.ServerboundSimpleSelectionTaskPacket;
 import org.minefortress.tasks.TaskType;
 import org.minefortress.utils.BlockUtils;
 

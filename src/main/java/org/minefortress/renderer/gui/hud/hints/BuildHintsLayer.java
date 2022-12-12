@@ -1,0 +1,64 @@
+package org.minefortress.renderer.gui.hud.hints;
+
+
+
+import org.minefortress.renderer.gui.hud.HudState;
+import org.minefortress.selections.ClickType;
+import org.minefortress.selections.SelectionManager;
+import org.minefortress.selections.SelectionType;
+import org.minefortress.utils.ModUtils;
+
+import java.util.List;
+import java.util.Optional;
+
+public class BuildHintsLayer extends AbstractHintsLayer{
+
+    private static final List<String> START_HINTS = List.of(
+            "left click - dig",
+            "right click - build"
+    );
+
+    private static final List<String> REMOVE_HINTS = List.of(
+            "left click - confirm task",
+            "right click - cancel",
+            "ctrl + E - move up",
+            "ctrl + Q - move down"
+    );
+
+    private static final List<String> BUILD_HINTS = List.of(
+            "left click - cancel",
+            "right click - confirm task",
+            "ctrl + E - move up",
+            "ctrl + Q - move down"
+    );
+
+    @Override
+    public boolean shouldRender(HudState hudState) {
+        final var selectType = getSelectionManager().getCurrentSelectionType();
+        return super.shouldRender(hudState) && hudState == HudState.BUILD &&
+                selectType != SelectionType.TREE && selectType != SelectionType.ROADS;
+    }
+
+    @Override
+    protected List<String> getHints() {
+        if(getSelectionManager().isSelecting()) {
+            if(getSelectionManager().getClickType() == ClickType.REMOVE) {
+                return REMOVE_HINTS;
+            } else {
+                return BUILD_HINTS;
+            }
+        } else {
+            return START_HINTS;
+        }
+    }
+
+    @Override
+    protected Optional<String> getInfoText() {
+        final var name = getSelectionManager().getCurrentSelectionType().getName();
+        return Optional.of("Selection type: " + name);
+    }
+
+    private SelectionManager getSelectionManager() {
+        return ModUtils.getFortressClient().getSelectionManager();
+    }
+}

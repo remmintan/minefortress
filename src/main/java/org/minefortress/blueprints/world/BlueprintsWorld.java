@@ -34,8 +34,10 @@ import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.interfaces.FortressServer;
+import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.io.IOException;
 import java.util.*;
@@ -158,11 +160,12 @@ public class BlueprintsWorld {
                 .withLayers(flatChunkGeneratorLayers, Optional.empty());
     }
 
-    public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel) {
+    public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel, BlueprintGroup group) {
         this.preparedBlueprintData = blueprintData;
         final FortressServerWorld world = getWorld();
         world.setFileName(blueprintFileName);
         world.setFloorLevel(floorLevel);
+        world.setBlueprintGroup(group);
     }
 
     public void putBlueprintInAWorld(final ServerPlayerEntity player, Vec3i blueprintSize) {
@@ -223,6 +226,10 @@ public class BlueprintsWorld {
 
     public boolean hasWorld() {
         return world != null;
+    }
+
+    public static boolean isBlueprintsWorld(@Nullable World world) {
+        return world != null && world.getRegistryKey().equals(BLUEPRINTS_WORLD_REGISTRY_KEY);
     }
 
 }

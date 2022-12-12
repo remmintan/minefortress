@@ -1,18 +1,15 @@
 package org.minefortress.professions;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import org.apache.logging.log4j.util.Strings;
 import org.minefortress.fortress.AbstractFortressManager;
-import org.minefortress.fortress.resources.ItemInfo;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import java.util.function.Supplier;
-
-import static java.util.Map.entry;
 
 public abstract class ProfessionManager {
 
@@ -35,358 +32,11 @@ public abstract class ProfessionManager {
             Items.GLOW_INK_SAC
     );
 
-    public final Map<String, Profession> professions = Map.ofEntries(
-            entry(
-                    "colonist",
-                    new Profession(
-                            "Colonist",
-                            Items.PLAYER_HEAD,
-                            "Can do any type of work, but is not very good at it.\nCan use only wooden tools.\nCan't fall tall trees\nCan't provide any food.",
-                            "",
-                            ""
-                    )
-            ),
-            // dig
-            entry(
-                    "miner1",
-                    new Profession(
-                            "Miner - LVL1",
-                            Items.STONE_PICKAXE,
-                            "Can work in mine and quarry.\nCan use stone shovel and pickaxe.",
-                            "Build 'Wooden Miner's house' to unlock",
-                            "Build more 'Wooden Miner's houses' to unlock more",
-                            "miner_wooden"
-                    )
-            ),
-            entry(
-                    "miner2",
-                    new Profession(
-                            "Miner - LVL2",
-                            Items.IRON_PICKAXE,
-                            "Can work in mine and quarry.\nCan use iron shovel and pickaxe.",
-                            "Build 'Stone Miner's house' to unlock",
-                            "Build more 'Stone Miner's houses' to unlock more",
-                            "miner_stone"
-                    )
-            ),
-            entry(
-                    "miner3",
-                    new Profession(
-                            "Miner - LVL3",
-                            Items.DIAMOND_PICKAXE,
-                            "Can work in mine and quarry.\nCan use diamond shovel and pickaxe.",
-                            "Build 'Miners' guild house' to unlock",
-                            "Build more 'Miners' guild houses' to unlock more",
-                            "miners_guild"
-                    )
-            ),
-            // fall trees
-            entry(
-                    "lumberjack1",
-                    new Profession(
-                            "Lumberjack - LVL1",
-                            Items.STONE_AXE,
-                            "Can fall tall trees.\nCan use stone axe.\nCollects saplings.",
-                            "Build 'Wooden Lumberjack's house' to unlock",
-                            "Build more 'Wooden Lumberjack's houses' to unlock more",
-                            "lumberjack_wooden"
-                    )
-            ),
-            entry(
-                    "lumberjack2",
-                    new Profession(
-                            "Lumberjack - LVL2",
-                            Items.IRON_AXE,
-                            "Can fall tall trees.\nCan use iron axe.\nCan plant saplings.",
-                            "Build 'Stone Lumberjack's house' to unlock",
-                            "Build more 'Stone Lumberjack's houses' to unlock more",
-                            "lumberjack_stone"
-                    )
-            ),
-            entry(
-                    "lumberjack3",
-                    new Profession(
-                            "Lumberjack - LVL3",
-                            Items.DIAMOND_AXE,
-                            "Can fall tall trees.\nCan use diamond axe.\nCan plant saplings.",
-                            "Build 'Lumberjack's guild house' to unlock",
-                            "Build more 'Lumberjack's guild houses' to unlock more",
-                            "lumberjack_guild"
-                    )
-            ),
-            // food / defence
-            entry(
-                    "forester",
-                    new Profession(
-                            "Forester",
-                            Items.APPLE,
-                            "Collects seeds, apples and some other basic food\nWhile working every tick has small chance of getting food.\nCollects saplings and sticks.",
-                            "Brings food. Build 'Forester's house' to unlock",
-                            "Build more 'Forester's houses' to unlock more",
-                            "forester"
-                    )
-            ),
-            entry(
-                    "hunter",
-                    new Profession(
-                            "Hunter",
-                            Items.BOW,
-                            "Can use bow.\nDefends village from monsters.\nHunts monsters.\nCan work at night",
-//                            "Build 'Shooting gallery' to unlock",
-                            "Will be available in future updates",
-//                            "shooting_gallery"
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "fisherman",
-                    new Profession(
-                            "Fisherman",
-                            Items.FISHING_ROD,
-                            "Catches fish in ponds\nCooks fish",
-//                            "Build 'Fishing hut' to unlock",
-                            "Will be available in future updates",
-                            "",
-//                            "fisher"
-                            "_"
-                    )
-            ),
-            entry(
-                    "farmer",
-                    new Profession(
-                            "Farmer",
-                            Items.WHEAT,
-                            "Plants any kind of seeds including wheat, watermelon and pumpkin",
-                            "Build any farm to unlock",
-                            "Build more farms to hire more",
-                            "farmer"
-                    )
-            ),
-            entry(
-                    "baker",
-                    new Profession(
-                            "Baker",
-                            Items.BREAD,
-                            "Bakes bread, cakes and other food",
-//                            "Build 'Bakery' to unlock",
-                            "Will be available in future releases",
-                            "",
-//                            "backer",
-                            "_"
-                    )
-            ),
-            entry(
-                    "shepherd",
-                    new Profession(
-                            "Shepherd",
-                            Items.CARROT_ON_A_STICK,
-                            "Brings pigs, sheeps and cows to the village.\nProvides milks, wool and meat",
-//                            "Build 'Animal Pen' to unlock",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "stableman",
-                    new Profession(
-                            "Stableman",
-                            Items.LEAD,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "butcher",
-                    new Profession(
-                            "Butcher",
-                            Items.BEEF,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "cook",
-                    new Profession(
-                            "Cook",
-                            Items.COOKED_BEEF,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            // craft / smith
-            entry(
-                    "crafter",
-                    new Profession(
-                            "Craftsman",
-                            Items.CRAFTING_TABLE,
-                            "Can craft any item that doesn't need smelting.\nCan't use redstone or nether blocks/items",
-                            "Build crafting table to unlock",
-                            "Build more crafting tables to unlock more",
-                            "_"
-                    ).setBlockRequirement(Blocks.CRAFTING_TABLE, false)
-            ),
-            entry(
-                    "leather_worker1",
-                    new Profession(
-                            "Leather Worker - LVL1",
-                            Items.LEATHER,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "leather_worker2",
-                    new Profession(
-                            "Leather Worker - LVL2",
-                            Items.LEATHER_HORSE_ARMOR,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "blacksmith",
-                    new Profession(
-                            "Blacksmith",
-                            Items.IRON_INGOT,
-                            "Can smelt ores and cook food in furnace",
-                            "Build any blueprint with a Furnace to unlock",
-                            "Build more blueprints with Furnaces to unlock more",
-                            "_"
-                    ).setBlockRequirement(Blocks.FURNACE, true)
-            ),
-            entry(
-                    "armorer",
-                    new Profession(
-                            "Armorer",
-                            Items.IRON_CHESTPLATE,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "weaver",
-                    new Profession(
-                            "Weaver",
-                            Items.STRING,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "tailor",
-                    new Profession(
-                            "Tailor",
-                            Items.WHITE_BANNER,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            // combat
-            entry(
-                    "warrior1",
-                    new Profession(
-                            "Warrior - LVL1",
-                            Items.STONE_SWORD,
-                            "Defends the village, can use stone sword and leather armor [1 stone sword for each]",
-                            "Build Small Warrior's house to unlock",
-                            "You need more stone swords or build another Small Warrior's house to hire more!",
-                            "warrior1"
-                    )
-                        .setItemsRequirement(Collections.singletonList(
-                                new ItemInfo(Items.STONE_SWORD, 1)
-                        ))
-            ),
-            entry(
-                    "warrior2",
-                    new Profession(
-                            "Warrior - LVL2",
-                            Items.IRON_SWORD,
-                            "Defends the village, can use iron sword and iron armor [1 iron sword for each, 1 iron armor set for each]",
-                            "Build Medium Warrior's house to unlock",
-                            "You need more iron swords/armors or build another Medium Warrior's house to hire more!",
-                            "warrior2"
-                    )
-                        .setItemsRequirement(Arrays.asList(
-                                new ItemInfo(Items.IRON_SWORD, 1),
-                                new ItemInfo(Items.IRON_HELMET, 1),
-                                new ItemInfo(Items.IRON_CHESTPLATE, 1),
-                                new ItemInfo(Items.IRON_LEGGINGS, 1),
-                                new ItemInfo(Items.IRON_BOOTS, 1)
-                        ))
-            ),
-            entry(
-                    "archer1",
-                    new Profession(
-                            "Archer",
-                            Items.BOW,
-                            "Defends the village, ranged fighter [1 bow, 32 arrow for each]",
-                            "Build Shooting gallery to unlock",
-                            "You need more bows/arrows to hire more!",
-                            "shooting_gallery"
-                    )
-                    .setItemsRequirement(Arrays.asList(
-                            new ItemInfo(Items.BOW, 1),
-                            new ItemInfo(Items.ARROW, 32)
-                    ))
-            ),
-            entry(
-                    "archer2",
-                    new Profession(
-                            "Archer - LVL2",
-                            Items.CROSSBOW,
-                            "",
-                            "Will be available in future releases",
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "knight1",
-                    new Profession(
-                            "Knight - LVL1",
-                            Items.IRON_HORSE_ARMOR,
-                            "Will be available in future releases",
-                            "",
-                            "",
-                            "_"
-                    )
-            ),
-            entry(
-                    "knight2",
-                    new Profession(
-                            "Knight - LVL2",
-                            Items.DIAMOND_HORSE_ARMOR,
-                            "Will be available in future releases",
-                            "",
-                            "",
-                            "_"
-                    )
-            )
-    );
-
-    private final Profession root;
+    private Profession root;
+    private final Map<String, Profession> professions = new HashMap<>();
     protected final Supplier<AbstractFortressManager> fortressManagerSupplier;
 
     public ProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
-        this.root = this.createProfessionTree();
         this.fortressManagerSupplier = fortressManagerSupplier;
     }
 
@@ -433,122 +83,54 @@ public abstract class ProfessionManager {
     }
 
     public Profession getProfession(String name) {
-        return professions.get(name);
+        return getProfessions().get(name);
+    }
+
+    protected Map<String, Profession> getProfessions(){
+        return this.professions;
     }
 
     public boolean hasProfession(String name) {
-        return professions.containsKey(name) && professions.get(name).getAmount() > 0;
+        return getProfessions().containsKey(name) && getProfessions().get(name).getAmount() > 0;
     }
 
-    /**
-     * colonist -> miner1, lumberjack1, forester, crafter
-     * miner1 -> miner2
-     * lumberjack1 -> lumberjack2
-     * forester -> hunter, fisherman, farmer, warrior1
-     * crafter -> blacksmith
-     * miner2 -> miner3
-     * lumberjack2 -> lumberjack3
-     * hunter -> archer1, knight1
-     * farmer -> baker, shepherd
-     * blacksmith -> leather_worker1, weaver
-     * leather_worker1 -> leather_worker2
-     * warrior1 -> warrior2
-     * archer1 -> archer2
-     * knight1 -> knight2
-     * shepherd -> stableman, butcher
-     * blacksmith -> armorer
-     * weaver -> tailor
-     * butcher -> cook
-     */
-    private Profession createProfessionTree() {
-        Profession colonist = getProfession("colonist");
+    protected void createProfessionTree(String treeJson) {
+        try (
+            var sr = new StringReader(treeJson);
+            var jsonReader = new JsonReader(sr)
+        ) {
+            jsonReader.beginObject();
 
-        // colonist -> miner1, lumberjack1, forester, crafter
-        Profession miner1 = getProfession("miner1");
-        Profession lumberjack1 = getProfession("lumberjack1");
-        Profession forester = getProfession("forester");
-        Profession crafter = getProfession("crafter");
-        addChildren(colonist, miner1, lumberjack1, forester, crafter);
+            final var rootProfessionName = jsonReader.nextName();
+            this.root = getProfession(rootProfessionName);
+            readChildren(jsonReader, this.root);
 
-        // miner1 -> miner2
-        Profession miner2 = getProfession("miner2");
-        addChildren(miner1, miner2);
+            if(jsonReader.hasNext()) {
+                throw new IllegalStateException("Expected end of object, but found more.");
+            }
 
-        // lumberjack1 -> lumberjack2
-        Profession lumberjack2 = getProfession("lumberjack2");
-        addChildren(lumberjack1, lumberjack2);
-
-        // forester -> warrior1, hunter, fisherman, farmer
-        Profession warrior1 = getProfession("warrior1");
-        Profession hunter = getProfession("hunter");
-        Profession fisherman = getProfession("fisherman");
-        Profession farmer = getProfession("farmer");
-        addChildren(forester, warrior1, hunter, fisherman, farmer);
-
-        // crafter -> blacksmith
-        Profession blacksmith = getProfession("blacksmith");
-        addChildren(crafter, blacksmith);
-
-        // miner2 -> miner3
-        Profession miner3 = getProfession("miner3");
-        addChildren(miner2, miner3);
-
-        // lumberjack2 -> lumberjack3
-        Profession lumberjack3 = getProfession("lumberjack3");
-        addChildren(lumberjack2, lumberjack3);
-
-        // hunter -> archer1, knight1
-        Profession knight1 = getProfession("knight1");
-        addChildren(hunter, knight1);
-
-        // farmer -> baker, shepherd
-        Profession baker = getProfession("baker");
-        Profession shepherd = getProfession("shepherd");
-        addChildren(farmer, baker, shepherd);
-
-        // blacksmith -> leather_worker1, weaver
-        Profession leather_worker1 = getProfession("leather_worker1");
-        Profession weaver = getProfession("weaver");
-        addChildren(blacksmith, leather_worker1, weaver);
-
-        // leather_worker1 -> leather_worker2
-        Profession leather_worker2 = getProfession("leather_worker2");
-        addChildren(leather_worker1, leather_worker2);
-
-        // warrior1 -> warrior2
-        Profession warrior2 = getProfession("warrior2");
-        Profession archer1 = getProfession("archer1");
-        addChildren(warrior1, warrior2, archer1);
-
-        // archer1 -> archer2
-        Profession archer2 = getProfession("archer2");
-        addChildren(archer1, archer2);
-
-        // knight1 -> knight2
-        Profession knight2 = getProfession("knight2");
-        addChildren(knight1, knight2);
-
-        // shepherd -> stableman, butcher
-        Profession stableman = getProfession("stableman");
-        Profession butcher = getProfession("butcher");
-        addChildren(shepherd, stableman, butcher);
-
-        // blacksmith -> armorer
-        Profession armorer = getProfession("armorer");
-        addChildren(blacksmith, armorer);
-
-        // weaver -> tailor
-        Profession tailor = getProfession("tailor");
-        addChildren(weaver, tailor);
-
-        // butcher -> cook
-        Profession cook = getProfession("cook");
-        addChildren(butcher, cook);
-
-        return colonist;
+            jsonReader.endObject();
+        } catch (IOException exception) {
+            throw new RuntimeException("cannot create profession tree", exception);
+        }
     }
 
-    private void addChildren(Profession parent, Profession... children) {
+    private void readChildren(JsonReader reader, Profession parent) throws IOException {
+        final var childrenProfession = new ArrayList<Profession>();
+        reader.beginObject();
+        while (reader.hasNext()) {
+            final var childName = reader.nextName();
+            final var childProfession = getProfession(childName);
+            readChildren(reader, childProfession);
+            childrenProfession.add(childProfession);
+        }
+        reader.endObject();
+        if(!childrenProfession.isEmpty()) {
+            addChildren(parent, childrenProfession);
+        }
+    }
+
+    private void addChildren(Profession parent, List<Profession> children) {
         for (Profession child : children) {
             parent.addChild(child);
             child.setParent(parent);
@@ -557,12 +139,12 @@ public abstract class ProfessionManager {
 
     public int getFreeColonists() {
         final int totalColonists = fortressManagerSupplier.get().getTotalColonistsCount();
-        final int totalWorkers = professions.values().stream().mapToInt(Profession::getAmount).sum();
+        final int totalWorkers = getProfessions().values().stream().mapToInt(Profession::getAmount).sum();
         return totalColonists - totalWorkers;
     }
 
     public Optional<String> findIdFromProfession(Profession profession) {
-        return professions.entrySet().stream().filter(entry -> entry.getValue() == profession).map(Map.Entry::getKey).findFirst();
+        return getProfessions().entrySet().stream().filter(entry -> entry.getValue() == profession).map(Map.Entry::getKey).findFirst();
     }
 
     public abstract void increaseAmount(String professionId);

@@ -1,13 +1,12 @@
 package org.minefortress.mixins.network;
 
-import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -21,15 +20,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.MineFortressMod;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServer;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.utils.ModUtils;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,7 +32,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static org.minefortress.MineFortressConstants.PICK_DISTANCE;
-import static org.minefortress.MineFortressConstants.PICK_DISTANCE_FLOAT;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class FortressServerPlayNetworkHandlerMixin {
@@ -47,7 +40,6 @@ public class FortressServerPlayNetworkHandlerMixin {
 
     @Shadow private @Nullable Vec3d requestedTeleportPos;
 
-    @Shadow @Final private MinecraftServer server;
 
     @Inject(method = "onPlayerInteractBlock", at = @At(value = "INVOKE", target="Lnet/minecraft/server/network/ServerPlayerEntity;updateLastActionTime()V", shift = At.Shift.AFTER), cancellable = true)
     public void onPlayerInteractBlock(PlayerInteractBlockC2SPacket packet, CallbackInfo ci) {
@@ -95,20 +87,12 @@ public class FortressServerPlayNetworkHandlerMixin {
     private void addCustomNbtToStack(ItemStack stack) {
         if(stack == null) return;
         if(stack.getItem() instanceof SpawnEggItem eggItem) {
-            if(eggItem.getEntityType(stack.getNbt()) != FortressEntities.COLONIST_ENTITY_TYPE) return;
+            final EntityType<?> entityType = eggItem.getEntityType(stack.getNbt());
+            if(!FortressEntities.isFortressAwareEntityType(entityType)) return;
             if(stack.getNbt() == null) stack.setNbt(new NbtCompound());
 
-            final var fortressServer = (FortressServer) this.server;
-            final var fortressManager = fortressServer.getFortressModServerManager().getByPlayer(player);
-
             final NbtCompound nbt = stack.getNbt();
-            nbt.putUuid("fortressUUID", fortressManager.getId());
-            final BlockPos fortressCenter = fortressManager.getFortressCenter();
-            if(fortressCenter != null) {
-                nbt.putInt("centerX", fortressCenter.getX());
-                nbt.putInt("centerY", fortressCenter.getY());
-                nbt.putInt("centerZ", fortressCenter.getZ());
-            }
+            nbt.putUuid(BasePawnEntity.FORTRESS_ID_NBT_KEY, player.getUuid());
         }
     }
 

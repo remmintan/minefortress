@@ -90,8 +90,14 @@ public abstract class FortressClientInteractionManagerMixin {
 
                 if(selectionManager.isSelecting())
                     selectionManager.endSelection();
-                else
-                    selectionManager.startSelection(mouse.getX(), mouse.getY(), client.crosshairTarget.getPos());
+                else {
+                    if(selectionManager.hasSelected()) {
+                        selectionManager.resetSelection();
+                    } else {
+                        selectionManager.startSelection(mouse.getX(), mouse.getY(), client.crosshairTarget.getPos());
+                    }
+                }
+
                 cir.setReturnValue(false);
                 return;
             }
@@ -102,7 +108,7 @@ public abstract class FortressClientInteractionManagerMixin {
                 return;
             }
 
-            if(fortressManager.isFortressInitializationNeeded()) {
+            if(fortressManager.isCenterNotSet()) {
                 cir.setReturnValue(true);
                 return;
             }
@@ -162,7 +168,7 @@ public abstract class FortressClientInteractionManagerMixin {
                     return;
                 }
 
-                if(fortressManager.isFortressInitializationNeeded()) {
+                if(fortressManager.isCenterNotSet()) {
                     fortressManager.setupFortressCenter();
                     cir.setReturnValue(ActionResult.SUCCESS);
                     return;

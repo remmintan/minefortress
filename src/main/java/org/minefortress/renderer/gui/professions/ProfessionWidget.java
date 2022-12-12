@@ -39,7 +39,7 @@ public class ProfessionWidget extends DrawableHelper {
         this.professionManager = professionManager;
         client = MinecraftClient.getInstance();
         int maxTextLength = 29 + client.textRenderer.getWidth(profession.getTitle());
-        for(Text text : this.profession.getUnlockedDescription()) {
+        for(Text text : this.profession.getDescription()) {
             maxTextLength = Math.max(maxTextLength, client.textRenderer.getWidth(text));
         }
         this.width = maxTextLength + 8;
@@ -162,11 +162,11 @@ public class ProfessionWidget extends DrawableHelper {
         final String title = this.profession.getTitle();
         List<Text> description;
         if(unlockedWithCount) {
-            description = this.profession.getUnlockedDescription();
+            description = this.profession.getDescription();
         } else if(unlocked) {
-            description = this.profession.getNotEnoughBuildingsDescription();
+            description = this.profession.getUnlockMoreMessage();
         } else {
-            description = this.profession.getLockedDescription();
+            description = this.profession.getUnlockMessage();
         }
 
         int n = 32 + description.size() * this.client.textRenderer.fontHeight;

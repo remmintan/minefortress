@@ -8,9 +8,9 @@ public class EssentialBuildingInfo {
     private final BlockPos start;
     private final BlockPos end;
     private final String requirementId;
-    private final int bedsCount;
+    private final long bedsCount;
 
-    public EssentialBuildingInfo(BlockPos start, BlockPos end, String requirementId, int bedsCount) {
+    public EssentialBuildingInfo(BlockPos start, BlockPos end, String requirementId, long bedsCount) {
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.requirementId = requirementId;
@@ -21,7 +21,7 @@ public class EssentialBuildingInfo {
         this.start = buf.readBlockPos();
         this.end = buf.readBlockPos();
         this.requirementId = buf.readString();
-        this.bedsCount = buf.readInt();
+        this.bedsCount = buf.readLong();
     }
 
     public BlockPos getStart() {
@@ -36,7 +36,7 @@ public class EssentialBuildingInfo {
         return requirementId;
     }
 
-    public int getBedsCount() {
+    public long getBedsCount() {
         return bedsCount;
     }
 
@@ -44,6 +44,6 @@ public class EssentialBuildingInfo {
         buffer.writeBlockPos(start);
         buffer.writeBlockPos(end);
         buffer.writeString(requirementId);
-        buffer.writeInt(bedsCount);
+        buffer.writeLong(bedsCount);
     }
 }

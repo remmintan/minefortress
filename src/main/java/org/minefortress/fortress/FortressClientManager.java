@@ -7,18 +7,19 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
-import org.minefortress.entity.Colonist;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
-import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.ServerboundFortressCenterSetPacket;
-import org.minefortress.network.ServerboundSetGamemodePacket;
+import org.minefortress.network.c2s.ServerboundFortressCenterSetPacket;
+import org.minefortress.network.c2s.ServerboundSetGamemodePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ClientProfessionManager;
+import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
+import org.minefortress.utils.ModUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,9 +31,7 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private final ClientProfessionManager professionManager;
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
-    private final ClientFightManager fightManager;
-
-    private UUID id;
+    private final ClientFightManager fightManager = new ClientFightManager();
 
     private boolean initialized = false;
 
@@ -44,7 +43,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private BlockPos posAppropriateForCenter;
     private BlockPos oldPosAppropriateForCenter;
 
-    private Colonist selectedColonist;
+    private BasePawnEntity selectedPawn;
     private Vec3d selectedColonistDelta;
 
     private List<EssentialBuildingInfo> buildings = new ArrayList<>();
@@ -59,10 +58,10 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
-        fightManager = new ClientFightManager(() -> this);
+
     }
 
-    public void select(Colonist colonist) {
+    public void select(BasePawnEntity colonist) {
         if(isInCombat) {
             final var mouse = MinecraftClient.getInstance().mouse;
             final var selectionManager = fightManager.getSelectionManager();
@@ -70,12 +69,12 @@ public final class FortressClientManager extends AbstractFortressManager {
             selectionManager.updateSelection(mouse.getX(), mouse.getY(), colonist.getPos());
             selectionManager.endSelection();
 
-            selectedColonist = null;
+            selectedPawn = null;
             return;
         }
-        this.selectedColonist = colonist;
+        this.selectedPawn = colonist;
         final Vec3d entityPos = colonist.getPos();
-        final Vec3d playerPos = MinecraftClient.getInstance().player.getPos();
+        final Vec3d playerPos = ModUtils.getClientPlayer().getPos();
 
         selectedColonistDelta = entityPos.subtract(playerPos);
     }
@@ -90,42 +89,37 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public boolean isSelectingColonist() {
-        return selectedColonist != null && !isInCombat;
+        return selectedPawn != null && !isInCombat;
     }
 
-    public Colonist getSelectedColonist() {
-        return selectedColonist;
+    public BasePawnEntity getSelectedPawn() {
+        return selectedPawn;
     }
 
     public void stopSelectingColonist() {
-        this.selectedColonist = null;
+        this.selectedPawn = null;
         this.selectedColonistDelta = null;
     }
 
     public Vec3d getProperCameraPosition() {
         if(!isSelectingColonist()) throw new IllegalStateException("No colonist selected");
-        return this.selectedColonist.getPos().subtract(selectedColonistDelta);
+        return this.selectedPawn.getPos().subtract(selectedColonistDelta);
     }
 
     public int getColonistsCount() {
         return colonistsCount;
     }
 
-    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, UUID fortressId, int maxColonistsCount) {
+    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, int maxColonistsCount) {
         this.colonistsCount = colonistsCount;
         this.fortressCenter = fortressCenter;
         this.gamemode = gamemode;
-        this.id = fortressId;
         this.maxColonistsCount = maxColonistsCount;
-        initialized = true;
-    }
-
-    public UUID getId() {
-        return id;
+        this.initialized = true;
     }
 
     public void tick(FortressMinecraftClient fortressClient) {
-        if(isSelectingColonist() && selectedColonist.isDead()) stopSelectingColonist();
+        if(isSelectingColonist() && selectedPawn.isDead()) stopSelectingColonist();
 
         final MinecraftClient client = (MinecraftClient) fortressClient;
         if(
@@ -144,7 +138,7 @@ public final class FortressClientManager extends AbstractFortressManager {
             return;
         }
         if(!initialized) return;
-        if(isFortressInitializationNeeded()) {
+        if(isCenterNotSet()) {
             synchronized (KEY) {
                 if(setCenterToast == null) {
                     this.setCenterToast = new FortressToast("Set up your Fortress", "Right-click to place", Items.CAMPFIRE);
@@ -173,11 +167,11 @@ public final class FortressClientManager extends AbstractFortressManager {
         return posAppropriateForCenter;
     }
 
-    public boolean isInitialized() {
-        return initialized;
+    public boolean notInitialized() {
+        return !initialized;
     }
 
-    public boolean isFortressInitializationNeeded() {
+    public boolean isCenterNotSet() {
         return initialized && fortressCenter == null && this.gamemode != FortressGamemode.NONE;
     }
 
@@ -216,7 +210,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         for(EssentialBuildingInfo building : buildings){
             final BlockPos start = building.getStart();
             final BlockPos end = building.getEnd();
-            if(isPosBetween(pos, start, end)){
+            if(BlockUtils.isPosBetween(pos, start, end)){
                 return StreamSupport
                         .stream(BlockPos.iterate(start, end).spliterator(), false)
                         .map(BlockPos::toImmutable)
@@ -236,7 +230,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
             return buildings.stream()
                     .filter(b -> b.getRequirementId().equals(requirementId))
-                    .mapToInt(EssentialBuildingInfo::getBedsCount)
+                    .mapToLong(it -> it.getBedsCount() * 10)
                     .sum() > minCount;
         }
         if(requirementId.equals("shooting_gallery"))
@@ -279,12 +273,6 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public ClientResourceManager getResourceManager() {
         return resourceManager;
-    }
-
-    private boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
-        return pos.getX() >= start.getX() && pos.getX() <= end.getX() &&
-                pos.getY() >= start.getY() && pos.getY() <= end.getY() &&
-                pos.getZ() >= start.getZ() && pos.getZ() <= end.getZ();
     }
 
     public boolean isInCombat() {

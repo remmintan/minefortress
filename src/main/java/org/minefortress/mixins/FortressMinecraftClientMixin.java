@@ -30,7 +30,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.gui.ChooseModeScreen;
-import org.minefortress.renderer.gui.FortressHud;
+import org.minefortress.renderer.gui.hud.FortressHud;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.selections.renderer.campfire.CampfireRenderer;
@@ -266,10 +266,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return this.clientBlueprintManager;
     }
 
-    @Override
-    public boolean isSupporter() {
-        return true;
-    }
 
     @Inject(method = "close", at = @At("HEAD"))
     public void close(CallbackInfo ci) {

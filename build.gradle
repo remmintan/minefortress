@@ -1,6 +1,6 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
-	id 'maven-publish'
+	id 'java'
+	id 'fabric-loom' version '1.0.12'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -20,17 +20,14 @@ repositories {
 		url 'https://jitpack.io'
 	}
 	maven {
-		name = "Ladysnake Mods"
-		url = 'https://ladysnake.jfrog.io/artifactory/mods'
-	}
-	maven {
 		url "https://maven.jamieswhiteshirt.com/libs-release"
 		content {
 			includeGroup "com.jamieswhiteshirt"
 		}
 	}
 	flatDir {
-		dirs "../automatone/build/libs"
+		// automatone, base, entity, world
+		dirs "../automatone/build/libs", "../cc-api/cardinal-components-base/build/libs", "../cc-api/cardinal-components-entity/build/libs", "../cc-api/cardinal-components-world/build/libs"
 	}
 }
 
@@ -44,12 +41,12 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.2.0")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.2.0")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.2.0")
+
 	modImplementation include("automatone:automatone-0.7.0")
-	modImplementation include("com.jamieswhiteshirt:reach-entity-attributes:2.2.0")
-//	modCompileOnly files('libs/sodium-fabric-mc1.17.1-0.3.4+build.13.jar')
+	modImplementation include("cardinal-components-base:cardinal-components-base-4.2.0")
+	modImplementation include("cardinal-components-entity:cardinal-components-entity-4.2.0")
+	modImplementation include("cardinal-components-world:cardinal-components-world-4.2.0")
+
 }
 
 processResources {
@@ -65,13 +62,6 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 17
 }
 
-java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
-}
-
 loom {
 	accessWidenerPath = file("src/main/resources/minefortress.accesswidener")
 }
@@ -79,22 +69,5 @@ loom {
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
 	}
 }

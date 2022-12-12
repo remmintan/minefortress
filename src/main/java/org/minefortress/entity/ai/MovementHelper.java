@@ -5,9 +5,7 @@ import baritone.api.event.events.PathEvent;
 import baritone.api.event.listener.AbstractGameEventListener;
 import baritone.api.pathing.calc.IPath;
 import baritone.api.pathing.goals.GoalNear;
-import baritone.api.pathing.movement.IMovement;
 import baritone.api.utils.BetterBlockPos;
-import baritone.pathing.movement.Movement;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.slf4j.Logger;
@@ -52,7 +50,7 @@ public class MovementHelper {
     }
 
     public void set(BlockPos goal, float speed) {
-        if(workGoal != null && workGoal.equals(goal)){
+        if(workGoal != null && workGoal.equals(goal)) {
             LOGGER.debug("{} trying to set new goal, but current goal is the same", getColonistName());
             return;
         }
@@ -65,6 +63,9 @@ public class MovementHelper {
         if(this.hasReachedWorkGoal()){
             LOGGER.debug("{} the goal {} is already reached", getColonistName(), goal);
             return;
+        }
+        if(colonist.isSleeping()) {
+            colonist.wakeUp();
         }
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }

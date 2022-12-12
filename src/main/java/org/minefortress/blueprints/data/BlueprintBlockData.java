@@ -6,6 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.spongepowered.include.com.google.common.collect.Sets;
@@ -123,12 +124,24 @@ public final class BlueprintBlockData {
             instance.stacks = layerBlockByItems.entrySet()
                     .stream()
                     .filter(it -> it.getValue() > 0 && !IGNORED_ITEMS.contains(it.getKey()))
-                    .map(it -> new ItemInfo(it.getKey(), (int) (
-                            (SimilarItemsHelper.contains(ItemTags.BEDS, it.getKey()) || SimilarItemsHelper.contains(ItemTags.DOORS, it.getKey())) ?
-                                    it.getValue()/2 : it.getValue())))
+                    .map(this::getItemInfo)
                     .toList();
 
             return instance;
+        }
+
+        @NotNull
+        private ItemInfo getItemInfo(Map.Entry<Item, Long> it) {
+            return new ItemInfo(it.getKey(), getItemAmount(it));
+        }
+
+        private int getItemAmount(Map.Entry<Item, Long> entry) {
+            final var defaultStack = entry.getKey().getDefaultStack();
+            final var count = entry.getValue().intValue();
+
+            final var shouldBeDivided = defaultStack.isIn(ItemTags.BEDS) || defaultStack.isIn(ItemTags.DOORS);
+
+            return shouldBeDivided ? count / 2 : count;
         }
     }
 

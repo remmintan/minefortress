@@ -2,7 +2,6 @@ package org.minefortress.mixins.renderer;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -11,7 +10,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
-import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressGameRenderer;
@@ -83,7 +81,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                     fightSelectionManager.resetSelection();
                 }
 
-                if(fortressClientManager.isFortressInitializationNeeded()) {
+                if(fortressClientManager.isCenterNotSet()) {
                     resetSelection(selectionManager);
                     fortressClientManager.updateRenderer(client.worldRenderer);
                     return;
@@ -128,8 +126,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
     public double updateTargetedEntityRedirectDistanceToEntity(Vec3d instance, Vec3d vec) {
         final double realDistance = instance.squaredDistanceTo(vec);
 
-        final ClientPlayerInteractionManager interactionManager = MinecraftClient.getInstance().interactionManager;
-        if(interactionManager != null && interactionManager.getCurrentGameMode() != MineFortressMod.FORTRESS) return realDistance;
+        if(!ModUtils.isClientInFortressGamemode()) return realDistance;
         if(realDistance > PICK_DISTANCE * PICK_DISTANCE) {
             return realDistance;
         } else {

@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.ServerboundOpenCraftingScreenPacket;
+import org.minefortress.network.c2s.ServerboundOpenCraftingScreenPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 

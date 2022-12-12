@@ -1,0 +1,318 @@
+{
+  "LIVING_HOUSES": [
+    {
+      "name": "Small House 1",
+      "file": "small_house_1",
+      "floorLevel": 0,
+      "requirementId": "house"
+    },
+    {
+      "name": "Small House 2",
+      "file": "small_house_2",
+      "floorLevel": 0,
+      "requirementId": "house"
+    },
+    {
+      "name": "Small House 3",
+      "file": "small_house_3",
+      "floorLevel": 0,
+      "requirementId": "house"
+    },
+    {
+      "name": "Small House 4",
+      "file": "small_house_4",
+      "floorLevel": 0,
+      "requirementId": "house"
+    },
+    {
+      "name": "Small House 5",
+      "file": "small_house_5",
+      "floorLevel": 1,
+      "requirementId": "house"
+    },
+    {
+      "name": "Small House 6",
+      "file": "small_house_6",
+      "floorLevel": 0,
+      "requirementId": "house"
+    },
+    {
+      "name": "Small House 7",
+      "file": "small_house_7",
+      "floorLevel": 0,
+      "requirementId": "house"
+    },
+    {
+      "name": "Small House 8",
+      "file": "small_house_8",
+      "floorLevel": 2,
+      "requirementId": "house"
+    },
+    {
+      "name": "Medium House 1",
+      "file": "medium_house_1",
+      "floorLevel": 1,
+      "requirementId": "house"
+    },
+    {
+      "name": "Medium House 2",
+      "file": "medium_house_2",
+      "floorLevel": 0,
+      "requirementId": "house"
+    },
+    {
+      "name": "Big House 1",
+      "file": "big_house_1",
+      "floorLevel": 1,
+      "requirementId": "house"
+    }
+  ],
+  "WORKSHOPS": [
+    {
+      "name": "Wooden Miner's House",
+      "file": "miner_house_wooden",
+      "requirementId": "miner_wooden",
+      "floorLevel": 0
+    },
+    {
+      "name": "Stone Miner's house",
+      "file": "miner_house_stone",
+      "requirementId": "miner_stone",
+      "floorLevel": 0
+    },
+    {
+      "name": "Miners' guild house",
+      "file": "miner_house_guild",
+      "requirementId": "miners_guild",
+      "floorLevel": 0
+    },
+    {
+      "name": "Wooden Lumberjack's house",
+      "file": "lumberjack_house_wooden",
+      "requirementId": "lumberjack_wooden",
+      "floorLevel": 0
+    },
+    {
+      "name": "Stone Lumberjack's house",
+      "file": "lumberjack_house_stone",
+      "requirementId": "lumberjack_stone",
+      "floorLevel": 0
+    },
+    {
+      "name": "Lumberjack's guild house",
+      "file": "lumberjack_house_guild",
+      "requirementId": "lumberjack_guild",
+      "floorLevel": 0
+    },
+    {
+      "name": "Blacksmith's house",
+      "file": "small_house_3_with_furnace",
+      "requirementId": "blacksmith",
+      "floorLevel": 0
+    },
+    {
+      "name": "Forester's house",
+      "file": "forester_house",
+      "requirementId": "forester",
+      "floorLevel": 0
+    },
+    {
+      "name": "Small Warrior's house",
+      "file": "warrior_1",
+      "requirementId": "warrior1",
+      "floorLevel": 0
+    },
+    {
+      "name": "Medium Warrior's house",
+      "file": "warrior_2",
+      "requirementId": "warrior2",
+      "floorLevel": 1
+    },
+    {
+      "name": "Shooting gallery",
+      "file": "shooting_gallery",
+      "requirementId": "shooting_gallery",
+      "floorLevel": 0
+    },
+    {
+      "name": "Armorer House 1",
+      "file": "armorer_house_1",
+      "requirementId": "armorer",
+      "floorLevel": 0
+    },
+    {
+      "name": "Butcher Shop 1",
+      "file": "butcher_shop_1",
+      "requirementId": "butcher",
+      "floorLevel": 0
+    },
+    {
+      "name": "Butcher Shop 2",
+      "file": "butcher_shop_2",
+      "requirementId": "butcher",
+      "floorLevel": 1
+    },
+    {
+      "name": "Cartographer 1",
+      "file": "cartographer_1",
+      "requirementId": "cartographer",
+      "floorLevel": 1
+    },
+    {
+      "name": "Fisher Cottage 1",
+      "file": "fisher_cottage_1",
+      "requirementId": "fisher",
+      "floorLevel": 2
+    },
+    {
+      "name": "Fletcher House 1",
+      "file": "fletcher_house_1",
+      "requirementId": "fletcher",
+      "floorLevel": 1
+    },
+    {
+      "name": "Masons House 1",
+      "file": "masons_house_1",
+      "requirementId": "masons",
+      "floorLevel": 0
+    },
+    {
+      "name": "Shepherds House 1",
+      "file": "shepherds_house_1",
+      "requirementId": "shepherd",
+      "floorLevel": 1
+    },
+    {
+      "name": "Tannery 1",
+      "file": "tannery_1",
+      "requirementId": "tanner",
+      "floorLevel": 0
+    },
+    {
+      "name": "Tool Smith 1",
+      "file": "tool_smith_1",
+      "requirementId": "crafter",
+      "floorLevel": 0
+    },
+    {
+      "name": "Weaponsmith 1",
+      "file": "weaponsmith_1",
+      "requirementId": "blacksmith",
+      "floorLevel": 0
+    }
+  ],
+  "SOCIAL_BUILDINGS": [
+    {
+      "name": "Library 1",
+      "file": "library_1",
+      "requirementId": "social",
+      "floorLevel": 0
+    },
+    {
+      "name": "Library 2",
+      "file": "library_2",
+      "requirementId": "social",
+      "floorLevel": 1
+    },
+    {
+      "name": "Temple 3",
+      "file": "temple_3",
+      "requirementId": "social",
+      "floorLevel": 0
+    },
+    {
+      "name": "Temple 4",
+      "file": "temple_4",
+      "requirementId": "social",
+      "floorLevel": 0
+    }
+  ],
+  "FARMS": [
+    {
+      "name": "Animal Pen 1",
+      "file": "animal_pen_1",
+      "requirementId": "shepherd",
+      "floorLevel": 1
+    },
+    {
+      "name": "Animal Pen 2",
+      "file": "animal_pen_2",
+      "requirementId": "shepherd",
+      "floorLevel": 1
+    },
+    {
+      "name": "Animal Pen 3",
+      "file": "animal_pen_3",
+      "requirementId": "shepherd",
+      "floorLevel": 1
+    },
+    {
+      "name": "Small Farm 1",
+      "file": "small_farm_1",
+      "requirementId": "farmer",
+      "floorLevel": 0
+    },
+    {
+      "name": "Large Farm 1",
+      "file": "large_farm_1",
+      "requirementId": "farmer",
+      "floorLevel": 0
+    },
+    {
+      "name": "Stable 1",
+      "file": "stable_1",
+      "requirementId": "stableman",
+      "floorLevel": 1
+    },
+    {
+      "name": "Stable 2",
+      "file": "stable_2",
+      "requirementId": "stableman",
+      "floorLevel": 1
+    }
+  ],
+  "DECORATION": [
+    {
+      "name": "Accessory 1",
+      "file": "accessory_1",
+      "requirementId": "decor",
+      "floorLevel": 0
+    },
+    {
+      "name": "Fountain 01",
+      "file": "fountain_01",
+      "requirementId": "decor",
+      "floorLevel": 1
+    },
+    {
+      "name": "Meeting Point 1",
+      "file": "meeting_point_1",
+      "requirementId": "decor",
+      "floorLevel": 1
+    },
+    {
+      "name": "Meeting Point 2",
+      "file": "meeting_point_2",
+      "requirementId": "decor",
+      "floorLevel": 1
+    },
+    {
+      "name": "Meeting Point 3",
+      "file": "meeting_point_3",
+      "requirementId": "decor",
+      "floorLevel": 1
+    },
+    {
+      "name": "Meeting Point 4",
+      "file": "meeting_point_4",
+      "requirementId": "decor",
+      "floorLevel": 1
+    },
+    {
+      "name": "Meeting Point 5",
+      "file": "meeting_point_5",
+      "requirementId": "decor",
+      "floorLevel": 1
+    }
+  ]
+}

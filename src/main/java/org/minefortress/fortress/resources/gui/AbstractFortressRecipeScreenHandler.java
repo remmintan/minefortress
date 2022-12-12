@@ -10,7 +10,6 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -18,7 +17,7 @@ import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressSimpleInventory;
-import org.minefortress.network.ServerboundScrollCurrentScreenPacket;
+import org.minefortress.network.c2s.ServerboundScrollCurrentScreenPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.interfaces.ScrollableHandler;
@@ -33,7 +32,6 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     private final ServerResourceManager serverResourceManager;
 
     private int clientCurrentRow = 5;
-    private float lastScrollPosition = 0;
 
     protected final PlayerEntity player;
     protected final World world;
@@ -204,7 +202,6 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         }
 
         this.virtualInventory.setRowsOffset(rowOffset);
-        this.lastScrollPosition = position;
     }
 
     public VirtualInventory getVirtualInventory() {

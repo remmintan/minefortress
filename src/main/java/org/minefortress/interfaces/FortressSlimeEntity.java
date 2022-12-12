@@ -1,9 +1,9 @@
 package org.minefortress.interfaces;
 
-import org.minefortress.entity.Colonist;
+import org.minefortress.entity.BasePawnEntity;
 
 public interface FortressSlimeEntity {
 
-    void touchColonist(Colonist colonist);
+    void touchPawn(BasePawnEntity colonist);
 
 }

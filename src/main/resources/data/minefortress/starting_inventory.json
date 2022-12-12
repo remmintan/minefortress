@@ -1,0 +1,22 @@
+[
+  {
+    "item": "minecraft:oak_planks",
+    "amount": 12
+  },
+  {
+    "item": "minecraft:crafting_table",
+    "amount": 1
+  },
+  {
+    "item": "minecraft:apple",
+    "amount": 32
+  },
+  {
+    "item": "minecraft:cooked_beef",
+    "amount": 16
+  },
+  {
+    "item": "minecraft:torch",
+    "amount": 16
+  }
+]

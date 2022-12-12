@@ -16,6 +16,7 @@
     "renderer.gui.FortressSimpleInventoryMixin",
     "entity.player.FortressPlayerInventoryMixin",
     "block.FortressAbstractBlockState",
+    "entity.ArrowEntityMixin",
     "entity.FortressTntEntityMixin",
     "item.DisabledBlockItemMixin",
     "item.DisableItemMixin",
@@ -38,6 +39,8 @@
     "renderer.FortressGuiMixin",
     "renderer.FortressWorldRendererMixin",
     "renderer.gui.FortressCreativeInventoryScreenMixin",
+    "renderer.gui.FortressHandledScreenMixin",
+    "renderer.gui.FortressSimpleInventoryMixin",
     "world.FortressClientWorldMixin"
   ],
   "server": [],

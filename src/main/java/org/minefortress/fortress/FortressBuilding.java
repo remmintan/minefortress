@@ -1,29 +1,26 @@
 package org.minefortress.fortress;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.block.BedBlock;
+import net.minecraft.block.enums.BedPart;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class FortressBuilding {
 
     private final BlockPos start;
     private final BlockPos end;
-    private final Set<FortressBedInfo> beds;
     private final String requirementId;
 
-    public FortressBuilding(BlockPos start, BlockPos end, Set<FortressBedInfo> bedPositions, String requirementId) {
+    public FortressBuilding(BlockPos start, BlockPos end, String requirementId) {
         this.start = start.toImmutable();
         this.end = end.toImmutable();
-        this.beds = new HashSet<>(bedPositions);
         this.requirementId = requirementId;
     }
 
@@ -37,17 +34,6 @@ public class FortressBuilding {
             this.end = BlockPos.fromLong(tag.getLong("end"));
         else
             throw new IllegalArgumentException("Tag does not contain end");
-
-        if(tag.contains("beds")) {
-            final long[] beds = tag.getLongArray("beds");
-            final HashSet<FortressBedInfo> bedsInfo = new HashSet<>();
-            for (long bed : beds) {
-                bedsInfo.add(FortressBedInfo.fromLong(bed));
-            }
-            this.beds = new HashSet<>(bedsInfo);
-        } else {
-            throw new IllegalArgumentException("Tag does not contain beds");
-        }
 
         if(tag.contains("requirementId"))
             this.requirementId = tag.getString("requirementId");
@@ -63,39 +49,29 @@ public class FortressBuilding {
         return end;
     }
 
-    public void tick(MinecraftServer server) {
-        final var world = server.getWorld(World.OVERWORLD);
-        if (world != null && world.getTime() % 100 == 0) {
-            beds.removeIf(bed -> {
-                final BlockPos pos = bed.getPos();
-                final BlockState state = world.getBlockState(pos);
-                return !state.isIn(BlockTags.BEDS);
-            });
-        }
+    public Optional<BlockPos> getFreeBed(World world) {
+        return streamBeds(world)
+                .filter(pos -> !world.getBlockState(pos).get(BedBlock.OCCUPIED))
+                .findFirst();
     }
 
-    public Optional<FortressBedInfo> getFreeBed() {
-        return beds.stream().filter(b -> !b.isOccupied()).findFirst();
+    @NotNull
+    private Stream<BlockPos> streamBeds(World world) {
+        return StreamSupport.stream(BlockPos.iterate(start, end).spliterator(), false)
+                .filter(pos -> world.getBlockState(pos).isIn(BlockTags.BEDS))
+                .filter(pos -> world.getBlockState(pos).get(BedBlock.PART) == BedPart.FOOT)
+                .map(BlockPos::toImmutable);
     }
 
-    public int getBedsCount() {
-        return beds.size();
+    public long getBedsCount(World world) {
+        return streamBeds(world).count();
     }
 
     public void writeToNbt(NbtCompound tag) {
         tag.putLong("start", start.asLong());
         tag.putLong("end", end.asLong());
 
-        final List<Long> beds = this.beds
-                .stream()
-                .map(FortressBedInfo::asLong)
-                .collect(Collectors.toList());
-        tag.putLongArray("beds", beds);
         tag.putString("requirementId", requirementId);
-    }
-
-    public Set<FortressBedInfo> getBeds() {
-        return beds;
     }
 
     public String getRequirementId() {

@@ -23,15 +23,14 @@ public class FortressChannelNames {
     public static final String FORTRESS_SPECIAL_BLOCKS_SYNC = "fortress_blocks_sync";
     public static final String FORTRESS_PROFESSION_STATE_CHANGE = "fortress_profession_state_change";
     public static final String FORTRESS_PROFESSION_SYNC = "fortress_profession_sync";
+    public static final String FORTRESS_PROFESSION_INIT = "fortress_profession_init";
     public static final String FORTRESS_SET_GAMEMODE = "fortress_set_gamemode";
     public static final String FORTRESS_RESOURCES_SYNC = "fortress_resources_sync";
     public static final String FORTRESS_OPEN_CRAFTING_TABLE = "fortress_open_crafting_table";
     public static final String SCROLL_CURRENT_SCREEN = "scroll_current_screen";
-    public static final String FORTRESS_COMBAT_STATE_SYNC = "fortress_combat_state_sync";
-    public static final String FORTRESS_SET_COMBAT_STATE = "fortress_set_combat_state";
-    public static final String FORTRESS_SELECT_COLONISTS = "fortress_select_colonists";
-    public static final String FORTRESS_SELECT_FIGHT_TARGET = "fortress_select_fight_target";
     public static final String FORTRESS_SLEEP = "fortress_sleep";
     public static final String FORTRESS_CHANGE_MAX_COLONISTS_COUNT = "fortress_change_max_colonists_count";
+    public static final String FORTRESS_BLUEPRINTS_IMPORT_EXPORT = "fortress_blueprints_import_export";
+    public static final String FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT = "fortress_blueprints_process_import_export";
 
 }

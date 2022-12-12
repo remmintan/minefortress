@@ -1,7 +1,6 @@
 package org.minefortress.mixins.entity;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -15,15 +14,8 @@ import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
-import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.network.ClientboundFollowColonistPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.utils.FortressSpawnLocating;
-import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,15 +25,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.UUID;
-
 @Mixin(ServerPlayerEntity.class)
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
 
     @Shadow @Final public ServerPlayerInteractionManager interactionManager;
     @Shadow @Final public MinecraftServer server;
 
-    private UUID fortressUUID = null;
 
     private Vec3d persistedPos;
     private Vec3d persistedVelocity;
@@ -49,7 +38,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     private float persistedPitch;
 
     private ServerBlueprintManager serverBlueprintManager;
-    private FortressServerManager fortressServerManager = null;
 
     public FortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
@@ -57,7 +45,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method="<init>", at=@At("RETURN"))
     public void init(MinecraftServer server, ServerWorld world, GameProfile profile, CallbackInfo ci) {
-        serverBlueprintManager = new ServerBlueprintManager(server);
+        serverBlueprintManager = new ServerBlueprintManager(server, this::getUuid);
     }
 
     @Inject(method="tick", at=@At("TAIL"))
@@ -67,27 +55,12 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
-        if(fortressUUID != null) {
-            nbt.putUuid("fortressUuid", fortressUUID);
-        }
-        serverBlueprintManager.writeToNbt(nbt);
+        serverBlueprintManager.write();
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        if(nbt.contains("fortressUuid")) {
-            fortressUUID = nbt.getUuid("fortressUuid");
-        }
-        if(nbt.contains("FortressManager")) {
-            final NbtCompound fortressManagerTag = nbt.getCompound("FortressManager");
-            fortressServerManager = new FortressServerManager(server);
-            fortressServerManager.readFromNbt(fortressManagerTag);
-        }
-        serverBlueprintManager.readFromNbt(nbt);
-    }
-
-    public FortressServerManager getFortressServerManager() {
-        return fortressServerManager;
+        serverBlueprintManager.read(nbt);
     }
 
     @Override
@@ -95,31 +68,13 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         return serverBlueprintManager;
     }
 
-    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
-    public void attack(Entity target, CallbackInfo ci) {
-        if(!ModUtils.isFortressGamemode(this)) return;
-
-        if(target instanceof Colonist colonist) {
-            final int id = colonist.getId();
-            final ClientboundFollowColonistPacket packet = new ClientboundFollowColonistPacket(id);
-            FortressServerNetworkHelper.send((ServerPlayerEntity) (Object)this, FortressChannelNames.FORTRESS_SELECT_COLONIST, packet);
-        }
-
-        ci.cancel();
-    }
-
     @Inject(method = "copyFrom", at = @At("TAIL"))
     public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         if(oldPlayer instanceof FortressServerPlayerEntity fortressServerPlayer) {
             this.serverBlueprintManager = fortressServerPlayer.getServerBlueprintManager();
-            this.fortressServerManager = fortressServerPlayer.getFortressServerManager();
         }
     }
 
-    @Override
-    public UUID getFortressUuid() {
-        return fortressUUID;
-    }
 
     @Inject(method="getTeleportTarget", at=@At("HEAD"), cancellable = true)
     public void getTeleportTarget(ServerWorld destination, CallbackInfoReturnable<TeleportTarget> cir) {
@@ -151,14 +106,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         } else {
             return actualSpawn;
         }
-    }
-
-    @Inject(method="onSpawn", at=@At("TAIL"))
-    public void onSpawn(CallbackInfo ci) {
-        final var fortressServer = (FortressServer) this.server;
-        final var serverManager = fortressServer.getFortressModServerManager();
-        final var fortressManager = serverManager.getByPlayer((ServerPlayerEntity) (Object) this);
-        fortressManager.scheduleSyncEverything();
     }
 
 }

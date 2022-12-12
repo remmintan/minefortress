@@ -4,78 +4,54 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import baritone.api.minefortress.IFortressColonist;
 import baritone.api.minefortress.IMinefortressEntity;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.ActiveTargetGoal;
+import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.SlimeEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.ai.MineFortressInventory;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
-import org.minefortress.entity.colonist.ColonistHungerManager;
+import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.server.FortressModServerManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.interfaces.FortressServer;
-import org.minefortress.interfaces.FortressSlimeEntity;
 import org.minefortress.professions.ServerProfessionManager;
+import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist {
+public final class Colonist extends NamedPawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
 
     public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;
 
-    private static final TrackedData<String> CURRENT_TASK_DECRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
-    private static final TrackedData<Integer> CURRENT_FOOD_LEVEL = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<String> CURRENT_TASK_DESCRIPTION = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<String> PROFESSION_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> HAS_TASK = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Integer> GUY_TYPE = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Optional<UUID>> FORTRESS_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+
     private static final String DEFAULT_PROFESSION_ID = "colonist";
 
     public static final float WORK_REACH_DISTANCE = 3f;
@@ -85,19 +61,12 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     private final ScaffoldsControl scaffoldsControl;
     private final TaskControl taskControl;
     private final MovementHelper movementHelper;
-    private final FightControl fightControl;
-    private final EatControl eatControl;
     private final IBaritone baritone;
-    private final Inventory inventory;
-
-    private int selectedSlot = 0;
 
     private boolean allowToPlaceBlockFromFarAway = false;
-    private final ColonistHungerManager hungerManager = new ColonistHungerManager();
-
 
     public Colonist(EntityType<? extends Colonist> entityType, World world) {
-        super(entityType, world);
+        super(entityType, world, true);
 
         if(world instanceof ServerWorld) {
             digControl = new DigControl(this, (ServerWorld) world);
@@ -106,9 +75,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
             taskControl = new TaskControl(this);
             baritone = BaritoneAPI.getProvider().getBaritone(this);
             movementHelper = new MovementHelper(this);
-            fightControl = new FightControl(this);
-            eatControl = new EatControl(this);
-            inventory = new MineFortressInventory();
         } else {
             digControl = null;
             placeControl = null;
@@ -116,104 +82,32 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
             taskControl = null;
             baritone = null;
             movementHelper = null;
-            fightControl = null;
-            eatControl = null;
-            inventory = null;
         }
+    }
 
-        this.dataTracker.startTracking(CURRENT_TASK_DECRIPTION, "");
-        this.dataTracker.startTracking(CURRENT_FOOD_LEVEL, HungerConstants.FULL_FOOD_LEVEL);
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        this.dataTracker.startTracking(CURRENT_TASK_DESCRIPTION, "");
         this.dataTracker.startTracking(PROFESSION_ID, DEFAULT_PROFESSION_ID);
         this.dataTracker.startTracking(HAS_TASK, false);
-        this.dataTracker.startTracking(GUY_TYPE, world.random.nextInt(4));
-        this.dataTracker.startTracking(FORTRESS_ID, Optional.empty());
     }
 
     public IBaritone getBaritone() {
         return baritone;
     }
 
-    @Override
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-        if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
-        this.setFortressId(entityNbt.getUuid("fortressUUID"));
-        if(this.getFortressId() == null) throw new IllegalStateException("Fortress UUID cannot be null for colonist");
-        getFortressServerManager().addColonist(this);
-        this.setCustomNameIfNeeded();
+    public ServerWorld getServerWorld() {
+        return (ServerWorld) this.world;
+    }
 
-        return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+    @Override
+    public String getClothingId() {
+        return getProfessionId();
     }
 
     public MovementHelper getMovementHelper() {
         return movementHelper;
-    }
-
-    public float getHungerMultiplier() {
-        final var foodLevel = this.hungerManager.getFoodLevel();
-        if(foodLevel  < 5) return 3f;
-        if(foodLevel  < 10) return 1.5f;
-        return 1f;
-    }
-
-    private void setCustomNameIfNeeded() {
-        if(!this.hasCustomName()) {
-            this.setCustomName(new LiteralText(getFortressServerManager().getNameGenerator().generateRandomName()));
-        }
-    }
-
-    public void addExhaustion(float exhaustion) {
-        this.hungerManager.addExhaustion(exhaustion);
-    }
-
-    public ColonistHungerManager getHungerManager() {
-        return hungerManager;
-    }
-
-    @Override
-    public void selectSlot(int i) {
-        this.selectedSlot = i;
-        this.setStackInHand(Hand.MAIN_HAND, this.getInventory().getStack(this.selectedSlot));
-    }
-
-    @Override
-    public int getSelectedSlot() {
-        return this.selectedSlot;
-    }
-
-    @Override
-    public ItemStack eatFood(World world, ItemStack stack) {
-        this.getHungerManager().eat(stack.getItem(), stack);
-        return super.eatFood(world, stack);
-    }
-
-    public FortressServerManager getFortressServerManager() {
-        if(this.getFortressId() == null){
-            throw new IllegalStateException("Fortress id is null");
-        }
-        return getFortressModServerManager().getByFortressId(this.getFortressId());
-    }
-
-    public void putItemInHand(Item item) {
-        ItemStack stackInHand = getStackInHand(Hand.MAIN_HAND);
-        if(item == null) {
-            if(stackInHand != ItemStack.EMPTY)
-                setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
-        } else {
-            Item itemInHand = stackInHand.getItem();
-            if(item.equals(itemInHand)) return;
-            setStackInHand(Hand.MAIN_HAND, new ItemStack(item));
-        }
-    }
-
-    @Override
-    public void setAttacking(boolean aggressive) {
-        super.setAttacking(aggressive);
-
-        if(aggressive) {
-            this.putItemInHand(Items.IRON_SWORD);
-        } else {
-            this.putItemInHand(null);
-        }
     }
 
     public float getDestroySpeed(BlockState state) {
@@ -231,21 +125,12 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         }
 
         if (this.hasStatusEffect(StatusEffects.MINING_FATIGUE)) {
-            float f1;
-            switch(this.getStatusEffect(StatusEffects.MINING_FATIGUE).getAmplifier()) {
-                case 0:
-                    f1 = 0.3F;
-                    break;
-                case 1:
-                    f1 = 0.09F;
-                    break;
-                case 2:
-                    f1 = 0.0027F;
-                    break;
-                case 3:
-                default:
-                    f1 = 8.1E-4F;
-            }
+            float f1 = switch (Optional.ofNullable(this.getStatusEffect(StatusEffects.MINING_FATIGUE)).map(StatusEffectInstance::getAmplifier).orElse(3)) {
+                case 0 -> 0.3F;
+                case 1 -> 0.09F;
+                case 2 -> 0.0027F;
+                default -> 8.1E-4F;
+            };
 
             f *= f1;
         }
@@ -261,79 +146,17 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         return f;
     }
 
-    public static DefaultAttributeContainer.Builder createAttributes() {
-        return LivingEntity.createLivingAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2D)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
-                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK)
-                .add(EntityAttributes.GENERIC_ATTACK_SPEED)
-                .add(EntityAttributes.GENERIC_LUCK);
-    }
-
-    @Override
-    public boolean isInvulnerable() {
-        if(isFortressCreative())
-            return true;
-        else
-            return super.isInvulnerable();
-    }
-
-    @Override
-    public boolean isInvulnerableTo(DamageSource damageSource) {
-        if(damageSource == DamageSource.FALL) return true;
-        if(isFortressCreative()) {
-            return !damageSource.isOutOfWorld();
-        } else {
-            return super.isInvulnerableTo(damageSource);
-        }
-    }
-
     @Override
     protected void initGoals() {
+        super.initGoals();
         this.goalSelector.add(1, new SwimGoal(this));
-//        this.goalSelector.add(2, new LongDoorInteractGoal(this, true));
-        this.goalSelector.add(3, new FortressEscapeDangerGoal(this, 1.75));
-        this.goalSelector.add(3, new FortressEscapeCreeperGoal(this));
-        this.goalSelector.add(4, new FightGoal(this));
-        this.goalSelector.add(4, new HideGoal(this));
+        this.goalSelector.add(3, new FleeEntityGoal<>(this, HostileEntity.class, 3, 1.5D, 2D));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
-        this.goalSelector.add(7, new ColonistEatGoal(this));
         this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
         this.goalSelector.add(8, new SleepOnTheBedGoal(this));
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
-
-        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
-    }
-
-    @Nullable
-    @Override
-    public PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
-        return null;
-    }
-
-    @Override
-    public void tickMovement() {
-        super.tickHandSwing();
-        super.tickMovement();
-
-        Box boundingBox = getBoundingBox();
-        List<SlimeEntity> touchingSlimes = world.getEntitiesByClass(SlimeEntity.class, boundingBox, slimeEntity -> true);
-        touchingSlimes.forEach(s -> ((FortressSlimeEntity)s).touchColonist(this));
-    }
-
-    @Override
-    public boolean canImmediatelyDespawn(double distanceSquared) {
-        return false;
-    }
-
-    @Override
-    public boolean cannotDespawn() {
-        return true;
     }
 
     @Override
@@ -352,56 +175,14 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         if(target != null && !target.isAlive()) {
             this.setTarget(null);
         }
-
-        this.hungerManager.update(this);
-
-        if(this.getCurrentFoodLevel() != this.hungerManager.getFoodLevel()) {
-            sendHungerMessage();
-            this.updateCurrentFoodLevel();
-        }
-    }
-
-    public void sendMessageToMasterPlayer(String message) {
-        final Optional<ServerPlayerEntity> player = getMasterPlayer();
-        player.ifPresent(p -> p.sendMessage(new LiteralText(message), false));
-    }
-
-    public boolean isScreenOpen(Class<? extends ScreenHandler> screenHandlerClass) {
-        return getMasterPlayer()
-                .map(it -> it.currentScreenHandler)
-                .map(screenHandlerClass::isInstance)
-                .orElse(false);
-    }
-
-    private void sendHungerMessage() {
-        if(hungerManager.prevFoodLevel > 0 && this.hungerManager.getFoodLevel() <= 0) {
-            sendMessageToMasterPlayer(getName().asString() + "is starving! Do something!");
-        } else if(this.hungerManager.prevFoodLevel >= 5 && this.hungerManager.foodLevel < 5) {
-            sendMessageToMasterPlayer(getName().asString() + " is very hungry! Bring some food to the village!");
-        } else if(this.hungerManager.prevFoodLevel >= 10 && this.hungerManager.foodLevel < 10) {
-            sendMessageToMasterPlayer(getName().asString() + " is hungry. It's time to eat something!");
-        }
-    }
-
-    public Optional<ServerPlayerEntity> getMasterPlayer() {
-        if(this.getFortressId() == null) throw new IllegalStateException("Fortress ID is null");
-        return getFortressModServerManager().getPlayerByFortressId(this.getFortressId());
     }
 
     private void tickProfessionCheck() {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId)) {
-            final ServerProfessionManager manager = getFortressServerManager().getServerProfessionManager();
-            manager.getProfessionsWithAvailablePlaces().ifPresent(p -> this.dataTracker.set(PROFESSION_ID, p));
-        }
-    }
-
-    private boolean isFortressCreative() {
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            final var client = (FortressMinecraftClient) MinecraftClient.getInstance();
-            return client.getFortressClientManager().isCreative();
-        } else {
-            return getFortressServerManager().isCreative();
+            getFortressServerManager().map(FortressServerManager::getServerProfessionManager)
+                    .flatMap(ServerProfessionManager::getProfessionsWithAvailablePlaces)
+                    .ifPresent(this::setProfession);
         }
     }
 
@@ -419,11 +200,10 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     }
 
     private void tickAllControls() {
+        if(getEatControl().map(EatControl::isEating).orElse(false)) return;
         if(getDigControl() != null) getDigControl().tick();
         if(getPlaceControl() != null) getPlaceControl().tick();
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();
-        if(getFightControl() != null) getFightControl().tick();
-        if(getEatControl() != null) getEatControl().tick();
         if(getMovementHelper() != null) getMovementHelper().tick();
     }
 
@@ -472,10 +252,6 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         return scaffoldsControl;
     }
 
-    public FightControl getFightControl() {
-        return fightControl;
-    }
-
     public void resetControls() {
         digControl.reset();
         placeControl.reset();
@@ -517,53 +293,24 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putUuid("playerId", this.getFortressId());
-
-        final NbtCompound hunger = new NbtCompound();
-        this.hungerManager.writeNbt(hunger);
-        nbt.put("hunger", hunger);
-
         final String professionId = this.getProfessionId();
         if(!DEFAULT_PROFESSION_ID.equals(professionId)) {
             nbt.putString("professionId", professionId);
         }
-
-        final var guyType = this.getGuyType();
-        nbt.putInt("guyType", guyType);
     }
 
     public String getProfessionId() {
         return this.dataTracker.get(PROFESSION_ID);
     }
 
-    public EatControl getEatControl() {
-        return eatControl;
-    }
-
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        if(nbt == null) return;
-        this.setFortressId(nbt.getUuid("playerId"));
-        if(nbt.contains("hunger")) {
-            this.hungerManager.readNbt(nbt.getCompound("hunger"));
-        }
-        getFortressServerManager().addColonist(this);
 
         if(nbt.contains("professionId")) {
             final String professionId = nbt.getString("professionId");
             this.setProfession(professionId);
         }
-
-        if (nbt.contains("guyType")) {
-            this.dataTracker.set(GUY_TYPE, nbt.getInt("guyType"));
-        }
-    }
-
-    private FortressModServerManager getFortressModServerManager() {
-        final var server = super.getServer();
-        if(!(server instanceof FortressServer fortressServer)) throw new IllegalStateException("FortressServerManager is only available on FortressServer");
-        return fortressServer.getFortressModServerManager();
     }
 
     public boolean isAllowToPlaceBlockFromFarAway() {
@@ -575,31 +322,27 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
     }
 
     public void setCurrentTaskDesc(String currentTaskDesc) {
-        this.dataTracker.set(CURRENT_TASK_DECRIPTION, currentTaskDesc);
+        this.dataTracker.set(CURRENT_TASK_DESCRIPTION, currentTaskDesc);
     }
 
     public String getCurrentTaskDesc() {
-        return this.dataTracker.get(CURRENT_TASK_DECRIPTION);
-    }
-
-    public void updateCurrentFoodLevel() {
-        this.dataTracker.set(CURRENT_FOOD_LEVEL, this.hungerManager.getFoodLevel());
-    }
-
-    public int getCurrentFoodLevel() {
-        return this.dataTracker.get(CURRENT_FOOD_LEVEL);
+        return this.dataTracker.get(CURRENT_TASK_DESCRIPTION);
     }
 
     public void setProfession(String professionId) {
-        this.dataTracker.set(PROFESSION_ID, professionId);
-    }
-
-    public int getGuyType() {
-        return this.dataTracker.get(GUY_TYPE);
+        getFortressServerManager().ifPresent(it -> {
+            final var spm = it.getServerProfessionManager();
+            final var type = spm.getEntityTypeForProfession(professionId);
+            if(type == FortressEntities.COLONIST_ENTITY_TYPE) {
+                this.dataTracker.set(PROFESSION_ID, professionId);
+            } else if (type == FortressEntities.WARRIOR_PAWN_ENTITY_TYPE || type == FortressEntities.ARCHER_PAWN_ENTITY_TYPE) {
+                it.replaceColonistWithTypedPawn(this, professionId, type);
+            }
+        });
     }
 
     public void resetProfession() {
-        this.dataTracker.set(PROFESSION_ID, DEFAULT_PROFESSION_ID);
+        this.setProfession(DEFAULT_PROFESSION_ID);
     }
 
     public TaskControl getTaskControl() {
@@ -622,30 +365,8 @@ public class Colonist extends PassiveEntity implements RangedAttackMob, IMinefor
         double f = target.getZ() - this.getZ();
         double g = Math.sqrt(d * d + f * f);
         arrow.setVelocity(d, e + g * (double)0.2f, f, 1.6f, 4);
-        this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+        this.playSound(SoundEvents.ENTITY_ARROW_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
         this.world.spawnEntity(arrow);
     }
 
-    private void setFortressId(UUID id) {
-        this.dataTracker.set(FORTRESS_ID, Optional.ofNullable(id));
-    }
-
-    public UUID getFortressId() {
-        return this.dataTracker.get(FORTRESS_ID).orElse(null);
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return inventory;
-    }
-
-    @Override
-    public @Nullable ServerPlayerEntity getPlayer() {
-        return getMasterPlayer().orElse(null);
-    }
-
-    @Override
-    public Fluid getBucketFluid(BucketItem bucketItem) {
-        return bucketItem.fluid;
-    }
 }

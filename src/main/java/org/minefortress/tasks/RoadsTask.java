@@ -5,8 +5,8 @@ import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.entity.Colonist;
-import org.minefortress.network.ClientboundTaskExecutedPacket;
+import org.minefortress.entity.interfaces.IWorkerPawn;
+import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
@@ -98,7 +98,7 @@ public class RoadsTask implements Task {
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld level, Colonist colonist) {
+    public TaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
         return taskParts.poll();
     }
 
@@ -118,8 +118,8 @@ public class RoadsTask implements Task {
     }
 
     @Override
-    public void finishPart(TaskPart part, Colonist colonist) {
-        final ServerWorld world = (ServerWorld) colonist.world;
+    public void finishPart(TaskPart part, IWorkerPawn colonist) {
+        final ServerWorld world = colonist.getServerWorld();
         finishedParts++;
         if(taskParts.isEmpty() && finishedParts == totalParts){
             world.getPlayers().stream().findAny().ifPresent(player -> {
