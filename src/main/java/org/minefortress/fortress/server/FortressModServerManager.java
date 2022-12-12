@@ -1,7 +1,5 @@
 package org.minefortress.fortress.server;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -24,9 +22,6 @@ public class FortressModServerManager {
     }
 
     public FortressServerManager getByPlayer(ServerPlayerEntity player) {
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-            return null;
-        }
         final var playerId = player.getUuid();
         return serverManagers.computeIfAbsent(playerId, (it) -> new FortressServerManager(server));
     }
