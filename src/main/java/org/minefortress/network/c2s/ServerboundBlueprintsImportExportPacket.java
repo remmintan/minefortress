@@ -15,6 +15,7 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.network.s2c.ClientboundBlueprintsProcessImportExportPacket;
 import org.minefortress.renderer.gui.blueprints.NetworkActionType;
+import org.minefortress.utils.NetworkUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,14 +49,14 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
     public ServerboundBlueprintsImportExportPacket(PacketByteBuf buf) {
         this.type = buf.readEnumConstant(NetworkActionType.class);
         this.path = buf.readString();
-        this.bytes = buf.readByteArray();
+        this.bytes = NetworkUtils.getDecompressedBytes(buf.readByteArray());
     }
 
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeEnumConstant(type);
         buf.writeString(path);
-        buf.writeByteArray(bytes);
+        buf.writeByteArray(NetworkUtils.getCompressedBytes(bytes));
     }
 
     @Override
@@ -137,8 +138,9 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
         try(
                 final var byteArrayOutputStream = new ByteArrayOutputStream();
                 final var zipOS = new ZipOutputStream(byteArrayOutputStream);
+                final var walk = Files.walk(path)
         ) {
-            for (Path it : Files.walk(path).toList()) {
+            for (Path it : walk.toList()) {
                 final var relative = path.relativize(it);
                 final var relativePathStr = relative.toString();
                 if (Strings.isEmpty(relativePathStr)) continue;
