@@ -3,12 +3,18 @@ package org.minefortress.renderer.gui.hire;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.professions.hire.IHireScreenHandler;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.renderer.gui.widget.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HirePawnScreen extends WindowScreen {
+
+    private final List<Pair<CostsWidget, ButtonWidget>> hireButtons = new ArrayList<>();
 
     private final IHireScreenHandler handler;
 
@@ -22,12 +28,22 @@ public class HirePawnScreen extends WindowScreen {
         super.init();
 
         final var professions = handler.getProfessions();
+        hireButtons.clear();
         final var startY = getScreenTopY() + 25;
         var i = 0;
         for(final String profId : professions) {
             final var rowY = startY + i * 25;
             addNewRow(profId, rowY, getScreenLeftX(), getScreenRightX());
             i++;
+        }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        for (Pair<CostsWidget, ButtonWidget> btn : hireButtons) {
+            final var button = btn.getRight();
+            button.active = btn.getLeft().isEnough();
         }
     }
 
@@ -45,23 +61,26 @@ public class HirePawnScreen extends WindowScreen {
                 this::renderTooltip
         );
         this.addDrawable(professionName);
-        this.addDrawable(
-                new CostsWidget(
-                        leftX + professionName.getOffset() + 25,
-                        rowY,
-                        this.handler.getCost(profId)
-                )
+        final var costs = new CostsWidget(
+                leftX + professionName.getOffset() + 25,
+                rowY,
+                this.handler.getCost(profId)
         );
-        this.addDrawableChild(
-                new ButtonWidget(
-                        rightX - 90,
-                        rowY,
-                        20,
-                        20,
-                        new LiteralText("+"),
-                        (btn) -> this.handler.increaseAmount(profId)
-                )
+        this.addDrawable(costs);
+        final var hireButton = new ButtonWidget(
+                rightX - 90,
+                rowY,
+                20,
+                20,
+                new LiteralText("+"),
+                (btn) -> this.handler.increaseAmount(profId),
+                (btn, matrices, x, y) -> {
+                    final var buttonTooltip = costs.isEnough() ? "Increase amount" : "Not enough resources";
+                    this.renderTooltip(matrices, new LiteralText(buttonTooltip), x, y);
+                }
         );
+        this.addDrawableChild(hireButton);
+        hireButtons.add(new Pair<>(costs, hireButton));
         this.addDrawable(
                 new ProfessionQueueWidget(
                         rightX - 70,

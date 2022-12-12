@@ -16,6 +16,7 @@ public interface ClientResourceManager extends FortressResourceManager {
     boolean hasItem(ItemInfo item, List<ItemInfo> items);
     List<ItemStack> getStacks(ItemGroup group);
     void setItemAmount(Item item, int amount);
+    int getItemAmount(Item item);
     void reset();
     List<ItemStack> getAllStacks();
 
