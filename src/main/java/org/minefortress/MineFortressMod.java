@@ -33,7 +33,7 @@ public class MineFortressMod implements ModInitializer {
         FortressBlocks.register();
         FortressEntities.register();
         FortressItems.register();
-        FortressEvents.register();
+        FortressEvents.registerServer();
 
         CommandsManager.registerCommands();
         FortressServerNetworkHelper.registerReceivers();
