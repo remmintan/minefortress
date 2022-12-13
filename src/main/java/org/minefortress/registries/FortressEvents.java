@@ -18,7 +18,7 @@ import org.minefortress.utils.ModUtils;
 
 public class FortressEvents {
 
-    public static void register() {
+    public static void registerServer() {
         EntitySleepEvents.ALLOW_BED.register((entity, sleepingPos, state, vanillaResult) -> {
             if(ModUtils.isFortressGamemode(entity)) {
                 return ActionResult.SUCCESS;
@@ -47,8 +47,6 @@ public class FortressEvents {
             final var fsm = fortressServer.getFortressModServerManager().getByPlayer(handler.player);
             fsm.scheduleSync();
         });
-
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ModUtils.getFortressClientManager().reset());
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             if(server instanceof FortressServer fortressServer) {
@@ -81,6 +79,10 @@ public class FortressEvents {
             }
             return ActionResult.PASS;
         });
+    }
+
+    public static void registerClient() {
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ModUtils.getFortressClientManager().reset());
     }
 
 }
