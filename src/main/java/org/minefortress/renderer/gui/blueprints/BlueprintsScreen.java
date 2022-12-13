@@ -66,7 +66,7 @@ public final class BlueprintsScreen extends Screen {
                 this.handler = new BlueprintScreenHandler(this.client);
                 this.blueprintRenderer = ModUtils.getFortressClient().getBlueprintRenderer();
                 final var connectedToTheServer = ModUtils.getFortressClientManager().isConnectedToTheServer();
-                if(connectedToTheServer) {
+                if(!connectedToTheServer) {
                     this.addDrawableChild(
                             new ButtonWidget(
                                     this.x + backgroundWidth + previewOffset,
