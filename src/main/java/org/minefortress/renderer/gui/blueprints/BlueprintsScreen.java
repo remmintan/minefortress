@@ -13,15 +13,13 @@ import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
-import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
+import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 
@@ -60,23 +58,26 @@ public final class BlueprintsScreen extends Screen {
         if(this.client != null) {
             this.client.keyboard.setRepeatEvents(true);
 
-            if(client instanceof FortressMinecraftClient fortressClient && fortressClient.isFortressGamemode()) {
+            if(ModUtils.isClientInFortressGamemode()) {
                 super.init();
                 this.x = (this.width - backgroundWidth - previewWidth - previewOffset) / 2;
                 this.y = (this.height - backgroundHeight) / 2;
 
                 this.handler = new BlueprintScreenHandler(this.client);
-                this.blueprintRenderer = fortressClient.getBlueprintRenderer();
-                this.addDrawableChild(
-                        new ButtonWidget(
-                                this.x + backgroundWidth + previewOffset,
-                                this.y - 22,
-                                120,
-                                20,
-                                new LiteralText("Import / Export"),
-                                btn -> client.setScreen(new ImportExportBlueprintsScreen())
-                        )
-                );
+                this.blueprintRenderer = ModUtils.getFortressClient().getBlueprintRenderer();
+                final var connectedToTheServer = ModUtils.getFortressClientManager().isConnectedToTheServer();
+                if(connectedToTheServer) {
+                    this.addDrawableChild(
+                            new ButtonWidget(
+                                    this.x + backgroundWidth + previewOffset,
+                                    this.y - 22,
+                                    120,
+                                    20,
+                                    new LiteralText("Import / Export"),
+                                    btn -> client.setScreen(new ImportExportBlueprintsScreen())
+                            )
+                    );
+                }
             } else {
                 this.client.setScreen(null);
             }
@@ -102,7 +103,7 @@ public final class BlueprintsScreen extends Screen {
             if(this.handler.hasFocusedSlot()) {
                 if(this.handler.getFocusedSlot() == BlueprintSlot.EMPTY) {
                     if(this.client != null)
-                    this.client.setScreen(new AddBlueprintScreen(handler.getSelectedGroup()));
+                        this.client.setScreen(new AddBlueprintScreen(handler.getSelectedGroup()));
                     return true;
                 }
 
@@ -179,7 +180,7 @@ public final class BlueprintsScreen extends Screen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
-        this.drawBackground(matrices, delta, mouseX, mouseY);
+        this.drawBackground(matrices);
         RenderSystem.disableDepthTest();
         super.render(matrices, mouseX, mouseY, delta);
 
@@ -207,7 +208,7 @@ public final class BlueprintsScreen extends Screen {
             this.drawSlot(blueprintSlot, slotColumn, slotRow);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
-            final FortressClientManager fortressClientManager = getFortressClientManager();
+            final var fortressClientManager = ModUtils.getFortressClientManager();
             final var resourceManager = fortressClientManager.getResourceManager();
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(matrices, slotX, slotY, this.getZOffset());
@@ -271,11 +272,6 @@ public final class BlueprintsScreen extends Screen {
             return Items.DIRT;
         }
         return originalItem;
-    }
-
-    private FortressClientManager getFortressClientManager() {
-        final var fortressClient = (FortressMinecraftClient) this.client;
-        return fortressClient.getFortressClientManager();
     }
 
     @Override
@@ -360,10 +356,10 @@ public final class BlueprintsScreen extends Screen {
         int slotX = slotColumn * 18 + 9 + 5;
         int slotY = slotRow * 18 + 18 + 5;
         if(slot == BlueprintSlot.EMPTY){
-            renderScaledItemStack(slotX, slotY, Items.BRICK);
+            renderScaledItemStack(slotX, slotY);
         } else {
             final BlueprintMetadata metadata = slot.getMetadata();
-            final var enoughResources = !getFortressClientManager().isSurvival() || slot.isEnoughResources();
+            final var enoughResources = !ModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
             if(this.client != null){
                 this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
             }
@@ -373,18 +369,18 @@ public final class BlueprintsScreen extends Screen {
         this.setZOffset(0);
     }
 
-    private void renderScaledItemStack(int slotX, int slotY, Item goldIngot) {
+    private void renderScaledItemStack(int slotX, int slotY) {
         final float scaleParameter = 2f;
         final MatrixStack matrices = RenderSystem.getModelViewStack();
         matrices.push();
         matrices.scale(1/ scaleParameter, 1/ scaleParameter, 1/ scaleParameter);
         RenderSystem.applyModelViewMatrix();
-        this.itemRenderer.renderInGui(new ItemStack(goldIngot), (int)(slotX * scaleParameter), (int)(slotY * scaleParameter));
+        this.itemRenderer.renderInGui(new ItemStack(Items.BRICK), (int)(slotX * scaleParameter), (int)(slotY * scaleParameter));
         matrices.pop();
         RenderSystem.applyModelViewMatrix();
     }
 
-    private void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+    private void drawBackground(MatrixStack matrices) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         final BlueprintGroup selectedGroup = this.handler.getSelectedGroup();
         for (BlueprintGroup bg : BlueprintGroup.values()) {
@@ -460,14 +456,14 @@ public final class BlueprintsScreen extends Screen {
         } else {
             y += this.backgroundHeight;
         }
-        if (this.isPointWithinBounds(x + 3, y + 3, 23, 27, mouseX, mouseY)) {
+        if (this.isPointWithinBounds(x + 3, y + 3, mouseX, mouseY)) {
             this.renderTooltip(matrices, group.getNameText(), mouseX, mouseY);
 
         }
     }
 
-    private boolean isPointWithinBounds(int x, int y, int width, int height, int mouseX, int mouseY) {
-        return mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+    private boolean isPointWithinBounds(int x, int y, int mouseX, int mouseY) {
+        return mouseX >= x && mouseY >= y && mouseX < x + 23 && mouseY < y + 27;
     }
 
     private void drawMouseoverTooltip(MatrixStack matrices, int x, int y) {

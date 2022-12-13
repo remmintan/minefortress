@@ -131,7 +131,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
         if(!needSync || player == null) return;
-        final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, maxColonistsCount);
+        final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
+        final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
             final var houses = buildings.stream()
@@ -324,7 +325,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         return new BlockPos(spawnX, spawnY, spawnZ);
     }
 
-    private void scheduleSync() {
+    public void scheduleSync() {
         needSync = true;
     }
 

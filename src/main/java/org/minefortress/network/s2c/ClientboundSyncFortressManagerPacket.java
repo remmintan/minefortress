@@ -12,12 +12,14 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
     private final int colonistsCount;
     private final BlockPos fortressPos;
     private final FortressGamemode fortressGamemode;
+    private final boolean connectedToTheServer;
     private final int maxColonistsCount;
 
-    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode,  int maxColonistsCount) {
+    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode, boolean connectedToTheServer, int maxColonistsCount) {
         this.colonistsCount = colonistsCount;
         this.fortressPos = fortressPos;
         this.fortressGamemode = fortressGamemode;
+        this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
     }
 
@@ -31,12 +33,13 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
 
         this.fortressGamemode = FortressGamemode.valueOf(buf.readString(100));
         this.maxColonistsCount = buf.readInt();
+        this.connectedToTheServer = buf.readBoolean();
     }
 
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.maxColonistsCount);
+            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.connectedToTheServer, this.maxColonistsCount);
         }
     }
 
@@ -50,5 +53,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
 
         buf.writeString(fortressGamemode.name());
         buf.writeInt(maxColonistsCount);
+        buf.writeBoolean(connectedToTheServer);
     }
 }

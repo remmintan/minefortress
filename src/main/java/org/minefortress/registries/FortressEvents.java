@@ -1,5 +1,6 @@
 package org.minefortress.registries;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -43,8 +44,11 @@ public class FortressEvents {
         // initialising the fortress server on join
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             final var fortressServer = (FortressServer) server;
-            fortressServer.getFortressModServerManager().getByPlayer(handler.player);
+            final var fsm = fortressServer.getFortressModServerManager().getByPlayer(handler.player);
+            fsm.scheduleSync();
         });
+
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ModUtils.getFortressClientManager().reset());
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             if(server instanceof FortressServer fortressServer) {
