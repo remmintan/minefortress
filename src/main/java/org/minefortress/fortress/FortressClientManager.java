@@ -33,6 +33,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
     private final ClientFightManager fightManager = new ClientFightManager();
 
+    private boolean connectedToTheServer = false;
     private boolean initialized = false;
 
     private BlockPos fortressCenter = null;
@@ -58,7 +59,6 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
-
     }
 
     public void select(BasePawnEntity colonist) {
@@ -110,10 +110,11 @@ public final class FortressClientManager extends AbstractFortressManager {
         return colonistsCount;
     }
 
-    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, int maxColonistsCount) {
+    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, boolean connectedToTheServer, int maxColonistsCount) {
         this.colonistsCount = colonistsCount;
         this.fortressCenter = fortressCenter;
         this.gamemode = gamemode;
+        this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
         this.initialized = true;
     }
@@ -162,6 +163,9 @@ public final class FortressClientManager extends AbstractFortressManager {
         }
     }
 
+    public boolean isConnectedToTheServer() {
+        return initialized && connectedToTheServer;
+    }
 
     public BlockPos getPosAppropriateForCenter() {
         return posAppropriateForCenter;
@@ -289,5 +293,9 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public int getMaxColonistsCount() {
         return maxColonistsCount;
+    }
+
+    public void reset() {
+        this.initialized = false;
     }
 }
