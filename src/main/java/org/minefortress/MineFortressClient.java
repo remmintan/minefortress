@@ -11,6 +11,7 @@ import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.registries.FortressEntities;
+import org.minefortress.registries.FortressEvents;
 import org.minefortress.registries.FortressKeybindings;
 import org.minefortress.tasks.ClientTasksHolder;
 
@@ -52,5 +53,7 @@ public class MineFortressClient implements ClientModInitializer {
         ScreenRegistry.register(FORTRESS_FURNACE_SCREEN_HANDLER, FortressFurnaceScreen::new);
 
         FortressClientNetworkHelper.registerReceivers();
+
+        FortressEvents.registerClient();
     }
 }
