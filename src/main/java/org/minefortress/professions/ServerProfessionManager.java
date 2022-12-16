@@ -5,6 +5,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.interfaces.IProfessional;
@@ -35,7 +36,6 @@ public class ServerProfessionManager extends ProfessionManager{
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
     private final MinecraftServer server;
     private boolean professionsRead = false;
-    private boolean professionsSent = false;
     private List<ProfessionFullInfo> professionsInfos;
     private String professionsTree;
     private boolean needsUpdate = false;
@@ -82,12 +82,6 @@ public class ServerProfessionManager extends ProfessionManager{
 
     public void tick(@Nullable ServerPlayerEntity player) {
         if(player == null) return;
-        if(!professionsSent) {
-            initProfessionsIfNeeded();
-            final var packet = new ClientboundProfessionsInitPacket(professionsInfos, professionsTree);
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_INIT, packet);
-            professionsSent = true;
-        }
 
         for(Profession prof : getProfessions().values()) {
             if(prof.getAmount() > 0) {
@@ -105,6 +99,12 @@ public class ServerProfessionManager extends ProfessionManager{
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             needsUpdate = false;
         }
+    }
+
+    public void sendProfessions(@NotNull ServerPlayerEntity player) {
+        initProfessionsIfNeeded();
+        final var packet = new ClientboundProfessionsInitPacket(professionsInfos, professionsTree);
+        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_INIT, packet);
     }
 
     private void initProfessionsIfNeeded() {
