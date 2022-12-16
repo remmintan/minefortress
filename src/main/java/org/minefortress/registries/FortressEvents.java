@@ -44,8 +44,10 @@ public class FortressEvents {
         // initialising the fortress server on join
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             final var fortressServer = (FortressServer) server;
-            final var fsm = fortressServer.getFortressModServerManager().getByPlayer(handler.player);
+            final var player = handler.player;
+            final var fsm = fortressServer.getFortressModServerManager().getByPlayer(player);
             fsm.scheduleSync();
+            fsm.getServerProfessionManager().sendProfessions(player);
         });
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
