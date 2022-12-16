@@ -105,4 +105,8 @@ public class HirePawnScreen extends WindowScreen {
         );
     }
 
+    public IHireScreenHandler getHandler() {
+        return handler;
+    }
+
 }

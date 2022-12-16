@@ -14,7 +14,6 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;
 import org.minefortress.network.s2c.ClientboundProfessionsInitPacket;
-import org.minefortress.network.s2c.S2COpenHireMenuPacket;
 
 import java.util.List;
 import java.util.Map;
@@ -46,8 +45,8 @@ public class ServerProfessionManager extends ProfessionManager{
     }
 
     public void openHireMenu(String professionId, ServerPlayerEntity player) {
-        final var packet = new S2COpenHireMenuPacket(professionId);
-        FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
+//        final var packet = new S2COpenHireMenuPacket(professionId);
+//        FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
     }
 
     @Override

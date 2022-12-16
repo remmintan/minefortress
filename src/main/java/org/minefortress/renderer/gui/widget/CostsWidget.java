@@ -6,19 +6,19 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.utils.ModUtils;
 
-import java.util.Map;
+import java.util.List;
 
 public class CostsWidget implements Drawable, Element {
 
     private final int x;
     private final int y;
-    private final Map<Item, Integer> costs;
+    private final List<ItemInfo> costs;
 
-    public CostsWidget(int x, int y, Map<Item, Integer> costs) {
+    public CostsWidget(int x, int y, List<ItemInfo> costs) {
         this.x = x;
         this.y = y;
         this.costs = costs;
@@ -28,9 +28,9 @@ public class CostsWidget implements Drawable, Element {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         final var itemRenderer = getItemRenderer();
         int i = 0;
-        for(var ent : costs.entrySet()) {
-            final var stack = ent.getKey().getDefaultStack();
-            final var amount = ent.getValue();
+        for(var ent : costs) {
+            final var stack = ent.item().getDefaultStack();
+            final var amount = ent.amount();
             final var actualItemAmount = getItemAmount(stack);
             final var color = actualItemAmount >= amount ? 0xFFFFFF : 0xFF0000;
             final var countLabel = amount > 1 ? amount + "/" + actualItemAmount : "";
@@ -46,9 +46,9 @@ public class CostsWidget implements Drawable, Element {
     }
 
     public boolean isEnough() {
-        for(var ent : costs.entrySet()) {
-            final var stack = ent.getKey().getDefaultStack();
-            final var amount = ent.getValue();
+        for(var ent : costs) {
+            final var stack = ent.item().getDefaultStack();
+            final var amount = ent.amount();
             final var actualItemAmount = getItemAmount(stack);
             if(actualItemAmount < amount) {
                 return false;

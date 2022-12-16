@@ -5,7 +5,6 @@ import io.netty.buffer.ByteBufOutputStream;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.network.interfaces.FortressS2CPacket;
-import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.professions.hire.HireInfo;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
 
@@ -14,30 +13,27 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-public class S2COpenHireMenuPacket implements FortressS2CPacket {
+public class SyncHireProgress implements FortressS2CPacket {
 
-    public static final String CHANNEL = "open_hire_menu";
-    private final String screenName;
-    private final Map<String, HireInfo> professions;
+    private static final String CHANNEL = "sync_hire_progress";
 
-    public S2COpenHireMenuPacket(String screenName, Map<String, HireInfo> professions) {
-        this.screenName = screenName;
+    private Map<String, HireInfo> professions;
+
+    public SyncHireProgress(Map<String, HireInfo> professions) {
         this.professions = professions;
     }
 
     @SuppressWarnings("unchecked")
-    public S2COpenHireMenuPacket(PacketByteBuf buf) {
-        this.screenName = buf.readString();
-        try(var stream = new ObjectInputStream(new ByteBufInputStream(buf))) {
-            this.professions = (Map<String, HireInfo>) stream.readObject();
+    public SyncHireProgress(PacketByteBuf buf) {
+        try (var ois = new ObjectInputStream(new ByteBufInputStream(buf))) {
+            this.professions = (Map<String, HireInfo>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
     @Override
     public void write(PacketByteBuf buf) {
-        buf.writeString(screenName);
         try(var stream = new ObjectOutputStream(new ByteBufOutputStream(buf))) {
             stream.writeObject(professions);
         } catch (IOException e) {
@@ -48,9 +44,13 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
     @Override
     public void handle(MinecraftClient client) {
         client.execute(() -> {
-            final var handler = new ClientHireHandler(screenName, professions);
-            final var screen = new HirePawnScreen(handler);
-            client.setScreen(screen);
+            final var currentScreen = client.currentScreen;
+            if (currentScreen instanceof HirePawnScreen screen) {
+                final var handler = screen.getHandler();
+                if(handler != null) {
+                    handler.sync(professions);
+                }
+            }
         });
     }
 }
