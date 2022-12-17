@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.professions.ServerProfessionManager;
+import org.minefortress.professions.hire.ProfessionsHireTypes;
 
 public class ServerboundChangeProfessionStatePacket implements FortressC2SPacket {
 
@@ -31,8 +32,9 @@ public class ServerboundChangeProfessionStatePacket implements FortressC2SPacket
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final ServerProfessionManager manager = this.getFortressServerManager(server, player).getServerProfessionManager();
         if (amountChange == AmountChange.ADD) {
-            if(ServerProfessionManager.HIREABLE_PROFESSIONS.contains(professionId)) {
-                manager.openHireMenu(professionId, player);
+            final var opt = ProfessionsHireTypes.getHireType(professionId);
+            if(opt.isPresent()) {
+                manager.openHireMenu(opt.get(), player);
             } else {
                 manager.increaseAmount(professionId);
             }

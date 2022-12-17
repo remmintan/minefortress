@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class SyncHireProgress implements FortressS2CPacket {
 
-    private static final String CHANNEL = "sync_hire_progress";
+    public static final String CHANNEL = "sync_hire_progress";
 
     private Map<String, HireInfo> professions;
 

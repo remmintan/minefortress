@@ -15,7 +15,11 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;
 import org.minefortress.network.s2c.ClientboundProfessionsInitPacket;
+import org.minefortress.network.s2c.S2COpenHireMenuPacket;
+import org.minefortress.professions.hire.ProfessionsHireTypes;
+import org.minefortress.professions.hire.ServerHireHandler;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,13 +28,6 @@ import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
 public class ServerProfessionManager extends ProfessionManager{
-
-    public static final List<String> HIREABLE_PROFESSIONS = List.of(
-            "warrior1",
-            "warrior2",
-            "archer1",
-            "archer2"
-    );
     public static final String PROFESSION_NBT_TAG = "professionId";
 
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
@@ -39,14 +36,17 @@ public class ServerProfessionManager extends ProfessionManager{
     private List<ProfessionFullInfo> professionsInfos;
     private String professionsTree;
     private boolean needsUpdate = false;
+
+    private final Map<ProfessionsHireTypes, ServerHireHandler> hireHandlers = new HashMap<>();
     public ServerProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier, MinecraftServer server) {
         super(fortressManagerSupplier);
         this.server = server;
     }
 
-    public void openHireMenu(String professionId, ServerPlayerEntity player) {
-//        final var packet = new S2COpenHireMenuPacket(professionId);
-//        FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
+    public void openHireMenu(ProfessionsHireTypes hireType, ServerPlayerEntity player) {
+        final var hireHandler = hireHandlers.computeIfAbsent(hireType, k -> new ServerHireHandler(hireType.getIds()));
+        final var packet = new S2COpenHireMenuPacket(hireType.getScreenName(), hireHandler.getProfessions());
+        FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
     }
 
     @Override
