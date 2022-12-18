@@ -22,7 +22,7 @@ public class ServerHireHandler {
     }
 
     public Map<String, HireInfo> getProfessions() {
-        return professions.stream()
+        return getUnlockedProfessions().stream()
                 .map(it ->
                         new HireInfo(it,
                         0,
@@ -43,6 +43,7 @@ public class ServerHireHandler {
     public void tick() {
         hireRequests.entrySet()
                 .stream()
+                .filter(it -> this.professionUnlocked(it.getKey()))
                 .flatMap(it -> it.getValue().stream())
                 .forEach(it -> {
                     it.tick();
@@ -54,6 +55,15 @@ public class ServerHireHandler {
         for (Map.Entry<String, List<HireRequest>> entry : hireRequests.entrySet()) {
             entry.getValue().removeIf(HireRequest::isDone);
         }
+    }
+
+    private List<String> getUnlockedProfessions() {
+        return professions.stream().filter(this::professionUnlocked).toList();
+    }
+
+    private boolean professionUnlocked(String it) {
+        final var profession = professionManager.getProfession(it);
+        return professionManager.isRequirementsFulfilled(profession, true, false);
     }
 
     private static class HireRequest {
