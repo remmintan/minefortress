@@ -16,6 +16,7 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;
 import org.minefortress.network.s2c.ClientboundProfessionsInitPacket;
 import org.minefortress.network.s2c.S2COpenHireMenuPacket;
+import org.minefortress.network.s2c.SyncHireProgress;
 import org.minefortress.professions.hire.ProfessionsHireTypes;
 import org.minefortress.professions.hire.ServerHireHandler;
 
@@ -38,14 +39,15 @@ public class ServerProfessionManager extends ProfessionManager{
     private boolean needsUpdate = false;
 
     private final Map<ProfessionsHireTypes, ServerHireHandler> hireHandlers = new HashMap<>();
+    private ServerHireHandler currentHireHandler;
     public ServerProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier, MinecraftServer server) {
         super(fortressManagerSupplier);
         this.server = server;
     }
 
     public void openHireMenu(ProfessionsHireTypes hireType, ServerPlayerEntity player) {
-        final var hireHandler = hireHandlers.computeIfAbsent(hireType, k -> new ServerHireHandler(hireType.getIds()));
-        final var packet = new S2COpenHireMenuPacket(hireType.getScreenName(), hireHandler.getProfessions());
+        currentHireHandler = hireHandlers.computeIfAbsent(hireType, k -> new ServerHireHandler(hireType.getIds(), this));
+        final var packet = new S2COpenHireMenuPacket(hireType.getScreenName(), currentHireHandler.getProfessions());
         FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
     }
 
@@ -83,6 +85,23 @@ public class ServerProfessionManager extends ProfessionManager{
     public void tick(@Nullable ServerPlayerEntity player) {
         if(player == null) return;
 
+        hireHandlers.forEach((k, v) -> v.tick());
+        if(currentHireHandler != null) {
+            final var packet = new SyncHireProgress(currentHireHandler.getProfessions());
+            FortressServerNetworkHelper.send(player, SyncHireProgress.CHANNEL, packet);
+        }
+
+        tickAddToProfession();
+        tickRemoveFromProfession();
+
+        if(needsUpdate) {
+            ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(getProfessions());
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
+            needsUpdate = false;
+        }
+    }
+
+    private void tickAddToProfession() {
         for(Profession prof : getProfessions().values()) {
             if(prof.getAmount() > 0) {
                 final boolean unlocked = this.isRequirementsFulfilled(prof);
@@ -91,13 +110,6 @@ public class ServerProfessionManager extends ProfessionManager{
                     this.scheduleSync();
                 }
             }
-        }
-
-        tickRemoveFromProfession();
-        if(needsUpdate) {
-            ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(getProfessions());
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
-            needsUpdate = false;
         }
     }
 
