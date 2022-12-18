@@ -45,10 +45,10 @@ public abstract class ProfessionManager {
     }
 
     public boolean isRequirementsFulfilled(Profession profession) {
-        return isRequirementsFulfilled(profession, false);
+        return isRequirementsFulfilled(profession, false, true);
     }
 
-    public boolean isRequirementsFulfilled(Profession profession, boolean countProfessionals) {
+    public boolean isRequirementsFulfilled(Profession profession, boolean countProfessionals, boolean countItems) {
         if(fortressManagerSupplier.get().isCreative())
             return true;
 
@@ -59,7 +59,7 @@ public abstract class ProfessionManager {
 
         final Profession parent = profession.getParent();
         if(Objects.nonNull(parent)) {
-            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, false);
+            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, false, countItems);
             if(!parentUnlocked) {
                 return false;
             }
@@ -73,10 +73,12 @@ public abstract class ProfessionManager {
             satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement.block(), blockRequirement.blueprint(), minRequirementCount);
         }
 
-        final var itemsRequirement = profession.getItemsRequirement();
-        if(countProfessionals && Objects.nonNull(itemsRequirement)) {
-            final var hasItems = fortressManager.getResourceManager().hasItems(itemsRequirement);
-            satisfied = satisfied && hasItems;
+        if(countItems) {
+            final var itemsRequirement = profession.getItemsRequirement();
+            if(countProfessionals && Objects.nonNull(itemsRequirement)) {
+                final var hasItems = fortressManager.getResourceManager().hasItems(itemsRequirement);
+                satisfied = satisfied && hasItems;
+            }
         }
 
         return satisfied;

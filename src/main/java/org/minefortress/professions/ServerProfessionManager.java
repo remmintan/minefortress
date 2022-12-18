@@ -56,7 +56,7 @@ public class ServerProfessionManager extends ProfessionManager{
         if(super.getFreeColonists() <= 0) return;
         final Profession profession = super.getProfession(professionId);
         if(profession == null) return;
-        if(!super.isRequirementsFulfilled(profession, true)) return;
+        if(!super.isRequirementsFulfilled(profession, true, true)) return;
 
         final var fortressServerManager = (FortressServerManager) fortressManagerSupplier.get();
         final var serverResourceManager = fortressServerManager.getServerResourceManager();
