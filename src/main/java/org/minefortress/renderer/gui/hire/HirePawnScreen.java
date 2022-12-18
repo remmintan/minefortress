@@ -5,6 +5,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.minefortress.network.c2s.C2SCloseHireMenuPacket;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.hire.IHireScreenHandler;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.renderer.gui.widget.*;
@@ -109,4 +111,10 @@ public class HirePawnScreen extends WindowScreen {
         return handler;
     }
 
+    @Override
+    public void close() {
+        super.close();
+        final var packet = new C2SCloseHireMenuPacket();
+        FortressClientNetworkHelper.send(C2SCloseHireMenuPacket.CHANNEL, packet);
+    }
 }

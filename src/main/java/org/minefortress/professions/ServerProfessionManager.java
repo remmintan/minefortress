@@ -51,6 +51,10 @@ public class ServerProfessionManager extends ProfessionManager{
         FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
     }
 
+    public void closeHireMenu() {
+        currentHireHandler = null;
+    }
+
     @Override
     public void increaseAmount(String professionId) {
         if(super.getFreeColonists() <= 0) return;

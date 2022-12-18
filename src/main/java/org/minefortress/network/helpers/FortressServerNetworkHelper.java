@@ -45,6 +45,7 @@ public class FortressServerNetworkHelper {
         FortressServerNetworkHelper.registerReceiver(FortressChannelNames.FORTRESS_BLUEPRINTS_IMPORT_EXPORT, ServerboundBlueprintsImportExportPacket::new);
         FortressServerNetworkHelper.registerReceiver(C2SMoveTargetPacket.CHANNEL, C2SMoveTargetPacket::new);
         FortressServerNetworkHelper.registerReceiver(C2SFollowTargetPacket.CHANNEL, C2SFollowTargetPacket::new);
+        FortressServerNetworkHelper.registerReceiver(C2SCloseHireMenuPacket.CHANNEL, C2SCloseHireMenuPacket::new);
     }
 
 }
