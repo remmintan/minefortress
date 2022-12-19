@@ -1,6 +1,8 @@
 package org.minefortress.professions.hire;
 
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.network.c2s.C2SHirePawnWithScreenPacket;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.utils.ModUtils;
 
 import java.util.List;
@@ -48,7 +50,8 @@ public final class ClientHireHandler implements IHireScreenHandler {
 
     @Override
     public void increaseAmount(String professionId) {
-
+        final var packet = new C2SHirePawnWithScreenPacket(professionId);
+        FortressClientNetworkHelper.send(C2SHirePawnWithScreenPacket.CHANNEL, packet);
     }
 
     @Override

@@ -46,6 +46,7 @@ public class FortressServerNetworkHelper {
         FortressServerNetworkHelper.registerReceiver(C2SMoveTargetPacket.CHANNEL, C2SMoveTargetPacket::new);
         FortressServerNetworkHelper.registerReceiver(C2SFollowTargetPacket.CHANNEL, C2SFollowTargetPacket::new);
         FortressServerNetworkHelper.registerReceiver(C2SCloseHireMenuPacket.CHANNEL, C2SCloseHireMenuPacket::new);
+        FortressServerNetworkHelper.registerReceiver(C2SHirePawnWithScreenPacket.CHANNEL, C2SHirePawnWithScreenPacket::new);
     }
 
 }

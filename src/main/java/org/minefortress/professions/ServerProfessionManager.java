@@ -11,6 +11,7 @@ import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;
@@ -53,6 +54,23 @@ public class ServerProfessionManager extends ProfessionManager{
 
     public void closeHireMenu() {
         currentHireHandler = null;
+    }
+
+    public void sendHireRequestToCurrentHandler(String professionId) {
+        if(currentHireHandler != null) {
+            final var profession = getProfession(professionId);
+            final var canHire = isRequirementsFulfilled(profession, true, true);
+            if(canHire) {
+                final var resourceManager = (ServerResourceManager) fortressManagerSupplier
+                        .get()
+                        .getResourceManager();
+                resourceManager.removeItems(profession.getItemsRequirement());
+                currentHireHandler.hire(professionId);
+            }
+
+        } else {
+            throw new IllegalStateException("No current hire handler");
+        }
     }
 
     @Override
