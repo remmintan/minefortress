@@ -165,6 +165,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     }
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public void fillInputSlots(boolean craftAll, Recipe<?> recipe, ServerPlayerEntity player) {
         new FortressInputSlotFiller(this).fillInputSlots(player, (Recipe<CraftingInventory>) recipe, craftAll);
@@ -295,7 +296,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         }
 
         boolean full() {
-            return !this.items.stream().anyMatch(ItemStack::isEmpty);
+            return this.items.stream().noneMatch(ItemStack::isEmpty);
         }
 
         ItemStack get(int index) {
@@ -371,6 +372,6 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
     }
 
-    protected static record InventoryDiff(List<ItemInfo> added, List<ItemInfo> updated, List<ItemInfo> removed) {}
+    protected record InventoryDiff(List<ItemInfo> added, List<ItemInfo> updated, List<ItemInfo> removed) {}
 
 }

@@ -24,8 +24,6 @@ public interface ServerResourceManager extends FortressResourceManager {
     void read(NbtCompound tag);
     void tick(ServerPlayerEntity player);
 
-    void syncAll();
-
     List<ItemStack> getAllItems();
 
 }
