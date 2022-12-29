@@ -1,6 +1,5 @@
 package org.minefortress.professions.hire;
 
-import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.Collections;
@@ -36,8 +35,12 @@ public class ServerHireHandler {
         hireRequests.computeIfAbsent(professionId, k -> Collections.emptyList()).add(hireRequest);
     }
 
-    private List<ItemInfo> getCost(String it) {
-        return professionManager.getProfession(it).getItemsRequirement();
+    private List<HireCost> getCost(String it) {
+        return professionManager.getProfession(it)
+                .getItemsRequirement()
+                .stream()
+                .map(HireCost::fromItemInfo)
+                .toList();
     }
 
     public void tick() {
