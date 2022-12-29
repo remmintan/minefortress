@@ -18,6 +18,7 @@ public interface IHireScreenHandler {
 
     Set<String> getProfessions();
     int getHireProgress(String professionId);
+    int getHireQueue(String professionId);
     List<ItemInfo> getCost(String professionId);
     static ItemStack getProfessionItem(String professionId) {
         return getProfession(professionId).map(Profession::getIcon).orElse(Items.PLAYER_HEAD.getDefaultStack());

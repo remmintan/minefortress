@@ -87,7 +87,8 @@ public class HirePawnScreen extends WindowScreen {
                 new ProfessionQueueWidget(
                         rightX - 70,
                         rowY,
-                        () -> 10
+                        () -> handler.getHireQueue(profId),
+                        this::renderTooltip
                 )
         );
         this.addDrawable(

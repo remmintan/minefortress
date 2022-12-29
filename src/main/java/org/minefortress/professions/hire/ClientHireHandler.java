@@ -35,6 +35,11 @@ public final class ClientHireHandler implements IHireScreenHandler {
     }
 
     @Override
+    public int getHireQueue(String professionId) {
+        return professions.get(professionId).hireQueue();
+    }
+
+    @Override
     public List<ItemInfo> getCost(String professionId) {
         return professions.get(professionId).cost().stream().map(HireCost::toItemInfo).toList();
     }

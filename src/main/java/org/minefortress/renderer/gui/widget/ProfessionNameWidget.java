@@ -4,6 +4,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import org.minefortress.renderer.gui.widget.interfaces.TooltipRenderer;
 
 
 public class ProfessionNameWidget extends MinefortressWidget implements Element, Drawable {
@@ -39,11 +40,6 @@ public class ProfessionNameWidget extends MinefortressWidget implements Element,
 
     public int getOffset() {
         return getTextRenderer().getWidth(shortName);
-    }
-
-    @FunctionalInterface
-    public interface TooltipRenderer {
-        void render(MatrixStack matrices, Text text, int mouseX, int mouseY);
     }
 
 }

@@ -6,5 +6,6 @@ import java.util.List;
 public record HireInfo(
         String professionId,
         int hireProgress,
+        int hireQueue,
         List<HireCost> cost
 ) implements Serializable {}

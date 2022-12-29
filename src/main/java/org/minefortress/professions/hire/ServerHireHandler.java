@@ -1,11 +1,9 @@
 package org.minefortress.professions.hire;
 
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.professions.ServerProfessionManager;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ServerHireHandler {
@@ -13,7 +11,7 @@ public class ServerHireHandler {
     private final List<String> professions;
     private final ServerProfessionManager professionManager;
 
-    private final Map<String, List<HireRequest>> hireRequests = new HashMap<>();
+    private final Map<String, Queue<HireRequest>> hireRequests = new HashMap<>();
 
     public ServerHireHandler(List<String> professions, ServerProfessionManager professionManager) {
         this.professions = Collections.unmodifiableList(professions);
@@ -21,18 +19,32 @@ public class ServerHireHandler {
     }
 
     public Map<String, HireInfo> getProfessions() {
-        return getUnlockedProfessions().stream()
+        return getUnlockedProfessions()
+                .stream()
                 .map(it ->
-                        new HireInfo(it,
-                        0,
-                        getCost(it))
+                        {
+                            final var hireRequestsQueue = getHireRequestsQueue(it);
+                            return new HireInfo(
+                                it,
+                                Optional.ofNullable(hireRequestsQueue.peek())
+                                        .map(HireRequest::getProgress)
+                                        .orElse(0),
+                                hireRequestsQueue.size(),
+                                getCost(it)
+                            );
+                        }
                 )
                 .collect(Collectors.toMap(HireInfo::professionId, it -> it));
     }
 
     public void hire(String professionId) {
         final var hireRequest = new HireRequest(professionId);
-        hireRequests.computeIfAbsent(professionId, k -> Collections.emptyList()).add(hireRequest);
+        getHireRequestsQueue(professionId).add(hireRequest);
+    }
+
+    @NotNull
+    private Queue<HireRequest> getHireRequestsQueue(String professionId) {
+        return hireRequests.computeIfAbsent(professionId, k -> new ArrayDeque<>());
     }
 
     private List<HireCost> getCost(String it) {
@@ -47,7 +59,8 @@ public class ServerHireHandler {
         hireRequests.entrySet()
                 .stream()
                 .filter(it -> this.professionUnlocked(it.getKey()))
-                .flatMap(it -> it.getValue().stream())
+                .map(it -> it.getValue().peek())
+                .filter(Objects::nonNull)
                 .forEach(it -> {
                     it.tick();
                     if(it.isDone()){
@@ -55,7 +68,7 @@ public class ServerHireHandler {
                     }
                 });
 
-        for (Map.Entry<String, List<HireRequest>> entry : hireRequests.entrySet()) {
+        for (Map.Entry<String, Queue<HireRequest>> entry : hireRequests.entrySet()) {
             entry.getValue().removeIf(HireRequest::isDone);
         }
     }
@@ -88,6 +101,10 @@ public class ServerHireHandler {
 
         boolean isDone() {
             return progress >= 100;
+        }
+
+        int getProgress() {
+            return progress;
         }
     }
 
