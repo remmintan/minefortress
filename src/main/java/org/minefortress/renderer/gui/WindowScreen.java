@@ -36,6 +36,11 @@ public class WindowScreen extends Screen {
         super.render(matrices, mouseX, mouseY, delta);
     }
 
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
+
     private void drawBackground(MatrixStack matrices) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
