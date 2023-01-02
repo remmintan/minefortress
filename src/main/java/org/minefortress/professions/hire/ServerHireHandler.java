@@ -61,15 +61,17 @@ public class ServerHireHandler {
                 .filter(it -> this.professionUnlocked(it.getKey()))
                 .map(it -> it.getValue().peek())
                 .filter(Objects::nonNull)
-                .forEach(it -> {
-                    it.tick();
-                    if(it.isDone()){
-                        professionManager.increaseAmount(it.getProfessionId());
-                    }
-                });
+                .forEach(HireRequest::tick);
 
         for (Map.Entry<String, Queue<HireRequest>> entry : hireRequests.entrySet()) {
-            entry.getValue().removeIf(HireRequest::isDone);
+            entry.getValue().removeIf(it -> {
+                if(it.isDone()){
+                    professionManager.increaseAmount(it.getProfessionId());
+                    return true;
+                } else {
+                    return false;
+                }
+            });
         }
     }
 
