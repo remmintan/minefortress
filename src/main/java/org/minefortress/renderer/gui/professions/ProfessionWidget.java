@@ -244,6 +244,9 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     public boolean isUnlocked(boolean countProfessionals) {
+        if(this.profession.isCantRemove() && this.professionManager.isRequirementsFulfilled(this.profession, true, false)){
+            return true;
+        }
         return this.professionManager.isRequirementsFulfilled(this.profession, countProfessionals, true);
     }
 

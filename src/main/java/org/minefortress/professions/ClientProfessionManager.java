@@ -26,13 +26,17 @@ public class ClientProfessionManager extends ProfessionManager {
     @Override
     public void increaseAmount(String professionId) {
         if("colonist".equals(professionId)) return;
-        if(!super.isRequirementsFulfilled(this.getProfession(professionId), true, true)) return;
-        final ServerboundChangeProfessionStatePacket.AmountChange change =
-                ServerboundChangeProfessionStatePacket.AmountChange.ADD;
-        final ServerboundChangeProfessionStatePacket packet =
-                new ServerboundChangeProfessionStatePacket(professionId, change);
-        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
-
+        if(
+                super.isRequirementsFulfilled(this.getProfession(professionId), true, true)
+                ||
+                this.getProfession(professionId).isCantRemove() && super.isRequirementsFulfilled(this.getProfession(professionId), true, false)
+        ) {
+            final ServerboundChangeProfessionStatePacket.AmountChange change =
+                    ServerboundChangeProfessionStatePacket.AmountChange.ADD;
+            final ServerboundChangeProfessionStatePacket packet =
+                    new ServerboundChangeProfessionStatePacket(professionId, change);
+            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
+        }
     }
 
     @Override
