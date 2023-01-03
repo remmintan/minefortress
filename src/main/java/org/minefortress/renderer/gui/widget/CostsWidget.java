@@ -33,15 +33,20 @@ public class CostsWidget implements Drawable, Element {
             final var amount = ent.amount();
             final var actualItemAmount = getItemAmount(stack);
             final var color = actualItemAmount >= amount ? 0xFFFFFF : 0xFF0000;
-            final var countLabel = amount > 1 ? amount + "/" + actualItemAmount : "";
+            final var countLabel = amount + "/" + actualItemAmount;
             final var textRenderer = getTextRenderer();
-            final var countLabelWidth = textRenderer.getWidth(countLabel)/2;
+            final var countLabelWidth = textRenderer.getWidth(countLabel);
             matrices.push();
+            final var scaleFactor = 0.5f;
+            matrices.scale(scaleFactor, scaleFactor, 1f);
             matrices.translate(0, 0, 500);
-            textRenderer.drawWithShadow(matrices, countLabel, x + i + countLabelWidth - 20, y+8, color);
+
+            final var textX = x + i + countLabelWidth / 2f - 25 * scaleFactor;
+            final var textY = y + 6 / scaleFactor;
+            textRenderer.drawWithShadow(matrices, countLabel, textX / scaleFactor, textY / scaleFactor, color);
             matrices.pop();
             itemRenderer.renderGuiItemIcon(stack, x + i, y);
-            i+=24 + countLabelWidth;
+            i+=(9 + countLabelWidth) * scaleFactor;
         }
     }
 

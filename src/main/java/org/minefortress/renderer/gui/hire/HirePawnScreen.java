@@ -64,7 +64,7 @@ public class HirePawnScreen extends WindowScreen {
         );
         this.addDrawable(professionName);
         final var costs = new CostsWidget(
-                leftX + professionName.getOffset() + 25,
+                leftX + professionName.getOffset() + 15,
                 rowY,
                 this.handler.getCost(profId)
         );
