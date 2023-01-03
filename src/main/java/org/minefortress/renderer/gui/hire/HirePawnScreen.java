@@ -31,7 +31,7 @@ public class HirePawnScreen extends WindowScreen {
 
         final var professions = handler.getProfessions();
         hireButtons.clear();
-        final var startY = getScreenTopY() + 25;
+        final var startY = getScreenTopY() + 35;
         var i = 0;
         for(final String profId : professions) {
             final var rowY = startY + i * 25;
@@ -52,10 +52,17 @@ public class HirePawnScreen extends WindowScreen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
-        HirePawnScreen.drawCenteredText(matrices, this.textRenderer, this.title, this.getScreenCenterX(), this.getScreenTopY() + 5, 0xFFFFFF);
+        HirePawnScreen.drawCenteredText(matrices, this.textRenderer, this.title, this.getScreenCenterX(), this.getScreenTopY() + 10, 0xFFFFFF);
     }
 
     private void addNewRow(String profId, int rowY, int leftX, int rightX) {
+        this.addDrawable(
+                new ProgressArrowWidget(
+                        rightX - 38,
+                        rowY,
+                        () -> this.handler.getHireProgress(profId)
+                )
+        );
         final var professionName = new ProfessionNameWidget(
                 IHireScreenHandler.getProfessionName(profId),
                 leftX + 10,
@@ -77,7 +84,7 @@ public class HirePawnScreen extends WindowScreen {
                 new LiteralText("+"),
                 (btn) -> this.handler.increaseAmount(profId),
                 (btn, matrices, x, y) -> {
-                    final var buttonTooltip = costs.isEnough() ? "Increase amount" : "Not enough resources";
+                    final var buttonTooltip = costs.isEnough() ? "Hire" : "Not enough resources";
                     this.renderTooltip(matrices, new LiteralText(buttonTooltip), x, y);
                 }
         );
@@ -91,13 +98,7 @@ public class HirePawnScreen extends WindowScreen {
                         this::renderTooltip
                 )
         );
-        this.addDrawable(
-                new ProgressArrowWidget(
-                        rightX - 38,
-                        rowY,
-                        () -> this.handler.getHireProgress(profId)
-                )
-        );
+
         this.addDrawable(
                 new ProfessionAmountWidget(
                         rightX - 25,
