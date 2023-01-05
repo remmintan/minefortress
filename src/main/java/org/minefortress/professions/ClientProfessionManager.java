@@ -29,7 +29,7 @@ public class ClientProfessionManager extends ProfessionManager {
         if(
                 super.isRequirementsFulfilled(this.getProfession(professionId), true, true)
                 ||
-                this.getProfession(professionId).isCantRemove() && super.isRequirementsFulfilled(this.getProfession(professionId), true, false)
+                this.getProfession(professionId).isHireMenu() && super.isRequirementsFulfilled(this.getProfession(professionId), true, false)
         ) {
             final ServerboundChangeProfessionStatePacket.AmountChange change =
                     ServerboundChangeProfessionStatePacket.AmountChange.ADD;
@@ -43,7 +43,7 @@ public class ClientProfessionManager extends ProfessionManager {
     public void decreaseAmount(String professionId) {
         if("colonist".equals(professionId)) return;
         final var profession = this.getProfession(professionId);
-        final var cantRemove = profession.isCantRemove();
+        final var cantRemove = profession.isHireMenu();
         if(cantRemove){
             final var message = new LiteralText("§cCan't remove pawn from profession: " + profession.getTitle());
             MinecraftClient.getInstance().setScreen(null);

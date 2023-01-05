@@ -8,6 +8,7 @@ import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
+import org.minefortress.entity.Colonist;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
@@ -59,15 +60,18 @@ public class ServerProfessionManager extends ProfessionManager{
     public void sendHireRequestToCurrentHandler(String professionId) {
         if(currentHireHandler != null) {
             final var profession = getProfession(professionId);
+            if(!profession.isHireMenu()) {
+                throw new IllegalArgumentException("Profession " + professionId + " is not a hire menu profession");
+            }
             final var canHire = isRequirementsFulfilled(profession, true, true);
-            if(canHire) {
-                final var resourceManager = (ServerResourceManager) fortressManagerSupplier
-                        .get()
+            final var abstractFortressManager = fortressManagerSupplier.get();
+            if(canHire && getFreeColonists() > 0 && abstractFortressManager instanceof FortressServerManager fsm) {
+                final var resourceManager = (ServerResourceManager) abstractFortressManager
                         .getResourceManager();
                 resourceManager.removeItems(profession.getItemsRequirement());
+                fsm.getPawnWithoutAProfession().ifPresent(Colonist::reserveColonist);
                 currentHireHandler.hire(professionId);
             }
-
         } else {
             throw new IllegalStateException("No current hire handler");
         }
@@ -100,7 +104,7 @@ public class ServerProfessionManager extends ProfessionManager{
         final Profession profession = super.getProfession(professionId);
         if(profession == null) return;
         if(profession.getAmount() <= 0) return;
-        if(profession.isCantRemove() && !force) return;
+        if(profession.isHireMenu() && !force) return;
 
         profession.setAmount(profession.getAmount() - 1);
         scheduleSync();
@@ -115,7 +119,7 @@ public class ServerProfessionManager extends ProfessionManager{
             FortressServerNetworkHelper.send(player, SyncHireProgress.CHANNEL, packet);
         }
 
-        tickAddToProfession();
+        tickCheckProfessionRequirements();
         tickRemoveFromProfession();
 
         if(needsUpdate) {
@@ -125,7 +129,7 @@ public class ServerProfessionManager extends ProfessionManager{
         }
     }
 
-    private void tickAddToProfession() {
+    private void tickCheckProfessionRequirements() {
         for(Profession prof : getProfessions().values()) {
             if(prof.getAmount() > 0) {
                 final boolean unlocked = this.isRequirementsFulfilled(prof);
@@ -192,10 +196,14 @@ public class ServerProfessionManager extends ProfessionManager{
         }
     }
 
-    public Optional<String> getProfessionsWithAvailablePlaces() {
+    public Optional<String> getProfessionsWithAvailablePlaces(boolean professionRequiresReservation) {
         for(Map.Entry<String, Profession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
             final Profession profession = entry.getValue();
+
+            if(professionRequiresReservation && !profession.isHireMenu()) continue;
+            if(!professionRequiresReservation && profession.isHireMenu()) continue;
+
             if(profession.getAmount() > 0) {
                 final long colonistsWithProfession = countPawnsWithProfession(professionId);
                 if(colonistsWithProfession < profession.getAmount()) {

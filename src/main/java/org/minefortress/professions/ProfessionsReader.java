@@ -80,7 +80,7 @@ public final class ProfessionsReader {
                 case "description" -> description = jsonReader.nextString();
                 case "unlockMessage" -> unlockMessage = jsonReader.nextString();
                 case "unlockMoreMessage" -> unlockMoreMessage = jsonReader.nextString();
-                case "cantRemove" -> cantRemove = jsonReader.nextBoolean();
+                case "hireMenu" -> cantRemove = jsonReader.nextBoolean();
                 case "requirements" -> requirements = readRequirements(jsonReader);
             }
         }

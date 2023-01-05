@@ -178,7 +178,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             throw new IllegalStateException("Tick should not be called on server");
         }
 
-        if(maxColonistsCount != -1 && getColonistsCount() > maxColonistsCount) {
+        if(maxColonistsCount != -1 && getTotalColonistsCount() > maxColonistsCount) {
             final var deltaColonists = Math.max( pawns.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
 
             pawns.stream()
@@ -494,10 +494,6 @@ public final class FortressServerManager extends AbstractFortressManager {
         return nameGenerator;
     }
 
-    public int getColonistsCount() {
-        return pawns.size();
-    }
-
     public BlockPos getFortressCenter() {
         return fortressCenter!=null?fortressCenter.toImmutable():null;
     }
@@ -540,11 +536,11 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public int getHomeOuterRadius() {
-        return Math.max(getColonistsCount(), 5) * 4 / 5;
+        return Math.max(getTotalColonistsCount(), 5) * 4 / 5;
     }
 
     private int getHomeInnerRadius() {
-        return Math.max(getColonistsCount(), 5) * 2 / 5;
+        return Math.max(getTotalColonistsCount(), 5) * 2 / 5;
     }
 
 
@@ -588,6 +584,15 @@ public final class FortressServerManager extends AbstractFortressManager {
         return this.pawns.size();
     }
 
+    public Optional<Colonist> getPawnWithoutAProfession() {
+        return pawns
+                .stream()
+                .filter(Colonist.class::isInstance)
+                .map(Colonist.class::cast)
+                .filter(it -> it.getProfessionId().equals(Colonist.DEFAULT_PROFESSION_ID))
+                .findAny();
+    }
+
     public ServerProfessionManager getServerProfessionManager() {
         return serverProfessionManager;
     }
@@ -629,7 +634,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     public void increaseMaxColonistsCount() {
         if(maxColonistsCount == -1) return;
         this.maxColonistsCount++;
-        if(this.maxColonistsCount >= getColonistsCount()) {
+        if(this.maxColonistsCount >= getTotalColonistsCount()) {
             this.maxColonistsCount = -1;
         }
         this.scheduleSync();
@@ -637,7 +642,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public void decreaseMaxColonistsCount() {
         if(maxColonistsCount == -1)
-            this.maxColonistsCount = getColonistsCount();
+            this.maxColonistsCount = getTotalColonistsCount();
 
         this.maxColonistsCount--;
 

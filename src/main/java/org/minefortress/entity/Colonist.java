@@ -37,7 +37,6 @@ import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
@@ -52,7 +51,8 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
     private static final TrackedData<String> PROFESSION_ID = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.STRING);
     private static final TrackedData<Boolean> HAS_TASK = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.BOOLEAN);
 
-    private static final String DEFAULT_PROFESSION_ID = "colonist";
+    public static final String DEFAULT_PROFESSION_ID = "colonist";
+    private static final String RESERVE_PROFESSION_ID = "reserve";
 
     public static final float WORK_REACH_DISTANCE = 3f;
 
@@ -179,9 +179,10 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
 
     private void tickProfessionCheck() {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
-        if(DEFAULT_PROFESSION_ID.equals(professionId)) {
-            getFortressServerManager().map(FortressServerManager::getServerProfessionManager)
-                    .flatMap(ServerProfessionManager::getProfessionsWithAvailablePlaces)
+        if(DEFAULT_PROFESSION_ID.equals(professionId) || RESERVE_PROFESSION_ID.equals(professionId)) {
+            getFortressServerManager()
+                    .map(FortressServerManager::getServerProfessionManager)
+                    .flatMap(it -> it.getProfessionsWithAvailablePlaces(RESERVE_PROFESSION_ID.equals(professionId)))
                     .ifPresent(this::setProfession);
         }
     }
@@ -329,6 +330,14 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
         return this.dataTracker.get(CURRENT_TASK_DESCRIPTION);
     }
 
+
+    public void reserveColonist() {
+        if(this.getProfessionId().equals(DEFAULT_PROFESSION_ID)) {
+            this.setProfession(RESERVE_PROFESSION_ID);
+        } else {
+            throw new IllegalStateException("Colonist cannot be reserved because it is already assigned to a profession");
+        }
+    }
     public void setProfession(String professionId) {
         getFortressServerManager().ifPresent(it -> {
             final var spm = it.getServerProfessionManager();
