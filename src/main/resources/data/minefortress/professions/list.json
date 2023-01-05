@@ -271,7 +271,7 @@
         }
       ]
     },
-    "cantRemove": true
+    "hireMenu": true
   },
   {
     "key": "warrior2",
@@ -305,7 +305,7 @@
         }
       ]
     },
-    "cantRemove": true
+    "hireMenu": true
   },
   {
     "key": "archer1",
@@ -327,7 +327,7 @@
         }
       ]
     },
-    "cantRemove": true
+    "hireMenu": true
   },
   {
     "key": "archer2",
@@ -339,7 +339,7 @@
     "requirements": {
       "building": "_"
     },
-    "cantRemove": true
+    "hireMenu": true
   },
   {
     "key": "knight1",
