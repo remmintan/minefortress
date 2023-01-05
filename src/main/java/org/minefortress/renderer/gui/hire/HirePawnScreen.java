@@ -10,6 +10,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.hire.IHireScreenHandler;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.renderer.gui.widget.*;
+import org.minefortress.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,9 @@ public class HirePawnScreen extends WindowScreen {
 
         final var professions = handler.getProfessions();
         hireButtons.clear();
-        final var startY = getScreenTopY() + 35;
+
+        final var startY = getScreenTopY() + 40;
+        addDrawable(new FreePawnsWidget(getScreenLeftX() + 10, startY - 15));
         var i = 0;
         for(final String profId : professions) {
             final var rowY = startY + i * 25;
@@ -45,7 +48,7 @@ public class HirePawnScreen extends WindowScreen {
         super.tick();
         for (Pair<CostsWidget, ButtonWidget> btn : hireButtons) {
             final var button = btn.getRight();
-            button.active = btn.getLeft().isEnough();
+            button.active = btn.getLeft().isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0;
         }
     }
 
@@ -82,9 +85,13 @@ public class HirePawnScreen extends WindowScreen {
                 20,
                 20,
                 new LiteralText("+"),
-                (btn) -> this.handler.increaseAmount(profId),
+                (btn) -> {
+                    if(canIncreaseAmount(costs)) {
+                        this.handler.increaseAmount(profId);
+                    }
+                },
                 (btn, matrices, x, y) -> {
-                    final var buttonTooltip = costs.isEnough() ? "Hire" : "Not enough resources";
+                    final var buttonTooltip = canIncreaseAmount(costs) ? "Hire" : "Not enough resources/pawns";
                     this.renderTooltip(matrices, new LiteralText(buttonTooltip), x, y);
                 }
         );
@@ -107,6 +114,10 @@ public class HirePawnScreen extends WindowScreen {
                         () -> this.handler.getCurrentCount(profId)
                 )
         );
+    }
+
+    private static boolean canIncreaseAmount(CostsWidget costs) {
+        return costs.isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0;
     }
 
     public IHireScreenHandler getHandler() {
