@@ -8,6 +8,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.utils.GuiUtils;
@@ -141,7 +142,7 @@ public class Profession {
         return buildingRequirement;
     }
 
-    @Nullable
+    @NotNull
     public BlockRequirement getBlockRequirement() {
         return new BlockRequirement(blockRequirement, blueprint);
     }
