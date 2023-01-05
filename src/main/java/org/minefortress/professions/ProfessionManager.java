@@ -149,6 +149,6 @@ public abstract class ProfessionManager {
         return getProfessions().entrySet().stream().filter(entry -> entry.getValue() == profession).map(Map.Entry::getKey).findFirst();
     }
 
-    public abstract void increaseAmount(String professionId);
+    public abstract void increaseAmount(String professionId, boolean alreadyCharged);
     public abstract void decreaseAmount(String professionId);
 }

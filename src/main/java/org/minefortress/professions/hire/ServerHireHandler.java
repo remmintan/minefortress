@@ -66,7 +66,7 @@ public class ServerHireHandler {
         for (Map.Entry<String, Queue<HireRequest>> entry : hireRequests.entrySet()) {
             entry.getValue().removeIf(it -> {
                 if(it.isDone()){
-                    professionManager.increaseAmount(it.getProfessionId());
+                    professionManager.increaseAmount(it.getProfessionId(), true);
                     return true;
                 } else {
                     return false;

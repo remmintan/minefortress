@@ -24,7 +24,7 @@ public class ClientProfessionManager extends ProfessionManager {
     }
 
     @Override
-    public void increaseAmount(String professionId) {
+    public void increaseAmount(String professionId, boolean alreadyCharged) {
         if("colonist".equals(professionId)) return;
         if(
                 super.isRequirementsFulfilled(this.getProfession(professionId), true, true)

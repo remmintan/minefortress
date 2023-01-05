@@ -36,7 +36,7 @@ public class ServerboundChangeProfessionStatePacket implements FortressC2SPacket
             if(opt.isPresent()) {
                 manager.openHireMenu(opt.get(), player);
             } else {
-                manager.increaseAmount(professionId);
+                manager.increaseAmount(professionId, false);
             }
         } else {
             manager.decreaseAmount(professionId);

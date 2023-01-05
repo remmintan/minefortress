@@ -74,16 +74,18 @@ public class ServerProfessionManager extends ProfessionManager{
     }
 
     @Override
-    public void increaseAmount(String professionId) {
+    public void increaseAmount(String professionId, boolean itemsAlreadyCharged) {
         if(super.getFreeColonists() <= 0) return;
         final Profession profession = super.getProfession(professionId);
         if(profession == null) return;
         if(!super.isRequirementsFulfilled(profession, true, true)) return;
 
-        final var fortressServerManager = (FortressServerManager) fortressManagerSupplier.get();
-        final var serverResourceManager = fortressServerManager.getServerResourceManager();
-        if(profession.getItemsRequirement() != null)
-            serverResourceManager.removeItems(profession.getItemsRequirement());
+        if(!itemsAlreadyCharged) {
+            final var resourceManager = (ServerResourceManager) fortressManagerSupplier
+                    .get()
+                    .getResourceManager();
+            resourceManager.removeItems(profession.getItemsRequirement());
+        }
 
         profession.setAmount(profession.getAmount() + 1);
         scheduleSync();
