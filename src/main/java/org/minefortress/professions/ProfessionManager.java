@@ -49,13 +49,16 @@ public abstract class ProfessionManager {
     }
 
     public boolean isRequirementsFulfilled(Profession profession, boolean countProfessionals, boolean countItems) {
-        if(fortressManagerSupplier.get().isCreative())
-            return true;
-
         final String buildingRequirement = profession.getBuildingRequirement();
         if(Objects.isNull(buildingRequirement) || Strings.isBlank(buildingRequirement)) {
             return true;
         }
+
+        final var disabled = "_".equals(buildingRequirement) && profession.getBlockRequirement().block() == null;
+        if(fortressManagerSupplier.get().isCreative() && !disabled) {
+            return true;
+        }
+
 
         final Profession parent = profession.getParent();
         if(Objects.nonNull(parent)) {
