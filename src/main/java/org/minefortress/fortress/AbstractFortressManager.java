@@ -17,6 +17,8 @@ public abstract class AbstractFortressManager {
 
     public abstract int getTotalColonistsCount();
 
+    public abstract int getReservedPawnsCount();
+
     abstract void setGamemode(FortressGamemode gamemode);
     public abstract boolean isCreative();
 

@@ -140,9 +140,11 @@ public abstract class ProfessionManager {
     }
 
     public int getFreeColonists() {
-        final int totalColonists = fortressManagerSupplier.get().getTotalColonistsCount();
+        final var abstractFortressManager = fortressManagerSupplier.get();
+        final int totalColonists = abstractFortressManager.getTotalColonistsCount();
+        final int reservedColonists = abstractFortressManager.getReservedPawnsCount();
         final int totalWorkers = getProfessions().values().stream().mapToInt(Profession::getAmount).sum();
-        return totalColonists - totalWorkers;
+        return totalColonists - totalWorkers - reservedColonists;
     }
 
     public Optional<String> findIdFromProfession(Profession profession) {

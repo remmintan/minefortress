@@ -70,6 +70,7 @@ public class ServerProfessionManager extends ProfessionManager{
                         .getResourceManager();
                 resourceManager.removeItems(profession.getItemsRequirement());
                 fsm.getPawnWithoutAProfession().ifPresent(Colonist::reserveColonist);
+                fsm.scheduleSync();
                 currentHireHandler.hire(professionId);
             }
         } else {

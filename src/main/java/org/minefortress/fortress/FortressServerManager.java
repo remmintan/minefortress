@@ -132,7 +132,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         serverResourceManager.tick(player);
         if(!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
-        final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount);
+        final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount, getReservedPawnsCount());
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
             final var houses = buildings.stream()
@@ -260,6 +260,13 @@ public final class FortressServerManager extends AbstractFortressManager {
                 }
             }
         }
+    }
+
+    public int getReservedPawnsCount() {
+        return (int) getProfessionals()
+                .stream()
+                .filter(it -> it.getProfessionId().equals(Colonist.RESERVE_PROFESSION_ID))
+                .count();
     }
 
     public void killAllPawns() {

@@ -38,6 +38,7 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private BlockPos fortressCenter = null;
     private int colonistsCount = 0;
+    private int reservedColonistCount = 0;
 
     private volatile FortressToast setCenterToast;
 
@@ -106,16 +107,18 @@ public final class FortressClientManager extends AbstractFortressManager {
         return this.selectedPawn.getPos().subtract(selectedColonistDelta);
     }
 
-    public int getColonistsCount() {
-        return colonistsCount;
+    @Override
+    public int getReservedPawnsCount() {
+        return reservedColonistCount;
     }
 
-    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, boolean connectedToTheServer, int maxColonistsCount) {
+    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, boolean connectedToTheServer, int maxColonistsCount, int reservedColonistCount) {
         this.colonistsCount = colonistsCount;
         this.fortressCenter = fortressCenter;
         this.gamemode = gamemode;
         this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
+        this.reservedColonistCount = reservedColonistCount;
         this.initialized = true;
     }
 

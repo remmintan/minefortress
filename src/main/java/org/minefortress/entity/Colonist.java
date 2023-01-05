@@ -52,7 +52,7 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
     private static final TrackedData<Boolean> HAS_TASK = DataTracker.registerData(Colonist.class, TrackedDataHandlerRegistry.BOOLEAN);
 
     public static final String DEFAULT_PROFESSION_ID = "colonist";
-    private static final String RESERVE_PROFESSION_ID = "reserve";
+    public static final String RESERVE_PROFESSION_ID = "reserve";
 
     public static final float WORK_REACH_DISTANCE = 3f;
 

@@ -83,7 +83,7 @@ public class ColonistsScreen extends Screen {
     }
 
     private int getColonistsCount() {
-        return getFortressClientManager().getColonistsCount();
+        return getFortressClientManager().getTotalColonistsCount();
     }
 
     private FortressClientManager getFortressClientManager() {
