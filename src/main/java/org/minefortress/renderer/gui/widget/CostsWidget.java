@@ -8,6 +8,7 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.utils.GuiUtils;
 import org.minefortress.utils.ModUtils;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class CostsWidget implements Drawable, Element {
             final var amount = ent.amount();
             final var actualItemAmount = getItemAmount(stack);
             final var color = actualItemAmount >= amount ? 0xFFFFFF : 0xFF0000;
-            final var countLabel = amount + "/" + actualItemAmount;
+            final var countLabel = amount + "/" + GuiUtils.formatSlotCount(actualItemAmount);
             final var textRenderer = getTextRenderer();
             final var countLabelWidth = textRenderer.getWidth(countLabel);
             matrices.push();
