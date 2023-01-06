@@ -47,7 +47,8 @@ public class HirePawnScreen extends WindowScreen {
         super.tick();
         for (HireButtonWithInfo btn : hireButtons) {
             final var button = btn.button;
-            final var enoughPlaceForNew = this.handler.getCurrentCount(btn.profId) < this.handler.getMaxCount(btn.profId);
+            final var profId = btn.profId;
+            final var enoughPlaceForNew = (handler.getCurrentCount(profId) + handler.getHireQueue(profId)) < this.handler.getMaxCount(profId);
             button.active = btn.costs.isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0 && enoughPlaceForNew;
         }
     }
@@ -119,7 +120,7 @@ public class HirePawnScreen extends WindowScreen {
     }
 
     private boolean canIncreaseAmount(CostsWidget costs, String profId) {
-        final var enoughPlaceForNew = this.handler.getCurrentCount(profId) < this.handler.getMaxCount(profId);
+        final var enoughPlaceForNew = (handler.getCurrentCount(profId) + handler.getHireQueue(profId)) < this.handler.getMaxCount(profId);
         return costs.isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0 && enoughPlaceForNew;
     }
 

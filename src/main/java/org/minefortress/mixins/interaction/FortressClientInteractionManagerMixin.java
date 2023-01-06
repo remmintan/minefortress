@@ -22,9 +22,10 @@ import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.professions.Profession;
 import org.minefortress.selections.SelectionManager;
-import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.BlockUtils;
+import org.minefortress.utils.BuildingHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -118,7 +119,12 @@ public abstract class FortressClientInteractionManagerMixin {
             }
 
             if(fortressManager.isBuildingSelected()){
-                cir.setReturnValue(false);
+                final var hoveredBuilding = fortressManager.getHoveredBuilding();
+                final var professionManager = fortressManager.getProfessionManager();
+                professionManager
+                        .getByRequirement(hoveredBuilding.getRequirementId())
+                        .filter(Profession::isHireMenu)
+                        .ifPresent(it -> professionManager.increaseAmount(professionManager.getIdByProfession(it), false));
                 return;
             }
 

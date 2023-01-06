@@ -93,6 +93,18 @@ public abstract class ProfessionManager {
         return getProfessions().get(id);
     }
 
+    public Optional<Profession> getByRequirement(String requirement) {
+        return getProfessions().values()
+                .stream()
+                .filter(
+                    profession -> Optional
+                        .ofNullable(profession.getBuildingRequirement())
+                        .orElse("!!!!some-invalid-requirement!!!!")
+                        .equals(requirement)
+                )
+                .findFirst();
+    }
+
     protected Map<String, Profession> getProfessions(){
         return this.professions;
     }

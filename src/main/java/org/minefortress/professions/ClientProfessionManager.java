@@ -8,6 +8,7 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -21,6 +22,14 @@ public class ClientProfessionManager extends ProfessionManager {
         getProfessions().clear();
         fullInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
         super.createProfessionTree(treeJson);
+    }
+
+    public String getIdByProfession(Profession profession) {
+        return getProfessions().entrySet().stream()
+                .filter(it -> it.getValue().equals(profession))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

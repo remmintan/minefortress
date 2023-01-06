@@ -237,6 +237,9 @@ public final class FortressClientManager extends AbstractFortressManager {
         return hoveredBuilding != null;
     }
 
+    public EssentialBuildingInfo getHoveredBuilding() {
+        return hoveredBuilding;
+    }
     public Optional<String> getHoveredBuildingName() {
         return Optional.ofNullable(hoveredBuilding)
                 .map(it -> ModUtils.getBlueprintManager())
