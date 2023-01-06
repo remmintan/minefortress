@@ -554,15 +554,16 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
+        final var requiredBuildings = buildings.stream()
+                .filter(b -> b.getRequirementId().equals(requirementId));
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
-            return buildings.stream()
-                    .filter(b -> b.getRequirementId().equals(requirementId))
+            return requiredBuildings
                     .mapToLong(it -> it.getBedsCount(getWorld()) * 10)
                     .sum() > minCount;
         }
         if(requirementId.equals("shooting_gallery"))
-            minCount = 0;
-        return buildings.stream().filter(b -> b.getRequirementId().equals(requirementId)).count() > minCount;
+            return requiredBuildings.count() * 10 > minCount;
+        return requiredBuildings.count() > minCount;
     }
 
     @Override

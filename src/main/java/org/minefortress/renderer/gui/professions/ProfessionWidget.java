@@ -133,7 +133,7 @@ public class ProfessionWidget extends DrawableHelper {
 
     boolean shouldNotRender(int originX, int originY, int mouseX, int mouseY) {
         final Profession parent = profession.getParent();
-        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent, false, true)){
+        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent, ProfessionManager.CountProfessionals.DONT_COUNT, false)){
             return true;
         }
 
@@ -244,10 +244,15 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     public boolean isUnlocked(boolean countProfessionals) {
-        if(this.profession.isHireMenu() && this.professionManager.isRequirementsFulfilled(this.profession, true, false)){
-            return true;
+        var shouldCountProfs = countProfessionals ? ProfessionManager.CountProfessionals.INCREASE : ProfessionManager.CountProfessionals.DONT_COUNT;
+        if(profession.isHireMenu()) {
+            shouldCountProfs = ProfessionManager.CountProfessionals.DONT_COUNT;
         }
-        return this.professionManager.isRequirementsFulfilled(this.profession, countProfessionals, true);
+        return this.professionManager.isRequirementsFulfilled(
+                this.profession,
+                shouldCountProfs,
+                true
+        );
     }
 
     public void onClick(int button) {

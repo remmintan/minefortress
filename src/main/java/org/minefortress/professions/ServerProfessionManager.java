@@ -21,6 +21,7 @@ import org.minefortress.network.s2c.S2COpenHireMenuPacket;
 import org.minefortress.network.s2c.SyncHireProgress;
 import org.minefortress.professions.hire.ProfessionsHireTypes;
 import org.minefortress.professions.hire.ServerHireHandler;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +64,7 @@ public class ServerProfessionManager extends ProfessionManager{
             if(!profession.isHireMenu()) {
                 throw new IllegalArgumentException("Profession " + professionId + " is not a hire menu profession");
             }
-            final var canHire = isRequirementsFulfilled(profession, true, true);
+            final var canHire = isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
             final var abstractFortressManager = fortressManagerSupplier.get();
             if(canHire && getFreeColonists() > 0 && abstractFortressManager instanceof FortressServerManager fsm) {
                 final var resourceManager = (ServerResourceManager) abstractFortressManager
@@ -80,10 +81,17 @@ public class ServerProfessionManager extends ProfessionManager{
 
     @Override
     public void increaseAmount(String professionId, boolean itemsAlreadyCharged) {
-        if(super.getFreeColonists() <= 0) return;
         final Profession profession = super.getProfession(professionId);
         if(profession == null) return;
-        if(!super.isRequirementsFulfilled(profession, true, true)) return;
+        if (profession.isHireMenu()) {
+            if(this.fortressManagerSupplier.get() instanceof FortressServerManager fsm && fsm.getReservedPawnsCount() <= 0) {
+                LoggerFactory.getLogger(ServerProfessionManager.class).error("No reserved pawns but trying to hire a profession");
+                return;
+            }
+        } else {
+            if(super.getFreeColonists() <= 0) return;
+        }
+        if(!super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, !itemsAlreadyCharged)) return;
 
         if(!itemsAlreadyCharged) {
             final var resourceManager = (ServerResourceManager) fortressManagerSupplier
@@ -133,7 +141,7 @@ public class ServerProfessionManager extends ProfessionManager{
     private void tickCheckProfessionRequirements() {
         for(Profession prof : getProfessions().values()) {
             if(prof.getAmount() > 0) {
-                final boolean unlocked = this.isRequirementsFulfilled(prof);
+                final boolean unlocked = isRequirementsFulfilled(prof, CountProfessionals.KEEP, false);
                 if(!unlocked) {
                     prof.setAmount(prof.getAmount() - 1);
                     this.scheduleSync();

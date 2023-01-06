@@ -44,11 +44,7 @@ public abstract class ProfessionManager {
         return this.root;
     }
 
-    public boolean isRequirementsFulfilled(Profession profession) {
-        return isRequirementsFulfilled(profession, false, true);
-    }
-
-    public boolean isRequirementsFulfilled(Profession profession, boolean countProfessionals, boolean countItems) {
+    public final boolean isRequirementsFulfilled(Profession profession, CountProfessionals countProfessionals, boolean countItems) {
         final String buildingRequirement = profession.getBuildingRequirement();
         if(Objects.isNull(buildingRequirement) || Strings.isBlank(buildingRequirement)) {
             return true;
@@ -62,14 +58,20 @@ public abstract class ProfessionManager {
 
         final Profession parent = profession.getParent();
         if(Objects.nonNull(parent)) {
-            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, false, countItems);
+            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, countProfessionals, false);
             if(!parentUnlocked) {
                 return false;
             }
         }
 
         final AbstractFortressManager fortressManager = fortressManagerSupplier.get();
-        final var minRequirementCount = countProfessionals ? profession.getAmount() : 0;
+        var minRequirementCount = 0;
+        if(countProfessionals == CountProfessionals.INCREASE) {
+            minRequirementCount = profession.getAmount();
+        }
+        if(countProfessionals == CountProfessionals.KEEP) {
+            minRequirementCount = profession.getAmount() - 1;
+        }
         boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement, minRequirementCount);
         final Profession.BlockRequirement blockRequirement = profession.getBlockRequirement();
         if(Objects.nonNull(blockRequirement)) {
@@ -78,7 +80,7 @@ public abstract class ProfessionManager {
 
         if(countItems) {
             final var itemsRequirement = profession.getItemsRequirement();
-            if(countProfessionals && Objects.nonNull(itemsRequirement)) {
+            if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement)) {
                 final var hasItems = fortressManager.getResourceManager().hasItems(itemsRequirement);
                 satisfied = satisfied && hasItems;
             }
@@ -156,4 +158,10 @@ public abstract class ProfessionManager {
 
     public abstract void increaseAmount(String professionId, boolean alreadyCharged);
     public abstract void decreaseAmount(String professionId);
+
+    public enum CountProfessionals {
+        KEEP,
+        INCREASE,
+        DONT_COUNT
+    }
 }

@@ -27,9 +27,9 @@ public class ClientProfessionManager extends ProfessionManager {
     public void increaseAmount(String professionId, boolean alreadyCharged) {
         if("colonist".equals(professionId)) return;
         if(
-                super.isRequirementsFulfilled(this.getProfession(professionId), true, true)
+                super.isRequirementsFulfilled(this.getProfession(professionId), CountProfessionals.INCREASE, true)
                 ||
-                this.getProfession(professionId).isHireMenu() && super.isRequirementsFulfilled(this.getProfession(professionId), true, false)
+                this.getProfession(professionId).isHireMenu() && super.isRequirementsFulfilled(this.getProfession(professionId), CountProfessionals.DONT_COUNT, false)
         ) {
             final ServerboundChangeProfessionStatePacket.AmountChange change =
                     ServerboundChangeProfessionStatePacket.AmountChange.ADD;
