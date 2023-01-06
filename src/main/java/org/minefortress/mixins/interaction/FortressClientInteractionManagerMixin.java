@@ -50,8 +50,6 @@ public abstract class FortressClientInteractionManagerMixin {
     @Shadow
     private void syncSelectedSlot() {}
 
-    @Shadow public abstract void setGameMode(GameMode gameMode);
-
     @Inject(method = "setGameModes", at = @At("RETURN"))
     public void setGameModes(GameMode gameMode, GameMode previousGameMode, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
@@ -112,12 +110,20 @@ public abstract class FortressClientInteractionManagerMixin {
                 cir.setReturnValue(true);
                 return;
             }
+
             if(clientBlueprintManager.hasSelectedBlueprint()) {
                clientBlueprintManager.clearStructure();
-            } else {
-                fortressClient.getSelectionManager().selectBlock(pos);
                 cir.setReturnValue(true);
+                return;
             }
+
+            if(fortressManager.isBuildingSelected()){
+                cir.setReturnValue(false);
+                return;
+            }
+
+            fortressClient.getSelectionManager().selectBlock(pos);
+            cir.setReturnValue(true);
         }
     }
 
@@ -179,6 +185,12 @@ public abstract class FortressClientInteractionManagerMixin {
                     cir.setReturnValue(ActionResult.SUCCESS);
                     return;
                 }
+
+                if(fortressManager.isBuildingSelected()){
+                    cir.setReturnValue(ActionResult.PASS);
+                    return;
+                }
+
                 final ItemStack stackInHand = player.getStackInHand(hand);
                 Item item = stackInHand.getItem();
                 ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);

@@ -36,6 +36,7 @@ public class FortressHud {
         hudLayers.add(new ModeHudLayer(client));
         hudLayers.add(new ColonistsHudLayer(client));
         hudLayers.add(new SelectedColonistHudLayer(client));
+        hudLayers.add(new HoveredBuildingHudLayer(client));
         hudLayers.add(new ToolsHudLayer(client));
         hudLayers.add(new TimeHudLayer(client));
         hudLayers.add(new FightHudLayer(client));

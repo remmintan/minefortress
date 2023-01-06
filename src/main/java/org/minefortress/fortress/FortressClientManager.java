@@ -7,6 +7,8 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
+import org.minefortress.blueprints.manager.BlueprintMetadata;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
@@ -39,6 +41,8 @@ public final class FortressClientManager extends AbstractFortressManager {
     private BlockPos fortressCenter = null;
     private int colonistsCount = 0;
     private int reservedColonistCount = 0;
+
+    private EssentialBuildingInfo hoveredBuilding = null;
 
     private volatile FortressToast setCenterToast;
 
@@ -218,14 +222,27 @@ public final class FortressClientManager extends AbstractFortressManager {
             final BlockPos start = building.getStart();
             final BlockPos end = building.getEnd();
             if(BlockUtils.isPosBetween(pos, start, end)){
+                hoveredBuilding = building;
                 return StreamSupport
                         .stream(BlockPos.iterate(start, end).spliterator(), false)
                         .map(BlockPos::toImmutable)
                         .collect(Collectors.toList());
             }
         }
-
+        hoveredBuilding = null;
         return Collections.emptyList();
+    }
+
+    public boolean isBuildingSelected() {
+        return hoveredBuilding != null;
+    }
+
+    public Optional<String> getHoveredBuildingName() {
+        return Optional.ofNullable(hoveredBuilding)
+                .map(it -> ModUtils.getBlueprintManager())
+                .map(ClientBlueprintManager::getBlueprintMetadataManager)
+                .flatMap(it -> it.getByRequirementId(hoveredBuilding.getRequirementId()))
+                .map(BlueprintMetadata::getName);
     }
 
     public ClientProfessionManager getProfessionManager() {
