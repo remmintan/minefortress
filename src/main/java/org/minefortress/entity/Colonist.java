@@ -347,6 +347,7 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
             } else if (type == FortressEntities.WARRIOR_PAWN_ENTITY_TYPE || type == FortressEntities.ARCHER_PAWN_ENTITY_TYPE) {
                 it.replaceColonistWithTypedPawn(this, professionId, type);
             }
+            it.scheduleSync();
         });
     }
 
