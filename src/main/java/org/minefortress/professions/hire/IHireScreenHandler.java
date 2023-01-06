@@ -24,6 +24,7 @@ public interface IHireScreenHandler {
         return getProfession(professionId).map(Profession::getIcon).orElse(Items.PLAYER_HEAD.getDefaultStack());
     }
     int getCurrentCount(String professionId);
+    int getMaxCount(String professionId);
     void increaseAmount(String professionId);
     static String getProfessionName(String professionId) {
         return getProfession(professionId)

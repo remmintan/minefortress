@@ -53,6 +53,15 @@ public final class ClientHireHandler implements IHireScreenHandler {
                 .getAmount();
     }
 
+    public int getMaxCount(String professionId) {
+        final var profession = ModUtils
+                .getFortressClientManager()
+                .getProfessionManager()
+                .getProfession(professionId);
+        final var buildingRequirement = profession.getBuildingRequirement();
+        return ModUtils.getFortressClientManager().countBuildings(buildingRequirement) * 10;
+    }
+
     @Override
     public void increaseAmount(String professionId) {
         final var packet = new C2SHirePawnWithScreenPacket(professionId);

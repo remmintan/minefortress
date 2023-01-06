@@ -3,7 +3,6 @@ package org.minefortress.renderer.gui.hire;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.network.c2s.C2SCloseHireMenuPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -17,7 +16,7 @@ import java.util.List;
 
 public class HirePawnScreen extends WindowScreen {
 
-    private final List<Pair<CostsWidget, ButtonWidget>> hireButtons = new ArrayList<>();
+    private final List<HireButtonWithInfo> hireButtons = new ArrayList<>();
 
     private final IHireScreenHandler handler;
 
@@ -46,9 +45,10 @@ public class HirePawnScreen extends WindowScreen {
     @Override
     public void tick() {
         super.tick();
-        for (Pair<CostsWidget, ButtonWidget> btn : hireButtons) {
-            final var button = btn.getRight();
-            button.active = btn.getLeft().isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0;
+        for (HireButtonWithInfo btn : hireButtons) {
+            final var button = btn.button;
+            final var enoughPlaceForNew = this.handler.getCurrentCount(btn.profId) < this.handler.getMaxCount(btn.profId);
+            button.active = btn.costs.isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0 && enoughPlaceForNew;
         }
     }
 
@@ -61,7 +61,7 @@ public class HirePawnScreen extends WindowScreen {
     private void addNewRow(String profId, int rowY, int leftX, int rightX) {
         this.addDrawable(
                 new ProgressArrowWidget(
-                        rightX - 38,
+                        rightX - 48,
                         rowY,
                         () -> this.handler.getHireProgress(profId)
                 )
@@ -80,26 +80,26 @@ public class HirePawnScreen extends WindowScreen {
         );
         this.addDrawable(costs);
         final var hireButton = new ButtonWidget(
-                rightX - 90,
+                rightX - 100,
                 rowY,
                 20,
                 20,
                 new LiteralText("+"),
                 (btn) -> {
-                    if(canIncreaseAmount(costs)) {
+                    if(canIncreaseAmount(costs, profId)) {
                         this.handler.increaseAmount(profId);
                     }
                 },
                 (btn, matrices, x, y) -> {
-                    final var buttonTooltip = canIncreaseAmount(costs) ? "Hire" : "Not enough resources/pawns";
+                    final var buttonTooltip = canIncreaseAmount(costs, profId) ? "Hire" : "Not enough resources/pawns";
                     this.renderTooltip(matrices, new LiteralText(buttonTooltip), x, y);
                 }
         );
         this.addDrawableChild(hireButton);
-        hireButtons.add(new Pair<>(costs, hireButton));
+        hireButtons.add(new HireButtonWithInfo(hireButton, costs, profId));
         this.addDrawable(
                 new ProfessionQueueWidget(
-                        rightX - 70,
+                        rightX - 80,
                         rowY,
                         () -> handler.getHireQueue(profId),
                         this::renderTooltip
@@ -111,13 +111,16 @@ public class HirePawnScreen extends WindowScreen {
                         rightX - 25,
                         rowY,
                         IHireScreenHandler.getProfessionItem(profId),
-                        () -> this.handler.getCurrentCount(profId)
+                        () -> this.handler.getCurrentCount(profId),
+                        () -> this.handler.getMaxCount(profId),
+                        this::renderTooltip
                 )
         );
     }
 
-    private static boolean canIncreaseAmount(CostsWidget costs) {
-        return costs.isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0;
+    private boolean canIncreaseAmount(CostsWidget costs, String profId) {
+        final var enoughPlaceForNew = this.handler.getCurrentCount(profId) < this.handler.getMaxCount(profId);
+        return costs.isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0 && enoughPlaceForNew;
     }
 
     public IHireScreenHandler getHandler() {
@@ -130,4 +133,6 @@ public class HirePawnScreen extends WindowScreen {
         final var packet = new C2SCloseHireMenuPacket();
         FortressClientNetworkHelper.send(C2SCloseHireMenuPacket.CHANNEL, packet);
     }
+
+    private record HireButtonWithInfo(ButtonWidget button, CostsWidget costs, String profId) {}
 }

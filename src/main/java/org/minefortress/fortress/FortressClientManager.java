@@ -246,6 +246,12 @@ public final class FortressClientManager extends AbstractFortressManager {
         return reuiredBuilding.count() > minCount;
     }
 
+    public int countBuildings(String requirementId) {
+        return (int) buildings.stream()
+                .filter(b -> b.getRequirementId().equals(requirementId))
+                .count();
+    }
+
     @Override
     public boolean hasRequiredBlock(Block block, boolean blueprint, int minCount) {
         if(blueprint)
