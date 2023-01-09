@@ -2,6 +2,7 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
+import org.minefortress.fortress.FortressState;
 import org.minefortress.renderer.gui.widget.ModeButtonWidget;
 import org.minefortress.utils.ModUtils;
 
@@ -11,22 +12,31 @@ public class ModeHudLayer extends AbstractHudLayer{
     protected ModeHudLayer(MinecraftClient client) {
         super(client);
         this.setBasepoint(0, 5, PositionX.CENTER, PositionY.TOP);
+        final var fcm = ModUtils.getFortressClientManager();
         this.addElement(
+                new ModeButtonWidget(
+                        36,
+                        0,
+                        Items.STONE_PICKAXE,
+                        (btn) -> fcm.setState(FortressState.AREAS_SELECTION),
+                        "Areas Selection Mode",
+                        () -> fcm.getState() == FortressState.AREAS_SELECTION
+                ),
                 new ModeButtonWidget(
                         -12,
                         0,
                         Items.STONE_SWORD,
-                        (btn) -> this.enableCombatModeIfDisabled(),
+                        (btn) -> fcm.setState(FortressState.COMBAT),
                         "Combat Mode",
-                        () -> ModUtils.getFortressClientManager().isInCombat()
+                        () -> fcm.getState() == FortressState.COMBAT
                 ),
                 new ModeButtonWidget(
                         12,
                         0,
                         Items.STONE_SHOVEL,
-                        (btn) -> this.disableCombatModIfEnabled(),
+                        (btn) -> fcm.setState(FortressState.BUILD),
                         "Build Mode",
-                        () -> !ModUtils.getFortressClientManager().isInCombat()
+                        () -> fcm.getState() == FortressState.BUILD
                 )
         );
     }
@@ -34,20 +44,6 @@ public class ModeHudLayer extends AbstractHudLayer{
     @Override
     public boolean shouldRender(HudState hudState) {
         return hudState != HudState.BLANK && hudState != HudState.INITIALIZING;
-    }
-
-    public void enableCombatModeIfDisabled(){
-        final var clientManager = ModUtils.getFortressClientManager();
-        if(!clientManager.isInCombat()){
-            clientManager.setInCombat(true);
-        }
-    }
-
-    public void disableCombatModIfEnabled(){
-        final var clientManager = ModUtils.getFortressClientManager();
-        if(clientManager.isInCombat()){
-            clientManager.setInCombat(false);
-        }
     }
 
 }

@@ -108,9 +108,11 @@ public class FortressHud {
         if(ModUtils.getBlueprintManager().hasSelectedBlueprint()) return HudState.BLUEPRINT;
         if(BlueprintsWorld.isBlueprintsWorld(client.world)) return HudState.BLUEPRINT_EDITING;
 
-        if(ModUtils.getFortressClientManager().isInCombat()) return HudState.COMBAT;
-
-        return HudState.BUILD;
+        return switch (ModUtils.getFortressClientManager().getState()) {
+            case BUILD -> HudState.BUILD;
+            case COMBAT -> HudState.COMBAT;
+            case AREAS_SELECTION -> HudState.AREAS_SELECTION;
+        };
     }
 
     private boolean isHudHidden() {

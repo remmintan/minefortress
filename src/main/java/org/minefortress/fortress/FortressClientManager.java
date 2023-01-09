@@ -58,16 +58,16 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private FortressGamemode gamemode;
 
-    private boolean isInCombat;
-
     private int maxColonistsCount;
+
+    private FortressState state = FortressState.BUILD;
 
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
     }
 
     public void select(BasePawnEntity colonist) {
-        if(isInCombat) {
+        if(state == FortressState.COMBAT) {
             final var mouse = MinecraftClient.getInstance().mouse;
             final var selectionManager = fightManager.getSelectionManager();
             selectionManager.startSelection(mouse.getX(), mouse.getY(), colonist.getPos());
@@ -94,7 +94,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public boolean isSelectingColonist() {
-        return selectedPawn != null && !isInCombat;
+        return selectedPawn != null && state == FortressState.BUILD;
     }
 
     public BasePawnEntity getSelectedPawn() {
@@ -309,14 +309,6 @@ public final class FortressClientManager extends AbstractFortressManager {
         return resourceManager;
     }
 
-    public boolean isInCombat() {
-        return isInCombat;
-    }
-
-    public void setInCombat(boolean inCombat) {
-        isInCombat = inCombat;
-    }
-
     public ClientFightManager getFightManager() {
         return fightManager;
     }
@@ -328,4 +320,14 @@ public final class FortressClientManager extends AbstractFortressManager {
     public void reset() {
         this.initialized = false;
     }
+
+    // getter and setter for state
+    public void setState(FortressState state) {
+        this.state = state;
+    }
+
+    public FortressState getState() {
+        return this.state;
+    }
+
 }

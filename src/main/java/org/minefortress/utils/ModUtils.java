@@ -10,6 +10,7 @@ import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
+import org.minefortress.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
@@ -98,6 +99,10 @@ public class ModUtils {
     @NotNull
     public static ClientPlayerEntity getClientPlayer() {
         return Objects.requireNonNull(MinecraftClient.getInstance().player);
+    }
+
+    public static AreasClientManager getAreasClientManager() {
+        return getFortressClient().getAreasClientManager();
     }
 
 }

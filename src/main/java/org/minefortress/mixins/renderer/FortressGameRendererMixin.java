@@ -12,6 +12,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressGameRenderer;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
@@ -59,7 +60,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                 final var fightSelectionManager = fortressClientManager
                         .getFightManager()
                         .getSelectionManager();
-                if(fortressClientManager.isInCombat()) {
+                if(fortressClientManager.getState() == FortressState.COMBAT) {
                     resetSelection(selectionManager);
                     if(fightSelectionManager.isSelectionStarted()) {
                         final var mouse = client.mouse;

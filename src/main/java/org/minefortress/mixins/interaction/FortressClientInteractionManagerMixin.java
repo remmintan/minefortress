@@ -21,6 +21,7 @@ import net.minecraft.world.GameMode;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.Profession;
 import org.minefortress.selections.SelectionManager;
@@ -83,7 +84,7 @@ public abstract class FortressClientInteractionManagerMixin {
             final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
             final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
-            if(fortressManager.isInCombat()) {
+            if(fortressManager.getState() == FortressState.COMBAT) {
                 final var selectionManager = fortressManager.getFightManager().getSelectionManager();
                 final var mouse = client.mouse;
 
@@ -93,7 +94,9 @@ public abstract class FortressClientInteractionManagerMixin {
                     if(selectionManager.hasSelected()) {
                         selectionManager.resetSelection();
                     } else {
-                        selectionManager.startSelection(mouse.getX(), mouse.getY(), client.crosshairTarget.getPos());
+                        final var crosshairTarget = client.crosshairTarget;
+                        if (crosshairTarget!=null)
+                            selectionManager.startSelection(mouse.getX(), mouse.getY(), crosshairTarget.getPos());
                     }
                 }
 
@@ -143,9 +146,9 @@ public abstract class FortressClientInteractionManagerMixin {
     public void interactEntity(PlayerEntity player, Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         if(getCurrentGameMode() == FORTRESS) {
             final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-            final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
-            if(fortressManager.isInCombat()) {
-                final var fightManager = fortressManager.getFightManager();
+            final FortressClientManager fcm = fortressClient.getFortressClientManager();
+            if (fcm.getState() == FortressState.COMBAT) {
+                final var fightManager = fcm.getFightManager();
                 final var selectionManager = fightManager.getSelectionManager();
                 if(selectionManager.isSelecting())
                     selectionManager.resetSelection();
@@ -167,15 +170,9 @@ public abstract class FortressClientInteractionManagerMixin {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
                 final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
                 final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
-                if(fortressManager.isInCombat()) {
-                    final var fightManager = fortressManager.getFightManager();
-                    final var selectionManager = fightManager.getSelectionManager();
-                    if(selectionManager.isSelecting())
-                        selectionManager.resetSelection();
 
-                    if(selectionManager.hasSelected()) {
-                        fightManager.setTarget(hitResult);
-                    }
+                if(fortressManager.getState() == FortressState.COMBAT) {
+                    updateFightSelection(hitResult, fortressManager);
                     cir.setReturnValue(ActionResult.SUCCESS);
                     return;
                 }
@@ -217,6 +214,17 @@ public abstract class FortressClientInteractionManagerMixin {
                 }
             }
 
+        }
+    }
+
+    private static void updateFightSelection(BlockHitResult hitResult, FortressClientManager fortressManager) {
+        final var fightManager = fortressManager.getFightManager();
+        final var selectionManager = fightManager.getSelectionManager();
+        if(selectionManager.isSelecting())
+            selectionManager.resetSelection();
+
+        if(selectionManager.hasSelected()) {
+            fightManager.setTarget(hitResult);
         }
     }
 
