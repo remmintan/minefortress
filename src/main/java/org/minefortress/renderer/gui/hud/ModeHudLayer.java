@@ -19,7 +19,7 @@ public class ModeHudLayer extends AbstractHudLayer{
                         0,
                         Items.STONE_PICKAXE,
                         (btn) -> fcm.setState(FortressState.AREAS_SELECTION),
-                        "Areas Selection Mode",
+                        "Zones Selection Mode",
                         () -> fcm.getState() == FortressState.AREAS_SELECTION
                 ),
                 new ModeButtonWidget(

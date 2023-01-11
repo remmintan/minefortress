@@ -190,6 +190,7 @@ public class SelectionManager implements FortressWorldRenderer {
     }
 
     public void resetSelection() {
+        if(!this.isSelecting()) return;
         selection.reset();
         this.clickType = null;
         this.upSelectionDelta = 0;

@@ -27,6 +27,7 @@ import org.minefortress.professions.Profession;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
+import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -79,66 +80,72 @@ public abstract class FortressClientInteractionManagerMixin {
 
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if(getCurrentGameMode() == FORTRESS) {
-            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-            final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
-            final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+        if(!ModUtils.isClientInFortressGamemode()) return;
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+        final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
-            if(fortressManager.getState() == FortressState.COMBAT) {
-                final var selectionManager = fortressManager.getFightManager().getSelectionManager();
-                final var mouse = client.mouse;
+        if(fortressManager.getState() == FortressState.COMBAT) {
+            final var selectionManager = fortressManager.getFightManager().getSelectionManager();
+            final var mouse = client.mouse;
 
-                if(selectionManager.isSelecting())
-                    selectionManager.endSelection();
-                else {
-                    if(selectionManager.hasSelected()) {
-                        selectionManager.resetSelection();
-                    } else {
-                        final var crosshairTarget = client.crosshairTarget;
-                        if (crosshairTarget!=null)
-                            selectionManager.startSelection(mouse.getX(), mouse.getY(), crosshairTarget.getPos());
-                    }
+            if(selectionManager.isSelecting())
+                selectionManager.endSelection();
+            else {
+                if(selectionManager.hasSelected()) {
+                    selectionManager.resetSelection();
+                } else {
+                    final var crosshairTarget = client.crosshairTarget;
+                    if (crosshairTarget!=null)
+                        selectionManager.startSelection(mouse.getX(), mouse.getY(), crosshairTarget.getPos());
                 }
-
-                cir.setReturnValue(false);
-                return;
             }
 
-            if(fortressManager.isSelectingColonist()){
-                fortressManager.stopSelectingColonist();
-                cir.setReturnValue(false);
-                return;
-            }
-
-            if(fortressManager.isCenterNotSet()) {
-                cir.setReturnValue(true);
-                return;
-            }
-
-            if(clientBlueprintManager.hasSelectedBlueprint()) {
-               clientBlueprintManager.clearStructure();
-                cir.setReturnValue(true);
-                return;
-            }
-
-            if(fortressManager.isBuildingSelected()){
-                final var hoveredBuilding = fortressManager.getHoveredBuilding();
-                final var professionManager = fortressManager.getProfessionManager();
-                professionManager
-                        .getByRequirement(hoveredBuilding.getRequirementId())
-                        .filter(Profession::isHireMenu)
-                        .ifPresent(it -> professionManager.increaseAmount(professionManager.getIdByProfession(it), false));
-                return;
-            }
-
-            fortressClient.getSelectionManager().selectBlock(pos);
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
+            return;
         }
+
+        if(fortressManager.getState() == FortressState.AREAS_SELECTION) {
+            final var areasClientManager = ModUtils.getAreasClientManager();
+            final var result = areasClientManager.select(client.crosshairTarget);
+            cir.setReturnValue(result);
+            return;
+        }
+
+        if(fortressManager.isSelectingColonist()){
+            fortressManager.stopSelectingColonist();
+            cir.setReturnValue(false);
+            return;
+        }
+
+        if(fortressManager.isCenterNotSet()) {
+            cir.setReturnValue(true);
+            return;
+        }
+
+        if(clientBlueprintManager.hasSelectedBlueprint()) {
+           clientBlueprintManager.clearStructure();
+            cir.setReturnValue(true);
+            return;
+        }
+
+        if(fortressManager.isBuildingSelected()){
+            final var hoveredBuilding = fortressManager.getHoveredBuilding();
+            final var professionManager = fortressManager.getProfessionManager();
+            professionManager
+                    .getByRequirement(hoveredBuilding.getRequirementId())
+                    .filter(Profession::isHireMenu)
+                    .ifPresent(it -> professionManager.increaseAmount(professionManager.getIdByProfession(it), false));
+            return;
+        }
+
+        fortressClient.getSelectionManager().selectBlock(pos);
+        cir.setReturnValue(true);
     }
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true)
     public void updateBlockBreakingProgress(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if(getCurrentGameMode() == FORTRESS)
+        if(ModUtils.isClientInFortressGamemode())
             cir.setReturnValue(true);
     }
 
@@ -163,58 +170,65 @@ public abstract class FortressClientInteractionManagerMixin {
 
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)
     public void interactBlock(ClientPlayerEntity player, ClientWorld world, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
-        if(getCurrentGameMode() == FORTRESS) {
-            syncSelectedSlot();
-            BlockPos blockPos = hitResult.getBlockPos();
-            if(world.getWorldBorder().contains(blockPos)) {
-                final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-                final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
-                final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
+        if(getCurrentGameMode() != FORTRESS)return;
+        syncSelectedSlot();
+        BlockPos blockPos = hitResult.getBlockPos();
+        if(world.getWorldBorder().contains(blockPos)) return;
 
-                if(fortressManager.getState() == FortressState.COMBAT) {
-                    updateFightSelection(hitResult, fortressManager);
-                    cir.setReturnValue(ActionResult.SUCCESS);
-                    return;
-                }
 
-                if(fortressManager.isCenterNotSet()) {
-                    fortressManager.setupFortressCenter();
-                    cir.setReturnValue(ActionResult.SUCCESS);
-                    return;
-                }
+        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+        final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
-                if(clientBlueprintManager.hasSelectedBlueprint()) {
-                    clientBlueprintManager.buildCurrentStructure();
-                    cir.setReturnValue(ActionResult.SUCCESS);
-                    return;
-                }
-
-                if(fortressManager.isBuildingSelected()){
-                    cir.setReturnValue(ActionResult.PASS);
-                    return;
-                }
-
-                final ItemStack stackInHand = player.getStackInHand(hand);
-                Item item = stackInHand.getItem();
-                ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);
-                final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
-                if(blockStateFromItem != null) {
-                    clickBuild(useoncontext, blockStateFromItem);
-                    cir.setReturnValue(ActionResult.SUCCESS);
-                    return;
-                }
-                final SelectionManager selectionManager = fortressClient.getSelectionManager();
-                if(selectionManager.isSelecting()) {
-                    selectionManager.selectBlock(blockPos, null);
-                    cir.setReturnValue(ActionResult.SUCCESS);
-                }
-
-                if(stackInHand.isEmpty()) {
-                    cir.setReturnValue(ActionResult.PASS);
-                }
-            }
-
+        if(fortressManager.getState() == FortressState.COMBAT) {
+            updateFightSelection(hitResult, fortressManager);
+            cir.setReturnValue(ActionResult.SUCCESS);
+            return;
         }
+
+        if(fortressManager.getState() == FortressState.AREAS_SELECTION) {
+            final var areasClientManager = ModUtils.getAreasClientManager();
+            areasClientManager.resetSelection();
+            cir.setReturnValue(ActionResult.SUCCESS);
+            return;
+        }
+
+        if(fortressManager.isCenterNotSet()) {
+            fortressManager.setupFortressCenter();
+            cir.setReturnValue(ActionResult.SUCCESS);
+            return;
+        }
+
+        if(clientBlueprintManager.hasSelectedBlueprint()) {
+            clientBlueprintManager.buildCurrentStructure();
+            cir.setReturnValue(ActionResult.SUCCESS);
+            return;
+        }
+
+        if(fortressManager.isBuildingSelected()){
+            cir.setReturnValue(ActionResult.PASS);
+            return;
+        }
+
+        final ItemStack stackInHand = player.getStackInHand(hand);
+        Item item = stackInHand.getItem();
+        ItemUsageContext useoncontext = new ItemUsageContext(player, hand, hitResult);
+        final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
+        if(blockStateFromItem != null) {
+            clickBuild(useoncontext, blockStateFromItem);
+            cir.setReturnValue(ActionResult.SUCCESS);
+            return;
+        }
+        final SelectionManager selectionManager = fortressClient.getSelectionManager();
+        if(selectionManager.isSelecting()) {
+            selectionManager.selectBlock(blockPos, null);
+            cir.setReturnValue(ActionResult.SUCCESS);
+        }
+
+        if(stackInHand.isEmpty()) {
+            cir.setReturnValue(ActionResult.PASS);
+        }
+
     }
 
     private static void updateFightSelection(BlockHitResult hitResult, FortressClientManager fortressManager) {

@@ -40,6 +40,7 @@ public class FortressHud {
         hudLayers.add(new ToolsHudLayer(client));
         hudLayers.add(new TimeHudLayer(client));
         hudLayers.add(new FightHudLayer(client));
+        hudLayers.add(new AreasHudLayer(client));
     }
 
     public void render(MatrixStack p, float delta) {
