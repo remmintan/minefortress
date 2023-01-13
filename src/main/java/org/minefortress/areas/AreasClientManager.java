@@ -1,13 +1,21 @@
 package org.minefortress.areas;
 
 import com.google.common.collect.Streams;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.Vector4f;
+import org.minefortress.selections.renderer.ISelectionInfoProvider;
+import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 
+import java.util.Collections;
 import java.util.List;
 
-public class AreasClientManager {
+public final class AreasClientManager implements ISelectionInfoProvider, ISelectionModelBuilderInfoProvider {
+
+    private boolean needsUpdate;
 
     private ProfessionsSelectionType selectionType;
 
@@ -30,7 +38,10 @@ public class AreasClientManager {
         if(crosshairTarget instanceof BlockHitResult bhr) {
             final var blockPos = bhr.getBlockPos();
             if(selectionStart != null) {
-                selectionEnd = blockPos;
+                if(blockPos != null && !blockPos.equals(selectionEnd)) {
+                    selectionEnd = blockPos;
+                    needsUpdate = true;
+                }
             }
         }
     }
@@ -44,7 +55,18 @@ public class AreasClientManager {
         return selectionStart != null;
     }
 
-    public List<BlockPos> getSelection() {
+    @Override
+    public boolean isNeedsUpdate() {
+        return this.needsUpdate;
+    }
+
+    @Override
+    public void setNeedsUpdate(boolean needsUpdate) {
+        this.needsUpdate = needsUpdate;
+    }
+
+    @Override
+    public List<BlockPos> getSelectedBlocks() {
         if(selectionStart == null || selectionEnd == null) return List.of();
         return Streams
                 .stream(BlockPos.iterate(selectionStart, selectionEnd))
@@ -60,4 +82,12 @@ public class AreasClientManager {
         this.selectionType = selectionType;
     }
 
+    @Override
+    public Vector4f getClickColor() {
+        return new Vector4f(0.0f, 0.0f, 1.0f, 1f);
+    }
+    @Override
+    public List<Pair<Vec3i, Vec3i>> getSelectionDimensions() {
+        return Collections.emptyList();
+    }
 }

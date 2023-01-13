@@ -25,6 +25,7 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.FortressCameraManager;
@@ -33,10 +34,13 @@ import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
 import org.minefortress.selections.SelectionManager;
+import org.minefortress.selections.renderer.ISelectionInfoProvider;
+import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 import org.minefortress.selections.renderer.campfire.CampfireRenderer;
 import org.minefortress.selections.renderer.selection.SelectionRenderer;
 import org.minefortress.selections.renderer.tasks.TasksRenderer;
 import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -116,7 +120,22 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
                 entry(RenderLayer.getLines(), new BufferBuilder(256)),
                 entry(FortressRenderLayer.getLinesNoDepth(), new BufferBuilder(256))
         );
-        selectionRenderer = new SelectionRenderer(client, selectionBufferBuilderStorage, blockBufferBuilderStorage);
+
+        final Supplier<ISelectionInfoProvider> selectInfProvSup = () ->
+                ModUtils.getFortressClientManager().getState() == FortressState.BUILD ?
+                        ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+
+        final Supplier<ISelectionModelBuilderInfoProvider> selModBuildInfProv = () ->
+                ModUtils.getFortressClientManager().getState() == FortressState.BUILD ?
+                        ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+
+        selectionRenderer = new SelectionRenderer(
+                client,
+                selectionBufferBuilderStorage,
+                blockBufferBuilderStorage,
+                selectInfProvSup,
+                selModBuildInfProv
+        );
 
         final Supplier<ClientTasksHolder> clientTasksHolderSupplier = () -> {
             final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;

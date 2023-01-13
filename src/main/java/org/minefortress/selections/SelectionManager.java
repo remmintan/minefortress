@@ -12,6 +12,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressWorldRenderer;
+import org.minefortress.selections.renderer.ISelectionInfoProvider;
+import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
 
@@ -20,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class SelectionManager implements FortressWorldRenderer {
+public class SelectionManager implements FortressWorldRenderer, ISelectionModelBuilderInfoProvider, ISelectionInfoProvider {
 
     private final MinecraftClient client;
 

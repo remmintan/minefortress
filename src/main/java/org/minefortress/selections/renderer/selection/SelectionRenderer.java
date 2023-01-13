@@ -5,30 +5,36 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.util.math.Vec3f;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.custom.AbstractCustomRenderer;
 import org.minefortress.renderer.custom.BuiltModel;
-import org.minefortress.selections.SelectionManager;
+import org.minefortress.selections.renderer.ISelectionInfoProvider;
+import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class SelectionRenderer extends AbstractCustomRenderer {
 
     private static final Vec3f WRONG_PLACEMENT_COLOR = new Vec3f(1.0F, 0.5F, 0.5F);
     private static final Vec3f CORRECT_PLACEMENT_COLOR = new Vec3f(1F, 1.0F, 1F);
 
-    private final SelectionManager selectionManager;
+    private final Supplier<ISelectionInfoProvider> selectionInfoProviderSupplier;
     private final SelectionModelBuilder selectionModelBuilder;
 
-    public SelectionRenderer(MinecraftClient client, Map<RenderLayer, BufferBuilder> selectionBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage) {
+    public SelectionRenderer(
+            MinecraftClient client,
+            Map<RenderLayer, BufferBuilder> selectionBufferBuilderStorage,
+            BlockBufferBuilderStorage blockBufferBuilderStorage,
+            Supplier<ISelectionInfoProvider> selectionInfoProviderSupplier,
+            Supplier<ISelectionModelBuilderInfoProvider> infoProviderSupplier
+    ) {
         super(client);
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
-        this.selectionManager = fortressClient.getSelectionManager();
-        this.selectionModelBuilder = new SelectionModelBuilder(selectionBufferBuilderStorage, blockBufferBuilderStorage, selectionManager);
+        this.selectionInfoProviderSupplier = selectionInfoProviderSupplier;
+        this.selectionModelBuilder = new SelectionModelBuilder(selectionBufferBuilderStorage, blockBufferBuilderStorage, infoProviderSupplier);
     }
 
     @Override
@@ -38,14 +44,14 @@ public class SelectionRenderer extends AbstractCustomRenderer {
 
     @Override
     protected boolean shouldRender() {
-        return !client.options.hudHidden && selectionManager.isSelecting();
+        return !client.options.hudHidden && getSelectionInfoProvider().isSelecting();
     }
 
     @Override
     public void prepareForRender() {
-        if(shouldRender() && selectionManager.isNeedsUpdate()) {
+        if(shouldRender() && getSelectionInfoProvider().isNeedsUpdate()) {
             selectionModelBuilder.build();
-            selectionManager.setNeedsUpdate(false);
+            getSelectionInfoProvider().setNeedsUpdate(false);
         }
     }
 
@@ -67,6 +73,10 @@ public class SelectionRenderer extends AbstractCustomRenderer {
 
     @Override
     protected Vec3f getColorModulator() {
-        return selectionManager.isInCorrectState() ? CORRECT_PLACEMENT_COLOR : WRONG_PLACEMENT_COLOR;
+        return getSelectionInfoProvider().isInCorrectState() ? CORRECT_PLACEMENT_COLOR : WRONG_PLACEMENT_COLOR;
+    }
+
+    private ISelectionInfoProvider getSelectionInfoProvider() {
+        return selectionInfoProviderSupplier.get();
     }
 }

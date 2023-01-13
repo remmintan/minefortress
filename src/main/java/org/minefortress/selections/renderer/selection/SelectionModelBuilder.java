@@ -3,35 +3,37 @@ package org.minefortress.selections.renderer.selection;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
-import org.minefortress.selections.SelectionManager;
+import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class SelectionModelBuilder {
 
     private final Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage;
     private final BlockBufferBuilderStorage blockBufferBuilderStorage;
-    private final SelectionManager selectionManager;
+    private final Supplier<ISelectionModelBuilderInfoProvider> infoProviderSupplier;
 
     private BuiltSelection builtSelection;
 
     public SelectionModelBuilder(
             Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage,
             BlockBufferBuilderStorage blockBufferBuilderStorage,
-            SelectionManager selectionManager
+            Supplier<ISelectionModelBuilderInfoProvider> infoProviderSupplier
     ) {
         this.lineBufferBuilderStorage = lineBufferBuilderStorage;
         this.blockBufferBuilderStorage = blockBufferBuilderStorage;
-        this.selectionManager = selectionManager;
+        this.infoProviderSupplier = infoProviderSupplier;
     }
 
     public void build() {
+        final var infoProvider = infoProviderSupplier.get();
         final SelectionRenderInfo activeSelectionInfo = new SelectionRenderInfo(
-                selectionManager.getClickType(),
-                selectionManager.getClickColor(),
-                selectionManager.getSelectedBlocks(),
-                selectionManager.getClickingBlock(),
-                selectionManager.getSelectionDimensions());
+                infoProvider.getClickType(),
+                infoProvider.getClickColor(),
+                infoProvider.getSelectedBlocks(),
+                infoProvider.getClickingBlock(),
+                infoProvider.getSelectionDimensions());
 
         if(this.builtSelection != null) {
             this.builtSelection.close();
