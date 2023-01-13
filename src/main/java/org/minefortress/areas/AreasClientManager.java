@@ -27,6 +27,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         if(target instanceof BlockHitResult bhr) {
             final var blockPos = bhr.getBlockPos();
             if(selectionStart == null) {
+                this.needsUpdate = true;
                 selectionStart = blockPos;
                 selectionEnd = blockPos;
             }
@@ -49,6 +50,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     public void resetSelection() {
         this.selectionEnd = null;
         this.selectionStart = null;
+        this.needsUpdate = true;
     }
 
     public boolean isSelecting() {

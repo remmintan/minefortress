@@ -170,10 +170,10 @@ public abstract class FortressClientInteractionManagerMixin {
 
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)
     public void interactBlock(ClientPlayerEntity player, ClientWorld world, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
-        if(getCurrentGameMode() != FORTRESS)return;
+        if(!ModUtils.isClientInFortressGamemode())return;
         syncSelectedSlot();
         BlockPos blockPos = hitResult.getBlockPos();
-        if(world.getWorldBorder().contains(blockPos)) return;
+        if(!world.getWorldBorder().contains(blockPos)) return;
 
 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;

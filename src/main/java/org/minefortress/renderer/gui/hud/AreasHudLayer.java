@@ -12,7 +12,7 @@ public class AreasHudLayer extends AbstractHudLayer {
         for (final ProfessionsSelectionType type : ProfessionsSelectionType.values()) {
             this.addElement(
                 new ModeButtonWidget(
-                    35 + 20 * type.ordinal(), 0,
+                     20 * type.ordinal(), 0,
                     type.getIcon(),
                     btn -> ModUtils.getAreasClientManager().setSelectionType(type),
                     type.getTitle(),
