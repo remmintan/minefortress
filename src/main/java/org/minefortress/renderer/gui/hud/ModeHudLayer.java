@@ -6,12 +6,16 @@ import org.minefortress.fortress.FortressState;
 import org.minefortress.renderer.gui.widget.ModeButtonWidget;
 import org.minefortress.utils.ModUtils;
 
-public class ModeHudLayer extends AbstractHudLayer{
+public final class ModeHudLayer extends AbstractHudLayer{
 
 
-    protected ModeHudLayer(MinecraftClient client) {
+    ModeHudLayer(MinecraftClient client) {
         super(client);
         this.setBasepoint(0, 5, PositionX.CENTER, PositionY.TOP);
+    }
+
+    @Override
+    protected void init() {
         final var fcm = ModUtils.getFortressClientManager();
         this.addElement(
                 new ModeButtonWidget(

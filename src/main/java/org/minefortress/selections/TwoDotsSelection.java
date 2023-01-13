@@ -37,6 +37,7 @@ public class TwoDotsSelection extends Selection {
 
     @Override
     public boolean needUpdate(BlockPos pickedBlock, int upSelectionDelta) {
+        if(pickedBlock == null) return false;
         pickedBlock = pickedBlock.up(upSelectionDelta);
         return this.selectionStart!=null && !pickedBlock.equals(this.selectionEnd);
     }

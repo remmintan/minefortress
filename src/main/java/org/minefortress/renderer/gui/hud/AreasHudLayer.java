@@ -9,16 +9,14 @@ public class AreasHudLayer extends AbstractHudLayer {
 
     public AreasHudLayer(MinecraftClient client) {
         super(client);
-        final var areasClientManager = ModUtils.getAreasClientManager();
-        final var selectionType = areasClientManager.getSelectionType();
         for (final ProfessionsSelectionType type : ProfessionsSelectionType.values()) {
             this.addElement(
                 new ModeButtonWidget(
                     35 + 20 * type.ordinal(), 0,
                     type.getIcon(),
-                    btn -> areasClientManager.setSelectionType(type),
+                    btn -> ModUtils.getAreasClientManager().setSelectionType(type),
                     type.getTitle(),
-                    () -> type == selectionType
+                    () -> type == ModUtils.getAreasClientManager().getSelectionType()
                 )
             );
         }
