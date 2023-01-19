@@ -139,12 +139,18 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         );
 
         final Supplier<ITasksRenderInfoProvider> clientTasksHolderSupplier = () -> {
+            if(fortressClientManager.getState() == FortressState.AREAS_SELECTION)
+                return areasClientManager.getSavedAreasHolder();
+
             final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
             if(fortressWorld == null) return null;
             return fortressWorld.getClientTasksHolder();
         };
 
         final Supplier<ITasksModelBuilderInfoProvider> clientBlueprintManagerSupplier = () -> {
+            if(fortressClientManager.getState() == FortressState.AREAS_SELECTION)
+                return areasClientManager.getSavedAreasHolder();
+
             final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
             if(fortressWorld == null) return null;
             return fortressWorld.getClientTasksHolder();
