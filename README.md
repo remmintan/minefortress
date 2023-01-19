@@ -10,14 +10,28 @@ git clone https://github.com/minefortress-mod/minefortress.git
 ```
 3. Rename the `Cardinal-Components-API` folder to `cc-api`
 4. Go to folder `cc-api` and run there
+
+Windows
 ```
 git checkout 1.18
-gradlew assemble
+./gradlew.bat assemble
+```
+Mac/Linux
+```
+git checkout 1.18
+./gradlew assemble
 ```
 5. Go to folder `automatone` and run there
+
+Windows
 ```
 git checkout 1.18
-gradlew assemble
+./gradlew.bat assemble
+```
+Mac/Linux
+```
+git checkout 1.18
+./gradlew assemble
 ```
 6. Go to folder `minefortress` and open it with IntelliJ IDEA
 7. Wait for the project to load with gradle
