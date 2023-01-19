@@ -421,6 +421,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         this.serverResourceManager.write(tag);
+        this.areasServerManager.write(tag);
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -496,6 +497,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(tag.contains("maxColonistsCount")) {
             this.maxColonistsCount = tag.getInt("maxColonistsCount");
         }
+
+        this.areasServerManager.read(tag);
 
         this.scheduleSync();
     }
