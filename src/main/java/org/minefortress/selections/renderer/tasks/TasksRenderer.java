@@ -5,7 +5,6 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import org.minefortress.renderer.custom.AbstractCustomRenderer;
 import org.minefortress.renderer.custom.BuiltModel;
-import org.minefortress.tasks.ClientTasksHolder;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,11 +14,16 @@ import java.util.function.Supplier;
 public class TasksRenderer extends AbstractCustomRenderer {
 
     private final TasksModelBuilder modelBuilder;
-    private final Supplier<ClientTasksHolder> tasksHolderSupplier;
+    private final Supplier<ITasksRenderInfoProvider> tasksHolderSupplier;
 
-    public TasksRenderer(MinecraftClient client, BufferBuilder bufferBuilder, Supplier<ClientTasksHolder> tasksHolderSupplier) {
+    public TasksRenderer(
+         MinecraftClient client,
+         BufferBuilder bufferBuilder,
+         Supplier<ITasksRenderInfoProvider> tasksHolderSupplier,
+         Supplier<ITasksModelBuilderInfoProvider> tasksModelBuilderInfoProviderSupplier
+    ) {
         super(client);
-        modelBuilder = new TasksModelBuilder(bufferBuilder, tasksHolderSupplier);
+        modelBuilder = new TasksModelBuilder(bufferBuilder, tasksModelBuilderInfoProviderSupplier);
         this.tasksHolderSupplier = tasksHolderSupplier;
     }
 
@@ -30,8 +34,8 @@ public class TasksRenderer extends AbstractCustomRenderer {
 
     @Override
     protected boolean shouldRender() {
-        final ClientTasksHolder tasksHolder = getTasksHolder();
-        return !client.options.hudHidden && !tasksHolder.isEmpty() && !tasksHolder.isSelectionHidden();
+        final ITasksRenderInfoProvider tasksHolder = getTasksHolder();
+        return !client.options.hudHidden && tasksHolder.shouldRender();
     }
 
     @Override
@@ -49,7 +53,7 @@ public class TasksRenderer extends AbstractCustomRenderer {
         return Collections.singletonList(RenderLayer.getLines());
     }
 
-    private ClientTasksHolder getTasksHolder() {
+    private ITasksRenderInfoProvider getTasksHolder() {
         return tasksHolderSupplier.get();
     }
 }

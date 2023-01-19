@@ -22,6 +22,8 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     private BlockPos selectionStart;
     private BlockPos selectionEnd;
 
+    private List<AutomationAreaInfo> savedAreas;
+
     public boolean select(HitResult target) {
         if(target == null) return false;
         if(target instanceof BlockHitResult bhr) {
@@ -30,6 +32,8 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                 this.needsUpdate = true;
                 selectionStart = blockPos;
                 selectionEnd = blockPos;
+            } else {
+
             }
         }
         return true;
@@ -91,5 +95,9 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     @Override
     public List<Pair<Vec3i, Vec3i>> getSelectionDimensions() {
         return Collections.emptyList();
+    }
+
+    public void setSavedAreas(List<AutomationAreaInfo> savedAreas) {
+        this.savedAreas = Collections.unmodifiableList(savedAreas);
     }
 }

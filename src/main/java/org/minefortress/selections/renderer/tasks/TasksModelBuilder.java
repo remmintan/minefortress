@@ -1,29 +1,25 @@
 package org.minefortress.selections.renderer.tasks;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.util.math.BlockPos;
 import org.minefortress.selections.ClientSelection;
-import org.minefortress.tasks.ClientTasksHolder;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
 public class TasksModelBuilder {
 
     private final BufferBuilder bufferBuilder;
-    private final Supplier<ClientTasksHolder> tasksHolderSupplier;
+    private final Supplier<ITasksModelBuilderInfoProvider> tasksHolderSupplier;
 
     private BuiltTasks builtTasks;
 
-    public TasksModelBuilder(BufferBuilder bufferBuilder, Supplier<ClientTasksHolder> tasksHolderSupplier) {
+    public TasksModelBuilder(BufferBuilder bufferBuilder, Supplier<ITasksModelBuilderInfoProvider> tasksHolderSupplier) {
         this.bufferBuilder = bufferBuilder;
         this.tasksHolderSupplier = tasksHolderSupplier;
     }
 
     public void build() {
-        final ClientTasksHolder tasksHolder = getTasksHolder();
+        final ITasksModelBuilderInfoProvider tasksHolder = getTasksHolder();
 
         if(!tasksHolder.isNeedRebuild()) return;
         tasksHolder.setNeedRebuild(false);
@@ -31,9 +27,8 @@ public class TasksModelBuilder {
         if(this.builtTasks != null)
             builtTasks.close();
 
-        final Set<ClientSelection> allBuildTasks = tasksHolder.getAllBuildTasks();
-        final Set<ClientSelection> allRemoveTasks = tasksHolder.getAllRemoveTasks();
-        builtTasks = new BuiltTasks(allBuildTasks, allRemoveTasks);
+        final Set<ClientSelection> allBuildTasks = tasksHolder.getAllSelections();
+        builtTasks = new BuiltTasks(allBuildTasks);
         builtTasks.build(bufferBuilder);
     }
 
@@ -46,7 +41,7 @@ public class TasksModelBuilder {
             builtTasks.close();
     }
 
-    private ClientTasksHolder getTasksHolder() {
+    private ITasksModelBuilderInfoProvider getTasksHolder() {
         return tasksHolderSupplier.get();
     }
 }

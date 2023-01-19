@@ -3,14 +3,20 @@ package org.minefortress.tasks;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vector4f;
 import org.minefortress.network.c2s.ServerboundCancelTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.selections.ClientSelection;
+import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
+import org.minefortress.selections.renderer.tasks.ITasksRenderInfoProvider;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
 
-public class ClientTasksHolder {
+public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider {
+    private static final Vector4f DESTROY_COLOR = new Vector4f(170f/255f, 0, 0, 1f);
+    private static final Vector4f BUILD_COLOR = new Vector4f(0, 170f/255f, 0, 1f);
 
     private final Map<UUID, UUID> subtasksMap = new HashMap<>();
 
@@ -51,7 +57,11 @@ public class ClientTasksHolder {
         if(blockState == null) {
             blockState = Blocks.DIRT.getDefaultState();
         }
-        ClientSelection newTask = new ClientSelection(blocks, blockState);
+        ClientSelection newTask = new ClientSelection(
+                blocks,
+                type == TaskType.REMOVE ? DESTROY_COLOR: BUILD_COLOR,
+                (w, p) -> type == TaskType.REMOVE ? BuildingHelper.canRemoveBlock(w, p) : BuildingHelper.canPlaceBlock(w, p)
+        );
         if(superTaskId != null) {
             subtasksMap.put(uuid, superTaskId);
         }
@@ -66,12 +76,11 @@ public class ClientTasksHolder {
         this.setNeedRebuild(true);
     }
 
-    public Set<ClientSelection> getAllRemoveTasks() {
-        return new HashSet<>(removeTasks.values());
-    }
-
-    public Set<ClientSelection> getAllBuildTasks() {
-        return new HashSet<>(buildTasks.values());
+    @Override
+    public Set<ClientSelection> getAllSelections() {
+        final var clientSelections = new HashSet<>(buildTasks.values());
+        clientSelections.addAll(removeTasks.values());
+        return clientSelections;
     }
 
     public void removeTask(UUID uuid) {

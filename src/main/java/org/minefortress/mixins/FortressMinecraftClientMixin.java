@@ -38,8 +38,9 @@ import org.minefortress.selections.renderer.ISelectionInfoProvider;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 import org.minefortress.selections.renderer.campfire.CampfireRenderer;
 import org.minefortress.selections.renderer.selection.SelectionRenderer;
+import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
+import org.minefortress.selections.renderer.tasks.ITasksRenderInfoProvider;
 import org.minefortress.selections.renderer.tasks.TasksRenderer;
-import org.minefortress.tasks.ClientTasksHolder;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -137,13 +138,22 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
                 selModBuildInfProv
         );
 
-        final Supplier<ClientTasksHolder> clientTasksHolderSupplier = () -> {
+        final Supplier<ITasksRenderInfoProvider> clientTasksHolderSupplier = () -> {
             final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
             if(fortressWorld == null) return null;
             return fortressWorld.getClientTasksHolder();
         };
 
-        tasksRenderer = new TasksRenderer(client, selectionBufferBuilderStorage.get(RenderLayer.getLines()), clientTasksHolderSupplier);
+        final Supplier<ITasksModelBuilderInfoProvider> clientBlueprintManagerSupplier = () -> {
+            final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
+            if(fortressWorld == null) return null;
+            return fortressWorld.getClientTasksHolder();
+        };
+
+        tasksRenderer = new TasksRenderer(client,
+                selectionBufferBuilderStorage.get(RenderLayer.getLines()),
+                clientTasksHolderSupplier,
+                clientBlueprintManagerSupplier);
     }
 
     @Override
