@@ -9,6 +9,7 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public final class AreasServerManager {
 
@@ -17,6 +18,11 @@ public final class AreasServerManager {
 
     public void addArea(AutomationAreaInfo area) {
         areas.add(area);
+        sync();
+    }
+
+    public void removeArea(UUID id) {
+        areas.removeIf(it -> it.id().equals(id));
         sync();
     }
 

@@ -33,4 +33,8 @@ public record AutomationAreaInfo(
         return new AutomationAreaInfo(area, name, id);
     }
 
+    public boolean contains(BlockPos pos) {
+        return area.contains(pos);
+    }
+
 }

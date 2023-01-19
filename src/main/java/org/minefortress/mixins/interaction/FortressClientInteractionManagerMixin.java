@@ -188,7 +188,10 @@ public abstract class FortressClientInteractionManagerMixin {
 
         if(fortressManager.getState() == FortressState.AREAS_SELECTION) {
             final var areasClientManager = ModUtils.getAreasClientManager();
-            areasClientManager.resetSelection();
+            if(areasClientManager.isSelecting())
+                areasClientManager.resetSelection();
+            else
+                areasClientManager.removeHovered();
             cir.setReturnValue(ActionResult.SUCCESS);
             return;
         }

@@ -1,11 +1,13 @@
 package org.minefortress.areas;
 
+import net.minecraft.util.math.BlockPos;
 import org.minefortress.selections.ClientSelection;
 import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
 import org.minefortress.selections.renderer.tasks.ITasksRenderInfoProvider;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,10 @@ public final class SavedAreasHolder implements ITasksModelBuilderInfoProvider, I
         return savedAreas.stream()
                 .map(this::toClientSelection)
                 .collect(Collectors.toSet());
+    }
+
+    public Optional<AutomationAreaInfo> getHovered(BlockPos pos) {
+        return savedAreas.stream().filter(it -> it.contains(pos)).findAny();
     }
 
     private ClientSelection toClientSelection(AutomationAreaInfo info) {

@@ -8,12 +8,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.Vector4f;
 import org.minefortress.network.c2s.C2SAddAreaPacket;
+import org.minefortress.network.c2s.C2SRemoveAutomationAreaPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.selections.renderer.ISelectionInfoProvider;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class AreasClientManager implements ISelectionInfoProvider, ISelectionModelBuilderInfoProvider {
@@ -23,6 +25,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     private ProfessionsSelectionType selectionType;
     private BlockPos selectionStart;
     private BlockPos selectionEnd;
+    private AutomationAreaInfo hoveredArea;
 
     public boolean select(HitResult target) {
         if(target == null) return false;
@@ -52,6 +55,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
             final var blockPos = bhr.getBlockPos();
             if(selectionStart != null) {
                 if(blockPos != null && !blockPos.equals(selectionEnd)) {
+                    this.hoveredArea = getSavedAreasHolder().getHovered(blockPos).orElse(null);
                     selectionEnd = blockPos;
                     needsUpdate = true;
                 }
@@ -63,6 +67,14 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         this.selectionEnd = null;
         this.selectionStart = null;
         this.needsUpdate = true;
+        this.hoveredArea = null;
+    }
+
+    public void removeHovered() {
+        if(hoveredArea != null) {
+            final var packet = new C2SRemoveAutomationAreaPacket(hoveredArea.id());
+            FortressClientNetworkHelper.send(C2SRemoveAutomationAreaPacket.CHANNEL, packet);
+        }
     }
 
     public boolean isSelecting() {
@@ -107,6 +119,12 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
 
     public SavedAreasHolder getSavedAreasHolder() {
         return savedAreasHolder;
+    }
+
+    public Optional<String> getHoveredAreaName() {
+        return Optional.ofNullable(hoveredArea)
+                .map(AutomationAreaInfo::areaType)
+                .map(ProfessionsSelectionType::getTitle);
     }
 
 }
