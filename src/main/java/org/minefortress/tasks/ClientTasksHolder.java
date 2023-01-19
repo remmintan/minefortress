@@ -54,9 +54,6 @@ public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasks
     }
 
     public void addTask(UUID uuid, Iterable<BlockPos> blocks, BlockState blockState, TaskType type, UUID superTaskId) {
-        if(blockState == null) {
-            blockState = Blocks.DIRT.getDefaultState();
-        }
         ClientSelection newTask = new ClientSelection(
                 blocks,
                 type == TaskType.REMOVE ? DESTROY_COLOR: BUILD_COLOR,
