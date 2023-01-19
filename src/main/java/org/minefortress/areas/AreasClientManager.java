@@ -7,22 +7,22 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.Vector4f;
+import org.minefortress.network.c2s.C2SAddAreaPacket;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.selections.renderer.ISelectionInfoProvider;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public final class AreasClientManager implements ISelectionInfoProvider, ISelectionModelBuilderInfoProvider {
 
+    private final SavedAreasHolder savedAreasHolder = new SavedAreasHolder();
     private boolean needsUpdate;
-
     private ProfessionsSelectionType selectionType;
-
     private BlockPos selectionStart;
     private BlockPos selectionEnd;
-
-    private List<AutomationAreaInfo> savedAreas;
 
     public boolean select(HitResult target) {
         if(target == null) return false;
@@ -33,7 +33,15 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                 selectionStart = blockPos;
                 selectionEnd = blockPos;
             } else {
-
+                final var selectedBlocks = Collections.unmodifiableList(getSelectedBlocks());
+                final var info = new AutomationAreaInfo(
+                        selectedBlocks,
+                        selectionType,
+                        UUID.randomUUID()
+                );
+                final var packet = new C2SAddAreaPacket(info);
+                FortressClientNetworkHelper.send(C2SAddAreaPacket.CHANNEL, packet);
+                resetSelection();
             }
         }
         return true;
@@ -90,14 +98,15 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
 
     @Override
     public Vector4f getClickColor() {
-        return new Vector4f(0.0f, 0.0f, 1.0f, 1f);
+        return selectionType.getColor();
     }
     @Override
     public List<Pair<Vec3i, Vec3i>> getSelectionDimensions() {
         return Collections.emptyList();
     }
 
-    public void setSavedAreas(List<AutomationAreaInfo> savedAreas) {
-        this.savedAreas = Collections.unmodifiableList(savedAreas);
+    public SavedAreasHolder getSavedAreasHolder() {
+        return savedAreasHolder;
     }
+
 }

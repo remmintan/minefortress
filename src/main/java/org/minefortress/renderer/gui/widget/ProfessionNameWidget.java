@@ -47,7 +47,7 @@ public class ProfessionNameWidget extends MinefortressWidget implements Element,
         final var newY = y / scaleFactor;
         getTextRenderer().drawWithShadow(matrices, shortName, newX, newY, 0xFFFFFF);
         matrices.pop();
-        // if hovered, draw full name
+        // if hovered, draw full areaType
         if (mouseX >= x && mouseX <= x + getTextRenderer().getWidth(shortName) * scaleFactor && mouseY >= y && mouseY <= y + getTextRenderer().fontHeight * scaleFactor) {
             tooltipRenderer.render(matrices, Text.of(fullName), mouseX, mouseY);
         }

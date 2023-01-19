@@ -27,7 +27,7 @@ public final class BlueprintMetadataManager {
 
     public BlueprintMetadata add(BlueprintGroup group, String name, String file, int floorLevel, String requirementId) {
         if (isContainsBlueprint(name, file)) {
-            throw new IllegalArgumentException("Blueprint with name " + name + " and file " + file + " already exists");
+            throw new IllegalArgumentException("Blueprint with areaType " + name + " and file " + file + " already exists");
         }
 
         final BlueprintMetadata metadata = new BlueprintMetadata(name, file, floorLevel, requirementId);

@@ -27,6 +27,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.areas.AreasServerManager;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
@@ -65,6 +66,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final ServerProfessionManager serverProfessionManager;
     private final ServerResourceManager serverResourceManager;
     private final TaskManager taskManager = new TaskManager();
+    private final AreasServerManager areasServerManager = new AreasServerManager();
     
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
 
@@ -130,6 +132,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         tickFortress(player);
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
+        areasServerManager.tick(player);
         if(!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
         final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount, getReservedPawnsCount());
@@ -572,6 +575,10 @@ public final class FortressServerManager extends AbstractFortressManager {
             return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
         else
             return this.specialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
+    }
+
+    public AreasServerManager getAreasManager() {
+        return areasServerManager;
     }
 
     public boolean isBlockSpecial(Block block) {
