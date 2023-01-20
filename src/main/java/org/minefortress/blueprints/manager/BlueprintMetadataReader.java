@@ -57,7 +57,7 @@ public class BlueprintMetadataReader {
         while (jsonReader.hasNext()) {
             final var propertyName = jsonReader.nextName();
             switch (propertyName) {
-                case "areaType" -> name = jsonReader.nextString();
+                case "name" -> name = jsonReader.nextString();
                 case "file" -> file = jsonReader.nextString();
                 case "floorLevel" -> floorLevel = jsonReader.nextInt();
                 case "requirementId" -> requirementId = jsonReader.nextString();

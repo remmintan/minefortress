@@ -4,6 +4,7 @@ import net.minecraft.util.math.BlockPos;
 import org.minefortress.selections.ClientSelection;
 import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
 import org.minefortress.selections.renderer.tasks.ITasksRenderInfoProvider;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,10 +43,16 @@ public final class SavedAreasHolder implements ITasksModelBuilderInfoProvider, I
         return savedAreas.stream().filter(it -> it.contains(pos)).findAny();
     }
 
+    @Override
+    public boolean shouldRender() {
+        return !savedAreas.isEmpty();
+    }
+
     private ClientSelection toClientSelection(AutomationAreaInfo info) {
         return new ClientSelection(
                 info.area(),
-                info.areaType().getColor()
+                info.areaType().getColor(),
+                BuildingHelper::canRemoveBlock
         );
     }
 }

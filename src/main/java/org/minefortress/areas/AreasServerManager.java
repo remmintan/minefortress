@@ -27,6 +27,7 @@ public final class AreasServerManager {
     }
 
     public void tick(ServerPlayerEntity serverPlayer) {
+        if(serverPlayer == null) return;
         if(needSync) {
             FortressServerNetworkHelper.send(serverPlayer, S2CSyncAreasPacket.CHANNEL, new S2CSyncAreasPacket(areas));
             needSync = false;

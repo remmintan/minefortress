@@ -14,10 +14,6 @@ public class ClientSelection {
     private final Vector4f color;
     private final BiFunction<World, BlockPos, Boolean> shouldRenderBlock;
 
-    public ClientSelection(Iterable<BlockPos> blockPositions,  Vector4f color) {
-        this(blockPositions, color, (w, p) -> true);
-    }
-
     public ClientSelection(Iterable<BlockPos> blockPositions,
                            Vector4f color,
                            BiFunction<World, BlockPos, Boolean> shouldRenderBlock) {

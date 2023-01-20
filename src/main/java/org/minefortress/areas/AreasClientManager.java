@@ -2,6 +2,8 @@ package org.minefortress.areas;
 
 import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -12,6 +14,7 @@ import org.minefortress.network.c2s.C2SRemoveAutomationAreaPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.selections.renderer.ISelectionInfoProvider;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,11 +33,18 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     public boolean select(HitResult target) {
         if(target == null) return false;
         if(target instanceof BlockHitResult bhr) {
+            if(selectionType == null) {
+                MinecraftClient.getInstance()
+                        .inGameHud
+                        .getChatHud()
+                        .addMessage(new LiteralText("Please select an area type first!"));
+                return false;
+            }
             final var blockPos = bhr.getBlockPos();
             if(selectionStart == null) {
                 this.needsUpdate = true;
-                selectionStart = blockPos;
-                selectionEnd = blockPos;
+                selectionStart = blockPos.withY(-64);
+                selectionEnd = blockPos.withY(320);
             } else {
                 final var selectedBlocks = Collections.unmodifiableList(getSelectedBlocks());
                 final var info = new AutomationAreaInfo(
@@ -53,10 +63,13 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     public void updateSelection(HitResult crosshairTarget) {
         if(crosshairTarget instanceof BlockHitResult bhr) {
             final var blockPos = bhr.getBlockPos();
+            if(blockPos == null) return;
+            this.hoveredArea = getSavedAreasHolder().getHovered(blockPos).orElse(null);
+
+            final var possibleEnd = blockPos.withY(320);
             if(selectionStart != null) {
-                if(blockPos != null && !blockPos.equals(selectionEnd)) {
-                    this.hoveredArea = getSavedAreasHolder().getHovered(blockPos).orElse(null);
-                    selectionEnd = blockPos;
+                if(possibleEnd != null && !possibleEnd.equals(selectionEnd)) {
+                    selectionEnd = possibleEnd;
                     needsUpdate = true;
                 }
             }
@@ -94,9 +107,18 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     @Override
     public List<BlockPos> getSelectedBlocks() {
         if(selectionStart == null || selectionEnd == null) return List.of();
+        final var world = MinecraftClient.getInstance().world;
+        if(world == null) return List.of();
         return Streams
                 .stream(BlockPos.iterate(selectionStart, selectionEnd))
                 .map(BlockPos::toImmutable)
+                .filter(pos -> {
+                    var thisBlock = pos.toImmutable();
+                    var upBlock = thisBlock.up();
+                    var downBlock = thisBlock.down();
+                    return BuildingHelper.canRemoveBlock(world, thisBlock) &&
+                            (BuildingHelper.canPlaceBlock(world, upBlock) || BuildingHelper.canPlaceBlock(world, downBlock));
+                })
                 .toList();
     }
 

@@ -56,6 +56,6 @@ public class HoveredEntityHudLayer extends AbstractHudLayer{
 
     @Override
     public boolean shouldRender(HudState hudState) {
-        return hudState == HudState.BUILD;
+        return hudState == HudState.BUILD || hudState == HudState.AREAS_SELECTION;
     }
 }
