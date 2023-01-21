@@ -9,11 +9,10 @@ import net.minecraft.item.Items;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.automation.FortressBuilding;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.IAutomationArea;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;
@@ -30,7 +29,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             Items.COCOA_BEANS
     );
 
-    private FortressBuilding currentFarm;
+    private IAutomationArea currentFarm;
     private Iterator<BlockPos> farmIterator;
     private BlockPos goal;
     private long stopTime = 0L;
@@ -45,7 +44,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         colonist.resetControls();
         colonist.setCurrentTaskDesc("Farming");
         getFarm(colonist).ifPresent(f -> this.currentFarm = f);
-        initIterator();
+        initIterator(colonist);
         colonist.getBaritone().settings().allowParkour.set(false);
     }
 
@@ -55,8 +54,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         if(!this.farmIterator.hasNext()) return;
         final var movementHelper = colonist.getMovementHelper();
         if(this.goal == null) {
-            findCorrectGoal(colonist);
-            if(this.goal == null) return;
+            this.goal = this.farmIterator.next();
             movementHelper.set(goal.up(), Colonist.FAST_MOVEMENT_SPEED);
         }
         if(this.goal != null && movementHelper.getWorkGoal() == null) {
@@ -129,21 +127,22 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         return colonist.world.isDay() && farmIterator.hasNext();
     }
 
-    private Optional<FortressBuilding> getFarm(Colonist colonist) {
+    private Optional<IAutomationArea> getFarm(Colonist colonist) {
         return colonist
             .getFortressServerManager()
-            .flatMap(it -> it.getRandomBuilding("farmer", colonist.world.random));
+            .flatMap(it -> it.getAutomationAreaByRequirementId("farmer"));
     }
 
     private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {
         return colonist.world.getTime() - this.stopTime > 100;
     }
 
-    private void initIterator() {
+    private void initIterator(Colonist pawn) {
         if(this.currentFarm == null) {
             this.farmIterator = Collections.emptyIterator();
         } else {
-            this.farmIterator = BlockPos.iterate(this.currentFarm.getStart(), this.currentFarm.getEnd()).iterator();
+            this.currentFarm.update();
+            this.farmIterator = this.currentFarm.iterator(pawn.world);
         }
     }
 
@@ -164,24 +163,6 @@ public class FarmerDailyTask implements ProfessionDailyTask{
 
         itemOpt.ifPresent(serverResourceManager::removeItemIfExists);
         return itemOpt;
-    }
-
-    private void findCorrectGoal(Colonist colonist) {
-        while (farmIterator.hasNext()) {
-            final var possibleGoal = this.farmIterator.next().toImmutable();
-            if(isCorrectGoal(colonist.world, possibleGoal)) {
-                this.goal = possibleGoal;
-                return;
-            }
-        }
-    }
-
-    private boolean isCorrectGoal(World world, BlockPos goal) {
-        final var blockState = world.getBlockState(goal);
-        final var goalCorrect = blockState.isOf(Blocks.FARMLAND) || blockState.isOf(Blocks.DIRT) || blockState.isOf(Blocks.GRASS_BLOCK);
-        final var aboveGoalState = world.getBlockState(goal.up());
-        final var aboveGoalCorrect = aboveGoalState.isIn(BlockTags.CROPS) || aboveGoalState.isAir();
-        return goalCorrect && aboveGoalCorrect;
     }
 
     private boolean isCreative(Colonist colonist) {

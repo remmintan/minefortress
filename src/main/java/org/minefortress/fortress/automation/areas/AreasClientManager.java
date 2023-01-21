@@ -85,7 +85,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
 
     public void removeHovered() {
         if(hoveredArea != null) {
-            final var packet = new C2SRemoveAutomationAreaPacket(hoveredArea.id());
+            final var packet = new C2SRemoveAutomationAreaPacket(hoveredArea.getId());
             FortressClientNetworkHelper.send(C2SRemoveAutomationAreaPacket.CHANNEL, packet);
         }
     }
@@ -145,7 +145,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
 
     public Optional<String> getHoveredAreaName() {
         return Optional.ofNullable(hoveredArea)
-                .map(AutomationAreaInfo::areaType)
+                .map(AutomationAreaInfo::getAreaType)
                 .map(ProfessionsSelectionType::getTitle);
     }
 

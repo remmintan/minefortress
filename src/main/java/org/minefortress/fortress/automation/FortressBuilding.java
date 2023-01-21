@@ -7,20 +7,24 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.minefortress.fortress.IAutomationArea;
+import org.minefortress.fortress.automation.iterators.FarmBuildingIterator;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class FortressBuilding {
+public class FortressBuilding implements IAutomationArea {
 
     private final UUID id;
     private final BlockPos start;
     private final BlockPos end;
     private final String requirementId;
-    private final LocalDateTime lastUpdated;
+    private LocalDateTime lastUpdated;
+    private Iterator<BlockPos> currentIterator;
 
     public FortressBuilding(UUID id, BlockPos start, BlockPos end, String requirementId) {
         this.id = id;
@@ -92,7 +96,35 @@ public class FortressBuilding {
         tag.putString("lastUpdated", lastUpdated.toString());
     }
 
-    public String getRequirementId() {
-        return requirementId;
+    @Override
+    public Iterator<BlockPos> iterator(World world) {
+        if (currentIterator == null || !currentIterator.hasNext()) {
+            if (requirementId.startsWith("farm")) {
+                this.currentIterator = new FarmBuildingIterator(start, end, world);
+            }
+        }
+        if(this.currentIterator == null) {
+            throw new IllegalStateException("Iterator is not set properly");
+        }
+
+        return currentIterator;
+    }
+
+    public boolean satisfiesRequirement(String requirementId) {
+        return this.requirementId != null && this.requirementId.equals(requirementId);
+    }
+
+    @Override
+    public void update() {
+        this.lastUpdated = LocalDateTime.now();
+    }
+
+    @Override
+    public LocalDateTime getUpdated() {
+        return lastUpdated;
+    }
+
+    public EssentialBuildingInfo toEssentialInfo(World world) {
+        return new EssentialBuildingInfo(start, end, requirementId, getBedsCount(world));
     }
 }

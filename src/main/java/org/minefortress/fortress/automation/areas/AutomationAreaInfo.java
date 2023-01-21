@@ -7,11 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public record AutomationAreaInfo(
-        List<BlockPos> area,
-        ProfessionsSelectionType areaType,
-        UUID id
-) {
+public class AutomationAreaInfo {
+
+    private final List<BlockPos> area;
+    private final ProfessionsSelectionType areaType;
+    private final UUID id;
+
+    public AutomationAreaInfo(List<BlockPos> area, ProfessionsSelectionType areaType, UUID id) {
+        this.area = area;
+        this.areaType = areaType;
+        this.id = id;
+    }
 
     public void writeToBuffer(PacketByteBuf buf) {
         buf.writeVarInt(area.size());
@@ -37,4 +43,15 @@ public record AutomationAreaInfo(
         return area.contains(pos);
     }
 
+    public List<BlockPos> getArea() {
+        return area;
+    }
+
+    public ProfessionsSelectionType getAreaType() {
+        return areaType;
+    }
+
+    public UUID getId() {
+        return id;
+    }
 }

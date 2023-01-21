@@ -27,14 +27,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.automation.EssentialBuildingInfo;
-import org.minefortress.fortress.automation.FortressBuilding;
-import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.entity.interfaces.IWorkerPawn;
+import org.minefortress.fortress.automation.FortressBuilding;
+import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
@@ -141,7 +140,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
             final var houses = buildings.stream()
-                    .map(h -> new EssentialBuildingInfo(h.getStart(), h.getEnd(), h.getRequirementId(), h.getBedsCount(getWorld())))
+                    .map(it -> it.toEssentialInfo(getWorld()))
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
             final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
@@ -153,14 +152,6 @@ public final class FortressServerManager extends AbstractFortressManager {
             needSyncSpecialBlocks = false;
         }
         needSync = false;
-    }
-
-    public Optional<FortressBuilding> getRandomBuilding(String requirementId, Random random) {
-        final var buildings = this.buildings.stream()
-                .filter(building -> building.getRequirementId().equals(requirementId))
-                .toList();
-        if(buildings.isEmpty()) return Optional.empty();
-        return Optional.of(buildings.get(random.nextInt(buildings.size())));
     }
 
     public void replaceColonistWithTypedPawn(Colonist colonist, String warriorId, EntityType<? extends BasePawnEntity> entityType) {
@@ -505,6 +496,18 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.scheduleSync();
     }
 
+    public Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement) {
+        final var buildings = this.buildings.stream()
+                .filter(building -> building.satisfiesRequirement(requirement))
+                .map(IAutomationArea.class::cast);
+
+        final var areas = areasServerManager.getByRequirement(requirement);
+
+        return Stream
+                .concat(buildings, areas)
+                .min(Comparator.comparing(IAutomationArea::getUpdated));
+    }
+
     public ColonistNameGenerator getNameGenerator() {
         return nameGenerator;
     }
@@ -563,7 +566,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
         final var requiredBuildings = buildings.stream()
-                .filter(b -> b.getRequirementId().equals(requirementId));
+                .filter(b -> b.satisfiesRequirement(requirementId));
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
             return requiredBuildings
                     .mapToLong(it -> it.getBedsCount(getWorld()) * 10)
