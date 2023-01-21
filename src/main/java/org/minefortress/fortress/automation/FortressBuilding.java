@@ -1,4 +1,4 @@
-package org.minefortress.fortress;
+package org.minefortress.fortress.automation;
 
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.enums.BedPart;

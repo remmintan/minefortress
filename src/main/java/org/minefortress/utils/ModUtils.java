@@ -10,7 +10,7 @@ import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
-import org.minefortress.areas.AreasClientManager;
+import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;

@@ -1,7 +1,7 @@
 package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
-import org.minefortress.areas.ProfessionsSelectionType;
+import org.minefortress.fortress.automation.areas.ProfessionsSelectionType;
 import org.minefortress.renderer.gui.widget.ModeButtonWidget;
 import org.minefortress.utils.ModUtils;
 

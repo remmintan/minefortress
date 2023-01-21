@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
-import org.minefortress.areas.AreasClientManager;
+import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;

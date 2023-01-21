@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressBuilding;
+import org.minefortress.fortress.automation.FortressBuilding;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;

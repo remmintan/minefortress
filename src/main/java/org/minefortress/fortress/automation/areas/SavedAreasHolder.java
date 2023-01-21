@@ -1,4 +1,4 @@
-package org.minefortress.areas;
+package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.selections.ClientSelection;

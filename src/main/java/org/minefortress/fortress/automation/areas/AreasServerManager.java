@@ -1,4 +1,4 @@
-package org.minefortress.areas;
+package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;

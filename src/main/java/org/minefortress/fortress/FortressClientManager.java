@@ -11,6 +11,7 @@ import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
+import org.minefortress.fortress.automation.EssentialBuildingInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;

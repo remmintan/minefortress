@@ -1,4 +1,4 @@
-package org.minefortress.areas;
+package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;

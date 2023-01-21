@@ -1,4 +1,4 @@
-package org.minefortress.areas;
+package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;

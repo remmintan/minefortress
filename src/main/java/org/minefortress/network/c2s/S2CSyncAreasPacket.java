@@ -2,7 +2,7 @@ package org.minefortress.network.c2s;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
-import org.minefortress.areas.AutomationAreaInfo;
+import org.minefortress.fortress.automation.areas.AutomationAreaInfo;
 import org.minefortress.network.interfaces.FortressS2CPacket;
 
 import java.util.ArrayList;

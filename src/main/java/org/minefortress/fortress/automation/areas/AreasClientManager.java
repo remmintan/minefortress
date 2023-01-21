@@ -1,4 +1,4 @@
-package org.minefortress.areas;
+package org.minefortress.fortress.automation.areas;
 
 import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Pair;
