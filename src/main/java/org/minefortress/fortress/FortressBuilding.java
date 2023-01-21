@@ -8,23 +8,35 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class FortressBuilding {
 
+    private final UUID id;
     private final BlockPos start;
     private final BlockPos end;
     private final String requirementId;
+    private final LocalDateTime lastUpdated;
 
-    public FortressBuilding(BlockPos start, BlockPos end, String requirementId) {
+    public FortressBuilding(UUID id, BlockPos start, BlockPos end, String requirementId) {
+        this.id = id;
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.requirementId = requirementId;
+        this.lastUpdated = LocalDateTime.MIN;
     }
 
     public FortressBuilding(NbtCompound tag) {
+        if(tag.contains("id")) {
+            this.id = tag.getUuid("id");
+        } else {
+            this.id = UUID.randomUUID();
+        }
+
         if(tag.contains("start"))
             this.start = BlockPos.fromLong(tag.getLong("start"));
         else
@@ -39,6 +51,11 @@ public class FortressBuilding {
             this.requirementId = tag.getString("requirementId");
         else
             this.requirementId = "<old>";
+
+        if(tag.contains("lastUpdated"))
+            this.lastUpdated = LocalDateTime.parse(tag.getString("lastUpdated"));
+        else
+            this.lastUpdated = LocalDateTime.MIN;
     }
 
     public BlockPos getStart() {
@@ -68,10 +85,11 @@ public class FortressBuilding {
     }
 
     public void writeToNbt(NbtCompound tag) {
+        tag.putUuid("id", id);
         tag.putLong("start", start.asLong());
         tag.putLong("end", end.asLong());
-
         tag.putString("requirementId", requirementId);
+        tag.putString("lastUpdated", lastUpdated.toString());
     }
 
     public String getRequirementId() {

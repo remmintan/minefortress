@@ -93,7 +93,7 @@ public class BlueprintTask extends AbstractTask {
                     });
             }
 
-            final FortressBuilding fortressBuilding = new FortressBuilding(startingBlock, endingBlock, requirementId);
+            final FortressBuilding fortressBuilding = new FortressBuilding(UUID.randomUUID(), startingBlock, endingBlock, requirementId);
             colonist.getFortressServerManager().orElseThrow().addBuilding(fortressBuilding);
         }
         super.finishPart(part, colonist);
