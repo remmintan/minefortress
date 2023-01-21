@@ -136,7 +136,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {
-        return colonist.world.getTime() - this.stopTime > 400;
+        return colonist.world.getTime() - this.stopTime > 100;
     }
 
     private void initIterator() {
