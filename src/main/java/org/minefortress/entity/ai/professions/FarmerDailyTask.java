@@ -8,7 +8,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
@@ -32,7 +31,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
 
     private IAutomationArea currentFarm;
     private Iterator<AutomationBlockInfo> farmIterator;
-    private BlockPos goal;
+    private AutomationBlockInfo goal;
     private long stopTime = 0L;
 
     @Override
@@ -55,24 +54,28 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         if(!this.farmIterator.hasNext()) return;
         final var movementHelper = colonist.getMovementHelper();
         if(this.goal == null) {
-            final var blockInfo = this.farmIterator.next();
-            this.goal = blockInfo.pos();
-            movementHelper.set(goal.up(), Colonist.FAST_MOVEMENT_SPEED);
+            this.goal = this.farmIterator.next();
+            movementHelper.set(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
         if(this.goal != null && movementHelper.getWorkGoal() == null) {
-            movementHelper.set(goal.up(), Colonist.FAST_MOVEMENT_SPEED);
+            movementHelper.set(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
 
-        if(movementHelper.getWorkGoal() != null && movementHelper.hasReachedWorkGoal()) {
-            final var goalBLockState = colonist.world.getBlockState(this.goal);
+        if(movementHelper.hasReachedWorkGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone()) {
+            final var goalBLockState = colonist.world.getBlockState(this.goal.pos());
             if (goalBLockState.isOf(Blocks.DIRT) || goalBLockState.isOf(Blocks.GRASS_BLOCK)) {
-                colonist.putItemInHand(Items.WOODEN_HOE);
-                colonist.swingHand(Hand.MAIN_HAND);
-                colonist.world.setBlockState(goal, Blocks.FARMLAND.getDefaultState(), 3);
-                colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal);
+                final var aboveBlock = goal.pos().up();
+                final var aboveBlockState = colonist.world.getBlockState(aboveBlock);
+                if(aboveBlockState.isIn(BlockTags.REPLACEABLE_PLANTS)) {
+                    colonist.setGoal(new DigTaskBlockInfo(aboveBlock));
+                } else {
+                    colonist.putItemInHand(Items.WOODEN_HOE);
+                    colonist.swingHand(Hand.MAIN_HAND);
+                    colonist.world.setBlockState(goal.pos(), Blocks.FARMLAND.getDefaultState(), 3);
+                    colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal.pos());
+                }
             } else if(goalBLockState.isOf(Blocks.FARMLAND)) {
-                if(colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone()) {
-                    final var aboveBlock = goal.up();
+                    final var aboveBlock = goal.pos().up();
                     final var aboveGoal = colonist.world.getBlockState(aboveBlock);
 
                     if(aboveGoal.isIn(BlockTags.CROPS) && aboveGoal.getBlock() instanceof CropBlock cropBlock) {
@@ -83,26 +86,19 @@ public class FarmerDailyTask implements ProfessionDailyTask{
                             this.goal = null;
                         }
                     } else if (aboveGoal.isAir()) {
-                        if(isCreative(colonist)) {
-                            final var wheatSeeds = (BlockItem) Items.WHEAT_SEEDS;
-                            final var blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(wheatSeeds, aboveBlock, wheatSeeds.getBlock().getDefaultState());
-                            colonist.setGoal(blockStateTaskBlockInfo);
+                        final var seedsOpt = getSeeds(colonist);
+                        if(seedsOpt.isPresent()) {
+                            final var blockItem = (BlockItem) seedsOpt.get();
+                            final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlock, blockItem.getBlock().getDefaultState());
+                            colonist.setGoal(bsTaskBlockInfo);
                             movementHelper.set(aboveBlock, Colonist.FAST_MOVEMENT_SPEED);
                         } else {
-                            final var seedsOpt = getSeeds(colonist);
-                            if(seedsOpt.isPresent()) {
-                                final var blockItem = (BlockItem) seedsOpt.get();
-                                final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlock, blockItem.getBlock().getDefaultState());
-                                colonist.setGoal(bsTaskBlockInfo);
-                                movementHelper.set(aboveBlock, Colonist.FAST_MOVEMENT_SPEED);
-                            } else {
-                                this.goal = null;
-                            }
+                            this.goal = null;
                         }
                     } else {
                         this.goal = null;
                     }
-                }
+
             } else {
                 this.goal = null;
             }
@@ -112,7 +108,6 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             final var workGoal = movementHelper.getWorkGoal().up();
             colonist.teleport(workGoal.getX(), workGoal.getY(), workGoal.getZ());
         }
-
     }
 
     @Override
@@ -120,7 +115,6 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         this.currentFarm = null;
         this.farmIterator = Collections.emptyIterator();
         this.stopTime = colonist.world.getTime();
-        colonist.getBaritone().settings().allowParkour.set(true);
         colonist.resetControls();
     }
 
@@ -148,7 +142,10 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         }
     }
 
-    private Optional<Item> getSeeds(Colonist colonist) {
+    private Optional<BlockItem> getSeeds(Colonist colonist) {
+        if(isCreative(colonist)) {
+            return Optional.of((BlockItem) Items.WHEAT_SEEDS);
+        }
         final var serverResourceManager = colonist.getFortressServerManager().orElseThrow().getServerResourceManager();
         final var itemOpt = serverResourceManager
                 .getAllItems()
@@ -164,10 +161,10 @@ public class FarmerDailyTask implements ProfessionDailyTask{
                 }));
 
         itemOpt.ifPresent(serverResourceManager::removeItemIfExists);
-        return itemOpt;
+        return itemOpt.map(it -> (BlockItem) it);
     }
 
-    private boolean isCreative(Colonist colonist) {
+    private static boolean isCreative(Colonist colonist) {
         return colonist.getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
     }
 }

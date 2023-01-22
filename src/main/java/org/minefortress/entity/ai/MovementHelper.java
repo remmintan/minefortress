@@ -39,6 +39,7 @@ public class MovementHelper {
         this.stuck = false;
         this.baritone.getPathingBehavior().cancelEverything();
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
+        this.baritone.settings().allowParkour.set(true);
     }
 
     private String getColonistName() {

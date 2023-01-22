@@ -22,7 +22,7 @@ public class FarmAreaIterator extends AbstractFilteredIterator{
         final var blockState = world.getBlockState(pos);
         final var goalCorrect = blockState.isOf(Blocks.FARMLAND) || blockState.isOf(Blocks.DIRT) || blockState.isOf(Blocks.GRASS_BLOCK);
         final var aboveGoalState = world.getBlockState(pos.up());
-        final var aboveGoalCorrect = aboveGoalState.isIn(BlockTags.CROPS) || aboveGoalState.isAir();
+        final var aboveGoalCorrect = aboveGoalState.isIn(BlockTags.CROPS) || aboveGoalState.isAir() || aboveGoalState.isIn(BlockTags.REPLACEABLE_PLANTS);
         return goalCorrect && aboveGoalCorrect;
     }
 
