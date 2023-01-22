@@ -23,7 +23,9 @@ public final class AreasServerManager {
     }
 
     public void removeArea(UUID id) {
-        areas.removeIf(it -> it.getId().equals(id));
+        final var areasToRemove = areas.stream().filter(it -> it.getId().equals(id)).toList();
+        areasToRemove.forEach(ServerAutomationAreaInfo::reset);
+        areas.removeAll(areasToRemove);
         sync();
     }
 

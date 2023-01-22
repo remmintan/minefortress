@@ -5,17 +5,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.minefortress.fortress.IAutomationArea;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
+import org.minefortress.fortress.automation.iterators.ResetableIterator;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class ServerAutomationAreaInfo extends AutomationAreaInfo implements IAutomationArea {
 
     private LocalDateTime updated = LocalDateTime.MIN;
-    private Iterator<BlockPos> currentIterator;
+    private ResetableIterator<BlockPos> currentIterator;
+    private boolean reset = false;
 
     public ServerAutomationAreaInfo(AutomationAreaInfo info) {
         super(info.getArea(), info.getAreaType(), info.getId());
@@ -28,6 +27,9 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
 
     @Override
     public Iterator<BlockPos> iterator(World world) {
+        if(this.reset) {
+            return Collections.emptyIterator();
+        }
         if(currentIterator == null || !currentIterator.hasNext())
             this.currentIterator = new FarmAreaIterator(this.getArea(), world);
         return currentIterator;
@@ -41,6 +43,12 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
     @Override
     public LocalDateTime getUpdated() {
         return updated;
+    }
+
+    public void reset() {
+        if(this.currentIterator != null)
+            this.currentIterator.reset();
+        this.reset = true;
     }
 
     public NbtCompound toNbt() {

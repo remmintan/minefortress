@@ -7,8 +7,9 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.StreamSupport;
 
-abstract class AbstractFilteredIterator implements Iterator<BlockPos> {
+abstract class AbstractFilteredIterator implements ResetableIterator<BlockPos> {
 
+    private boolean reset = false;
     private final Iterator<BlockPos> iterator;
 
     public AbstractFilteredIterator(Iterator<BlockPos> iterable) {
@@ -22,7 +23,7 @@ abstract class AbstractFilteredIterator implements Iterator<BlockPos> {
 
     @Override
     public boolean hasNext() {
-        return iterator.hasNext();
+        return !reset && iterator.hasNext();
     }
 
     @Override
@@ -32,4 +33,8 @@ abstract class AbstractFilteredIterator implements Iterator<BlockPos> {
 
     protected abstract boolean getFilter(BlockPos pos);
 
+    @Override
+    public void reset() {
+        this.reset = true;
+    }
 }
