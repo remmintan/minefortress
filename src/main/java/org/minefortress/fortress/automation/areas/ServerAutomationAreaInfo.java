@@ -4,6 +4,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.minefortress.fortress.IAutomationArea;
+import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.automation.iterators.ResetableIterator;
 
@@ -13,7 +14,7 @@ import java.util.*;
 public final class ServerAutomationAreaInfo extends AutomationAreaInfo implements IAutomationArea {
 
     private LocalDateTime updated = LocalDateTime.MIN;
-    private ResetableIterator<BlockPos> currentIterator;
+    private ResetableIterator<AutomationBlockInfo> currentIterator;
     private boolean reset = false;
 
     public ServerAutomationAreaInfo(AutomationAreaInfo info) {
@@ -26,7 +27,7 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
     }
 
     @Override
-    public Iterator<BlockPos> iterator(World world) {
+    public Iterator<AutomationBlockInfo> iterator(World world) {
         if(this.reset) {
             return Collections.emptyIterator();
         }

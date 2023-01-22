@@ -1,23 +1,25 @@
 package org.minefortress.fortress.automation.iterators;
 
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.fortress.automation.AutomationBlockInfo;
 
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.StreamSupport;
 
-abstract class AbstractFilteredIterator implements ResetableIterator<BlockPos> {
+abstract class AbstractFilteredIterator implements ResetableIterator<AutomationBlockInfo> {
 
     private boolean reset = false;
-    private final Iterator<BlockPos> iterator;
+    private final Iterator<AutomationBlockInfo> iterator;
 
     public AbstractFilteredIterator(Iterator<BlockPos> iterable) {
         final var spliterator = Spliterators.spliteratorUnknownSize(iterable, Spliterator.ORDERED);
         this.iterator = StreamSupport
                 .stream(spliterator, false)
                 .map(BlockPos::toImmutable)
-                .filter(this::getFilter)
+                .filter(this::filter)
+                .map(this::map)
                 .iterator();
     }
 
@@ -27,11 +29,13 @@ abstract class AbstractFilteredIterator implements ResetableIterator<BlockPos> {
     }
 
     @Override
-    public BlockPos next() {
+    public AutomationBlockInfo next() {
         return iterator.next();
     }
 
-    protected abstract boolean getFilter(BlockPos pos);
+    protected abstract boolean filter(BlockPos pos);
+
+    protected abstract AutomationBlockInfo map(BlockPos pos);
 
     @Override
     public void reset() {

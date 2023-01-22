@@ -24,7 +24,7 @@ public class FortressBuilding implements IAutomationArea {
     private final BlockPos end;
     private final String requirementId;
     private LocalDateTime lastUpdated;
-    private Iterator<BlockPos> currentIterator;
+    private Iterator<AutomationBlockInfo> currentIterator;
 
     public FortressBuilding(UUID id, BlockPos start, BlockPos end, String requirementId) {
         this.id = id;
@@ -97,7 +97,7 @@ public class FortressBuilding implements IAutomationArea {
     }
 
     @Override
-    public Iterator<BlockPos> iterator(World world) {
+    public Iterator<AutomationBlockInfo> iterator(World world) {
         if (currentIterator == null || !currentIterator.hasNext()) {
             if (requirementId.startsWith("farm")) {
                 this.currentIterator = new FarmBuildingIterator(start, end, world);

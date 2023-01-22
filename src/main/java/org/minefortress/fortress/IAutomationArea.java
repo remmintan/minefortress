@@ -1,14 +1,14 @@
 package org.minefortress.fortress;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.minefortress.fortress.automation.AutomationBlockInfo;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
 
 public interface IAutomationArea {
 
-    Iterator<BlockPos> iterator(World world);
+    Iterator<AutomationBlockInfo> iterator(World world);
     void update();
     LocalDateTime getUpdated();
 

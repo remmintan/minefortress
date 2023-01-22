@@ -13,6 +13,7 @@ import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.IAutomationArea;
+import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;
@@ -30,7 +31,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     );
 
     private IAutomationArea currentFarm;
-    private Iterator<BlockPos> farmIterator;
+    private Iterator<AutomationBlockInfo> farmIterator;
     private BlockPos goal;
     private long stopTime = 0L;
 
@@ -54,7 +55,8 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         if(!this.farmIterator.hasNext()) return;
         final var movementHelper = colonist.getMovementHelper();
         if(this.goal == null) {
-            this.goal = this.farmIterator.next();
+            final var blockInfo = this.farmIterator.next();
+            this.goal = blockInfo.pos();
             movementHelper.set(goal.up(), Colonist.FAST_MOVEMENT_SPEED);
         }
         if(this.goal != null && movementHelper.getWorkGoal() == null) {
