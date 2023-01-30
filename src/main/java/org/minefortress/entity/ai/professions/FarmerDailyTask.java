@@ -7,11 +7,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.IAutomationArea;
+import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
@@ -51,10 +53,13 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     @Override
     public void tick(Colonist colonist) {
         if(this.currentFarm == null) return;
-        if(!this.farmIterator.hasNext()) return;
+
         final var movementHelper = colonist.getMovementHelper();
         if(this.goal == null) {
-            this.goal = this.farmIterator.next();
+            do {
+                if(!this.farmIterator.hasNext()) return;
+                this.goal = this.farmIterator.next();
+            } while(goalAlreadyInCorrectState(colonist));
             movementHelper.set(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
         if(this.goal != null && movementHelper.getWorkGoal() == null) {
@@ -129,6 +134,22 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         } else {
             this.goal = null;
         }
+    }
+
+    private boolean goalAlreadyInCorrectState(Colonist colonist) {
+        final var goalBlockState = colonist.world.getBlockState(goal.pos());
+        final var abovePos = goal.pos().up();
+        final var aboveBlockState = colonist.world.getBlockState(abovePos);
+
+        if(goal.info() == AutomationActionType.FARM_CROPS) {
+            return goalBlockState.isOf(Blocks.FARMLAND) && aboveBlockState.isIn(BlockTags.CROPS) && aboveBlockState.get(CropBlock.AGE) < CropBlock.MAX_AGE;
+        }
+
+        if(goal.info() == AutomationActionType.FARM_WATER) {
+            return goalBlockState.getFluidState().isIn(FluidTags.WATER);
+        }
+
+        return false;
     }
 
     @Override
