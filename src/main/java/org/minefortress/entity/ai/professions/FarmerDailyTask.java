@@ -119,7 +119,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
 
     private void doSetWater(Colonist colonist) {
         final var goalBlockState = colonist.world.getBlockState(goal.pos());
-        if(goalBlockState.isOf(Blocks.DIRT) || goalBlockState.isOf(Blocks.GRASS_BLOCK)) {
+        if(goalBlockState.isOf(Blocks.DIRT) || goalBlockState.isOf(Blocks.GRASS_BLOCK) || goalBlockState.isOf(Blocks.FARMLAND)) {
             colonist.setGoal(new DigTaskBlockInfo(goal.pos()));
         } else if(goalBlockState.isAir()) {
             colonist.putItemInHand(Items.WATER_BUCKET);
