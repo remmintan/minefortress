@@ -62,51 +62,72 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         }
 
         if(movementHelper.hasReachedWorkGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone()) {
-            final var goalBLockState = colonist.world.getBlockState(this.goal.pos());
-            if (goalBLockState.isOf(Blocks.DIRT) || goalBLockState.isOf(Blocks.GRASS_BLOCK)) {
-                final var aboveBlock = goal.pos().up();
-                final var aboveBlockState = colonist.world.getBlockState(aboveBlock);
-                if(aboveBlockState.isIn(BlockTags.REPLACEABLE_PLANTS)) {
-                    colonist.setGoal(new DigTaskBlockInfo(aboveBlock));
-                } else {
-                    colonist.putItemInHand(Items.WOODEN_HOE);
-                    colonist.swingHand(Hand.MAIN_HAND);
-                    colonist.world.setBlockState(goal.pos(), Blocks.FARMLAND.getDefaultState(), 3);
-                    colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal.pos());
-                }
-            } else if(goalBLockState.isOf(Blocks.FARMLAND)) {
-                    final var aboveBlock = goal.pos().up();
-                    final var aboveGoal = colonist.world.getBlockState(aboveBlock);
-
-                    if(aboveGoal.isIn(BlockTags.CROPS) && aboveGoal.getBlock() instanceof CropBlock cropBlock) {
-                        if(aboveGoal.get(cropBlock.getAgeProperty()) == cropBlock.getMaxAge()) {
-                            final var digTaskBlockInfo = new DigTaskBlockInfo(aboveBlock);
-                            colonist.setGoal(digTaskBlockInfo);
-                        } else {
-                            this.goal = null;
-                        }
-                    } else if (aboveGoal.isAir()) {
-                        final var seedsOpt = getSeeds(colonist);
-                        if(seedsOpt.isPresent()) {
-                            final var blockItem = (BlockItem) seedsOpt.get();
-                            final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlock, blockItem.getBlock().getDefaultState());
-                            colonist.setGoal(bsTaskBlockInfo);
-                            movementHelper.set(aboveBlock, Colonist.FAST_MOVEMENT_SPEED);
-                        } else {
-                            this.goal = null;
-                        }
-                    } else {
-                        this.goal = null;
-                    }
-
-            } else {
-                this.goal = null;
+            switch (this.goal.info()) {
+                case FARM_CROPS -> doFarmCrops(colonist);
+                case FARM_WATER -> doSetWater(colonist);
             }
         }
 
         if(movementHelper.getWorkGoal() != null && !movementHelper.hasReachedWorkGoal() && movementHelper.isStuck()){
             final var workGoal = movementHelper.getWorkGoal().up();
             colonist.teleport(workGoal.getX(), workGoal.getY(), workGoal.getZ());
+        }
+    }
+
+    private void doFarmCrops(Colonist colonist) {
+        final var movementHelper = colonist.getMovementHelper();
+        final var goalBlockState = colonist.world.getBlockState(this.goal.pos());
+        if (goalBlockState.isOf(Blocks.DIRT) || goalBlockState.isOf(Blocks.GRASS_BLOCK)) {
+            final var aboveBlock = goal.pos().up();
+            final var aboveBlockState = colonist.world.getBlockState(aboveBlock);
+            if(aboveBlockState.isIn(BlockTags.REPLACEABLE_PLANTS)) {
+                colonist.setGoal(new DigTaskBlockInfo(aboveBlock));
+            } else {
+                colonist.putItemInHand(Items.WOODEN_HOE);
+                colonist.swingHand(Hand.MAIN_HAND);
+                colonist.world.setBlockState(goal.pos(), Blocks.FARMLAND.getDefaultState(), 3);
+                colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal.pos());
+            }
+        } else if(goalBlockState.isOf(Blocks.FARMLAND)) {
+            final var aboveBlock = goal.pos().up();
+            final var aboveGoal = colonist.world.getBlockState(aboveBlock);
+
+            if(aboveGoal.isIn(BlockTags.CROPS) && aboveGoal.getBlock() instanceof CropBlock cropBlock) {
+                if(aboveGoal.get(cropBlock.getAgeProperty()) == cropBlock.getMaxAge()) {
+                    final var digTaskBlockInfo = new DigTaskBlockInfo(aboveBlock);
+                    colonist.setGoal(digTaskBlockInfo);
+                } else {
+                    this.goal = null;
+                }
+            } else if (aboveGoal.isAir()) {
+                final var seedsOpt = getSeeds(colonist);
+                if(seedsOpt.isPresent()) {
+                    final var blockItem = (BlockItem) seedsOpt.get();
+                    final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlock, blockItem.getBlock().getDefaultState());
+                    colonist.setGoal(bsTaskBlockInfo);
+                    movementHelper.set(aboveBlock, Colonist.FAST_MOVEMENT_SPEED);
+                } else {
+                    this.goal = null;
+                }
+            } else {
+                this.goal = null;
+            }
+        } else {
+            this.goal = null;
+        }
+    }
+
+    private void doSetWater(Colonist colonist) {
+        final var goalBlockState = colonist.world.getBlockState(goal.pos());
+        if(goalBlockState.isOf(Blocks.DIRT) || goalBlockState.isOf(Blocks.GRASS_BLOCK)) {
+            colonist.setGoal(new DigTaskBlockInfo(goal.pos()));
+        } else if(goalBlockState.isAir()) {
+            colonist.putItemInHand(Items.WATER_BUCKET);
+            colonist.swingHand(Hand.MAIN_HAND);
+            colonist.world.setBlockState(goal.pos(), Blocks.WATER.getDefaultState(), 3);
+            colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal.pos());
+        } else {
+            this.goal = null;
         }
     }
 
