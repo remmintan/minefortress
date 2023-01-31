@@ -17,6 +17,9 @@ public final class AreasServerManager {
     private boolean needSync = false;
     private final List<ServerAutomationAreaInfo> areas = new ArrayList<>();
 
+    private int tickCounter = 0;
+    private int refreshPointer = 0;
+
     public void addArea(AutomationAreaInfo area) {
         areas.add(new ServerAutomationAreaInfo(area));
         sync();
@@ -31,6 +34,14 @@ public final class AreasServerManager {
 
     public void tick(ServerPlayerEntity serverPlayer) {
         if(serverPlayer == null) return;
+
+        if(tickCounter++ % 20 == 0) {
+            if(areas.isEmpty()) return;
+            if(refreshPointer >= areas.size()) refreshPointer = 0;
+            areas.get(refreshPointer++).refresh(serverPlayer.world);
+            sync();
+        }
+
         if(needSync) {
             final var automationAreaInfos = areas.stream().map(AutomationAreaInfo.class::cast).toList();
             FortressServerNetworkHelper.send(serverPlayer, S2CSyncAreasPacket.CHANNEL, new S2CSyncAreasPacket(automationAreaInfos));

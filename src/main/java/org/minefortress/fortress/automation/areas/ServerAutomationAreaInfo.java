@@ -7,9 +7,11 @@ import org.minefortress.fortress.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.automation.iterators.ResetableIterator;
+import org.minefortress.utils.AreasUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class ServerAutomationAreaInfo extends AutomationAreaInfo implements IAutomationArea {
 
@@ -34,6 +36,16 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
         if(currentIterator == null || !currentIterator.hasNext())
             this.currentIterator = new FarmAreaIterator(this.getArea(), world);
         return currentIterator;
+    }
+
+    public void refresh(World world) {
+        final var area = this.getArea();
+        if(area.isEmpty()) return;
+        final var first = area.get(0);
+        final var flatBlocks = area.stream().map(it -> it.withY(first.getY())).collect(Collectors.toSet());
+        final var refreshedArea = AreasUtils.buildAnAreaOnSurfaceWithinBlocks(flatBlocks, world);
+        super.area.clear();
+        super.area.addAll(refreshedArea);
     }
 
     @Override

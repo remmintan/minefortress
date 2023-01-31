@@ -4,12 +4,13 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class AutomationAreaInfo {
 
-    private final List<BlockPos> area;
+    protected final List<BlockPos> area;
     private final ProfessionsSelectionType areaType;
     private final UUID id;
 
@@ -44,7 +45,7 @@ public class AutomationAreaInfo {
     }
 
     public List<BlockPos> getArea() {
-        return area;
+        return Collections.unmodifiableList(area);
     }
 
     public ProfessionsSelectionType getAreaType() {
