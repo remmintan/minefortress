@@ -1,6 +1,5 @@
 package org.minefortress.fortress.automation.areas;
 
-import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.LiteralText;
@@ -14,7 +13,7 @@ import org.minefortress.network.c2s.C2SRemoveAutomationAreaPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.selections.renderer.ISelectionInfoProvider;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
-import org.minefortress.utils.BuildingHelper;
+import org.minefortress.utils.AreasUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -109,17 +108,10 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         if(selectionStart == null || selectionEnd == null) return List.of();
         final var world = MinecraftClient.getInstance().world;
         if(world == null) return List.of();
-        return Streams
-                .stream(BlockPos.iterate(selectionStart, selectionEnd))
-                .map(BlockPos::toImmutable)
-                .filter(pos -> {
-                    var thisBlock = pos.toImmutable();
-                    var upBlock = thisBlock.up();
-                    var downBlock = thisBlock.down();
-                    return BuildingHelper.canRemoveBlock(world, thisBlock) &&
-                            (BuildingHelper.canPlaceBlock(world, upBlock) || BuildingHelper.canPlaceBlock(world, downBlock));
-                })
-                .toList();
+        return AreasUtils.buildAnAreaOnSurfaceWithinBlocks (
+                BlockPos.iterate(selectionStart, selectionEnd.withY(selectionStart.getY())),
+                world
+        );
     }
 
     public ProfessionsSelectionType getSelectionType() {
