@@ -43,9 +43,7 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
         if(area.isEmpty()) return;
         final var first = area.get(0);
         final var flatBlocks = area.stream().map(it -> it.withY(first.getY())).collect(Collectors.toSet());
-        final var refreshedArea = AreasUtils.buildAnAreaOnSurfaceWithinBlocks(flatBlocks, world);
-        super.area.clear();
-        super.area.addAll(refreshedArea);
+        super.area = AreasUtils.buildAnAreaOnSurfaceWithinBlocks(flatBlocks, world);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class TreeSelection extends Selection {
 
     @Override
     public boolean needUpdate(BlockPos pickedBlock, int upDelta) {
-        return start != null && !pickedBlock.equals(end);
+        return start != null && !Objects.equals(pickedBlock, end);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class BuiltTasks implements BuiltModel {
 
     @Override
     public boolean hasLayer(RenderLayer layer) {
-        return this.upload.isDone() && layer == RenderLayer.getLines() && notEmpty;
+        return this.upload!=null && this.upload.isDone() && layer == RenderLayer.getLines() && notEmpty;
     }
 
     @Override

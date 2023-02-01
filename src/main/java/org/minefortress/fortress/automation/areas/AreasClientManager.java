@@ -1,5 +1,6 @@
 package org.minefortress.fortress.automation.areas;
 
+import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.LiteralText;
@@ -13,7 +14,7 @@ import org.minefortress.network.c2s.C2SRemoveAutomationAreaPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.selections.renderer.ISelectionInfoProvider;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
-import org.minefortress.utils.AreasUtils;
+import org.minefortress.utils.BuildingHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,8 +43,8 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
             final var blockPos = bhr.getBlockPos();
             if(selectionStart == null) {
                 this.needsUpdate = true;
-                selectionStart = blockPos.withY(-64);
-                selectionEnd = blockPos.withY(320);
+                selectionStart = blockPos.toImmutable();
+                selectionEnd = blockPos.toImmutable();
             } else {
                 final var selectedBlocks = Collections.unmodifiableList(getSelectedBlocks());
                 final var info = new AutomationAreaInfo(
@@ -65,7 +66,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
             if(blockPos == null) return;
             this.hoveredArea = getSavedAreasHolder().getHovered(blockPos).orElse(null);
 
-            final var possibleEnd = blockPos.withY(320);
+            final var possibleEnd = blockPos.toImmutable();
             if(selectionStart != null) {
                 if(possibleEnd != null && !possibleEnd.equals(selectionEnd)) {
                     selectionEnd = possibleEnd;
@@ -108,10 +109,11 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         if(selectionStart == null || selectionEnd == null) return List.of();
         final var world = MinecraftClient.getInstance().world;
         if(world == null) return List.of();
-        return AreasUtils.buildAnAreaOnSurfaceWithinBlocks (
-                BlockPos.iterate(selectionStart, selectionEnd.withY(selectionStart.getY())),
-                world
-        );
+        return Streams
+                .stream(BlockPos.iterate(selectionStart.withY(-64), selectionEnd.withY(320)))
+                .map(BlockPos::toImmutable)
+                .filter(it -> BuildingHelper.canRemoveBlock(world, it) && BuildingHelper.canPlaceBlock(world, it.up()))
+                .toList();
     }
 
     public ProfessionsSelectionType getSelectionType() {

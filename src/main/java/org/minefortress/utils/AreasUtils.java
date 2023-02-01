@@ -15,7 +15,7 @@ public class AreasUtils {
                 .map(BlockPos::toImmutable)
                 .flatMap(it -> {
                     final var topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, it.getX(), it.getZ());
-                    return Streams.stream(BlockPos.iterate(it.withY(topY-3), it.withY(topY+3)));
+                    return Streams.stream(BlockPos.iterate(it.withY(topY-3), it.withY(topY+3))).map(BlockPos::toImmutable);
                 })
                 .toList();
     }
