@@ -2,6 +2,7 @@ package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import org.minefortress.fortress.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
@@ -61,11 +62,12 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
         super.area = getRefreshedArea(world, area);
     }
 
-    private static List<BlockPos> getRefreshedArea(World world, List<BlockPos> area) {
+    private List<BlockPos> getRefreshedArea(World world, List<BlockPos> area) {
         if (area.isEmpty()) return area;
         final var first = area.get(0);
         final var flatBlocks = area.stream().map(it -> it.withY(first.getY())).collect(Collectors.toSet());
-        return AreasUtils.buildAnAreaOnSurfaceWithinBlocks(flatBlocks, world);
+        return AreasUtils.buildAnAreaOnSurfaceWithinBlocks(flatBlocks, world,
+                super.getAreaType() == ProfessionsSelectionType.QUARRY ? Heightmap.Type.WORLD_SURFACE : Heightmap.Type.MOTION_BLOCKING);
     }
 
     public List<BlockPos> getServerArea() {
