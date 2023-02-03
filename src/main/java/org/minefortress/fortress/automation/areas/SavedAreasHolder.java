@@ -50,7 +50,7 @@ public final class SavedAreasHolder implements ITasksModelBuilderInfoProvider, I
 
     private ClientSelection toClientSelection(AutomationAreaInfo info) {
         return new ClientSelection(
-                info.getArea(),
+                info.getClientArea(),
                 info.getAreaType().getColor(),
                 BuildingHelper::canRemoveBlock
         );

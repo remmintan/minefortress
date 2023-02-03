@@ -14,7 +14,8 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
             entry("crafter", new CrafterDailyTask()),
             entry("blacksmith", new BlacksmithDailyTask()),
             entry("forester", new ForesterDailyTask()),
-            entry("farmer", new FarmerDailyTask())
+            entry("farmer", new FarmerDailyTask()),
+            entry("miner", new MinerDailyTask())
     );
 
     private ProfessionDailyTask currentTask;
@@ -30,7 +31,17 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
         if(taskControl.hasTask()) return false;
         final String professionId = colonist.getProfessionId();
 
-        this.currentTask =  dailyTasks.get(professionId);
+        for(String professionIdPart : dailyTasks.keySet()) {
+            if(professionId.startsWith(professionIdPart)) {
+                final ProfessionDailyTask task = dailyTasks.get(professionIdPart);
+                if(task.canStart(colonist)) {
+                    this.currentTask = task;
+                    return true;
+                }
+            }
+        }
+
+        this.currentTask = dailyTasks.get(professionId);
         return currentTask != null && this.currentTask.canStart(colonist);
     }
 
@@ -47,7 +58,8 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return  !isStarving() && this.dailyTasks.containsKey(colonist.getProfessionId())
+        return  !isStarving()
+                && this.currentTask != null
                 && this.currentTask.shouldContinue(colonist)
                 && !getTaskControl().hasTask();
     }

@@ -162,7 +162,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return colonist.world.isDay() && farmIterator.hasNext();
+        return colonist.world.isDay() && (farmIterator.hasNext() || this.goal != null);
     }
 
     private Optional<IAutomationArea> getFarm(Colonist colonist) {

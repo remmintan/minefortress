@@ -6,6 +6,7 @@ import net.minecraft.world.World;
 import org.minefortress.fortress.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
+import org.minefortress.fortress.automation.iterators.MineAreaIterator;
 import org.minefortress.fortress.automation.iterators.ResetableIterator;
 import org.minefortress.utils.AreasUtils;
 
@@ -15,16 +16,27 @@ import java.util.stream.Collectors;
 
 public final class ServerAutomationAreaInfo extends AutomationAreaInfo implements IAutomationArea {
 
-    private LocalDateTime updated = LocalDateTime.MIN;
+    private LocalDateTime updated;
     private ResetableIterator<AutomationBlockInfo> currentIterator;
     private boolean reset = false;
 
     public ServerAutomationAreaInfo(AutomationAreaInfo info) {
-        super(info.getArea(), info.getAreaType(), info.getId());
+        this(info.getClientArea(), info.getAreaType(), info.getId(), LocalDateTime.MIN);
     }
 
     private ServerAutomationAreaInfo(List<BlockPos> area, ProfessionsSelectionType areaType, UUID id, LocalDateTime updated) {
-        super(area, areaType, id);
+        super(
+            area
+                .stream()
+                .sorted(
+                    Comparator.comparingInt(BlockPos::getY)
+                        .reversed()
+                        .thenComparingInt(BlockPos::getX)
+                        .thenComparingInt(BlockPos::getZ)
+                ).toList(),
+            areaType,
+            id
+        );
         this.updated = updated;
     }
 
@@ -33,17 +45,31 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
         if(this.reset) {
             return Collections.emptyIterator();
         }
-        if(currentIterator == null || !currentIterator.hasNext())
-            this.currentIterator = new FarmAreaIterator(this.getArea(), world);
+        if(currentIterator == null || !currentIterator.hasNext()){
+            this.currentIterator = switch (getAreaType()) {
+                case FARMING -> new FarmAreaIterator(this.getServerArea(), world);
+                case QUARRY -> new MineAreaIterator(this.getServerArea(), world);
+                default -> throw new IllegalStateException("Unexpected value: " + getAreaType());
+            };
+        }
+
         return currentIterator;
     }
 
     public void refresh(World world) {
-        final var area = this.getArea();
-        if(area.isEmpty()) return;
+        final var area = this.getClientArea();
+        super.area = getRefreshedArea(world, area);
+    }
+
+    private static List<BlockPos> getRefreshedArea(World world, List<BlockPos> area) {
+        if (area.isEmpty()) return area;
         final var first = area.get(0);
         final var flatBlocks = area.stream().map(it -> it.withY(first.getY())).collect(Collectors.toSet());
-        super.area = AreasUtils.buildAnAreaOnSurfaceWithinBlocks(flatBlocks, world);
+        return AreasUtils.buildAnAreaOnSurfaceWithinBlocks(flatBlocks, world);
+    }
+
+    public List<BlockPos> getServerArea() {
+        return getClientArea();
     }
 
     @Override
@@ -65,7 +91,7 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
     public NbtCompound toNbt() {
         NbtCompound tag = new NbtCompound();
         tag.putUuid("id", getId());
-        tag.putLongArray("blocks", getArea().stream().map(BlockPos::asLong).toList());
+        tag.putLongArray("blocks", getClientArea().stream().map(BlockPos::asLong).toList());
         tag.putString("areaType", getAreaType().name());
         tag.putString("updated", updated.toString());
         return tag;

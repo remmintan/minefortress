@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class AreasUtils {
@@ -14,9 +15,15 @@ public class AreasUtils {
                 .stream(blocks)
                 .map(BlockPos::toImmutable)
                 .flatMap(it -> {
-                    final var topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, it.getX(), it.getZ());
+                    final var topY = world.getTopY(Heightmap.Type.WORLD_SURFACE, it.getX(), it.getZ());
                     return Streams.stream(BlockPos.iterate(it.withY(topY-3), it.withY(topY+3))).map(BlockPos::toImmutable);
                 })
+                .sorted(
+                    Comparator.comparingInt(BlockPos::getY)
+                        .reversed()
+                        .thenComparing(BlockPos::getX)
+                        .thenComparing(BlockPos::getZ)
+                )
                 .toList();
     }
 

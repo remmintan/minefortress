@@ -43,7 +43,7 @@ public class AutomationAreaInfo {
         return area.contains(pos);
     }
 
-    public List<BlockPos> getArea() {
+    public List<BlockPos> getClientArea() {
         return area;
     }
 
