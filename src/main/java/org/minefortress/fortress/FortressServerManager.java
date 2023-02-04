@@ -106,12 +106,15 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public Optional<BlockPos> getFreeBed(){
-        return buildings
+        final var freeBedsList = buildings
                 .stream()
                 .map(it -> it.getFreeBed(server.getWorld(World.OVERWORLD)))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .findFirst();
+                .toList();
+        if(freeBedsList.isEmpty())
+            return Optional.empty();
+        return Optional.of(freeBedsList.get(new Random().nextInt(freeBedsList.size())));
     }
 
     public void addColonist(LivingEntity colonist) {
