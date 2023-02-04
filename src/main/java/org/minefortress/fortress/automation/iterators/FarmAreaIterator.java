@@ -22,11 +22,17 @@ public class FarmAreaIterator extends AbstractFilteredIterator{
 
     @Override
     protected boolean filter(BlockPos pos) {
-        if(world.getTopY(Heightmap.Type.MOTION_BLOCKING, pos.getX(), pos.getZ())-1 != pos.getY()) {
+        final var topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING, pos.getX(), pos.getZ());
+        final var posSuitableForWater = pos.getY() == topY && isGoalCorrectForWater(pos);
+        if(topY -1 != pos.getY() && !posSuitableForWater) {
             return false;
         }
 
         final var blockState = world.getBlockState(pos);
+        if(posSuitableForWater && blockState.isAir()) {
+            return true;
+        }
+
         final var goalCorrect = blockState.isOf(Blocks.FARMLAND) || blockState.isOf(Blocks.DIRT) || blockState.isOf(Blocks.GRASS_BLOCK) || isGoalCorrectForWater(pos);
         final var aboveGoalState = world.getBlockState(pos.up());
         final var aboveGoalCorrect = aboveGoalState.isIn(BlockTags.CROPS) || aboveGoalState.isAir() || aboveGoalState.isIn(BlockTags.REPLACEABLE_PLANTS);
