@@ -564,8 +564,6 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Math.max(getTotalColonistsCount(), 5) * 2 / 5;
     }
 
-
-
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
         final var requiredBuildings = buildings.stream()

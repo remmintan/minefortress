@@ -24,13 +24,13 @@ public enum ProfessionsSelectionType {
             Items.WHEAT_SEEDS,
             new Vector4f(0.8f, 0.6f, 0.2f, 1.0f),
             (reqString) -> reqString.startsWith("farm")
+    ),
+    PLANTING(
+            "Planting",
+            Items.OAK_SAPLING,
+            new Vector4f(0.2f, 0.8f, 0.2f, 1.0f),
+            (reqString) -> reqString.startsWith("forest")
     );
-//    PLANTING(
-//            "Planting",
-//            Items.OAK_SAPLING,
-//            new Vector4f(0.2f, 0.8f, 0.2f, 1.0f),
-//            (reqString) -> reqString.startsWith("forest")
-//    );
 
     private final String title;
     private final Item icon;
