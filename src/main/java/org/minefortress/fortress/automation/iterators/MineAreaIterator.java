@@ -1,5 +1,6 @@
 package org.minefortress.fortress.automation.iterators;
 
+import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.minefortress.fortress.automation.AutomationActionType;
@@ -19,11 +20,24 @@ public class MineAreaIterator extends AbstractFilteredIterator{
 
     @Override
     protected boolean filter(BlockPos pos) {
-        return BuildingHelper.canRemoveBlock(world, pos);
+        return BuildingHelper.canRemoveBlock(world, pos) && notWater(pos) && noWaterAround(pos);
     }
 
     @Override
     protected AutomationBlockInfo map(BlockPos pos) {
         return new AutomationBlockInfo(pos, AutomationActionType.MINE);
     }
+
+    private boolean notWater(BlockPos pos) {
+        return !world.getFluidState(pos).isIn(FluidTags.WATER);
+    }
+
+    private boolean noWaterAround(BlockPos pos) {
+        return world.getFluidState(pos.up()).isEmpty()
+                && world.getFluidState(pos.north()).isEmpty()
+                && world.getFluidState(pos.south()).isEmpty()
+                && world.getFluidState(pos.east()).isEmpty()
+                && world.getFluidState(pos.west()).isEmpty();
+    }
+
 }

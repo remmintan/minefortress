@@ -1,5 +1,6 @@
 package org.minefortress.entity.ai.professions;
 
+import net.minecraft.tag.FluidTags;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
@@ -50,12 +51,13 @@ public class MinerDailyTask implements ProfessionDailyTask{
 
         if(movementHelper.getWorkGoal() != null && !movementHelper.hasReachedWorkGoal() && movementHelper.isStuck()){
             final var workGoal = movementHelper.getWorkGoal().up();
-            colonist.teleport(workGoal.getX(), workGoal.getY(), workGoal.getZ());
+            colonist.teleport(workGoal.getX() + 0.5, workGoal.getY(), workGoal.getZ() + 0.5);
         }
     }
 
     private void doActionWithTheGoal(Colonist colonist) {
-        if(colonist.world.getBlockState(goal.pos()).isAir()) {
+        final var blockState = colonist.world.getBlockState(goal.pos());
+        if(blockState.isAir() || blockState.getFluidState().isIn(FluidTags.WATER)) {
             colonist.getMovementHelper().reset();
             this.goal = null;
         } else {
