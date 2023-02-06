@@ -325,6 +325,12 @@ public final class FortressClientManager extends AbstractFortressManager {
     // getter and setter for state
     public void setState(FortressState state) {
         this.state = state;
+        if(state == FortressState.AREAS_SELECTION) {
+            ModUtils.getAreasClientManager().getSavedAreasHolder().setNeedRebuild(true);
+        }
+        if(state == FortressState.BUILD) {
+            ModUtils.getClientTasksHolder().ifPresent(it -> it.setNeedRebuild(true));
+        }
     }
 
     public FortressState getState() {
