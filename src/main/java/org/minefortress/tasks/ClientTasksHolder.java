@@ -103,7 +103,7 @@ public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasks
 
     @Override
     public boolean shouldRender() {
-        return removeTasks.size() > 0 || buildTasks.size() > 0;
+        return !selectionHidden && removeTasks.size() > 0 || buildTasks.size() > 0;
     }
 
     public void toggleSelectionVisibility() {
