@@ -96,30 +96,31 @@ public class ForesterDailyTask implements ProfessionDailyTask{
                 .orElseThrow(() -> new IllegalStateException("No fortress center found"));
 
 
-        final var randPointAroundCenter = BlockPos.iterateRandomly(world.random, 1, fortressCenter, 20)
+        final var horizontalRange = 10;
+        final var randPointAroundCenter = BlockPos.iterateRandomly(world.random, 1, fortressCenter, horizontalRange)
                 .iterator()
                 .next();
 
         this.goal = BlockPos
                 .findClosest(
                         randPointAroundCenter,
-                        21,
-                        21,
+                        horizontalRange,
+                        horizontalRange,
                         pos -> world.getBlockState(pos).isOf(Blocks.GRASS) || world.getBlockState(pos).isOf(Blocks.TALL_GRASS)
                 ).or(
                         () -> BlockPos
                                 .findClosest(
                                         randPointAroundCenter,
-                                        21,
-                                        21,
+                                        horizontalRange,
+                                        horizontalRange,
                                         pos -> world.getBlockState(pos).isOf(Blocks.GRASS_BLOCK)
                                 )
                 ).or(
                         () -> BlockPos
                                 .findClosest(
                                         randPointAroundCenter,
-                                        21,
-                                        21,
+                                        horizontalRange,
+                                        horizontalRange,
                                         pos -> BuildingHelper.canStayOnBlock(world, pos)
                                 )
                                 .map(BlockPos::up)
