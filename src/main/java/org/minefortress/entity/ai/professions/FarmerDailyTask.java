@@ -142,7 +142,10 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         final var aboveBlockState = colonist.world.getBlockState(abovePos);
 
         if(goal.info() == AutomationActionType.FARM_CROPS) {
-            return goalBlockState.isOf(Blocks.FARMLAND) && aboveBlockState.isIn(BlockTags.CROPS) && aboveBlockState.get(CropBlock.AGE) < CropBlock.MAX_AGE;
+            return goalBlockState.isOf(Blocks.FARMLAND)
+                    && aboveBlockState.isIn(BlockTags.CROPS)
+                    && aboveBlockState.getBlock() instanceof CropBlock crops
+                    && aboveBlockState.get(crops.getAgeProperty()) < crops.getMaxAge();
         }
 
         if(goal.info() == AutomationActionType.FARM_WATER) {
