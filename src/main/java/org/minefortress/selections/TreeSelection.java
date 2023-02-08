@@ -36,7 +36,7 @@ public class TreeSelection extends Selection {
 
     @Override
     public boolean needUpdate(BlockPos pickedBlock, int upDelta) {
-        return start != null && !pickedBlock.equals(end);
+        return start != null && !Objects.equals(pickedBlock, end);
     }
 
     @Override
@@ -102,6 +102,7 @@ public class TreeSelection extends Selection {
 
     private void updateTreeRoots(World world) {
         treeRoots.clear();
+        if(start == null || end == null) return;
         int minY = Math.min(start.getY(), end.getY());
 
         BlockPos flatStart = new BlockPos(start.getX(), minY, start.getZ());

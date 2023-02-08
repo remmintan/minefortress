@@ -131,20 +131,20 @@ public class ProfessionWidget extends DrawableHelper {
         this.y = MathHelper.floor(row * PROFESSION_WIDGET_HEIGHT);
     }
 
-    boolean shouldRender(int originX, int originY, int mouseX, int mouseY) {
+    boolean shouldNotRender(int originX, int originY, int mouseX, int mouseY) {
         final Profession parent = profession.getParent();
-        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent, false)){
-            return false;
+        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent, ProfessionManager.CountProfessionals.DONT_COUNT, false)){
+            return true;
         }
 
         int i = originX + this.x;
         int j = i + 26;
         int k = originY + this.y;
         int l = k + 26;
-        return mouseX >= i && mouseX <= j && mouseY >= k && mouseY <= l;
+        return mouseX < i || mouseX > j || mouseY < k || mouseY > l;
     }
 
-    public void drawTooltip(MatrixStack matrices, int originX, int originY, float alpha, int x, int y, int screenWidth) {
+    public void drawTooltip(MatrixStack matrices, int originX, int originY, int x, int screenWidth) {
         final boolean unlocked = isUnlocked(false);
         final boolean unlockedWithCount = isUnlocked(true);
 
@@ -173,9 +173,9 @@ public class ProfessionWidget extends DrawableHelper {
         boolean bl2 = 113 - originY - this.y - 26 <= 6 + description.size() * client.textRenderer.fontHeight;
         if (!description.isEmpty()) {
             if (bl2) {
-                this.method_2324(matrices, m, l + 26 - n, this.width, n, 10, 200, 26, 0, 52);
+                this.method_2324(matrices, m, l + 26 - n, this.width, n);
             } else {
-                this.method_2324(matrices, m, l, this.width, n, 10, 200, 26, 0, 52);
+                this.method_2324(matrices, m, l, this.width, n);
             }
         }
         this.drawTexture(matrices, m, l, 0, status.getSpriteIndex() * 26, j, 26);
@@ -211,16 +211,16 @@ public class ProfessionWidget extends DrawableHelper {
         }
     }
 
-    protected void method_2324(MatrixStack matrices, int x, int y, int i, int j, int k, int l, int m, int n, int o) {
-        this.drawTexture(matrices, x, y, n, o, k, k);
-        this.method_2321(matrices, x + k, y, i - k - k, k, n + k, o, l - k - k, m);
-        this.drawTexture(matrices, x + i - k, y, n + l - k, o, k, k);
-        this.drawTexture(matrices, x, y + j - k, n, o + m - k, k, k);
-        this.method_2321(matrices, x + k, y + j - k, i - k - k, k, n + k, o + m - k, l - k - k, m);
-        this.drawTexture(matrices, x + i - k, y + j - k, n + l - k, o + m - k, k, k);
-        this.method_2321(matrices, x, y + k, k, j - k - k, n, o + k, l, m - k - k);
-        this.method_2321(matrices, x + k, y + k, i - k - k, j - k - k, n + k, o + k, l - k - k, m - k - k);
-        this.method_2321(matrices, x + i - k, y + k, k, j - k - k, n + l - k, o + k, l, m - k - k);
+    protected void method_2324(MatrixStack matrices, int x, int y, int i, int j) {
+        this.drawTexture(matrices, x, y, 0, 52, 10, 10);
+        this.method_2321(matrices, x + 10, y, i - 10 - 10, 10, 10, 52, 200 - 10 - 10, 26);
+        this.drawTexture(matrices, x + i - 10, y, 200 - 10, 52, 10, 10);
+        this.drawTexture(matrices, x, y + j - 10, 0, 52 + 26 - 10, 10, 10);
+        this.method_2321(matrices, x + 10, y + j - 10, i - 10 - 10, 10, 10, 52 + 26 - 10, 200 - 10 - 10, 26);
+        this.drawTexture(matrices, x + i - 10, y + j - 10, 200 - 10, 52 + 26 - 10, 10, 10);
+        this.method_2321(matrices, x, y + 10, 10, j - 10 - 10, 0, 52 + 10, 200, 26 - 10 - 10);
+        this.method_2321(matrices, x + 10, y + 10, i - 10 - 10, j - 10 - 10, 10, 52 + 10, 200 - 10 - 10, 26 - 10 - 10);
+        this.method_2321(matrices, x + i - 10, y + 10, 10, j - 10 - 10, 200 - 10, 52 + 10, 200, 26 - 10 - 10);
     }
 
     protected void method_2321(MatrixStack matrices, int x, int y, int i, int j, int k, int l, int m, int n) {
@@ -244,13 +244,21 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     public boolean isUnlocked(boolean countProfessionals) {
-        return this.professionManager.isRequirementsFulfilled(this.profession, countProfessionals);
+        var shouldCountProfs = countProfessionals ? ProfessionManager.CountProfessionals.INCREASE : ProfessionManager.CountProfessionals.DONT_COUNT;
+        if(profession.isHireMenu()) {
+            shouldCountProfs = ProfessionManager.CountProfessionals.DONT_COUNT;
+        }
+        return this.professionManager.isRequirementsFulfilled(
+                this.profession,
+                shouldCountProfs,
+                true
+        );
     }
 
     public void onClick(int button) {
         if(button == 0) {
             professionManager.findIdFromProfession(this.profession)
-                            .ifPresent(professionManager::increaseAmount);
+                            .ifPresent(it -> professionManager.increaseAmount(it, false));
         } else if(button == 1) {
             professionManager.findIdFromProfession(this.profession)
                             .ifPresent(professionManager::decreaseAmount);

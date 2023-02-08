@@ -1,9 +1,12 @@
 package org.minefortress.fight;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.entity.EntityType;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.interfaces.ITargetedPawn;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.utils.ModUtils;
@@ -41,7 +44,13 @@ public class ClientFightSelectionManager {
         return !this.selectedPawns.isEmpty();
     }
 
-    public void updateSelection(double x, double y, Vec3d endBlock) {
+    public void updateSelection(Mouse mouse, BlockHitResult target) {
+        Vec3d pos = target.getPos();
+        this.updateSelection(mouse.getX(), mouse.getY(), pos);
+    }
+
+    public void updateSelection(double x, double y, @Nullable Vec3d endBlock) {
+        if(endBlock == null) return;
         if(!isSelectionStarted()) return;
         this.selectionCurPos = new MousePos(x, y);
         this.selectionCurBlock = endBlock;

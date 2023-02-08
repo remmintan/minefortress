@@ -1,6 +1,5 @@
 package org.minefortress.entity.ai.controls;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
@@ -34,7 +33,7 @@ abstract class PositionedActionControl  {
     }
 
     protected boolean canReachTheGoal(Colonist colonsit) {
-        return goal.isWithinDistance(colonsit.getBlockPos(), Colonist.WORK_REACH_DISTANCE) || colonsit.isAllowToPlaceBlockFromFarAway();
+        return goal.isWithinDistance(colonsit.getBlockPos(), Colonist.WORK_REACH_DISTANCE+1) || colonsit.isAllowToPlaceBlockFromFarAway();
     }
 
 }

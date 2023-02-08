@@ -15,8 +15,19 @@
     "unlockMessage": "Build 'Wooden Miner's house' to unlock",
     "unlockMoreMessage": "Build more 'Wooden Miner's houses' to unlock more",
     "requirements": {
-      "building": "miner_wooden"
-    }
+      "building": "miner_wooden",
+      "items": [
+        {
+          "id": "minecraft:stone_pickaxe",
+          "count": 1
+        },
+        {
+          "id": "minecraft:stone_shovel",
+          "count": 1
+        }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "miner2",
@@ -26,8 +37,19 @@
     "unlockMessage": "Build 'Stone Miner's house' to unlock",
     "unlockMoreMessage": "Build more 'Stone Miner's houses' to unlock more",
     "requirements": {
-      "building": "miner_stone"
-    }
+      "building": "miner_stone",
+      "items": [
+        {
+          "id": "minecraft:iron_pickaxe",
+          "count": 1
+        },
+        {
+          "id": "minecraft:iron_shovel",
+          "count": 1
+        }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "miner3",
@@ -37,8 +59,19 @@
     "unlockMessage": "Build 'Miners' guild house' to unlock",
     "unlockMoreMessage": "Build more 'Miners' guild houses' to unlock more",
     "requirements": {
-      "building": "miners_guild"
-    }
+      "building": "miners_guild",
+      "items": [
+        {
+          "id": "minecraft:diamond_pickaxe",
+          "count": 1
+        },
+        {
+          "id": "minecraft:diamond_shovel",
+          "count": 1
+        }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "lumberjack1",
@@ -48,8 +81,15 @@
     "unlockMessage": "Build 'Wooden Lumberjack's house' to unlock",
     "unlockMoreMessage": "Build more 'Wooden Lumberjack's houses' to unlock more",
     "requirements": {
-      "building": "lumberjack_wooden"
-    }
+      "building": "lumberjack_wooden",
+      "items": [
+          {
+          "id": "minecraft:stone_axe",
+          "count": 1
+          }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "lumberjack2",
@@ -59,8 +99,15 @@
     "unlockMessage": "Build 'Stone Lumberjack's house' to unlock",
     "unlockMoreMessage": "Build more 'Stone Lumberjack's houses' to unlock more",
     "requirements": {
-      "building": "lumberjack_stone"
-    }
+      "building": "lumberjack_stone",
+      "items": [
+          {
+          "id": "minecraft:iron_axe",
+          "count": 1
+          }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "lumberjack3",
@@ -70,8 +117,15 @@
     "unlockMessage": "Build 'Lumberjack's guild house' to unlock",
     "unlockMoreMessage": "Build more 'Lumberjack's guild houses' to unlock more",
     "requirements": {
-      "building": "lumberjack_guild"
-    }
+      "building": "lumberjack_guild",
+      "items": [
+          {
+          "id": "minecraft:diamond_axe",
+          "count": 1
+          }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "forester",
@@ -271,7 +325,7 @@
         }
       ]
     },
-    "cantRemove": true
+    "hireMenu": true
   },
   {
     "key": "warrior2",
@@ -305,7 +359,7 @@
         }
       ]
     },
-    "cantRemove": true
+    "hireMenu": true
   },
   {
     "key": "archer1",
@@ -327,7 +381,7 @@
         }
       ]
     },
-    "cantRemove": true
+    "hireMenu": true
   },
   {
     "key": "archer2",
@@ -339,7 +393,7 @@
     "requirements": {
       "building": "_"
     },
-    "cantRemove": true
+    "hireMenu": true
   },
   {
     "key": "knight1",
@@ -350,7 +404,8 @@
     "unlockMoreMessage": "",
     "requirements": {
       "building": "_"
-    }
+    },
+    "hireMenu": true
   },
   {
     "key": "knight2",
@@ -361,6 +416,7 @@
     "unlockMoreMessage": "",
     "requirements": {
       "building": "_"
-    }
+    },
+    "hireMenu": true
   }
 ]

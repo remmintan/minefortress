@@ -10,11 +10,12 @@ import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
+import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.ProfessionManager;
+import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.tasks.ClientTasksHolder;
 
@@ -73,7 +74,7 @@ public class ModUtils {
         return getFortressClient().getFortressClientManager();
     }
 
-    public static ProfessionManager getProfessionManager() {
+    public static ClientProfessionManager getProfessionManager() {
         return getFortressClientManager().getProfessionManager();
     }
 
@@ -98,6 +99,10 @@ public class ModUtils {
     @NotNull
     public static ClientPlayerEntity getClientPlayer() {
         return Objects.requireNonNull(MinecraftClient.getInstance().player);
+    }
+
+    public static AreasClientManager getAreasClientManager() {
+        return getFortressClient().getAreasClientManager();
     }
 
 }

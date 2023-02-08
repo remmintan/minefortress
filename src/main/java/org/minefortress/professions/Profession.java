@@ -30,7 +30,7 @@ public class Profession {
     private final String buildingRequirement;
     private final Block blockRequirement;
     private final List<ItemInfo> itemsRequirement;
-    private final boolean cantRemove;
+    private final boolean hireMenu;
     private final boolean blueprint;
 
     private Profession parent;
@@ -39,7 +39,7 @@ public class Profession {
     public Profession(ProfessionFullInfo fullInfo) {
         this.title = fullInfo.title();
         this.icon = new ItemStack(fullInfo.icon());
-        this.cantRemove = fullInfo.cantRemove();
+        this.hireMenu = fullInfo.hireMenu();
 
         final var requirements = fullInfo.requirements();
 
@@ -78,8 +78,8 @@ public class Profession {
         }
     }
 
-    public boolean isCantRemove() {
-        return cantRemove;
+    public boolean isHireMenu() {
+        return hireMenu;
     }
 
     public String getTitle() {

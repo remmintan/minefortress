@@ -36,9 +36,11 @@ public class FortressHud {
         hudLayers.add(new ModeHudLayer(client));
         hudLayers.add(new ColonistsHudLayer(client));
         hudLayers.add(new SelectedColonistHudLayer(client));
+        hudLayers.add(new HoveredEntityHudLayer(client));
         hudLayers.add(new ToolsHudLayer(client));
         hudLayers.add(new TimeHudLayer(client));
         hudLayers.add(new FightHudLayer(client));
+        hudLayers.add(new AreasHudLayer(client));
     }
 
     public void render(MatrixStack p, float delta) {
@@ -107,9 +109,11 @@ public class FortressHud {
         if(ModUtils.getBlueprintManager().hasSelectedBlueprint()) return HudState.BLUEPRINT;
         if(BlueprintsWorld.isBlueprintsWorld(client.world)) return HudState.BLUEPRINT_EDITING;
 
-        if(ModUtils.getFortressClientManager().isInCombat()) return HudState.COMBAT;
-
-        return HudState.BUILD;
+        return switch (ModUtils.getFortressClientManager().getState()) {
+            case BUILD -> HudState.BUILD;
+            case COMBAT -> HudState.COMBAT;
+            case AREAS_SELECTION -> HudState.AREAS_SELECTION;
+        };
     }
 
     private boolean isHudHidden() {

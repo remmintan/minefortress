@@ -14,7 +14,7 @@ import java.util.stream.StreamSupport;
 
 public class TaskManager {
 
-    private final static Set<String> BUILDER_PROFESSIONS = Set.of("miner1", "miner2", "miner3", "lumberjack1", "lumberjack2", "lumberjack3", "colonist");
+    private final static Set<String> BUILDER_PROFESSIONS = Set.of("miner1", "miner2", "miner3", "colonist");
 
     private final Deque<Task> tasks = new ArrayDeque<>();
     private final Set<UUID> cancelledTasks = new HashSet<>();

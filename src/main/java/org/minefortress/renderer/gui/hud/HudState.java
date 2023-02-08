@@ -8,5 +8,6 @@ public enum HudState {
     BLUEPRINT,
     COMBAT,
     BLUEPRINT_EDITING,
+    AREAS_SELECTION,
 
 }

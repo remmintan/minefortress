@@ -88,7 +88,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
 
     private boolean hasReachedTheBed() {
         if(bedPos == null) return false;
-        return bedPos.isWithinDistance(colonist.getPos(), 2);
+        return bedPos.isWithinDistance(colonist.getPos(), Colonist.WORK_REACH_DISTANCE);
     }
 
 

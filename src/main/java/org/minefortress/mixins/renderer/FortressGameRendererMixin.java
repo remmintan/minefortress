@@ -7,11 +7,10 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressGameRenderer;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
@@ -34,7 +33,9 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
     public abstract Camera getCamera();
 
     @Shadow
-    private double getFov(Camera camera, float f, boolean b) {return 0.0;}
+    private double getFov(Camera camera, float f, boolean b) {
+        return 0.0;
+    }
 
     @Shadow @Final private MinecraftClient client;
 
@@ -51,59 +52,53 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
     public void tick(CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         final SelectionManager selectionManager = fortressClient.getSelectionManager();
-        if(fortressClient.isFortressGamemode())  {
-            if(this.client.crosshairTarget != null && this.client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
-                BlockHitResult blockHitResult = (BlockHitResult) this.client.crosshairTarget;
-
-                final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
-                final var fightSelectionManager = fortressClientManager
-                        .getFightManager()
-                        .getSelectionManager();
-                if(fortressClientManager.isInCombat()) {
-                    resetSelection(selectionManager);
-                    if(fightSelectionManager.isSelectionStarted()) {
-                        final var mouse = client.mouse;
-                        final var crosshairTarget = client.crosshairTarget;
-                        Vec3d pos;
-                        if(crosshairTarget instanceof BlockHitResult) {
-                            pos = crosshairTarget.getPos();
-                        } else if(crosshairTarget instanceof EntityHitResult) {
-                            pos = ((EntityHitResult) crosshairTarget).getEntity().getPos();
-                        } else {
-                            pos = null;
-                        }
-                        if(pos != null) {
-                            fightSelectionManager.updateSelection(mouse.getX(), mouse.getY(), pos);
-                        }
-                    }
-                    return;
-                } else {
-                    fightSelectionManager.resetSelection();
-                }
-
+        final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
+        final var fightSelectionManager = fortressClientManager
+                .getFightManager()
+                .getSelectionManager();
+        final var areasClientManager = ModUtils.getAreasClientManager();
+        if (fortressClient.isFortressGamemode()) {
+            if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
                 if(fortressClientManager.isCenterNotSet()) {
-                    resetSelection(selectionManager);
+                    resetAllSelectionManagers();
                     fortressClientManager.updateRenderer(client.worldRenderer);
                     return;
                 }
 
                 final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
                 if(clientBlueprintManager.hasSelectedBlueprint()) {
-                    resetSelection(selectionManager);
+                    resetAllSelectionManagers();
                     return;
                 }
 
-                selectionManager.tickSelectionUpdate(blockHitResult.getBlockPos(), blockHitResult.getSide());
+                final var clientState = fortressClientManager.getState();
+                if(clientState == FortressState.AREAS_SELECTION) {
+                    areasClientManager.updateSelection(blockHitResult);
+                } else {
+                    areasClientManager.resetSelection();
+                }
+
+                if(clientState == FortressState.COMBAT) {
+                    fightSelectionManager.updateSelection(client.mouse, blockHitResult);
+                } else {
+                    fightSelectionManager.resetSelection();
+                }
+
+                if(clientState == FortressState.BUILD) {
+                    selectionManager.tickSelectionUpdate(blockHitResult.getBlockPos(), blockHitResult.getSide());
+                } else {
+                    selectionManager.resetSelection();
+                }
             }
         } else {
-            resetSelection(selectionManager);
+            resetAllSelectionManagers();
         }
     }
 
-    private void resetSelection(SelectionManager selectionManager) {
-        if (selectionManager.isSelecting()) {
-            selectionManager.resetSelection();
-        }
+    private static void resetAllSelectionManagers() {
+        ModUtils.getSelectionManager().resetSelection();
+        ModUtils.getFortressClientManager().getFightManager().getSelectionManager().resetSelection();
+        ModUtils.getAreasClientManager().resetSelection();
     }
 
     @Inject(method = "render", at = @At("TAIL"))

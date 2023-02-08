@@ -176,6 +176,10 @@ public class ClientBlueprintManager {
         return selectedStructure;
     }
 
+    public BlueprintMetadataManager getBlueprintMetadataManager() {
+        return blueprintMetadataManager;
+    }
+
     public void rotateSelectedStructureClockwise() {
         if(selectedStructure == null) throw new IllegalStateException("No blueprint selected");
         this.selectedStructure.rotateRight();

@@ -15,7 +15,6 @@ public class FortressHungerManager extends HungerManager implements IFortressHun
             final var creative = fae.getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
             if(creative) {
                 this.foodLevel = 20;
-                return;
             }
         }
         boolean naturalRegen = livingEntity.world.getGameRules().getBoolean(GameRules.NATURAL_REGENERATION);

@@ -5,9 +5,11 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
+import org.minefortress.utils.ModUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ClientResourceManagerImpl implements ClientResourceManager {
 
@@ -77,6 +79,16 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
         final var group = groupManager.getGroup(item);
         final var manager = groupManager.getStacksManager(group);
         manager.getStack(item).setCount(amount);
+    }
+
+    @Override
+    public int getItemAmount(Item item) {
+        if(ModUtils.getFortressClientManager().isCreative()) {
+            return 999;
+        }
+        final var group = groupManager.getGroup(item);
+        final var manager = groupManager.getStacksManager(group);
+        return manager.getStack(item).getCount();
     }
 
     @Override

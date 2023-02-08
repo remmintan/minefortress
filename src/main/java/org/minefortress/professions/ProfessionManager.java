@@ -44,46 +44,65 @@ public abstract class ProfessionManager {
         return this.root;
     }
 
-    public boolean isRequirementsFulfilled(Profession profession) {
-        return isRequirementsFulfilled(profession, false);
-    }
-
-    public boolean isRequirementsFulfilled(Profession profession, boolean countProfessionals) {
-        if(fortressManagerSupplier.get().isCreative())
-            return true;
-
+    public final boolean isRequirementsFulfilled(Profession profession, CountProfessionals countProfessionals, boolean countItems) {
         final String buildingRequirement = profession.getBuildingRequirement();
         if(Objects.isNull(buildingRequirement) || Strings.isBlank(buildingRequirement)) {
             return true;
         }
 
+        final var disabled = "_".equals(buildingRequirement) && profession.getBlockRequirement().block() == null;
+        if(fortressManagerSupplier.get().isCreative() && !disabled) {
+            return true;
+        }
+
+
         final Profession parent = profession.getParent();
         if(Objects.nonNull(parent)) {
-            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, false);
+            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, countProfessionals, false);
             if(!parentUnlocked) {
                 return false;
             }
         }
 
         final AbstractFortressManager fortressManager = fortressManagerSupplier.get();
-        final var minRequirementCount = countProfessionals ? profession.getAmount() : 0;
+        var minRequirementCount = 0;
+        if(countProfessionals == CountProfessionals.INCREASE) {
+            minRequirementCount = profession.getAmount();
+        }
+        if(countProfessionals == CountProfessionals.KEEP) {
+            minRequirementCount = profession.getAmount() - 1;
+        }
         boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement, minRequirementCount);
         final Profession.BlockRequirement blockRequirement = profession.getBlockRequirement();
         if(Objects.nonNull(blockRequirement)) {
             satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement.block(), blockRequirement.blueprint(), minRequirementCount);
         }
 
-        final var itemsRequirement = profession.getItemsRequirement();
-        if(countProfessionals && Objects.nonNull(itemsRequirement)) {
-            final var hasItems = fortressManager.getResourceManager().hasItems(itemsRequirement);
-            satisfied = satisfied && hasItems;
+        if(countItems) {
+            final var itemsRequirement = profession.getItemsRequirement();
+            if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement)) {
+                final var hasItems = fortressManager.getResourceManager().hasItems(itemsRequirement);
+                satisfied = satisfied && hasItems;
+            }
         }
 
         return satisfied;
     }
 
-    public Profession getProfession(String name) {
-        return getProfessions().get(name);
+    public Profession getProfession(String id) {
+        return getProfessions().get(id);
+    }
+
+    public Optional<Profession> getByRequirement(String requirement) {
+        return getProfessions().values()
+                .stream()
+                .filter(
+                    profession -> Optional
+                        .ofNullable(profession.getBuildingRequirement())
+                        .orElse("!!!!some-invalid-requirement!!!!")
+                        .equals(requirement)
+                )
+                .findFirst();
     }
 
     protected Map<String, Profession> getProfessions(){
@@ -138,15 +157,23 @@ public abstract class ProfessionManager {
     }
 
     public int getFreeColonists() {
-        final int totalColonists = fortressManagerSupplier.get().getTotalColonistsCount();
+        final var abstractFortressManager = fortressManagerSupplier.get();
+        final int totalColonists = abstractFortressManager.getTotalColonistsCount();
+        final int reservedColonists = abstractFortressManager.getReservedPawnsCount();
         final int totalWorkers = getProfessions().values().stream().mapToInt(Profession::getAmount).sum();
-        return totalColonists - totalWorkers;
+        return totalColonists - totalWorkers - reservedColonists;
     }
 
     public Optional<String> findIdFromProfession(Profession profession) {
         return getProfessions().entrySet().stream().filter(entry -> entry.getValue() == profession).map(Map.Entry::getKey).findFirst();
     }
 
-    public abstract void increaseAmount(String professionId);
+    public abstract void increaseAmount(String professionId, boolean alreadyCharged);
     public abstract void decreaseAmount(String professionId);
+
+    public enum CountProfessionals {
+        KEEP,
+        INCREASE,
+        DONT_COUNT
+    }
 }

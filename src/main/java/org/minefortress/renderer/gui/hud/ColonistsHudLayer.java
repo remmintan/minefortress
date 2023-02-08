@@ -85,7 +85,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
     }
 
     private String getColonistsCountText() {
-        return "x" + ModUtils.getFortressClientManager().getColonistsCount();
+        return "x" + ModUtils.getFortressClientManager().getTotalColonistsCount();
     }
 
     private boolean hasProfessionInAVillage(String crafter) {

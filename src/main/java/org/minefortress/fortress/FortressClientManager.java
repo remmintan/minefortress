@@ -7,8 +7,11 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
+import org.minefortress.blueprints.manager.BlueprintMetadata;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
+import org.minefortress.fortress.automation.EssentialBuildingInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -38,6 +41,9 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private BlockPos fortressCenter = null;
     private int colonistsCount = 0;
+    private int reservedColonistCount = 0;
+
+    private EssentialBuildingInfo hoveredBuilding = null;
 
     private volatile FortressToast setCenterToast;
 
@@ -53,16 +59,16 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private FortressGamemode gamemode;
 
-    private boolean isInCombat;
-
     private int maxColonistsCount;
+
+    private FortressState state = FortressState.BUILD;
 
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
     }
 
     public void select(BasePawnEntity colonist) {
-        if(isInCombat) {
+        if(state == FortressState.COMBAT) {
             final var mouse = MinecraftClient.getInstance().mouse;
             final var selectionManager = fightManager.getSelectionManager();
             selectionManager.startSelection(mouse.getX(), mouse.getY(), colonist.getPos());
@@ -89,7 +95,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public boolean isSelectingColonist() {
-        return selectedPawn != null && !isInCombat;
+        return selectedPawn != null && state == FortressState.BUILD;
     }
 
     public BasePawnEntity getSelectedPawn() {
@@ -106,16 +112,18 @@ public final class FortressClientManager extends AbstractFortressManager {
         return this.selectedPawn.getPos().subtract(selectedColonistDelta);
     }
 
-    public int getColonistsCount() {
-        return colonistsCount;
+    @Override
+    public int getReservedPawnsCount() {
+        return reservedColonistCount;
     }
 
-    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, boolean connectedToTheServer, int maxColonistsCount) {
+    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, boolean connectedToTheServer, int maxColonistsCount, int reservedColonistCount) {
         this.colonistsCount = colonistsCount;
         this.fortressCenter = fortressCenter;
         this.gamemode = gamemode;
         this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
+        this.reservedColonistCount = reservedColonistCount;
         this.initialized = true;
     }
 
@@ -215,14 +223,30 @@ public final class FortressClientManager extends AbstractFortressManager {
             final BlockPos start = building.getStart();
             final BlockPos end = building.getEnd();
             if(BlockUtils.isPosBetween(pos, start, end)){
+                hoveredBuilding = building;
                 return StreamSupport
                         .stream(BlockPos.iterate(start, end).spliterator(), false)
                         .map(BlockPos::toImmutable)
                         .collect(Collectors.toList());
             }
         }
-
+        hoveredBuilding = null;
         return Collections.emptyList();
+    }
+
+    public boolean isBuildingSelected() {
+        return hoveredBuilding != null;
+    }
+
+    public EssentialBuildingInfo getHoveredBuilding() {
+        return hoveredBuilding;
+    }
+    public Optional<String> getHoveredBuildingName() {
+        return Optional.ofNullable(hoveredBuilding)
+                .map(it -> ModUtils.getBlueprintManager())
+                .map(ClientBlueprintManager::getBlueprintMetadataManager)
+                .flatMap(it -> it.getByRequirementId(hoveredBuilding.getRequirementId()))
+                .map(BlueprintMetadata::getName);
     }
 
     public ClientProfessionManager getProfessionManager() {
@@ -231,15 +255,22 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
+        final var reuiredBuilding = buildings.stream()
+                .filter(b -> b.getRequirementId().equals(requirementId));
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
-            return buildings.stream()
-                    .filter(b -> b.getRequirementId().equals(requirementId))
+            return reuiredBuilding
                     .mapToLong(it -> it.getBedsCount() * 10)
                     .sum() > minCount;
         }
         if(requirementId.equals("shooting_gallery"))
-            minCount = 0;
-        return buildings.stream().filter(b -> b.getRequirementId().equals(requirementId)).count() > minCount;
+            return reuiredBuilding.count() * 10 > minCount;
+        return reuiredBuilding.count() > minCount;
+    }
+
+    public int countBuildings(String requirementId) {
+        return (int) buildings.stream()
+                .filter(b -> b.getRequirementId().equals(requirementId))
+                .count();
     }
 
     @Override
@@ -279,14 +310,6 @@ public final class FortressClientManager extends AbstractFortressManager {
         return resourceManager;
     }
 
-    public boolean isInCombat() {
-        return isInCombat;
-    }
-
-    public void setInCombat(boolean inCombat) {
-        isInCombat = inCombat;
-    }
-
     public ClientFightManager getFightManager() {
         return fightManager;
     }
@@ -298,4 +321,20 @@ public final class FortressClientManager extends AbstractFortressManager {
     public void reset() {
         this.initialized = false;
     }
+
+    // getter and setter for state
+    public void setState(FortressState state) {
+        this.state = state;
+        if(state == FortressState.AREAS_SELECTION) {
+            ModUtils.getAreasClientManager().getSavedAreasHolder().setNeedRebuild(true);
+        }
+        if(state == FortressState.BUILD) {
+            ModUtils.getClientTasksHolder().ifPresent(it -> it.setNeedRebuild(true));
+        }
+    }
+
+    public FortressState getState() {
+        return this.state;
+    }
+
 }

@@ -1,6 +1,5 @@
 package org.minefortress.mixins;
 
-import com.google.common.base.Supplier;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.RunArgs;
@@ -21,22 +20,28 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
+import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.gui.ChooseModeScreen;
-import org.minefortress.renderer.gui.hud.FortressHud;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
+import org.minefortress.renderer.gui.hud.FortressHud;
 import org.minefortress.selections.SelectionManager;
+import org.minefortress.selections.renderer.ISelectionInfoProvider;
+import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 import org.minefortress.selections.renderer.campfire.CampfireRenderer;
 import org.minefortress.selections.renderer.selection.SelectionRenderer;
+import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
+import org.minefortress.selections.renderer.tasks.ITasksRenderInfoProvider;
 import org.minefortress.selections.renderer.tasks.TasksRenderer;
-import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -45,6 +50,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static java.util.Map.entry;
 
@@ -58,13 +64,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private FortressClientManager fortressClientManager;
 
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
-    private Map<RenderLayer, BufferBuilder> selectionBufferBuilderStorage;
 
     private ClientBlueprintManager clientBlueprintManager;
     private BlueprintRenderer blueprintRenderer;
     private CampfireRenderer campfireRenderer;
     private SelectionRenderer selectionRenderer;
     private TasksRenderer tasksRenderer;
+    private AreasClientManager areasClientManager;
 
     @Shadow
     @Final
@@ -106,23 +112,54 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.fortressCameraManager = new FortressCameraManager(client);
         this.fortressHud = new FortressHud(client);
         this.fortressClientManager = new FortressClientManager();
+        this.areasClientManager = new AreasClientManager();
 
         clientBlueprintManager = new ClientBlueprintManager(client);
         blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), client, blockBufferBuilderStorage);
         campfireRenderer = new CampfireRenderer(client, blockBufferBuilderStorage);
-        this.selectionBufferBuilderStorage = Map.ofEntries(
+        Map<RenderLayer, BufferBuilder> selectionBufferBuilderStorage = Map.ofEntries(
                 entry(RenderLayer.getLines(), new BufferBuilder(256)),
                 entry(FortressRenderLayer.getLinesNoDepth(), new BufferBuilder(256))
         );
-        selectionRenderer = new SelectionRenderer(client, selectionBufferBuilderStorage, blockBufferBuilderStorage);
 
-        final Supplier<ClientTasksHolder> clientTasksHolderSupplier = () -> {
+        final Supplier<ISelectionInfoProvider> selectInfProvSup = () ->
+                ModUtils.getFortressClientManager().getState() == FortressState.BUILD ?
+                        ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+
+        final Supplier<ISelectionModelBuilderInfoProvider> selModBuildInfProv = () ->
+                ModUtils.getFortressClientManager().getState() == FortressState.BUILD ?
+                        ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+
+        selectionRenderer = new SelectionRenderer(
+                client,
+                selectionBufferBuilderStorage,
+                blockBufferBuilderStorage,
+                selectInfProvSup,
+                selModBuildInfProv
+        );
+
+        final Supplier<ITasksRenderInfoProvider> clientTasksHolderSupplier = () -> {
+            if(fortressClientManager.getState() == FortressState.AREAS_SELECTION)
+                return areasClientManager.getSavedAreasHolder();
+
             final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
             if(fortressWorld == null) return null;
             return fortressWorld.getClientTasksHolder();
         };
 
-        tasksRenderer = new TasksRenderer(client, selectionBufferBuilderStorage.get(RenderLayer.getLines()), clientTasksHolderSupplier);
+        final Supplier<ITasksModelBuilderInfoProvider> clientBlueprintManagerSupplier = () -> {
+            if(fortressClientManager.getState() == FortressState.AREAS_SELECTION)
+                return areasClientManager.getSavedAreasHolder();
+
+            final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
+            if(fortressWorld == null) return null;
+            return fortressWorld.getClientTasksHolder();
+        };
+
+        tasksRenderer = new TasksRenderer(client,
+                selectionBufferBuilderStorage.get(RenderLayer.getLines()),
+                clientTasksHolderSupplier,
+                clientBlueprintManagerSupplier);
     }
 
     @Override
@@ -230,7 +267,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Inject(method = "openPauseMenu", at = @At("HEAD"), cancellable = true)
     public void openPauseMenu(boolean pause, CallbackInfo ci) {
         if(this.world != null && this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
-            final boolean localServer = this.isIntegratedServerRunning() && !this.server.isRemote();
+            final boolean localServer = this.isIntegratedServerRunning() && (this.server == null || !this.server.isRemote());
             if (localServer) {
                 this.setScreen(new BlueprintsPauseScreen(!pause));
                 this.soundManager.pauseAll();
@@ -266,6 +303,10 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return this.clientBlueprintManager;
     }
 
+    @Override
+    public AreasClientManager getAreasClientManager() {
+        return this.areasClientManager;
+    }
 
     @Inject(method = "close", at = @At("HEAD"))
     public void close(CallbackInfo ci) {

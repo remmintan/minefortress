@@ -18,7 +18,7 @@ public record ProfessionFullInfo(
         String description,
         String unlockMessage,
         String unlockMoreMessage,
-        boolean cantRemove,
+        boolean hireMenu,
         Requirements requirements
 ) {
 
@@ -30,7 +30,7 @@ public record ProfessionFullInfo(
         packet.writeString(description);
         packet.writeString(unlockMessage);
         packet.writeString(unlockMoreMessage);
-        packet.writeBoolean(cantRemove);
+        packet.writeBoolean(hireMenu);
         if(requirements != null) {
             packet.writeString(requirements.building());
             final var blockRequirement = requirements.block();

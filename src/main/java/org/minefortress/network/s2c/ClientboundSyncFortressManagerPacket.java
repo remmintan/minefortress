@@ -14,13 +14,15 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
     private final FortressGamemode fortressGamemode;
     private final boolean connectedToTheServer;
     private final int maxColonistsCount;
+    private final int reservedColonistsCount;
 
-    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode, boolean connectedToTheServer, int maxColonistsCount) {
+    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode, boolean connectedToTheServer, int maxColonistsCount, int reservedColonistsCount) {
         this.colonistsCount = colonistsCount;
         this.fortressPos = fortressPos;
         this.fortressGamemode = fortressGamemode;
         this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
+        this.reservedColonistsCount = reservedColonistsCount;
     }
 
     public ClientboundSyncFortressManagerPacket(PacketByteBuf buf) {
@@ -34,12 +36,13 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
         this.fortressGamemode = FortressGamemode.valueOf(buf.readString(100));
         this.maxColonistsCount = buf.readInt();
         this.connectedToTheServer = buf.readBoolean();
+        this.reservedColonistsCount = buf.readInt();
     }
 
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.connectedToTheServer, this.maxColonistsCount);
+            fortressClient.getFortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.connectedToTheServer, this.maxColonistsCount, reservedColonistsCount);
         }
     }
 
@@ -54,5 +57,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
         buf.writeString(fortressGamemode.name());
         buf.writeInt(maxColonistsCount);
         buf.writeBoolean(connectedToTheServer);
+        buf.writeInt(reservedColonistsCount);
     }
 }

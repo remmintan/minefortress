@@ -32,6 +32,8 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.entity.interfaces.IWorkerPawn;
+import org.minefortress.fortress.automation.FortressBuilding;
+import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
@@ -65,6 +67,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final ServerProfessionManager serverProfessionManager;
     private final ServerResourceManager serverResourceManager;
     private final TaskManager taskManager = new TaskManager();
+    private final AreasServerManager areasServerManager = new AreasServerManager();
     
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
 
@@ -103,12 +106,15 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public Optional<BlockPos> getFreeBed(){
-        return buildings
+        final var freeBedsList = buildings
                 .stream()
                 .map(it -> it.getFreeBed(server.getWorld(World.OVERWORLD)))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .findFirst();
+                .toList();
+        if(freeBedsList.isEmpty())
+            return Optional.empty();
+        return Optional.of(freeBedsList.get(new Random().nextInt(freeBedsList.size())));
     }
 
     public void addColonist(LivingEntity colonist) {
@@ -130,13 +136,14 @@ public final class FortressServerManager extends AbstractFortressManager {
         tickFortress(player);
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
+        areasServerManager.tick(player);
         if(!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
-        final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount);
+        final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount, getReservedPawnsCount());
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
         if (needSyncBuildings) {
             final var houses = buildings.stream()
-                    .map(h -> new EssentialBuildingInfo(h.getStart(), h.getEnd(), h.getRequirementId(), h.getBedsCount(getWorld())))
+                    .map(it -> it.toEssentialInfo(getWorld()))
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
             final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
@@ -148,14 +155,6 @@ public final class FortressServerManager extends AbstractFortressManager {
             needSyncSpecialBlocks = false;
         }
         needSync = false;
-    }
-
-    public Optional<FortressBuilding> getRandomBuilding(String requirementId, Random random) {
-        final var buildings = this.buildings.stream()
-                .filter(building -> building.getRequirementId().equals(requirementId))
-                .toList();
-        if(buildings.isEmpty()) return Optional.empty();
-        return Optional.of(buildings.get(random.nextInt(buildings.size())));
     }
 
     public void replaceColonistWithTypedPawn(Colonist colonist, String warriorId, EntityType<? extends BasePawnEntity> entityType) {
@@ -174,7 +173,11 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void tickFortress(@Nullable ServerPlayerEntity player) {
-        if(maxColonistsCount != -1 && getColonistsCount() > maxColonistsCount) {
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+            throw new IllegalStateException("Tick should not be called on server");
+        }
+
+        if(maxColonistsCount != -1 && getTotalColonistsCount() > maxColonistsCount) {
             final var deltaColonists = Math.max( pawns.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
 
             pawns.stream()
@@ -256,6 +259,13 @@ public final class FortressServerManager extends AbstractFortressManager {
                 }
             }
         }
+    }
+
+    public int getReservedPawnsCount() {
+        return (int) getProfessionals()
+                .stream()
+                .filter(it -> it.getProfessionId().equals(Colonist.RESERVE_PROFESSION_ID))
+                .count();
     }
 
     public void killAllPawns() {
@@ -407,6 +417,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         this.serverResourceManager.write(tag);
+        this.areasServerManager.write(tag);
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -483,15 +494,25 @@ public final class FortressServerManager extends AbstractFortressManager {
             this.maxColonistsCount = tag.getInt("maxColonistsCount");
         }
 
+        this.areasServerManager.read(tag);
+
         this.scheduleSync();
+    }
+
+    public Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement) {
+        final var buildings = this.buildings.stream()
+                .filter(building -> building.satisfiesRequirement(requirement))
+                .map(IAutomationArea.class::cast);
+
+        final var areas = areasServerManager.getByRequirement(requirement);
+
+        return Stream
+                .concat(buildings, areas)
+                .min(Comparator.comparing(IAutomationArea::getUpdated));
     }
 
     public ColonistNameGenerator getNameGenerator() {
         return nameGenerator;
-    }
-
-    public int getColonistsCount() {
-        return pawns.size();
     }
 
     public BlockPos getFortressCenter() {
@@ -536,26 +557,25 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public int getHomeOuterRadius() {
-        return Math.max(getColonistsCount(), 5) * 4 / 5;
+        return Math.max(getTotalColonistsCount(), 5) * 4 / 5;
     }
 
     private int getHomeInnerRadius() {
-        return Math.max(getColonistsCount(), 5) * 2 / 5;
+        return Math.max(getTotalColonistsCount(), 5) * 2 / 5;
     }
-
-
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
+        final var requiredBuildings = buildings.stream()
+                .filter(b -> b.satisfiesRequirement(requirementId));
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
-            return buildings.stream()
-                    .filter(b -> b.getRequirementId().equals(requirementId))
+            return requiredBuildings
                     .mapToLong(it -> it.getBedsCount(getWorld()) * 10)
                     .sum() > minCount;
         }
         if(requirementId.equals("shooting_gallery"))
-            minCount = 0;
-        return buildings.stream().filter(b -> b.getRequirementId().equals(requirementId)).count() > minCount;
+            return requiredBuildings.count() * 10 > minCount;
+        return requiredBuildings.count() > minCount;
     }
 
     @Override
@@ -564,6 +584,10 @@ public final class FortressServerManager extends AbstractFortressManager {
             return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
         else
             return this.specialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
+    }
+
+    public AreasServerManager getAreasManager() {
+        return areasServerManager;
     }
 
     public boolean isBlockSpecial(Block block) {
@@ -582,6 +606,15 @@ public final class FortressServerManager extends AbstractFortressManager {
     @Override
     public int getTotalColonistsCount() {
         return this.pawns.size();
+    }
+
+    public Optional<Colonist> getPawnWithoutAProfession() {
+        return pawns
+                .stream()
+                .filter(Colonist.class::isInstance)
+                .map(Colonist.class::cast)
+                .filter(it -> it.getProfessionId().equals(Colonist.DEFAULT_PROFESSION_ID))
+                .findAny();
     }
 
     public ServerProfessionManager getServerProfessionManager() {
@@ -625,7 +658,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     public void increaseMaxColonistsCount() {
         if(maxColonistsCount == -1) return;
         this.maxColonistsCount++;
-        if(this.maxColonistsCount >= getColonistsCount()) {
+        if(this.maxColonistsCount >= getTotalColonistsCount()) {
             this.maxColonistsCount = -1;
         }
         this.scheduleSync();
@@ -633,7 +666,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public void decreaseMaxColonistsCount() {
         if(maxColonistsCount == -1)
-            this.maxColonistsCount = getColonistsCount();
+            this.maxColonistsCount = getTotalColonistsCount();
 
         this.maxColonistsCount--;
 

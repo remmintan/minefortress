@@ -27,11 +27,15 @@ public abstract class AbstractHudLayer extends DrawableHelper implements IHudLay
     private PositionX positionX;
     private PositionY positionY;
 
+    private boolean initialized = false;
+
     protected AbstractHudLayer(MinecraftClient client) {
         this.client = client;
         this.itemRenderer = client.getItemRenderer();
         this.textRenderer = client.textRenderer;
     }
+
+    protected void init() {}
 
     protected final void setBasepoint(int x, int y, PositionX positionX, PositionY positionY) {
         this.basepointX = x;
@@ -49,6 +53,10 @@ public abstract class AbstractHudLayer extends DrawableHelper implements IHudLay
     }
 
     public void tick() {
+        if(!initialized) {
+            init();
+            initialized = true;
+        }
         for(IHudElement button : fortressHudElements)
             button.tick();
     }

@@ -1,6 +1,7 @@
 package org.minefortress.interfaces;
 
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.fortress.FortressClientManager;
@@ -14,7 +15,7 @@ public interface FortressMinecraftClient {
 
     SelectionManager getSelectionManager();
     FortressHud getFortressHud();
-
+    AreasClientManager getAreasClientManager();
     ClientBlueprintManager getBlueprintManager();
     BlueprintRenderer getBlueprintRenderer();
     CampfireRenderer getCampfireRenderer();

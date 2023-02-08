@@ -8,14 +8,22 @@ import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
+import org.minefortress.entity.Colonist;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;
 import org.minefortress.network.s2c.ClientboundProfessionsInitPacket;
+import org.minefortress.network.s2c.S2COpenHireMenuPacket;
+import org.minefortress.network.s2c.SyncHireProgress;
+import org.minefortress.professions.hire.ProfessionsHireTypes;
+import org.minefortress.professions.hire.ServerHireHandler;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +32,6 @@ import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
 public class ServerProfessionManager extends ProfessionManager{
-
     public static final String PROFESSION_NBT_TAG = "professionId";
 
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
@@ -33,22 +40,65 @@ public class ServerProfessionManager extends ProfessionManager{
     private List<ProfessionFullInfo> professionsInfos;
     private String professionsTree;
     private boolean needsUpdate = false;
+
+    private final Map<ProfessionsHireTypes, ServerHireHandler> hireHandlers = new HashMap<>();
+    private ServerHireHandler currentHireHandler;
     public ServerProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier, MinecraftServer server) {
         super(fortressManagerSupplier);
         this.server = server;
     }
 
+    public void openHireMenu(ProfessionsHireTypes hireType, ServerPlayerEntity player) {
+        currentHireHandler = hireHandlers.computeIfAbsent(hireType, k -> new ServerHireHandler(k.getIds(), this));
+        final var packet = new S2COpenHireMenuPacket(hireType.getScreenName(), currentHireHandler.getProfessions());
+        FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
+    }
+
+    public void closeHireMenu() {
+        currentHireHandler = null;
+    }
+
+    public void sendHireRequestToCurrentHandler(String professionId) {
+        if(currentHireHandler != null) {
+            final var profession = getProfession(professionId);
+            if(!profession.isHireMenu()) {
+                throw new IllegalArgumentException("Profession " + professionId + " is not a hire menu profession");
+            }
+            final var canHire = isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
+            final var abstractFortressManager = fortressManagerSupplier.get();
+            if(canHire && getFreeColonists() > 0 && abstractFortressManager instanceof FortressServerManager fsm) {
+                final var resourceManager = (ServerResourceManager) abstractFortressManager
+                        .getResourceManager();
+                resourceManager.removeItems(profession.getItemsRequirement());
+                fsm.getPawnWithoutAProfession().ifPresent(Colonist::reserveColonist);
+                fsm.scheduleSync();
+                currentHireHandler.hire(professionId);
+            }
+        } else {
+            throw new IllegalStateException("No current hire handler");
+        }
+    }
+
     @Override
-    public void increaseAmount(String professionId) {
-        if(super.getFreeColonists() <= 0) return;
+    public void increaseAmount(String professionId, boolean itemsAlreadyCharged) {
         final Profession profession = super.getProfession(professionId);
         if(profession == null) return;
-        if(!super.isRequirementsFulfilled(profession, true)) return;
+        if (profession.isHireMenu()) {
+            if(this.fortressManagerSupplier.get() instanceof FortressServerManager fsm && fsm.getReservedPawnsCount() <= 0) {
+                LoggerFactory.getLogger(ServerProfessionManager.class).error("No reserved pawns but trying to hire a profession");
+                return;
+            }
+        } else {
+            if(super.getFreeColonists() <= 0) return;
+        }
+        if(!super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, !itemsAlreadyCharged)) return;
 
-        final var fortressServerManager = (FortressServerManager) fortressManagerSupplier.get();
-        final var serverResourceManager = fortressServerManager.getServerResourceManager();
-        if(profession.getItemsRequirement() != null)
-            serverResourceManager.removeItems(profession.getItemsRequirement());
+        if(!itemsAlreadyCharged) {
+            final var resourceManager = (ServerResourceManager) fortressManagerSupplier
+                    .get()
+                    .getResourceManager();
+            resourceManager.removeItems(profession.getItemsRequirement());
+        }
 
         profession.setAmount(profession.getAmount() + 1);
         scheduleSync();
@@ -63,7 +113,7 @@ public class ServerProfessionManager extends ProfessionManager{
         final Profession profession = super.getProfession(professionId);
         if(profession == null) return;
         if(profession.getAmount() <= 0) return;
-        if(profession.isCantRemove() && !force) return;
+        if(profession.isHireMenu() && !force) return;
 
         profession.setAmount(profession.getAmount() - 1);
         scheduleSync();
@@ -72,21 +122,31 @@ public class ServerProfessionManager extends ProfessionManager{
     public void tick(@Nullable ServerPlayerEntity player) {
         if(player == null) return;
 
+        hireHandlers.forEach((k, v) -> v.tick());
+        if(currentHireHandler != null) {
+            final var packet = new SyncHireProgress(currentHireHandler.getProfessions());
+            FortressServerNetworkHelper.send(player, SyncHireProgress.CHANNEL, packet);
+        }
+
+        tickCheckProfessionRequirements();
+        tickRemoveFromProfession();
+
+        if(needsUpdate) {
+            ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(getProfessions());
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
+            needsUpdate = false;
+        }
+    }
+
+    private void tickCheckProfessionRequirements() {
         for(Profession prof : getProfessions().values()) {
             if(prof.getAmount() > 0) {
-                final boolean unlocked = this.isRequirementsFulfilled(prof);
+                final boolean unlocked = isRequirementsFulfilled(prof, CountProfessionals.KEEP, false);
                 if(!unlocked) {
                     prof.setAmount(prof.getAmount() - 1);
                     this.scheduleSync();
                 }
             }
-        }
-
-        tickRemoveFromProfession();
-        if(needsUpdate) {
-            ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(getProfessions());
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
-            needsUpdate = false;
         }
     }
 
@@ -145,10 +205,14 @@ public class ServerProfessionManager extends ProfessionManager{
         }
     }
 
-    public Optional<String> getProfessionsWithAvailablePlaces() {
+    public Optional<String> getProfessionsWithAvailablePlaces(boolean professionRequiresReservation) {
         for(Map.Entry<String, Profession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
             final Profession profession = entry.getValue();
+
+            if(professionRequiresReservation && !profession.isHireMenu()) continue;
+            if(!professionRequiresReservation && profession.isHireMenu()) continue;
+
             if(profession.getAmount() > 0) {
                 final long colonistsWithProfession = countPawnsWithProfession(professionId);
                 if(colonistsWithProfession < profession.getAmount()) {

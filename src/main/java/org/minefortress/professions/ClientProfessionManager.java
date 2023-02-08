@@ -8,6 +8,7 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -23,23 +24,35 @@ public class ClientProfessionManager extends ProfessionManager {
         super.createProfessionTree(treeJson);
     }
 
-    @Override
-    public void increaseAmount(String professionId) {
-        if("colonist".equals(professionId)) return;
-        if(!super.isRequirementsFulfilled(this.getProfession(professionId), true)) return;
-        final ServerboundChangeProfessionStatePacket.AmountChange change =
-                ServerboundChangeProfessionStatePacket.AmountChange.ADD;
-        final ServerboundChangeProfessionStatePacket packet =
-                new ServerboundChangeProfessionStatePacket(professionId, change);
-        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
+    public String getIdByProfession(Profession profession) {
+        return getProfessions().entrySet().stream()
+                .filter(it -> it.getValue().equals(profession))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
 
+    @Override
+    public void increaseAmount(String professionId, boolean alreadyCharged) {
+        if("colonist".equals(professionId)) return;
+        if(
+                super.isRequirementsFulfilled(this.getProfession(professionId), CountProfessionals.INCREASE, true)
+                ||
+                this.getProfession(professionId).isHireMenu() && super.isRequirementsFulfilled(this.getProfession(professionId), CountProfessionals.DONT_COUNT, false)
+        ) {
+            final ServerboundChangeProfessionStatePacket.AmountChange change =
+                    ServerboundChangeProfessionStatePacket.AmountChange.ADD;
+            final ServerboundChangeProfessionStatePacket packet =
+                    new ServerboundChangeProfessionStatePacket(professionId, change);
+            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
+        }
     }
 
     @Override
     public void decreaseAmount(String professionId) {
         if("colonist".equals(professionId)) return;
         final var profession = this.getProfession(professionId);
-        final var cantRemove = profession.isCantRemove();
+        final var cantRemove = profession.isHireMenu();
         if(cantRemove){
             final var message = new LiteralText("§cCan't remove pawn from profession: " + profession.getTitle());
             MinecraftClient.getInstance().setScreen(null);

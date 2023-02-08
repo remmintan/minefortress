@@ -126,7 +126,7 @@ public class ProfessionsLayer extends DrawableHelper {
         }
     }
 
-    public void drawWidgetTooltip(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int screenWidth) {
+    public void drawWidgetTooltip(MatrixStack matrices, int mouseX, int mouseY, int x, int screenWidth) {
         matrices.push();
         matrices.translate(0.0, 0.0, -200.0);
         AdvancementTab.fill(matrices, 0, 0, layerWidth, layerHeight, MathHelper.floor(this.alpha * 255.0f) << 24);
@@ -136,9 +136,9 @@ public class ProfessionsLayer extends DrawableHelper {
         boolean bl = false;
         if (mouseX > 0 && mouseX < layerWidth && mouseY > 0 && mouseY < layerHeight) {
             for (ProfessionWidget advancementWidget : this.widgets) {
-                if (!advancementWidget.shouldRender(oX, oY, mouseX, mouseY)) continue;
+                if (advancementWidget.shouldNotRender(oX, oY, mouseX, mouseY)) continue;
                 bl = true;
-                advancementWidget.drawTooltip(matrices, oX, oY, this.alpha, x, y, screenWidth);
+                advancementWidget.drawTooltip(matrices, oX, oY,  x, screenWidth);
                 break;
             }
         }
@@ -152,7 +152,7 @@ public class ProfessionsLayer extends DrawableHelper {
         int oY = MathHelper.floor(this.originY);
         if (mouseX > 0 && mouseX < layerWidth && mouseY > 0 && mouseY < layerHeight) {
             for (ProfessionWidget professionWidget : this.widgets) {
-                if (!professionWidget.shouldRender(oX, oY, (int)mouseX, (int)mouseY)) continue;
+                if (professionWidget.shouldNotRender(oX, oY, (int) mouseX, (int) mouseY)) continue;
                 professionWidget.onClick(button);
                 break;
             }

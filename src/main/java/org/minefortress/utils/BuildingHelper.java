@@ -31,20 +31,6 @@ public class BuildingHelper {
         );
     }
 
-    public static boolean canPlaceScaffold(World level, BlockPos pos) {
-        final BlockState blockState = level.getBlockState(pos);
-        return canPlaceScaffold(level, blockState, pos);
-    }
-
-    public static boolean canPlaceScaffold(World level, BlockState state, BlockPos pos) {
-        return inWorldBounds(level, pos) && (
-                isAirOrFluid(state) ||
-                isGrass(level, state, pos) ||
-                doesNotHaveCollisions(level, pos) ||
-                state.getBlock().equals(FortressBlocks.SCAFFOLD_OAK_PLANKS)
-        );
-    }
-
     public static boolean canRemoveBlock(World level, BlockPos pos) {
         final BlockState blockState = level.getBlockState(pos);
         return canRemoveBlock(level, blockState, pos);
@@ -64,20 +50,9 @@ public class BuildingHelper {
 
     public static boolean canStayOnBlock(WorldAccess level, BlockState state, BlockPos pos) {
         return !isAirOrFluid(state) &&
-                hasCollisions((WorldAccess)level, pos) &&
-                doesNotHaveCollisions((WorldAccess)level, pos.up()) &&
-                doesNotHaveCollisions((WorldAccess)level, pos.up().up());
-    }
-
-    public static boolean canGoUpOnBlock(WorldAccess level, BlockPos pos) {
-        final BlockState blockState = level.getBlockState(pos);
-        return canGoUpOnBlock(level, blockState, pos);
-    }
-
-    public static boolean canGoUpOnBlock(WorldAccess level, BlockState state, BlockPos pos) {
-        return doesNotHaveCollisions(level, pos) &&
-                doesNotHaveCollisions((WorldAccess)level, pos.up()) &&
-                doesNotHaveCollisions((WorldAccess)level, pos.up().up());
+                hasCollisions(level, pos) &&
+                doesNotHaveCollisions(level, pos.up()) &&
+                doesNotHaveCollisions(level, pos.up().up());
     }
 
     public static boolean doesNotHaveCollisions(@Nullable WorldAccess level, BlockPos pos) {
@@ -86,7 +61,7 @@ public class BuildingHelper {
         return state.getCollisionShape(level, pos) == VoxelShapes.empty();
     }
 
-    private static boolean hasCollisions(WorldAccess level, BlockPos pos) {
+    public static boolean hasCollisions(WorldAccess level, BlockPos pos) {
         final BlockState state = level.getBlockState(pos);
         return state.getCollisionShape(level, pos) != VoxelShapes.empty();
     }

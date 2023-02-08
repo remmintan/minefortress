@@ -1,8 +1,5 @@
 package org.minefortress.mixins.renderer;
 
-import com.chocohead.mm.api.ClassTinkerers;
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
@@ -12,16 +9,17 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vector4f;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.GameMode;
-import org.minefortress.MineFortressMod;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.MineFortressEntityRenderer;
-import org.minefortress.selections.ClickType;
 import org.minefortress.selections.SelectionManager;
+import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -78,15 +76,14 @@ public abstract class FortressWorldRendererMixin  {
 
         SelectionManager selectionManager = fortressClient.getSelectionManager();
         VertexConsumer vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
-        if (!selectionManager.isSelecting()) {
-            final GameMode currentGameMode = this.client.interactionManager.getCurrentGameMode();
-            if(currentGameMode == MineFortressMod.FORTRESS) {
-                final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
+        final FortressClientManager fcm = fortressClient.getFortressClientManager();
+        if (!selectionManager.isSelecting() && fcm.getState() == FortressState.BUILD) {
+            if(ModUtils.isClientInFortressGamemode()) {
                 final HitResult crosshairTarget = client.crosshairTarget;
                 if(crosshairTarget instanceof BlockHitResult bhr) {
                     BlockPos pos = bhr.getBlockPos();
-                    if(pos != null && !world.getBlockState(pos).isAir() && !fortressClientManager.isInCombat()) {
-                        final List<BlockPos> buildingSelection = fortressClientManager.getBuildingSelection(pos);
+                    if(pos != null && !world.getBlockState(pos).isAir()) {
+                        final List<BlockPos> buildingSelection = fcm.getBuildingSelection(pos);
                         for(BlockPos sel: buildingSelection) {
                             if(this.world.getWorldBorder().contains(sel)) {
                                 final BlockState blockState = this.world.getBlockState(sel);
