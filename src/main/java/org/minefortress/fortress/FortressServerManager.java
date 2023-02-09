@@ -173,10 +173,6 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void tickFortress(@Nullable ServerPlayerEntity player) {
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-            throw new IllegalStateException("Tick should not be called on server");
-        }
-
         if(maxColonistsCount != -1 && getTotalColonistsCount() > maxColonistsCount) {
             final var deltaColonists = Math.max( pawns.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
 
