@@ -3,6 +3,7 @@ package org.minefortress.fight;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.entity.EntityType;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -38,6 +39,14 @@ public class ClientFightSelectionManager {
         this.selectionStartPos = null;
         this.selectionCurBlock = null;
         this.selectionCurPos = null;
+        if(!hasSelected()) {
+            final var message = Text.of("Only warriors and archers can be selected and controlled directly.");
+            MinecraftClient
+                    .getInstance()
+                    .inGameHud
+                    .getChatHud()
+                    .addMessage(message);
+        }
     }
 
     public boolean hasSelected() {
