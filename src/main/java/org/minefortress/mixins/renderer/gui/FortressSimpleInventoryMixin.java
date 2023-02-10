@@ -1,5 +1,7 @@
 package org.minefortress.mixins.renderer.gui;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeMatcher;
@@ -24,7 +26,8 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
 
     @Override
     public int getMaxCountPerStack() {
-        if(ModUtils.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative())
+        final var clientFortressSurvival = FabricLoader.getInstance().getEnvironmentType() != EnvType.SERVER && ModUtils.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative();
+        if(clientFortressSurvival || FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER)
             return Integer.MAX_VALUE;
         else
             return FortressSimpleInventory.super.getMaxCountPerStack();
