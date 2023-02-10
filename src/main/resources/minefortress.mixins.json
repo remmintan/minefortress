@@ -20,7 +20,8 @@
     "item.DisabledBlockItemMixin",
     "item.DisableItemMixin",
     "network.FortressPacketByteBufMixin",
-    "renderer.gui.FortressScreenHandler"
+    "renderer.gui.FortressScreenHandler",
+    "renderer.gui.FortressSimpleInventoryMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",
@@ -39,7 +40,6 @@
     "renderer.FortressWorldRendererMixin",
     "renderer.gui.FortressCreativeInventoryScreenMixin",
     "renderer.gui.FortressHandledScreenMixin",
-    "renderer.gui.FortressSimpleInventoryMixin",
     "world.FortressClientWorldMixin"
   ],
   "server": [],
