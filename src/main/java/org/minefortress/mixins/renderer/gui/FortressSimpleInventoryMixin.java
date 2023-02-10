@@ -26,7 +26,8 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
 
     @Override
     public int getMaxCountPerStack() {
-        if(FabricLoader.getInstance().getEnvironmentType() != EnvType.SERVER && ModUtils.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative())
+        final var clientFortressSurvival = FabricLoader.getInstance().getEnvironmentType() != EnvType.SERVER && ModUtils.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative();
+        if(clientFortressSurvival || FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER)
             return Integer.MAX_VALUE;
         else
             return FortressSimpleInventory.super.getMaxCountPerStack();
