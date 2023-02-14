@@ -50,18 +50,18 @@ public abstract class ProfessionManager {
             return true;
         }
 
-        final var disabled = "_".equals(buildingRequirement) && profession.getBlockRequirement().block() == null;
-        if(fortressManagerSupplier.get().isCreative() && !disabled) {
-            return true;
-        }
-
-
         final Profession parent = profession.getParent();
         if(Objects.nonNull(parent)) {
-            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, countProfessionals, false);
+            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, CountProfessionals.DONT_COUNT, false);
             if(!parentUnlocked) {
                 return false;
             }
+        }
+
+        final var disabled = "_".equals(buildingRequirement) &&
+                Optional.ofNullable(profession.getBlockRequirement()).map(it -> it.block() == null).orElse(true);
+        if(fortressManagerSupplier.get().isCreative() && !disabled) {
+            return true;
         }
 
         final AbstractFortressManager fortressManager = fortressManagerSupplier.get();
