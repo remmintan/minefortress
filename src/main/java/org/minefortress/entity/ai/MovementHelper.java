@@ -58,6 +58,7 @@ public class MovementHelper {
         LOGGER.debug("{} set new goal {}. speed: {}", getColonistName(), goal, speed);
         this.reset();
         this.workGoal = goal;
+        if(this.workGoal == null) return;
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
         this.colonist.setMovementSpeed(speed);
         this.colonist.getNavigation().stop();
