@@ -17,6 +17,9 @@ import org.minefortress.utils.ModUtils;
 
 public class ColonistsHudLayer extends AbstractHudLayer {
 
+    private final ItemButtonWidget furnaceButton;
+    private final ItemButtonWidget craftingButton;
+
     protected ColonistsHudLayer(MinecraftClient client) {
         super(client);
         this.addElement(
@@ -47,32 +50,30 @@ public class ColonistsHudLayer extends AbstractHudLayer {
                         "Inventory"
                 )
         );
-        this.addElement(
-            new ItemButtonWidget(
-                    35+40, 0,
-                    Items.CRAFTING_TABLE,
-                    btn -> {
-                        if(hasProfessionInAVillage("crafter"))
-                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.CRAFTING));
-                        else
-                            this.client.setScreen(new MissingCraftsmanScreen());
-                    },
-                    "Crafting"
-            )
+        craftingButton = new ItemButtonWidget(
+                35 + 40, 0,
+                Items.CRAFTING_TABLE,
+                btn -> {
+                    if (hasProfessionInAVillage("crafter"))
+                        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.CRAFTING));
+                    else
+                        this.client.setScreen(new MissingCraftsmanScreen());
+                },
+                "Crafting"
         );
-        this.addElement(
-            new ItemButtonWidget(
-                    35+60, 0,
-                    Items.FURNACE,
-                    btn -> {
-                        if(hasProfessionInAVillage("blacksmith"))
-                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE));
-                        else
-                            this.client.setScreen(new MissingBlacksmithScreen());
-                    },
-                    "Furnace"
-            )
+        furnaceButton = new ItemButtonWidget(
+                35 + 60, 0,
+                Items.FURNACE,
+                btn -> {
+                    if (hasProfessionInAVillage("blacksmith"))
+                        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE));
+                    else
+                        this.client.setScreen(new MissingBlacksmithScreen());
+                },
+                "Furnace"
         );
+        this.addElement(craftingButton);
+        this.addElement(furnaceButton);
 
         this.addElement(
                 new ItemHudElement(
@@ -90,6 +91,18 @@ public class ColonistsHudLayer extends AbstractHudLayer {
 
     private boolean hasProfessionInAVillage(String crafter) {
         return ModUtils.isClientInFortressGamemode() && ModUtils.getProfessionManager().hasProfession(crafter);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if(ModUtils.getFortressClientManager().isCreative()) {
+            craftingButton.visible = false;
+            furnaceButton.visible = false;
+        } else {
+            craftingButton.visible = true;
+            furnaceButton.visible = true;
+        }
     }
 
     @Override
