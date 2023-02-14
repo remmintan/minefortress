@@ -1,9 +1,9 @@
 package org.minefortress.interfaces;
 
-import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.tasks.ClientVisualTasksHolder;
 
 public interface FortressClientWorld {
 
-    ClientTasksHolder getClientTasksHolder();
+    ClientVisualTasksHolder getClientTasksHolder();
 
 }

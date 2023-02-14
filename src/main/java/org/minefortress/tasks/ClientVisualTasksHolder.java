@@ -12,7 +12,7 @@ import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
 
-public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider {
+public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider {
     private static final Vector4f DESTROY_COLOR = new Vector4f(170f/255f, 0, 0, 1f);
     private static final Vector4f BUILD_COLOR = new Vector4f(0, 170f/255f, 0, 1f);
 

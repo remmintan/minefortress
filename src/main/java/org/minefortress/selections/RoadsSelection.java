@@ -14,7 +14,7 @@ import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.network.c2s.ServerboundRoadsTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.tasks.ClientVisualTasksHolder;
 import org.minefortress.tasks.TaskType;
 
 import java.util.*;
@@ -32,7 +32,7 @@ public class RoadsSelection extends WallsSelection{
             final UUID digTaskId = UUID.randomUUID();
             final UUID placeTaskId = UUID.randomUUID();
 
-            final ClientTasksHolder tasksHolder = ((FortressClientWorld) level).getClientTasksHolder();
+            final ClientVisualTasksHolder tasksHolder = ((FortressClientWorld) level).getClientTasksHolder();
             tasksHolder.addTask(digTaskId, getSelection(), TaskType.REMOVE);
             tasksHolder.addTask(placeTaskId, getSelection(), TaskType.BUILD);
 

@@ -10,11 +10,9 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.tasks.ClientVisualTasksHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,7 +27,7 @@ import java.util.function.Supplier;
 public abstract class FortressClientWorldMixin extends World implements FortressClientWorld {
 
     @Shadow @Final private MinecraftClient client;
-    private ClientTasksHolder tasksHolder;
+    private ClientVisualTasksHolder tasksHolder;
 
     protected FortressClientWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, RegistryEntry<DimensionType> dimensionType, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
         super(properties, registryRef, dimensionType, profiler, isClient, debugWorld, seed);
@@ -38,11 +36,11 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void constructor(ClientPlayNetworkHandler netHandler, ClientWorld.Properties properties, RegistryKey registryRef, RegistryEntry registryEntry, int loadDistance, int simulationDistance, Supplier profiler, WorldRenderer worldRenderer, boolean debugWorld, long seed, CallbackInfo ci) {
-        tasksHolder = new ClientTasksHolder();
+        tasksHolder = new ClientVisualTasksHolder();
     }
 
     @Override
-    public ClientTasksHolder getClientTasksHolder() {
+    public ClientVisualTasksHolder getClientTasksHolder() {
         return tasksHolder;
     }
 

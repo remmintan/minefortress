@@ -13,7 +13,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressEvents;
 import org.minefortress.registries.FortressKeybindings;
-import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.tasks.ClientVisualTasksHolder;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
 import static org.minefortress.MineFortressMod.FORTRESS_FURNACE_SCREEN_HANDLER;
@@ -38,12 +38,12 @@ public class MineFortressClient implements ClientModInitializer {
             while (FortressKeybindings.cancelTaskKeybinding.wasPressed()) {
                 final ClientWorld world = client.world;
                 if(world != null) {
-                    final ClientTasksHolder clientTasksHolder = ((FortressClientWorld) world).getClientTasksHolder();
+                    final ClientVisualTasksHolder clientVisualTasksHolder = ((FortressClientWorld) world).getClientTasksHolder();
 
                     if(client.options.sprintKey.isPressed()) {
-                        clientTasksHolder.cancelAllTasks();
+                        clientVisualTasksHolder.cancelAllTasks();
                     } else {
-                        clientTasksHolder.cancelTask();
+                        clientVisualTasksHolder.cancelTask();
                     }
                 }
             }
