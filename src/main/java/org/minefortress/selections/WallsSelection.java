@@ -1,7 +1,6 @@
 package org.minefortress.selections;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.HitResult;
@@ -10,11 +9,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.network.c2s.ServerboundSimpleSelectionTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.network.c2s.ServerboundSimpleSelectionTaskPacket;
 import org.minefortress.tasks.TaskType;
-import org.minefortress.utils.BlockUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -121,7 +119,7 @@ public class WallsSelection extends Selection {
         }
 
         BlockPos preLastCorner = getPreLastCorner();
-        if(preLastCorner.equals(pickedBlock) || flatCloserThan(preLastCorner, pickedBlock, 2.5)) {
+        if(preLastCorner.equals(pickedBlock) || flatCloserThan(preLastCorner, pickedBlock)) {
             corners.remove(corners.size() -1);
             return;
         }
@@ -141,16 +139,16 @@ public class WallsSelection extends Selection {
 
             setLast(newLast);
 
-            if(flatCloserThan(newLast, pickedBlock, 2.5)) return;
+            if(flatCloserThan(newLast, pickedBlock)) return;
             corners.add(pickedBlock);
         }
     }
 
-    private static boolean flatCloserThan(Vec3i it, Vec3i other, double distance) {
+    private static boolean flatCloserThan(Vec3i it, Vec3i other) {
         int d1 = it.getX() - other.getX();
         int d2 = it.getZ() - other.getZ();
 
-        return (d1 * d1 + d2 * d2) < distance * distance;
+        return (d1 * d1 + d2 * d2) < 2.5 * 2.5;
     }
 
 
@@ -176,12 +174,11 @@ public class WallsSelection extends Selection {
         } else {
             if(this.clickType == click) {
                 UUID supertaskUuid = UUID.randomUUID();
-                final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(mainHandItem);
                 final TaskType taskType = mapClickTypeToTaskType(clickType);
                 getCornerPairs()
                         .forEach(p -> {
                             UUID uuid = UUID.randomUUID();
-                            ((FortressClientWorld)level).getClientTasksHolder().addTask(uuid, getSelection(), blockStateFromItem, taskType, supertaskUuid);
+                            ((FortressClientWorld)level).getClientTasksHolder().addTask(uuid, getSelection(), taskType, supertaskUuid);
                             ServerboundSimpleSelectionTaskPacket packet = new ServerboundSimpleSelectionTaskPacket(
                                     uuid,
                                     taskType,

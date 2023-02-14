@@ -2,7 +2,6 @@ package org.minefortress.selections;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.world.ClientWorld;
@@ -34,8 +33,8 @@ public class RoadsSelection extends WallsSelection{
             final UUID placeTaskId = UUID.randomUUID();
 
             final ClientTasksHolder tasksHolder = ((FortressClientWorld) level).getClientTasksHolder();
-            tasksHolder.addTask(digTaskId, getSelection(), Blocks.DIRT.getDefaultState(), TaskType.REMOVE);
-            tasksHolder.addTask(placeTaskId, getSelection(), Blocks.GRASS_BLOCK.getDefaultState(), TaskType.BUILD);
+            tasksHolder.addTask(digTaskId, getSelection(), TaskType.REMOVE);
+            tasksHolder.addTask(placeTaskId, getSelection(), TaskType.BUILD);
 
             final ServerboundRoadsTaskPacket packet = new ServerboundRoadsTaskPacket(digTaskId, placeTaskId, selection);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_ROADS_TASK, packet);
@@ -48,16 +47,13 @@ public class RoadsSelection extends WallsSelection{
         if(Objects.isNull(world)) {
             return Collections.emptyList();
         }
-
-        final BlockPos firstCorner = cornerPairs.isEmpty() ? null : cornerPairs.get(0).getFirst();
-
+        
         return cornerPairs
                 .stream()
                 .map(p -> {
                     final BlockPos start = p.getFirst();
                     final BlockPos end = p.getSecond();
 
-                    final boolean isFirstCorner = Objects.equals(start, firstCorner);
 
                     final BlockPos flatEnd = new BlockPos(end.getX(), start.getY() + upDelta, end.getZ());
 

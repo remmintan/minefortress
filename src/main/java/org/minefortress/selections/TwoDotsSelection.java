@@ -1,7 +1,6 @@
 package org.minefortress.selections;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.item.Item;
 import net.minecraft.util.hit.BlockHitResult;
@@ -11,11 +10,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.network.c2s.ServerboundSimpleSelectionTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.network.c2s.ServerboundSimpleSelectionTaskPacket;
 import org.minefortress.tasks.TaskType;
-import org.minefortress.utils.BlockUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -58,8 +56,7 @@ public class TwoDotsSelection extends Selection {
             if(pickedBlock != null && hitResult instanceof BlockHitResult && click == this.clickType && connection != null && selectionEnd != null) {
                 UUID newTaskId = UUID.randomUUID();
                 TaskType taskType = mapClickTypeToTaskType(clickType);
-                final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(item);
-                ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelection(), blockStateFromItem, taskType);
+                ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelection(), taskType);
                 ServerboundSimpleSelectionTaskPacket packet = new ServerboundSimpleSelectionTaskPacket(
                         newTaskId,
                         taskType,

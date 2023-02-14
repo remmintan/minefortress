@@ -14,7 +14,6 @@ import org.minefortress.network.c2s.ServerboundCutTreesTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.tasks.TaskType;
-import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.TreeBlocks;
 
 import java.util.*;
@@ -52,8 +51,7 @@ public class TreeSelection extends Selection {
             if(!treeRoots.isEmpty()) {
                 this.selectedTreeBlocks.remove(start);
                 final UUID newTaskId = UUID.randomUUID();
-                final BlockState blockStateFromItem = BlockUtils.getBlockStateFromItem(mainHandItem);
-                ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelection(), blockStateFromItem, TaskType.REMOVE);
+                ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelection(), TaskType.REMOVE);
                 final ServerboundCutTreesTaskPacket packet = new ServerboundCutTreesTaskPacket(newTaskId, Collections.unmodifiableList(treeRoots));
                 FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_CUT_TREES_TASK, packet);
             }
