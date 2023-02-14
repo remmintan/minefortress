@@ -187,7 +187,7 @@ public class ServerProfessionManager extends ProfessionManager{
         }
     }
 
-    private void scheduleSync() {
+    public void scheduleSync() {
         needsUpdate = true;
     }
 
