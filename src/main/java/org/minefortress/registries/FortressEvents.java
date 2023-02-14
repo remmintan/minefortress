@@ -47,7 +47,9 @@ public class FortressEvents {
             final var player = handler.player;
             final var fsm = fortressServer.getFortressModServerManager().getByPlayer(player);
             fsm.scheduleSync();
-            fsm.getServerProfessionManager().sendProfessions(player);
+            final var serverProfessionManager = fsm.getServerProfessionManager();
+            serverProfessionManager.sendProfessions(player);
+            serverProfessionManager.scheduleSync();
         });
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
