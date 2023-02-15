@@ -10,7 +10,7 @@ import org.minefortress.renderer.gui.FortressBookContents;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.widget.*;
 import org.minefortress.selections.SelectionType;
-import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.tasks.ClientVisualTasksHolder;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Arrays;
@@ -101,10 +101,10 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         0,
                         150,
                         Items.ENDER_EYE,
-                        (btn) -> ModUtils.getClientTasksHolder().ifPresent(ClientTasksHolder::toggleSelectionVisibility),
-                        (button) -> ModUtils.getClientTasksHolder().map(ClientTasksHolder::isSelectionHidden)
+                        (btn) -> ModUtils.getClientTasksHolder().ifPresent(ClientVisualTasksHolder::toggleSelectionVisibility),
+                        (button) -> ModUtils.getClientTasksHolder().map(ClientVisualTasksHolder::isSelectionHidden)
                                 .map(it -> it ? "Show Tasks outline" : "Hide Tasks outline"),
-                        () -> ModUtils.getClientTasksHolder().map(ClientTasksHolder::isSelectionHidden).orElse(false),
+                        () -> ModUtils.getClientTasksHolder().map(ClientVisualTasksHolder::isSelectionHidden).orElse(false),
                         () -> !blueprintSelected() && !treeCutterSelected() && !roadsSelected(),
                         Items.ENDER_PEARL
                 ),

@@ -17,7 +17,7 @@ import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.selections.SelectionManager;
-import org.minefortress.tasks.ClientTasksHolder;
+import org.minefortress.tasks.ClientVisualTasksHolder;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -92,7 +92,7 @@ public class ModUtils {
                 .map(FortressClientWorld.class::cast);
     }
 
-    public static Optional<ClientTasksHolder> getClientTasksHolder() {
+    public static Optional<ClientVisualTasksHolder> getClientTasksHolder() {
         return getFortressClientWorld().map(FortressClientWorld::getClientTasksHolder);
     }
 

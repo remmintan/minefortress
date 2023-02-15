@@ -1,7 +1,5 @@
 package org.minefortress.tasks;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vector4f;
 import org.minefortress.network.c2s.ServerboundCancelTaskPacket;
@@ -14,7 +12,7 @@ import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
 
-public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider {
+public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider {
     private static final Vector4f DESTROY_COLOR = new Vector4f(170f/255f, 0, 0, 1f);
     private static final Vector4f BUILD_COLOR = new Vector4f(0, 170f/255f, 0, 1f);
 
@@ -46,14 +44,14 @@ public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasks
     }
 
     public void addTask(UUID uuid, Iterable<BlockPos> blocks) {
-        addTask(uuid, blocks, Blocks.DIRT.getDefaultState(), TaskType.BUILD);
+        addTask(uuid, blocks, TaskType.BUILD);
     }
 
-    public void addTask(UUID uuid, Iterable<BlockPos> blocks, BlockState blockState, TaskType type) {
-        addTask(uuid, blocks, blockState, type, null);
+    public void addTask(UUID uuid, Iterable<BlockPos> blocks, TaskType type) {
+        addTask(uuid, blocks, type, null);
     }
 
-    public void addTask(UUID uuid, Iterable<BlockPos> blocks, BlockState blockState, TaskType type, UUID superTaskId) {
+    public void addTask(UUID uuid, Iterable<BlockPos> blocks, TaskType type, UUID superTaskId) {
         ClientSelection newTask = new ClientSelection(
                 blocks,
                 type == TaskType.REMOVE ? DESTROY_COLOR: BUILD_COLOR,
