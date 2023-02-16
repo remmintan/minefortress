@@ -28,10 +28,13 @@ import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.professions.hire.ClientHireHandler;
+import org.minefortress.professions.hire.HireInfo;
 import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
+import org.minefortress.renderer.gui.hire.HirePawnScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.selections.renderer.ISelectionInfoProvider;
@@ -306,6 +309,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public AreasClientManager getAreasClientManager() {
         return this.areasClientManager;
+    }
+
+    @Override
+    public void openHireScreen(MinecraftClient client, String screenName, Map<String, HireInfo> professions) {
+        final var handler = new ClientHireHandler(screenName, professions);
+        final var screen = new HirePawnScreen(handler);
+        client.setScreen(screen);
     }
 
     @Inject(method = "close", at = @At("HEAD"))

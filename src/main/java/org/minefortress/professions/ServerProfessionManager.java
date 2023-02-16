@@ -50,7 +50,9 @@ public class ServerProfessionManager extends ProfessionManager{
 
     public void openHireMenu(ProfessionsHireTypes hireType, ServerPlayerEntity player) {
         currentHireHandler = hireHandlers.computeIfAbsent(hireType, k -> new ServerHireHandler(k.getIds(), this));
-        final var packet = new S2COpenHireMenuPacket(hireType.getScreenName(), currentHireHandler.getProfessions());
+        final var professions = currentHireHandler.getProfessions();
+        final var screenName = hireType.getScreenName();
+        final var packet = new S2COpenHireMenuPacket(screenName, professions);
         FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
     }
 
