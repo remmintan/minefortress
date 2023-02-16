@@ -5,9 +5,8 @@ import io.netty.buffer.ByteBufOutputStream;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.network.interfaces.FortressS2CPacket;
-import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.professions.hire.HireInfo;
-import org.minefortress.renderer.gui.hire.HirePawnScreen;
+import org.minefortress.utils.ModUtils;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -47,10 +46,6 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        client.execute(() -> {
-            final var handler = new ClientHireHandler(screenName, professions);
-            final var screen = new HirePawnScreen(handler);
-            client.setScreen(screen);
-        });
+        client.execute(() -> ModUtils.getFortressClient().openHireScreen(client, screenName, professions));
     }
 }
