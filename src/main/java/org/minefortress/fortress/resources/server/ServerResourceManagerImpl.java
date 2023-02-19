@@ -232,7 +232,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
         return reservedResources.computeIfAbsent(taskId, k -> new ItemStacksManager());
     }
 
-    private void syncAll() {
+    public void syncAll() {
         this.synchronizer.reset();
         this.synchronizer.syncAll(resources.getAll());
     }

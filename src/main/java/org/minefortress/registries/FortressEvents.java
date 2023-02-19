@@ -46,7 +46,7 @@ public class FortressEvents {
             final var fortressServer = (FortressServer) server;
             final var player = handler.player;
             final var fsm = fortressServer.getFortressModServerManager().getByPlayer(player);
-            fsm.scheduleSync();
+            fsm.syncOnJoin();
             final var serverProfessionManager = fsm.getServerProfessionManager();
             serverProfessionManager.sendProfessions(player);
             serverProfessionManager.scheduleSync();
