@@ -9,6 +9,7 @@ import org.minefortress.entity.interfaces.IFortressAwareEntity;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 
+import java.util.Comparator;
 import java.util.Optional;
 
 public class EatGoal extends Goal {
@@ -21,22 +22,6 @@ public class EatGoal extends Goal {
     @Override
     public boolean canStart() {
         return getEatControl().isHungry() && getEatableItem().isPresent();
-    }
-
-    @NotNull
-    private EatControl getEatControl() {
-        return entity.getEatControl().orElseThrow();
-    }
-
-    @NotNull
-    private Optional<ItemStack> getEatableItem() {
-        return getResourceManager()
-                .flatMap(it -> it
-                        .getAllItems()
-                        .stream()
-                        .filter(stack -> !stack.isEmpty() && stack.getItem().isFood())
-                        .findFirst()
-                );
     }
 
     @Override
@@ -60,5 +45,27 @@ public class EatGoal extends Goal {
                 .map(FortressServerManager::getResourceManager)
                 .map(ServerResourceManager.class::cast) :
                 Optional.empty();
+    }
+
+    @NotNull
+    private EatControl getEatControl() {
+        return entity.getEatControl().orElseThrow();
+    }
+
+    @NotNull
+    private Optional<ItemStack> getEatableItem() {
+        return getResourceManager()
+                .flatMap(it -> it
+                        .getAllItems()
+                        .stream()
+                        .filter(stack -> !stack.isEmpty() && stack.getItem().isFood())
+                        .min(
+                                Comparator.comparingDouble(stack ->
+                                        Optional.ofNullable(stack.getItem().getFoodComponent())
+                                                .map(item -> item.getHunger() * item.getSaturationModifier() * 2.0f)
+                                                .orElse(0f)
+                                )
+                        )
+                );
     }
 }
