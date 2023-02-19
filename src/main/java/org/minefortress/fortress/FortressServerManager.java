@@ -327,6 +327,14 @@ public final class FortressServerManager extends AbstractFortressManager {
         return new BlockPos(spawnX, spawnY, spawnZ);
     }
 
+    public void syncOnJoin() {
+        this.needSync = true;
+        this.needSyncBuildings = true;
+        this.needSyncSpecialBlocks = true;
+        final var resourceManager = (ServerResourceManager) this.getResourceManager();
+        resourceManager.syncAll();
+    }
+
     public void scheduleSync() {
         needSync = true;
     }
