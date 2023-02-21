@@ -6,6 +6,7 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.border.WorldBorder;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
@@ -92,6 +93,16 @@ public final class FortressClientManager extends AbstractFortressManager {
     public void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks) {
         this.specialBlocks = specialBlocks;
         this.blueprintsSpecialBlocks = blueprintSpecialBlocks;
+    }
+
+    public Optional<WorldBorder> getFortressBorder() {
+        return Optional.ofNullable(fortressCenter)
+                .map(it -> {
+                    final WorldBorder border = new WorldBorder();
+                    border.setCenter(it.getX(), it.getZ());
+                    border.setSize(64);
+                    return border;
+                });
     }
 
     public boolean isSelectingColonist() {

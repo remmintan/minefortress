@@ -14,6 +14,7 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vector4f;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.border.WorldBorder;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -25,6 +26,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -107,6 +109,13 @@ public abstract class FortressWorldRendererMixin  {
     @Inject(method = "render", at = @At(value = "INVOKE", ordinal=18, target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", shift = At.Shift.BY, by = -3))
     public void renderTranslucentBuffer(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
         renderTranslucent(matrices, camera, matrix4f);
+    }
+
+    @Redirect(method = "renderWorldBorder", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
+    public WorldBorder getWorldBorder(ClientWorld instance) {
+        return ModUtils.getFortressClientManager()
+                .getFortressBorder()
+                .orElseGet(instance::getWorldBorder);
     }
 
     private void renderTranslucent(MatrixStack matrices, Camera camera, Matrix4f matrix4f) {
