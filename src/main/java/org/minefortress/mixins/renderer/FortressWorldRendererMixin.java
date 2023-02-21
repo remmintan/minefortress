@@ -113,9 +113,16 @@ public abstract class FortressWorldRendererMixin  {
 
     @Redirect(method = "renderWorldBorder", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
     public WorldBorder getWorldBorder(ClientWorld instance) {
-        return ModUtils.getFortressClientManager()
-                .getFortressBorder()
-                .orElseGet(instance::getWorldBorder);
+        final var selectingBlueprint = ModUtils.getBlueprintManager().hasSelectedBlueprint();
+        final var selecting = ModUtils.getSelectionManager().isSelecting();
+        final var selectingArea = ModUtils.getAreasClientManager().isSelecting();
+
+        if(selectingBlueprint || selecting || selectingArea)
+            return ModUtils.getFortressClientManager()
+                    .getFortressBorder()
+                    .orElseGet(instance::getWorldBorder);
+        else
+            return instance.getWorldBorder();
     }
 
     private void renderTranslucent(MatrixStack matrices, Camera camera, Matrix4f matrix4f) {
