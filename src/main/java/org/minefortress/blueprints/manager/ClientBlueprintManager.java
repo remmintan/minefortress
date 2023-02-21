@@ -17,6 +17,7 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.minefortress.utils.BuildingHelper;
+import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -77,10 +78,13 @@ public class ClientBlueprintManager {
                 .collect(Collectors.toSet());
         final int floorLevel = selectedStructure.getFloorLevel();
 
+        final var fortressBorder = ModUtils.getFortressClientManager().getFortressBorder();
+
         final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
                 .filter(blockPos -> blockPos.getY() >= floorLevel)
                 .map(pos -> pos.add(blueprintBuildPos.down(floorLevel)))
-                .anyMatch(pos -> !BuildingHelper.canPlaceBlock(client.world, pos));
+                .anyMatch(pos -> !BuildingHelper.canPlaceBlock(client.world, pos) ||
+                        fortressBorder.map(border -> !border.contains(pos)).orElse(false));
 
         final boolean blueprintPartInTheAir = blueprintDataPositions.stream()
                 .filter(blockPos -> {
@@ -88,7 +92,8 @@ public class ClientBlueprintManager {
                     return y<=floorLevel;
                 })
                 .map(pos -> pos.add(blueprintBuildPos.down(floorLevel)))
-                .anyMatch(pos -> BuildingHelper.canPlaceBlock(client.world, pos.down()));
+                .anyMatch(pos -> BuildingHelper.canPlaceBlock(client.world, pos.down()) ||
+                        fortressBorder.map(border -> !border.contains(pos)).orElse(false));
 
         cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
     }

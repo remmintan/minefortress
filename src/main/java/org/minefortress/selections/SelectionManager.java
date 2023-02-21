@@ -89,8 +89,8 @@ public class SelectionManager implements FortressWorldRenderer, ISelectionModelB
             this.selection.update(pickedPos, upSelectionDelta);
             this.setNeedsUpdate(true);
 
+            final var clientManager = ((FortressMinecraftClient) client).getFortressClientManager();
             if((clickType == ClickType.BUILD || clickType == ClickType.ROADS)&& clickingBlockState != null) {
-                final var clientManager = ((FortressMinecraftClient) client).getFortressClientManager();
                 if(clientManager.isSurvival()){
                     if(BlockUtils.isCountableBlock(clickingBlockState)) {
                         final var blocksAmount = this.selection.getSelection().size();
@@ -108,10 +108,20 @@ public class SelectionManager implements FortressWorldRenderer, ISelectionModelB
                 inCorrectState = true;
             }
 
+            clientManager.getFortressBorder()
+                            .ifPresent(border ->
+                                    inCorrectState = inCorrectState && selection
+                                            .getSelection()
+                                            .stream()
+                                            .allMatch(border::contains)
+                            );
         }
     }
 
     public Vector4f getClickColor() {
+        if(!inCorrectState) {
+            return new Vector4f((170f/255f), 0.0f, 0.0f, 0.5f);
+        }
         float green = (this.clickType == ClickType.BUILD || this.clickType == ClickType.ROADS)? (170f/255f) : 0.0f;
         return new Vector4f(0.0f, green, 0.0f, 0.5f);
     }
