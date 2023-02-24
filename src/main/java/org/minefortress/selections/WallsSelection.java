@@ -48,6 +48,7 @@ public class WallsSelection extends Selection {
 
     @Override
     public void update(BlockPos pickedBlock, final int upDelta) {
+        if(pickedBlock == null) return;
         pickedBlock = pickedBlock.toImmutable();
         this.upDelta = upDelta;
         updateCorners(pickedBlock);
