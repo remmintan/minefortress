@@ -59,7 +59,7 @@ public class EatGoal extends Goal {
                         .getAllItems()
                         .stream()
                         .filter(stack -> !stack.isEmpty() && stack.getItem().isFood())
-                        .min(
+                        .max(
                                 Comparator.comparingDouble(stack ->
                                         Optional.ofNullable(stack.getItem().getFoodComponent())
                                                 .map(item -> item.getHunger() * item.getSaturationModifier() * 2.0f)

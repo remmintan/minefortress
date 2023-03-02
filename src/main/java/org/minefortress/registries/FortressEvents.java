@@ -87,6 +87,7 @@ public class FortressEvents {
 
     public static void registerClient() {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ModUtils.getFortressClientManager().reset());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ModUtils.getFortressClientManager().reset());
     }
 
 }

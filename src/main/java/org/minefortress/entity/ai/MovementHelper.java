@@ -142,7 +142,7 @@ public class MovementHelper {
             }
 
             if(pathEvent == PathEvent.CALC_FAILED) {
-                MovementHelper.LOGGER.warn("{} can't find path to {}", getColonistName(), workGoal);
+                MovementHelper.LOGGER.debug("{} can't find path to {}", getColonistName(), workGoal);
                 MovementHelper.this.colonist.setAllowToPlaceBlockFromFarAway(true);
             }
         }
