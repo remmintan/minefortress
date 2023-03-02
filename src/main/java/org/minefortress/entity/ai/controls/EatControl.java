@@ -15,7 +15,7 @@ public class EatControl {
     }
 
     public boolean isHungry() {
-        return colonist.getCurrentFoodLevel() < 12 || (colonist.getHealth() <= 10 && colonist.getCurrentFoodLevel() < 20);
+        return colonist.getCurrentFoodLevel() < 12 || (colonist.getHealth() < 20 && colonist.getCurrentFoodLevel() < 20);
     }
 
     public void tick() {
