@@ -70,6 +70,8 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Shadow @Final static SimpleInventory INVENTORY;
 
+    @Shadow public abstract int getSelectedTab();
+
     public FortressCreativeInventoryScreenMixin(CreativeInventoryScreen.CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {
         super(screenHandler, playerInventory, text);
     }
@@ -173,6 +175,13 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             }
 
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "handledScreenTick", at = @At("HEAD"))
+    public void tick(CallbackInfo ci) {
+        if(this.getSelectedTab() == ItemGroup.INVENTORY.getIndex() && ModUtils.isClientInFortressGamemode()) {
+            this.setSelectedTab(ItemGroup.BUILDING_BLOCKS);
         }
     }
 
