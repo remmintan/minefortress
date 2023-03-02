@@ -320,6 +320,8 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public void reset() {
         this.initialized = false;
+        this.selectedPawn = null;
+        this.selectedColonistDelta = null;
     }
 
     // getter and setter for state
