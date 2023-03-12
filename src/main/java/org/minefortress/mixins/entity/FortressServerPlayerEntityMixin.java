@@ -5,12 +5,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
@@ -28,9 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ServerPlayerEntity.class)
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
 
-    @Shadow @Final public ServerPlayerInteractionManager interactionManager;
     @Shadow @Final public MinecraftServer server;
-
 
     private Vec3d persistedPos;
     private Vec3d persistedVelocity;
@@ -38,6 +36,8 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     private float persistedPitch;
 
     private ServerBlueprintManager serverBlueprintManager;
+
+    private boolean wasInBlueprintWorldWhenLoggedOut = false;
 
     public FortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
@@ -56,11 +56,31 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
         serverBlueprintManager.write();
+        NbtCompound playerState = new NbtCompound();
+        playerState.putBoolean("wasInBlueprintWorldWhenLoggedOut", wasInBlueprintWorldWhenLoggedOut);
+        if(persistedPos != null) {
+            playerState.putDouble("persistedPosX", persistedPos.x);
+            playerState.putDouble("persistedPosY", persistedPos.y);
+            playerState.putDouble("persistedPosZ", persistedPos.z);
+        }
+        nbt.put("playerState", playerState);
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         serverBlueprintManager.read(nbt);
+        if(nbt.contains("playerState")) {
+            NbtCompound playerState = nbt.getCompound("playerState");
+            wasInBlueprintWorldWhenLoggedOut = playerState.getBoolean("wasInBlueprintWorldWhenLoggedOut");
+            if(playerState.contains("persistedPosX")) {
+                persistedPos = new Vec3d(
+                        playerState.getDouble("persistedPosX"),
+                        playerState.getDouble("persistedPosY"),
+                        playerState.getDouble("persistedPosZ")
+                );
+            }
+        }
+
     }
 
     @Override
@@ -106,6 +126,22 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         } else {
             return actualSpawn;
         }
+    }
+
+    @Override
+    public boolean wasInBlueprintWorldWhenLoggedOut() {
+        return wasInBlueprintWorldWhenLoggedOut;
+    }
+
+    @Override
+    public void setWasInBlueprintWorldWhenLoggedOut(boolean wasInBlueprintWorldWhenLoggedOut) {
+        this.wasInBlueprintWorldWhenLoggedOut = wasInBlueprintWorldWhenLoggedOut;
+    }
+
+    @Override
+    @Nullable
+    public Vec3d getPersistedPos() {
+        return persistedPos;
     }
 
 }
