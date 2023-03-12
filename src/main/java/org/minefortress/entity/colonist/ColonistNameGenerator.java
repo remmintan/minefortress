@@ -7,7 +7,24 @@ import java.util.*;
 
 public class ColonistNameGenerator {
 
-    private static final List<String> randomNames = Arrays.asList(
+    private static final List<String> SUPPORTER_NAMES = Arrays.asList(
+            "Jèff",
+            "Travis",
+            "Fed",
+            "Noah",
+            "Ray",
+            "Moench",
+            "Hunter",
+            "Christian",
+            "Dean",
+            "Lyam",
+            "Takelale",
+            "Varneke",
+            "Brandon",
+            "Aki"
+    );
+
+    private static final List<String> RANDOM_NAMES = Arrays.asList(
             "James",
             "Robert",
             "John",
@@ -93,7 +110,7 @@ public class ColonistNameGenerator {
 
     public ColonistNameGenerator() {
         mandatoryNames = new ArrayList<>();
-        mandatoryNames.addAll(Arrays.asList("Jèff", "Travis", "Fed", "Noah",  "Ray", "Moench", "Hunter", "Christian", "Dean", "Lyam", "Takelale", "Varneke", "Brandon", "Aki"));
+        mandatoryNames.addAll(SUPPORTER_NAMES);
     }
 
     public ColonistNameGenerator(NbtCompound nbtCompound) {
@@ -114,7 +131,7 @@ public class ColonistNameGenerator {
             mandatoryNames.remove(name);
             return name;
         } else {
-            return randomNames.get((int) (Math.random() * randomNames.size()));
+            return RANDOM_NAMES.get((int) (Math.random() * RANDOM_NAMES.size()));
         }
     }
 
