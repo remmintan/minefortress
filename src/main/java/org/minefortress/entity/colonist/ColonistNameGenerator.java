@@ -3,10 +3,7 @@ package org.minefortress.entity.colonist;
 import net.minecraft.nbt.NbtCompound;
 import org.apache.logging.log4j.util.Strings;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class ColonistNameGenerator {
 
@@ -92,10 +89,10 @@ public class ColonistNameGenerator {
             "Joe"
     );
 
-    private final Queue<String> mandatoryNames;
+    private final List<String> mandatoryNames;
 
     public ColonistNameGenerator() {
-        mandatoryNames = new ArrayDeque<>();
+        mandatoryNames = new ArrayList<>();
         mandatoryNames.addAll(Arrays.asList("Jèff", "Travis", "Fed", "Noah",  "Ray", "Moench", "Hunter", "Christian", "Dean", "Lyam", "Takelale", "Varneke", "Brandon", "Aki"));
     }
 
@@ -104,16 +101,18 @@ public class ColonistNameGenerator {
             final String mandatoryNamesString = nbtCompound.getString("mandatoryNames");
             if(Strings.isNotBlank(mandatoryNamesString)) {
                 final String[] mandatoryNames = mandatoryNamesString.split(",");
-                this.mandatoryNames = new ArrayDeque<>(Arrays.asList(mandatoryNames));
+                this.mandatoryNames = new ArrayList<>(Arrays.asList(mandatoryNames));
                 return;
             }
         }
-        mandatoryNames = new ArrayDeque<>();
+        mandatoryNames = new ArrayList<>();
     }
 
     public String generateRandomName() {
         if(!mandatoryNames.isEmpty()) {
-            return mandatoryNames.remove();
+            final var name = mandatoryNames.get((int) (Math.random() * mandatoryNames.size()));
+            mandatoryNames.remove(name);
+            return name;
         } else {
             return randomNames.get((int) (Math.random() * randomNames.size()));
         }
