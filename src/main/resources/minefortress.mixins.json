@@ -14,6 +14,7 @@
     "network.FortressServerPlayNetworkHandlerMixin",
     "renderer.gui.FortressSimpleInventoryMixin",
     "entity.player.FortressPlayerInventoryMixin",
+    "block.FarmlandBlockMixin",
     "block.FortressAbstractBlockState",
     "entity.ArrowEntityMixin",
     "entity.FortressTntEntityMixin",

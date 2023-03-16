@@ -577,9 +577,13 @@ public final class FortressServerManager extends AbstractFortressManager {
                     .mapToLong(it -> it.getBedsCount(getWorld()) * 10)
                     .sum() > minCount;
         }
+        final var count = requiredBuildings.count();
         if(requirementId.equals("shooting_gallery"))
-            return requiredBuildings.count() * 10 > minCount;
-        return requiredBuildings.count() > minCount;
+            return count * 10 > minCount;
+
+        if(requirementId.startsWith("farm"))
+            return count * 5 > minCount;
+        return count > minCount;
     }
 
     @Override

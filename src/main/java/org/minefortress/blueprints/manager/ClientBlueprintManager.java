@@ -17,6 +17,7 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.minefortress.utils.BuildingHelper;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -139,8 +140,14 @@ public class ClientBlueprintManager {
     }
 
     public void buildCurrentStructure() {
-        if(selectedStructure == null) throw new IllegalStateException("No blueprint selected");
-        if(blueprintBuildPos == null) throw new IllegalStateException("No blueprint build position");
+        if(selectedStructure == null) {
+            LoggerFactory.getLogger(ClientBlueprintManager.class).error("No structure selected");
+            return;
+        }
+        if(blueprintBuildPos == null) {
+            LoggerFactory.getLogger(ClientBlueprintManager.class).error("No position selected");
+            return;
+        }
 
         if(cantBuild) return;
 
