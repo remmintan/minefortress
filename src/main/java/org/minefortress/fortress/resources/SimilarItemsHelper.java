@@ -47,7 +47,9 @@ public class SimilarItemsHelper {
             ItemTags.LEAVES,
             ItemTags.FLOWERS,
             ItemTags.LOGS,
-            ItemTags.PLANKS
+            ItemTags.PLANKS,
+            ItemTags.CARPETS,
+            ItemTags.WOOL
     );
 
     private static final List<Item> similarDirt = Arrays.asList(

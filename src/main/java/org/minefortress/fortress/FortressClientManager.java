@@ -273,9 +273,15 @@ public final class FortressClientManager extends AbstractFortressManager {
                     .mapToLong(it -> it.getBedsCount() * 10)
                     .sum() > minCount;
         }
+        final var count = reuiredBuilding.count();
         if(requirementId.equals("shooting_gallery"))
-            return reuiredBuilding.count() * 10 > minCount;
-        return reuiredBuilding.count() > minCount;
+            return count * 10 > minCount;
+
+        if(requirementId.startsWith("farm"))
+            return count * 5 > minCount;
+
+
+        return count > minCount;
     }
 
     public int countBuildings(String requirementId) {
@@ -331,6 +337,8 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public void reset() {
         this.initialized = false;
+        this.selectedPawn = null;
+        this.selectedColonistDelta = null;
     }
 
     // getter and setter for state

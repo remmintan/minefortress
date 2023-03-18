@@ -4,6 +4,7 @@
   "package": "org.minefortress.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "block.FarmlandBlockMixin",
     "block.FortressAbstractBlockState",
     "entity.ArrowEntityMixin",
     "entity.FortressTntEntityMixin",

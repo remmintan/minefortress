@@ -41,6 +41,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressC2SPacket {
         }
 
         final ServerWorld world = server.getWorld(World.OVERWORLD);
+        player.getInventory().clear();
         player.moveToWorld(world);
     }
 

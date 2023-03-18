@@ -80,7 +80,7 @@ public class FortressBuilding implements IAutomationArea {
     private Stream<BlockPos> streamBeds(World world) {
         return StreamSupport.stream(BlockPos.iterate(start, end).spliterator(), false)
                 .filter(pos -> world.getBlockState(pos).isIn(BlockTags.BEDS))
-                .filter(pos -> world.getBlockState(pos).get(BedBlock.PART) == BedPart.FOOT)
+                .filter(pos -> world.getBlockState(pos).get(BedBlock.PART) == BedPart.HEAD)
                 .map(BlockPos::toImmutable);
     }
 

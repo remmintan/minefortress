@@ -9,8 +9,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
+import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.interfaces.FortressServer;
+import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundFollowColonistPacket;
@@ -50,6 +52,20 @@ public class FortressEvents {
             final var serverProfessionManager = fsm.getServerProfessionManager();
             serverProfessionManager.sendProfessions(player);
             serverProfessionManager.scheduleSync();
+
+            if(player instanceof FortressServerPlayerEntity fortressPlayer) {
+                if(fortressPlayer.wasInBlueprintWorldWhenLoggedOut() && fortressPlayer.getPersistedPos() != null) {
+                    final var pos = fortressPlayer.getPersistedPos();
+                    player.teleport(pos.x, pos.y, pos.z);
+                }
+            }
+        });
+
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            final var inBlueprintWorldOnDisconnect = handler.player.getWorld().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
+            if(handler.player instanceof FortressServerPlayerEntity fortressPlayer) {
+                fortressPlayer.setWasInBlueprintWorldWhenLoggedOut(inBlueprintWorldOnDisconnect);
+            }
         });
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
@@ -87,6 +103,7 @@ public class FortressEvents {
 
     public static void registerClient() {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ModUtils.getFortressClientManager().reset());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ModUtils.getFortressClientManager().reset());
     }
 
 }

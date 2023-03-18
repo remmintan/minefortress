@@ -15,13 +15,14 @@ import org.minefortress.registries.FortressBlocks;
 
 public class BuildingHelper {
 
-    public static boolean canPlaceBlock(@Nullable World level, BlockPos pos) {
-        if (level == null) return false;
+    public static boolean canPlaceBlock(@Nullable World level, @Nullable BlockPos pos) {
+        if (level == null || pos == null) return false;
         final BlockState blockState = level.getBlockState(pos);
         return canPlaceBlock(level, blockState, pos);
     }
 
-    public static boolean canPlaceBlock(World level, BlockState state, BlockPos pos) {
+    public static boolean canPlaceBlock(@Nullable World level, @Nullable BlockState state, @Nullable BlockPos pos) {
+        if (level == null || state == null || pos == null) return false;
         return inWorldBounds(level, pos) && (
                 isAirOrFluid(state) ||
                 isGrass(level, state, pos) ||
@@ -31,37 +32,42 @@ public class BuildingHelper {
         );
     }
 
-    public static boolean canRemoveBlock(World level, BlockPos pos) {
+    public static boolean canRemoveBlock(@Nullable World level, @Nullable BlockPos pos) {
+        if (level == null || pos == null) return false;
         final BlockState blockState = level.getBlockState(pos);
         return canRemoveBlock(level, blockState, pos);
     }
 
-    public static boolean canRemoveBlock(World level, BlockState state, BlockPos pos) {
+    public static boolean canRemoveBlock(@Nullable World level, @Nullable BlockState state, @Nullable BlockPos pos) {
+        if (level == null || state == null || pos == null) return false;
         return inWorldBounds(level, pos) &&
                 !isAirOrFluid(state) &&
                 !state.isOf(Blocks.BEDROCK) &&
                 !state.isOf(Blocks.BARRIER);
     }
 
-    public static boolean canStayOnBlock(WorldAccess level, BlockPos pos) {
+    public static boolean canStayOnBlock(@Nullable WorldAccess level, @Nullable BlockPos pos) {
+        if (level == null || pos == null) return false;
         final BlockState blockState = level.getBlockState(pos);
         return canStayOnBlock(level, blockState, pos);
     }
 
-    public static boolean canStayOnBlock(WorldAccess level, BlockState state, BlockPos pos) {
+    public static boolean canStayOnBlock(@Nullable WorldAccess level, @Nullable BlockState state, @Nullable BlockPos pos) {
+        if (level == null || state == null || pos == null) return false;
         return !isAirOrFluid(state) &&
                 hasCollisions(level, pos) &&
                 doesNotHaveCollisions(level, pos.up()) &&
                 doesNotHaveCollisions(level, pos.up().up());
     }
 
-    public static boolean doesNotHaveCollisions(@Nullable WorldAccess level, BlockPos pos) {
-        if (level == null) return false;
+    public static boolean doesNotHaveCollisions(@Nullable WorldAccess level, @Nullable BlockPos pos) {
+        if (level == null || pos == null) return false;
         final BlockState state = level.getBlockState(pos);
         return state.getCollisionShape(level, pos) == VoxelShapes.empty();
     }
 
-    public static boolean hasCollisions(WorldAccess level, BlockPos pos) {
+    public static boolean hasCollisions(@Nullable WorldAccess level, @Nullable BlockPos pos) {
+        if (level == null || pos == null) return false;
         final BlockState state = level.getBlockState(pos);
         return state.getCollisionShape(level, pos) != VoxelShapes.empty();
     }
