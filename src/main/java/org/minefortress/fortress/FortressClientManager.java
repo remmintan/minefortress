@@ -7,6 +7,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.border.WorldBorder;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
@@ -32,6 +33,7 @@ import java.util.stream.StreamSupport;
 public final class FortressClientManager extends AbstractFortressManager {
 
     private static final Object KEY = new Object();
+    private static final int FORTRESS_BORDER_SIZE = 64;
 
     private final ClientProfessionManager professionManager;
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
@@ -96,13 +98,30 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public Optional<WorldBorder> getFortressBorder() {
-        return Optional.ofNullable(fortressCenter)
-                .map(it -> {
-                    final WorldBorder border = new WorldBorder();
-                    border.setCenter(it.getX(), it.getZ());
-                    border.setSize(64);
-                    return border;
-                });
+        if(isCenterNotSet()) {
+            return getWorldBorder(posAppropriateForCenter);
+        }
+        return Optional.ofNullable(fortressCenter).flatMap(FortressClientManager::getWorldBorder);
+    }
+
+    @NotNull
+    private static Optional<WorldBorder> getWorldBorder(BlockPos pos) {
+        if(pos != null) {
+            final WorldBorder border = new WorldBorder();
+            final var x = pos.getX();
+            final var z = pos.getZ();
+            final var xSign = Math.signum(x);
+            final var zSign = Math.signum(z);
+            final var nonZeroSignX = xSign == 0 ? 1 : xSign;
+            final var nonZeroSignZ = zSign == 0 ? 1 : zSign;
+            final var adjustedX = x - x % FORTRESS_BORDER_SIZE + nonZeroSignX * FORTRESS_BORDER_SIZE / 2f;
+            final var adjustedZ = z - z % FORTRESS_BORDER_SIZE + nonZeroSignZ * FORTRESS_BORDER_SIZE / 2f;
+            border.setCenter(adjustedX, adjustedZ);
+            border.setSize(FORTRESS_BORDER_SIZE);
+            return Optional.of(border);
+        } else {
+            return Optional.empty();
+        }
     }
 
     public boolean isSelectingColonist() {

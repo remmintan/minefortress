@@ -116,8 +116,9 @@ public abstract class FortressWorldRendererMixin  {
         final var selectingBlueprint = ModUtils.getBlueprintManager().hasSelectedBlueprint();
         final var selecting = ModUtils.getSelectionManager().isSelecting();
         final var selectingArea = ModUtils.getAreasClientManager().isSelecting();
+        final var centerNotSet = ModUtils.getFortressClientManager().isCenterNotSet();
 
-        if(selectingBlueprint || selecting || selectingArea)
+        if(selectingBlueprint || selecting || selectingArea || centerNotSet )
             return ModUtils.getFortressClientManager()
                     .getFortressBorder()
                     .orElseGet(instance::getWorldBorder);
