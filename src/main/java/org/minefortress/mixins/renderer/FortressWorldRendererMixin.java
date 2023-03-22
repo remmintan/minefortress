@@ -1,5 +1,7 @@
 package org.minefortress.mixins.renderer;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
@@ -7,14 +9,14 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vector4f;
+import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.border.WorldBorder;
+import org.minefortress.fortress.FortressBorder;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -26,7 +28,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -34,11 +35,14 @@ import java.util.List;
 @Mixin(WorldRenderer.class)
 public abstract class FortressWorldRendererMixin  {
 
+    private static final Identifier FORCEFIELD = new Identifier("textures/misc/forcefield.png");
     @Shadow @Final private MinecraftClient client;
     @Shadow private ClientWorld world;
     @Shadow @Final private BufferBuilderStorage bufferBuilders;
 
     @Shadow private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
+
+    @Shadow private int cameraChunkX;
     private MineFortressEntityRenderer entityRenderer;
 
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -111,8 +115,8 @@ public abstract class FortressWorldRendererMixin  {
         renderTranslucent(matrices, camera, matrix4f);
     }
 
-    @Redirect(method = "renderWorldBorder", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
-    public WorldBorder getWorldBorder(ClientWorld instance) {
+//    @Redirect(method = "renderWorldBorder", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
+    private WorldBorder getWorldBorder(ClientWorld instance) {
         final var selectingBlueprint = ModUtils.getBlueprintManager().hasSelectedBlueprint();
         final var selecting = ModUtils.getSelectionManager().isSelecting();
         final var selectingArea = ModUtils.getAreasClientManager().isSelecting();
@@ -124,6 +128,129 @@ public abstract class FortressWorldRendererMixin  {
                     .orElseGet(instance::getWorldBorder);
         else
             return instance.getWorldBorder();
+    }
+
+    @Inject(method="renderWorldBorder", at=@At("HEAD"), cancellable = true)
+    public void renderCustomWorldBorder(Camera camera, CallbackInfo ci) {
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        WorldBorder worldBorder = getWorldBorder(this.world);
+        double viewDistance = this.client.options.getViewDistance() * 16;
+        if (!(camera.getPos().x < worldBorder.getBoundEast() - viewDistance) || !(camera.getPos().x > worldBorder.getBoundWest() + viewDistance) || !(camera.getPos().z < worldBorder.getBoundSouth() - viewDistance) || !(camera.getPos().z > worldBorder.getBoundNorth() + viewDistance)) {
+            double e = 1.0 - worldBorder.getDistanceInsideBorder(camera.getPos().x, camera.getPos().z) / viewDistance;
+            e = Math.pow(e, 4.0);
+            e = MathHelper.clamp(e, 0.0, 1.0);
+
+            double cameraDistance = this.client.gameRenderer.method_32796();
+            RenderSystem.enableBlend();
+            RenderSystem.enableDepthTest();
+            RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
+            RenderSystem.setShaderTexture(0, FORCEFIELD);
+            RenderSystem.depthMask(MinecraftClient.isFabulousGraphicsOrBetter());
+            MatrixStack matrixStack = RenderSystem.getModelViewStack();
+            matrixStack.push();
+            RenderSystem.applyModelViewMatrix();
+            int i = worldBorder.getStage().getColor();
+            float j = (float)(i >> 16 & 255) / 255.0F;
+            float k = (float)(i >> 8 & 255) / 255.0F;
+            float l = (float)(i & 255) / 255.0F;
+            RenderSystem.setShaderColor(j, k, l, (float)e);
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.polygonOffset(-3.0F, -3.0F);
+            RenderSystem.enablePolygonOffset();
+            RenderSystem.disableCull();
+
+
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+
+            renderParticularWorldBorder(bufferBuilder, worldBorder, viewDistance, camera, cameraDistance);
+            if(worldBorder instanceof FortressBorder fortressBorder) {
+                fortressBorder
+                        .getAdditionalBorders()
+                        .forEach(border -> renderParticularWorldBorder(bufferBuilder, border, viewDistance, camera, cameraDistance));
+            }
+
+            bufferBuilder.end();
+            BufferRenderer.draw(bufferBuilder);
+            RenderSystem.enableCull();
+            RenderSystem.polygonOffset(0.0F, 0.0F);
+            RenderSystem.disablePolygonOffset();
+            RenderSystem.disableBlend();
+            matrixStack.pop();
+            RenderSystem.applyModelViewMatrix();
+            RenderSystem.depthMask(true);
+        }
+        ci.cancel();
+    }
+
+    private static void renderParticularWorldBorder(BufferBuilder bufferBuilder, WorldBorder worldBorder, double viewDistance, Camera camera, double cameraDistance) {
+        float m = (float)(Util.getMeasuringTimeMs() % 3000L) / 3000.0F;
+        double cameraX = camera.getPos().x;
+        double cameraZ = camera.getPos().z;
+        double q = Math.max(MathHelper.floor(cameraZ - viewDistance), worldBorder.getBoundNorth());
+        double r = Math.min(MathHelper.ceil(cameraZ + viewDistance), worldBorder.getBoundSouth());
+        float p = (float)(cameraDistance - MathHelper.fractionalPart(camera.getPos().y));
+        float v;
+        float s;
+        double t;
+        double u;
+
+        if (cameraX > worldBorder.getBoundEast() - viewDistance) {
+            s = 0.0F;
+
+            for(t = q; t < r; s += 0.5F) {
+                u = Math.min(1.0, r - t);
+                v = (float)u * 0.5F;
+                bufferBuilder.vertex(worldBorder.getBoundEast() - cameraX, -cameraDistance, t - cameraZ).texture(m - s, m + p).next();
+                bufferBuilder.vertex(worldBorder.getBoundEast() - cameraX, -cameraDistance, t + u - cameraZ).texture(m - (v + s), m + p).next();
+                bufferBuilder.vertex(worldBorder.getBoundEast() - cameraX, cameraDistance, t + u - cameraZ).texture(m - (v + s), m + 0.0F).next();
+                bufferBuilder.vertex(worldBorder.getBoundEast() - cameraX, cameraDistance, t - cameraZ).texture(m - s, m + 0.0F).next();
+                ++t;
+            }
+        }
+
+        if (cameraX < worldBorder.getBoundWest() + viewDistance) {
+            s = 0.0F;
+
+            for(t = q; t < r; s += 0.5F) {
+                u = Math.min(1.0, r - t);
+                v = (float)u * 0.5F;
+                bufferBuilder.vertex(worldBorder.getBoundWest() - cameraX, -cameraDistance, t - cameraZ).texture(m + s, m + p).next();
+                bufferBuilder.vertex(worldBorder.getBoundWest() - cameraX, -cameraDistance, t + u - cameraZ).texture(m + v + s, m + p).next();
+                bufferBuilder.vertex(worldBorder.getBoundWest() - cameraX, cameraDistance, t + u - cameraZ).texture(m + v + s, m + 0.0F).next();
+                bufferBuilder.vertex(worldBorder.getBoundWest() - cameraX, cameraDistance, t - cameraZ).texture(m + s, m + 0.0F).next();
+                ++t;
+            }
+        }
+
+        q = Math.max(MathHelper.floor(cameraX - viewDistance), worldBorder.getBoundWest());
+        r = Math.min(MathHelper.ceil(cameraX + viewDistance), worldBorder.getBoundEast());
+        if (cameraZ > worldBorder.getBoundSouth() - viewDistance) {
+            s = 0.0F;
+
+            for(t = q; t < r; s += 0.5F) {
+                u = Math.min(1.0, r - t);
+                v = (float)u * 0.5F;
+                bufferBuilder.vertex(t - cameraX, -cameraDistance, worldBorder.getBoundSouth() - cameraZ).texture(m + s, m + p).next();
+                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, worldBorder.getBoundSouth() - cameraZ).texture(m + v + s, m + p).next();
+                bufferBuilder.vertex(t + u - cameraX, cameraDistance, worldBorder.getBoundSouth() - cameraZ).texture(m + v + s, m + 0.0F).next();
+                bufferBuilder.vertex(t - cameraX, cameraDistance, worldBorder.getBoundSouth() - cameraZ).texture(m + s, m + 0.0F).next();
+                ++t;
+            }
+        }
+
+        if (cameraZ < worldBorder.getBoundNorth() + viewDistance) {
+            s = 0.0F;
+
+            for(t = q; t < r; s += 0.5F) {
+                u = Math.min(1.0, r - t);
+                v = (float)u * 0.5F;
+                bufferBuilder.vertex(t - cameraX, -cameraDistance, worldBorder.getBoundNorth() - cameraZ).texture(m - s, m + p).next();
+                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, worldBorder.getBoundNorth() - cameraZ).texture(m - (v + s), m + p).next();
+                bufferBuilder.vertex(t + u - cameraX, cameraDistance, worldBorder.getBoundNorth() - cameraZ).texture(m - (v + s), m + 0.0F).next();
+                bufferBuilder.vertex(t - cameraX, cameraDistance, worldBorder.getBoundNorth() - cameraZ).texture(m - s, m + 0.0F).next();
+                ++t;
+            }
+        }
     }
 
     private void renderTranslucent(MatrixStack matrices, Camera camera, Matrix4f matrix4f) {

@@ -99,29 +99,55 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public Optional<WorldBorder> getFortressBorder() {
         if(isCenterNotSet()) {
-            return getWorldBorder(posAppropriateForCenter);
+            return getWorldBorder(Collections.singletonList(posAppropriateForCenter), true);
         }
         return Optional.ofNullable(fortressCenter).flatMap(FortressClientManager::getWorldBorder);
     }
 
     @NotNull
     private static Optional<WorldBorder> getWorldBorder(BlockPos pos) {
-        if(pos != null) {
-            final WorldBorder border = new WorldBorder();
-            final var x = pos.getX();
-            final var z = pos.getZ();
-            final var xSign = Math.signum(x);
-            final var zSign = Math.signum(z);
-            final var nonZeroSignX = xSign == 0 ? 1 : xSign;
-            final var nonZeroSignZ = zSign == 0 ? 1 : zSign;
-            final var adjustedX = x - x % FORTRESS_BORDER_SIZE + nonZeroSignX * FORTRESS_BORDER_SIZE / 2f;
-            final var adjustedZ = z - z % FORTRESS_BORDER_SIZE + nonZeroSignZ * FORTRESS_BORDER_SIZE / 2f;
-            border.setCenter(adjustedX, adjustedZ);
-            border.setSize(FORTRESS_BORDER_SIZE);
+        return getWorldBorder(Collections.singletonList(pos), false);
+    }
+
+    @NotNull
+    private static Optional<WorldBorder> getWorldBorder(List<BlockPos> positions, boolean dynamicState) {
+        if(positions != null && !positions.isEmpty()) {
+            final var posQueue = new ArrayDeque<>(positions);
+
+            BlockPos mainPos = posQueue.poll();
+            if(mainPos == null) {
+                return Optional.empty();
+            }
+            final var border = new FortressBorder();
+            createBorder(border, mainPos);
+            if (dynamicState) {
+                border.enableDynamicStage();
+            }
+            posQueue.forEach(pos -> border.addAdditionalBorder(createBorder(pos)));
+
             return Optional.of(border);
         } else {
             return Optional.empty();
         }
+    }
+
+    private static WorldBorder createBorder(BlockPos center) {
+        final var border = new WorldBorder();
+        createBorder(border, center);
+        return border;
+    }
+
+    private static void createBorder(WorldBorder border, BlockPos center) {
+        final var x = center.getX();
+        final var z = center.getZ();
+        final var xSign = Math.signum(x);
+        final var zSign = Math.signum(z);
+        final var nonZeroSignX = xSign == 0 ? 1 : xSign;
+        final var nonZeroSignZ = zSign == 0 ? 1 : zSign;
+        final var adjustedX = x - x % FORTRESS_BORDER_SIZE + nonZeroSignX * FORTRESS_BORDER_SIZE / 2f;
+        final var adjustedZ = z - z % FORTRESS_BORDER_SIZE + nonZeroSignZ * FORTRESS_BORDER_SIZE / 2f;
+        border.setCenter(adjustedX, adjustedZ);
+        border.setSize(FORTRESS_BORDER_SIZE);
     }
 
     public boolean isSelectingColonist() {
