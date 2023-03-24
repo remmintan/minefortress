@@ -106,8 +106,8 @@ public final class FortressClientManager extends AbstractFortressManager {
         }
         return Optional.ofNullable(fortressCenter).map(it -> Arrays.asList(
                 it.toImmutable(),
-                it.add(-FORTRESS_BORDER_SIZE, 0, -FORTRESS_BORDER_SIZE).toImmutable(),
-                it.add(0, 0, -FORTRESS_BORDER_SIZE-1).toImmutable()
+                it.add(-FORTRESS_BORDER_SIZE, 0, FORTRESS_BORDER_SIZE).toImmutable(),
+                it.add(0, 0, FORTRESS_BORDER_SIZE).toImmutable()
         )).flatMap(FortressClientManager::getWorldBorder);
     }
 
