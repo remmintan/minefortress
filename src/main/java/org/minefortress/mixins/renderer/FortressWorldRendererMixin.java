@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @Mixin(WorldRenderer.class)
 public abstract class FortressWorldRendererMixin  {
@@ -163,7 +163,7 @@ public abstract class FortressWorldRendererMixin  {
 
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 
-            Function<Double, Boolean> shouldRenderBoundFunc = it -> worldBorder instanceof FortressBorder fb && fb.shouldRenderBound(it);
+            BiFunction<Double, Double, Boolean> shouldRenderBoundFunc = (x, z) -> worldBorder instanceof FortressBorder fb && fb.shouldRenderBound(x, z);
 
             renderParticularWorldBorder(bufferBuilder, worldBorder, viewDistance, camera, cameraDistance, shouldRenderBoundFunc);
             if(worldBorder instanceof FortressBorder fortressBorder) {
@@ -190,7 +190,7 @@ public abstract class FortressWorldRendererMixin  {
                                                     double viewDistance,
                                                     Camera camera,
                                                     double cameraDistance,
-                                                    Function<Double, Boolean> shouldRenderBound) {
+                                                    BiFunction<Double, Double, Boolean> shouldRenderBound) {
         float m = (float)(Util.getMeasuringTimeMs() % 3000L) / 3000.0F;
         double cameraX = camera.getPos().x;
         double cameraZ = camera.getPos().z;
@@ -204,8 +204,11 @@ public abstract class FortressWorldRendererMixin  {
         double t;
         double u;
 
+        final var centerX = worldBorder.getCenterX();
+        final var centerZ = worldBorder.getCenterZ();
+
         final var boundEast = worldBorder.getBoundEast();
-        if (cameraX > boundEast - viewDistance && shouldRenderBound.apply(boundEast)) {
+        if (cameraX > boundEast - viewDistance && shouldRenderBound.apply(boundEast, centerZ)) {
             s = 0.0F;
 
             for(t = q; t < r; s += 0.5F) {
@@ -220,7 +223,7 @@ public abstract class FortressWorldRendererMixin  {
         }
 
         final var boundWest = worldBorder.getBoundWest();
-        if (cameraX < boundWest + viewDistance && shouldRenderBound.apply(boundWest)) {
+        if (cameraX < boundWest + viewDistance && shouldRenderBound.apply(boundWest, centerZ)) {
             s = 0.0F;
 
             for(t = q; t < r; s += 0.5F) {
@@ -236,7 +239,7 @@ public abstract class FortressWorldRendererMixin  {
 
         q = Math.max(MathHelper.floor(cameraX - viewDistance), boundWest);
         r = Math.min(MathHelper.ceil(cameraX + viewDistance), boundEast);
-        if (cameraZ > boundSouth - viewDistance && shouldRenderBound.apply(boundSouth)) {
+        if (cameraZ > boundSouth - viewDistance && shouldRenderBound.apply(centerX, boundSouth)) {
             s = 0.0F;
 
             for(t = q; t < r; s += 0.5F) {
@@ -250,7 +253,7 @@ public abstract class FortressWorldRendererMixin  {
             }
         }
 
-        if (cameraZ < boundNorth + viewDistance && shouldRenderBound.apply(boundNorth)) {
+        if (cameraZ < boundNorth + viewDistance && shouldRenderBound.apply(centerX, boundNorth)) {
             s = 0.0F;
 
             for(t = q; t < r; s += 0.5F) {

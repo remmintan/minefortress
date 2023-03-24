@@ -13,8 +13,7 @@ public final class FortressBorder extends WorldBorder {
 
     private boolean hasDynamicStage = false;
     private final List<WorldBorder> additionalBorders = new ArrayList<>();
-
-    private final List<Double> uniqueBorders = new ArrayList<>();
+    private final List<BoundPosition> uniqueBorders = new ArrayList<>();
 
     public void addAdditionalBorder(WorldBorder worldBorder) {
         additionalBorders.add(worldBorder);
@@ -24,18 +23,18 @@ public final class FortressBorder extends WorldBorder {
     private void recalculateUniqueBorders() {
         uniqueBorders.clear();
         final var thisBorderPositions = Arrays.asList(
-                getBoundWest(),
-                getBoundEast(),
-                getBoundNorth(),
-                getBoundSouth()
+                new BoundPosition(getBoundWest(), getCenterZ()),
+                new BoundPosition(getBoundEast(), getCenterZ()),
+                new BoundPosition(getCenterX(), getBoundNorth()),
+                new BoundPosition(getCenterX(), getBoundSouth())
         );
         final var nonUniqueBorders = new ArrayList<>(thisBorderPositions);
 
         for (WorldBorder additionalBorder : additionalBorders) {
-            nonUniqueBorders.add(additionalBorder.getBoundWest());
-            nonUniqueBorders.add(additionalBorder.getBoundEast());
-            nonUniqueBorders.add(additionalBorder.getBoundNorth());
-            nonUniqueBorders.add(additionalBorder.getBoundSouth());
+            nonUniqueBorders.add(new BoundPosition(additionalBorder.getBoundWest(), additionalBorder.getCenterZ()));
+            nonUniqueBorders.add(new BoundPosition(additionalBorder.getBoundEast(), additionalBorder.getCenterZ()));
+            nonUniqueBorders.add(new BoundPosition(additionalBorder.getCenterX(), additionalBorder.getBoundNorth()));
+            nonUniqueBorders.add(new BoundPosition(additionalBorder.getCenterX(), additionalBorder.getBoundSouth()));
         }
 
         nonUniqueBorders.removeIf(it -> Collections.frequency(nonUniqueBorders, it) > 1);
@@ -43,8 +42,8 @@ public final class FortressBorder extends WorldBorder {
         uniqueBorders.addAll(nonUniqueBorders);
     }
 
-    public boolean shouldRenderBound(@Nullable Double bound) {
-        return bound != null && uniqueBorders.contains(bound);
+    public boolean shouldRenderBound(@Nullable Double boundX, @Nullable Double boundZ) {
+        return boundX != null && boundZ != null && uniqueBorders.contains(new BoundPosition(boundX, boundZ));
     }
 
     @Override
@@ -62,4 +61,6 @@ public final class FortressBorder extends WorldBorder {
     public List<WorldBorder> getAdditionalBorders() {
         return Collections.unmodifiableList(additionalBorders);
     }
+
+    private record BoundPosition(double x, double z) {}
 }
