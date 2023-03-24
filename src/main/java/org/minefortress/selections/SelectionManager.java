@@ -67,11 +67,15 @@ public class SelectionManager implements FortressWorldRenderer, ISelectionModelB
         upSelectionDelta--;
     }
 
-    public void tickSelectionUpdate(BlockPos blockPos, Direction clickedFace) {
+    public void tickSelectionUpdate(@Nullable BlockPos blockPos, Direction clickedFace) {
         if(isNotOverworld()) {
             if(selection.isSelecting()) {
                 this.resetSelection();
             }
+            return;
+        }
+
+        if(blockPos == null) {
             return;
         }
 

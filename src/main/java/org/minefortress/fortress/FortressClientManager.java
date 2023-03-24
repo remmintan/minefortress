@@ -99,14 +99,21 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public Optional<WorldBorder> getFortressBorder() {
         if(isCenterNotSet()) {
+            if(posAppropriateForCenter == null) {
+                return Optional.empty();
+            }
             return getWorldBorder(Collections.singletonList(posAppropriateForCenter), true);
         }
-        return Optional.ofNullable(fortressCenter).flatMap(FortressClientManager::getWorldBorder);
+        return Optional.ofNullable(fortressCenter).map(it -> Arrays.asList(
+                it.toImmutable(),
+                it.add(-FORTRESS_BORDER_SIZE, 0, -FORTRESS_BORDER_SIZE).toImmutable(),
+                it.add(0, 0, -FORTRESS_BORDER_SIZE-1).toImmutable()
+        )).flatMap(FortressClientManager::getWorldBorder);
     }
 
     @NotNull
-    private static Optional<WorldBorder> getWorldBorder(BlockPos pos) {
-        return getWorldBorder(Collections.singletonList(pos), false);
+    private static Optional<WorldBorder> getWorldBorder(List<BlockPos> pos) {
+        return getWorldBorder(pos, false);
     }
 
     @NotNull

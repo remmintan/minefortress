@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.function.Function;
 
 @Mixin(WorldRenderer.class)
 public abstract class FortressWorldRendererMixin  {
@@ -162,11 +163,13 @@ public abstract class FortressWorldRendererMixin  {
 
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 
-            renderParticularWorldBorder(bufferBuilder, worldBorder, viewDistance, camera, cameraDistance);
+            Function<Double, Boolean> shouldRenderBoundFunc = it -> worldBorder instanceof FortressBorder fb && fb.shouldRenderBound(it);
+
+            renderParticularWorldBorder(bufferBuilder, worldBorder, viewDistance, camera, cameraDistance, shouldRenderBoundFunc);
             if(worldBorder instanceof FortressBorder fortressBorder) {
                 fortressBorder
                         .getAdditionalBorders()
-                        .forEach(border -> renderParticularWorldBorder(bufferBuilder, border, viewDistance, camera, cameraDistance));
+                        .forEach(border -> renderParticularWorldBorder(bufferBuilder, border, viewDistance, camera, cameraDistance, shouldRenderBoundFunc));
             }
 
             bufferBuilder.end();
@@ -182,72 +185,81 @@ public abstract class FortressWorldRendererMixin  {
         ci.cancel();
     }
 
-    private static void renderParticularWorldBorder(BufferBuilder bufferBuilder, WorldBorder worldBorder, double viewDistance, Camera camera, double cameraDistance) {
+    private static void renderParticularWorldBorder(BufferBuilder bufferBuilder,
+                                                    WorldBorder worldBorder,
+                                                    double viewDistance,
+                                                    Camera camera,
+                                                    double cameraDistance,
+                                                    Function<Double, Boolean> shouldRenderBound) {
         float m = (float)(Util.getMeasuringTimeMs() % 3000L) / 3000.0F;
         double cameraX = camera.getPos().x;
         double cameraZ = camera.getPos().z;
-        double q = Math.max(MathHelper.floor(cameraZ - viewDistance), worldBorder.getBoundNorth());
-        double r = Math.min(MathHelper.ceil(cameraZ + viewDistance), worldBorder.getBoundSouth());
+        final var boundNorth = worldBorder.getBoundNorth();
+        double q = Math.max(MathHelper.floor(cameraZ - viewDistance), boundNorth);
+        final var boundSouth = worldBorder.getBoundSouth();
+        double r = Math.min(MathHelper.ceil(cameraZ + viewDistance), boundSouth);
         float p = (float)(cameraDistance - MathHelper.fractionalPart(camera.getPos().y));
         float v;
         float s;
         double t;
         double u;
 
-        if (cameraX > worldBorder.getBoundEast() - viewDistance) {
+        final var boundEast = worldBorder.getBoundEast();
+        if (cameraX > boundEast - viewDistance && shouldRenderBound.apply(boundEast)) {
             s = 0.0F;
 
             for(t = q; t < r; s += 0.5F) {
                 u = Math.min(1.0, r - t);
                 v = (float)u * 0.5F;
-                bufferBuilder.vertex(worldBorder.getBoundEast() - cameraX, -cameraDistance, t - cameraZ).texture(m - s, m + p).next();
-                bufferBuilder.vertex(worldBorder.getBoundEast() - cameraX, -cameraDistance, t + u - cameraZ).texture(m - (v + s), m + p).next();
-                bufferBuilder.vertex(worldBorder.getBoundEast() - cameraX, cameraDistance, t + u - cameraZ).texture(m - (v + s), m + 0.0F).next();
-                bufferBuilder.vertex(worldBorder.getBoundEast() - cameraX, cameraDistance, t - cameraZ).texture(m - s, m + 0.0F).next();
+                bufferBuilder.vertex(boundEast - cameraX, -cameraDistance, t - cameraZ).texture(m - s, m + p).next();
+                bufferBuilder.vertex(boundEast - cameraX, -cameraDistance, t + u - cameraZ).texture(m - (v + s), m + p).next();
+                bufferBuilder.vertex(boundEast - cameraX, cameraDistance, t + u - cameraZ).texture(m - (v + s), m + 0.0F).next();
+                bufferBuilder.vertex(boundEast - cameraX, cameraDistance, t - cameraZ).texture(m - s, m + 0.0F).next();
                 ++t;
             }
         }
 
-        if (cameraX < worldBorder.getBoundWest() + viewDistance) {
+        final var boundWest = worldBorder.getBoundWest();
+        if (cameraX < boundWest + viewDistance && shouldRenderBound.apply(boundWest)) {
             s = 0.0F;
 
             for(t = q; t < r; s += 0.5F) {
                 u = Math.min(1.0, r - t);
                 v = (float)u * 0.5F;
-                bufferBuilder.vertex(worldBorder.getBoundWest() - cameraX, -cameraDistance, t - cameraZ).texture(m + s, m + p).next();
-                bufferBuilder.vertex(worldBorder.getBoundWest() - cameraX, -cameraDistance, t + u - cameraZ).texture(m + v + s, m + p).next();
-                bufferBuilder.vertex(worldBorder.getBoundWest() - cameraX, cameraDistance, t + u - cameraZ).texture(m + v + s, m + 0.0F).next();
-                bufferBuilder.vertex(worldBorder.getBoundWest() - cameraX, cameraDistance, t - cameraZ).texture(m + s, m + 0.0F).next();
+                bufferBuilder.vertex(boundWest - cameraX, -cameraDistance, t - cameraZ).texture(m + s, m + p).next();
+                bufferBuilder.vertex(boundWest - cameraX, -cameraDistance, t + u - cameraZ).texture(m + v + s, m + p).next();
+                bufferBuilder.vertex(boundWest - cameraX, cameraDistance, t + u - cameraZ).texture(m + v + s, m + 0.0F).next();
+                bufferBuilder.vertex(boundWest - cameraX, cameraDistance, t - cameraZ).texture(m + s, m + 0.0F).next();
                 ++t;
             }
         }
 
-        q = Math.max(MathHelper.floor(cameraX - viewDistance), worldBorder.getBoundWest());
-        r = Math.min(MathHelper.ceil(cameraX + viewDistance), worldBorder.getBoundEast());
-        if (cameraZ > worldBorder.getBoundSouth() - viewDistance) {
+        q = Math.max(MathHelper.floor(cameraX - viewDistance), boundWest);
+        r = Math.min(MathHelper.ceil(cameraX + viewDistance), boundEast);
+        if (cameraZ > boundSouth - viewDistance && shouldRenderBound.apply(boundSouth)) {
             s = 0.0F;
 
             for(t = q; t < r; s += 0.5F) {
                 u = Math.min(1.0, r - t);
                 v = (float)u * 0.5F;
-                bufferBuilder.vertex(t - cameraX, -cameraDistance, worldBorder.getBoundSouth() - cameraZ).texture(m + s, m + p).next();
-                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, worldBorder.getBoundSouth() - cameraZ).texture(m + v + s, m + p).next();
-                bufferBuilder.vertex(t + u - cameraX, cameraDistance, worldBorder.getBoundSouth() - cameraZ).texture(m + v + s, m + 0.0F).next();
-                bufferBuilder.vertex(t - cameraX, cameraDistance, worldBorder.getBoundSouth() - cameraZ).texture(m + s, m + 0.0F).next();
+                bufferBuilder.vertex(t - cameraX, -cameraDistance, boundSouth - cameraZ).texture(m + s, m + p).next();
+                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, boundSouth - cameraZ).texture(m + v + s, m + p).next();
+                bufferBuilder.vertex(t + u - cameraX, cameraDistance, boundSouth - cameraZ).texture(m + v + s, m + 0.0F).next();
+                bufferBuilder.vertex(t - cameraX, cameraDistance, boundSouth - cameraZ).texture(m + s, m + 0.0F).next();
                 ++t;
             }
         }
 
-        if (cameraZ < worldBorder.getBoundNorth() + viewDistance) {
+        if (cameraZ < boundNorth + viewDistance && shouldRenderBound.apply(boundNorth)) {
             s = 0.0F;
 
             for(t = q; t < r; s += 0.5F) {
                 u = Math.min(1.0, r - t);
                 v = (float)u * 0.5F;
-                bufferBuilder.vertex(t - cameraX, -cameraDistance, worldBorder.getBoundNorth() - cameraZ).texture(m - s, m + p).next();
-                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, worldBorder.getBoundNorth() - cameraZ).texture(m - (v + s), m + p).next();
-                bufferBuilder.vertex(t + u - cameraX, cameraDistance, worldBorder.getBoundNorth() - cameraZ).texture(m - (v + s), m + 0.0F).next();
-                bufferBuilder.vertex(t - cameraX, cameraDistance, worldBorder.getBoundNorth() - cameraZ).texture(m - s, m + 0.0F).next();
+                bufferBuilder.vertex(t - cameraX, -cameraDistance, boundNorth - cameraZ).texture(m - s, m + p).next();
+                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, boundNorth - cameraZ).texture(m - (v + s), m + p).next();
+                bufferBuilder.vertex(t + u - cameraX, cameraDistance, boundNorth - cameraZ).texture(m - (v + s), m + 0.0F).next();
+                bufferBuilder.vertex(t - cameraX, cameraDistance, boundNorth - cameraZ).texture(m - s, m + 0.0F).next();
                 ++t;
             }
         }
