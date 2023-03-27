@@ -12,9 +12,9 @@ import net.minecraft.util.math.*;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.custom.AbstractCustomRenderer;
 import org.minefortress.renderer.custom.BuiltModel;
+import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;
 
@@ -32,7 +32,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     public void prepareForRender() {
-        final ClientBlueprintManager clientBlueprintManager = getBlueprintManager();
+        final ClientBlueprintManager clientBlueprintManager = ModUtils.getBlueprintManager();
         if(clientBlueprintManager.hasSelectedBlueprint()) {
             final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
             final BlockRotation blockRotation = selectedStructure.getRotation();
@@ -48,17 +48,17 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     protected boolean shouldRender() {
-        return getBlueprintManager().hasSelectedBlueprint();
+        return ModUtils.getBlueprintManager().hasSelectedBlueprint();
     }
 
     @Override
     protected Vec3f getColorModulator() {
-        return getBlueprintManager().isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR;
+        return ModUtils.getBlueprintManager().isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR;
     }
 
     @Override
     protected Optional<BlockPos> getRenderTargetPosition() {
-        final ClientBlueprintManager blueprintManager = getBlueprintManager();
+        final ClientBlueprintManager blueprintManager = ModUtils.getBlueprintManager();
         final int floorLevel = blueprintManager.getSelectedStructure().getFloorLevel();
         return Optional.ofNullable(blueprintManager.getBlueprintBuildPos()).map(o -> o.down(floorLevel));
     }
@@ -124,7 +124,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     protected Optional<BuiltModel> getBuiltModel() {
-        final BlueprintMetadata selectedStructure = getBlueprintManager().getSelectedStructure();
+        final BlueprintMetadata selectedStructure = ModUtils.getBlueprintManager().getSelectedStructure();
         final BuiltBlueprint nullableBlueprint = this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getFile(), selectedStructure.getRotation());
         return Optional.ofNullable(nullableBlueprint);
     }
@@ -227,8 +227,4 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         renderLayer.endDrawing();
     }
 
-    private ClientBlueprintManager getBlueprintManager() {
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        return fortressClient.getBlueprintManager();
-    }
 }
