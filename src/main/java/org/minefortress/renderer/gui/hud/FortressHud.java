@@ -107,7 +107,7 @@ public class FortressHud {
         if(fortressClientManager.notInitialized()) return HudState.BLANK;
         if(fortressClientManager.isCenterNotSet()) return HudState.INITIALIZING;
 
-        if(ModUtils.getBlueprintManager().hasSelectedBlueprint()) return HudState.BLUEPRINT;
+        if(ModUtils.getBlueprintManager().isSelecting()) return HudState.BLUEPRINT;
         if(BlueprintsWorld.isBlueprintsWorld(client.world)) return HudState.BLUEPRINT_EDITING;
 
         return switch (ModUtils.getFortressClientManager().getState()) {

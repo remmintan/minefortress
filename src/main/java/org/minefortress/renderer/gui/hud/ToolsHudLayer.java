@@ -155,7 +155,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
     }
 
     private boolean blueprintSelected() {
-        return ModUtils.getFortressClient().getBlueprintManager().hasSelectedBlueprint();
+        return ModUtils.getFortressClient().getBlueprintManager().isSelecting();
     }
 
 }

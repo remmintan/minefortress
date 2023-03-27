@@ -28,7 +28,7 @@ public class MineFortressClient implements ClientModInitializer {
             while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
                 final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
                 final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
-                if(clientBlueprintManager.hasSelectedBlueprint()) {
+                if(clientBlueprintManager.isSelecting()) {
                     fortressClient.getBlueprintManager().selectNext();
                 } else {
                     fortressClient.getSelectionManager().toggleSelectionType();

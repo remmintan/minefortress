@@ -123,7 +123,7 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        if(clientBlueprintManager.hasSelectedBlueprint()) {
+        if(clientBlueprintManager.isSelecting()) {
            clientBlueprintManager.clearStructure();
             cir.setReturnValue(true);
             return;
@@ -202,7 +202,7 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        if(clientBlueprintManager.hasSelectedBlueprint()) {
+        if(clientBlueprintManager.isSelecting()) {
             clientBlueprintManager.buildCurrentStructure();
             cir.setReturnValue(ActionResult.SUCCESS);
             return;

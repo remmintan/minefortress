@@ -46,7 +46,7 @@ public class ClientBlueprintManager {
     }
 
     public void tick() {
-        if(!hasSelectedBlueprint()) return;
+        if(!isSelecting()) return;
         blueprintBuildPos = getSelectedPos();
         if(blueprintBuildPos == null) return;
         checkNotEnoughResources();
@@ -126,7 +126,7 @@ public class ClientBlueprintManager {
         return movedPos;
     }
 
-    public boolean hasSelectedBlueprint() {
+    public boolean isSelecting() {
         return selectedStructure != null;
     }
 
@@ -136,7 +136,7 @@ public class ClientBlueprintManager {
     }
 
     public void selectNext() {
-        if(!this.hasSelectedBlueprint()) return;
+        if(!this.isSelecting()) return;
         this.selectedStructure = blueprintMetadataManager.selectNext();
     }
 

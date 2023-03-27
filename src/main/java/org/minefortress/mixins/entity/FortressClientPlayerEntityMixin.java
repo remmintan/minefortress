@@ -59,7 +59,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
             if(client.options.sprintKey.isPressed()) {
                 final FortressMinecraftClient fortressClient = ModUtils.getFortressClient();
                 final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
-                if(clientBlueprintManager.hasSelectedBlueprint()) {
+                if(clientBlueprintManager.isSelecting()) {
                     clientBlueprintManager.rotateSelectedStructureCounterClockwise();
                 } else {
                     final SelectionManager selectionManager = fortressClient.getSelectionManager();

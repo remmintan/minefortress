@@ -43,7 +43,6 @@ public abstract class FortressWorldRendererMixin  {
 
     @Shadow private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
 
-    @Shadow private int cameraChunkX;
     private MineFortressEntityRenderer entityRenderer;
 
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -118,7 +117,7 @@ public abstract class FortressWorldRendererMixin  {
 
 //    @Redirect(method = "renderWorldBorder", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
     private WorldBorder getWorldBorder(ClientWorld instance) {
-        final var selectingBlueprint = ModUtils.getBlueprintManager().hasSelectedBlueprint();
+        final var selectingBlueprint = ModUtils.getBlueprintManager().isSelecting();
         final var selecting = ModUtils.getSelectionManager().isSelecting();
         final var selectingArea = ModUtils.getAreasClientManager().isSelecting();
         final var centerNotSet = ModUtils.getFortressClientManager().isCenterNotSet();

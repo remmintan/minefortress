@@ -9,6 +9,7 @@ import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
@@ -32,8 +33,8 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     public void prepareForRender() {
-        final ClientBlueprintManager clientBlueprintManager = ModUtils.getBlueprintManager();
-        if(clientBlueprintManager.hasSelectedBlueprint()) {
+        final ClientBlueprintManager clientBlueprintManager = getBlueprintManager();
+        if(clientBlueprintManager.isSelecting()) {
             final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
             final BlockRotation blockRotation = selectedStructure.getRotation();
             final String fileName = selectedStructure.getFile();
@@ -48,17 +49,17 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     protected boolean shouldRender() {
-        return ModUtils.getBlueprintManager().hasSelectedBlueprint();
+        return getBlueprintManager().isSelecting();
     }
 
     @Override
     protected Vec3f getColorModulator() {
-        return ModUtils.getBlueprintManager().isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR;
+        return getBlueprintManager().isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR;
     }
 
     @Override
     protected Optional<BlockPos> getRenderTargetPosition() {
-        final ClientBlueprintManager blueprintManager = ModUtils.getBlueprintManager();
+        final ClientBlueprintManager blueprintManager = getBlueprintManager();
         final int floorLevel = blueprintManager.getSelectedStructure().getFloorLevel();
         return Optional.ofNullable(blueprintManager.getBlueprintBuildPos()).map(o -> o.down(floorLevel));
     }
@@ -124,7 +125,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     protected Optional<BuiltModel> getBuiltModel() {
-        final BlueprintMetadata selectedStructure = ModUtils.getBlueprintManager().getSelectedStructure();
+        final BlueprintMetadata selectedStructure = getBlueprintManager().getSelectedStructure();
         final BuiltBlueprint nullableBlueprint = this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getFile(), selectedStructure.getRotation());
         return Optional.ofNullable(nullableBlueprint);
     }
@@ -170,6 +171,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         VertexFormat vertexFormat = renderLayer.getVertexFormat();
 
         Shader shader = RenderSystem.getShader();
+        if(shader == null) throw new IllegalStateException("Shader is null while rendering blueprint");
         BufferRenderer.unbindAll();
         int k;
         for (int i = 0; i < 12; ++i) {
@@ -225,6 +227,11 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         VertexBuffer.unbind();
         VertexBuffer.unbindVertexArray();
         renderLayer.endDrawing();
+    }
+
+    @NotNull
+    private static ClientBlueprintManager getBlueprintManager() {
+        return ModUtils.getBlueprintManager();
     }
 
 }

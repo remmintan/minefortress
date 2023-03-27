@@ -210,7 +210,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private void handleInputEvents(CallbackInfo ci) {
         if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS) {
             if(this.options.sprintKey.isPressed()) {
-                if(this.getBlueprintManager().hasSelectedBlueprint()) {
+                if(this.getBlueprintManager().isSelecting()) {
                     this.getBlueprintManager().rotateSelectedStructureClockwise();
                 } else {
                     this.getSelectionManager().moveSelectionUp();
