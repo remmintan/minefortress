@@ -20,6 +20,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
+import org.minefortress.blueprints.interfaces.IBlockDataProvider;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
@@ -69,6 +71,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
 
     private ClientBlueprintManager clientBlueprintManager;
+    private ClientInfluenceManager clientInfluenceManager;
     private BlueprintRenderer blueprintRenderer;
     private CampfireRenderer campfireRenderer;
     private SelectionRenderer selectionRenderer;
@@ -118,7 +121,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.areasClientManager = new AreasClientManager();
 
         clientBlueprintManager = new ClientBlueprintManager(client);
-        blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), client, blockBufferBuilderStorage);
+        clientInfluenceManager = new ClientInfluenceManager();
+
+        final Supplier<IBlockDataProvider> blockDataManagerSup = () -> clientBlueprintManager.getBlockDataManager();
+
+        blueprintRenderer = new BlueprintRenderer(blockDataManagerSup, client, blockBufferBuilderStorage);
         campfireRenderer = new CampfireRenderer(client, blockBufferBuilderStorage);
         Map<RenderLayer, BufferBuilder> selectionBufferBuilderStorage = Map.ofEntries(
                 entry(RenderLayer.getLines(), new BufferBuilder(256)),

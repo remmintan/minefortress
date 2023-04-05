@@ -254,17 +254,15 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         }
 
         structuresMap
-                .entrySet()
-                .forEach(it -> {
-                    final var key = it.getKey();
+                .forEach((key, value) -> {
                     final var groupOpt = filenameToGroupConverter.apply(key);
                     final var group = groupOpt.orElseThrow(() -> new IllegalStateException("Can't find group for blueprint " + key));
-                    final var bp = new Blueprint(key, floorLevelsMap.getOrDefault(key, 0), it.getValue(), group);
+                    final var bp = new Blueprint(key, floorLevelsMap.getOrDefault(key, 0), value, group);
                     updatedStructures.put(key, bp);
                 });
     }
 
-    private static record Blueprint(
+    private record Blueprint(
             String filename,
             int floorLevel,
             NbtCompound tag,

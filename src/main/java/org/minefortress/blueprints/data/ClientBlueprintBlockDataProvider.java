@@ -6,12 +6,13 @@ import net.minecraft.structure.Structure;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.blueprints.interfaces.BlueprintsTagsKeeper;
+import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public final class ClientBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager implements BlueprintsTagsKeeper {
+public final class ClientBlueprintBlockDataProvider extends AbstractBlueprintBlockDataManager implements BlueprintsTagsKeeper, IBlockDataProvider {
 
     private final Map<String, NbtCompound> blueprintTags = new HashMap<>();
 

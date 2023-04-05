@@ -9,7 +9,7 @@ import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
+import org.minefortress.blueprints.data.ClientBlueprintBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class ClientBlueprintManager implements IStructureRenderInfoProvider {
 
     private final MinecraftClient client;
-    private final ClientBlueprintBlockDataManager blockDataManager = new ClientBlueprintBlockDataManager();
+    private final ClientBlueprintBlockDataProvider blockDataManager = new ClientBlueprintBlockDataProvider();
     private final BlueprintMetadataManager blueprintMetadataManager = new BlueprintMetadataManager();
 
     private BlueprintMetadata selectedStructure;
@@ -205,7 +205,7 @@ public class ClientBlueprintManager implements IStructureRenderInfoProvider {
         return !cantBuild;
     }
 
-    public ClientBlueprintBlockDataManager getBlockDataManager() {
+    public ClientBlueprintBlockDataProvider getBlockDataManager() {
         return blockDataManager;
     }
 

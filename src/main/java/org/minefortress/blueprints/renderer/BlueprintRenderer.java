@@ -10,7 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
+import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.renderer.custom.AbstractCustomRenderer;
@@ -18,6 +18,7 @@ import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public final class BlueprintRenderer extends AbstractCustomRenderer {
 
@@ -26,9 +27,9 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     private final BlueprintsModelBuilder blueprintsModelBuilder;
 
-    public BlueprintRenderer(ClientBlueprintBlockDataManager blockDataManager, MinecraftClient client, BlockBufferBuilderStorage blockBufferBuilderStorage) {
+    public BlueprintRenderer(Supplier<IBlockDataProvider> blockDataProviderSupplier, MinecraftClient client, BlockBufferBuilderStorage blockBufferBuilderStorage) {
         super(client);
-        blueprintsModelBuilder  = new BlueprintsModelBuilder(blockBufferBuilderStorage, blockDataManager);
+        blueprintsModelBuilder  = new BlueprintsModelBuilder(blockBufferBuilderStorage, blockDataProviderSupplier);
     }
 
     @Override
@@ -38,7 +39,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
             final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
             final BlockRotation blockRotation = selectedStructure.getRotation();
             final String fileName = selectedStructure.getFile();
-            blueprintsModelBuilder.buildBlueprint(fileName, blockRotation);
+            blueprintsModelBuilder.getOrBuildBlueprint(fileName, blockRotation);
         }
     }
 
