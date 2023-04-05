@@ -2,7 +2,6 @@ package org.minefortress.blueprints.data;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.BlockArgumentParser;
@@ -16,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 abstract class AbstractBlueprintBlockDataManager {
 
@@ -116,7 +114,6 @@ abstract class AbstractBlueprintBlockDataManager {
 
     protected SizeAndPivot getSizeAndPivot(Structure structure, BlockRotation rotation) {
         Vec3i size = structure.getRotatedSize(rotation);
-//        final int biggerSide = Math.max(size.getX(), size.getZ());
         final BlockPos pivot = BlockPos.ORIGIN.add(size.getX() / 2, 0,  size.getZ() / 2);
         size = new Vec3i(size.getX(), size.getY(), size.getZ());
         return new SizeAndPivot(size, pivot);
