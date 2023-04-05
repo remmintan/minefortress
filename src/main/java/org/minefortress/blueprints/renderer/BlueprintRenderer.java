@@ -11,8 +11,8 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
+import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.renderer.custom.AbstractCustomRenderer;
 import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.utils.ModUtils;
@@ -33,7 +33,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     public void prepareForRender() {
-        final ClientBlueprintManager clientBlueprintManager = getBlueprintManager();
+        final IStructureRenderInfoProvider clientBlueprintManager = getBlueprintManager();
         if(clientBlueprintManager.isSelecting()) {
             final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
             final BlockRotation blockRotation = selectedStructure.getRotation();
@@ -54,16 +54,13 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     protected Vec3f getColorModulator() {
-        return getBlueprintManager().isCantBuild() ? WRONG_PLACEMENT_COLOR : CORRECT_PLACEMENT_COLOR;
+        return getBlueprintManager().canBuild() ? CORRECT_PLACEMENT_COLOR : WRONG_PLACEMENT_COLOR;
     }
 
     @Override
     protected Optional<BlockPos> getRenderTargetPosition() {
-        final ClientBlueprintManager blueprintManager = getBlueprintManager();
-        final int floorLevel = blueprintManager.getSelectedStructure().getFloorLevel();
-        return Optional.ofNullable(blueprintManager.getBlueprintBuildPos()).map(o -> o.down(floorLevel));
+        return getBlueprintManager().getStructureRenderPos();
     }
-
 
     public void renderBlueprintPreview(String fileName, BlockRotation blockRotation) {
         final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
@@ -230,7 +227,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     }
 
     @NotNull
-    private static ClientBlueprintManager getBlueprintManager() {
+    private static IStructureRenderInfoProvider getBlueprintManager() {
         return ModUtils.getBlueprintManager();
     }
 

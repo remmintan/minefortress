@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.BlueprintBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
+import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.c2s.ServerboundBlueprintTaskPacket;
@@ -17,16 +18,13 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.minefortress.utils.BuildingHelper;
-import org.slf4j.LoggerFactory;
 import org.minefortress.utils.ModUtils;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class ClientBlueprintManager {
+public class ClientBlueprintManager implements IStructureRenderInfoProvider {
 
     private final MinecraftClient client;
     private final ClientBlueprintBlockDataManager blockDataManager = new ClientBlueprintBlockDataManager();
@@ -41,8 +39,9 @@ public class ClientBlueprintManager {
         this.client = client;
     }
 
-    public BlockPos getBlueprintBuildPos() {
-        return blueprintBuildPos;
+    public Optional<BlockPos> getStructureRenderPos() {
+        final var floorLevel = Optional.ofNullable(getSelectedStructure()).map(BlueprintMetadata::getFloorLevel).orElse(0);
+        return Optional.ofNullable(blueprintBuildPos).map(it -> it.down(floorLevel));
     }
 
     public void tick() {
@@ -202,8 +201,8 @@ public class ClientBlueprintManager {
         this.selectedStructure.rotateLeft();
     }
 
-    public boolean isCantBuild() {
-        return cantBuild;
+    public boolean canBuild() {
+        return !cantBuild;
     }
 
     public ClientBlueprintBlockDataManager getBlockDataManager() {
