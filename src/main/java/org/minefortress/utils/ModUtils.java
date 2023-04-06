@@ -10,6 +10,7 @@ import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
@@ -80,6 +81,9 @@ public class ModUtils {
 
     public static ClientBlueprintManager getBlueprintManager() {
         return getFortressClient().getBlueprintManager();
+    }
+    public static ClientInfluenceManager getInfluenceManager() {
+        return getFortressClient().getInfluenceManager();
     }
 
     public static SelectionManager getSelectionManager() {

@@ -2,6 +2,7 @@ package org.minefortress.interfaces;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
@@ -32,4 +33,5 @@ public interface FortressMinecraftClient {
     boolean isNotFortressGamemode();
     boolean isFortressGamemode();
     BlockPos getHoveredBlockPos();
+    ClientInfluenceManager getInfluenceManager();
 }

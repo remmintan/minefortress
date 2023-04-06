@@ -7,9 +7,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.data.ServerBlueprintBlockDataManager;
+import org.minefortress.blueprints.data.ServerStructureBlockDataManager;
 import org.minefortress.network.s2c.ClientboundAddBlueprintPacket;
 import org.minefortress.network.s2c.ClientboundResetBlueprintPacket;
 import org.minefortress.network.s2c.ClientboundUpdateBlueprintPacket;
@@ -28,13 +28,13 @@ public class ServerBlueprintManager {
 
     private boolean initialized = false;
 
-    private final ServerBlueprintBlockDataManager blockDataManager;
+    private final ServerStructureBlockDataManager blockDataManager;
     private final BlueprintMetadataReader blueprintMetadataReader;
     private final Queue<FortressS2CPacket> scheduledEdits = new ArrayDeque<>();
 
     public ServerBlueprintManager(MinecraftServer server, Supplier<UUID> userIdProvider) {
         this.blueprintMetadataReader = new BlueprintMetadataReader(server);
-        this.blockDataManager = new ServerBlueprintBlockDataManager(server, blueprintMetadataReader::convertFilenameToGroup, userIdProvider);
+        this.blockDataManager = new ServerStructureBlockDataManager(server, blueprintMetadataReader::convertFilenameToGroup, userIdProvider);
     }
 
     public void tick(ServerPlayerEntity player) {
@@ -94,14 +94,14 @@ public class ServerBlueprintManager {
         scheduledEdits.add(remove);
     }
 
-    public ServerBlueprintBlockDataManager getBlockDataManager() {
+    public ServerStructureBlockDataManager getBlockDataManager() {
         return blockDataManager;
     }
 
     public BlueprintTask createTask(UUID taskId, String structureFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
         final String requirementId = this.findRequirementIdByFileName(structureFile)
                 .orElse("custom");
-        final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation, floorLevel);
+        final StrctureBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation, floorLevel);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
         final BlockPos endPos = getEndPos(startPos, size);
@@ -112,7 +112,7 @@ public class ServerBlueprintManager {
     }
 
     public SimpleSelectionTask createDigTask(UUID uuid, BlockPos startPos, int floorLevel, String structureFile, BlockRotation rotation) {
-        final BlueprintBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation);
+        final StrctureBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
         final BlockPos endPos = getEndPos(startPos, size);

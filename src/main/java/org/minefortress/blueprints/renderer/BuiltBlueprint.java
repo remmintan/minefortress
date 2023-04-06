@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.level.ColorResolver;
-import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.renderer.custom.BuiltModel;
 
@@ -46,7 +46,7 @@ public class BuiltBlueprint implements BuiltModel {
     private final BlockRenderView blueprintData;
     private final Vec3i size;
 
-    public BuiltBlueprint(BlueprintBlockData blockData, BiFunction<BlockState, ColorResolver, Integer> colorProvider) {
+    public BuiltBlueprint(StrctureBlockData blockData, BiFunction<BlockState, ColorResolver, Integer> colorProvider) {
         if(blockData == null) throw new IllegalArgumentException("Block data cannot be null");
         if(!blockData.hasLayer(BlueprintDataLayer.GENERAL)) throw new IllegalArgumentException("Block data must have a general layer");
         this.blueprintData = new BlueprintBlockRenderView(blockData.getLayer(BlueprintDataLayer.GENERAL), colorProvider);

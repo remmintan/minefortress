@@ -5,7 +5,7 @@ import net.minecraft.item.Items;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.registry.Registry;
-import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.StrctureBlockData;
 
 import java.util.*;
 
@@ -73,7 +73,7 @@ public class SimilarItemsHelper {
 
     public static boolean isIgnorable(Item it) {
         final var defaultStack = it.getDefaultStack();
-        return BlueprintBlockData.IGNORED_ITEMS.contains(it) ||
+        return StrctureBlockData.IGNORED_ITEMS.contains(it) ||
                 defaultStack.isIn(ItemTags.BEDS) ||
                 defaultStack.isIn(ItemTags.DOORS) ||
                 defaultStack.isIn(ItemTags.BANNERS);

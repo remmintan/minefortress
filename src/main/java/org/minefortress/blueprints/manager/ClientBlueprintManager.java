@@ -7,9 +7,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.data.ClientBlueprintBlockDataProvider;
+import org.minefortress.blueprints.data.ClientStructureBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class ClientBlueprintManager implements IStructureRenderInfoProvider {
 
     private final MinecraftClient client;
-    private final ClientBlueprintBlockDataProvider blockDataManager = new ClientBlueprintBlockDataProvider();
+    private final ClientStructureBlockDataProvider blockDataManager = new ClientStructureBlockDataProvider();
     private final BlueprintMetadataManager blueprintMetadataManager = new BlueprintMetadataManager();
 
     private BlueprintMetadata selectedStructure;
@@ -69,7 +69,7 @@ public class ClientBlueprintManager implements IStructureRenderInfoProvider {
             cantBuild = true;
             return;
         }
-        final BlueprintBlockData blockData = getBlockData();
+        final StrctureBlockData blockData = getBlockData();
         final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL)
                 .entrySet()
                 .stream()
@@ -98,7 +98,7 @@ public class ClientBlueprintManager implements IStructureRenderInfoProvider {
         cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
     }
 
-    private BlueprintBlockData getBlockData() {
+    private StrctureBlockData getBlockData() {
         return blockDataManager
                 .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
     }
@@ -117,7 +117,7 @@ public class ClientBlueprintManager implements IStructureRenderInfoProvider {
         if(selectedStructure == null) return pos;
 
         final boolean posSolid = !BuildingHelper.doesNotHaveCollisions(client.world, pos);
-        final BlueprintBlockData blockData = getBlockData();
+        final StrctureBlockData blockData = getBlockData();
         final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
         BlockPos movedPos = pos.subtract(halfSize);
@@ -158,7 +158,7 @@ public class ClientBlueprintManager implements IStructureRenderInfoProvider {
         UUID taskId = UUID.randomUUID();
         final FortressClientWorld world = (FortressClientWorld) client.world;
         if(world != null) {
-            final BlueprintBlockData blockData = getBlockData();
+            final StrctureBlockData blockData = getBlockData();
             final Map<BlockPos, BlockState> structureData = blockData
                     .getLayer(BlueprintDataLayer.GENERAL);
             final int floorLevel = selectedStructure.getFloorLevel();
@@ -205,7 +205,7 @@ public class ClientBlueprintManager implements IStructureRenderInfoProvider {
         return !cantBuild;
     }
 
-    public ClientBlueprintBlockDataProvider getBlockDataManager() {
+    public ClientStructureBlockDataProvider getBlockDataManager() {
         return blockDataManager;
     }
 

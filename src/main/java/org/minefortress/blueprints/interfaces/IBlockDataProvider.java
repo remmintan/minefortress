@@ -1,9 +1,9 @@
 package org.minefortress.blueprints.interfaces;
 
 import net.minecraft.util.BlockRotation;
-import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.StrctureBlockData;
 
 public interface IBlockDataProvider {
 
-    BlueprintBlockData getBlockData(String fileName, BlockRotation rotation);
+    StrctureBlockData getBlockData(String fileName, BlockRotation rotation);
 }

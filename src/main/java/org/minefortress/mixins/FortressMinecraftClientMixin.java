@@ -71,7 +71,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
 
     private ClientBlueprintManager clientBlueprintManager;
-    private ClientInfluenceManager clientInfluenceManager;
+    private ClientInfluenceManager influenceManager;
     private BlueprintRenderer blueprintRenderer;
     private CampfireRenderer campfireRenderer;
     private SelectionRenderer selectionRenderer;
@@ -121,11 +121,10 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.areasClientManager = new AreasClientManager();
 
         clientBlueprintManager = new ClientBlueprintManager(client);
-        clientInfluenceManager = new ClientInfluenceManager();
+        influenceManager = new ClientInfluenceManager();
 
-        final Supplier<IBlockDataProvider> blockDataManagerSup = () -> clientBlueprintManager.getBlockDataManager();
 
-        blueprintRenderer = new BlueprintRenderer(blockDataManagerSup, client, blockBufferBuilderStorage);
+        blueprintRenderer = new BlueprintRenderer(this::getProperBlockDataProviderBasedOnState, client, blockBufferBuilderStorage);
         campfireRenderer = new CampfireRenderer(client, blockBufferBuilderStorage);
         Map<RenderLayer, BufferBuilder> selectionBufferBuilderStorage = Map.ofEntries(
                 entry(RenderLayer.getLines(), new BufferBuilder(256)),
@@ -319,6 +318,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
+    public ClientInfluenceManager getInfluenceManager() {
+        return this.influenceManager;
+    }
+
+    @Override
     public void openHireScreen(MinecraftClient client, String screenName, Map<String, HireInfo> professions) {
         final var handler = new ClientHireHandler(screenName, professions);
         final var screen = new HirePawnScreen(handler);
@@ -330,5 +334,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.blueprintRenderer.close();
         this.campfireRenderer.close();
         this.selectionRenderer.close();
+    }
+
+    private IBlockDataProvider getProperBlockDataProviderBasedOnState() {
+        if(fortressClientManager.getState() == FortressState.COMBAT) {
+            return this.getInfluenceManager().getBlockDataProvider();
+        }
+
+        return this.getBlueprintManager().getBlockDataManager();
     }
 }

@@ -7,7 +7,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class BlueprintsModelBuilder {
 
         String key = getKey(fileName, rotation);
         if(!this.builtBlueprints.containsKey(key)) {
-            final BlueprintBlockData blockData = this.blockDataManagerSupplier.get().getBlockData(fileName, rotation);
+            final StrctureBlockData blockData = this.blockDataManagerSupplier.get().getBlockData(fileName, rotation);
             final BuiltBlueprint builtBlueprint = new BuiltBlueprint(blockData, (p, c) -> getWorld().getColor(getBlockPos(), c));
             builtBlueprint.build(this.blockBufferBuilders);
             this.builtBlueprints.put(key, builtBlueprint);

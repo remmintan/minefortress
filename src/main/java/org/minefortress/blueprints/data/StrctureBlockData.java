@@ -14,7 +14,7 @@ import org.spongepowered.include.com.google.common.collect.Sets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public final class BlueprintBlockData {
+public final class StrctureBlockData {
 
     public static final Set<Item> IGNORED_ITEMS;
 
@@ -69,7 +69,7 @@ public final class BlueprintBlockData {
     private final Map<BlueprintDataLayer, Map<BlockPos, BlockState>> layers = new HashMap<>();
     private List<ItemInfo> stacks;
 
-    public BlueprintBlockData(Vec3i size) {
+    private StrctureBlockData(Vec3i size) {
         this.size = size;
     }
 
@@ -95,10 +95,10 @@ public final class BlueprintBlockData {
 
     static final class Builder {
 
-        private final BlueprintBlockData instance;
+        private final StrctureBlockData instance;
 
         private Builder(Vec3i blueprintSize) {
-            instance = new BlueprintBlockData(blueprintSize);
+            instance = new StrctureBlockData(blueprintSize);
         }
 
         Builder setLayer(BlueprintDataLayer layer, Map<BlockPos, BlockState> layerData) {
@@ -106,7 +106,7 @@ public final class BlueprintBlockData {
             return this;
         }
 
-        BlueprintBlockData build() {
+        StrctureBlockData build() {
             final var layerBlockByItems = instance.layers.containsKey(BlueprintDataLayer.GENERAL) ?
                     instance.layers
                             .get(BlueprintDataLayer.GENERAL)

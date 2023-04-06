@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
+import org.minefortress.fortress.FortressState;
 import org.minefortress.renderer.custom.AbstractCustomRenderer;
 import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.utils.ModUtils;
@@ -34,7 +35,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     public void prepareForRender() {
-        final IStructureRenderInfoProvider clientBlueprintManager = getBlueprintManager();
+        final IStructureRenderInfoProvider clientBlueprintManager = getStructureRenderInfoProvider();
         if(clientBlueprintManager.isSelecting()) {
             final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
             final BlockRotation blockRotation = selectedStructure.getRotation();
@@ -50,17 +51,17 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     protected boolean shouldRender() {
-        return getBlueprintManager().isSelecting();
+        return getStructureRenderInfoProvider().isSelecting();
     }
 
     @Override
     protected Vec3f getColorModulator() {
-        return getBlueprintManager().canBuild() ? CORRECT_PLACEMENT_COLOR : WRONG_PLACEMENT_COLOR;
+        return getStructureRenderInfoProvider().canBuild() ? CORRECT_PLACEMENT_COLOR : WRONG_PLACEMENT_COLOR;
     }
 
     @Override
     protected Optional<BlockPos> getRenderTargetPosition() {
-        return getBlueprintManager().getStructureRenderPos();
+        return getStructureRenderInfoProvider().getStructureRenderPos();
     }
 
     public void renderBlueprintPreview(String fileName, BlockRotation blockRotation) {
@@ -123,7 +124,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     protected Optional<BuiltModel> getBuiltModel() {
-        final BlueprintMetadata selectedStructure = getBlueprintManager().getSelectedStructure();
+        final BlueprintMetadata selectedStructure = getStructureRenderInfoProvider().getSelectedStructure();
         final BuiltBlueprint nullableBlueprint = this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getFile(), selectedStructure.getRotation());
         return Optional.ofNullable(nullableBlueprint);
     }
@@ -228,7 +229,11 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     }
 
     @NotNull
-    private static IStructureRenderInfoProvider getBlueprintManager() {
+    private static IStructureRenderInfoProvider getStructureRenderInfoProvider() {
+        final var state = ModUtils.getFortressClientManager().getState();
+        if(state == FortressState.COMBAT) {
+            return ModUtils.getInfluenceManager();
+        }
         return ModUtils.getBlueprintManager();
     }
 

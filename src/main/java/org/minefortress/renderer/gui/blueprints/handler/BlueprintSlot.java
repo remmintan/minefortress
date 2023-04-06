@@ -2,7 +2,7 @@ package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import org.minefortress.blueprints.data.BlueprintBlockData;
+import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 
 public class BlueprintSlot {
@@ -12,7 +12,7 @@ public class BlueprintSlot {
     private final BlueprintMetadata metadata;
     private final boolean enoughResources;
     private final Text tooltipText;
-    private final BlueprintBlockData blockData;
+    private final StrctureBlockData blockData;
 
     private BlueprintSlot() {
         metadata = null;
@@ -21,7 +21,7 @@ public class BlueprintSlot {
         blockData = null;
     }
 
-    public BlueprintSlot(BlueprintMetadata metadata, boolean enoughResources, BlueprintBlockData blockData) {
+    public BlueprintSlot(BlueprintMetadata metadata, boolean enoughResources, StrctureBlockData blockData) {
         this.metadata = metadata;
         this.tooltipText = new LiteralText(metadata.getName());
         this.enoughResources = enoughResources;
@@ -40,7 +40,7 @@ public class BlueprintSlot {
         return enoughResources;
     }
 
-    public BlueprintBlockData getBlockData() {
+    public StrctureBlockData getBlockData() {
         return blockData;
     }
 }
