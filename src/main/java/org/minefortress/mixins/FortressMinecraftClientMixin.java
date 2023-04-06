@@ -341,6 +341,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             return this.getInfluenceManager().getBlockDataProvider();
         }
 
-        return this.getBlueprintManager().getBlockDataManager();
+        return this.getBlueprintManager().getBlockDataProvider();
     }
 }

@@ -64,7 +64,7 @@ public final class BlueprintScreenHandler {
                 int m = column + (row + skippedRows) * 9;
                 if (m >= 0 && m < this.totalSize) {
                     final BlueprintMetadata blueprintMetadata = allBlueprint.get(m);
-                    final var blockData = blueprintManager.getBlockDataManager().getBlockData(blueprintMetadata.getFile(), BlockRotation.NONE);
+                    final var blockData = blueprintManager.getBlockDataProvider().getBlockData(blueprintMetadata.getFile(), BlockRotation.NONE);
                     if(fortressClientManager.isSurvival()) {
                         final var stacks = blockData.getStacks();
                         final var hasEnoughItems = resourceManager.hasItems(stacks);
