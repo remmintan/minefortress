@@ -62,7 +62,7 @@ public final class ClientBlueprintManager extends BaseClientStructureManager {
                 new ServerboundBlueprintTaskPacket(taskId,
                         selectedStructure.getId(),
                         selectedStructure.getFile(),
-                        getBlueprintBuildPos(),
+                        getStructureBuildPos(),
                         selectedStructure.getRotation(),
                         getSelectedStructure().getFloorLevel());
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);

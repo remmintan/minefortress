@@ -121,7 +121,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.areasClientManager = new AreasClientManager();
 
         clientBlueprintManager = new ClientBlueprintManager(client);
-        influenceManager = new ClientInfluenceManager();
+        influenceManager = new ClientInfluenceManager(client);
 
 
         blueprintRenderer = new BlueprintRenderer(this::getProperBlockDataProviderBasedOnState, client, blockBufferBuilderStorage);

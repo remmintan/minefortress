@@ -1,24 +1,27 @@
 package org.minefortress.fight.influence;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
-import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
+import org.minefortress.blueprints.manager.BaseClientStructureManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-public class ClientInfluenceManager implements IStructureRenderInfoProvider {
+public class ClientInfluenceManager extends BaseClientStructureManager {
 
     private static final BlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0, null);
 
     private final InfluenceFlagBlockDataProvider blockDataProvider = new InfluenceFlagBlockDataProvider();
 
     private final List<BlockPos> allInfluencePositions = new ArrayList<>();
-    private BlockPos currentPossibleInfluencePosition = null;
     private boolean isSelectingInfluencePosition = false;
+
+    public ClientInfluenceManager(MinecraftClient client) {
+        super(client);
+    }
 
     public void addInfluencePosition(BlockPos pos) {
         allInfluencePositions.add(pos);
@@ -37,18 +40,20 @@ public class ClientInfluenceManager implements IStructureRenderInfoProvider {
     }
 
     public void cancelSelectingInfluencePosition() {
+        super.reset();
         isSelectingInfluencePosition = false;
-        currentPossibleInfluencePosition = null;
     }
 
     public void selectInfluencePosition() {
         isSelectingInfluencePosition = false;
-        if(currentPossibleInfluencePosition != null) {
-            addInfluencePosition(currentPossibleInfluencePosition);
-            currentPossibleInfluencePosition = null;
+        final var pos = getStructureBuildPos();
+        if(pos != null) {
+            addInfluencePosition(pos);
+            super.reset();
         }
     }
 
+    @Override
     public IBlockDataProvider getBlockDataProvider() {
         return blockDataProvider;
     }
@@ -56,16 +61,6 @@ public class ClientInfluenceManager implements IStructureRenderInfoProvider {
     @Override
     public boolean isSelecting() {
         return isSelectingInfluencePosition;
-    }
-
-    @Override
-    public Optional<BlockPos> getStructureRenderPos() {
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean canBuild() {
-        return false;
     }
 
     @Override

@@ -24,7 +24,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     private boolean enoughResources = true;
     private boolean cantBuild = false;
 
-    private BlockPos blueprintBuildPos = null;
+    private BlockPos structureBuildPos = null;
 
     protected BaseClientStructureManager(MinecraftClient client) {
         this.client = client;
@@ -34,13 +34,13 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     public abstract BlueprintMetadata getSelectedStructure();
     public void tick() {
         if(!isSelecting()) return;
-        blueprintBuildPos = getSelectedPos();
-        if(blueprintBuildPos == null) return;
+        structureBuildPos = getSelectedPos();
+        if(structureBuildPos == null) return;
         checkNotEnoughResources();
         checkCantBuild();
     }
-    protected BlockPos getBlueprintBuildPos() {
-        return blueprintBuildPos;
+    protected BlockPos getStructureBuildPos() {
+        return structureBuildPos;
     }
     private void checkNotEnoughResources() {
         final var fortressClientManager = ((FortressMinecraftClient)client).getFortressClientManager();
@@ -71,7 +71,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
 
         final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
                 .filter(blockPos -> blockPos.getY() >= floorLevel)
-                .map(pos -> pos.add(blueprintBuildPos.down(floorLevel)))
+                .map(pos -> pos.add(structureBuildPos.down(floorLevel)))
                 .anyMatch(pos -> !BuildingHelper.canPlaceBlock(client.world, pos) ||
                         fortressBorder.map(border -> !border.contains(pos)).orElse(false));
 
@@ -80,7 +80,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
                     final int y = blockPos.getY();
                     return y<=floorLevel;
                 })
-                .map(pos -> pos.add(blueprintBuildPos.down(floorLevel)))
+                .map(pos -> pos.add(structureBuildPos.down(floorLevel)))
                 .anyMatch(pos -> BuildingHelper.canPlaceBlock(client.world, pos.down()) ||
                         fortressBorder.map(border -> !border.contains(pos)).orElse(false));
 
@@ -119,7 +119,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     @Override
     public final Optional<BlockPos> getStructureRenderPos() {
         final var floorLevel = Optional.ofNullable(getSelectedStructure()).map(BlueprintMetadata::getFloorLevel).orElse(0);
-        return Optional.ofNullable(blueprintBuildPos).map(it -> it.down(floorLevel));
+        return Optional.ofNullable(structureBuildPos).map(it -> it.down(floorLevel));
     }
 
     @Override
@@ -139,10 +139,17 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
                     .stream()
                     .filter(entry -> !entry.getValue().isAir())
                     .map(Map.Entry::getKey)
-                    .map(it -> it.add(blueprintBuildPos.down(floorLevel)))
+                    .map(it -> it.add(structureBuildPos.down(floorLevel)))
                     .collect(Collectors.toList());
             world.getClientTasksHolder().addTask(taskId, blocks);
         }
+    }
+
+    protected void reset() {
+        structureBuildPos = null;
+        cantBuild = false;
+        enoughResources = true;
+        getBlockDataProvider().reset();
     }
 
 }

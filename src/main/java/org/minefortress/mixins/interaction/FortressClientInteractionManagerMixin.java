@@ -86,6 +86,11 @@ public abstract class FortressClientInteractionManagerMixin {
         final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
         if(fortressManager.getState() == FortressState.COMBAT) {
+            final var influenceManager = ModUtils.getInfluenceManager();
+            if(influenceManager.isSelecting()) {
+                influenceManager.cancelSelectingInfluencePosition();
+                return;
+            }
             final var selectionManager = fortressManager.getFightManager().getSelectionManager();
             final var mouse = client.mouse;
 
@@ -181,6 +186,11 @@ public abstract class FortressClientInteractionManagerMixin {
         final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
         if(fortressManager.getState() == FortressState.COMBAT) {
+            final var influenceManager = ModUtils.getInfluenceManager();
+            if(influenceManager.isSelecting()) {
+                influenceManager.selectInfluencePosition();
+                return;
+            }
             updateFightSelection(hitResult, fortressManager);
             cir.setReturnValue(ActionResult.SUCCESS);
             return;

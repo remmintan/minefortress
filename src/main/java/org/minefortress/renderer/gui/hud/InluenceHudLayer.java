@@ -3,6 +3,7 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
 import org.minefortress.renderer.gui.widget.ItemToggleWidget;
+import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;
 
@@ -18,7 +19,12 @@ public class InluenceHudLayer extends AbstractHudLayer {
                         0,
                         Items.RED_BANNER,
                         btn -> {
-
+                            final var influenceManager = ModUtils.getInfluenceManager();
+                            if(influenceManager.isSelecting()) {
+                                influenceManager.cancelSelectingInfluencePosition();
+                            } else {
+                                influenceManager.startSelectingInfluencePosition();
+                            }
                         },
                         (button) -> Optional.of("Influence"),
                         () -> false,
