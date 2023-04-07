@@ -6,8 +6,6 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.border.WorldBorder;
-import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
@@ -33,8 +31,6 @@ import java.util.stream.StreamSupport;
 public final class FortressClientManager extends AbstractFortressManager {
 
     private static final Object KEY = new Object();
-    private static final int FORTRESS_BORDER_SIZE = 64;
-
     private final ClientProfessionManager professionManager;
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
     private final ClientFightManager fightManager = new ClientFightManager();
@@ -70,6 +66,10 @@ public final class FortressClientManager extends AbstractFortressManager {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
     }
 
+    public BlockPos getFortressCenter() {
+        return fortressCenter;
+    }
+
     public void select(BasePawnEntity colonist) {
         if(state == FortressState.COMBAT) {
             final var mouse = MinecraftClient.getInstance().mouse;
@@ -95,66 +95,6 @@ public final class FortressClientManager extends AbstractFortressManager {
     public void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks) {
         this.specialBlocks = specialBlocks;
         this.blueprintsSpecialBlocks = blueprintSpecialBlocks;
-    }
-
-    public Optional<WorldBorder> getFortressBorder() {
-        if(isCenterNotSet()) {
-            if(posAppropriateForCenter == null) {
-                return Optional.empty();
-            }
-            return getWorldBorder(Collections.singletonList(posAppropriateForCenter), true);
-        }
-        return Optional.ofNullable(fortressCenter).map(it -> Arrays.asList(
-                it.toImmutable(),
-                it.add(-FORTRESS_BORDER_SIZE, 0, FORTRESS_BORDER_SIZE).toImmutable(),
-                it.add(0, 0, FORTRESS_BORDER_SIZE).toImmutable()
-        )).flatMap(FortressClientManager::getWorldBorder);
-    }
-
-    @NotNull
-    private static Optional<WorldBorder> getWorldBorder(List<BlockPos> pos) {
-        return getWorldBorder(pos, false);
-    }
-
-    @NotNull
-    private static Optional<WorldBorder> getWorldBorder(List<BlockPos> positions, boolean dynamicState) {
-        if(positions != null && !positions.isEmpty()) {
-            final var posQueue = new ArrayDeque<>(positions);
-
-            BlockPos mainPos = posQueue.poll();
-            if(mainPos == null) {
-                return Optional.empty();
-            }
-            final var border = new FortressBorder();
-            createBorder(border, mainPos);
-            if (dynamicState) {
-                border.enableDynamicStage();
-            }
-            posQueue.forEach(pos -> border.addAdditionalBorder(createBorder(pos)));
-
-            return Optional.of(border);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    private static WorldBorder createBorder(BlockPos center) {
-        final var border = new WorldBorder();
-        createBorder(border, center);
-        return border;
-    }
-
-    private static void createBorder(WorldBorder border, BlockPos center) {
-        final var x = center.getX();
-        final var z = center.getZ();
-        final var xSign = Math.signum(x);
-        final var zSign = Math.signum(z);
-        final var nonZeroSignX = xSign == 0 ? 1 : xSign;
-        final var nonZeroSignZ = zSign == 0 ? 1 : zSign;
-        final var adjustedX = x - x % FORTRESS_BORDER_SIZE + nonZeroSignX * FORTRESS_BORDER_SIZE / 2f;
-        final var adjustedZ = z - z % FORTRESS_BORDER_SIZE + nonZeroSignZ * FORTRESS_BORDER_SIZE / 2f;
-        border.setCenter(adjustedX, adjustedZ);
-        border.setSize(FORTRESS_BORDER_SIZE);
     }
 
     public boolean isSelectingColonist() {

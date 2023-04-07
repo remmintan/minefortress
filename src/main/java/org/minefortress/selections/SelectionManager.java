@@ -16,6 +16,7 @@ import org.minefortress.selections.renderer.ISelectionInfoProvider;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
+import org.minefortress.utils.ModUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -112,13 +113,14 @@ public class SelectionManager implements FortressWorldRenderer, ISelectionModelB
                 inCorrectState = true;
             }
 
-            clientManager.getFortressBorder()
-                            .ifPresent(border ->
-                                    inCorrectState = inCorrectState && selection
-                                            .getSelection()
-                                            .stream()
-                                            .allMatch(border::contains)
-                            );
+            ModUtils.getInfluenceManager()
+                    .getFortressBorder()
+                    .ifPresent(border ->
+                            inCorrectState = inCorrectState && selection
+                                    .getSelection()
+                                    .stream()
+                                    .allMatch(border::contains)
+                    );
         }
     }
 

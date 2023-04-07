@@ -109,7 +109,7 @@ abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
         return inf;
     }
 
-    protected void reset() {
+    public void reset() {
         this.blueprints.clear();
     }
 

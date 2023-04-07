@@ -67,7 +67,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
                 .collect(Collectors.toSet());
         final int floorLevel = getSelectedStructure().getFloorLevel();
 
-        final var fortressBorder = ModUtils.getFortressClientManager().getFortressBorder();
+        final var fortressBorder = ModUtils.getInfluenceManager().getFortressBorder();
 
         final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
                 .filter(blockPos -> blockPos.getY() >= floorLevel)

@@ -115,7 +115,6 @@ public abstract class FortressWorldRendererMixin  {
         renderTranslucent(matrices, camera, matrix4f);
     }
 
-//    @Redirect(method = "renderWorldBorder", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
     private WorldBorder getWorldBorder(ClientWorld instance) {
         final var selectingBlueprint = ModUtils.getBlueprintManager().isSelecting();
         final var selecting = ModUtils.getSelectionManager().isSelecting();
@@ -123,7 +122,7 @@ public abstract class FortressWorldRendererMixin  {
         final var centerNotSet = ModUtils.getFortressClientManager().isCenterNotSet();
 
         if(selectingBlueprint || selecting || selectingArea || centerNotSet )
-            return ModUtils.getFortressClientManager()
+            return ModUtils.getInfluenceManager()
                     .getFortressBorder()
                     .orElseGet(instance::getWorldBorder);
         else

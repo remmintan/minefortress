@@ -1,38 +1,28 @@
 package org.minefortress.fight.influence;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.border.WorldBorder;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.manager.BaseClientStructureManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 public class ClientInfluenceManager extends BaseClientStructureManager {
 
     private static final BlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0, null);
 
     private final InfluenceFlagBlockDataProvider blockDataProvider = new InfluenceFlagBlockDataProvider();
+    private final FortressBorderHolder fortressBorderHolder = new FortressBorderHolder(this);
 
-    private final List<BlockPos> allInfluencePositions = new ArrayList<>();
     private boolean isSelectingInfluencePosition = false;
 
     public ClientInfluenceManager(MinecraftClient client) {
         super(client);
     }
 
-    public void addInfluencePosition(BlockPos pos) {
-        allInfluencePositions.add(pos);
-    }
-
-    public void removeInfluencePosition(BlockPos pos) {
-        allInfluencePositions.remove(pos);
-    }
-
-    public List<BlockPos> getAllInfluencePositions() {
-        return Collections.unmodifiableList(allInfluencePositions);
+    public Optional<WorldBorder> getFortressBorder() {
+        return fortressBorderHolder.getFortressBorder();
     }
 
     public void startSelectingInfluencePosition() {
@@ -48,7 +38,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         isSelectingInfluencePosition = false;
         final var pos = getStructureBuildPos();
         if(pos != null) {
-            addInfluencePosition(pos);
+            fortressBorderHolder.addInfluencePosition(pos);
             super.reset();
         }
     }

@@ -83,7 +83,8 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                 }
             }
 
-            isCorrectState = ModUtils.getFortressClientManager().getFortressBorder()
+            isCorrectState = ModUtils.getInfluenceManager()
+                    .getFortressBorder()
                     .map(it -> getSelectedBlocks().stream().allMatch(it::contains))
                     .orElse(true);
 
