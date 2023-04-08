@@ -69,7 +69,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final ServerResourceManager serverResourceManager;
     private final TaskManager taskManager = new TaskManager();
     private final AreasServerManager areasServerManager = new AreasServerManager();
-    private final ServerInfluenceManager influenceManager = new ServerInfluenceManager();
+    private final ServerInfluenceManager influenceManager = new ServerInfluenceManager(this);
     
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
 
@@ -131,6 +131,10 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public TaskManager getTaskManager() {
         return taskManager;
+    }
+
+    public ServerInfluenceManager getInfluenceManager() {
+        return influenceManager;
     }
 
     public void tick(@Nullable ServerPlayerEntity player) {
