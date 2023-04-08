@@ -35,6 +35,7 @@ public class FortressClientNetworkHelper {
         FortressClientNetworkHelper.registerReceiver(S2COpenHireMenuPacket.CHANNEL, S2COpenHireMenuPacket::new);
         FortressClientNetworkHelper.registerReceiver(SyncHireProgress.CHANNEL, SyncHireProgress::new);
         FortressClientNetworkHelper.registerReceiver(S2CSyncAreasPacket.CHANNEL, S2CSyncAreasPacket::new);
+        FortressClientNetworkHelper.registerReceiver(S2CSyncInfluence.CHANNEL, S2CSyncInfluence::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressS2CPacket> packetConstructor) {

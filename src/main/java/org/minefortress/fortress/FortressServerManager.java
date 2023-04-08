@@ -32,6 +32,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.entity.interfaces.IWorkerPawn;
+import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.automation.FortressBuilding;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
@@ -68,6 +69,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final ServerResourceManager serverResourceManager;
     private final TaskManager taskManager = new TaskManager();
     private final AreasServerManager areasServerManager = new AreasServerManager();
+    private final ServerInfluenceManager influenceManager = new ServerInfluenceManager();
     
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
 
@@ -137,6 +139,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
         areasServerManager.tick(player);
+        influenceManager.tick(player);
         if(!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
         final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount, getReservedPawnsCount());
@@ -337,6 +340,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.needSyncSpecialBlocks = true;
         final var resourceManager = (ServerResourceManager) this.getResourceManager();
         resourceManager.syncAll();
+        areasServerManager.sync();
+        influenceManager.sync();
     }
 
     public void scheduleSync() {
@@ -426,6 +431,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         this.serverResourceManager.write(tag);
         this.areasServerManager.write(tag);
+        this.influenceManager.write(tag);
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -503,6 +509,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         this.areasServerManager.read(tag);
+        this.influenceManager.read(tag);
 
         this.scheduleSync();
     }

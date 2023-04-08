@@ -1,11 +1,13 @@
 package org.minefortress.fight.influence;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.manager.BaseClientStructureManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ClientInfluenceManager extends BaseClientStructureManager {
@@ -34,11 +36,15 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         isSelectingInfluencePosition = false;
     }
 
+    public void sync(List<BlockPos> positions) {
+        fortressBorderHolder.syncInfluencePositions(positions);
+    }
+
     public void selectInfluencePosition() {
         isSelectingInfluencePosition = false;
         final var pos = getStructureBuildPos();
         if(pos != null) {
-            fortressBorderHolder.addInfluencePosition(pos);
+            // TODO send packet to server
             super.reset();
         }
     }

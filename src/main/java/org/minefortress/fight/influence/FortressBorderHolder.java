@@ -20,8 +20,9 @@ public class FortressBorderHolder {
         this.clientInfluenceManager = clientInfluenceManager;
     }
 
-    public void addInfluencePosition(BlockPos pos) {
-        allInfluencePositions.add(pos);
+    public void syncInfluencePositions(List<BlockPos> positions) {
+        allInfluencePositions.clear();
+        allInfluencePositions.addAll(positions);
         rebuildFortressBorder();
     }
 

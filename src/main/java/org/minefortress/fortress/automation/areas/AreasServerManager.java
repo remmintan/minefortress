@@ -55,7 +55,7 @@ public final class AreasServerManager {
                 .map(ServerAutomationAreaInfo.class::cast);
     }
 
-    private void sync() {
+    public void sync() {
         needSync = true;
     }
 
