@@ -3,6 +3,7 @@ package org.minefortress.fortress;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderStage;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +52,14 @@ public final class FortressBorder extends WorldBorder {
         if(!hasDynamicStage) {
             return super.getStage();
         }
-        return WorldBorderStage.SHRINKING;
+        final var fortressClientManager = ModUtils.getFortressClientManager();
+        if(fortressClientManager.isCenterNotSet()) {
+            return WorldBorderStage.GROWING;
+        }
+        final var influenceManager = ModUtils.getInfluenceManager();
+        final var inCorrectState = influenceManager.getInfluencePosStateHolder().isInCorrectState();
+
+        return inCorrectState ? WorldBorderStage.GROWING : WorldBorderStage.SHRINKING;
     }
 
     public void enableDynamicStage() {

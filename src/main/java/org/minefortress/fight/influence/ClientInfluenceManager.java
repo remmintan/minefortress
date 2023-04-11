@@ -12,11 +12,13 @@ import org.minefortress.blueprints.manager.BaseClientStructureManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.network.c2s.C2SCaptureInfluencePositionPacket;
+import org.minefortress.network.c2s.C2SUpdateNewInfluencePosition;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.hire.ProfessionsHireTypes;
 import org.minefortress.utils.ModUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,7 +27,8 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
     private static final BlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0, null);
 
     private final InfluenceFlagBlockDataProvider blockDataProvider = new InfluenceFlagBlockDataProvider();
-    private final FortressBorderHolder fortressBorderHolder = new FortressBorderHolder(this);
+    private final ClientFortressBorderHolder clientFortressBorderHolder = new ClientFortressBorderHolder(this);
+    private final InfluencePosStateHolder influencePosStateHolder = new InfluencePosStateHolder();
 
     private boolean isSelectingInfluencePosition = false;
 
@@ -33,8 +36,14 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         super(client);
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+        influencePosStateHolder.syncNewPos(getStructureBuildPos());
+    }
+
     public Optional<WorldBorder> getFortressBorder() {
-        return fortressBorderHolder.getFortressBorder();
+        return clientFortressBorderHolder.getFortressBorder();
     }
 
     public void startSelectingInfluencePosition() {
@@ -44,10 +53,11 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
     public void cancelSelectingInfluencePosition() {
         super.reset();
         isSelectingInfluencePosition = false;
+        influencePosStateHolder.reset();
     }
 
     public void sync(List<BlockPos> positions) {
-        fortressBorderHolder.syncInfluencePositions(positions);
+        clientFortressBorderHolder.syncInfluencePositions(positions);
     }
 
     public void selectInfluencePosition() {
@@ -74,6 +84,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
 
             sendCaptureTaskPacket(pos, blockData);
         }
+        influencePosStateHolder.reset();
     }
 
     private static boolean isNotEnoughResources(StrctureBlockData blockData, FortressClientManager fortressClientManager) {
@@ -115,5 +126,43 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
     @Override
     public BlueprintMetadata getSelectedStructure() {
         return INFLUENCE_FLAG_METADATA;
+    }
+
+    public InfluencePosStateHolder getInfluencePosStateHolder() {
+        return influencePosStateHolder;
+    }
+
+    public static class InfluencePosStateHolder {
+        private boolean inCorrectState = true;
+        private BlockPos lastPos = null;
+
+        void syncNewPos(BlockPos newPos) {
+            if(newPos == null) {
+                setCorrect(true);
+                return;
+            }
+            final var alignedPos = BaseFortressBorderHolder.alignToAGrid(newPos);
+            if(Objects.equals(lastPos, alignedPos)) {
+                return;
+            }
+
+            final var packet = new C2SUpdateNewInfluencePosition(alignedPos);
+            FortressClientNetworkHelper.send(C2SUpdateNewInfluencePosition.CHANNEL, packet);
+            lastPos = alignedPos;
+        }
+
+        public void setCorrect(boolean state) {
+            inCorrectState = state;
+        }
+
+        public boolean isInCorrectState() {
+            return inCorrectState;
+        }
+
+        void reset() {
+            inCorrectState = true;
+            lastPos = null;
+        }
+
     }
 }

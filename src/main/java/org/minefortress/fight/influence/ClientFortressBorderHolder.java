@@ -8,15 +8,13 @@ import org.minefortress.utils.ModUtils;
 
 import java.util.*;
 
-public class FortressBorderHolder {
-
-    private static final int FORTRESS_BORDER_SIZE = 64;
+public class ClientFortressBorderHolder extends BaseFortressBorderHolder {
     private final ClientInfluenceManager clientInfluenceManager;
     private final List<BlockPos> allInfluencePositions = new ArrayList<>();
 
     private WorldBorder fortressBorder;
 
-    public FortressBorderHolder(ClientInfluenceManager clientInfluenceManager) {
+    public ClientFortressBorderHolder(ClientInfluenceManager clientInfluenceManager) {
         this.clientInfluenceManager = clientInfluenceManager;
     }
 

@@ -12,6 +12,7 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.network.s2c.S2CSyncInfluence;
+import org.minefortress.network.s2c.S2CUpdateNewInfluencePositionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ public class ServerInfluenceManager  {
     private final List<BlockPos> allInfluencePositions = new ArrayList<>();
     private final Synchronizer synchronizer = new Synchronizer();
     private final InfluenceFlagBlockDataProvider influenceFlagBlockDataProvider = new InfluenceFlagBlockDataProvider();
+    private final ServerFortressBorderHolder fortressBorderHolder = new ServerFortressBorderHolder();
 
     private final FortressServerManager fortressServerManager;
 
@@ -40,6 +42,7 @@ public class ServerInfluenceManager  {
         if(resourceManager.hasItems(stacks)) {
             resourceManager.reserveItems(taskId, stacks);
             captureTasksQueue.add(new CaptureTask(taskId, pos));
+            fortressBorderHolder.add(pos);
         } else {
             final var packet = new ClientboundTaskExecutedPacket(taskId);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, packet);
@@ -84,6 +87,12 @@ public class ServerInfluenceManager  {
         tag.put("influenceManager", nbt);
     }
 
+    public void checkNewPositionAndUpdateClientState(BlockPos pos, ServerPlayerEntity player) {
+        final var posAlreadyExists = fortressBorderHolder.contains(pos);
+        final var packet = new S2CUpdateNewInfluencePositionState(!posAlreadyExists);
+        FortressServerNetworkHelper.send(player, S2CUpdateNewInfluencePositionState.CHANNEL, packet);
+    }
+
     public void read(NbtCompound tag) {
         if (!tag.contains("influenceManager")) {
             return;
@@ -91,11 +100,13 @@ public class ServerInfluenceManager  {
         NbtCompound nbt = tag.getCompound("influenceManager");
 
         allInfluencePositions.clear();
+        fortressBorderHolder.clear();
         final var list = nbt.getList("positions", NbtList.COMPOUND_TYPE);
         for (int i = 0; i < list.size(); i++) {
             final var posTag = list.getCompound(i);
             final var pos = BlockPos.fromLong(posTag.getLong("pos"));
             allInfluencePositions.add(pos);
+            fortressBorderHolder.add(pos);
         }
         synchronizer.scheduleSync();
     }
