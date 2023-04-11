@@ -43,14 +43,7 @@ public class ClientFortressBorderHolder extends BaseFortressBorderHolder {
     }
 
     private void rebuildFortressBorder() {
-        final var positionsForBorder = new ArrayList<BlockPos>();
-        final var fortressCenter = ModUtils.getFortressClientManager().getFortressCenter();
-        if(fortressCenter == null) {
-            fortressBorder = null;
-            return;
-        }
-        positionsForBorder.add(fortressCenter);
-        positionsForBorder.addAll(allInfluencePositions);
+        final var positionsForBorder = new ArrayList<>(allInfluencePositions);
         fortressBorder = getWorldBorder(positionsForBorder).orElse(null);
     }
 

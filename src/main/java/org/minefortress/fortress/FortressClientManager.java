@@ -66,10 +66,6 @@ public final class FortressClientManager extends AbstractFortressManager {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
     }
 
-    public BlockPos getFortressCenter() {
-        return fortressCenter;
-    }
-
     public void select(BasePawnEntity colonist) {
         if(state == FortressState.COMBAT) {
             final var mouse = MinecraftClient.getInstance().mouse;

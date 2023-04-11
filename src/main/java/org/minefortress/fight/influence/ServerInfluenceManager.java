@@ -5,6 +5,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
@@ -16,7 +17,10 @@ import org.minefortress.network.s2c.S2CUpdateNewInfluencePositionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ServerInfluenceManager  {
@@ -66,7 +70,10 @@ public class ServerInfluenceManager  {
         synchronizer.scheduleSync();
     }
 
-    public void tick(ServerPlayerEntity player) {
+    public void tick(@Nullable ServerPlayerEntity player) {
+        if(player == null) {
+            return;
+        }
         synchronizer.tick(player);
     }
 
@@ -95,6 +102,7 @@ public class ServerInfluenceManager  {
 
     public void read(NbtCompound tag) {
         if (!tag.contains("influenceManager")) {
+            addCenterAsInfluencePosition();
             return;
         }
         NbtCompound nbt = tag.getCompound("influenceManager");
@@ -108,7 +116,17 @@ public class ServerInfluenceManager  {
             allInfluencePositions.add(pos);
             fortressBorderHolder.add(pos);
         }
+        if(allInfluencePositions.isEmpty()) {
+            addCenterAsInfluencePosition();
+        }
         synchronizer.scheduleSync();
+    }
+
+    private void addCenterAsInfluencePosition() {
+        final var fortressCenter = fortressServerManager.getFortressCenter();
+        if(fortressCenter != null) {
+            addInfluencePosition(fortressCenter);
+        }
     }
 
     private class Synchronizer {
