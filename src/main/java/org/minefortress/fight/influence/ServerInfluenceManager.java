@@ -5,6 +5,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -15,11 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ServerInfluenceManager  {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfluenceManager.class);
-    private final Deque<CaptureTask> captureTasksQueue = new ArrayDeque<>();
+    private final Deque<CaptureTask> captureTasksQueue = new ConcurrentLinkedDeque<>();
     private final List<BlockPos> allInfluencePositions = new ArrayList<>();
     private final Synchronizer synchronizer = new Synchronizer();
     private final InfluenceFlagBlockDataProvider influenceFlagBlockDataProvider = new InfluenceFlagBlockDataProvider();
@@ -44,9 +46,16 @@ public class ServerInfluenceManager  {
             LOGGER.warn("Player tried to capture influence flag without having the required items!");
         }
     }
+    public CaptureTask getCaptureTask() {
+        return captureTasksQueue.poll();
+    }
 
-    public boolean hasCaptureTask() {
-        return !captureTasksQueue.isEmpty();
+    public void failCaptureTask(CaptureTask task) {
+        captureTasksQueue.add(task);
+    }
+
+    public IBlockDataProvider getBlockDataProvider() {
+        return influenceFlagBlockDataProvider;
     }
 
     public void addInfluencePosition(BlockPos pos) {
@@ -112,6 +121,6 @@ public class ServerInfluenceManager  {
         }
     }
 
-    private record CaptureTask(UUID taskId, BlockPos pos) { }
+    public record CaptureTask(UUID taskId, BlockPos pos) { }
 
 }
