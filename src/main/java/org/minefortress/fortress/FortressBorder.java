@@ -44,7 +44,10 @@ public final class FortressBorder extends WorldBorder {
     }
 
     public boolean shouldRenderBound(@Nullable Double boundX, @Nullable Double boundZ) {
-        return boundX != null && boundZ != null && uniqueBorders.contains(new BoundPosition(boundX, boundZ));
+
+        return additionalBorders.isEmpty() ||
+                boundX != null && boundZ != null &&
+                uniqueBorders.contains(new BoundPosition(boundX, boundZ));
     }
 
     @Override
