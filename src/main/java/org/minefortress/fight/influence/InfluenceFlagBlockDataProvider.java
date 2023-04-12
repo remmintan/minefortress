@@ -23,7 +23,8 @@ public class InfluenceFlagBlockDataProvider implements IBlockDataProvider {
 
         if (influenceFlagData == null) {
             final var structure = new Structure();
-            structure.readNbt(readTheStructureNbtTag());
+            final var nbt = readTheStructureNbtTag();
+            structure.readNbt(nbt.getCompound("tag"));
             influenceFlagData = ClientStructureBlockDataProvider.buildStructureForClient(structure, rotation);
         }
 
@@ -33,10 +34,10 @@ public class InfluenceFlagBlockDataProvider implements IBlockDataProvider {
     private static NbtCompound readTheStructureNbtTag() {
         final var modContainer = FabricLoader.getInstance().getModContainer(MineFortressMod.MOD_ID)
                 .orElseThrow(() -> new IllegalStateException("Mod container not found!"));
-        final var path = modContainer.findPath("data/stuctures/influence_flag.nbt")
+        final var path = modContainer.findPath("data/minefortress/structures/influence_flag.nbt")
                 .orElseThrow(() -> new IllegalStateException("Structure file not found!"));
         try {
-            return NbtIo.read(path.toFile());
+            return NbtIo.readCompressed(path.toFile());
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read structure file!", e);
         }
