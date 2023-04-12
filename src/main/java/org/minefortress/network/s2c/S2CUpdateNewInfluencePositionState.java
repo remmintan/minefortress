@@ -26,5 +26,6 @@ public class S2CUpdateNewInfluencePositionState implements FortressS2CPacket {
     @Override
     public void handle(MinecraftClient client) {
         final var influenceManager = ModUtils.getInfluenceManager();
+        influenceManager.getInfluencePosStateHolder().setCorrect(isCorrect);
     }
 }

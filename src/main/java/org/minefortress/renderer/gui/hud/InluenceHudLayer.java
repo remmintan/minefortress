@@ -27,7 +27,7 @@ public class InluenceHudLayer extends AbstractHudLayer {
                             }
                         },
                         (button) -> Optional.of("Influence"),
-                        () -> false,
+                        () -> ModUtils.getInfluenceManager().isSelecting(),
                         () -> true
                 )
         );

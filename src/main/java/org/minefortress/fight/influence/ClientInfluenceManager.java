@@ -139,6 +139,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         void syncNewPos(BlockPos newPos) {
             if(newPos == null) {
                 setCorrect(true);
+                lastPos = null;
                 return;
             }
             final var alignedPos = BaseFortressBorderHolder.alignToAGrid(newPos);
