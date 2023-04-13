@@ -6,10 +6,16 @@ public class BaseFortressBorderHolder {
 
     public static final int FORTRESS_BORDER_SIZE = 64;
 
-    public static BlockPos alignToAGrid(BlockPos pos) {
-        var x = pos.getX() - (pos.getX() % ClientFortressBorderHolder.FORTRESS_BORDER_SIZE);
-        var z = pos.getZ() - (pos.getZ() % ClientFortressBorderHolder.FORTRESS_BORDER_SIZE);
-        return new BlockPos(x, 0, z);
+    static BlockPos alignToAGrid(BlockPos center) {
+        final var x = center.getX();
+        final var z = center.getZ();
+        final var xSign = Math.signum(x);
+        final var zSign = Math.signum(z);
+        final var nonZeroSignX = xSign == 0 ? 1 : xSign;
+        final var nonZeroSignZ = zSign == 0 ? 1 : zSign;
+        final var adjustedX = x - x % FORTRESS_BORDER_SIZE + nonZeroSignX * FORTRESS_BORDER_SIZE / 2f;
+        final var adjustedZ = z - z % FORTRESS_BORDER_SIZE + nonZeroSignZ * FORTRESS_BORDER_SIZE / 2f;
+        return new BlockPos(adjustedX, 0, adjustedZ);
     }
 
 }

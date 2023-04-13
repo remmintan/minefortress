@@ -44,7 +44,6 @@ public final class FortressBorder extends WorldBorder {
     }
 
     public boolean shouldRenderBound(@Nullable Double boundX, @Nullable Double boundZ) {
-
         return additionalBorders.isEmpty() ||
                 boundX != null && boundZ != null &&
                 uniqueBorders.contains(new BoundPosition(boundX, boundZ));
@@ -60,9 +59,7 @@ public final class FortressBorder extends WorldBorder {
             return WorldBorderStage.GROWING;
         }
         final var influenceManager = ModUtils.getInfluenceManager();
-        final var inCorrectState = influenceManager.getInfluencePosStateHolder().isInCorrectState();
-
-        return inCorrectState ? WorldBorderStage.GROWING : WorldBorderStage.SHRINKING;
+        return influenceManager.getInfluencePosStateHolder().getWorldBorderStage();
     }
 
     public void enableDynamicStage() {

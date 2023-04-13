@@ -5,6 +5,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.border.WorldBorderStage;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
@@ -133,12 +134,12 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
     }
 
     public static class InfluencePosStateHolder {
-        private boolean inCorrectState = true;
+        private WorldBorderStage worldBorderStage = WorldBorderStage.STATIONARY;
         private BlockPos lastPos = null;
 
         void syncNewPos(BlockPos newPos) {
             if(newPos == null) {
-                setCorrect(true);
+                setCorrect(WorldBorderStage.STATIONARY);
                 lastPos = null;
                 return;
             }
@@ -152,16 +153,16 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
             lastPos = alignedPos;
         }
 
-        public void setCorrect(boolean state) {
-            inCorrectState = state;
+        public void setCorrect(WorldBorderStage state) {
+            worldBorderStage = state;
         }
 
-        public boolean isInCorrectState() {
-            return inCorrectState;
+        public WorldBorderStage getWorldBorderStage() {
+            return worldBorderStage;
         }
 
         void reset() {
-            inCorrectState = true;
+            worldBorderStage = WorldBorderStage.STATIONARY;
             lastPos = null;
         }
 

@@ -5,6 +5,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.border.WorldBorderStage;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.fortress.FortressServerManager;
@@ -13,7 +14,7 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.network.s2c.S2CSyncInfluence;
-import org.minefortress.network.s2c.S2CUpdateNewInfluencePositionState;
+import org.minefortress.network.s2c.S2CUpdateInfluenceBorderStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,9 +96,8 @@ public class ServerInfluenceManager  {
     }
 
     public void checkNewPositionAndUpdateClientState(BlockPos pos, ServerPlayerEntity player) {
-        final var posAlreadyExists = fortressBorderHolder.contains(pos);
-        final var packet = new S2CUpdateNewInfluencePositionState(!posAlreadyExists);
-        FortressServerNetworkHelper.send(player, S2CUpdateNewInfluencePositionState.CHANNEL, packet);
+        final var packet = new S2CUpdateInfluenceBorderStage(fortressBorderHolder.getStage(pos));
+        FortressServerNetworkHelper.send(player, S2CUpdateInfluenceBorderStage.CHANNEL, packet);
     }
 
     public void read(NbtCompound tag) {
