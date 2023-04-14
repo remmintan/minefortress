@@ -212,17 +212,17 @@ public final class BlueprintsScreen extends Screen {
             final var resourceManager = fortressClientManager.getResourceManager();
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(matrices, slotX, slotY, this.getZOffset());
-
+            final var x = this.x - this.backgroundWidth / 2;
             if(blueprintSlot != BlueprintSlot.EMPTY) {
                 if(fortressClientManager.isSurvival()) {
                     final var stacks = blueprintSlot.getBlockData().getStacks();
                     for (int i1 = 0; i1 < stacks.size(); i1++) {
                         final ItemInfo stack = stacks.get(i1);
                         final var hasItem = resourceManager.hasItem(stack, stacks);
-                        final var itemX = this.x - this.backgroundWidth/2 + 25 + i1%10 * 30;
+                        final var itemX = x + 25 + i1%10 * 30;
                         final var itemY = i1/10 * 20 + this.backgroundHeight;
                         final var convertedItem = convertItemIconInTheGUI(stack);
-                        itemRenderer.renderInGui(new ItemStack(convertedItem), itemX, itemY);
+                        this.itemRenderer.renderInGui(new ItemStack(convertedItem), itemX, itemY);
                         this.textRenderer.draw(matrices, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000);
                     }
                 }
@@ -266,7 +266,7 @@ public final class BlueprintsScreen extends Screen {
         this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
-    private Item convertItemIconInTheGUI(ItemInfo stack) {
+    public static Item convertItemIconInTheGUI(ItemInfo stack) {
         final var originalItem = stack.item();
         if(Items.FARMLAND.equals(originalItem)) {
             return Items.DIRT;

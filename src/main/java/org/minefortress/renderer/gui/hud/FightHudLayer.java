@@ -3,8 +3,13 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRotation;
 import org.minefortress.fight.ClientFightSelectionManager;
+import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.utils.ModUtils;
+
+import static org.minefortress.renderer.gui.blueprints.BlueprintsScreen.convertItemIconInTheGUI;
 
 class FightHudLayer extends AbstractHudLayer {
 
@@ -17,23 +22,43 @@ class FightHudLayer extends AbstractHudLayer {
 
     @Override
     protected void renderHud(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight) {
+        final var influenceManager = ModUtils.getInfluenceManager();
+        if(influenceManager.isSelecting() && ModUtils.getFortressClientManager().isSurvival()) {
+            final var stacks = influenceManager.getBlockDataProvider()
+                    .getBlockData("influence_flag", BlockRotation.NONE)
+                    .getStacks();
+
+            final var resourceManager = ModUtils.getFortressClientManager().getResourceManager();
+
+            for (int i1 = 0; i1 < stacks.size(); i1++) {
+                final ItemInfo stack = stacks.get(i1);
+                final var hasItem = resourceManager.hasItem(stack, stacks);
+                final var itemX = screenWidth/2 - 55 + i1%10 * 30;
+                final var itemY = i1/10 * 20 + screenHeight - 40;
+                final var convertedItem = convertItemIconInTheGUI(stack);
+                this.itemRenderer.renderInGui(new ItemStack(convertedItem), itemX, itemY);
+                this.textRenderer.draw(matrices, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000);
+            }
+        }
+
         final var fightSelectionManager = getFightSelectionManager();
-        if(!fightSelectionManager.isSelecting()) return;
-        final var selectionStartPos = fightSelectionManager.getSelectionStartPos();
-        final var selectionCurPos = fightSelectionManager.getSelectionCurPos();
+        if(fightSelectionManager.isSelecting()) {
+            final var selectionStartPos = fightSelectionManager.getSelectionStartPos();
+            final var selectionCurPos = fightSelectionManager.getSelectionCurPos();
 
-        final var widthScaleFactor = (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-        final var heightScaleFactor = (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
+            final var widthScaleFactor = (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+            final var heightScaleFactor = (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
 
-        final var selectionStartX = (int) (selectionStartPos.x() * widthScaleFactor);
-        final var selectionStartY = (int) (selectionStartPos.y() * heightScaleFactor);
-        final var selectionCurX = (int) (selectionCurPos.x() * widthScaleFactor);
-        final var selectionCurY = (int) (selectionCurPos.y() * heightScaleFactor);
+            final var selectionStartX = (int) (selectionStartPos.x() * widthScaleFactor);
+            final var selectionStartY = (int) (selectionStartPos.y() * heightScaleFactor);
+            final var selectionCurX = (int) (selectionCurPos.x() * widthScaleFactor);
+            final var selectionCurY = (int) (selectionCurPos.y() * heightScaleFactor);
 
-        super.drawHorizontalLine(matrices, selectionStartX, selectionCurX, selectionStartY, SELECTION_COLOR);
-        super.drawVerticalLine(matrices, selectionCurX, selectionStartY, selectionCurY, SELECTION_COLOR);
-        super.drawHorizontalLine(matrices, selectionStartX, selectionCurX, selectionCurY, SELECTION_COLOR);
-        super.drawVerticalLine(matrices, selectionStartX, selectionStartY, selectionCurY, SELECTION_COLOR);
+            super.drawHorizontalLine(matrices, selectionStartX, selectionCurX, selectionStartY, SELECTION_COLOR);
+            super.drawVerticalLine(matrices, selectionCurX, selectionStartY, selectionCurY, SELECTION_COLOR);
+            super.drawHorizontalLine(matrices, selectionStartX, selectionCurX, selectionCurY, SELECTION_COLOR);
+            super.drawVerticalLine(matrices, selectionStartX, selectionStartY, selectionCurY, SELECTION_COLOR);
+        }
     }
 
     private ClientFightSelectionManager getFightSelectionManager() {

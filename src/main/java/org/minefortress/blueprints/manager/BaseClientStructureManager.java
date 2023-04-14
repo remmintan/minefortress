@@ -53,6 +53,10 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         }
     }
 
+    protected boolean isEnoughResources() {
+        return enoughResources;
+    }
+
     private void checkCantBuild() {
         if(!enoughResources) {
             cantBuild = true;

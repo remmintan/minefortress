@@ -1,8 +1,8 @@
 package org.minefortress.renderer.gui.hud.hints;
 
 import org.minefortress.renderer.gui.hud.HudState;
+import org.minefortress.utils.ModUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class CombatHintsLayer extends AbstractHintsLayer {
@@ -21,6 +21,7 @@ public class CombatHintsLayer extends AbstractHintsLayer {
 
     @Override
     public boolean shouldRender(HudState hudState) {
-        return super.shouldRender(hudState) && hudState == HudState.COMBAT;
+        return super.shouldRender(hudState) && hudState == HudState.COMBAT
+                && !ModUtils.getInfluenceManager().isSelecting();
     }
 }

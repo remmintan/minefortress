@@ -44,8 +44,10 @@ public class ServerInfluenceManager  {
         final var resourceManager = (ServerResourceManager)this.fortressServerManager.getResourceManager();
         final var influenceFlag = influenceFlagBlockDataProvider.getBlockData("influence_flag", BlockRotation.NONE);
         final var stacks = influenceFlag.getStacks();
-        if(stage == WorldBorderStage.GROWING && resourceManager.hasItems(stacks)) {
-            resourceManager.reserveItems(taskId, stacks);
+        if(stage == WorldBorderStage.GROWING && (resourceManager.hasItems(stacks) || fortressServerManager.isCreative())) {
+            if(fortressServerManager.isSurvival()) {
+                resourceManager.reserveItems(taskId, stacks);
+            }
             captureTasksQueue.add(new CaptureTask(taskId, pos));
             fortressBorderHolder.add(pos);
         } else {

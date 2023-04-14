@@ -81,9 +81,9 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
                 return;
             }
 
-            final boolean notEnoughResources = isNotEnoughResources(blockData, fortressClientManager);
-            if(notEnoughResources) {
-                final var message = Text.of("You don't have the required items to capture this influence point!");
+            if(!isEnoughResources()) {
+                final var msg = "You don't have the required items to capture this influence point!";
+                final var message = Text.of(msg);
                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message);
                 super.reset();
                 return;
@@ -100,11 +100,6 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
             sendCaptureTaskPacket(pos, blockData);
         }
         influencePosStateHolder.reset();
-    }
-
-    private static boolean isNotEnoughResources(StrctureBlockData blockData, FortressClientManager fortressClientManager) {
-        final var resourceManager = fortressClientManager.getResourceManager();
-        return !resourceManager.hasItems(blockData.getStacks());
     }
 
     private static boolean isHasAnyWarrior(FortressClientManager fortressClientManager) {

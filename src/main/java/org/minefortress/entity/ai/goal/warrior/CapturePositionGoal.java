@@ -75,7 +75,9 @@ public class CapturePositionGoal extends Goal {
                             .forEach((pos, state) -> {
                                 final var realpos = pos.add(targetPos);
                                 pawn.world.setBlockState(realpos, state, 3);
-                                resourceManager.removeReservedItem(target.taskId(), state.getBlock().asItem());
+                                if(it.isSurvival()) {
+                                    resourceManager.removeReservedItem(target.taskId(), state.getBlock().asItem());
+                                }
                             });
                     influenceManager.addInfluencePosition(target.pos());
                 });
@@ -110,6 +112,6 @@ public class CapturePositionGoal extends Goal {
     }
 
     private boolean hasReachedTarget() {
-        return target != null && target.pos().isWithinDistance(pawn.getPos(), pawn.getTargetMoveRange());
+        return target != null && target.pos().isWithinDistance(pawn.getPos(), pawn.getTargetMoveRange() + 1);
     }
 }
