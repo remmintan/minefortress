@@ -123,7 +123,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     }
 
     @Override
-    public final boolean canBuild() {
+    public boolean canBuild() {
         return !cantBuild;
     }
 

@@ -67,6 +67,20 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         if(pos != null) {
             final var blockData = blockDataProvider.getBlockData(INFLUENCE_FLAG_METADATA.getFile(), BlockRotation.NONE);
             final var fortressClientManager = ModUtils.getFortressClientManager();
+
+            String stageMessage = switch (influencePosStateHolder.getWorldBorderStage()) {
+                case STATIONARY -> "This influence point is already captured!";
+                case SHRINKING -> "This influence point is too close to the enemy fortress!";
+                default -> null;
+            };
+
+            if(stageMessage != null) {
+                final var message = Text.of(stageMessage);
+                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(message);
+                super.reset();
+                return;
+            }
+
             final boolean notEnoughResources = isNotEnoughResources(blockData, fortressClientManager);
             if(notEnoughResources) {
                 final var message = Text.of("You don't have the required items to capture this influence point!");
@@ -127,6 +141,12 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
     @Override
     public BlueprintMetadata getSelectedStructure() {
         return INFLUENCE_FLAG_METADATA;
+    }
+
+    @Override
+    public boolean canBuild() {
+        return getInfluencePosStateHolder().getWorldBorderStage() != WorldBorderStage.SHRINKING
+                && super.canBuild();
     }
 
     public InfluencePosStateHolder getInfluencePosStateHolder() {
