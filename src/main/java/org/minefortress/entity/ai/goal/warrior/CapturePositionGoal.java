@@ -38,6 +38,7 @@ public class CapturePositionGoal extends Goal {
     @Override
     public void start() {
         if(target == null) return;
+        pawn.resetTargets();
         final var moveControl = pawn.getFortressMoveControl();
         moveControl.moveTo(target.pos());
     }
