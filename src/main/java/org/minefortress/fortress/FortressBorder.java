@@ -1,19 +1,17 @@
 package org.minefortress.fortress;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderStage;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.utils.ModUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public final class FortressBorder extends WorldBorder {
 
     private boolean hasDynamicStage = false;
-    private final List<WorldBorder> additionalBorders = new ArrayList<>();
+    private final Set<WorldBorder> additionalBorders = new HashSet<>();
     private final List<BoundPosition> uniqueBorders = new ArrayList<>();
 
     public void addAdditionalBorder(WorldBorder worldBorder) {
@@ -62,12 +60,26 @@ public final class FortressBorder extends WorldBorder {
         return influenceManager.getInfluencePosStateHolder().getWorldBorderStage();
     }
 
+    @Override
+    public boolean contains(BlockPos pos) {
+        if(super.contains(pos)) {
+            return true;
+        }
+        final var ab = this.getAdditionalBorders();
+        for (WorldBorder additionalBorder : ab) {
+            if(additionalBorder.contains(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void enableDynamicStage() {
         this.hasDynamicStage = true;
     }
 
-    public List<WorldBorder> getAdditionalBorders() {
-        return Collections.unmodifiableList(additionalBorders);
+    public Set<WorldBorder> getAdditionalBorders() {
+        return Collections.unmodifiableSet(additionalBorders);
     }
 
     private record BoundPosition(double x, double z) {}
