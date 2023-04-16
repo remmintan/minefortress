@@ -1,6 +1,7 @@
 package org.minefortress.fight.influence;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
@@ -41,7 +42,11 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
     }
 
     public Optional<WorldBorder> getFortressBorder() {
-        return clientFortressBorderHolder.getFortressBorder();
+        if(ModUtils.getFortressClientManager().isCreative())
+            return Optional.ofNullable(MinecraftClient.getInstance().world)
+                    .map(ClientWorld::getWorldBorder);
+        else
+            return clientFortressBorderHolder.getFortressBorder();
     }
 
     public void startSelectingInfluencePosition() {
