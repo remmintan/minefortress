@@ -8,10 +8,10 @@ import java.util.List;
 public class CombatHintsLayer extends AbstractHintsLayer {
 
     private static final List<String> COMBAT_HINTS = List.of(
-            "hold left mouse button and",
-            "drag to select units",
-            "click right mouse button",
-            "to give commands"
+            "",
+            "",
+            "click LMB to select units",
+            "click RMB to give commands"
     );
 
     @Override
