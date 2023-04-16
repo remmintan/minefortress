@@ -318,6 +318,8 @@ public final class FortressServerManager extends AbstractFortressManager {
             spawnPawnNearCampfire(player.getUuid());
         }
 
+        influenceManager.addCenterAsInfluencePosition();
+
         this.scheduleSync();
     }
 

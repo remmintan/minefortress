@@ -72,7 +72,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
 
             String stageMessage = switch (influencePosStateHolder.getWorldBorderStage()) {
                 case STATIONARY -> "This influence point is already captured!";
-                case SHRINKING -> "This influence point is too close to the enemy fortress!";
+                case SHRINKING -> "This influence point is too farm away from your fortress!";
                 default -> null;
             };
 

@@ -124,10 +124,11 @@ public class ServerInfluenceManager  {
         synchronizer.scheduleSync();
     }
 
-    private void addCenterAsInfluencePosition() {
+    public void addCenterAsInfluencePosition() {
         final var fortressCenter = fortressServerManager.getFortressCenter();
         if(fortressCenter != null) {
             addInfluencePosition(fortressCenter);
+            fortressBorderHolder.add(fortressCenter);
         }
     }
 
