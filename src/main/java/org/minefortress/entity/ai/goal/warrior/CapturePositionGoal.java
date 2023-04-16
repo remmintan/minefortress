@@ -69,8 +69,7 @@ public class CapturePositionGoal extends Goal {
                     final var influenceManager = it.getInfluenceManager();
                     final var flagDataProvider = influenceManager.getBlockDataProvider();
                     final var influenceFlag = flagDataProvider.getBlockData("influence_flag", BlockRotation.NONE);
-                    final var size = influenceFlag.getSize();
-                    final var targetPos = target.pos().add(-size.getX() / 2, 0, -size.getZ() / 2);
+                    final var targetPos = target.pos();
                     influenceFlag.getLayer(BlueprintDataLayer.GENERAL)
                             .forEach((pos, state) -> {
                                 final var realpos = pos.add(targetPos);

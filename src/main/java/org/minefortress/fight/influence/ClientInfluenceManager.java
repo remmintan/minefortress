@@ -18,10 +18,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.hire.ProfessionsHireTypes;
 import org.minefortress.utils.ModUtils;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class ClientInfluenceManager extends BaseClientStructureManager {
 
@@ -116,7 +113,18 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
     private void sendCaptureTaskPacket(BlockPos pos, StrctureBlockData blockData) {
         final var taskId = UUID.randomUUID();
         ModUtils.getClientTasksHolder()
-                .ifPresent(it -> it.addTask(taskId, blockData.getLayer(BlueprintDataLayer.GENERAL).keySet()));
+                .ifPresent(it -> {
+                    final var blocks = blockData.getLayer(BlueprintDataLayer.GENERAL)
+                            .entrySet()
+                            .stream()
+                            .filter(e -> e.getValue() != null && !e.getValue().isAir())
+                            .map(Map.Entry::getKey)
+                            .filter(Objects::nonNull)
+                            .map(BlockPos::toImmutable)
+                            .map(p -> p.add(pos))
+                            .toList();
+                    it.addTask(taskId, blocks);
+                });
 
         final var packet = new C2SCaptureInfluencePositionPacket(taskId, pos);
         FortressClientNetworkHelper.send(C2SCaptureInfluencePositionPacket.CHANNEL, packet);
