@@ -62,6 +62,7 @@ public final class StrctureBlockData {
                 Items.STRIPPED_CRIMSON_STEM
         );
         items.addAll(SimilarItemsHelper.getItems(ItemTags.FLOWERS));
+        items.addAll(SimilarItemsHelper.getItems(ItemTags.BANNERS));
         IGNORED_ITEMS = items;
     }
 
