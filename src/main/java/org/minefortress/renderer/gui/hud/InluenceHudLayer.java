@@ -13,11 +13,11 @@ public class InluenceHudLayer extends AbstractHudLayer {
 
     protected InluenceHudLayer(MinecraftClient client) {
         super(client);
-        setBasepoint(-5 , 0, PositionX.RIGHT, PositionY.CENTER);
+        setBasepoint(-25 , 0, PositionX.RIGHT, PositionY.CENTER);
 
         captureButton = new ItemToggleWidget(
                 0,
-                0,
+                -13,
                 Items.RED_BANNER,
                 btn -> {
                     final var influenceManager = ModUtils.getInfluenceManager();

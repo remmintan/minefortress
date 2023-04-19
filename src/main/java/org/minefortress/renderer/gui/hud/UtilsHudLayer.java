@@ -20,19 +20,19 @@ public class UtilsHudLayer extends AbstractHudLayer {
 
     protected UtilsHudLayer(MinecraftClient client) {
         super(client);
-        this.setBasepoint(25, 5, PositionX.LEFT, PositionY.TOP);
+        this.setBasepoint(5, 5, PositionX.LEFT, PositionY.TOP);
 
         this.addElement(
             new ItemButtonWidget(
                     0,
-                    100,
+                    50,
                     Items.CAMPFIRE,
                     btn -> ModUtils.getFortressClientManager().jumpToCampfire(),
                     "Jump to Campfire"
             ),
             new ItemButtonWidget(
                     0,
-                    125,
+                    75,
                     Items.RED_BED,
                     btn -> {
                         final var player = MinecraftClient.getInstance().player;
@@ -44,7 +44,7 @@ public class UtilsHudLayer extends AbstractHudLayer {
             ),
             new ItemToggleOtherItemWidget(
                     0,
-                    150,
+                    100,
                     Items.ENDER_EYE,
                     (btn) -> ModUtils.getClientTasksHolder().ifPresent(ClientVisualTasksHolder::toggleSelectionVisibility),
                     (button) -> ModUtils.getClientTasksHolder().map(ClientVisualTasksHolder::isSelectionHidden)
@@ -55,7 +55,7 @@ public class UtilsHudLayer extends AbstractHudLayer {
             ),
             new TextButtonWidget(
                     0,
-                    175,
+                    125,
                     20,
                     20,
                     "?",
