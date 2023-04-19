@@ -15,6 +15,7 @@ import org.minefortress.fortress.automation.EssentialBuildingInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.c2s.C2SJumpToCampfire;
 import org.minefortress.network.c2s.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.c2s.ServerboundSetGamemodePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -82,6 +83,11 @@ public final class FortressClientManager extends AbstractFortressManager {
         final Vec3d playerPos = ModUtils.getClientPlayer().getPos();
 
         selectedColonistDelta = entityPos.subtract(playerPos);
+    }
+
+    public void jumpToCampfire() {
+        final var packet = new C2SJumpToCampfire();
+        FortressClientNetworkHelper.send(C2SJumpToCampfire.CHANNEL, packet);
     }
 
     public void updateBuildings(List<EssentialBuildingInfo> buildings) {

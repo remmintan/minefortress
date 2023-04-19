@@ -13,7 +13,7 @@ public class InluenceHudLayer extends AbstractHudLayer {
 
     protected InluenceHudLayer(MinecraftClient client) {
         super(client);
-        setBasepoint(5 , 0, PositionX.LEFT, PositionY.CENTER);
+        setBasepoint(-5 , 0, PositionX.RIGHT, PositionY.CENTER);
 
         captureButton = new ItemToggleWidget(
                 0,

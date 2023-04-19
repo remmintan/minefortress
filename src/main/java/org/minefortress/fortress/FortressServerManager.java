@@ -319,8 +319,17 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         influenceManager.addCenterAsInfluencePosition();
+        player.setSpawnPoint(getWorld().getRegistryKey(), player.getBlockPos(), 0, true, false);
 
         this.scheduleSync();
+    }
+
+    public void jumpToCampfire(ServerPlayerEntity player) {
+        if(fortressCenter == null) return;
+        if(player.getWorld().getRegistryKey() != World.OVERWORLD) return;
+        player.setPitch(45);
+        player.setYaw(105);
+        player.teleport(fortressCenter.getX() + 10, fortressCenter.getY() + 30, fortressCenter.getZ() + 10);
     }
 
     private static NbtCompound getColonistInfoTag(UUID masterPlayerId) {
