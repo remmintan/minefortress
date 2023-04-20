@@ -327,9 +327,9 @@ public final class FortressServerManager extends AbstractFortressManager {
     public void jumpToCampfire(ServerPlayerEntity player) {
         if(fortressCenter == null) return;
         if(player.getWorld().getRegistryKey() != World.OVERWORLD) return;
-        player.setPitch(45);
-        player.setYaw(105);
-        player.teleport(fortressCenter.getX() + 10, fortressCenter.getY() + 30, fortressCenter.getZ() + 10);
+        player.setPitch(60);
+        player.setYaw(90 + 45);
+        player.teleport(fortressCenter.getX() + 10, fortressCenter.getY() + 20, fortressCenter.getZ() + 10);
     }
 
     private static NbtCompound getColonistInfoTag(UUID masterPlayerId) {
