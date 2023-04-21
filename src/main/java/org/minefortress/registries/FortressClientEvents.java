@@ -2,8 +2,13 @@ package org.minefortress.registries;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.client.world.ClientWorld;
+import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
+import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.ChooseModeScreen;
+import org.minefortress.tasks.ClientVisualTasksHolder;
 import org.minefortress.utils.ModUtils;
 
 public class FortressClientEvents {
@@ -46,6 +51,31 @@ public class FortressClientEvents {
             fortressClientManager.tick(fortressClient);
             if(fortressClientManager.gamemodeNeedsInitialization() && !(client.currentScreen instanceof ChooseModeScreen)) {
                 client.setScreen(new ChooseModeScreen());
+            }
+        });
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
+                final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
+                final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+                if(clientBlueprintManager.isSelecting()) {
+                    fortressClient.getBlueprintManager().selectNext();
+                } else {
+                    fortressClient.getSelectionManager().toggleSelectionType();
+                }
+            }
+
+            while (FortressKeybindings.cancelTaskKeybinding.wasPressed()) {
+                final ClientWorld world = client.world;
+                if(world != null) {
+                    final ClientVisualTasksHolder clientVisualTasksHolder = ((FortressClientWorld) world).getClientTasksHolder();
+
+                    if(client.options.sprintKey.isPressed()) {
+                        clientVisualTasksHolder.cancelAllTasks();
+                    } else {
+                        clientVisualTasksHolder.cancelTask();
+                    }
+                }
             }
         });
     }
