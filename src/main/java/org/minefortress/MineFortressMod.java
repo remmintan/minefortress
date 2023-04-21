@@ -13,7 +13,7 @@ import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandle
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.registries.FortressBlocks;
 import org.minefortress.registries.FortressEntities;
-import org.minefortress.registries.FortressEvents;
+import org.minefortress.registries.FortressServerEvents;
 import org.minefortress.registries.FortressItems;
 
 public class MineFortressMod implements ModInitializer {
@@ -33,7 +33,7 @@ public class MineFortressMod implements ModInitializer {
         FortressBlocks.register();
         FortressEntities.register();
         FortressItems.register();
-        FortressEvents.registerServer();
+        FortressServerEvents.register();
 
         CommandsManager.registerCommands();
         FortressServerNetworkHelper.registerReceivers();

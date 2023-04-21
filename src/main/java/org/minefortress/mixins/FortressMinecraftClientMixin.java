@@ -21,20 +21,19 @@ import net.minecraft.util.thread.ReentrantThreadExecutor;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
-import org.minefortress.fight.influence.ClientInfluenceManager;
-import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
+import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.professions.hire.HireInfo;
 import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.renderer.FortressRenderLayer;
-import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
@@ -65,11 +64,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private SelectionManager selectionManager;
     private FortressCameraManager fortressCameraManager;
     private FortressHud fortressHud;
-
     private FortressClientManager fortressClientManager;
-
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
-
     private ClientBlueprintManager clientBlueprintManager;
     private ClientInfluenceManager influenceManager;
     private BlueprintRenderer blueprintRenderer;
@@ -103,8 +99,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Shadow @Final private SoundManager soundManager;
 
     @Shadow public abstract void setScreen(@Nullable Screen screen);
-
-    @Shadow @Nullable public Screen currentScreen;
 
     public FortressMinecraftClientMixin(String string) {
         super(string);
@@ -177,39 +171,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public boolean isNotFortressGamemode() {
-        return this.interactionManager == null || this.interactionManager.getCurrentGameMode() != MineFortressMod.FORTRESS;
-    }
-
-    @Override
     public boolean isFortressGamemode() {
-        return !isNotFortressGamemode();
-    }
-
-    @Inject(method="render", at=@At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;updateMouse()V"))
-    public void render(boolean tick, CallbackInfo ci) {
-        final boolean middleMouseButtonIsDown = options.pickItemKey.isPressed();
-        if(!isNotFortressGamemode()) { // is fortress
-            if(middleMouseButtonIsDown) {
-                if(!mouse.isCursorLocked())
-                    mouse.lockCursor();
-            } else {
-                if(mouse.isCursorLocked())
-                    mouse.unlockCursor();
-            }
-        }
-
-        if(isFortressGamemode() && !middleMouseButtonIsDown) {
-            if(player != null) {
-                this.fortressCameraManager.updateCameraPosition();
-            }
-        }
-
-        if ((isNotFortressGamemode() || middleMouseButtonIsDown) && this.world!=null && this.world.getRegistryKey() != BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
-            if(player != null) {
-                this.fortressCameraManager.setRot(player.getPitch(), player.getYaw());
-            }
-        }
+        return this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
     }
 
     @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/TutorialManager;onInventoryOpened()V", shift = At.Shift.BEFORE))
@@ -227,7 +190,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreenMix(Screen screen, CallbackInfo ci) {
-        if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS) {
+        if(isFortressGamemode()) {
             if(this.options.sprintKey.isPressed() && screen instanceof InventoryScreen) {
                 ci.cancel();
             }
@@ -238,18 +201,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     public void doItemPick(CallbackInfo ci) {
         if(this.isFortressGamemode()) {
             ci.cancel();
-        }
-    }
-
-    @Inject(method="tick", at=@At("TAIL"))
-    public void tick(CallbackInfo ci) {
-        if(this.world == null && this.fortressHud.isHovered()) {
-            this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
-        }
-        this.fortressHud.tick();
-        this.fortressClientManager.tick(this);
-        if(this.fortressClientManager.gamemodeNeedsInitialization() && !(this.currentScreen instanceof ChooseModeScreen)) {
-            this.setScreen(new ChooseModeScreen());
         }
     }
 
@@ -320,6 +271,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public ClientInfluenceManager getInfluenceManager() {
         return this.influenceManager;
+    }
+
+    @Override
+    public FortressCameraManager getFortressCameraManager() {
+        return this.fortressCameraManager;
     }
 
     @Override

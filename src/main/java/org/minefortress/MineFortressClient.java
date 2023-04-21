@@ -10,9 +10,10 @@ import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreen;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.registries.FortressClientEvents;
 import org.minefortress.registries.FortressEntities;
-import org.minefortress.registries.FortressEvents;
 import org.minefortress.registries.FortressKeybindings;
+import org.minefortress.registries.FortressServerEvents;
 import org.minefortress.tasks.ClientVisualTasksHolder;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
@@ -53,7 +54,7 @@ public class MineFortressClient implements ClientModInitializer {
         ScreenRegistry.register(FORTRESS_FURNACE_SCREEN_HANDLER, FortressFurnaceScreen::new);
 
         FortressClientNetworkHelper.registerReceivers();
-
-        FortressEvents.registerClient();
+        FortressServerEvents.register();
+        FortressClientEvents.register();
     }
 }

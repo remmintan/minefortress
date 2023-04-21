@@ -4,11 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.MovementType;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.RaycastContext;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -82,34 +79,34 @@ public class FortressCameraManager {
         float yRot = player.getYaw();
         float xRot = player.getPitch();
 
-        if(neededYRot != yRot) {
-            player.setYaw(neededYRot);
-            if(!yRotDirty) return;
-
-            yRotDirty = false;
-
-            Vec3d playerDirection = Vec3d.fromPolar(xRot, yRot).normalize();
-
-            if(moveDistance != null) {
-                float deltaRot = neededYRot - yRot;
-                float moveScale = (float) (Math.sin(Math.toRadians(deltaRot / 2)) * moveDistance * 2);
-                Vec3f moveVector = new Vec3f(playerDirection);
-                Quaternion rotationQ = Vec3f.POSITIVE_Y.getDegreesQuaternion(deltaRot / 2);
-                moveVector.rotate(rotationQ);
-                moveVector.cross(Vec3f.POSITIVE_Y);
-                moveVector.normalize();
-                moveVector.scale(moveScale);
-                moveVector.scale(-1);
-
-                player.move(MovementType.SELF, new Vec3d(moveVector));
-            }
-        }
+//        if(neededYRot != yRot) {
+//            player.setYaw(neededYRot);
+//            if(!yRotDirty) return;
+//
+//            yRotDirty = false;
+//
+//            Vec3d playerDirection = Vec3d.fromPolar(xRot, yRot).normalize();
+//
+//            if(moveDistance != null) {
+//                float deltaRot = neededYRot - yRot;
+//                float moveScale = (float) (Math.sin(Math.toRadians(deltaRot / 2)) * moveDistance * 2);
+//                Vec3f moveVector = new Vec3f(playerDirection);
+//                Quaternion rotationQ = Vec3f.POSITIVE_Y.getDegreesQuaternion(deltaRot / 2);
+//                moveVector.rotate(rotationQ);
+//                moveVector.cross(Vec3f.POSITIVE_Y);
+//                moveVector.normalize();
+//                moveVector.scale(moveScale);
+//                moveVector.scale(-1);
+//
+//                player.move(MovementType.SELF, new Vec3d(moveVector));
+//            }
+//        }
     }
 
 
     private void updateXRotation(ClientPlayerEntity player) {
         if(neededXRot != player.getPitch()) {
-            player.setPitch(neededXRot);
+//            player.setYaw();
         }
     }
 

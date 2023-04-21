@@ -8,6 +8,7 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.professions.hire.HireInfo;
+import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.renderer.gui.hud.FortressHud;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.selections.renderer.campfire.CampfireRenderer;
@@ -27,8 +28,8 @@ public interface FortressMinecraftClient {
     CampfireRenderer getCampfireRenderer();
     SelectionRenderer getSelectionRenderer();
     TasksRenderer getTasksRenderer();
-
     FortressClientManager getFortressClientManager();
+    FortressCameraManager getFortressCameraManager();
 
     boolean isNotFortressGamemode();
     boolean isFortressGamemode();

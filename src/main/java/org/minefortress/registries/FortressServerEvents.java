@@ -1,6 +1,5 @@
 package org.minefortress.registries;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -18,9 +17,9 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundFollowColonistPacket;
 import org.minefortress.utils.ModUtils;
 
-public class FortressEvents {
+public class FortressServerEvents {
 
-    public static void registerServer() {
+    public static void register() {
         EntitySleepEvents.ALLOW_BED.register((entity, sleepingPos, state, vanillaResult) -> {
             if(ModUtils.isFortressGamemode(entity)) {
                 return ActionResult.SUCCESS;
@@ -99,11 +98,6 @@ public class FortressEvents {
             }
             return ActionResult.PASS;
         });
-    }
-
-    public static void registerClient() {
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ModUtils.getFortressClientManager().reset());
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ModUtils.getFortressClientManager().reset());
     }
 
 }
