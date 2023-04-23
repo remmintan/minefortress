@@ -10,7 +10,9 @@ import org.minefortress.blueprints.data.ClientStructureBlockDataProvider;
 import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class InfluenceFlagBlockDataProvider implements IBlockDataProvider {
 
@@ -37,7 +39,13 @@ public class InfluenceFlagBlockDataProvider implements IBlockDataProvider {
         final var path = modContainer.findPath("data/minefortress/structures/influence_flag.nbt")
                 .orElseThrow(() -> new IllegalStateException("Structure file not found!"));
         try {
-            return NbtIo.readCompressed(path.toFile());
+            final File file;
+            try {
+                file = path.toFile();
+            } catch (UnsupportedOperationException e) {
+                return NbtIo.readCompressed(Files.newInputStream(path));
+            }
+            return NbtIo.readCompressed(file);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read structure file!", e);
         }
