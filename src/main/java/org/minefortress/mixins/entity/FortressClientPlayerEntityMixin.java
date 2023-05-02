@@ -39,7 +39,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     @Override
     public HitResult raycast(double maxDistance, float tickDelta, boolean includeFluids) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        if(fortressClient.isNotFortressGamemode() || this.client.options.pickItemKey.isPressed()){
+        if(!fortressClient.isFortressGamemode() || this.client.options.pickItemKey.isPressed()){
             return super.raycast(maxDistance, tickDelta, includeFluids);
         }
 

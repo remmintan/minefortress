@@ -30,8 +30,6 @@ public interface FortressMinecraftClient {
     TasksRenderer getTasksRenderer();
     FortressClientManager getFortressClientManager();
     FortressCameraManager getFortressCameraManager();
-
-    boolean isNotFortressGamemode();
     boolean isFortressGamemode();
     BlockPos getHoveredBlockPos();
     ClientInfluenceManager getInfluenceManager();

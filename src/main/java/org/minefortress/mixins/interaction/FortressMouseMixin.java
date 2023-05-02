@@ -24,7 +24,7 @@ public class FortressMouseMixin {
     @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
     public void lockCursor(CallbackInfo ci) {
         FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        final boolean fortressGamemode = !fortressClient.isNotFortressGamemode();
+        final boolean fortressGamemode = fortressClient.isFortressGamemode();
         final boolean middleMouseNotPressed = isMiddleMouseNotPressed();
         if (fortressGamemode && middleMouseNotPressed) {
             ci.cancel();
@@ -47,7 +47,7 @@ public class FortressMouseMixin {
     @Inject(method = "onMouseButton", at = @At("HEAD"))
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        if(fortressClient.isNotFortressGamemode()) {
+        if(!fortressClient.isFortressGamemode()) {
             return;
         }
 
