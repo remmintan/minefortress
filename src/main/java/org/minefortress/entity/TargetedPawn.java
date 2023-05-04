@@ -77,7 +77,7 @@ public abstract class TargetedPawn extends NamedPawnEntity implements ITargetedP
         return moveControl;
     }
 
-    private void resetTargets() {
+    public void resetTargets() {
         this.moveTarget = null;
         this.attackTarget = null;
     }
