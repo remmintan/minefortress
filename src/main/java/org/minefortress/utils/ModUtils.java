@@ -10,10 +10,10 @@ import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
-import org.minefortress.fight.influence.ClientInfluenceManager;
-import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ClientProfessionManager;
@@ -107,6 +107,25 @@ public class ModUtils {
 
     public static AreasClientManager getAreasClientManager() {
         return getFortressClient().getAreasClientManager();
+    }
+
+
+    public static boolean shouldReleaseCamera() {
+        final var client = MinecraftClient.getInstance();
+        final var options = client.options;
+
+
+        final var blueprintManager = getBlueprintManager();
+        final var selectionManager = getSelectionManager();
+        final var areasClientManager = getAreasClientManager();
+        final var influenceManager = getInfluenceManager();
+
+        final var anyManagerSelecting = blueprintManager.isSelecting() ||
+                selectionManager.isSelecting() ||
+                areasClientManager.isSelecting() ||
+                influenceManager.isSelecting();
+
+        return options.pickItemKey.isPressed() || (options.sprintKey.isPressed() && !anyManagerSelecting);
     }
 
 }

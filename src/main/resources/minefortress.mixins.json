@@ -27,7 +27,6 @@
     "entity.player.FortressPlayerInventoryMixin",
     "interaction.FortressClientInteractionManagerMixin",
     "interaction.FortressGameModeMixin",
-    "interaction.FortressKeyboardInputMixin",
     "interaction.FortressMouseMixin",
     "interaction.FortressTutorialManagerMixin",
     "network.FortressClientPlayNetworkHandlerMixin",

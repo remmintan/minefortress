@@ -32,7 +32,6 @@ import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.professions.hire.HireInfo;
-import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
@@ -62,7 +61,6 @@ import static java.util.Map.entry;
 public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecutor<Runnable> implements FortressMinecraftClient {
 
     private SelectionManager selectionManager;
-    private FortressCameraManager fortressCameraManager;
     private FortressHud fortressHud;
     private FortressClientManager fortressClientManager;
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
@@ -109,7 +107,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         final MinecraftClient client = (MinecraftClient) (Object) this;
 
         this.selectionManager = new SelectionManager(client);
-        this.fortressCameraManager = new FortressCameraManager(client);
         this.fortressHud = new FortressHud(client);
         this.fortressClientManager = new FortressClientManager();
         this.areasClientManager = new AreasClientManager();
@@ -273,10 +270,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return this.influenceManager;
     }
 
-    @Override
-    public FortressCameraManager getFortressCameraManager() {
-        return this.fortressCameraManager;
-    }
 
     @Override
     public void openHireScreen(MinecraftClient client, String screenName, Map<String, HireInfo> professions) {
