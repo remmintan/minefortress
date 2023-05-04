@@ -59,7 +59,7 @@ public class CapturePositionGoal extends Goal {
         if(target == null) return;
         moveControl.reset();
         final var pos = target.pos();
-        pawn.teleport(pos.getX() + 1, pos.getY(), pos.getZ() + 1);
+        pawn.teleport(pos.getX(), pos.getY()+1, pos.getZ());
     }
 
     private void finish() {
