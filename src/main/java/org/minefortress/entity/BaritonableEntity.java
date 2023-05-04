@@ -17,12 +17,11 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IMine
 
     private static final TrackedData<Integer> SELECTED_SLOT = DataTracker.registerData(BaritonableEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
-    private final Inventory fakeInventory;
+    private final Inventory fakeInventoryWithPlanks = new MineFortressInventory(true);
+    private final Inventory fakeInventoryWithoutPlanks = new MineFortressInventory(false);
 
     protected BaritonableEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
-
-        this.fakeInventory = new MineFortressInventory();
     }
 
     @Override
@@ -33,7 +32,7 @@ public abstract class BaritonableEntity extends PathAwareEntity implements IMine
 
     @Override
     public final Inventory getInventory() {
-        return fakeInventory;
+        return this instanceof WarriorPawn ? fakeInventoryWithoutPlanks : fakeInventoryWithPlanks;
     }
 
     @Override
