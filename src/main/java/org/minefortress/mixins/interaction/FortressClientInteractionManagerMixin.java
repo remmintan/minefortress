@@ -8,6 +8,7 @@ import net.minecraft.client.tutorial.TutorialManager;
 import net.minecraft.client.tutorial.TutorialStep;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -164,6 +165,10 @@ public abstract class FortressClientInteractionManagerMixin {
                     fightManager.setTarget(entity);
                 }
                 cir.setReturnValue(ActionResult.SUCCESS);
+                return;
+            }
+            if(entity instanceof LivingEntity) {
+                cir.setReturnValue(ActionResult.FAIL);
             }
         }
     }
