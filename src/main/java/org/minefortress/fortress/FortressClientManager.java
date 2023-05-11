@@ -8,7 +8,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fortress.automation.EssentialBuildingInfo;
@@ -242,10 +241,12 @@ public final class FortressClientManager extends AbstractFortressManager {
         return hoveredBuilding;
     }
     public Optional<String> getHoveredBuildingName() {
-        return Optional.ofNullable(hoveredBuilding)
-                .map(it -> ModUtils.getBlueprintManager())
-                .map(ClientBlueprintManager::getBlueprintMetadataManager)
-                .flatMap(it -> it.getByRequirementId(hoveredBuilding.getRequirementId()))
+        if(hoveredBuilding == null) return Optional.empty();
+        if(hoveredBuilding.getFile().equals(EssentialBuildingInfo.DEFAULT_FILE))
+            return Optional.empty();
+
+        final var blueprintMetadataManager = ModUtils.getBlueprintManager().getBlueprintMetadataManager();
+        return blueprintMetadataManager.getByFile(hoveredBuilding.getFile())
                 .map(BlueprintMetadata::getName);
     }
 
