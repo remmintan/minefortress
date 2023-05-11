@@ -108,8 +108,8 @@ public abstract class FortressClientInteractionManagerMixin {
 
         if(fortressManager.getState() == FortressState.AREAS_SELECTION) {
             final var areasClientManager = ModUtils.getAreasClientManager();
-            final var result = areasClientManager.select(client.crosshairTarget);
-            cir.setReturnValue(result);
+            areasClientManager.select(client.crosshairTarget);
+            cir.setReturnValue(false);
             return;
         }
 
@@ -120,13 +120,13 @@ public abstract class FortressClientInteractionManagerMixin {
         }
 
         if(fortressManager.isCenterNotSet()) {
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
             return;
         }
 
         if(clientBlueprintManager.hasSelectedBlueprint()) {
            clientBlueprintManager.clearStructure();
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
             return;
         }
 
@@ -141,7 +141,7 @@ public abstract class FortressClientInteractionManagerMixin {
         }
 
         fortressClient.getSelectionManager().selectBlock(pos);
-        cir.setReturnValue(true);
+        cir.setReturnValue(false);
     }
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true)
@@ -164,7 +164,7 @@ public abstract class FortressClientInteractionManagerMixin {
                 if(selectionManager.hasSelected()) {
                     fightManager.setTarget(entity);
                 }
-                cir.setReturnValue(ActionResult.SUCCESS);
+                cir.setReturnValue(ActionResult.FAIL);
                 return;
             }
             if(entity instanceof LivingEntity) {
