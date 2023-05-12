@@ -108,7 +108,17 @@ public class ServerBlueprintManager {
         final Map<BlockPos, BlockState> manualLayer = serverStructureInfo.getLayer(BlueprintDataLayer.MANUAL);
         final Map<BlockPos, BlockState> automatic = serverStructureInfo.getLayer(BlueprintDataLayer.AUTOMATIC);
         final Map<BlockPos, BlockState> entityLayer = serverStructureInfo.getLayer(BlueprintDataLayer.ENTITY);
-        return new BlueprintTask(taskId, startPos, endPos, manualLayer, automatic, entityLayer, floorLevel, requirementId);
+        return new BlueprintTask(
+                taskId,
+                startPos,
+                endPos,
+                manualLayer,
+                automatic,
+                entityLayer,
+                floorLevel,
+                requirementId,
+                structureFile
+        );
     }
 
     public SimpleSelectionTask createDigTask(UUID uuid, BlockPos startPos, int floorLevel, String structureFile, BlockRotation rotation) {

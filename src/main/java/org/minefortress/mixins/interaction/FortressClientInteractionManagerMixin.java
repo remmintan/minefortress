@@ -8,6 +8,7 @@ import net.minecraft.client.tutorial.TutorialManager;
 import net.minecraft.client.tutorial.TutorialStep;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -112,8 +113,8 @@ public abstract class FortressClientInteractionManagerMixin {
 
         if(fortressManager.getState() == FortressState.AREAS_SELECTION) {
             final var areasClientManager = ModUtils.getAreasClientManager();
-            final var result = areasClientManager.select(client.crosshairTarget);
-            cir.setReturnValue(result);
+            areasClientManager.select(client.crosshairTarget);
+            cir.setReturnValue(false);
             return;
         }
 
@@ -124,13 +125,13 @@ public abstract class FortressClientInteractionManagerMixin {
         }
 
         if(fortressManager.isCenterNotSet()) {
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
             return;
         }
 
         if(clientBlueprintManager.isSelecting()) {
            clientBlueprintManager.clearStructure();
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
             return;
         }
 
@@ -145,7 +146,7 @@ public abstract class FortressClientInteractionManagerMixin {
         }
 
         fortressClient.getSelectionManager().selectBlock(pos);
-        cir.setReturnValue(true);
+        cir.setReturnValue(false);
     }
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true)
@@ -168,7 +169,11 @@ public abstract class FortressClientInteractionManagerMixin {
                 if(selectionManager.hasSelected()) {
                     fightManager.setTarget(entity);
                 }
-                cir.setReturnValue(ActionResult.SUCCESS);
+                cir.setReturnValue(ActionResult.FAIL);
+                return;
+            }
+            if(entity instanceof LivingEntity) {
+                cir.setReturnValue(ActionResult.FAIL);
             }
         }
     }

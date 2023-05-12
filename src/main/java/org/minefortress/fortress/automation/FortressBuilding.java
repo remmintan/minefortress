@@ -7,6 +7,7 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.IAutomationArea;
 import org.minefortress.fortress.automation.iterators.FarmBuildingIterator;
 
@@ -23,15 +24,18 @@ public class FortressBuilding implements IAutomationArea {
     private final BlockPos start;
     private final BlockPos end;
     private final String requirementId;
+    @Nullable
+    private final String file;
     private LocalDateTime lastUpdated;
     private Iterator<AutomationBlockInfo> currentIterator;
 
-    public FortressBuilding(UUID id, BlockPos start, BlockPos end, String requirementId) {
+    public FortressBuilding(UUID id, BlockPos start, BlockPos end, String requirementId, @NotNull String file) {
         this.id = id;
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.requirementId = requirementId;
         this.lastUpdated = LocalDateTime.MIN;
+        this.file = file;
     }
 
     public FortressBuilding(NbtCompound tag) {
@@ -60,6 +64,11 @@ public class FortressBuilding implements IAutomationArea {
             this.lastUpdated = LocalDateTime.parse(tag.getString("lastUpdated"));
         else
             this.lastUpdated = LocalDateTime.MIN;
+
+        if(tag.contains("file"))
+            this.file = tag.getString("file");
+        else
+            this.file = null;
     }
 
     public BlockPos getStart() {
@@ -94,6 +103,9 @@ public class FortressBuilding implements IAutomationArea {
         tag.putLong("end", end.asLong());
         tag.putString("requirementId", requirementId);
         tag.putString("lastUpdated", lastUpdated.toString());
+        if(file != null) {
+            tag.putString("file", file);
+        }
     }
 
     @Override
@@ -125,6 +137,6 @@ public class FortressBuilding implements IAutomationArea {
     }
 
     public EssentialBuildingInfo toEssentialInfo(World world) {
-        return new EssentialBuildingInfo(start, end, requirementId, getBedsCount(world));
+        return new EssentialBuildingInfo(start, end, requirementId, getBedsCount(world), file);
     }
 }

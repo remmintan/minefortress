@@ -17,6 +17,7 @@ public interface ITargetedPawn extends IFortressAwareEntity {
     BlockPos getMoveTarget();
 
     BaritoneMoveControl getFortressMoveControl();
+    void resetTargets();
 
     default double getTargetMoveRange() {
         return 2.0;

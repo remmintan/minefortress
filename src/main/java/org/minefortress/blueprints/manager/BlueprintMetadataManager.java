@@ -59,8 +59,9 @@ public final class BlueprintMetadataManager {
         return blueprintsMap.values().stream().flatMap(Collection::stream).toList();
     }
 
-    public Optional<BlueprintMetadata> getByRequirementId(String requirementId) {
-        return flatBlueprints().stream().filter(b -> b.getRequirementId().equals(requirementId)).findFirst();
+    public Optional<BlueprintMetadata> getByFile(String file) {
+        if(file == null) return Optional.empty();
+        return flatBlueprints().stream().filter(b -> b.getFile().equals(file)).findFirst();
     }
 
 }
