@@ -41,6 +41,8 @@ public class FortressHud {
         hudLayers.add(new TimeHudLayer(client));
         hudLayers.add(new FightHudLayer(client));
         hudLayers.add(new AreasHudLayer(client));
+        hudLayers.add(new InluenceHudLayer(client));
+        hudLayers.add(new UtilsHudLayer(client));
     }
 
     public void render(MatrixStack p, float delta) {
@@ -106,7 +108,7 @@ public class FortressHud {
         if(fortressClientManager.notInitialized()) return HudState.BLANK;
         if(fortressClientManager.isCenterNotSet()) return HudState.INITIALIZING;
 
-        if(ModUtils.getBlueprintManager().hasSelectedBlueprint()) return HudState.BLUEPRINT;
+        if(ModUtils.getBlueprintManager().isSelecting()) return HudState.BLUEPRINT;
         if(BlueprintsWorld.isBlueprintsWorld(client.world)) return HudState.BLUEPRINT_EDITING;
 
         return switch (ModUtils.getFortressClientManager().getState()) {

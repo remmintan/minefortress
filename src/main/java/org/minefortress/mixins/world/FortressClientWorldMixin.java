@@ -47,8 +47,10 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         if(shouldKeepTicking.getAsBoolean()) {
-            if(client instanceof FortressMinecraftClient fortressClient)
+            if(client instanceof FortressMinecraftClient fortressClient){
                 fortressClient.getBlueprintManager().tick();
+                fortressClient.getInfluenceManager().tick();
+            }
         }
     }
 

@@ -32,6 +32,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.entity.interfaces.IWorkerPawn;
+import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.automation.FortressBuilding;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
@@ -68,6 +69,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final ServerResourceManager serverResourceManager;
     private final TaskManager taskManager = new TaskManager();
     private final AreasServerManager areasServerManager = new AreasServerManager();
+    private final ServerInfluenceManager influenceManager = new ServerInfluenceManager(this);
     
     private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
 
@@ -131,12 +133,17 @@ public final class FortressServerManager extends AbstractFortressManager {
         return taskManager;
     }
 
+    public ServerInfluenceManager getInfluenceManager() {
+        return influenceManager;
+    }
+
     public void tick(@Nullable ServerPlayerEntity player) {
         taskManager.tick(this, getWorld());
         tickFortress(player);
         serverProfessionManager.tick(player);
         serverResourceManager.tick(player);
         areasServerManager.tick(player);
+        influenceManager.tick(player);
         if(!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
         final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount, getReservedPawnsCount());
@@ -307,7 +314,18 @@ public final class FortressServerManager extends AbstractFortressManager {
             spawnPawnNearCampfire(player.getUuid());
         }
 
+        influenceManager.addCenterAsInfluencePosition();
+        player.setSpawnPoint(getWorld().getRegistryKey(), player.getBlockPos(), 0, true, false);
+
         this.scheduleSync();
+    }
+
+    public void jumpToCampfire(ServerPlayerEntity player) {
+        if(fortressCenter == null) return;
+        if(player.getWorld().getRegistryKey() != World.OVERWORLD) return;
+        player.setPitch(60);
+        player.setYaw(90 + 45);
+        player.teleport(fortressCenter.getX() + 10, fortressCenter.getY() + 20, fortressCenter.getZ() + 10);
     }
 
     private static NbtCompound getColonistInfoTag(UUID masterPlayerId) {
@@ -333,6 +351,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.needSyncSpecialBlocks = true;
         final var resourceManager = (ServerResourceManager) this.getResourceManager();
         resourceManager.syncAll();
+        areasServerManager.sync();
+        influenceManager.sync();
     }
 
     public void scheduleSync() {
@@ -422,6 +442,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         this.serverResourceManager.write(tag);
         this.areasServerManager.write(tag);
+        this.influenceManager.write(tag);
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -499,6 +520,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         this.areasServerManager.read(tag);
+        this.influenceManager.read(tag);
 
         this.scheduleSync();
     }

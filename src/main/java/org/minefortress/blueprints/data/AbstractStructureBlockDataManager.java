@@ -2,7 +2,6 @@ package org.minefortress.blueprints.data;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.BlockArgumentParser;
@@ -13,25 +12,25 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-abstract class AbstractBlueprintBlockDataManager {
+abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
 
-    private final Map<String, BlueprintBlockData> blueprints = new HashMap<>();
+    private final Map<String, StrctureBlockData> blueprints = new HashMap<>();
 
-    public BlueprintBlockData getBlockData(String blueprintFileName, BlockRotation rotation) {
+    public StrctureBlockData getBlockData(String blueprintFileName, BlockRotation rotation) {
         return getBlockData(blueprintFileName, rotation, 0);
     }
 
-    public BlueprintBlockData getBlockData(String blueprintFileName, BlockRotation rotation, int floorLevel) {
+    public StrctureBlockData getBlockData(String blueprintFileName, BlockRotation rotation, int floorLevel) {
         final String key = getKey(blueprintFileName, rotation);
         if(!blueprints.containsKey(key)) {
             final Structure structure = getStructure(blueprintFileName)
                     .orElseThrow(() -> new IllegalStateException("Blueprint not found " + blueprintFileName));
-            final BlueprintBlockData blueprintBlockData = buildBlueprint(structure, rotation, floorLevel);
+            final StrctureBlockData blueprintBlockData = buildStructure(structure, rotation, floorLevel);
             blueprints.put(key, blueprintBlockData);
         }
 
@@ -43,10 +42,10 @@ abstract class AbstractBlueprintBlockDataManager {
     }
 
     protected abstract Optional<Structure> getStructure(String blueprintFileName);
-    protected abstract BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation, int floorLevel);
+    protected abstract StrctureBlockData buildStructure(Structure structure, BlockRotation rotation, int floorLevel);
 
     @NotNull
-    protected Map<BlockPos, BlockState> getStrcutureData(Structure structure, BlockRotation rotation, BlockPos pivot) {
+    protected static Map<BlockPos, BlockState> getStrcutureData(Structure structure, BlockRotation rotation, BlockPos pivot) {
         final StructurePlacementData placementData = new StructurePlacementData().setRotation(rotation);
         final List<Structure.StructureBlockInfo> blockInfos = placementData
                 .getRandomBlockInfos(structure.blockInfoLists, pivot)
@@ -55,7 +54,7 @@ abstract class AbstractBlueprintBlockDataManager {
 
         final var convertedStructureBlocks = blockInfos
                 .stream()
-                .map(AbstractBlueprintBlockDataManager::convertJigsawBlock)
+                .map(AbstractStructureBlockDataManager::convertJigsawBlock)
                 .toList();
 
         int minX = Integer.MAX_VALUE;
@@ -110,13 +109,12 @@ abstract class AbstractBlueprintBlockDataManager {
         return inf;
     }
 
-    protected void reset() {
+    public void reset() {
         this.blueprints.clear();
     }
 
-    protected SizeAndPivot getSizeAndPivot(Structure structure, BlockRotation rotation) {
+    protected static SizeAndPivot getSizeAndPivot(Structure structure, BlockRotation rotation) {
         Vec3i size = structure.getRotatedSize(rotation);
-//        final int biggerSide = Math.max(size.getX(), size.getZ());
         final BlockPos pivot = BlockPos.ORIGIN.add(size.getX() / 2, 0,  size.getZ() / 2);
         size = new Vec3i(size.getX(), size.getY(), size.getZ());
         return new SizeAndPivot(size, pivot);

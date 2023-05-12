@@ -4,7 +4,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
+import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,6 +22,13 @@ public abstract class FortressGuiMixin extends DrawableHelper {
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
     private void renderCrosshair(MatrixStack matrices, CallbackInfo ci) {
         if (((FortressMinecraftClient)client).isFortressGamemode()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
+    private void renderHotbar(float tickDelta, MatrixStack matrices, CallbackInfo ci) {
+        if (ModUtils.isClientInFortressGamemode() && ModUtils.getFortressClientManager().getState() == FortressState.COMBAT) {
             ci.cancel();
         }
     }

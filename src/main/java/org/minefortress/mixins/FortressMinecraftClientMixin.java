@@ -20,19 +20,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
-import org.minefortress.fortress.automation.areas.AreasClientManager;
+import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
+import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.professions.hire.HireInfo;
-import org.minefortress.renderer.FortressCameraManager;
 import org.minefortress.renderer.FortressRenderLayer;
-import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
@@ -61,14 +61,11 @@ import static java.util.Map.entry;
 public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecutor<Runnable> implements FortressMinecraftClient {
 
     private SelectionManager selectionManager;
-    private FortressCameraManager fortressCameraManager;
     private FortressHud fortressHud;
-
     private FortressClientManager fortressClientManager;
-
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
-
     private ClientBlueprintManager clientBlueprintManager;
+    private ClientInfluenceManager influenceManager;
     private BlueprintRenderer blueprintRenderer;
     private CampfireRenderer campfireRenderer;
     private SelectionRenderer selectionRenderer;
@@ -101,8 +98,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Shadow public abstract void setScreen(@Nullable Screen screen);
 
-    @Shadow @Nullable public Screen currentScreen;
-
     public FortressMinecraftClientMixin(String string) {
         super(string);
     }
@@ -112,13 +107,15 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         final MinecraftClient client = (MinecraftClient) (Object) this;
 
         this.selectionManager = new SelectionManager(client);
-        this.fortressCameraManager = new FortressCameraManager(client);
         this.fortressHud = new FortressHud(client);
         this.fortressClientManager = new FortressClientManager();
         this.areasClientManager = new AreasClientManager();
 
         clientBlueprintManager = new ClientBlueprintManager(client);
-        blueprintRenderer = new BlueprintRenderer(clientBlueprintManager.getBlockDataManager(), client, blockBufferBuilderStorage);
+        influenceManager = new ClientInfluenceManager(client);
+
+
+        blueprintRenderer = new BlueprintRenderer(this::getProperBlockDataProviderBasedOnState, client, blockBufferBuilderStorage);
         campfireRenderer = new CampfireRenderer(client, blockBufferBuilderStorage);
         Map<RenderLayer, BufferBuilder> selectionBufferBuilderStorage = Map.ofEntries(
                 entry(RenderLayer.getLines(), new BufferBuilder(256)),
@@ -171,46 +168,15 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public boolean isNotFortressGamemode() {
-        return this.interactionManager == null || this.interactionManager.getCurrentGameMode() != MineFortressMod.FORTRESS;
-    }
-
-    @Override
     public boolean isFortressGamemode() {
-        return !isNotFortressGamemode();
-    }
-
-    @Inject(method="render", at=@At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;updateMouse()V"))
-    public void render(boolean tick, CallbackInfo ci) {
-        final boolean middleMouseButtonIsDown = options.pickItemKey.isPressed();
-        if(!isNotFortressGamemode()) { // is fortress
-            if(middleMouseButtonIsDown) {
-                if(!mouse.isCursorLocked())
-                    mouse.lockCursor();
-            } else {
-                if(mouse.isCursorLocked())
-                    mouse.unlockCursor();
-            }
-        }
-
-        if(isFortressGamemode() && !middleMouseButtonIsDown) {
-            if(player != null) {
-                this.fortressCameraManager.updateCameraPosition();
-            }
-        }
-
-        if ((isNotFortressGamemode() || middleMouseButtonIsDown) && this.world!=null && this.world.getRegistryKey() != BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
-            if(player != null) {
-                this.fortressCameraManager.setRot(player.getPitch(), player.getYaw());
-            }
-        }
+        return this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
     }
 
     @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/TutorialManager;onInventoryOpened()V", shift = At.Shift.BEFORE))
     private void handleInputEvents(CallbackInfo ci) {
         if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS) {
             if(this.options.sprintKey.isPressed()) {
-                if(this.getBlueprintManager().hasSelectedBlueprint()) {
+                if(this.getBlueprintManager().isSelecting()) {
                     this.getBlueprintManager().rotateSelectedStructureClockwise();
                 } else {
                     this.getSelectionManager().moveSelectionUp();
@@ -221,7 +187,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreenMix(Screen screen, CallbackInfo ci) {
-        if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS) {
+        if(isFortressGamemode()) {
             if(this.options.sprintKey.isPressed() && screen instanceof InventoryScreen) {
                 ci.cancel();
             }
@@ -232,18 +198,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     public void doItemPick(CallbackInfo ci) {
         if(this.isFortressGamemode()) {
             ci.cancel();
-        }
-    }
-
-    @Inject(method="tick", at=@At("TAIL"))
-    public void tick(CallbackInfo ci) {
-        if(this.world == null && this.fortressHud.isHovered()) {
-            this.fortressHud = new FortressHud((MinecraftClient)(Object)this);
-        }
-        this.fortressHud.tick();
-        this.fortressClientManager.tick(this);
-        if(this.fortressClientManager.gamemodeNeedsInitialization() && !(this.currentScreen instanceof ChooseModeScreen)) {
-            this.setScreen(new ChooseModeScreen());
         }
     }
 
@@ -312,6 +266,12 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
+    public ClientInfluenceManager getInfluenceManager() {
+        return this.influenceManager;
+    }
+
+
+    @Override
     public void openHireScreen(MinecraftClient client, String screenName, Map<String, HireInfo> professions) {
         final var handler = new ClientHireHandler(screenName, professions);
         final var screen = new HirePawnScreen(handler);
@@ -323,5 +283,13 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.blueprintRenderer.close();
         this.campfireRenderer.close();
         this.selectionRenderer.close();
+    }
+
+    private IBlockDataProvider getProperBlockDataProviderBasedOnState() {
+        if(fortressClientManager.getState() == FortressState.COMBAT) {
+            return this.getInfluenceManager().getBlockDataProvider();
+        }
+
+        return this.getBlueprintManager().getBlockDataProvider();
     }
 }

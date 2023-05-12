@@ -38,3 +38,6 @@ git checkout 1.18
 8. Close IntelliJ IDEA
 9. Reopen IntelliJ IDEA
 10. Run the `Minecraft Client` configuration
+
+## Other
+Fabric API javadoc: https://maven.fabricmc.net/docs/fabric-api-0.51.0+1.18.2/

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public final class ClientBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager implements BlueprintsTagsKeeper {
+public final class ClientStructureBlockDataProvider extends AbstractStructureBlockDataManager implements BlueprintsTagsKeeper {
 
     private final Map<String, NbtCompound> blueprintTags = new HashMap<>();
 
@@ -25,13 +25,17 @@ public final class ClientBlueprintBlockDataManager extends AbstractBlueprintBloc
     }
 
     @Override
-    protected BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation, int floorLevel) {
+    protected StrctureBlockData buildStructure(Structure structure, BlockRotation rotation, int floorLevel) {
+        return buildStructureForClient(structure, rotation);
+    }
+
+    public static StrctureBlockData buildStructureForClient(Structure structure, BlockRotation rotation) {
         final var sizeAndPivot = getSizeAndPivot(structure, rotation);
         final var size = sizeAndPivot.size();
         final var pivot = sizeAndPivot.pivot();
 
         final Map<BlockPos, BlockState> structureData = getStrcutureData(structure, rotation, pivot);
-        return BlueprintBlockData
+        return StrctureBlockData
                 .withBlueprintSize(size)
                 .setLayer(BlueprintDataLayer.GENERAL, structureData).build();
     }

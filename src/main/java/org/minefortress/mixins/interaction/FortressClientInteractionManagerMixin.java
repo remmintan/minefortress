@@ -8,6 +8,7 @@ import net.minecraft.client.tutorial.TutorialManager;
 import net.minecraft.client.tutorial.TutorialStep;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -86,6 +87,11 @@ public abstract class FortressClientInteractionManagerMixin {
         final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
         if(fortressManager.getState() == FortressState.COMBAT) {
+            final var influenceManager = ModUtils.getInfluenceManager();
+            if(influenceManager.isSelecting()) {
+                influenceManager.cancelSelectingInfluencePosition();
+                return;
+            }
             final var selectionManager = fortressManager.getFightManager().getSelectionManager();
             final var mouse = client.mouse;
 
@@ -107,8 +113,8 @@ public abstract class FortressClientInteractionManagerMixin {
 
         if(fortressManager.getState() == FortressState.AREAS_SELECTION) {
             final var areasClientManager = ModUtils.getAreasClientManager();
-            final var result = areasClientManager.select(client.crosshairTarget);
-            cir.setReturnValue(result);
+            areasClientManager.select(client.crosshairTarget);
+            cir.setReturnValue(false);
             return;
         }
 
@@ -119,13 +125,13 @@ public abstract class FortressClientInteractionManagerMixin {
         }
 
         if(fortressManager.isCenterNotSet()) {
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
             return;
         }
 
-        if(clientBlueprintManager.hasSelectedBlueprint()) {
+        if(clientBlueprintManager.isSelecting()) {
            clientBlueprintManager.clearStructure();
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
             return;
         }
 
@@ -140,7 +146,7 @@ public abstract class FortressClientInteractionManagerMixin {
         }
 
         fortressClient.getSelectionManager().selectBlock(pos);
-        cir.setReturnValue(true);
+        cir.setReturnValue(false);
     }
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true)
@@ -163,7 +169,11 @@ public abstract class FortressClientInteractionManagerMixin {
                 if(selectionManager.hasSelected()) {
                     fightManager.setTarget(entity);
                 }
-                cir.setReturnValue(ActionResult.SUCCESS);
+                cir.setReturnValue(ActionResult.FAIL);
+                return;
+            }
+            if(entity instanceof LivingEntity) {
+                cir.setReturnValue(ActionResult.FAIL);
             }
         }
     }
@@ -181,6 +191,12 @@ public abstract class FortressClientInteractionManagerMixin {
         final FortressClientManager fortressManager = fortressClient.getFortressClientManager();
 
         if(fortressManager.getState() == FortressState.COMBAT) {
+            final var influenceManager = ModUtils.getInfluenceManager();
+            if(influenceManager.isSelecting()) {
+                influenceManager.selectInfluencePosition();
+                cir.setReturnValue(ActionResult.SUCCESS);
+                return;
+            }
             updateFightSelection(hitResult, fortressManager);
             cir.setReturnValue(ActionResult.SUCCESS);
             return;
@@ -202,7 +218,7 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        if(clientBlueprintManager.hasSelectedBlueprint()) {
+        if(clientBlueprintManager.isSelecting()) {
             clientBlueprintManager.buildCurrentStructure();
             cir.setReturnValue(ActionResult.SUCCESS);
             return;

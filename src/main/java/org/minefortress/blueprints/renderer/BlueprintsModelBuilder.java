@@ -7,27 +7,26 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.blueprints.data.BlueprintBlockData;
-import org.minefortress.blueprints.data.ClientBlueprintBlockDataManager;
+import org.minefortress.blueprints.data.StrctureBlockData;
+import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 public class BlueprintsModelBuilder {
 
     private final BlockBufferBuilderStorage blockBufferBuilders;
-    private final ClientBlueprintBlockDataManager blockDataManager;
+    private final Supplier<IBlockDataProvider> blockDataManagerSupplier;
 
     private final Map<String, BuiltBlueprint> builtBlueprints = new HashMap<>();
     private final HashSet<BuiltBlueprint> blueprintsToClose = new HashSet<>();
 
     public BlueprintsModelBuilder(BlockBufferBuilderStorage blockBufferBuilders,
-                                  ClientBlueprintBlockDataManager blockDataManager) {
+                                  Supplier<IBlockDataProvider> blockDataProviderSupplier) {
         this.blockBufferBuilders = blockBufferBuilders;
-        this.blockDataManager = blockDataManager;
+        this.blockDataManagerSupplier = blockDataProviderSupplier;
     }
 
     public BuiltBlueprint getOrBuildBlueprint(String fileName, BlockRotation rotation) {
@@ -36,7 +35,7 @@ public class BlueprintsModelBuilder {
         return this.builtBlueprints.get(getKey(fileName, rotation));
     }
 
-    public void buildBlueprint(String fileName, BlockRotation rotation) {
+    private void buildBlueprint(String fileName, BlockRotation rotation) {
         for(BuiltBlueprint blueprint : this.blueprintsToClose) {
             blueprint.close();
         }
@@ -44,7 +43,7 @@ public class BlueprintsModelBuilder {
 
         String key = getKey(fileName, rotation);
         if(!this.builtBlueprints.containsKey(key)) {
-            final BlueprintBlockData blockData = this.blockDataManager.getBlockData(fileName, rotation);
+            final StrctureBlockData blockData = this.blockDataManagerSupplier.get().getBlockData(fileName, rotation);
             final BuiltBlueprint builtBlueprint = new BuiltBlueprint(blockData, (p, c) -> getWorld().getColor(getBlockPos(), c));
             builtBlueprint.build(this.blockBufferBuilders);
             this.builtBlueprints.put(key, builtBlueprint);
@@ -57,10 +56,10 @@ public class BlueprintsModelBuilder {
     }
 
     public void invalidateBlueprint(final String fileName) {
-        final List<Map.Entry<String, BuiltBlueprint>> toRemove = builtBlueprints.entrySet()
+        final var toRemove = builtBlueprints.entrySet()
                 .stream()
                 .filter(e -> e.getKey().startsWith(fileName))
-                .collect(Collectors.toList());
+                .toList();
         for(Map.Entry<String, BuiltBlueprint> entry : toRemove) {
             String key = entry.getKey();
             BuiltBlueprint blueprint = entry.getValue();

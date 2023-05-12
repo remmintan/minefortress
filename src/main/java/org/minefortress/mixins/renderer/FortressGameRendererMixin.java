@@ -66,7 +66,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                 }
 
                 final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
-                if(clientBlueprintManager.hasSelectedBlueprint()) {
+                if(clientBlueprintManager.isSelecting()) {
                     resetAllSelectionManagers();
                     return;
                 }

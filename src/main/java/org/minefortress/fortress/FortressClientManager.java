@@ -8,13 +8,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fortress.automation.EssentialBuildingInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.c2s.C2SJumpToCampfire;
 import org.minefortress.network.c2s.ServerboundFortressCenterSetPacket;
 import org.minefortress.network.c2s.ServerboundSetGamemodePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -31,7 +31,6 @@ import java.util.stream.StreamSupport;
 public final class FortressClientManager extends AbstractFortressManager {
 
     private static final Object KEY = new Object();
-
     private final ClientProfessionManager professionManager;
     private final ClientResourceManager resourceManager = new ClientResourceManagerImpl();
     private final ClientFightManager fightManager = new ClientFightManager();
@@ -83,6 +82,11 @@ public final class FortressClientManager extends AbstractFortressManager {
         final Vec3d playerPos = ModUtils.getClientPlayer().getPos();
 
         selectedColonistDelta = entityPos.subtract(playerPos);
+    }
+
+    public void jumpToCampfire() {
+        final var packet = new C2SJumpToCampfire();
+        FortressClientNetworkHelper.send(C2SJumpToCampfire.CHANNEL, packet);
     }
 
     public void updateBuildings(List<EssentialBuildingInfo> buildings) {
@@ -242,10 +246,12 @@ public final class FortressClientManager extends AbstractFortressManager {
         return hoveredBuilding;
     }
     public Optional<String> getHoveredBuildingName() {
-        return Optional.ofNullable(hoveredBuilding)
-                .map(it -> ModUtils.getBlueprintManager())
-                .map(ClientBlueprintManager::getBlueprintMetadataManager)
-                .flatMap(it -> it.getByRequirementId(hoveredBuilding.getRequirementId()))
+        if(hoveredBuilding == null) return Optional.empty();
+        if(hoveredBuilding.getFile().equals(EssentialBuildingInfo.DEFAULT_FILE))
+            return Optional.empty();
+
+        final var blueprintMetadataManager = ModUtils.getBlueprintManager().getBlueprintMetadataManager();
+        return blueprintMetadataManager.getByFile(hoveredBuilding.getFile())
                 .map(BlueprintMetadata::getName);
     }
 

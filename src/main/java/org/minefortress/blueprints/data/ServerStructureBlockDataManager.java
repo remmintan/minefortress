@@ -26,7 +26,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBlockDataManager{
+public final class ServerStructureBlockDataManager extends AbstractStructureBlockDataManager {
 
     private static final String BLUEPRINTS_FOLDER = "blueprints";
     private static final String REMOVED_BLUEPRINTS_FILENAME = "removed_blueprints.nbt";
@@ -37,7 +37,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     private final Function<String, Optional<BlueprintGroup>> filenameToGroupConverter;
     private final Supplier<UUID> userIdProvider;
 
-    public ServerBlueprintBlockDataManager(MinecraftServer server, Function<String, Optional<BlueprintGroup>> filenameToGroupConverter, Supplier<UUID> userIdProvider) {
+    public ServerStructureBlockDataManager(MinecraftServer server, Function<String, Optional<BlueprintGroup>> filenameToGroupConverter, Supplier<UUID> userIdProvider) {
         this.server = server;
         this.filenameToGroupConverter = filenameToGroupConverter;
         this.userIdProvider = userIdProvider;
@@ -117,7 +117,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
     }
 
     @Override
-    protected BlueprintBlockData buildBlueprint(Structure structure, BlockRotation rotation, int floorLevel) {
+    protected StrctureBlockData buildStructure(Structure structure, BlockRotation rotation, int floorLevel) {
         final var sizeAndPivot = getSizeAndPivot(structure, rotation);
         final var size = sizeAndPivot.size();
         final var pivot = sizeAndPivot.pivot();
@@ -166,7 +166,7 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
             }
         }
 
-        return BlueprintBlockData
+        return StrctureBlockData
                 .withBlueprintSize(size)
                 .setLayer(BlueprintDataLayer.GENERAL, structureData)
                 .setLayer(BlueprintDataLayer.MANUAL, manualData)
@@ -254,17 +254,15 @@ public final class ServerBlueprintBlockDataManager extends AbstractBlueprintBloc
         }
 
         structuresMap
-                .entrySet()
-                .forEach(it -> {
-                    final var key = it.getKey();
+                .forEach((key, value) -> {
                     final var groupOpt = filenameToGroupConverter.apply(key);
                     final var group = groupOpt.orElseThrow(() -> new IllegalStateException("Can't find group for blueprint " + key));
-                    final var bp = new Blueprint(key, floorLevelsMap.getOrDefault(key, 0), it.getValue(), group);
+                    final var bp = new Blueprint(key, floorLevelsMap.getOrDefault(key, 0), value, group);
                     updatedStructures.put(key, bp);
                 });
     }
 
-    private static record Blueprint(
+    private record Blueprint(
             String filename,
             int floorLevel,
             NbtCompound tag,

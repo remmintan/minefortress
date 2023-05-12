@@ -49,6 +49,9 @@ public class FortressServerNetworkHelper {
         FortressServerNetworkHelper.registerReceiver(C2SHirePawnWithScreenPacket.CHANNEL, C2SHirePawnWithScreenPacket::new);
         FortressServerNetworkHelper.registerReceiver(C2SAddAreaPacket.CHANNEL, C2SAddAreaPacket::new);
         FortressServerNetworkHelper.registerReceiver(C2SRemoveAutomationAreaPacket.CHANNEL, C2SRemoveAutomationAreaPacket::new);
+        FortressServerNetworkHelper.registerReceiver(C2SCaptureInfluencePositionPacket.CHANNEL, C2SCaptureInfluencePositionPacket::new);
+        FortressServerNetworkHelper.registerReceiver(C2SUpdateNewInfluencePosition.CHANNEL, C2SUpdateNewInfluencePosition::new);
+        FortressServerNetworkHelper.registerReceiver(C2SJumpToCampfire.CHANNEL, C2SJumpToCampfire::new);
     }
 
 }

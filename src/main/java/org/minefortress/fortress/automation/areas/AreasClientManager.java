@@ -15,6 +15,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.selections.renderer.ISelectionInfoProvider;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 import org.minefortress.utils.BuildingHelper;
+import org.minefortress.utils.ModUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     private BlockPos selectionStart;
     private BlockPos selectionEnd;
     private AutomationAreaInfo hoveredArea;
+    private boolean isCorrectState = true;
 
     public boolean select(HitResult target) {
         if(target == null) return false;
@@ -46,14 +48,21 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                 selectionStart = blockPos.toImmutable();
                 selectionEnd = blockPos.toImmutable();
             } else {
-                final var selectedBlocks = Collections.unmodifiableList(getSelectedBlocks());
-                final var info = new AutomationAreaInfo(
-                        selectedBlocks,
-                        selectionType,
-                        UUID.randomUUID()
-                );
-                final var packet = new C2SAddAreaPacket(info);
-                FortressClientNetworkHelper.send(C2SAddAreaPacket.CHANNEL, packet);
+                if(isCorrectState) {
+                    final var selectedBlocks = Collections.unmodifiableList(getSelectedBlocks());
+                    final var info = new AutomationAreaInfo(
+                            selectedBlocks,
+                            selectionType,
+                            UUID.randomUUID()
+                    );
+                    final var packet = new C2SAddAreaPacket(info);
+                    FortressClientNetworkHelper.send(C2SAddAreaPacket.CHANNEL, packet);
+                } else {
+                    MinecraftClient.getInstance()
+                            .inGameHud
+                            .getChatHud()
+                            .addMessage(new LiteralText("The selected area is not inside the fortress!"));
+                }
                 resetSelection();
             }
         }
@@ -73,6 +82,12 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                     needsUpdate = true;
                 }
             }
+
+            isCorrectState = ModUtils.getInfluenceManager()
+                    .getFortressBorder()
+                    .map(it -> getSelectedBlocks().stream().allMatch(it::contains))
+                    .orElse(true);
+
         }
     }
 
@@ -81,6 +96,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         this.selectionStart = null;
         this.needsUpdate = true;
         this.hoveredArea = null;
+        this.isCorrectState = true;
     }
 
     public void removeHovered() {
@@ -126,6 +142,9 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
 
     @Override
     public Vector4f getClickColor() {
+        if(!isCorrectState) {
+            return new Vector4f((170f/255f), 0.0f, 0.0f, 0.5f);
+        }
         return selectionType.getColor();
     }
     @Override

@@ -12,6 +12,9 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.BaritonableEntity;
+import org.minefortress.entity.TargetedPawn;
+import org.minefortress.entity.WarriorPawn;
+import org.minefortress.entity.interfaces.IFortressAwareEntity;
 import org.minefortress.entity.interfaces.ITargetedPawn;
 import org.minefortress.entity.interfaces.IWarrior;
 
@@ -116,8 +119,19 @@ public class BaritoneMoveControl {
 
         private void checkFailedToCalc(PathEvent pathEvent) {
             if(pathEvent == PathEvent.CALC_FAILED) {
+                if(entity instanceof IFortressAwareEntity fae && entity instanceof TargetedPawn targetedPawn)  {
+                    fae.sendMessageToMasterPlayer(getPawnType(fae) + " " + entity.getName().asString() + " can't reach the target");
+                    targetedPawn.resetTargets();
+                }
                 stuck = true;
             }
+        }
+
+        private static String getPawnType(IFortressAwareEntity fae) {
+            if(fae instanceof WarriorPawn) {
+                return "Warrior";
+            }
+            return "Pawn";
         }
 
         private void checkStuckOnTheSamePlace(PathEvent pathEvent) {
