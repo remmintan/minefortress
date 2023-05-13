@@ -43,3 +43,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BUILD_NUMBER: ${{ github.run_number }}
 
+    - name: Delete packages, keep most recent
+      uses: actions/delete-package-versions@v4
+      with:
+        package-name: 'org.minefortress.minefortress-nightly'
+        package-type: 'maven'
+        min-versions-to-keep: 10
+
