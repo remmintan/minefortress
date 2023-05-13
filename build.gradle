@@ -26,7 +26,6 @@ repositories {
 		}
 	}
 	maven {
-		name = "cc-api"
 		url = "https://maven.pkg.github.com/minefortress-mod/minefortress-cc-api"
 		credentials {
 			username = System.getenv("GITHUB_USERNAME")
@@ -34,7 +33,6 @@ repositories {
 		}
 	}
 	maven {
-		name = "cc-api"
 		url = "https://maven.pkg.github.com/minefortress-mod/automatone"
 		credentials {
 			username = System.getenv("GITHUB_USERNAME")
