@@ -25,9 +25,21 @@ repositories {
 			includeGroup "com.jamieswhiteshirt"
 		}
 	}
-	flatDir {
-		// automatone, base, entity, world
-		dirs "../automatone/build/libs", "../cc-api/cardinal-components-base/build/libs", "../cc-api/cardinal-components-entity/build/libs", "../cc-api/cardinal-components-world/build/libs"
+	maven {
+		name = "cc-api"
+		url = "https://maven.pkg.github.com/minefortress-mod/minefortress-cc-api"
+		credentials {
+			username = System.getenv("GITHUB_USERNAME")
+			password = System.getenv("GITHUB_TOKEN")
+		}
+	}
+	maven {
+		name = "cc-api"
+		url = "https://maven.pkg.github.com/minefortress-mod/automatone"
+		credentials {
+			username = System.getenv("GITHUB_USERNAME")
+			password = System.getenv("GITHUB_TOKEN")
+		}
 	}
 }
 
@@ -42,10 +54,10 @@ dependencies {
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
 
-	modImplementation include("automatone:automatone-0.7.0")
-	modImplementation include("cardinal-components-base:cardinal-components-base-4.2.0")
-	modImplementation include("cardinal-components-entity:cardinal-components-entity-4.2.0")
-	modImplementation include("cardinal-components-world:cardinal-components-world-4.2.0")
+	modImplementation include("io.github.ladysnake:automatone:0.9.2+minefortress")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.2.0+minefortress")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.2.0+minefortress")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.2.0+minefortress")
 
 }
 
