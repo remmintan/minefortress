@@ -1,13 +1,20 @@
 plugins {
 	id 'java'
 	id 'fabric-loom' version '1.0.12'
+	id 'maven-publish'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
+if(System.getenv("BUILD_NUMBER") != null) {
+	archivesBaseName = "${project.archives_base_name}-nightly"
+	version = "${project.mod_version}+${System.getenv("BUILD_NUMBER")}"
+} else {
+	archivesBaseName = project.archives_base_name
+	version =  project.mod_version
+}
+
 group = project.maven_group
 
 repositories {
@@ -79,5 +86,23 @@ loom {
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
+	}
+}
+
+publishing {
+	repositories {
+		maven {
+			name = "GitHubPackages"
+			url = uri("https://maven.pkg.github.com/" + System.getenv("GITHUB_REPOSITORY"))
+			credentials {
+				username = System.getenv("GITHUB_USERNAME")
+				password = System.getenv("GITHUB_TOKEN")
+			}
+		}
+	}
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
 	}
 }
