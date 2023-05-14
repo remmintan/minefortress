@@ -21,7 +21,8 @@ public class ColonistNameGenerator {
             "Takelale",
             "Varneke",
             "Brandon",
-            "Aki"
+            "Aki",
+            "Grungy"
     );
 
     private static final List<String> RANDOM_NAMES = Arrays.asList(
