@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.minefortress.network.c2s.ServerboundFinishEditBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -17,7 +18,7 @@ public class BlueprintsPauseScreen extends Screen {
     private final boolean showMenu;
 
     public BlueprintsPauseScreen(boolean showMenu) {
-        super(new LiteralText("Edit Blueprint"));
+        super(Text.of("Edit Blueprint"));
         this.showMenu = showMenu;
     }
 
@@ -36,16 +37,25 @@ public class BlueprintsPauseScreen extends Screen {
             sendSave(true);
             closeMenu();
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 72 - 16, 204, 20, new LiteralText("Discard Blueprint"), button -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 72 - 16, 204, 20, new LiteralText("Clear blueprint"), button -> {
+            openClearConfirmationScreen();
+        }));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 96 - 16, 204, 20, new LiteralText("Discard Blueprint"), button -> {
             sendSave(false);
             closeMenu();
         }));
-
     }
 
     private void sendSave(boolean shouldSave) {
         final ServerboundFinishEditBlueprintPacket packet = new ServerboundFinishEditBlueprintPacket(shouldSave);
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SAVE_EDIT_BLUEPRINT, packet);
+    }
+
+    private void openClearConfirmationScreen() {
+        if(this.client!=null)
+            this.client.setScreen(new ClearBlueprintConfirmationScreen(this));
+        else
+            throw new RuntimeException("Client is null");
     }
 
     private void closeMenu() {
