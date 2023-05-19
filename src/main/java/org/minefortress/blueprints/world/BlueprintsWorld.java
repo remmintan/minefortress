@@ -168,6 +168,11 @@ public class BlueprintsWorld {
         world.setBlueprintGroup(group);
     }
 
+    public void clearBlueprint(ServerPlayerEntity player) {
+        preparedBlueprintData.clear();
+        putBlueprintInAWorld(player, new Vec3i(1, 1, 1));
+    }
+
     public void putBlueprintInAWorld(final ServerPlayerEntity player, Vec3i blueprintSize) {
         final BlockState borderBlockState = Blocks.RED_WOOL.getDefaultState();
 
