@@ -8,6 +8,8 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import org.minefortress.network.c2s.C2SClearActiveBlueprint;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 @Environment(value= EnvType.CLIENT)
 public class ClearBlueprintConfirmationScreen extends Screen {
@@ -53,7 +55,8 @@ public class ClearBlueprintConfirmationScreen extends Screen {
     }
 
     private void sendClear() {
-
+        var packet = new C2SClearActiveBlueprint();
+        FortressClientNetworkHelper.send(C2SClearActiveBlueprint.CHANNEL, packet);
     }
 
     @Override
