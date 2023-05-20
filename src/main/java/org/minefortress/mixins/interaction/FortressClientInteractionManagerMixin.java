@@ -90,6 +90,7 @@ public abstract class FortressClientInteractionManagerMixin {
             final var influenceManager = ModUtils.getInfluenceManager();
             if(influenceManager.isSelecting()) {
                 influenceManager.cancelSelectingInfluencePosition();
+                cir.setReturnValue(false);
                 return;
             }
             final var selectionManager = fortressManager.getFightManager().getSelectionManager();
