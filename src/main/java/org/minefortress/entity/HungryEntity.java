@@ -107,12 +107,13 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
     private void sendHungerMessage() {
         if(this instanceof IFortressAwareEntity fae && this instanceof NamedPawnEntity npe) {
             final HungerManager hungerManager = getHungerManager();
+            final var pawnName = npe.getName().asString();
             if(hungerManager.prevFoodLevel > 0 && hungerManager.getFoodLevel() <= 0) {
-                fae.sendMessageToMasterPlayer(npe.getName().asString() + "is starving! Do something!");
+                fae.sendMessageToMasterPlayer(pawnName + " is starving! Do something!");
             } else if(hungerManager.prevFoodLevel >= 5 && hungerManager.foodLevel < 5) {
-                fae.sendMessageToMasterPlayer(npe.getName().asString() + " is very hungry! Bring some food to the village!");
+                fae.sendMessageToMasterPlayer(pawnName + " is very hungry! Bring some food to the village!");
             } else if(hungerManager.prevFoodLevel >= 10 && hungerManager.foodLevel < 10) {
-                fae.sendMessageToMasterPlayer(npe.getName().asString() + " is hungry. It's time to eat something!");
+                fae.sendMessageToMasterPlayer(pawnName + " is hungry. It's time to eat something!");
             }
         }
     }
