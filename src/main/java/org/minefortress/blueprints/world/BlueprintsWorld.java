@@ -169,7 +169,7 @@ public class BlueprintsWorld {
     }
 
     public void clearBlueprint(ServerPlayerEntity player) {
-        preparedBlueprintData.clear();
+        preparedBlueprintData = new HashMap<>();
         putBlueprintInAWorld(player, new Vec3i(1, 1, 1));
     }
 

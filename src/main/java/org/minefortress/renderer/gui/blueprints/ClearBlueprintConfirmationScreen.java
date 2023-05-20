@@ -29,11 +29,11 @@ public class ClearBlueprintConfirmationScreen extends Screen {
         super.init();
         this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20, new LiteralText("Yes"), button -> {
             sendClear();
-            close();
+            if(super.client != null) {
+                super.client.setScreen(null);
+            }
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, new LiteralText("No"), button -> {
-            close();
-        }));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, new LiteralText("No"), button -> close()));
     }
 
     @Override
