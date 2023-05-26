@@ -10,20 +10,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(PlayerManager.class)
 public class PlayerManagerMixin {
 
-//    @Inject(
-//            method = "respawnPlayer",
-//            at = @At(
-//                    value = "INVOKE",
-//                    target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/Packet;)V",
-//                    ordinal = 1,
-//                    shift = At.Shift.BEFORE
-//            )
-//    )
-//    public void respawnPlayer(ServerPlayerEntity player, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
-//        player.setYaw(45);
-//        player.setPitch(60);
-//    }
-
     @Redirect(method = "respawnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;refreshPositionAndAngles(DDDFF)V"))
     public void respawnPlayer(ServerPlayerEntity instance, double x, double y, double z, float yaw, float pitch) {
         if(ModUtils.isFortressGamemode(instance))
