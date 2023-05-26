@@ -8,6 +8,7 @@
     "block.FortressAbstractBlockState",
     "entity.ArrowEntityMixin",
     "entity.FortressTntEntityMixin",
+    "entity.PlayerManagerMixin",
     "item.DisabledBlockItemMixin",
     "item.DisableItemMixin",
     "network.FortressPacketByteBufMixin",

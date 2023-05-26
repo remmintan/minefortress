@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -30,6 +31,9 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Shadow @Final public MinecraftServer server;
 
+    @Shadow public abstract void teleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch);
+
+    @Shadow public ServerPlayNetworkHandler networkHandler;
     private Vec3d persistedPos;
     private Vec3d persistedVelocity;
     private float persistedYaw;
@@ -126,6 +130,15 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         } else {
             return actualSpawn;
         }
+    }
+
+    @Inject(method = "moveToSpawn", at = @At("RETURN"))
+    public void moveToSpawnAfter(ServerWorld world, CallbackInfo ci) {
+        this.setYaw(45f);
+        this.setPitch(60f);
+        final var blockPos = this.getBlockPos();
+        if(this.networkHandler!=null)
+            this.teleport(blockPos.getX(), blockPos.getY(), blockPos.getZ());
     }
 
     @Override
