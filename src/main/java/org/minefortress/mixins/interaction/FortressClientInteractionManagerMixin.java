@@ -140,6 +140,7 @@ public abstract class FortressClientInteractionManagerMixin {
         if(fortressManager.isBuildingHovered()) {
             openManageBuildingMenu(fortressManager);
             cir.setReturnValue(false);
+            return;
         }
 
         fortressClient.getSelectionManager().selectBlock(pos);

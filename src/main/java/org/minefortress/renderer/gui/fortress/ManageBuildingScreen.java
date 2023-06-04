@@ -39,10 +39,11 @@ public class ManageBuildingScreen extends WindowScreen {
 
     @Override
     protected void init() {
+        super.init();
         this.addDrawableChild(new ButtonWidget(
-                getScreenTopY() + 10,
-                getScreenRightX() - 10,
-                204,
+                getScreenRightX() - 25,
+                getScreenTopY() + 5,
+                20,
                 20,
                 Text.of("X"),
                 button -> super.closeScreen()
@@ -66,7 +67,7 @@ public class ManageBuildingScreen extends WindowScreen {
                 this.addDrawableChild(
                         new ButtonWidget(
                                 getScreenCenterX() - 100,
-                                getScreenTopY() + 30,
+                                getScreenTopY() + 55,
                                 200,
                                 20,
                                 Text.of("Hire pawns"),
