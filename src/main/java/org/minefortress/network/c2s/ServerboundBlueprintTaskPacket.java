@@ -61,7 +61,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
             final ServerBlueprintManager blueprintManager = fortressServerPlayer.getServerBlueprintManager();
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation, floorLevel);
 
-            if (player instanceof FortressServerPlayerEntity fortressPlayer) {
+            if (player instanceof FortressServerPlayerEntity) {
                 if(fortressServerManager.isSurvival()) {
                     final var serverResourceManager = fortressServerManager.getServerResourceManager();
                     final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintFile, rotation).getStacks();
