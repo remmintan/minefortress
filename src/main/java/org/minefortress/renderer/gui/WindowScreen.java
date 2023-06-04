@@ -6,6 +6,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.minefortress.renderer.gui.hire.HirePawnScreen;
 
 public class WindowScreen extends Screen {
 
@@ -14,8 +15,8 @@ public class WindowScreen extends Screen {
     protected static final int BACKGROUND_WIDTH = 248;
     protected static final int BACKGROUND_HEIGHT = 166;
 
-    protected int x;
-    protected int y;
+    private int x;
+    private int y;
 
     protected WindowScreen(Text title) {
         super(title);
@@ -34,10 +35,11 @@ public class WindowScreen extends Screen {
         super.renderBackground(matrices);
         this.drawBackground(matrices);
         super.render(matrices, mouseX, mouseY, delta);
+        HirePawnScreen.drawCenteredText(matrices, this.textRenderer, getTitle(), this.getScreenCenterX(), this.getScreenTopY() + 10, 0xFFFFFF);
     }
 
     @Override
-    public boolean shouldPause() {
+    public final boolean shouldPause() {
         return false;
     }
 
@@ -48,20 +50,25 @@ public class WindowScreen extends Screen {
         this.drawTexture(matrices, this.x, this.y, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
     }
 
-    protected int getScreenCenterX() {
+    protected final int getScreenCenterX() {
         return this.width / 2;
     }
 
-    protected int getScreenTopY() {
+    protected final int getScreenTopY() {
         return this.y;
     }
 
-    protected int getScreenLeftX() {
+    protected final int getScreenLeftX() {
         return this.x;
     }
 
-    protected int getScreenRightX() {
+    protected final int getScreenRightX() {
         return this.x + BACKGROUND_WIDTH;
+    }
+
+    protected final void closeScreen() {
+        if(this.client != null && this.client.player != null)
+            this.client.player.closeScreen();
     }
 
 }

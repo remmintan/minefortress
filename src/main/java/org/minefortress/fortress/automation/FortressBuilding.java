@@ -128,6 +128,10 @@ public class FortressBuilding implements IAutomationArea {
         return this.requirementId != null && this.requirementId.equals(requirementId);
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     @Override
     public void update() {
         this.lastUpdated = LocalDateTime.now();
@@ -139,6 +143,6 @@ public class FortressBuilding implements IAutomationArea {
     }
 
     public EssentialBuildingInfo toEssentialInfo(World world) {
-        return new EssentialBuildingInfo(start, end, requirementId, getBedsCount(world), blueprintId);
+        return new EssentialBuildingInfo(id, start, end, requirementId, getBedsCount(world), blueprintId);
     }
 }

@@ -93,7 +93,7 @@ public abstract class ProfessionManager {
         return getProfessions().get(id);
     }
 
-    public Optional<Profession> getByRequirement(String requirement) {
+    public Optional<Profession> getByBuildingRequirement(String requirement) {
         return getProfessions().values()
                 .stream()
                 .filter(

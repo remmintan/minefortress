@@ -5,7 +5,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.entity.BasePawnEntity;
@@ -237,9 +236,8 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public Optional<String> getHoveredBuildingName() {
         return getHoveredBuilding()
-                .filter(b -> !b.getBlueprintId().equals(EssentialBuildingInfo.DEFAULT_FILE))
-                .map(EssentialBuildingInfo::getBlueprintId)
-                .flatMap(it -> ModUtils.getBlueprintManager().getBlueprintMetadataManager().getByFile(it))
+                .flatMap(EssentialBuildingInfo::getBlueprintId)
+                .flatMap(it -> ModUtils.getBlueprintManager().getBlueprintMetadataManager().getByBlueprintId(it))
                 .map(BlueprintMetadata::getName);
     }
 

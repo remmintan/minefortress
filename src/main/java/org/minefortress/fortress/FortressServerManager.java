@@ -96,6 +96,18 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
     }
 
+    public void destroyBuilding(UUID id) {
+        buildings.stream()
+                .filter(it -> it.getId().equals(id))
+                .findFirst()
+                .ifPresent(it -> {
+                    buildings.remove(it);
+                    BlockPos.iterate(it.getStart(), it.getEnd())
+                            .forEach(pos -> getWorld().setBlockState(pos, Blocks.AIR.getDefaultState()));
+                    this.scheduleSyncBuildings();
+                });
+    }
+
     public void addBuilding(FortressBuilding building) {
         final BlockPos start = building.getStart();
         final BlockPos end = building.getEnd();

@@ -24,7 +24,7 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.Profession;
+import org.minefortress.renderer.gui.fortress.ManageBuildingScreen;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
@@ -150,11 +150,8 @@ public abstract class FortressClientInteractionManagerMixin {
         fortressManager
                 .getHoveredBuilding()
                 .ifPresent(it -> {
-                    final var professionManager = fortressManager.getProfessionManager();
-                    professionManager
-                            .getByRequirement(it.getRequirementId())
-                            .filter(Profession::isHireMenu)
-                            .ifPresent(req -> professionManager.increaseAmount(professionManager.getIdByProfession(req), false));
+                    final var manageBuildingScreen = new ManageBuildingScreen(it);
+                    MinecraftClient.getInstance().setScreen(manageBuildingScreen);
                 });
     }
 

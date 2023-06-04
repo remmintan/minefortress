@@ -1,8 +1,8 @@
 package org.minefortress.renderer.gui.hire;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.network.c2s.C2SCloseHireMenuPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -51,12 +51,6 @@ public class HirePawnScreen extends WindowScreen {
             final var enoughPlaceForNew = (handler.getCurrentCount(profId) + handler.getHireQueue(profId)) < this.handler.getMaxCount(profId);
             button.active = btn.costs.isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0 && enoughPlaceForNew;
         }
-    }
-
-    @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
-        HirePawnScreen.drawCenteredText(matrices, this.textRenderer, this.title, this.getScreenCenterX(), this.getScreenTopY() + 10, 0xFFFFFF);
     }
 
     private void addNewRow(String profId, int rowY, int leftX, int rightX) {

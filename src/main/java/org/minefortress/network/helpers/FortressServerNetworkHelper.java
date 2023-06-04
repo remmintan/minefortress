@@ -53,6 +53,7 @@ public class FortressServerNetworkHelper {
         FortressServerNetworkHelper.registerReceiver(C2SUpdateNewInfluencePosition.CHANNEL, C2SUpdateNewInfluencePosition::new);
         FortressServerNetworkHelper.registerReceiver(C2SJumpToCampfire.CHANNEL, C2SJumpToCampfire::new);
         FortressServerNetworkHelper.registerReceiver(C2SClearActiveBlueprint.CHANNEL, C2SClearActiveBlueprint::new);
+        FortressServerNetworkHelper.registerReceiver(C2SDestroyBuilding.CHANNEL, C2SDestroyBuilding::new);
     }
 
 }

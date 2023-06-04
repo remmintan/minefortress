@@ -6,11 +6,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class EssentialBuildingInfo {
 
-    public static final String DEFAULT_FILE = "default-file-36d9a49d-4d47-45c8-9201-23d71e156da1";
+    public static final String DEFAULT_BLUEPRINT_ID = "default-file-36d9a49d-4d47-45c8-9201-23d71e156da1";
 
+    private final UUID id;
     private final BlockPos start;
     private final BlockPos end;
     private final String requirementId;
@@ -18,15 +20,17 @@ public class EssentialBuildingInfo {
     @NotNull
     private final String blueprintId;
 
-    public EssentialBuildingInfo(BlockPos start, BlockPos end, String requirementId, long bedsCount, @Nullable String blueprintId) {
+    public EssentialBuildingInfo(UUID id, BlockPos start, BlockPos end, String requirementId, long bedsCount, @Nullable String blueprintId) {
+        this.id = id;
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.requirementId = requirementId;
         this.bedsCount = bedsCount;
-        this.blueprintId = Optional.ofNullable(blueprintId).orElse(DEFAULT_FILE);
+        this.blueprintId = Optional.ofNullable(blueprintId).orElse(DEFAULT_BLUEPRINT_ID);
     }
 
     public EssentialBuildingInfo(PacketByteBuf buf) {
+        this.id = buf.readUuid();
         this.start = buf.readBlockPos();
         this.end = buf.readBlockPos();
         this.requirementId = buf.readString();
@@ -50,12 +54,18 @@ public class EssentialBuildingInfo {
         return bedsCount;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     @NotNull
-    public String getBlueprintId() {
-        return blueprintId;
+    public Optional<String> getBlueprintId() {
+        if(blueprintId.equals(DEFAULT_BLUEPRINT_ID)) return Optional.empty();
+        return Optional.of(blueprintId);
     }
 
     public void write(PacketByteBuf buffer) {
+        buffer.writeUuid(id);
         buffer.writeBlockPos(start);
         buffer.writeBlockPos(end);
         buffer.writeString(requirementId);
