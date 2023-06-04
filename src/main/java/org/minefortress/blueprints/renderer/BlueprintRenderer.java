@@ -39,7 +39,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         if(clientBlueprintManager.isSelecting()) {
             final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
             final BlockRotation blockRotation = selectedStructure.getRotation();
-            final String fileName = selectedStructure.getFile();
+            final String fileName = selectedStructure.getId();
             blueprintsModelBuilder.getOrBuildBlueprint(fileName, blockRotation);
         }
     }
@@ -125,7 +125,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     @Override
     protected Optional<BuiltModel> getBuiltModel() {
         final BlueprintMetadata selectedStructure = getStructureRenderInfoProvider().getSelectedStructure();
-        final BuiltBlueprint nullableBlueprint = this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getFile(), selectedStructure.getRotation());
+        final BuiltBlueprint nullableBlueprint = this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getId(), selectedStructure.getRotation());
         return Optional.ofNullable(nullableBlueprint);
     }
 

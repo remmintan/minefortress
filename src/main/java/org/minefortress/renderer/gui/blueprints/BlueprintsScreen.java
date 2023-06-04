@@ -227,7 +227,7 @@ public final class BlueprintsScreen extends Screen {
                     }
                 }
 
-                this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getFile(), BlockRotation.NONE);
+                this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getId(), BlockRotation.NONE);
             }
         }
 
@@ -361,7 +361,7 @@ public final class BlueprintsScreen extends Screen {
             final BlueprintMetadata metadata = slot.getMetadata();
             final var enoughResources = !ModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
             if(this.client != null){
-                this.blueprintRenderer.renderBlueprintInGui(metadata.getFile(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
+                this.blueprintRenderer.renderBlueprintInGui(metadata.getId(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
             }
         }
 

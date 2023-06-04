@@ -21,15 +21,15 @@ abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
 
     private final Map<String, StrctureBlockData> blueprints = new HashMap<>();
 
-    public StrctureBlockData getBlockData(String blueprintFileName, BlockRotation rotation) {
-        return getBlockData(blueprintFileName, rotation, 0);
+    public StrctureBlockData getBlockData(String blueprintId, BlockRotation rotation) {
+        return getBlockData(blueprintId, rotation, 0);
     }
 
-    public StrctureBlockData getBlockData(String blueprintFileName, BlockRotation rotation, int floorLevel) {
-        final String key = getKey(blueprintFileName, rotation);
+    public StrctureBlockData getBlockData(String blueprintId, BlockRotation rotation, int floorLevel) {
+        final String key = getKey(blueprintId, rotation);
         if(!blueprints.containsKey(key)) {
-            final Structure structure = getStructure(blueprintFileName)
-                    .orElseThrow(() -> new IllegalStateException("Blueprint not found " + blueprintFileName));
+            final Structure structure = getStructure(blueprintId)
+                    .orElseThrow(() -> new IllegalStateException("Blueprint not found " + blueprintId));
             final StrctureBlockData blueprintBlockData = buildStructure(structure, rotation, floorLevel);
             blueprints.put(key, blueprintBlockData);
         }
@@ -84,8 +84,8 @@ abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
     }
 
     @NotNull
-    private String getKey(String fileName, BlockRotation rotation) {
-        return fileName + ":" + rotation.name();
+    private static String getKey(String id, BlockRotation rotation) {
+        return id + ":" + rotation.name();
     }
 
     protected static Structure.StructureBlockInfo convertJigsawBlock(Structure.StructureBlockInfo inf) {

@@ -95,7 +95,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         final var blockDataProvider = getBlockDataProvider();
         final var selectedStructure = getSelectedStructure();
         return blockDataProvider
-                .getBlockData(selectedStructure.getFile(), selectedStructure.getRotation());
+                .getBlockData(selectedStructure.getId(), selectedStructure.getRotation());
     }
 
     @Nullable

@@ -41,18 +41,18 @@ public final class BlueprintMetadataManager {
     }
 
     public void remove(String filename) {
-        blueprintsMap.forEach((k, v) -> v.removeIf(it -> it.getFile().equals(filename)));
+        blueprintsMap.forEach((k, v) -> v.removeIf(it -> it.getId().equals(filename)));
     }
 
     public void update(String fileName, int newFloorLevel) {
         flatBlueprints()
                 .stream()
-                .filter(b -> b.getFile().equals(fileName))
+                .filter(b -> b.getId().equals(fileName))
                 .forEach(b -> b.setFloorLevel(newFloorLevel));
     }
 
     private boolean isContainsBlueprint(String name, String file) {
-        return flatBlueprints().stream().anyMatch(b -> b.getName().equals(name) && b.getFile().equals(file));
+        return flatBlueprints().stream().anyMatch(b -> b.getName().equals(name) && b.getId().equals(file));
     }
 
     private List<BlueprintMetadata> flatBlueprints() {
@@ -61,7 +61,7 @@ public final class BlueprintMetadataManager {
 
     public Optional<BlueprintMetadata> getByFile(String file) {
         if(file == null) return Optional.empty();
-        return flatBlueprints().stream().filter(b -> b.getFile().equals(file)).findFirst();
+        return flatBlueprints().stream().filter(b -> b.getId().equals(file)).findFirst();
     }
 
 }

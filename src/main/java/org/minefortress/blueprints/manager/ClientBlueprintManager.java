@@ -60,7 +60,7 @@ public final class ClientBlueprintManager extends BaseClientStructureManager {
         addTaskToTasksHolder(taskId);
         final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket =
                 new ServerboundBlueprintTaskPacket(taskId,
-                        selectedStructure.getFile(),
+                        selectedStructure.getId(),
                         getStructureBuildPos(),
                         selectedStructure.getRotation(),
                         getSelectedStructure().getFloorLevel());
@@ -100,8 +100,8 @@ public final class ClientBlueprintManager extends BaseClientStructureManager {
 
     public void add(BlueprintGroup group, String name, String file, int floorLevel, String requirementId, NbtCompound tag) {
         final BlueprintMetadata metadata = this.blueprintMetadataManager.add(group, name, file, floorLevel, requirementId);
-        blockDataManager.setBlueprint(metadata.getFile(), tag);
-        blockDataManager.invalidateBlueprint(metadata.getFile());
+        blockDataManager.setBlueprint(metadata.getId(), tag);
+        blockDataManager.invalidateBlueprint(metadata.getId());
     }
 
     public void update(String fileName, NbtCompound tag, int newFloorLevel) {

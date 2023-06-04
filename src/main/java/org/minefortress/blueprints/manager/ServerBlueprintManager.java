@@ -46,7 +46,7 @@ public class ServerBlueprintManager {
 
             for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : blueprintMetadataReader.getPredefinedBlueprints().entrySet()) {
                 for(BlueprintMetadata blueprintMetadata : entry.getValue()) {
-                    final String file = blueprintMetadata.getFile();
+                    final String file = blueprintMetadata.getId();
                     blockDataManager.getStructureNbt(file)
                             .ifPresent(it -> {
                                 final int floorLevel = blockDataManager.getFloorLevel(file).orElse(blueprintMetadata.getFloorLevel());
@@ -98,10 +98,10 @@ public class ServerBlueprintManager {
         return blockDataManager;
     }
 
-    public BlueprintTask createTask(UUID taskId, String structureFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
-        final String requirementId = this.findRequirementIdByFileName(structureFile)
+    public BlueprintTask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel) {
+        final String requirementId = this.findRequirementById(blueprintId)
                 .orElse("custom");
-        final StrctureBlockData serverStructureInfo = blockDataManager.getBlockData(structureFile, rotation, floorLevel);
+        final StrctureBlockData serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation, floorLevel);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
         final BlockPos endPos = getEndPos(startPos, size);
@@ -117,7 +117,7 @@ public class ServerBlueprintManager {
                 entityLayer,
                 floorLevel,
                 requirementId,
-                structureFile
+                blueprintId
         );
     }
 
@@ -147,9 +147,12 @@ public class ServerBlueprintManager {
         blockDataManager.readBlockDataManager(compound);
     }
 
-    private Optional<String> findRequirementIdByFileName(String fileName){
-        return blueprintMetadataReader.getPredefinedBlueprints().values().stream().flatMap(Collection::stream)
-                .filter(blueprintMetadata -> blueprintMetadata.getFile().equals(fileName))
+    private Optional<String> findRequirementById(String blueprintId){
+        return blueprintMetadataReader.getPredefinedBlueprints()
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .filter(blueprintMetadata -> blueprintMetadata.getId().equals(blueprintId))
                 .findFirst()
                 .map(BlueprintMetadata::getRequirementId);
     }

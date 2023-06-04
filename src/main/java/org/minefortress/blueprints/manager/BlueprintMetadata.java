@@ -6,16 +6,16 @@ import java.util.Optional;
 
 public class BlueprintMetadata {
 
+    private final String id;
     private final String name;
-    private final String file;
     private final String requirementId;
     private int floorLevel;
 
     private BlockRotation rotation = BlockRotation.NONE;
 
-    public BlueprintMetadata(String name, String file, int floorLevel, String requirementId) {
+    public BlueprintMetadata(String name, String id, int floorLevel, String requirementId) {
         this.name = name;
-        this.file = file;
+        this.id = id;
         this.floorLevel = floorLevel;
         this.requirementId = requirementId;
     }
@@ -24,8 +24,8 @@ public class BlueprintMetadata {
         return name;
     }
 
-    public String getFile() {
-        return file;
+    public String getId() {
+        return id;
     }
 
     public String getRequirementId() {

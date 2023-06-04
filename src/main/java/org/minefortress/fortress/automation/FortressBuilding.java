@@ -25,17 +25,17 @@ public class FortressBuilding implements IAutomationArea {
     private final BlockPos end;
     private final String requirementId;
     @Nullable
-    private final String file;
+    private final String blueprintId;
     private LocalDateTime lastUpdated;
     private Iterator<AutomationBlockInfo> currentIterator;
 
-    public FortressBuilding(UUID id, BlockPos start, BlockPos end, String requirementId, @NotNull String file) {
+    public FortressBuilding(UUID id, BlockPos start, BlockPos end, String requirementId, @NotNull String blueprintId) {
         this.id = id;
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.requirementId = requirementId;
         this.lastUpdated = LocalDateTime.MIN;
-        this.file = file;
+        this.blueprintId = blueprintId;
     }
 
     public FortressBuilding(NbtCompound tag) {
@@ -65,10 +65,12 @@ public class FortressBuilding implements IAutomationArea {
         else
             this.lastUpdated = LocalDateTime.MIN;
 
-        if(tag.contains("file"))
-            this.file = tag.getString("file");
+        if(tag.contains("blueprintId"))
+            this.blueprintId = tag.getString("blueprintId");
+        else if(tag.contains("file")) // support old format
+            this.blueprintId = tag.getString("file");
         else
-            this.file = null;
+            this.blueprintId = null;
     }
 
     public BlockPos getStart() {
@@ -103,8 +105,8 @@ public class FortressBuilding implements IAutomationArea {
         tag.putLong("end", end.asLong());
         tag.putString("requirementId", requirementId);
         tag.putString("lastUpdated", lastUpdated.toString());
-        if(file != null) {
-            tag.putString("file", file);
+        if(blueprintId != null) {
+            tag.putString("blueprintId", blueprintId);
         }
     }
 
@@ -137,6 +139,6 @@ public class FortressBuilding implements IAutomationArea {
     }
 
     public EssentialBuildingInfo toEssentialInfo(World world) {
-        return new EssentialBuildingInfo(start, end, requirementId, getBedsCount(world), file);
+        return new EssentialBuildingInfo(start, end, requirementId, getBedsCount(world), blueprintId);
     }
 }

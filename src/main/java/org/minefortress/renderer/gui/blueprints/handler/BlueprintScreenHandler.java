@@ -64,7 +64,7 @@ public final class BlueprintScreenHandler {
                 int m = column + (row + skippedRows) * 9;
                 if (m >= 0 && m < this.totalSize) {
                     final BlueprintMetadata blueprintMetadata = allBlueprint.get(m);
-                    final var blockData = blueprintManager.getBlockDataProvider().getBlockData(blueprintMetadata.getFile(), BlockRotation.NONE);
+                    final var blockData = blueprintManager.getBlockDataProvider().getBlockData(blueprintMetadata.getId(), BlockRotation.NONE);
                     if(fortressClientManager.isSurvival()) {
                         final var stacks = blockData.getStacks();
                         final var hasEnoughItems = resourceManager.hasItems(stacks);
@@ -80,13 +80,13 @@ public final class BlueprintScreenHandler {
     }
 
     public void sendRemovePacket() {
-        final var packet = ServerboundEditBlueprintPacket.remove(getFocusedSlot().getMetadata().getFile());
+        final var packet = ServerboundEditBlueprintPacket.remove(getFocusedSlot().getMetadata().getId());
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
     }
 
     public void sendEditPacket() {
         final BlueprintMetadata metadata = this.focusedSlot.getMetadata();
-        final String file = metadata.getFile();
+        final String file = metadata.getId();
         final int floorLevel = metadata.getFloorLevel();
         final ServerboundEditBlueprintPacket packet = ServerboundEditBlueprintPacket.edit(file, floorLevel, selectedGroup);
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);

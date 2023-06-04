@@ -243,8 +243,8 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public Optional<String> getHoveredBuildingName() {
         return getHoveredBuilding()
-                .filter(b -> !b.getFile().equals(EssentialBuildingInfo.DEFAULT_FILE))
-                .map(EssentialBuildingInfo::getFile)
+                .filter(b -> !b.getBlueprintId().equals(EssentialBuildingInfo.DEFAULT_FILE))
+                .map(EssentialBuildingInfo::getBlueprintId)
                 .flatMap(it -> ModUtils.getBlueprintManager().getBlueprintMetadataManager().getByFile(it))
                 .map(BlueprintMetadata::getName);
     }

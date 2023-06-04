@@ -67,7 +67,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         isSelectingInfluencePosition = false;
         final var pos = getStructureBuildPos();
         if(pos != null) {
-            final var blockData = blockDataProvider.getBlockData(INFLUENCE_FLAG_METADATA.getFile(), BlockRotation.NONE);
+            final var blockData = blockDataProvider.getBlockData(INFLUENCE_FLAG_METADATA.getId(), BlockRotation.NONE);
             final var fortressClientManager = ModUtils.getFortressClientManager();
 
             String stageMessage = switch (influencePosStateHolder.getWorldBorderStage()) {

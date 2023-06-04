@@ -27,7 +27,7 @@ public class BlueprintTask extends AbstractTask {
     private final Map<BlockPos, BlockState> blueprintAutomaticData;
     private final float floorLevel;
     private final String requirementId;
-    private final String file;
+    private final String blueprintId;
 
     public BlueprintTask(
             UUID id,
@@ -38,7 +38,7 @@ public class BlueprintTask extends AbstractTask {
             Map<BlockPos, BlockState> blueprintAutomaticData,
             int floorLevel,
             String requirementId,
-            @NotNull String file
+            @NotNull String blueprintId
     ) {
         super(id, TaskType.BUILD, startingPos, endingPos);
         this.blueprintData = blueprintData;
@@ -46,7 +46,7 @@ public class BlueprintTask extends AbstractTask {
         this.blueprintAutomaticData = blueprintAutomaticData;
         this.floorLevel = floorLevel;
         this.requirementId = requirementId;
-        this.file = file;
+        this.blueprintId = blueprintId;
     }
 
     @Override
@@ -101,7 +101,7 @@ public class BlueprintTask extends AbstractTask {
                     startingBlock,
                     endingBlock,
                     requirementId,
-                    file
+                    blueprintId
             );
             colonist.getFortressServerManager().orElseThrow().addBuilding(fortressBuilding);
         }

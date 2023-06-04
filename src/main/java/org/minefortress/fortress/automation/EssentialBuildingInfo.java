@@ -16,14 +16,14 @@ public class EssentialBuildingInfo {
     private final String requirementId;
     private final long bedsCount;
     @NotNull
-    private final String file;
+    private final String blueprintId;
 
-    public EssentialBuildingInfo(BlockPos start, BlockPos end, String requirementId, long bedsCount, @Nullable String file) {
+    public EssentialBuildingInfo(BlockPos start, BlockPos end, String requirementId, long bedsCount, @Nullable String blueprintId) {
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.requirementId = requirementId;
         this.bedsCount = bedsCount;
-        this.file = Optional.ofNullable(file).orElse(DEFAULT_FILE);
+        this.blueprintId = Optional.ofNullable(blueprintId).orElse(DEFAULT_FILE);
     }
 
     public EssentialBuildingInfo(PacketByteBuf buf) {
@@ -31,7 +31,7 @@ public class EssentialBuildingInfo {
         this.end = buf.readBlockPos();
         this.requirementId = buf.readString();
         this.bedsCount = buf.readLong();
-        this.file = buf.readString();
+        this.blueprintId = buf.readString();
     }
 
     public BlockPos getStart() {
@@ -51,8 +51,8 @@ public class EssentialBuildingInfo {
     }
 
     @NotNull
-    public String getFile() {
-        return file;
+    public String getBlueprintId() {
+        return blueprintId;
     }
 
     public void write(PacketByteBuf buffer) {
@@ -60,6 +60,6 @@ public class EssentialBuildingInfo {
         buffer.writeBlockPos(end);
         buffer.writeString(requirementId);
         buffer.writeLong(bedsCount);
-        buffer.writeString(file);
+        buffer.writeString(blueprintId);
     }
 }

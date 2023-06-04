@@ -20,14 +20,14 @@ import java.util.UUID;
 public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
     private final UUID taskId;
-    private final String blueprintFile;
+    private final String blueprintId;
     private final BlockPos startPos;
     private final BlockRotation rotation;
     private final int floorLevel;
 
-    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
+    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel) {
         this.taskId = taskId;
-        this.blueprintFile = blueprintFile;
+        this.blueprintId = blueprintId;
         this.startPos = startPos;
         this.rotation = rotation;
         this.floorLevel = floorLevel;
@@ -35,7 +35,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
     public ServerboundBlueprintTaskPacket(PacketByteBuf buf) {
         this.taskId = buf.readUuid();
-        this.blueprintFile = buf.readString();
+        this.blueprintId = buf.readString();
         this.startPos = buf.readBlockPos();
         this.rotation = buf.readEnumConstant(BlockRotation.class);
         this.floorLevel = buf.readInt();
@@ -44,7 +44,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeUuid(taskId);
-        buf.writeString(blueprintFile);
+        buf.writeString(blueprintId);
         buf.writeBlockPos(startPos);
         buf.writeEnumConstant(rotation);
         buf.writeInt(floorLevel);
@@ -55,11 +55,11 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
         if(player instanceof final FortressServerPlayerEntity fortressServerPlayer) {
             final var fortressServerManager = this.getFortressServerManager(server, player);
             final ServerBlueprintManager blueprintManager = fortressServerPlayer.getServerBlueprintManager();
-            final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation, floorLevel);
+            final BlueprintTask task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
 
             if(fortressServerManager.isSurvival()) {
                 final var serverResourceManager = fortressServerManager.getServerResourceManager();
-                final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintFile, rotation).getStacks();
+                final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
                 try {
                     serverResourceManager.reserveItems(taskId, stacks);
                 }catch (IllegalStateException e) {
@@ -70,7 +70,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
             }
             Runnable executeBuildTask = () -> fortressServerManager.getTaskManager().addTask(task, fortressServerManager);
             if (floorLevel > 0) {
-                final SimpleSelectionTask digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintFile, rotation);
+                final SimpleSelectionTask digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintId, rotation);
                 digTask.addFinishListener(executeBuildTask);
 
                 fortressServerManager.getTaskManager().addTask(digTask, fortressServerManager);
