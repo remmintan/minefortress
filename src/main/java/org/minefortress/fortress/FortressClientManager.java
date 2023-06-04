@@ -111,11 +111,6 @@ public final class FortressClientManager extends AbstractFortressManager {
         this.selectedColonistDelta = null;
     }
 
-    public Vec3d getProperCameraPosition() {
-        if(!isSelectingColonist()) throw new IllegalStateException("No colonist selected");
-        return this.selectedPawn.getPos().subtract(selectedColonistDelta);
-    }
-
     @Override
     public int getReservedPawnsCount() {
         return reservedColonistCount;
@@ -238,20 +233,19 @@ public final class FortressClientManager extends AbstractFortressManager {
         return Collections.emptyList();
     }
 
-    public boolean isBuildingSelected() {
+    public boolean isBuildingHovered() {
         return hoveredBuilding != null;
     }
 
-    public EssentialBuildingInfo getHoveredBuilding() {
-        return hoveredBuilding;
+    public Optional<EssentialBuildingInfo> getHoveredBuilding() {
+        return Optional.ofNullable(hoveredBuilding);
     }
-    public Optional<String> getHoveredBuildingName() {
-        if(hoveredBuilding == null) return Optional.empty();
-        if(hoveredBuilding.getFile().equals(EssentialBuildingInfo.DEFAULT_FILE))
-            return Optional.empty();
 
-        final var blueprintMetadataManager = ModUtils.getBlueprintManager().getBlueprintMetadataManager();
-        return blueprintMetadataManager.getByFile(hoveredBuilding.getFile())
+    public Optional<String> getHoveredBuildingName() {
+        return getHoveredBuilding()
+                .filter(b -> !b.getFile().equals(EssentialBuildingInfo.DEFAULT_FILE))
+                .map(EssentialBuildingInfo::getFile)
+                .flatMap(it -> ModUtils.getBlueprintManager().getBlueprintMetadataManager().getByFile(it))
                 .map(BlueprintMetadata::getName);
     }
 

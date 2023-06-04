@@ -136,18 +136,26 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        if(fortressManager.isBuildingSelected()){
-            final var hoveredBuilding = fortressManager.getHoveredBuilding();
-            final var professionManager = fortressManager.getProfessionManager();
-            professionManager
-                    .getByRequirement(hoveredBuilding.getRequirementId())
-                    .filter(Profession::isHireMenu)
-                    .ifPresent(it -> professionManager.increaseAmount(professionManager.getIdByProfession(it), false));
-            return;
+
+        if(fortressManager.isBuildingHovered()) {
+            openManageBuildingMenu(fortressManager);
+            cir.setReturnValue(false);
         }
 
         fortressClient.getSelectionManager().selectBlock(pos);
         cir.setReturnValue(false);
+    }
+
+    private static void openManageBuildingMenu(FortressClientManager fortressManager) {
+        fortressManager
+                .getHoveredBuilding()
+                .ifPresent(it -> {
+                    final var professionManager = fortressManager.getProfessionManager();
+                    professionManager
+                            .getByRequirement(it.getRequirementId())
+                            .filter(Profession::isHireMenu)
+                            .ifPresent(req -> professionManager.increaseAmount(professionManager.getIdByProfession(req), false));
+                });
     }
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true)
@@ -225,8 +233,9 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        if(fortressManager.isBuildingSelected()){
-            cir.setReturnValue(ActionResult.PASS);
+        if(fortressManager.isBuildingHovered()){
+            openManageBuildingMenu(fortressManager);
+            cir.setReturnValue(ActionResult.SUCCESS);
             return;
         }
 
@@ -248,7 +257,6 @@ public abstract class FortressClientInteractionManagerMixin {
         if(stackInHand.isEmpty()) {
             cir.setReturnValue(ActionResult.PASS);
         }
-
     }
 
     private static void updateFightSelection(BlockHitResult hitResult, FortressClientManager fortressManager) {
