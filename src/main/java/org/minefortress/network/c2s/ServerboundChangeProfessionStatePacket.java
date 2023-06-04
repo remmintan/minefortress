@@ -32,9 +32,12 @@ public class ServerboundChangeProfessionStatePacket implements FortressC2SPacket
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final ServerProfessionManager manager = this.getFortressServerManager(server, player).getServerProfessionManager();
         if (amountChange == AmountChange.ADD) {
-            final var opt = ProfessionsHireTypes.getHireType(professionId);
-            if(opt.isPresent()) {
-                manager.openHireMenu(opt.get(), player);
+            final var profession = manager.getProfession(professionId);
+            if(profession.isHireMenu()) {
+                final var professionsHireType = ProfessionsHireTypes
+                        .getHireType(professionId)
+                        .orElseThrow(() -> new RuntimeException("Hire type not found for profession: " + professionId));
+                manager.openHireMenu(professionsHireType, player);
             } else {
                 manager.increaseAmount(professionId, false);
             }
