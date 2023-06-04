@@ -60,7 +60,6 @@ public final class ClientBlueprintManager extends BaseClientStructureManager {
         addTaskToTasksHolder(taskId);
         final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket =
                 new ServerboundBlueprintTaskPacket(taskId,
-                        selectedStructure.getId(),
                         selectedStructure.getFile(),
                         getStructureBuildPos(),
                         selectedStructure.getRotation(),

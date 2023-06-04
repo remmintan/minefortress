@@ -20,15 +20,13 @@ import java.util.UUID;
 public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
     private final UUID taskId;
-    private final String blueprintId;
     private final String blueprintFile;
     private final BlockPos startPos;
     private final BlockRotation rotation;
     private final int floorLevel;
 
-    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintId, String blueprintFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
+    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintFile, BlockPos startPos, BlockRotation rotation, int floorLevel) {
         this.taskId = taskId;
-        this.blueprintId = blueprintId;
         this.blueprintFile = blueprintFile;
         this.startPos = startPos;
         this.rotation = rotation;
@@ -37,7 +35,6 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
     public ServerboundBlueprintTaskPacket(PacketByteBuf buf) {
         this.taskId = buf.readUuid();
-        this.blueprintId = buf.readString();
         this.blueprintFile = buf.readString();
         this.startPos = buf.readBlockPos();
         this.rotation = buf.readEnumConstant(BlockRotation.class);
@@ -47,7 +44,6 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeUuid(taskId);
-        buf.writeString(blueprintId);
         buf.writeString(blueprintFile);
         buf.writeBlockPos(startPos);
         buf.writeEnumConstant(rotation);
@@ -61,27 +57,25 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
             final ServerBlueprintManager blueprintManager = fortressServerPlayer.getServerBlueprintManager();
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintFile, startPos, rotation, floorLevel);
 
-            if (player instanceof FortressServerPlayerEntity) {
-                if(fortressServerManager.isSurvival()) {
-                    final var serverResourceManager = fortressServerManager.getServerResourceManager();
-                    final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintFile, rotation).getStacks();
-                    try {
-                        serverResourceManager.reserveItems(taskId, stacks);
-                    }catch (IllegalStateException e) {
-                        LogManager.getLogger().error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
-                        FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
-                        return;
-                    }
+            if(fortressServerManager.isSurvival()) {
+                final var serverResourceManager = fortressServerManager.getServerResourceManager();
+                final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintFile, rotation).getStacks();
+                try {
+                    serverResourceManager.reserveItems(taskId, stacks);
+                }catch (IllegalStateException e) {
+                    LogManager.getLogger().error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
+                    FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
+                    return;
                 }
-                Runnable executeBuildTask = () -> fortressServerManager.getTaskManager().addTask(task, fortressServerManager);
-                if (floorLevel > 0) {
-                    final SimpleSelectionTask digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintFile, rotation);
-                    digTask.addFinishListener(executeBuildTask);
+            }
+            Runnable executeBuildTask = () -> fortressServerManager.getTaskManager().addTask(task, fortressServerManager);
+            if (floorLevel > 0) {
+                final SimpleSelectionTask digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintFile, rotation);
+                digTask.addFinishListener(executeBuildTask);
 
-                    fortressServerManager.getTaskManager().addTask(digTask, fortressServerManager);
-                } else {
-                    executeBuildTask.run();
-                }
+                fortressServerManager.getTaskManager().addTask(digTask, fortressServerManager);
+            } else {
+                executeBuildTask.run();
             }
         }
     }

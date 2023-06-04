@@ -32,11 +32,6 @@ public class BlueprintMetadata {
         return Optional.ofNullable(requirementId).orElse("none");
     }
 
-    public String getId() {
-        return file +"-"+rotation.name();
-    }
-
-
     public int getFloorLevel() {
         return floorLevel;
     }
