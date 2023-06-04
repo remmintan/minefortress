@@ -50,7 +50,6 @@ public final class FortressClientManager extends AbstractFortressManager {
     private BlockPos oldPosAppropriateForCenter;
 
     private BasePawnEntity selectedPawn;
-    private Vec3d selectedColonistDelta;
 
     private List<EssentialBuildingInfo> buildings = new ArrayList<>();
     private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
@@ -78,10 +77,6 @@ public final class FortressClientManager extends AbstractFortressManager {
             return;
         }
         this.selectedPawn = colonist;
-        final Vec3d entityPos = colonist.getPos();
-        final Vec3d playerPos = ModUtils.getClientPlayer().getPos();
-
-        selectedColonistDelta = entityPos.subtract(playerPos);
     }
 
     public void jumpToCampfire() {
@@ -108,7 +103,6 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public void stopSelectingColonist() {
         this.selectedPawn = null;
-        this.selectedColonistDelta = null;
     }
 
     @Override
@@ -327,7 +321,6 @@ public final class FortressClientManager extends AbstractFortressManager {
     public void reset() {
         this.initialized = false;
         this.selectedPawn = null;
-        this.selectedColonistDelta = null;
     }
 
     // getter and setter for state
