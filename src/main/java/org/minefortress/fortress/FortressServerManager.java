@@ -264,9 +264,9 @@ public final class FortressServerManager extends AbstractFortressManager {
             }
 
             final var colonistsCount = this.pawns.size();
-            final var spawnFactor = MathHelper.clampedLerp(84, 99, colonistsCount / 50f);
+            final var spawnFactor = MathHelper.clampedLerp(82, 99, colonistsCount / 50f);
             if(maxColonistsCount == -1 || colonistsCount < maxColonistsCount) {
-                if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) > spawnFactor) {
+                if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) >= spawnFactor) {
                     final long bedsCount = buildings.stream().mapToLong(it -> it.getBedsCount(getWorld())).reduce(0, Long::sum);
                     if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
                         if(player != null) {
