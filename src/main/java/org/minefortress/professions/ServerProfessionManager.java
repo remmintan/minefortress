@@ -130,25 +130,12 @@ public class ServerProfessionManager extends ProfessionManager{
             FortressServerNetworkHelper.send(player, SyncHireProgress.CHANNEL, packet);
         }
 
-        tickCheckProfessionRequirements();
         tickRemoveFromProfession();
 
         if(needsUpdate) {
             ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(getProfessions());
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             needsUpdate = false;
-        }
-    }
-
-    private void tickCheckProfessionRequirements() {
-        for(Profession prof : getProfessions().values()) {
-            if(prof.getAmount() > 0) {
-                final boolean unlocked = isRequirementsFulfilled(prof, CountProfessionals.KEEP, false);
-                if(!unlocked) {
-                    prof.setAmount(prof.getAmount() - 1);
-                    this.scheduleSync();
-                }
-            }
         }
     }
 

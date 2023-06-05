@@ -69,9 +69,7 @@ public abstract class ProfessionManager {
         if(countProfessionals == CountProfessionals.INCREASE) {
             minRequirementCount = profession.getAmount();
         }
-        if(countProfessionals == CountProfessionals.KEEP) {
-            minRequirementCount = profession.getAmount() - 1;
-        }
+
         boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement, minRequirementCount);
         final Profession.BlockRequirement blockRequirement = profession.getBlockRequirement();
         if(Objects.nonNull(blockRequirement)) {
@@ -172,7 +170,6 @@ public abstract class ProfessionManager {
     public abstract void decreaseAmount(String professionId);
 
     public enum CountProfessionals {
-        KEEP,
         INCREASE,
         DONT_COUNT
     }
