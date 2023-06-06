@@ -18,8 +18,6 @@ import java.util.List;
 
 public class Profession {
 
-    private static final int MAX_WIDTH = 150;
-
     private final String title;
     private final ItemStack icon;
     private int amount = 0;
@@ -68,9 +66,9 @@ public class Profession {
         }
 
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            this.description = GuiUtils.splitTextInWordsForLength(fullInfo.description(), MAX_WIDTH);
-            this.unlockMessage = GuiUtils.splitTextInWordsForLength(fullInfo.unlockMessage(), MAX_WIDTH);
-            this.unlockMoreMessage = GuiUtils.splitTextInWordsForLength(fullInfo.unlockMoreMessage(), MAX_WIDTH);
+            this.description = GuiUtils.splitTextInWordsForLength(fullInfo.description());
+            this.unlockMessage = GuiUtils.splitTextInWordsForLength(fullInfo.unlockMessage());
+            this.unlockMoreMessage = GuiUtils.splitTextInWordsForLength(fullInfo.unlockMoreMessage());
         } else {
             this.description = null;
             this.unlockMessage = null;

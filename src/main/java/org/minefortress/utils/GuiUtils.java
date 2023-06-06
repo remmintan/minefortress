@@ -32,6 +32,10 @@ public class GuiUtils {
         return (truncated / 10) + suffix;
     }
 
+    public static List<Text> splitTextInWordsForLength(String text) {
+        return splitTextInWordsForLength(text, 150);
+    }
+
     public static List<Text> splitTextInWordsForLength(String text, int maxWidth) {
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 

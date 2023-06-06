@@ -11,8 +11,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import org.minefortress.professions.ProfessionManager;
 import org.minefortress.professions.Profession;
+import org.minefortress.professions.ProfessionManager;
+import org.minefortress.utils.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +69,6 @@ public class ProfessionWidget extends DrawableHelper {
                 this.drawVerticalLine(matrices, j, m, k, n);
             }
         }
-        if(!isUnlocked(false)) return;
         for (ProfessionWidget child : this.children) {
             child.renderLines(matrices, x, y, bl);
         }
@@ -89,16 +89,15 @@ public class ProfessionWidget extends DrawableHelper {
         matrices.push();
         matrices.translate(0.0, 0.0, 200.0);
         if(unlocked)
-            getTextRenderer().draw(matrices, ""+ getAmount(), x + this.x + 6, y + this.y + 4, 0xFFFFFF);
+            getTextRenderer().draw(matrices, String.valueOf(getAmount()), x + this.x + 6, y + this.y + 4, 0xFFFFFF);
         matrices.pop();
         final String title = profession.getTitle().contains("-") ? profession.getTitle().split("-")[0] : profession.getTitle();
         final String trimmedTitle = getTextRenderer().trimToWidth(title, (int) (PROFESSION_WIDGET_WIDTH - 4));
         final int titleWidth = getTextRenderer().getWidth(trimmedTitle);
         getTextRenderer().draw(matrices, trimmedTitle, x + this.x + 4f  - titleWidth/2f + 13f  , y + this.y + 27, 0xFFFFFF);
 
-        if(!unlocked) return;
-        for (ProfessionWidget advancementWidget : this.children) {
-            advancementWidget.renderWidgets(matrices, x, y);
+        for (ProfessionWidget professionWidget : this.children) {
+            professionWidget.renderWidgets(matrices, x, y);
         }
     }
 
@@ -132,10 +131,10 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     boolean shouldNotRender(int originX, int originY, int mouseX, int mouseY) {
-        final Profession parent = profession.getParent();
-        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent, ProfessionManager.CountProfessionals.DONT_COUNT, false)){
-            return true;
-        }
+//        final Profession parent = profession.getParent();
+//        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent, ProfessionManager.CountProfessionals.DONT_COUNT, false)){
+//            return true;
+//        }
 
         int i = originX + this.x;
         int j = i + 26;
@@ -147,6 +146,8 @@ public class ProfessionWidget extends DrawableHelper {
     public void drawTooltip(MatrixStack matrices, int originX, int originY, int x, int screenWidth) {
         final boolean unlocked = isUnlocked(false);
         final boolean unlockedWithCount = isUnlocked(true);
+
+        final boolean parentUnlocked = parent == null || parent.isUnlocked(false);
 
         AdvancementObtainedStatus status = unlockedWithCount?AdvancementObtainedStatus.OBTAINED:AdvancementObtainedStatus.UNOBTAINED;
         int j = MathHelper.floor((float)this.width);
@@ -165,6 +166,8 @@ public class ProfessionWidget extends DrawableHelper {
             description = this.profession.getDescription();
         } else if(unlocked) {
             description = this.profession.getUnlockMoreMessage();
+        } else if (!parentUnlocked) {
+            description = GuiUtils.splitTextInWordsForLength("You need to unlock the parent profession first!");
         } else {
             description = this.profession.getUnlockMessage();
         }
@@ -184,7 +187,7 @@ public class ProfessionWidget extends DrawableHelper {
         matrices.push();
         matrices.translate(0.0, 0.0, 200.0);
         if(unlocked)
-            getTextRenderer().draw(matrices, ""+ getAmount(), m + 6, originY + this.y + 4, 0xFFFFFFFF);
+            getTextRenderer().draw(matrices, String.valueOf(getAmount()), m + 6, originY + this.y + 4, 0xFFFFFFFF);
         matrices.pop();
         if (bl) {
             this.client.textRenderer.drawWithShadow(matrices, title, (float)(m + 5), (float)(originY + this.y + 9), 0xffffffff);

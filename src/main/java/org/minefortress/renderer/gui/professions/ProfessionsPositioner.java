@@ -36,15 +36,8 @@ public class ProfessionsPositioner {
     }
 
     private ProfessionsPositioner findChildrenRecursively(ProfessionWidget profession, ProfessionsPositioner lastChild) {
-        final ProfessionWidget parent = profession.getParent();
-        if(parent == null || parent.isUnlocked(false)) {
-            lastChild = new ProfessionsPositioner(profession, this, lastChild, this.children.size() + 1, this.depth + 1);
-            this.children.add(lastChild);
-        } else {
-            for(ProfessionWidget widget : profession.getChildren()) {
-                lastChild = this.findChildrenRecursively(widget, lastChild);
-            }
-        }
+        lastChild = new ProfessionsPositioner(profession, this, lastChild, this.children.size() + 1, this.depth + 1);
+        this.children.add(lastChild);
 
         return lastChild;
     }
@@ -60,7 +53,7 @@ public class ProfessionsPositioner {
             professionPositioner = child.onFinishCalculation(professionPositioner == null ? child : professionPositioner);
         }
         this.onFinishChildrenCalculation();
-        float f = (this.children.get((int)0).row + this.children.get((int)(this.children.size() - 1)).row) / 2.0f;
+        float f = (this.children.get(0).row + this.children.get(this.children.size() - 1).row) / 2.0f;
         if (this.previousSibling != null) {
             this.row = this.previousSibling.row + 1.0f;
             this.relativeRowInSiblings = this.row - f;
@@ -138,6 +131,8 @@ public class ProfessionsPositioner {
             professionPositioner = professionPositioner.getFirstChild();
             professionPositioner4 = professionPositioner4.getFirstChild();
             professionPositioner2 = professionPositioner2.getLastChild();
+            if(professionPositioner2==null)
+                throw new IllegalStateException("ProfessionPositioner2 is null");
             professionPositioner2.optionalLast = this;
             float j = professionPositioner3.row + h - (professionPositioner.row + f) + 1.0f;
             if (j > 0.0f) {
@@ -147,6 +142,8 @@ public class ProfessionsPositioner {
             }
             h += professionPositioner3.relativeRowInSiblings;
             f += professionPositioner.relativeRowInSiblings;
+            if(professionPositioner4==null)
+                throw new IllegalStateException("ProfessionPositioner4 is null");
             i += professionPositioner4.relativeRowInSiblings;
             g += professionPositioner2.relativeRowInSiblings;
         }
