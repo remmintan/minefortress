@@ -1,0 +1,71 @@
+name: Release new version on TAG push
+
+on:
+  push:
+    tags:
+      - '1.*.*'
+
+jobs:
+  remove-all:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: build
+        env:
+          GITHUB_USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+
+      - name: Publish to GitHub Packages
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: publishAllPublicationsToGitHubPackagesRepository
+        env:
+          GITHUB_USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_NUMBER: ${{ github.run_number }}
+
+      - name: Retrieve all commit messages between the latest two tags
+        id: get_commits
+        run: |
+          export commitsText=$(git log --format=%s $(git describe --tags --abbrev=0 $(git describe --tags --abbrev=0 HEAD)^)..$(git describe --tags --abbrev=0 HEAD))
+          echo "Commits texts: $commitsText"
+          echo "commitsTexts=$commitsText" >> $GITHUB_OUTPUT
+          
+      - name: OpenAI CreateCompletion
+        uses: onmax/oai-createcompletion-githubaction@v1.0
+        id: openai
+        with:
+          model: ${{ env.OPEN_AI_MODEL_NAME }}
+          prompt: ${{ steps.get_commits.outputs.commitsTexts }}
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          max_tokens: 1000
+
+      - name: create-release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ github.ref_name }}
+          name: MineFortress ${{ github.ref_name }}
+          body: ${{ fromJson(steps.openai.outputs.response).texts }}
+          prerelease: false
+          allowUpdates: true

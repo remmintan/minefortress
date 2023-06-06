@@ -12,7 +12,11 @@ if(System.getenv("BUILD_NUMBER") != null) {
 	version = "${project.mod_version}+${System.getenv("BUILD_NUMBER")}"
 } else {
 	archivesBaseName = project.archives_base_name
-	version =  project.mod_version
+	if(System.getenv("TAG_NAME") != null) {
+		version = System.getenv("TAG_NAME")
+	} else {
+		version = project.mod_version
+	}
 }
 
 group = project.maven_group
