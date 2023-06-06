@@ -41,14 +41,14 @@ jobs:
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BUILD_NUMBER: ${{ github.run_number }}
+          TAG_NAME: ${{ github.ref_name }}
 
       - name: Retrieve all commit messages between the latest two tags
         id: get_commits
         run: |
-          export commitsText=$(git log --format=%s $(git describe --tags --abbrev=0 $(git describe --tags --abbrev=0 HEAD)^)..$(git describe --tags --abbrev=0 HEAD))
-          echo "Commits texts: $commitsText"
-          echo "commitsTexts=$commitsText" >> $GITHUB_OUTPUT
+          export commitsText=$(git log --format=%s $(git describe --tags --abbrev=0 $(git describe --tags --abbrev=0 HEAD)^)..$(git describe --tags --abbrev=0 HEAD) | tr '\n' '\\n')
+          echo "Commits texts: TAG: ${{github.ref_name}}\\n$commitsText"
+          echo "commitsTexts=TAG: ${{github.ref_name}}\\n$commitsText" >> $GITHUB_OUTPUT
           
       - name: OpenAI CreateCompletion
         uses: onmax/oai-createcompletion-githubaction@v1.0
