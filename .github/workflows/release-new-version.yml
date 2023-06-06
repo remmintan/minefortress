@@ -6,7 +6,7 @@ on:
       - '1.*.*'
 
 jobs:
-  remove-all:
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -43,6 +43,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ github.ref_name }}
 
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Retrieve all commit messages between the latest two tags
         id: get_commits
         run: |
@@ -54,7 +64,7 @@ jobs:
         uses: onmax/oai-createcompletion-githubaction@v1.0
         id: openai
         with:
-          model: ${{ env.OPEN_AI_MODEL_NAME }}
+          model: ${{ vars.OPEN_AI_MODEL_NAME }}
           prompt: ${{ steps.get_commits.outputs.commitsTexts }}
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
           max_tokens: 1000
