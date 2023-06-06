@@ -4,6 +4,8 @@ import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import org.apache.logging.log4j.util.Strings;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.minefortress.fortress.AbstractFortressManager;
 
 import java.io.IOException;
@@ -33,7 +35,7 @@ public abstract class ProfessionManager {
     );
 
     private Profession root;
-    private final Map<String, Profession> professions = new HashMap<>();
+    private Map<String, Profession> professions = Collections.emptyMap();
     protected final Supplier<AbstractFortressManager> fortressManagerSupplier;
 
     public ProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
@@ -103,8 +105,14 @@ public abstract class ProfessionManager {
                 .findFirst();
     }
 
+    @Unmodifiable
+    @NotNull
     protected Map<String, Profession> getProfessions(){
         return this.professions;
+    }
+
+    protected void setProfessions(Map<String, Profession> professions) {
+        this.professions = Collections.unmodifiableMap(professions);
     }
 
     public boolean hasProfession(String name) {

@@ -36,7 +36,6 @@ public class ServerProfessionManager extends ProfessionManager{
 
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
     private final MinecraftServer server;
-    private boolean professionsRead = false;
     private List<ProfessionFullInfo> professionsInfos;
     private String professionsTree;
     private boolean needsUpdate = false;
@@ -146,14 +145,15 @@ public class ServerProfessionManager extends ProfessionManager{
     }
 
     private void initProfessionsIfNeeded() {
-        if(!professionsRead) {
-            getProfessions().clear();
+        if(getProfessions().isEmpty()) {
             final var professionsReader = new ProfessionsReader(server);
             professionsInfos = professionsReader.readProfessions();
             professionsTree = professionsReader.readTreeJson();
-            professionsInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
+            final var professionsMap = professionsInfos
+                    .stream()
+                    .collect(Collectors.toMap(ProfessionFullInfo::key, Profession::new));
+            setProfessions(professionsMap);
             profToEntityMapper.read(server);
-            professionsRead = true;
         }
     }
 

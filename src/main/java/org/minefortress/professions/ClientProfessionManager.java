@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class ClientProfessionManager extends ProfessionManager {
 
@@ -19,8 +20,8 @@ public class ClientProfessionManager extends ProfessionManager {
     }
 
     public void initProfessions(List<ProfessionFullInfo> fullInfos, String treeJson) {
-        getProfessions().clear();
-        fullInfos.forEach(it -> getProfessions().put(it.key(), new Profession(it)));
+        final var professionsMap = fullInfos.stream().collect(Collectors.toMap(ProfessionFullInfo::key, Profession::new));
+        super.setProfessions(professionsMap);
         super.createProfessionTree(treeJson);
     }
 
