@@ -69,13 +69,17 @@ jobs:
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
           max_tokens: 1000
 
-      - name: create-release
-        uses: ncipollo/release-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag: ${{ github.ref_name }}
-          name: MineFortress ${{ github.ref_name }}
-          body: ${{ fromJson(steps.openai.outputs.response).texts }}
-          prerelease: false
-          allowUpdates: true
+      - name: Print response
+        run: |
+          echo "Response: ${{ steps.openai.outputs.response }}"
+
+#      - name: create-release
+#        uses: ncipollo/release-action@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag: ${{ github.ref_name }}
+#          name: MineFortress ${{ github.ref_name }}
+#          body: ${{ fromJson(steps.openai.outputs.response).texts }}
+#          prerelease: false
+#          allowUpdates: true
