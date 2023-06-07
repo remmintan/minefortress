@@ -56,30 +56,23 @@ jobs:
       - name: Retrieve all commit messages between the latest two tags
         id: get_commits
         run: |
-          export commitsText=$(git log --format=%s $(git describe --tags --abbrev=0 $(git describe --tags --abbrev=0 HEAD)^)..$(git describe --tags --abbrev=0 HEAD) | tr '\n' '\\n')
-          echo "Commits texts: TAG: ${{github.ref_name}}\\n$commitsText"
-          echo "commitsTexts=TAG: ${{github.ref_name}}\\n$commitsText" >> $GITHUB_OUTPUT
+          export commitsText=$(./prepare-commits-texts.sh)
+          echo "$commitsText"
+          echo "commitsTexts=$commitsText" >> $GITHUB_OUTPUT
           
       - name: OpenAI CreateCompletion
-        uses: onmax/oai-createcompletion-githubaction@v1.0
         id: openai
-        with:
-          model: ${{ vars.OPEN_AI_MODEL_NAME }}
-          prompt: ${{ steps.get_commits.outputs.commitsTexts }}
-          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
-          max_tokens: 1000
-
-      - name: Print response
         run: |
-          echo "Response: ${{ steps.openai.outputs.response }}"
+          export response=$(./create-release-text.sh ${{secret.OPENAI_API_KEY}} "${{ steps.get_commits.outputs.commitsTexts }} ${{ vars.OPEN_AI_MODEL_NAME }})
+          echo ${{ fromJson(response).choices[0].text }}
 
-#      - name: create-release
-#        uses: ncipollo/release-action@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag: ${{ github.ref_name }}
-#          name: MineFortress ${{ github.ref_name }}
-#          body: ${{ fromJson(steps.openai.outputs.response).texts }}
-#          prerelease: false
-#          allowUpdates: true
+      - name: create-release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ github.ref_name }}
+          name: MineFortress ${{ github.ref_name }}
+          body: ${{ fromJson(steps.openai.outputs.response).choices[0].text }}
+          prerelease: false
+          allowUpdates: true
