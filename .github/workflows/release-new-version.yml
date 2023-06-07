@@ -46,7 +46,7 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - uses: actions/checkout@v3
