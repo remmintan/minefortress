@@ -64,7 +64,10 @@ jobs:
         id: openai
         run: |
           export response=$(./create-release-text.sh ${{secrets.OPENAI_API_KEY}} "${{ steps.get_commits.outputs.commitsTexts }}" ${{ vars.OPEN_AI_MODEL_NAME }})
+          echo "Response:"
+          echo ""
           echo "$response"
+          echo "response=$response" >> $GITHUB_OUTPUT
 
       - name: Create Release on GitHub
         uses: ncipollo/release-action@v1
