@@ -63,7 +63,7 @@ jobs:
       - name: OpenAI CreateCompletion
         id: openai
         run: |
-          export response=$(./create-release-text.sh ${{secrets.OPENAI_API_KEY}} "${{ steps.get_commits.outputs.commitsTexts }} ${{ vars.OPEN_AI_MODEL_NAME }})
+          export response=$(./create-release-text.sh ${{secrets.OPENAI_API_KEY}} "${{ steps.get_commits.outputs.commitsTexts }}" ${{ vars.OPEN_AI_MODEL_NAME }})
           echo "$response"
 
       - name: Create Release on GitHub
