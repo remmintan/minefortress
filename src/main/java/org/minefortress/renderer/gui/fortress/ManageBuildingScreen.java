@@ -73,7 +73,7 @@ public class ManageBuildingScreen extends WindowScreen {
                                 Text.of("Hire pawns"),
                                 button -> ModUtils
                                         .getProfessionManager()
-                                        .increaseAmount(buildingInfo.getRequirementId(), false)
+                                        .increaseAmount(it.getId(), false)
                         )
                 );
             }

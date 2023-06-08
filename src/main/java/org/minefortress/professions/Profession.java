@@ -18,6 +18,7 @@ import java.util.List;
 
 public class Profession {
 
+    private final String id;
     private final String title;
     private final ItemStack icon;
     private int amount = 0;
@@ -35,6 +36,7 @@ public class Profession {
     private final List<Profession> children = new ArrayList<>();
 
     public Profession(ProfessionFullInfo fullInfo) {
+        this.id = fullInfo.key();
         this.title = fullInfo.title();
         this.icon = new ItemStack(fullInfo.icon());
         this.hireMenu = fullInfo.hireMenu();
@@ -74,6 +76,10 @@ public class Profession {
             this.unlockMessage = null;
             this.unlockMoreMessage = null;
         }
+    }
+
+    public String getId() {
+        return id;
     }
 
     public boolean isHireMenu() {
