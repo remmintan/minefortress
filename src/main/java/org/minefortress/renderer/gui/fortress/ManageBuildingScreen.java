@@ -98,11 +98,19 @@ public class ManageBuildingScreen extends WindowScreen {
             final var packet = new C2SDestroyBuilding(buildingInfo.getId());
             FortressClientNetworkHelper.send(C2SDestroyBuilding.CHANNEL, packet);
             super.closeScreen();
+        } else {
+            if(this.client != null)
+                this.client.setScreen(null);
         }
     }
 
     @Override
     public Text getTitle() {
         return screenName;
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc() {
+        return true;
     }
 }
