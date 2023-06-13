@@ -26,8 +26,6 @@ public final class StrctureBlockData {
                 Items.DIRT,
                 Items.GRASS_BLOCK,
                 Items.DIRT_PATH,
-                Items.GLASS,
-                Items.GLASS_PANE,
                 Items.WHITE_BED,
                 Items.ORANGE_BED,
                 Items.MAGENTA_BED,

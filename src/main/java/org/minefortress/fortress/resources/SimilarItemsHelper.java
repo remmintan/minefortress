@@ -71,6 +71,46 @@ public class SimilarItemsHelper {
             Items.WARPED_FENCE_GATE
     );
 
+    private static final List<Item> similarGlass = Arrays.asList(
+            Items.GLASS,
+            Items.WHITE_STAINED_GLASS,
+            Items.ORANGE_STAINED_GLASS,
+            Items.MAGENTA_STAINED_GLASS,
+            Items.LIGHT_BLUE_STAINED_GLASS,
+            Items.YELLOW_STAINED_GLASS,
+            Items.LIME_STAINED_GLASS,
+            Items.PINK_STAINED_GLASS,
+            Items.GRAY_STAINED_GLASS,
+            Items.LIGHT_GRAY_STAINED_GLASS,
+            Items.CYAN_STAINED_GLASS,
+            Items.PURPLE_STAINED_GLASS,
+            Items.BLUE_STAINED_GLASS,
+            Items.BROWN_STAINED_GLASS,
+            Items.GREEN_STAINED_GLASS,
+            Items.RED_STAINED_GLASS,
+            Items.BLACK_STAINED_GLASS
+    );
+
+    private static final List<Item> similarGlassPanes = Arrays.asList(
+            Items.GLASS_PANE,
+            Items.WHITE_STAINED_GLASS_PANE,
+            Items.ORANGE_STAINED_GLASS_PANE,
+            Items.MAGENTA_STAINED_GLASS_PANE,
+            Items.LIGHT_BLUE_STAINED_GLASS_PANE,
+            Items.YELLOW_STAINED_GLASS_PANE,
+            Items.LIME_STAINED_GLASS_PANE,
+            Items.PINK_STAINED_GLASS_PANE,
+            Items.GRAY_STAINED_GLASS_PANE,
+            Items.LIGHT_GRAY_STAINED_GLASS_PANE,
+            Items.CYAN_STAINED_GLASS_PANE,
+            Items.PURPLE_STAINED_GLASS_PANE,
+            Items.BLUE_STAINED_GLASS_PANE,
+            Items.BROWN_STAINED_GLASS_PANE,
+            Items.GREEN_STAINED_GLASS_PANE,
+            Items.RED_STAINED_GLASS_PANE,
+            Items.BLACK_STAINED_GLASS_PANE
+    );
+
     public static boolean isIgnorable(Item it) {
         final var defaultStack = it.getDefaultStack();
         return StrctureBlockData.IGNORED_ITEMS.contains(it) ||
@@ -80,20 +120,28 @@ public class SimilarItemsHelper {
     }
 
     public static List<Item> getSimilarItems(Item item) {
-        if(strippedLogs.contains(item)) {
+        if (strippedLogs.contains(item)) {
             return strippedLogs.stream().filter(i -> i != item).toList();
         }
 
-        if(strippedWood.contains(item)) {
+        if (strippedWood.contains(item)) {
             return strippedWood.stream().filter(i -> i != item).toList();
         }
 
-        if(similarDirt.contains(item)) {
+        if (similarDirt.contains(item)) {
             return similarDirt.stream().filter(i -> i != item).toList();
         }
 
-        if(similarFenceGate.contains(item)) {
+        if (similarFenceGate.contains(item)) {
             return similarFenceGate.stream().filter(i -> i != item).toList();
+        }
+
+        if (similarGlass.contains(item)) {
+            return similarGlass.stream().filter(i -> i != item).toList();
+        }
+
+        if (similarGlassPanes.contains(item)) {
+            return similarGlassPanes.stream().filter(i -> i != item).toList();
         }
 
         return getItemTag(item)
@@ -105,6 +153,7 @@ public class SimilarItemsHelper {
                                 .filter(it -> !strippedWood.contains(it))
                                 .filter(it -> !similarDirt.contains(it))
                                 .filter(it -> !similarFenceGate.contains(it))
+                                .filter(it -> !similarGlass.contains(it))
                                 .toList()
                 )
                 .orElse(Collections.emptyList());
@@ -116,8 +165,8 @@ public class SimilarItemsHelper {
     }
 
     public static List<Item> getItems(TagKey<Item> tag) {
-        var items  = new ArrayList<Item>();
-        for(var it: Registry.ITEM.iterateEntries(tag)) {
+        var items = new ArrayList<Item>();
+        for (var it : Registry.ITEM.iterateEntries(tag)) {
             items.add(it.value());
         }
         return Collections.unmodifiableList(items);
