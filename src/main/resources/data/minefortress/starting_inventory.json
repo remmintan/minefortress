@@ -12,6 +12,14 @@
     "amount": 32
   },
   {
+    "item": "minecraft:glass",
+    "amount": 16
+  },
+  {
+    "item": "minecraft:glass_pane",
+    "amount": 32
+  },
+  {
     "item": "minecraft:cooked_beef",
     "amount": 16
   },
