@@ -67,7 +67,6 @@ dependencies {
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.2.0+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.2.0+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.2.0+minefortress")
-
 }
 
 processResources {

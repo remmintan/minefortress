@@ -56,14 +56,14 @@ jobs:
       - name: Retrieve all commit messages between the latest two tags
         id: get_commits
         run: |
-          export commitsText=$(./prepare-commits-texts.sh)
+          export commitsText=$(./automation-scripts/prepare-commits-texts.sh)
           echo "$commitsText"
           echo "commitsTexts=$commitsText" >> $GITHUB_OUTPUT
           
       - name: OpenAI CreateCompletion
         id: openai
         run: |
-          export response=$(./create-release-text.sh ${{secrets.OPENAI_API_KEY}} "${{ steps.get_commits.outputs.commitsTexts }}" ${{ vars.OPEN_AI_MODEL_NAME }})
+          export response=$(./automation-scripts/create-release-text.sh ${{secrets.OPENAI_API_KEY}} "${{ steps.get_commits.outputs.commitsTexts }}" ${{ vars.OPEN_AI_MODEL_NAME }})
           echo "Response:"
           echo ""
           echo "$response"
