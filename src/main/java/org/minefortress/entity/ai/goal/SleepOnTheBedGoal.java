@@ -83,7 +83,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
 
     private void moveToBed() {
         if(bedPos == null) return;
-        colonist.getMovementHelper().set(bedPos, Colonist.SLOW_MOVEMENT_SPEED);
+        colonist.getMovementHelper().goTo(bedPos, Colonist.SLOW_MOVEMENT_SPEED);
     }
 
     private boolean hasReachedTheBed() {

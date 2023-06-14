@@ -61,10 +61,10 @@ public class FarmerDailyTask implements ProfessionDailyTask{
                 if(!this.farmIterator.hasNext()) return;
                 this.goal = this.farmIterator.next();
             } while(goalAlreadyInCorrectState(colonist));
-            movementHelper.set(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
+            movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
         if(this.goal != null && movementHelper.getWorkGoal() == null) {
-            movementHelper.set(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
+            movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
 
         if(movementHelper.hasReachedWorkGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone()) {
@@ -111,7 +111,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
                     final var blockItem = (BlockItem) seedsOpt.get();
                     final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlock, blockItem.getBlock().getDefaultState());
                     colonist.setGoal(bsTaskBlockInfo);
-                    movementHelper.set(aboveBlock, Colonist.FAST_MOVEMENT_SPEED);
+                    movementHelper.goTo(aboveBlock, Colonist.FAST_MOVEMENT_SPEED);
                 } else {
                     this.goal = null;
                 }

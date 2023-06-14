@@ -7,8 +7,6 @@ import baritone.api.minefortress.IMinefortressEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -16,14 +14,12 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -41,7 +37,7 @@ import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.Optional;
 
-public final class Colonist extends NamedPawnEntity implements RangedAttackMob, IMinefortressEntity, IFortressColonist, IWorkerPawn {
+public final class Colonist extends NamedPawnEntity implements IMinefortressEntity, IFortressColonist, IWorkerPawn {
 
     public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;
@@ -150,7 +146,8 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
         super.initGoals();
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new MeleeAttackGoal(this));
-        this.goalSelector.add(3, new FleeEntityGoal<>(this, HostileEntity.class, 5, 1.5D, 2.1D));
+        this.goalSelector.add(3, new FleeEntityGoal<>(this, CreeperEntity.class, 5, 1.5D, 2.1D));
+
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
         this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
@@ -158,7 +155,8 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
 
-        this.targetSelector.add(1, new ActiveTargetGoal<>(this, HostileEntity.class, true));
+        this.targetSelector.add(1, new RevengeGoal(this, Colonist.class).setGroupRevenge());
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
     }
 
     @Override
@@ -290,7 +288,7 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
 
     @Override
     public boolean isPushedByFluids() {
-        return this.doesNotHaveTask();
+        return !this.hasTask();
     }
 
     @Override
@@ -365,20 +363,7 @@ public final class Colonist extends NamedPawnEntity implements RangedAttackMob, 
         this.dataTracker.set(HAS_TASK, hasTask);
     }
 
-    private boolean doesNotHaveTask() {
-        return !this.dataTracker.get(HAS_TASK);
+    public boolean hasTask() {
+        return this.dataTracker.get(HAS_TASK);
     }
-
-    @Override
-    public void attack(LivingEntity target, float pullProgress) {
-        final var arrow = ProjectileUtil.createArrowProjectile(this, new ItemStack(Items.ARROW), pullProgress);
-        double d = target.getX() - this.getX();
-        double e = target.getBodyY(0.3333333333333333) - arrow.getY();
-        double f = target.getZ() - this.getZ();
-        double g = Math.sqrt(d * d + f * f);
-        arrow.setVelocity(d, e + g * (double)0.2f, f, 1.6f, 4);
-        this.playSound(SoundEvents.ENTITY_ARROW_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
-        this.world.spawnEntity(arrow);
-    }
-
 }

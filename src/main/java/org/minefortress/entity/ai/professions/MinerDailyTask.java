@@ -42,7 +42,7 @@ public class MinerDailyTask implements ProfessionDailyTask{
         }
 
         if (goal != null && movementHelper.getWorkGoal() == null) {
-            movementHelper.set(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
+            movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
 
         if (movementHelper.hasReachedWorkGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone())

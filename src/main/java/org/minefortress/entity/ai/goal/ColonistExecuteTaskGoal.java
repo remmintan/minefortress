@@ -55,7 +55,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         }
 
         if(getMovementHelper().getWorkGoal() == null) {
-            getMovementHelper().set(workGoal, Colonist.FAST_MOVEMENT_SPEED);
+            getMovementHelper().goTo(workGoal, Colonist.FAST_MOVEMENT_SPEED);
         }
 
         if(getMovementHelper().hasReachedWorkGoal()) {
@@ -138,7 +138,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
             return;
         }
         LOGGER.debug("{} setting work goal {}", getColonistName(), taskBlockInfo);
-        getMovementHelper().set(workGoal, Colonist.FAST_MOVEMENT_SPEED);
+        getMovementHelper().goTo(workGoal, Colonist.FAST_MOVEMENT_SPEED);
         LOGGER.debug("{} setting goal for colonist {}", getColonistName(), taskBlockInfo);
         colonist.setGoal(taskBlockInfo);
     }

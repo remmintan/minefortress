@@ -49,7 +49,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
         if(randPos.isEmpty()) return;
 
 
-        colonist.getMovementHelper().set(randPos.get().up(), Colonist.SLOW_MOVEMENT_SPEED);
+        colonist.getMovementHelper().goTo(randPos.get().up(), Colonist.SLOW_MOVEMENT_SPEED);
         if(colonist.isSleeping()) {
             colonist.wakeUp();
         }

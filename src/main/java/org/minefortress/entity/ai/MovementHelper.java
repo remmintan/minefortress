@@ -6,6 +6,7 @@ import baritone.api.event.listener.AbstractGameEventListener;
 import baritone.api.pathing.calc.IPath;
 import baritone.api.pathing.goals.GoalNear;
 import baritone.api.utils.BetterBlockPos;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.slf4j.Logger;
@@ -37,7 +38,9 @@ public class MovementHelper {
         this.lastPos = null;
         this.stuckTicks = 0;
         this.stuck = false;
+        this.colonist.getNavigation().stop();
         this.baritone.getPathingBehavior().cancelEverything();
+        this.baritone.getFollowProcess().cancel();
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
         this.baritone.settings().allowParkour.set(true);
     }
@@ -50,7 +53,7 @@ public class MovementHelper {
         return workGoal;
     }
 
-    public void set(BlockPos goal, float speed) {
+    public void goTo(BlockPos goal, float speed) {
         if(workGoal != null && workGoal.equals(goal)) {
             LOGGER.debug("{} trying to set new goal, but current goal is the same", getColonistName());
             return;
@@ -59,9 +62,7 @@ public class MovementHelper {
         this.reset();
         this.workGoal = goal;
         if(this.workGoal == null) return;
-        this.colonist.setAllowToPlaceBlockFromFarAway(false);
         this.colonist.setMovementSpeed(speed);
-        this.colonist.getNavigation().stop();
         if(this.hasReachedWorkGoal()){
             LOGGER.debug("{} the goal {} is already reached", getColonistName(), goal);
             return;
@@ -70,6 +71,13 @@ public class MovementHelper {
             colonist.wakeUp();
         }
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
+    }
+
+    public void follow(LivingEntity entity) {
+        this.reset();
+        baritone.settings().followRadius.set((int)Colonist.WORK_REACH_DISTANCE);
+        colonist.setMovementSpeed(Colonist.FAST_MOVEMENT_SPEED);
+        baritone.getFollowProcess().follow(it -> it.equals(entity));
     }
 
     public boolean hasReachedWorkGoal() {
