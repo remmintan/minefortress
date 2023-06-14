@@ -8,7 +8,6 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -25,27 +24,29 @@ public class ClientProfessionManager extends ProfessionManager {
         super.createProfessionTree(treeJson);
     }
 
-    public String getIdByProfession(Profession profession) {
-        return getProfessions().entrySet().stream()
-                .filter(it -> it.getValue().equals(profession))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(null);
-    }
-
     @Override
     public void increaseAmount(String professionId, boolean alreadyCharged) {
         if("colonist".equals(professionId)) return;
+        final var profession = this.getProfession(professionId);
+        final var unlockedForNormalIncrease = super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
+        final var unlockedForHireMenu = super.isRequirementsFulfilled(profession, CountProfessionals.DONT_COUNT, false);
         if(
-                super.isRequirementsFulfilled(this.getProfession(professionId), CountProfessionals.INCREASE, true)
-                ||
-                this.getProfession(professionId).isHireMenu() && super.isRequirementsFulfilled(this.getProfession(professionId), CountProfessionals.DONT_COUNT, false)
+            unlockedForNormalIncrease == ProfessionResearchState.UNLOCKED ||
+            profession.isHireMenu() && unlockedForHireMenu == ProfessionResearchState.UNLOCKED
         ) {
             final ServerboundChangeProfessionStatePacket.AmountChange change =
                     ServerboundChangeProfessionStatePacket.AmountChange.ADD;
             final ServerboundChangeProfessionStatePacket packet =
                     new ServerboundChangeProfessionStatePacket(professionId, change);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
+        } else if(profession.isHireMenu() && unlockedForHireMenu == ProfessionResearchState.LOCKED_PARENT) {
+            final var parent = profession.getParent();
+            final var message = new LiteralText("§cCan't hire " + profession.getTitle() + "§c. " +
+                    "You need to unlock the " + parent.getTitle() + "§c profession first.");
+            MinecraftClient.getInstance().setScreen(null);
+
+            Optional.ofNullable(MinecraftClient.getInstance().player)
+                    .ifPresent(it -> it.sendMessage(message, false));
         }
     }
 

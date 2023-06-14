@@ -2,6 +2,7 @@ package org.minefortress.professions.hire;
 
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.professions.ProfessionManager;
+import org.minefortress.professions.ProfessionResearchState;
 import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.*;
@@ -82,7 +83,7 @@ public class ServerHireHandler {
 
     private boolean professionUnlocked(String it) {
         final var profession = professionManager.getProfession(it);
-        return professionManager.isRequirementsFulfilled(profession, ProfessionManager.CountProfessionals.DONT_COUNT, false);
+        return professionManager.isRequirementsFulfilled(profession, ProfessionManager.CountProfessionals.DONT_COUNT, false) == ProfessionResearchState.UNLOCKED;
     }
 
     private static class HireRequest {

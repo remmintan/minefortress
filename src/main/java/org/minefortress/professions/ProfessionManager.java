@@ -46,24 +46,24 @@ public abstract class ProfessionManager {
         return this.root;
     }
 
-    public final boolean isRequirementsFulfilled(Profession profession, CountProfessionals countProfessionals, boolean countItems) {
+    public final ProfessionResearchState isRequirementsFulfilled(Profession profession, CountProfessionals countProfessionals, boolean countItems) {
         final String buildingRequirement = profession.getBuildingRequirement();
         if(Objects.isNull(buildingRequirement) || Strings.isBlank(buildingRequirement)) {
-            return true;
+            return ProfessionResearchState.UNLOCKED;
         }
 
         final Profession parent = profession.getParent();
         if(Objects.nonNull(parent)) {
-            final boolean parentUnlocked = this.isRequirementsFulfilled(parent, CountProfessionals.DONT_COUNT, false);
-            if(!parentUnlocked) {
-                return false;
+            final var parentState = this.isRequirementsFulfilled(parent, CountProfessionals.DONT_COUNT, false);
+            if(parentState != ProfessionResearchState.UNLOCKED) {
+                return ProfessionResearchState.LOCKED_PARENT;
             }
         }
 
         final var disabled = "_".equals(buildingRequirement) &&
                 Optional.ofNullable(profession.getBlockRequirement()).map(it -> it.block() == null).orElse(true);
         if(fortressManagerSupplier.get().isCreative() && !disabled) {
-            return true;
+            return ProfessionResearchState.UNLOCKED;
         }
 
         final AbstractFortressManager fortressManager = fortressManagerSupplier.get();
@@ -86,7 +86,7 @@ public abstract class ProfessionManager {
             }
         }
 
-        return satisfied;
+        return satisfied ? ProfessionResearchState.UNLOCKED : ProfessionResearchState.LOCKED_SELF;
     }
 
     public Profession getProfession(String id) {

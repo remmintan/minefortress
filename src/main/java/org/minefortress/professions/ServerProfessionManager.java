@@ -67,7 +67,7 @@ public class ServerProfessionManager extends ProfessionManager{
             }
             final var canHire = isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
             final var abstractFortressManager = fortressManagerSupplier.get();
-            if(canHire && getFreeColonists() > 0 && abstractFortressManager instanceof FortressServerManager fsm) {
+            if(canHire == ProfessionResearchState.UNLOCKED && getFreeColonists() > 0 && abstractFortressManager instanceof FortressServerManager fsm) {
                 final var resourceManager = (ServerResourceManager) abstractFortressManager
                         .getResourceManager();
                 resourceManager.removeItems(profession.getItemsRequirement());
@@ -92,7 +92,7 @@ public class ServerProfessionManager extends ProfessionManager{
         } else {
             if(super.getFreeColonists() <= 0) return;
         }
-        if(!super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, !itemsAlreadyCharged)) return;
+        if(super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, !itemsAlreadyCharged) != ProfessionResearchState.UNLOCKED) return;
 
         if(!itemsAlreadyCharged) {
             final var resourceManager = (ServerResourceManager) fortressManagerSupplier

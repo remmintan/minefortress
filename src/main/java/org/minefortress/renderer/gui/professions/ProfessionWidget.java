@@ -13,6 +13,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.minefortress.professions.Profession;
 import org.minefortress.professions.ProfessionManager;
+import org.minefortress.professions.ProfessionResearchState;
 import org.minefortress.utils.GuiUtils;
 
 import java.util.ArrayList;
@@ -75,8 +76,8 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     public void renderWidgets(MatrixStack matrices, int x, int y){
-        final boolean unlockedWithCount = isUnlocked(true);
-        final boolean unlocked = isUnlocked(false);
+        final boolean unlockedWithCount = isUnlocked(true) == ProfessionResearchState.UNLOCKED;
+        final boolean unlocked = isUnlocked(false) == ProfessionResearchState.UNLOCKED;
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
@@ -144,10 +145,10 @@ public class ProfessionWidget extends DrawableHelper {
     }
 
     public void drawTooltip(MatrixStack matrices, int originX, int originY, int x, int screenWidth) {
-        final boolean unlocked = isUnlocked(false);
-        final boolean unlockedWithCount = isUnlocked(true);
+        final var unlocked = isUnlocked(false) == ProfessionResearchState.UNLOCKED;
+        final var unlockedWithCount = isUnlocked(true) == ProfessionResearchState.UNLOCKED;
 
-        final boolean parentUnlocked = parent == null || parent.isUnlocked(false);
+        final boolean parentUnlocked = isUnlocked(false) != ProfessionResearchState.LOCKED_PARENT;
 
         AdvancementObtainedStatus status = unlockedWithCount?AdvancementObtainedStatus.OBTAINED:AdvancementObtainedStatus.UNOBTAINED;
         int j = MathHelper.floor((float)this.width);
@@ -246,7 +247,7 @@ public class ProfessionWidget extends DrawableHelper {
         return y;
     }
 
-    public boolean isUnlocked(boolean countProfessionals) {
+    public ProfessionResearchState isUnlocked(boolean countProfessionals) {
         var shouldCountProfs = countProfessionals ? ProfessionManager.CountProfessionals.INCREASE : ProfessionManager.CountProfessionals.DONT_COUNT;
         if(profession.isHireMenu()) {
             shouldCountProfs = ProfessionManager.CountProfessionals.DONT_COUNT;
