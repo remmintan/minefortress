@@ -20,14 +20,14 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
         if(colonist.getEatControl().map(EatControl::isEating).orElse(false)) return false;
         if(!isDay() || colonist.getTaskControl().hasTask()) return false;
         return colonist.getFortressServerManager()
-                .flatMap(FortressServerManager::randomSurfacePos)
+                .flatMap(FortressServerManager::getRandomPosWithinFortress)
                 .isPresent();
 
     }
 
     @Override
     public void start() {
-        colonist.getFortressServerManager().flatMap(FortressServerManager::randomSurfacePos)
+        colonist.getFortressServerManager().flatMap(FortressServerManager::getRandomPosWithinFortress)
                 .ifPresent(it -> {
                     colonist.setCurrentTaskDesc("Wandering around");
                     colonist.putItemInHand(null);

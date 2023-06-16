@@ -147,7 +147,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new MeleeAttackGoal(this));
         this.goalSelector.add(3, new FleeEntityGoal<>(this, CreeperEntity.class, 5, 1.5D, 2.1D));
-
+        this.goalSelector.add(4, new FollowFortressAttackTargetGoal(this, Colonist.FAST_MOVEMENT_SPEED, Colonist.WORK_REACH_DISTANCE));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
         this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
@@ -155,8 +155,8 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
 
-        this.targetSelector.add(1, new RevengeGoal(this, Colonist.class).setGroupRevenge());
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, true));
+        this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, false));
     }
 
     @Override
@@ -366,4 +366,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     public boolean hasTask() {
         return this.dataTracker.get(HAS_TASK);
     }
+
+
+
 }

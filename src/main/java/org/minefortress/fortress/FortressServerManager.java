@@ -561,7 +561,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         return fortressCenter!=null?fortressCenter.toImmutable():null;
     }
 
-    public Optional<BlockPos> randomSurfacePos(){
+    public Optional<BlockPos> getRandomPosWithinFortress(){
         if(minX == Integer.MAX_VALUE) return Optional.empty();
 
         int tires = 0;
@@ -581,6 +581,14 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(isFluid || isFluidAbove) return Optional.empty();
 
         return Optional.of(fortressPos.up());
+    }
+
+    public boolean isPositionWithinFortress(BlockPos pos) {
+        if(minX == Integer.MAX_VALUE) {
+            return false;
+        }
+
+        return pos.getX() >= minX && pos.getX() <= maxX && pos.getZ() >= minZ && pos.getZ() <= maxZ;
     }
 
     public Optional<BlockPos> getRandomPositionAroundCampfire() {

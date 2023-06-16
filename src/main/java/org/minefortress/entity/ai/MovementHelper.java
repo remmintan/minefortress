@@ -73,10 +73,10 @@ public class MovementHelper {
         baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(workGoal, (int)Colonist.WORK_REACH_DISTANCE-1));
     }
 
-    public void follow(LivingEntity entity) {
+    public void follow(LivingEntity entity, float speed) {
         this.reset();
         baritone.settings().followRadius.set((int)Colonist.WORK_REACH_DISTANCE);
-        colonist.setMovementSpeed(Colonist.FAST_MOVEMENT_SPEED);
+        colonist.setMovementSpeed(speed);
         baritone.getFollowProcess().follow(it -> it.equals(entity));
     }
 
