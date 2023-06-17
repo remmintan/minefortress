@@ -7,7 +7,10 @@ import baritone.api.minefortress.IMinefortressEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.goal.ActiveTargetGoal;
+import net.minecraft.entity.ai.goal.FleeEntityGoal;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -29,7 +32,6 @@ import net.minecraft.world.World;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
-import org.minefortress.entity.ai.goal.warrior.MeleeAttackGoal;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.registries.FortressEntities;
@@ -145,7 +147,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     protected void initGoals() {
         super.initGoals();
         this.goalSelector.add(1, new SwimGoal(this));
-        this.goalSelector.add(2, new MeleeAttackGoal(this));
+        this.goalSelector.add(2, new ColonistMeleeAttackGoal(this));
         this.goalSelector.add(3, new FleeEntityGoal<>(this, CreeperEntity.class, 5, 1.5D, 2.1D));
         this.goalSelector.add(4, new FollowFortressAttackTargetGoal(this, Colonist.FAST_MOVEMENT_SPEED, Colonist.WORK_REACH_DISTANCE));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
