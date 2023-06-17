@@ -75,7 +75,7 @@ public class MovementHelper {
 
     public void follow(LivingEntity entity, float speed) {
         this.reset();
-        baritone.settings().followRadius.set((int)Colonist.WORK_REACH_DISTANCE);
+        baritone.settings().followRadius.set(1);
         colonist.setMovementSpeed(speed);
         baritone.getFollowProcess().follow(it -> it.equals(entity));
     }

@@ -1,9 +1,11 @@
 package org.minefortress.entity.ai.goal;
 
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 
+import java.util.EnumSet;
 import java.util.Optional;
 
 public class ReturnToFireGoal extends AbstractFortressGoal {
@@ -11,6 +13,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     public ReturnToFireGoal(Colonist colonist) {
         super(colonist);
+        super.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
     }
 
     @Override
@@ -19,6 +22,10 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
             final Optional<BlockPos> pos = colonist.getFortressServerManager()
                     .flatMap(FortressServerManager::getRandomPosWithinFortress);
             if(pos.isPresent()) return false;
+        }
+
+        if(colonist.getTarget() != null && colonist.getTarget().isAlive()) {
+            return false;
         }
 
         return !colonist.getTaskControl().hasTask() && isFarFromCenter();
