@@ -17,6 +17,7 @@ public class MeleeAttackGoal extends AttackGoal {
     public void start() {
         super.start();
         this.pawn.putItemInHand(getCorrectItem());
+        getTarget().ifPresent(it -> this.pawn.getLookControl().lookAt(it));
     }
 
     private Item getCorrectItem() {

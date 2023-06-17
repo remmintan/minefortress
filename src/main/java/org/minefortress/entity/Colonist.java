@@ -7,10 +7,13 @@ import baritone.api.minefortress.IMinefortressEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -29,6 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
@@ -159,6 +163,22 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
 
         this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
         this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, false));
+    }
+
+    @Override
+    public void setTarget(@Nullable LivingEntity target) {
+        super.setTarget(target);
+    }
+
+    public static DefaultAttributeContainer.Builder createAttributes() {
+        return LivingEntity.createLivingAttributes()
+                .add(EntityAttributes.GENERIC_MAX_HEALTH)
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0d)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15d)
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0d)
+                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 0.0)
+                .add(EntityAttributes.GENERIC_ATTACK_SPEED, 2.0)
+                .add(EntityAttributes.GENERIC_LUCK);
     }
 
     @Override
