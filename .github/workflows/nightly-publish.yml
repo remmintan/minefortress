@@ -63,7 +63,7 @@ jobs:
     - name: prepare the commit messages
       run: |
         export notificationMessages=$(git log --reverse --format=%s ${{ github.event.before }}..${{ github.sha }} | tr '$' '- ')
-        echo "Notification messages: notificationMesages"
+        echo "Notification messages: $notificationMessages"
         echo "notificationMessages=$notificationMessages" >> $GITHUB_OUTPUT
 
 
