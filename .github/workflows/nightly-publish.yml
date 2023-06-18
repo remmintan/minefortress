@@ -6,8 +6,26 @@ on:
       - master
 
 jobs:
-  build:
+  get-commits:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Retrieve all commit messages pushed and put in the environment variable GITHUB_COMMITS_TEXT
+      id: commits
+      run: |
+        export commitsText=$(git log --format=%s ${{ github.event.before }}..${{ github.sha }} | tr '\n' ':newline:')
+        echo "Commits texts: $commitsText"
+        echo "GITHUB_COMMITS_TEXT=$commitsText" >> $GITHUB_ENV
+
+  build:
+    needs:
+      - get-commits
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -35,12 +53,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BUILD_NUMBER: ${{ github.run_number }}
 
-    - name: Retrieve all commit messages pushed and put in the environment variable GITHUB_COMMITS_TEXT
-      run: |
-        export commitsText=$(git log --format=%s ${{ github.event.before }}..${{ github.sha }} | tr '\n' ':newline:')
-        echo "Commits texts: $commitsText"
-        echo "GITHUB_COMMITS_TEXT=$commitsText" >> $GITHUB_ENV
-
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle
     - name: Publish to GitHub Packages
@@ -59,3 +71,23 @@ jobs:
         package-name: 'org.minefortress.minefortress-nightly'
         package-type: 'maven'
         min-versions-to-keep: 10
+
+  send-discord-notification:
+    needs:
+      - build
+      - get-commits
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send Discord Notification
+      uses: sebastianpopp/discord-action@releases/v2
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        message: |
+          New dev build available!
+          Build number: ${{ github.run_number }}
+          
+          What's new:
+            ${{ env.GITHUB_COMMITS_TEXT }}
+          
+          https://builds.minefortress.org
