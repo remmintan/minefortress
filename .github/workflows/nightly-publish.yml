@@ -60,18 +60,24 @@ jobs:
         package-type: 'maven'
         min-versions-to-keep: 10
 
+    - name: prepare the commit messages
+      run: |
+        export notificationMessages=$(git log --reverse --format=%s ${{ github.event.before }}..${{ github.sha }} | tr '$' '- ')
+        echo "Notification messages: notificationMesages"
+        echo "notificationMessages=$notificationMessages" >> $GITHUB_OUTPUT
 
-    - name: Send Discord Notification
-      uses: sebastianpopp/discord-action@releases/v2
-      with:
-        webhook: ${{ secrets.DISCORD_WEBHOOK }}
-        message: |
-          New dev build available!
-          Build number: ${{ github.run_number }}
-          
-          What's new:
-            ${{ env.GITHUB_COMMITS_TEXT }}
-          
-          https://builds.minefortress.org
-          @remmintan
+
+#    - name: Send Discord Notification
+#      uses: sebastianpopp/discord-action@releases/v2
+#      with:
+#        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+#        message: |
+#          New dev build available!
+#          Build number: ${{ github.run_number }}
+#
+#          What's new:
+#            ${{ env.GITHUB_COMMITS_TEXT }}
+#
+#          https://builds.minefortress.org
+#          @remmintan
           
