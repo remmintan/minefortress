@@ -6,23 +6,6 @@ on:
       - master
 
 jobs:
-  get-commits:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-
-    - name: Retrieve all commit messages pushed and put in the environment variable GITHUB_COMMITS_TEXT
-      id: commits
-      run: |
-        export commitsText=$(git log --format=%s ${{ github.event.before }}..${{ github.sha }} | tr '\n' ':newline:')
-        echo "Commits texts: $commitsText"
-        echo "GITHUB_COMMITS_TEXT=$commitsText" >> $GITHUB_ENV
-
   build:
     needs:
       - get-commits
@@ -43,6 +26,13 @@ jobs:
         distribution: 'temurin'
         server-id: github
         settings-path: ${{ github.workspace }}
+
+    - name: Retrieve all commit messages pushed and put in the environment variable GITHUB_COMMITS_TEXT
+      id: commits
+      run: |
+        export commitsText=$(git log --format=%s ${{ github.event.before }}..${{ github.sha }} | tr '\n' ':newline:')
+        echo "Commits texts: $commitsText"
+        echo "GITHUB_COMMITS_TEXT=$commitsText" >> $GITHUB_ENV
 
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
@@ -72,13 +62,7 @@ jobs:
         package-type: 'maven'
         min-versions-to-keep: 10
 
-  send-discord-notification:
-    needs:
-      - build
-      - get-commits
-    runs-on: ubuntu-latest
 
-    steps:
     - name: Send Discord Notification
       uses: sebastianpopp/discord-action@releases/v2
       with:
