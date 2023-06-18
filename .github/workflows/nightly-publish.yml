@@ -7,8 +7,6 @@ on:
 
 jobs:
   build:
-    needs:
-      - get-commits
     runs-on: ubuntu-latest
     permissions:
       contents: read
