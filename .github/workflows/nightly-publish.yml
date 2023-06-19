@@ -63,5 +63,5 @@ jobs:
     - name: Send Discord Notification
       run: |
         messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
-        ./automation-scripts/discord-notification.sh ${{ secrets.DISCORD_WEBHOOK }} $${{ github.run_number }} $messages 906471730732761118
+        ./automation-scripts/discord-notification.sh ${{ secrets.DISCORD_WEBHOOK }} $${{ github.run_number }} "$messages" ${{ vars.DISCORD_ROLE_ID }}
           
