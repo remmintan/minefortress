@@ -74,6 +74,7 @@ jobs:
       run: |
         messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
         ./automation-scripts/discord-notification.sh ${{ secrets.DISCORD_WEBHOOK }} ${{ github.run_number }} "$messages" "${{ vars.DISCORD_ROLE_ID }}"
+
   twitter-notification:
     runs-on: ubuntu-latest
     permissions:
@@ -92,7 +93,7 @@ jobs:
           echo "twitterMessages=$messages" >> $GITHUB_OUTPUT
 
     - name: Send Twitter Notification
-      uses: snow-actions/tweet@v1.4.0
+      uses: remmintan/tweet-v2-api@1.0
       with:
         status: |
           New dev build available!
