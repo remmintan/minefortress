@@ -60,8 +60,53 @@ jobs:
         package-type: 'maven'
         min-versions-to-keep: 10
 
+  discord-notification:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
     - name: Send Discord Notification
       run: |
         messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
         ./automation-scripts/discord-notification.sh ${{ secrets.DISCORD_WEBHOOK }} ${{ github.run_number }} "$messages" "${{ vars.DISCORD_ROLE_ID }}"
+  twitter-notification:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Prepare twitter messages
+      id: prepare-twitter-messages
+      run: |
+          export messages=$(git log --reverse --format='%s' ${{ github.event.before }}..${{ github.sha }} | tr '\n' '\\n')
+          echo "Twitter messages: $messages"
+          echo "twitterMessages=$messages" >> $GITHUB_OUTPUT
+
+    - name: Send Twitter Notification
+      uses: snow-actions/tweet@v1.4.0
+      with:
+        status: |
+          New dev build available!
+          Build number: ${{ github.run_number }}
           
+          What's new:
+          ${{ steps.prepare-twitter-messages.outputs.twitterMessages }}
+          
+          https://builds.minecraftfortress.org
+      env:
+        CONSUMER_API_KEY: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
+        CONSUMER_API_SECRET_KEY: ${{ secrets.TWITTER_CONSUMER_API_SECRET_KEY }}
+        ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+        ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+
+
+
