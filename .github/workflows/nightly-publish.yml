@@ -93,9 +93,13 @@ jobs:
           echo "twitterMessages=$messages" >> $GITHUB_OUTPUT
 
     - name: Send Twitter Notification
-      uses: remmintan/tweet-v2-api@1.0
+      uses: remmintan/send-tweet-action@1.0
       with:
-        status: |
+        api-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
+        api-key-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET_KEY }}
+        access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+        access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+        tweet-text: |
           New dev build available!
           Build number: ${{ github.run_number }}
           
@@ -103,11 +107,6 @@ jobs:
           ${{ steps.prepare-twitter-messages.outputs.twitterMessages }}
           
           https://builds.minecraftfortress.org
-      env:
-        CONSUMER_API_KEY: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
-        CONSUMER_API_SECRET_KEY: ${{ secrets.TWITTER_CONSUMER_API_SECRET_KEY }}
-        ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-        ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
 
 
 
