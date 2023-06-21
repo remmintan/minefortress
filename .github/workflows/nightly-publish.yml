@@ -88,7 +88,7 @@ jobs:
     - name: Prepare twitter messages
       id: prepare-twitter-messages
       run: |
-          export messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }} | tr '\n' '\\n')
+          export messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
           echo "Twitter messages: $messages"
           echo "twitterMessages=$messages" >> $GITHUB_OUTPUT
 
