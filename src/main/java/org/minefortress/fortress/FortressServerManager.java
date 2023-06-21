@@ -60,7 +60,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final MinecraftServer server;
     
     private final Set<LivingEntity> pawns = new HashSet<>();
-    private final Set<FortressBuilding> buildings = new HashSet<>();
+    private final List<FortressBuilding> buildings = new ArrayList<>();
 
     private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
     private final Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
@@ -564,23 +564,22 @@ public final class FortressServerManager extends AbstractFortressManager {
     public Optional<BlockPos> getRandomPosWithinFortress(){
         if(minX == Integer.MAX_VALUE) return Optional.empty();
 
-        int tires = 0;
-        BlockPos fortressPos;
-        boolean isFluid, isFluidAbove;
-        do {
-            int x = getWorld().random.nextInt(maxX - minX) + minX;
-            int z = getWorld().random.nextInt(maxZ - minZ) + minZ;
-            int y = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
+        final int x = getWorld().random.nextInt(maxX - minX) + minX;
+        final int z = getWorld().random.nextInt(maxZ - minZ) + minZ;
+        final int y = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
 
-            fortressPos = new BlockPos(x, y, z);
-            isFluid = getWorld().getBlockState(fortressPos).isOf(Blocks.WATER);
-            isFluidAbove = getWorld().getBlockState(fortressPos.down()).isOf(Blocks.WATER);
-            tires++;
-        }while((isFluid || isFluidAbove) && tires < 10);
-
-        if(isFluid || isFluidAbove) return Optional.empty();
+        final BlockPos fortressPos = new BlockPos(x, y, z);
+        if(isPartOfAnyBuilding(fortressPos)) return Optional.empty();
+        boolean isFluid = getWorld().getBlockState(fortressPos).isOf(Blocks.WATER);
+        if(isFluid) return Optional.empty();
+        boolean isFluidAbove = getWorld().getBlockState(fortressPos.down()).isOf(Blocks.WATER);
+        if(isFluidAbove) return Optional.empty();
 
         return Optional.of(fortressPos.up());
+    }
+
+    private boolean isPartOfAnyBuilding(BlockPos pos) {
+        return buildings.stream().anyMatch(it -> it.isPartOfTheBuilding(pos));
     }
 
     public boolean isPositionWithinFortress(BlockPos pos) {

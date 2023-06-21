@@ -39,13 +39,13 @@ public class FortressBuilding implements IAutomationArea {
     }
 
     public FortressBuilding(NbtCompound tag) {
-        if(tag.contains("id")) {
+        if (tag.contains("id")) {
             this.id = tag.getUuid("id");
         } else {
             this.id = UUID.randomUUID();
         }
 
-        if(tag.contains("start"))
+        if (tag.contains("start"))
             this.start = BlockPos.fromLong(tag.getLong("start"));
         else
             throw new IllegalArgumentException("Tag does not contain start");
@@ -55,22 +55,28 @@ public class FortressBuilding implements IAutomationArea {
         else
             throw new IllegalArgumentException("Tag does not contain end");
 
-        if(tag.contains("requirementId"))
+        if (tag.contains("requirementId"))
             this.requirementId = tag.getString("requirementId");
         else
             this.requirementId = "<old>";
 
-        if(tag.contains("lastUpdated"))
+        if (tag.contains("lastUpdated"))
             this.lastUpdated = LocalDateTime.parse(tag.getString("lastUpdated"));
         else
             this.lastUpdated = LocalDateTime.MIN;
 
-        if(tag.contains("blueprintId"))
+        if (tag.contains("blueprintId"))
             this.blueprintId = tag.getString("blueprintId");
-        else if(tag.contains("file")) // support old format
+        else if (tag.contains("file")) // support old format
             this.blueprintId = tag.getString("file");
         else
             this.blueprintId = null;
+    }
+
+    public boolean isPartOfTheBuilding(BlockPos pos) {
+        return start.getX() <= pos.getX() && pos.getX() <= end.getX()
+                && start.getY()-1 <= pos.getY() && pos.getY() <= end.getY() + 1
+                && start.getZ() <= pos.getZ() && pos.getZ() <= end.getZ();
     }
 
     public BlockPos getStart() {
