@@ -102,13 +102,43 @@ jobs:
         access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
         access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
         tweet-text: |
-          New dev build available!
-          Build number: ${{ github.run_number }}
+          MineFortress Dev Build ${{ github.run_number }} built successfully!
           
-          What's new:
+          Changes:
           ${{ steps.prepare-twitter-messages.outputs.twitterMessages }}
           
           https://builds.minecraftfortress.org
 
+  reddit-notification:
+    runs-on: ubuntu-latest
+#    needs: [build]
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Prepare reddit messages
+      id: prepare-reddit-messages
+      run: |
+          export messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
+          echo "Reddit messages: $messages"
+          echo "redditMessages=${messages//$'\n'/'\\n'}" >> $GITHUB_OUTPUT
+
+    - name: Send Reddit Notification
+      uses: remmintan/reddit-post-action@1.0
+      with:
+        app-id: ${{ secrets.REDDIT_APP_ID }}
+        app-secret: ${{ secrets.REDDIT_APP_SECRET }}
+        username: ${{ secrets.REDDIT_USERNAME }}
+        password: ${{ secrets.REDDIT_PASSWORD }}
+        post-title: MineFortress dev build ${{ github.run_number }} built successfully!
+        post-text: |
+          Changes:
+          ${{ steps.prepare-reddit-messages.outputs.redditMessages }}
+          
+          https://builds.minecraftfortress.org
 
 
