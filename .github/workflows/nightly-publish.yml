@@ -90,7 +90,7 @@ jobs:
       run: |
           export messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
           echo "Twitter messages: $messages"
-          echo "twitterMessages=$messages" >> $GITHUB_OUTPUT
+          echo "twitterMessages=${messages//$'\n'/'\\n'}" >> $GITHUB_OUTPUT
 
     - name: Send Twitter Notification
       uses: remmintan/send-tweet-action@1.0
