@@ -92,6 +92,7 @@ jobs:
           echo "Twitter messages: $messages"
           echo "twitterMessages=${messages//$'\n'/'\\n'}" >> $GITHUB_OUTPUT
 
+
     - name: Send Twitter Notification
       uses: remmintan/send-tweet-action@1.0
       with:
