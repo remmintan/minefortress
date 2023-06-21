@@ -106,12 +106,13 @@ jobs:
           
           Changes:
           ${{ steps.prepare-twitter-messages.outputs.twitterMessages }}
-          
+          ===next-tweet===
+          Dev Builds portal:
           https://builds.minecraftfortress.org
 
   reddit-notification:
     runs-on: ubuntu-latest
-#    needs: [build]
+    needs: [build]
     permissions:
       contents: read
 
