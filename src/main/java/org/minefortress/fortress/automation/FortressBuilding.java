@@ -1,6 +1,7 @@
 package org.minefortress.fortress.automation;
 
 import net.minecraft.block.BedBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.tag.BlockTags;
@@ -13,6 +14,7 @@ import org.minefortress.fortress.automation.iterators.FarmBuildingIterator;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -26,14 +28,23 @@ public class FortressBuilding implements IAutomationArea {
     private final String requirementId;
     @Nullable
     private final String blueprintId;
+    @Nullable
+    private final FortressBuildingBlockData buildingBlockData;
     private LocalDateTime lastUpdated;
     private Iterator<AutomationBlockInfo> currentIterator;
 
-    public FortressBuilding(UUID id, BlockPos start, BlockPos end, String requirementId, @NotNull String blueprintId) {
+    public FortressBuilding(UUID id,
+                            BlockPos start,
+                            BlockPos end,
+                            String requirementId,
+                            @NotNull String blueprintId,
+                            Map<BlockPos, BlockState> buildingBlockData
+    ) {
         this.id = id;
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.requirementId = requirementId;
+        this.buildingBlockData = new FortressBuildingBlockData(buildingBlockData);
         this.lastUpdated = LocalDateTime.MIN;
         this.blueprintId = blueprintId;
     }
@@ -71,6 +82,13 @@ public class FortressBuilding implements IAutomationArea {
             this.blueprintId = tag.getString("file");
         else
             this.blueprintId = null;
+
+        if(tag.contains("buildingBlockData")) {
+            final var buildBlockDataTag = tag.get("buildingBlockData");
+            this.buildingBlockData = FortressBuildingBlockData.fromNbt(buildBlockDataTag);
+        } else {
+            this.buildingBlockData = null;
+        }
     }
 
     public boolean isPartOfTheBuilding(BlockPos pos) {
@@ -113,6 +131,9 @@ public class FortressBuilding implements IAutomationArea {
         tag.putString("lastUpdated", lastUpdated.toString());
         if(blueprintId != null) {
             tag.putString("blueprintId", blueprintId);
+        }
+        if(buildingBlockData != null) {
+            tag.put("buildingBlockData", buildingBlockData.toNbt());
         }
     }
 

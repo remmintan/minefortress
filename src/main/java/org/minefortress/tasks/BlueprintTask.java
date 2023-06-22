@@ -15,10 +15,7 @@ import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class BlueprintTask extends AbstractTask {
 
@@ -96,12 +93,17 @@ public class BlueprintTask extends AbstractTask {
                     });
             }
 
+            final var mergeBlockData = new HashMap<>(blueprintData);
+            if(blueprintEntityData != null) mergeBlockData.putAll(blueprintEntityData);
+            if(blueprintAutomaticData != null) mergeBlockData.putAll(blueprintAutomaticData);
+
             final FortressBuilding fortressBuilding = new FortressBuilding(
                     UUID.randomUUID(),
                     startingBlock,
                     endingBlock,
                     requirementId,
-                    blueprintId
+                    blueprintId,
+                    mergeBlockData
             );
             colonist.getFortressServerManager().orElseThrow().addBuilding(fortressBuilding);
         }
