@@ -11,7 +11,7 @@ message_body="MineFortress Dev Build ${build_number} built successfully!
 Changes:
 ${commit_messages}
 
-https://builds.minefortress.org/
+https://builds.minecraftfortress.org/
 
 <@${role_id}>"
 
