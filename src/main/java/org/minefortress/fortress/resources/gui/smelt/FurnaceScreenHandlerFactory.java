@@ -13,7 +13,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressServer;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
 
 import java.util.Objects;
 
