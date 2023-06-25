@@ -8,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
@@ -21,7 +20,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.CreeperEntity;
-import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -162,7 +160,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         this.goalSelector.add(10, new LookAroundGoal(this));
 
         this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, HostileEntity.class, false));
+        this.targetSelector.add(2, new FortressColonistActiveTargetGoal(this));
     }
 
     @Override

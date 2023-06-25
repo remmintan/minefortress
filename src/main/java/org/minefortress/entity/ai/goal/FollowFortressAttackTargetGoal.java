@@ -29,9 +29,7 @@ public class FollowFortressAttackTargetGoal extends Goal {
         }
 
         final var target1 = this.colonist.getTarget();
-        if(target1 != null && target1.isAlive() && this.colonist.squaredDistanceTo(target1) >= range * range
-        && this.colonist.getFortressServerManager()
-                .map(it -> it.isPositionWithinFortress(colonist.getBlockPos())).orElse(false)) {
+        if(target1 != null && target1.isAlive() && this.colonist.squaredDistanceTo(target1) >= range * range) {
             this.target = target1;
             return true;
         }
