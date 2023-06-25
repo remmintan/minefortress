@@ -12,17 +12,18 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundSyncBuildingsPacket;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FortressBuildingManager implements IAutomationAreaProvider {
 
     private final List<FortressBuilding> buildings = new ArrayList<>();
-    private final ServerWorld overworld;
+    private final Supplier<ServerWorld> overworldSupplier;
     private boolean needSync = false;
 
-    public FortressBuildingManager(ServerWorld overworld) {
-        this.overworld = overworld;
+    public FortressBuildingManager(Supplier<ServerWorld> overworldSupplier) {
+        this.overworldSupplier = overworldSupplier;
     }
 
     public void addBuilding(FortressBuilding building) {
@@ -37,7 +38,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
                 .ifPresent(it -> {
                     buildings.remove(it);
                     BlockPos.iterate(it.getStart(), it.getEnd())
-                            .forEach(pos -> overworld.setBlockState(pos, Blocks.AIR.getDefaultState()));
+                            .forEach(pos -> getWorld().setBlockState(pos, Blocks.AIR.getDefaultState()));
                     this.scheduleSync();
                 });
     }
@@ -46,7 +47,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
     public Optional<BlockPos> getFreeBed(){
         final var freeBedsList = buildings
                 .stream()
-                .map(it -> it.getFreeBed(overworld))
+                .map(it -> it.getFreeBed(getWorld()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
@@ -56,19 +57,19 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
     }
 
     public long getTotalBedsCount() {
-        return buildings.stream().mapToLong(it -> it.getBedsCount(overworld)).reduce(0, Long::sum);
+        return buildings.stream().mapToLong(it -> it.getBedsCount(getWorld())).reduce(0, Long::sum);
     }
 
 
     public void tick(ServerPlayerEntity player) {
+        if(player == null) return;
         if (needSync) {
-            if(player != null) {
-                final var houses = buildings.stream()
-                        .map(it -> it.toEssentialInfo(overworld))
-                        .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-                final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
-                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
-            }
+            final var houses = buildings.stream()
+                    .map(it -> it.toEssentialInfo(getWorld()))
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
+
             needSync = false;
         }
     }
@@ -82,7 +83,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
                 .filter(b -> b.satisfiesRequirement(requirementId));
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
             return requiredBuildings
-                    .mapToLong(it -> it.getBedsCount(overworld) * 10)
+                    .mapToLong(it -> it.getBedsCount(getWorld()) * 10)
                     .sum() > minCount;
         }
         final var count = requiredBuildings.count();
@@ -125,5 +126,9 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
 
     public boolean isPartOfAnyBuilding(BlockPos pos) {
         return buildings.stream().anyMatch(it -> it.isPartOfTheBuilding(pos));
+    }
+
+    private ServerWorld getWorld() {
+        return this.overworldSupplier.get();
     }
 }

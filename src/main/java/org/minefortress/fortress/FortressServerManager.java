@@ -90,7 +90,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.server = server;
         this.serverProfessionManager = new ServerProfessionManager(() -> this, server);
         this.serverResourceManager = new ServerResourceManagerImpl(server);
-        this.fortressBuildingManager = new FortressBuildingManager(server.getWorld(World.OVERWORLD));
+        this.fortressBuildingManager = new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD));
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             this.gamemode = FortressGamemode.SURVIVAL;
         }
