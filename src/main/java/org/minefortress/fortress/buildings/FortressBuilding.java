@@ -1,4 +1,4 @@
-package org.minefortress.fortress.automation;
+package org.minefortress.fortress.buildings;
 
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
@@ -9,7 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.IAutomationArea;
+import org.minefortress.fortress.automation.IAutomationArea;
+import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.fortress.automation.iterators.FarmBuildingIterator;
 
 import java.time.LocalDateTime;

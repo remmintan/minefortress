@@ -1,4 +1,4 @@
-package org.minefortress.fortress;
+package org.minefortress.fortress.automation;
 
 import net.minecraft.world.World;
 import org.minefortress.fortress.automation.AutomationBlockInfo;

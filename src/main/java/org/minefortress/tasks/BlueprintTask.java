@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.interfaces.IFortressAwareEntity;
 import org.minefortress.entity.interfaces.IWorkerPawn;
-import org.minefortress.fortress.automation.FortressBuilding;
+import org.minefortress.fortress.buildings.FortressBuilding;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
@@ -105,7 +105,12 @@ public class BlueprintTask extends AbstractTask {
                     blueprintId,
                     mergeBlockData
             );
-            colonist.getFortressServerManager().orElseThrow().addBuilding(fortressBuilding);
+            final var serverManager = colonist.getFortressServerManager().orElseThrow();
+            serverManager.expandTheVillage(fortressBuilding.getStart());
+            serverManager.expandTheVillage(fortressBuilding.getEnd());
+
+            final var buildingManager = serverManager.getFortressBuildingManager();
+            buildingManager.addBuilding(fortressBuilding);
         }
         super.finishPart(part, colonist);
     }

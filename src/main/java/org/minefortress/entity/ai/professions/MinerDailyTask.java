@@ -2,7 +2,7 @@ package org.minefortress.entity.ai.professions;
 
 import net.minecraft.tag.FluidTags;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.IAutomationArea;
+import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 

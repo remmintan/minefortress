@@ -3,7 +3,7 @@ package org.minefortress.fortress.automation.areas;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.fortress.IAutomationArea;
+import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.network.c2s.S2CSyncAreasPacket;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 

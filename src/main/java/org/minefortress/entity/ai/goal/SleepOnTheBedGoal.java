@@ -6,6 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.buildings.FortressBuildingManager;
 
 import java.util.Optional;
 
@@ -69,7 +70,10 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
 
     @NotNull
     private Optional<BlockPos> getFreeBed() {
-        return colonist.getFortressServerManager().flatMap(FortressServerManager::getFreeBed);
+        return colonist
+                .getFortressServerManager()
+                .map(FortressServerManager::getFortressBuildingManager)
+                .flatMap(FortressBuildingManager::getFreeBed);
     }
 
     private boolean isNight() {

@@ -33,15 +33,15 @@ import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fight.influence.ServerInfluenceManager;
-import org.minefortress.fortress.automation.FortressBuilding;
+import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
+import org.minefortress.fortress.buildings.FortressBuildingManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManagerImpl;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundSyncBuildingsPacket;
 import org.minefortress.network.s2c.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.s2c.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.professions.ServerProfessionManager;
@@ -60,13 +60,13 @@ public final class FortressServerManager extends AbstractFortressManager {
     private final MinecraftServer server;
     
     private final Set<LivingEntity> pawns = new HashSet<>();
-    private final List<FortressBuilding> buildings = new ArrayList<>();
 
     private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
     private final Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
     
     private final ServerProfessionManager serverProfessionManager;
     private final ServerResourceManager serverResourceManager;
+    private final FortressBuildingManager fortressBuildingManager;
     private final TaskManager taskManager = new TaskManager();
     private final AreasServerManager areasServerManager = new AreasServerManager();
     private final ServerInfluenceManager influenceManager = new ServerInfluenceManager(this);
@@ -81,7 +81,6 @@ public final class FortressServerManager extends AbstractFortressManager {
     private FortressGamemode gamemode = FortressGamemode.NONE;
 
     private boolean needSync = true;
-    private boolean needSyncBuildings = true;
     private boolean needSyncSpecialBlocks = true;
 
     private BlockPos fortressCenter = null;
@@ -91,44 +90,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         this.server = server;
         this.serverProfessionManager = new ServerProfessionManager(() -> this, server);
         this.serverResourceManager = new ServerResourceManagerImpl(server);
+        this.fortressBuildingManager = new FortressBuildingManager(server.getWorld(World.OVERWORLD));
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             this.gamemode = FortressGamemode.SURVIVAL;
         }
-    }
-
-    public void destroyBuilding(UUID id) {
-        buildings.stream()
-                .filter(it -> it.getId().equals(id))
-                .findFirst()
-                .ifPresent(it -> {
-                    buildings.remove(it);
-                    BlockPos.iterate(it.getStart(), it.getEnd())
-                            .forEach(pos -> getWorld().setBlockState(pos, Blocks.AIR.getDefaultState()));
-                    this.scheduleSyncBuildings();
-                });
-    }
-
-    public void addBuilding(FortressBuilding building) {
-        final BlockPos start = building.getStart();
-        final BlockPos end = building.getEnd();
-        if(start.getX() < minX) minX = start.getX();
-        if(start.getZ() < minZ) minZ = start.getZ();
-        if(end.getX() > maxX) maxX = end.getX();
-        if(end.getZ() > maxZ) maxZ = end.getZ();
-        buildings.add(building);
-        this.scheduleSyncBuildings();
-    }
-
-    public Optional<BlockPos> getFreeBed(){
-        final var freeBedsList = buildings
-                .stream()
-                .map(it -> it.getFreeBed(server.getWorld(World.OVERWORLD)))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
-        if(freeBedsList.isEmpty())
-            return Optional.empty();
-        return Optional.of(freeBedsList.get(new Random().nextInt(freeBedsList.size())));
     }
 
     public void addColonist(LivingEntity colonist) {
@@ -149,6 +114,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         return influenceManager;
     }
 
+    public FortressBuildingManager getFortressBuildingManager() {
+        return fortressBuildingManager;
+    }
+
     public void tick(@Nullable ServerPlayerEntity player) {
         taskManager.tick(this, getWorld());
         tickFortress(player);
@@ -156,18 +125,11 @@ public final class FortressServerManager extends AbstractFortressManager {
         serverResourceManager.tick(player);
         areasServerManager.tick(player);
         influenceManager.tick(player);
+        fortressBuildingManager.tick(player);
         if(!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
         final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount, getReservedPawnsCount());
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
-        if (needSyncBuildings) {
-            final var houses = buildings.stream()
-                    .map(it -> it.toEssentialInfo(getWorld()))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-            final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
-            needSyncBuildings = false;
-        }
         if(needSyncSpecialBlocks){
             final var syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks, blueprintsSpecialBlocks);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, syncBlocks);
@@ -267,7 +229,7 @@ public final class FortressServerManager extends AbstractFortressManager {
             final var spawnFactor = MathHelper.clampedLerp(82, 99, colonistsCount / 50f);
             if(maxColonistsCount == -1 || colonistsCount < maxColonistsCount) {
                 if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) >= spawnFactor) {
-                    final long bedsCount = buildings.stream().mapToLong(it -> it.getBedsCount(getWorld())).reduce(0, Long::sum);
+                    final long bedsCount = fortressBuildingManager.getTotalBedsCount();
                     if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
                         if(player != null) {
                             spawnPawnNearCampfire(player.getUuid())
@@ -363,7 +325,6 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public void syncOnJoin() {
         this.needSync = true;
-        this.needSyncBuildings = true;
         this.needSyncSpecialBlocks = true;
         final var resourceManager = (ServerResourceManager) this.getResourceManager();
         resourceManager.syncAll();
@@ -373,11 +334,6 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public void scheduleSync() {
         needSync = true;
-    }
-
-    private void scheduleSyncBuildings() {
-        needSyncBuildings = true;
-        this.scheduleSync();
     }
 
     private void scheduleSyncSpecialBlocks() {
@@ -405,16 +361,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         tag.putInt("maxX", maxX);
         tag.putInt("maxZ", maxZ);
 
-        if(!buildings.isEmpty()) {
-            int i = 0;
-            final NbtCompound buildingsTag = new NbtCompound();
-            for (FortressBuilding building : this.buildings) {
-                final NbtCompound buildingTag = new NbtCompound();
-                building.writeToNbt(buildingTag);
-                buildingsTag.put("building" + i++, buildingTag);
-            }
-            tag.put("buildings", buildingsTag);
-        }
+        final var buildingsNbt = fortressBuildingManager.toNbt();
+        tag.put("buildings", buildingsNbt);
 
         final NbtCompound nameGeneratorTag = new NbtCompound();
         this.nameGenerator.write(nameGeneratorTag);
@@ -476,13 +424,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         if(tag.contains("buildings")) {
             final NbtCompound buildingsTag = tag.getCompound("buildings");
-            int i = 0;
-            while(buildingsTag.contains("building" + i)) {
-                final NbtCompound buildingTag = buildingsTag.getCompound("building" + i++);
-                FortressBuilding building = new FortressBuilding(buildingTag);
-                buildings.add(building);
-                this.scheduleSyncBuildings();
-            }
+            fortressBuildingManager.readFromNbt(buildingsTag);
         }
 
         if(tag.contains("nameGenerator")) {
@@ -542,10 +484,7 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement) {
-        final var buildings = this.buildings.stream()
-                .filter(building -> building.satisfiesRequirement(requirement))
-                .map(IAutomationArea.class::cast);
-
+        final var buildings = fortressBuildingManager.getAutomationAreasByRequirement(requirement);
         final var areas = areasServerManager.getByRequirement(requirement);
 
         return Stream
@@ -569,17 +508,13 @@ public final class FortressServerManager extends AbstractFortressManager {
         final int y = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
 
         final BlockPos fortressPos = new BlockPos(x, y, z);
-        if(isPartOfAnyBuilding(fortressPos)) return Optional.empty();
+        if(fortressBuildingManager.isPartOfAnyBuilding(fortressPos)) return Optional.empty();
         boolean isFluid = getWorld().getBlockState(fortressPos).isOf(Blocks.WATER);
         if(isFluid) return Optional.empty();
         boolean isFluidAbove = getWorld().getBlockState(fortressPos.down()).isOf(Blocks.WATER);
         if(isFluidAbove) return Optional.empty();
 
         return Optional.of(fortressPos.up());
-    }
-
-    private boolean isPartOfAnyBuilding(BlockPos pos) {
-        return buildings.stream().anyMatch(it -> it.isPartOfTheBuilding(pos));
     }
 
     public boolean isPositionWithinFortress(BlockPos pos) {
@@ -615,20 +550,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
-        final var requiredBuildings = buildings.stream()
-                .filter(b -> b.satisfiesRequirement(requirementId));
-        if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
-            return requiredBuildings
-                    .mapToLong(it -> it.getBedsCount(getWorld()) * 10)
-                    .sum() > minCount;
-        }
-        final var count = requiredBuildings.count();
-        if(requirementId.equals("shooting_gallery"))
-            return count * 10 > minCount;
-
-        if(requirementId.startsWith("farm"))
-            return count * 5 > minCount;
-        return count > minCount;
+        return fortressBuildingManager.hasRequiredBuilding(requirementId, minCount);
     }
 
     @Override
@@ -726,6 +648,13 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(this.maxColonistsCount <= 0)
             this.maxColonistsCount = 1;
         this.scheduleSync();
+    }
+
+    public void expandTheVillage(BlockPos pos) {
+        if(maxX < pos.getX()) maxX = pos.getX();
+        if(minX > pos.getX()) minX = pos.getX();
+        if(maxZ < pos.getZ()) maxZ = pos.getZ();
+        if(minZ > pos.getZ()) minZ = pos.getZ();
     }
 
 }

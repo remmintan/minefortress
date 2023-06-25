@@ -12,7 +12,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.IAutomationArea;
+import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;

@@ -4,7 +4,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
-import org.minefortress.fortress.IAutomationArea;
+import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.automation.iterators.MineAreaIterator;

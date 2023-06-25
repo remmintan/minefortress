@@ -1,4 +1,4 @@
-package org.minefortress.fortress.automation;
+package org.minefortress.fortress.buildings;
 
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.Block;

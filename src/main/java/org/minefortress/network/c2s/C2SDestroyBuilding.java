@@ -24,7 +24,7 @@ public class C2SDestroyBuilding implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        getFortressServerManager(server, player).destroyBuilding(buildingId);
+        getFortressServerManager(server, player).getFortressBuildingManager().destroyBuilding(buildingId);
     }
 
     @Override

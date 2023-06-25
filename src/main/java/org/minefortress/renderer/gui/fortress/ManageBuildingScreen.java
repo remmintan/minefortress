@@ -4,7 +4,7 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.fortress.automation.EssentialBuildingInfo;
+import org.minefortress.fortress.buildings.EssentialBuildingInfo;
 import org.minefortress.network.c2s.C2SDestroyBuilding;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.Profession;
