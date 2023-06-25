@@ -5,9 +5,13 @@ import org.minefortress.fortress.resources.gui.AbstractMissingProfessionScreen;
 
 public class MissingBlacksmithScreen extends AbstractMissingProfessionScreen {
 
+    public MissingBlacksmithScreen(boolean missingBuilding) {
+        super(missingBuilding);
+    }
+
     @Override
-    protected @NotNull String getMissingProfession() {
-        return "Blacksmith";
+    protected @NotNull String getMissingObjectName() {
+        return "Blacksmith" + (missingBuilding ? "'s House" : "");
     }
 
 }

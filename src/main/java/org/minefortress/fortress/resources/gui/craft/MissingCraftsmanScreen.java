@@ -6,7 +6,7 @@ import org.minefortress.fortress.resources.gui.AbstractMissingProfessionScreen;
 public class MissingCraftsmanScreen extends AbstractMissingProfessionScreen {
 
     @Override
-    protected @NotNull String getMissingProfession() {
+    protected @NotNull String getMissingObjectName() {
         return "Craftsman";
     }
 
