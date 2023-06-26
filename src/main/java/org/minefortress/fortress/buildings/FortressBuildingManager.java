@@ -62,12 +62,6 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
     }
 
     public void tick(ServerPlayerEntity player) {
-        if(!buildings.isEmpty()) {
-            buildingPointer = buildingPointer % buildings.size();
-            final var building = buildings.get(buildingPointer++);
-            building.updateTheHealthState(getWorld());
-        }
-
         if(player != null) {
             if (needSync) {
                 final var houses = buildings.stream()
@@ -77,6 +71,14 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
                 FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
 
                 needSync = false;
+            }
+        }
+
+        if(!buildings.isEmpty()) {
+            buildingPointer = buildingPointer % buildings.size();
+            final var building = buildings.get(buildingPointer++);
+            if(building.updateTheHealthState(getWorld())) {
+                this.scheduleSync();
             }
         }
     }

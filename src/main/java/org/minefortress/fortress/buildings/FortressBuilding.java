@@ -101,9 +101,9 @@ public class FortressBuilding implements IAutomationArea {
         }
     }
 
-    public void updateTheHealthState(ServerWorld world) {
+    public boolean updateTheHealthState(ServerWorld world) {
         if(world == null || world.getRegistryKey() != World.OVERWORLD) {
-            return;
+            return false;
         }
 
         if(buildingBlockData == null) {
@@ -112,7 +112,7 @@ public class FortressBuilding implements IAutomationArea {
             buildingBlockData = new FortressBuildingBlockData(blocks);
         }
 
-        buildingBlockData.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world);
+        return buildingBlockData.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world);
     }
 
     public int getHealth() {

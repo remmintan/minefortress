@@ -58,10 +58,11 @@ class FortressBuildingBlockData {
         }
     }
 
-    void checkTheNextBlocksState(int blocksAmount, ServerWorld world) {
+    boolean checkTheNextBlocksState(int blocksAmount, ServerWorld world) {
         if(world.getRegistryKey() != World.OVERWORLD)
             throw new IllegalArgumentException("The world must be the overworld");
 
+        boolean stateUpdated = false;
         for (int i = 0; i < blocksAmount; i++) {
             final var state = referenceState.get(blockPointer);
             final var pos = state.pos;
@@ -69,14 +70,16 @@ class FortressBuildingBlockData {
 
             final var actualBlock = world.getBlockState(pos).getBlock();
 
-            if(Objects.equals(block, actualBlock)) {
-                actualState.put(pos, BuildingBlockState.PRESERVED);
-            } else {
-                actualState.put(pos, BuildingBlockState.DESTROYED);
-            }
+            final var previousState = actualState.getOrDefault(pos, BuildingBlockState.PRESERVED);
+            final var newState = Objects.equals(block, actualBlock)? BuildingBlockState.PRESERVED : BuildingBlockState.DESTROYED;
+
+            actualState.put(pos, newState);
 
             blockPointer++;
+            stateUpdated = stateUpdated || previousState != newState;
         }
+
+        return stateUpdated;
     }
 
     int getHealth() {
