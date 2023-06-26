@@ -198,6 +198,6 @@ public class FortressBuilding implements IAutomationArea {
     }
 
     public EssentialBuildingInfo toEssentialInfo(World world) {
-        return new EssentialBuildingInfo(id, start, end, requirementId, getBedsCount(world), blueprintId);
+        return new EssentialBuildingInfo(id, start, end, requirementId, getBedsCount(world), blueprintId, getHealth());
     }
 }

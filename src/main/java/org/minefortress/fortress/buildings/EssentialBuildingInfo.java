@@ -19,14 +19,22 @@ public class EssentialBuildingInfo {
     private final long bedsCount;
     @NotNull
     private final String blueprintId;
+    private final int health;
 
-    public EssentialBuildingInfo(UUID id, BlockPos start, BlockPos end, String requirementId, long bedsCount, @Nullable String blueprintId) {
+    public EssentialBuildingInfo(UUID id,
+                                 BlockPos start,
+                                 BlockPos end,
+                                 String requirementId,
+                                 long bedsCount,
+                                 @Nullable String blueprintId,
+                                 int health) {
         this.id = id;
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.requirementId = requirementId;
         this.bedsCount = bedsCount;
         this.blueprintId = Optional.ofNullable(blueprintId).orElse(DEFAULT_BLUEPRINT_ID);
+        this.health = health;
     }
 
     public EssentialBuildingInfo(PacketByteBuf buf) {
@@ -36,6 +44,7 @@ public class EssentialBuildingInfo {
         this.requirementId = buf.readString();
         this.bedsCount = buf.readLong();
         this.blueprintId = buf.readString();
+        this.health = buf.readInt();
     }
 
     public BlockPos getStart() {
@@ -64,6 +73,10 @@ public class EssentialBuildingInfo {
         return Optional.of(blueprintId);
     }
 
+    public int getHealth() {
+        return health;
+    }
+
     public void write(PacketByteBuf buffer) {
         buffer.writeUuid(id);
         buffer.writeBlockPos(start);
@@ -71,5 +84,6 @@ public class EssentialBuildingInfo {
         buffer.writeString(requirementId);
         buffer.writeLong(bedsCount);
         buffer.writeString(blueprintId);
+        buffer.writeInt(health);
     }
 }
