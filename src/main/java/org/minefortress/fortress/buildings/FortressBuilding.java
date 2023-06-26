@@ -4,6 +4,7 @@ import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -86,7 +87,11 @@ public class FortressBuilding implements IAutomationArea {
 
         if(tag.contains("buildingBlockData")) {
             final var buildBlockDataTag = tag.get("buildingBlockData");
-            this.buildingBlockData = FortressBuildingBlockData.fromNbt(buildBlockDataTag);
+            if(buildBlockDataTag != null && buildBlockDataTag.getType() == NbtElement.COMPOUND_TYPE) {
+                this.buildingBlockData = FortressBuildingBlockData.fromNbt((NbtCompound) buildBlockDataTag);
+            } else {
+                this.buildingBlockData = null;
+            }
         } else {
             this.buildingBlockData = null;
         }

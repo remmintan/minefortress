@@ -3,38 +3,48 @@ package org.minefortress.fortress.buildings;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 class FortressBuildingBlockData {
 
+    private int blockPointer = 0;
     private final Map<BlockPos, Block> data = new HashMap<>();
 
     FortressBuildingBlockData(Map<BlockPos, BlockState> data) {
         for (Map.Entry<BlockPos, BlockState> entry : data.entrySet()) {
             final var pos = entry.getKey();
             final var state = entry.getValue();
-            this.data.put(pos, state.getBlock());
+            final var block = state.getBlock();
+            if(block == Blocks.AIR)
+                continue;
+            this.data.put(pos, block);
         }
     }
 
-    private FortressBuildingBlockData(NbtList list) {
-        for (int i = 0; i < list.size(); i++) {
-            final var compound = list.getCompound(i);
-            final var pos = BlockPos.fromLong(compound.getLong("pos"));
-            final var block = Registry.BLOCK.get(compound.getInt("block"));
-            data.put(pos, block);
+    private FortressBuildingBlockData(NbtCompound tag) {
+        if(tag.contains("pointer", NbtType.NUMBER))
+            blockPointer = tag.getInt("pointer");
+
+        if(tag.contains("blocks", NbtType.LIST)) {
+            final var list = tag.getList("blocks", NbtType.COMPOUND);
+            for (int i = 0; i < list.size(); i++) {
+                final var compound = list.getCompound(i);
+                final var pos = BlockPos.fromLong(compound.getLong("pos"));
+                final var block = Registry.BLOCK.get(compound.getInt("block"));
+                data.put(pos, block);
+            }
         }
     }
 
-    NbtElement toNbt() {
+    NbtCompound toNbt() {
+        final var tag = new NbtCompound();
         final var list = new NbtList();
         for (Map.Entry<BlockPos, Block> entry : data.entrySet()) {
             final var pos = entry.getKey();
@@ -44,13 +54,15 @@ class FortressBuildingBlockData {
             compound.putInt("block", Registry.BLOCK.getRawId(block));
             list.add(compound);
         }
-        return list;
+
+        tag.put("blocks", list);
+        tag.putInt("pointer", blockPointer);
+
+        return tag;
     }
 
-    static FortressBuildingBlockData fromNbt(@Nullable NbtElement list) {
-        if(list == null || list.getType() != NbtType.LIST)
-            throw new IllegalArgumentException("NbtElement must be a NbtList");
-        return new FortressBuildingBlockData((NbtList) list);
+    static FortressBuildingBlockData fromNbt(NbtCompound compound) {
+        return new FortressBuildingBlockData(compound);
     }
 
 }
