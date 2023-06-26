@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 public class FortressBuildingManager implements IAutomationAreaProvider {
 
+    private int buildingPointer = 0;
     private final List<FortressBuilding> buildings = new ArrayList<>();
     private final Supplier<ServerWorld> overworldSupplier;
     private boolean needSync = false;
@@ -60,17 +61,23 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
         return buildings.stream().mapToLong(it -> it.getBedsCount(getWorld())).reduce(0, Long::sum);
     }
 
-
     public void tick(ServerPlayerEntity player) {
-        if(player == null) return;
-        if (needSync) {
-            final var houses = buildings.stream()
-                    .map(it -> it.toEssentialInfo(getWorld()))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-            final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
+        if(!buildings.isEmpty()) {
+            buildingPointer = buildingPointer % buildings.size();
+            final var building = buildings.get(buildingPointer++);
+            building.updateTheHealthState(getWorld());
+        }
 
-            needSync = false;
+        if(player != null) {
+            if (needSync) {
+                final var houses = buildings.stream()
+                        .map(it -> it.toEssentialInfo(getWorld()))
+                        .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+                final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
+
+                needSync = false;
+            }
         }
     }
 
@@ -104,6 +111,8 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
             buildingsTag.put("building" + i++, buildingTag);
         }
 
+        buildingsTag.putInt("buildingPointer", buildingPointer);
+
         return buildingsTag;
     }
 
@@ -115,6 +124,8 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
             buildings.add(building);
             this.scheduleSync();
         }
+
+        buildingPointer = buildingsTag.getInt("buildingPointer");
     }
 
     @Override

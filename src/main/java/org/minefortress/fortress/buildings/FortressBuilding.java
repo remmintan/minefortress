@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -19,10 +20,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class FortressBuilding implements IAutomationArea {
+
+    private static final int MAX_BLOCKS_PER_UPDATE = 10;
 
     private final UUID id;
     private final BlockPos start;
@@ -31,7 +35,7 @@ public class FortressBuilding implements IAutomationArea {
     @Nullable
     private final String blueprintId;
     @Nullable
-    private final FortressBuildingBlockData buildingBlockData;
+    private FortressBuildingBlockData buildingBlockData;
     private LocalDateTime lastUpdated;
     private Iterator<AutomationBlockInfo> currentIterator;
 
@@ -95,6 +99,24 @@ public class FortressBuilding implements IAutomationArea {
         } else {
             this.buildingBlockData = null;
         }
+    }
+
+    public void updateTheHealthState(ServerWorld world) {
+        if(world == null || world.getRegistryKey() != World.OVERWORLD) {
+            return;
+        }
+
+        if(buildingBlockData == null) {
+            final var blocks = BlockPos.stream(start, end)
+                    .collect(Collectors.toMap(it -> it, world::getBlockState));
+            buildingBlockData = new FortressBuildingBlockData(blocks);
+        }
+
+        buildingBlockData.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world);
+    }
+
+    public float getHealth() {
+        return buildingBlockData == null ? 0 : buildingBlockData.getHealth();
     }
 
     public boolean isPartOfTheBuilding(BlockPos pos) {
