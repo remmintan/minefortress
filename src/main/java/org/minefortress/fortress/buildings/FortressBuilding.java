@@ -50,7 +50,9 @@ public class FortressBuilding implements IAutomationArea {
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.requirementId = requirementId;
-        this.buildingBlockData = new FortressBuildingBlockData(buildingBlockData);
+        final var blockData = buildingBlockData.entrySet().stream()
+                .collect(Collectors.toMap(it -> it.getKey().add(start).toImmutable(), Map.Entry::getValue));
+        this.buildingBlockData = new FortressBuildingBlockData(blockData);
         this.lastUpdated = LocalDateTime.MIN;
         this.blueprintId = blueprintId;
     }
