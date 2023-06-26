@@ -56,9 +56,7 @@ public class ManageBuildingScreen extends WindowScreen {
                 200,
                 20,
                 Text.of("Destroy Building"),
-                button -> {
-                    showDestroyConfirmation();
-                }
+                button -> showDestroyConfirmation()
             )
         );
 
@@ -107,10 +105,5 @@ public class ManageBuildingScreen extends WindowScreen {
     @Override
     public Text getTitle() {
         return screenName;
-    }
-
-    @Override
-    public boolean shouldCloseOnEsc() {
-        return true;
     }
 }

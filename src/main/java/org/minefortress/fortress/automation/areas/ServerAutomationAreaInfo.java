@@ -50,7 +50,6 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
             this.currentIterator = switch (getAreaType()) {
                 case FARMING -> new FarmAreaIterator(this.getServerArea(), world);
                 case QUARRY -> new MineAreaIterator(this.getServerArea(), world);
-                default -> throw new IllegalStateException("Unexpected value: " + getAreaType());
             };
         }
 

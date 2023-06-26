@@ -1,7 +1,6 @@
 package org.minefortress.fortress.automation;
 
 import net.minecraft.world.World;
-import org.minefortress.fortress.automation.AutomationBlockInfo;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;

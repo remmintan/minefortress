@@ -13,8 +13,6 @@ public class FollowFortressAttackTargetGoal extends Goal {
     private final float range;
     private LivingEntity target;
 
-    private long stopTime;
-
     public FollowFortressAttackTargetGoal(Colonist colonist, float speed, float range) {
         this.colonist = colonist;
         this.speed = speed;
