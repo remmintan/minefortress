@@ -79,9 +79,9 @@ class FortressBuildingBlockData {
         }
     }
 
-    float getHealth() {
+    int getHealth() {
         final var preserved = actualState.values().stream().filter(state -> state == BuildingBlockState.PRESERVED).count();
-        return (float) preserved / (float) actualState.size() * 100f;
+        return (int)((float) preserved / (float) actualState.size() * 100);
     }
 
     NbtCompound toNbt() {

@@ -115,7 +115,7 @@ public class FortressBuilding implements IAutomationArea {
         buildingBlockData.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world);
     }
 
-    public float getHealth() {
+    public int getHealth() {
         return buildingBlockData == null ? 0 : buildingBlockData.getHealth();
     }
 
