@@ -64,6 +64,7 @@ class FortressBuildingBlockData {
 
         boolean stateUpdated = false;
         for (int i = 0; i < blocksAmount; i++) {
+            blockPointer = blockPointer % referenceState.size();
             final var state = referenceState.get(blockPointer);
             final var pos = state.pos;
             final var block = state.block;

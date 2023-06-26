@@ -2,6 +2,7 @@ package org.minefortress.renderer.gui.fortress;
 
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.fortress.buildings.EssentialBuildingInfo;
@@ -52,7 +53,7 @@ public class ManageBuildingScreen extends WindowScreen {
         this.addDrawableChild(
             new ButtonWidget(
                 getScreenCenterX() - 100,
-                getScreenTopY() + 30,
+                getScreenTopY() + 55,
                 200,
                 20,
                 Text.of("Destroy Building"),
@@ -65,7 +66,7 @@ public class ManageBuildingScreen extends WindowScreen {
                 this.addDrawableChild(
                         new ButtonWidget(
                                 getScreenCenterX() - 100,
-                                getScreenTopY() + 55,
+                                getScreenTopY() + 80,
                                 200,
                                 20,
                                 Text.of("Hire pawns"),
@@ -76,6 +77,16 @@ public class ManageBuildingScreen extends WindowScreen {
                 );
             }
         });
+    }
+
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        // render health
+        final var healthInPercents = buildingInfo.getHealth();
+
+        final var healthText = Text.of("Health: " + healthInPercents + "%");
+        textRenderer.draw(matrices, healthText, getScreenLeftX() + 30, getScreenTopY() + 30, 0xFFFFFF);
     }
 
     private void showDestroyConfirmation() {

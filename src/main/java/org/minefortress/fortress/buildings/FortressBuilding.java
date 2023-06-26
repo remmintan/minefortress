@@ -108,7 +108,7 @@ public class FortressBuilding implements IAutomationArea {
 
         if(buildingBlockData == null) {
             final var blocks = BlockPos.stream(start, end)
-                    .collect(Collectors.toMap(it -> it, world::getBlockState));
+                    .collect(Collectors.toMap(BlockPos::toImmutable, world::getBlockState));
             buildingBlockData = new FortressBuildingBlockData(blocks);
         }
 
