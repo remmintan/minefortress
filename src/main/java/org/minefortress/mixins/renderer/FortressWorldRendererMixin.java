@@ -50,11 +50,6 @@ public abstract class FortressWorldRendererMixin  {
         this.entityRenderer = new MineFortressEntityRenderer(client.textRenderer, ((FortressMinecraftClient) client)::getSelectionManager);
     }
 
-    @Inject(method = "setWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;setWorld(Lnet/minecraft/world/World;)V"))
-    public void setWorld(ClientWorld world, CallbackInfo ci) {
-        this.entityRenderer.setLevel(world);
-    }
-
     @Inject(method = "setupTerrain", at = @At("TAIL"))
     public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
@@ -70,7 +65,7 @@ public abstract class FortressWorldRendererMixin  {
         final VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
 
         if(!client.options.hudHidden) {
-            this.entityRenderer.prepare(this.world, camera);
+            this.entityRenderer.prepare(camera);
             this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
         }
 
