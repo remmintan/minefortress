@@ -20,7 +20,7 @@ import org.minefortress.fortress.FortressBorder;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.renderer.MineFortressEntityRenderer;
+import org.minefortress.renderer.MineFortressLabelsRenderer;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -43,12 +43,12 @@ public abstract class FortressWorldRendererMixin  {
 
     @Shadow private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
 
-    private MineFortressEntityRenderer entityRenderer;
+    private MineFortressLabelsRenderer entityRenderer;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(MinecraftClient client, BufferBuilderStorage bufferBuilders, CallbackInfo ci) {
         final var fortressClient = (FortressMinecraftClient) client;
-        this.entityRenderer = new MineFortressEntityRenderer(
+        this.entityRenderer = new MineFortressLabelsRenderer(
                 client.textRenderer,
                 fortressClient::getSelectionManager,
                 () -> fortressClient.getFortressClientManager().getBuildingHealths()
