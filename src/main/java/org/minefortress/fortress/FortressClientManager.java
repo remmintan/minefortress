@@ -5,10 +5,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
+import org.minefortress.fortress.buildings.BuildingHealthRenderInfo;
 import org.minefortress.fortress.buildings.EssentialBuildingInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
@@ -334,6 +336,30 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     public FortressState getState() {
         return this.state;
+    }
+
+    public List<BuildingHealthRenderInfo> getBuildingHealths() {
+        if(this.getState() == FortressState.COMBAT)
+            return buildings
+                .stream()
+                .map(this::buildingToHealthRenderInfo)
+                .toList();
+        else
+            return Collections.emptyList();
+    }
+
+    private BuildingHealthRenderInfo buildingToHealthRenderInfo(EssentialBuildingInfo buildingInfo) {
+        final var start = buildingInfo.getStart();
+        final var end = buildingInfo.getEnd();
+
+        final var maxY = Math.max(start.getY(), end.getY());
+        final var centerX = (start.getX() + end.getX()) / 2;
+        final var centerZ = (start.getZ() + end.getZ()) / 2;
+
+        final var center = new Vec3d(centerX, maxY, centerZ);
+        final var health = buildingInfo.getHealth();
+
+        return new BuildingHealthRenderInfo(center, health);
     }
 
 }

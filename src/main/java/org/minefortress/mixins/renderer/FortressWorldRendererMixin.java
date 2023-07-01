@@ -47,7 +47,12 @@ public abstract class FortressWorldRendererMixin  {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(MinecraftClient client, BufferBuilderStorage bufferBuilders, CallbackInfo ci) {
-        this.entityRenderer = new MineFortressEntityRenderer(client.textRenderer, ((FortressMinecraftClient) client)::getSelectionManager);
+        final var fortressClient = (FortressMinecraftClient) client;
+        this.entityRenderer = new MineFortressEntityRenderer(
+                client.textRenderer,
+                fortressClient::getSelectionManager,
+                () -> fortressClient.getFortressClientManager().getBuildingHealths()
+        );
     }
 
     @Inject(method = "setupTerrain", at = @At("TAIL"))
