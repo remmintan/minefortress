@@ -1,10 +1,13 @@
 package org.minefortress.fortress.buildings;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.IAutomationAreaProvider;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -12,6 +15,8 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundSyncBuildingsPacket;
 
 import java.util.*;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,6 +26,10 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
     private int buildingPointer = 0;
     private final List<FortressBuilding> buildings = new ArrayList<>();
     private final Supplier<ServerWorld> overworldSupplier;
+    private final Cache<BlockPos, Object> bedsCache =
+            CacheBuilder.newBuilder()
+                    .expireAfterWrite(10, TimeUnit.SECONDS)
+                    .build();
     private boolean needSync = false;
 
     public FortressBuildingManager(Supplier<ServerWorld> overworldSupplier) {
@@ -44,17 +53,17 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
                 });
     }
 
-
     public Optional<BlockPos> getFreeBed(){
-        final var freeBedsList = buildings
+        final var freeBed = buildings
                 .stream()
                 .map(it -> it.getFreeBed(getWorld()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .toList();
-        if(freeBedsList.isEmpty())
-            return Optional.empty();
-        return Optional.of(freeBedsList.get(new Random().nextInt(freeBedsList.size())));
+                .filter(it -> !bedsCache.asMap().containsKey(it))
+                .findFirst();
+
+        freeBed.ifPresent(it -> bedsCache.put(it, new Object()));
+        return freeBed;
     }
 
     public long getTotalBedsCount() {
@@ -147,5 +156,35 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
 
     private ServerWorld getWorld() {
         return this.overworldSupplier.get();
+    }
+
+    private static class DelayedBedPosition implements Delayed {
+
+        private final static long DELAY = 1000 * 10;
+
+        private final BlockPos pos;
+        private final long creationTime;
+
+        public DelayedBedPosition(BlockPos pos) {
+            this.pos = pos;
+            this.creationTime = System.currentTimeMillis();
+        }
+
+        @Override
+        public long getDelay(@NotNull TimeUnit unit) {
+            return unit.convert(creationTime + DELAY - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        }
+
+        public BlockPos getPos() {
+            return pos;
+        }
+
+        @Override
+        public int compareTo(@NotNull Delayed o) {
+            if(o instanceof DelayedBedPosition bedPosition) {
+                return Long.compare(this.creationTime, bedPosition.creationTime);
+            }
+            return 0;
+        }
     }
 }
