@@ -339,13 +339,18 @@ public final class FortressClientManager extends AbstractFortressManager {
     }
 
     public List<BuildingHealthRenderInfo> getBuildingHealths() {
-        if(this.getState() == FortressState.COMBAT)
-            return buildings
-                .stream()
-                .map(this::buildingToHealthRenderInfo)
-                .toList();
-        else
-            return Collections.emptyList();
+        return switch (this.getState()) {
+            case COMBAT -> buildings
+                    .stream()
+                    .map(this::buildingToHealthRenderInfo)
+                    .toList();
+            case BUILD -> buildings
+                    .stream()
+                    .filter(it -> it.getHealth() < 33)
+                    .map(this::buildingToHealthRenderInfo)
+                    .toList();
+            default -> Collections.emptyList();
+        };
     }
 
     private BuildingHealthRenderInfo buildingToHealthRenderInfo(EssentialBuildingInfo buildingInfo) {
