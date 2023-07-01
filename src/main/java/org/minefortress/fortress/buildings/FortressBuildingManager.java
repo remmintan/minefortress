@@ -80,6 +80,10 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
             if(building.updateTheHealthState(getWorld())) {
                 this.scheduleSync();
             }
+
+            if(building.getHealth() < 1) {
+                this.destroyBuilding(building.getId());
+            }
         }
     }
 

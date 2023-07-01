@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
@@ -85,7 +86,8 @@ class FortressBuildingBlockData {
 
     int getHealth() {
         final var preserved = actualState.values().stream().filter(state -> state == BuildingBlockState.PRESERVED).count();
-        return (int)((float) preserved / (float) actualState.size() * 100);
+        final var delta = (float) preserved / (float) actualState.size();
+        return (int)MathHelper.clampedLerpFromProgress(delta, 0.5f, 1, 0, 100);
     }
 
     NbtCompound toNbt() {
