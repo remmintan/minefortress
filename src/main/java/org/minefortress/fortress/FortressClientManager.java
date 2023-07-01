@@ -342,6 +342,7 @@ public final class FortressClientManager extends AbstractFortressManager {
         return switch (this.getState()) {
             case COMBAT -> buildings
                     .stream()
+                    .filter(it -> it.getHealth() < 100)
                     .map(this::buildingToHealthRenderInfo)
                     .toList();
             case BUILD -> buildings
