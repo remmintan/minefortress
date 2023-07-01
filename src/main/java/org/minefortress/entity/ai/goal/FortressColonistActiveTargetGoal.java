@@ -20,22 +20,23 @@ public class FortressColonistActiveTargetGoal extends ActiveTargetGoal<HostileEn
 
     @Override
     public boolean canStart() {
+        if(this.colonist.isSleeping()) return false;
         if(!super.canStart()) {
             return false;
         }
 
-        if(this.target != null) {
+        if(this.targetEntity != null) {
             final var fortressServerManagerOpt = this.colonist.getFortressServerManager();
             if(fortressServerManagerOpt.isPresent()) {
                 final var serverManager = fortressServerManagerOpt.get();
-                final var targetWithinFortress = serverManager.isPositionWithinFortress(this.target.getBlockPos());
+                final var targetWithinFortress = serverManager.isPositionWithinFortress(this.targetEntity.getBlockPos());
                 if(targetWithinFortress) {
                     return true;
                 }
             }
         }
 
-        this.target = null;
+        this.targetEntity = null;
         return false;
     }
 }
