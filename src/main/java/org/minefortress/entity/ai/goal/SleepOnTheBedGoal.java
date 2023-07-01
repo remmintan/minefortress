@@ -46,7 +46,8 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
                 }
             }
         } else if(movementHelper.isStuck()) {
-            colonist.getFortressServerManager().flatMap(FortressServerManager::getRandomPositionAroundCampfire)
+            colonist.getFortressServerManager()
+                    .flatMap(FortressServerManager::getRandomPositionAroundCampfire)
                     .ifPresent(it -> {
                         final var pos = it.up();
                         colonist.resetControls();

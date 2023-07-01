@@ -530,8 +530,11 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(fortressCenter == null) return Optional.empty();
 
         final var random = getWorld().random;
-        final int x = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
-        final int z = random.nextInt(getHomeOuterRadius() - getHomeInnerRadius()) + getHomeInnerRadius() * (random.nextBoolean()?1:-1);
+
+        final var radius = Math.sqrt(random.nextDouble());
+        final var angle = random.nextDouble() * 2 * Math.PI;
+        final var x = (int) Math.round(radius * Math.cos(angle) * getHomeOuterRadius());
+        final var z = (int) Math.round(radius * Math.sin(angle) * getHomeOuterRadius());
 
         final var blockX = fortressCenter.getX() + x;
         final var blockZ = fortressCenter.getZ() + z;
@@ -540,12 +543,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Optional.of(new BlockPos(blockX, blockY, blockZ));
     }
 
-    public int getHomeOuterRadius() {
-        return Math.max(getTotalColonistsCount(), 5) * 4 / 5;
-    }
-
-    private int getHomeInnerRadius() {
-        return Math.max(getTotalColonistsCount(), 5) * 2 / 5;
+    public double getHomeOuterRadius() {
+        return Math.max(Math.sqrt(getTotalColonistsCount()), 4);
     }
 
     @Override

@@ -6,10 +6,10 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 
 import java.util.EnumSet;
-import java.util.Optional;
 
 public class ReturnToFireGoal extends AbstractFortressGoal {
 
+    private BlockPos positionAroundCampfire;
 
     public ReturnToFireGoal(Colonist colonist) {
         super(colonist);
@@ -18,53 +18,28 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(!isNight()) {
-            final Optional<BlockPos> pos = colonist.getFortressServerManager()
-                    .flatMap(FortressServerManager::getRandomPosWithinFortress);
-            if(pos.isPresent()) return false;
-        }
+        if(!colonist.world.isNight()) return false;
+        if(colonist.getTarget() != null && colonist.getTarget().isAlive()) return false;
+        if(colonist.getTaskControl().hasTask()) return false;
+        if(!isFarFromCenter()) return false;
 
-        if(colonist.getTarget() != null && colonist.getTarget().isAlive()) {
-            return false;
-        }
+        colonist.getFortressServerManager()
+                .flatMap(FortressServerManager::getRandomPositionAroundCampfire)
+                .ifPresent(pos -> positionAroundCampfire = pos);
 
-        return !colonist.getTaskControl().hasTask() && isFarFromCenter();
+        return  positionAroundCampfire != null;
     }
-
-    private boolean isFarFromCenter() {
-        final var serverManager = colonist.getFortressServerManager().orElseThrow();
-        final BlockPos fortressCenter = serverManager.getFortressCenter();
-        return fortressCenter != null &&
-                colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()) > Math.pow(serverManager.getHomeOuterRadius(), 2);
-    }
-
-    private boolean isNight() {
-        return colonist.world.isNight();
-    }
-
 
     @Override
     public void start() {
         super.start();
-        moveToTheFire();
+        colonist.getMovementHelper().goTo(positionAroundCampfire, Colonist.SLOW_MOVEMENT_SPEED);
         this.colonist.setCurrentTaskDesc("Staying near campfire");
-    }
-
-    private void moveToTheFire() {
-        final var randPos = colonist.getFortressServerManager()
-                .flatMap(FortressServerManager::getRandomPositionAroundCampfire);
-        if(randPos.isEmpty()) return;
-
-
-        colonist.getMovementHelper().goTo(randPos.get().up(), Colonist.SLOW_MOVEMENT_SPEED);
-        if(colonist.isSleeping()) {
-            colonist.wakeUp();
-        }
     }
 
     @Override
     public boolean shouldContinue() {
-        return isNight() &&
+        return colonist.world.isNight() &&
                 !colonist.getTaskControl().hasTask() &&
                 !colonist.getMovementHelper().isStuck() &&
                 (isFarFromCenter() || colonist.getMovementHelper().stillTryingToReachGoal());
@@ -74,5 +49,14 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     public void stop() {
         super.stop();
         colonist.getMovementHelper().reset();
+        this.positionAroundCampfire = null;
+    }
+
+    private boolean isFarFromCenter() {
+        final var serverManager = colonist.getFortressServerManager().orElseThrow();
+        final BlockPos fortressCenter = serverManager.getFortressCenter();
+        if (fortressCenter == null) return false;
+        final var distanseToCenter = Math.sqrt(colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()));
+        return distanseToCenter > serverManager.getHomeOuterRadius();
     }
 }
