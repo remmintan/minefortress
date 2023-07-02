@@ -7,6 +7,7 @@ import net.minecraft.text.Text;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.fortress.buildings.EssentialBuildingInfo;
 import org.minefortress.network.c2s.C2SDestroyBuilding;
+import org.minefortress.network.c2s.C2SOpenRepairBuildingScreen;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.Profession;
 import org.minefortress.renderer.gui.WindowScreen;
@@ -61,12 +62,26 @@ public class ManageBuildingScreen extends WindowScreen {
             )
         );
 
+        if(buildingInfo.getHealth() < 100) {
+            this.addDrawableChild(
+                    new ButtonWidget(
+                            getScreenCenterX() - 100,
+                            getScreenTopY() + 80,
+                            200,
+                            20,
+                            Text.of("Repair Building"),
+                            button -> openRepairBuildingScreen()
+                    )
+            );
+        }
+
+
         Optional.ofNullable(profession).ifPresent(it -> {
             if(it.isHireMenu()) {
                 this.addDrawableChild(
                         new ButtonWidget(
                                 getScreenCenterX() - 100,
-                                getScreenTopY() + 80,
+                                getScreenTopY() + 105,
                                 200,
                                 20,
                                 Text.of("Hire pawns"),
@@ -116,5 +131,10 @@ public class ManageBuildingScreen extends WindowScreen {
     @Override
     public Text getTitle() {
         return screenName;
+    }
+
+    private void openRepairBuildingScreen() {
+        final var packet = new C2SOpenRepairBuildingScreen(buildingInfo.getId());
+        FortressClientNetworkHelper.send(C2SOpenRepairBuildingScreen.CHANNEL, packet);
     }
 }

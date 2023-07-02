@@ -160,6 +160,12 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
                 .findFirst();
     }
 
+    public void doRepairConfirmation(UUID id) {
+        buildings.stream()
+                .filter(it -> it.getId().equals(id))
+                .findFirst();
+    }
+
     private ServerWorld getWorld() {
         return this.overworldSupplier.get();
     }
