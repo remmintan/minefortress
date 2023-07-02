@@ -117,6 +117,7 @@ class FortressBuildingBlockData {
     }
 
     void attack(HostileEntity attacker) {
+        if(attacker.getWorld().random.nextFloat() < 0.4f) return;
         for (Map.Entry<BlockPos, BuildingBlockState> entries : actualState.entrySet()) {
             final var pos = entries.getKey();
             final var state = entries.getValue();
