@@ -9,8 +9,12 @@ import org.minefortress.entity.interfaces.IProfessional;
 public class MeleeAttackGoal extends AttackGoal {
 
 
+    private final BasePawnEntity pawn;
+    private int cooldown = 0;
+
     public MeleeAttackGoal(BasePawnEntity pawn) {
         super(pawn);
+        this.pawn = pawn;
     }
 
     @Override
@@ -34,9 +38,14 @@ public class MeleeAttackGoal extends AttackGoal {
     @Override
     public void tick() {
         getTarget().ifPresent(it -> {
-            pawn.swingHand(Hand.MAIN_HAND);
-            pawn.tryAttack(it);
+            if(cooldown <= 0) {
+                pawn.swingHand(Hand.MAIN_HAND);
+                pawn.tryAttack(it);
+                cooldown = this.getTickCount(pawn.getAttackCooldown());
+            }
         });
+
+        if(cooldown > 0) cooldown--;
     }
 
 }

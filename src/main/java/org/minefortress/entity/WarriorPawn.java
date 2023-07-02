@@ -95,4 +95,8 @@ public final class WarriorPawn extends TargetedPawn implements IProfessional, IW
         return this.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
     }
 
+    @Override
+    public int getAttackCooldown() {
+        return 10;
+    }
 }

@@ -146,4 +146,8 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     public MinecraftServer getServer() {
         return super.getServer();
     }
+
+    public int getAttackCooldown() {
+        return 15;
+    }
 }
