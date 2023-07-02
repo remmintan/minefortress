@@ -3,6 +3,7 @@ package org.minefortress.fortress.buildings;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.BedPart;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
@@ -208,6 +209,11 @@ public class FortressBuilding implements IAutomationArea {
     @Override
     public LocalDateTime getUpdated() {
         return lastUpdated;
+    }
+
+    public void attack(HostileEntity attacker) {
+        if(buildingBlockData != null)
+            buildingBlockData.attack(attacker);
     }
 
     public EssentialBuildingInfo toEssentialInfo(World world) {

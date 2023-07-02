@@ -102,6 +102,7 @@ public final class AttackBuildingGoal extends Goal {
         this.mob.getLookControl().lookAt(targetPosition.getX(), targetPosition.getY(), targetPosition.getZ(), 30, 30);
         if(cooldown <= 0) {
             this.mob.swingHand(Hand.MAIN_HAND);
+            this.targetBuilding.attack(this.mob);
             cooldown = this.getTickCount(20);
         }
     }

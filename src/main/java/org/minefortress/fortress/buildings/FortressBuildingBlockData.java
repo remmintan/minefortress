@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
@@ -113,6 +114,18 @@ class FortressBuildingBlockData {
         tag.putInt("pointer", blockPointer);
 
         return tag;
+    }
+
+    void attack(HostileEntity attacker) {
+        for (Map.Entry<BlockPos, BuildingBlockState> entries : actualState.entrySet()) {
+            final var pos = entries.getKey();
+            final var state = entries.getValue();
+            if(state == BuildingBlockState.DESTROYED)
+                continue;
+            final var world = attacker.getWorld();
+            world.setBlockState(pos, Blocks.AIR.getDefaultState());
+            break;
+        }
     }
 
     static FortressBuildingBlockData fromNbt(NbtCompound compound) {
