@@ -20,7 +20,7 @@ public class FortressZombieEntityMixin extends HostileEntity {
 
     @Inject(method = "initCustomGoals", at = @At("TAIL"))
     protected void initCustomGoals(CallbackInfo ci) {
-        if(world.random.nextBoolean()) return;
+        if(world.random.nextFloat() >= 0.66f) return;
         if(this.getServer() instanceof FortressServer frtressServer) {
             final var modServerManager = frtressServer.getFortressModServerManager();
             final var zombie = (ZombieEntity) (Object) this;
