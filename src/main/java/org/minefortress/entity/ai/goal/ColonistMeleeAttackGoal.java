@@ -19,6 +19,6 @@ public class ColonistMeleeAttackGoal extends MeleeAttackGoal {
                 Optional.ofNullable(colonist.getTarget())
                         .map(it -> it.squaredDistanceTo(colonist))
                         .orElse(Double.MAX_VALUE)
-                     <= 5f;
+                     <= Colonist.WORK_REACH_DISTANCE * Colonist.WORK_REACH_DISTANCE;
     }
 }
