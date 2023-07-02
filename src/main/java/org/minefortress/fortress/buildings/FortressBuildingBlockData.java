@@ -12,6 +12,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldEvents;
+import net.minecraft.world.event.GameEvent;
 
 import java.util.*;
 
@@ -20,6 +22,7 @@ class FortressBuildingBlockData {
     private int blockPointer = 0;
     private final List<PositionedState> referenceState = new ArrayList<>();
     private final Map<BlockPos, BuildingBlockState> actualState = new HashMap<>();
+    private List<BlockPos> preservedPositions;
 
     FortressBuildingBlockData(Map<BlockPos, BlockState> preservedState) {
         for (Map.Entry<BlockPos, BlockState> entry : preservedState.entrySet()) {
@@ -58,6 +61,8 @@ class FortressBuildingBlockData {
                 actualState.put(pos, block);
             }
         }
+
+        recalculatePreservedPositions();
     }
 
     boolean checkTheNextBlocksState(int blocksAmount, ServerWorld world) {
@@ -82,7 +87,19 @@ class FortressBuildingBlockData {
             stateUpdated = stateUpdated || previousState != newState;
         }
 
+        if(stateUpdated)
+            recalculatePreservedPositions();
+
+
         return stateUpdated;
+    }
+
+    private void recalculatePreservedPositions() {
+        preservedPositions = actualState.entrySet()
+                .stream()
+                .filter(it -> it.getValue() == BuildingBlockState.PRESERVED)
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
     int getHealth() {
@@ -117,15 +134,31 @@ class FortressBuildingBlockData {
     }
 
     void attack(HostileEntity attacker) {
-        if(attacker.getWorld().random.nextFloat() < 0.4f) return;
+        final var world = attacker.getWorld();
+        final var random = world.random;
         for (Map.Entry<BlockPos, BuildingBlockState> entries : actualState.entrySet()) {
             final var pos = entries.getKey();
             final var state = entries.getValue();
             if(state == BuildingBlockState.DESTROYED)
                 continue;
-            final var world = attacker.getWorld();
-            world.setBlockState(pos, Blocks.AIR.getDefaultState());
+
+
+            if(random.nextFloat() >= 0.6f) {
+                world.syncWorldEvent(
+                        WorldEvents.BLOCK_BROKEN,
+                        pos,
+                        Block.getRawIdFromState(world.getBlockState(pos))
+                );
+                world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                world.emitGameEvent(GameEvent.BLOCK_DESTROY, pos);
+
+            }
             break;
+        }
+
+        if(preservedPositions!=null) {
+            final var pos = preservedPositions.get(random.nextInt(preservedPositions.size()));
+            world.setBlockBreakingInfo(attacker.getId(), pos, random.nextInt(10));
         }
     }
 
