@@ -6,11 +6,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.fortress.FortressServerManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FortressModServerManager {
@@ -71,6 +73,18 @@ public class FortressModServerManager {
 
             serverManagers.put(masterPlayerId, manager);
         }
+    }
+
+    public Optional<FortressServerManager> findReachableFortress(BlockPos pos, double reachRange) {
+        for (FortressServerManager manager : serverManagers.values()) {
+            final var fortressCenter = manager.getFortressCenter();
+            final var villageRadius = manager.getVillageRadius();
+
+            if(fortressCenter != null && fortressCenter.isWithinDistance(pos, villageRadius+reachRange)) {
+                return Optional.of(manager);
+            }
+        }
+        return Optional.empty();
     }
 
 }

@@ -1,4 +1,4 @@
-package org.minefortress.mixins.entity;
+package org.minefortress.mixins.entity.mob;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;

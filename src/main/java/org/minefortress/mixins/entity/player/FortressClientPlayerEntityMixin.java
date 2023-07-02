@@ -1,4 +1,4 @@
-package org.minefortress.mixins.entity;
+package org.minefortress.mixins.entity.player;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;

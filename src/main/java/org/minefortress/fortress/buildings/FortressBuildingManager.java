@@ -7,7 +7,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.IAutomationAreaProvider;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -15,7 +14,6 @@ import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundSyncBuildingsPacket;
 
 import java.util.*;
-import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -154,37 +152,16 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
         return buildings.stream().anyMatch(it -> it.isPartOfTheBuilding(pos));
     }
 
+    public Optional<FortressBuilding> findNearest(BlockPos pos) {
+        return buildings
+                .stream()
+                .sorted(Comparator.comparing(it -> it.getCenter().getSquaredDistance(pos)))
+                .filter(it -> it.getHealth() > 0)
+                .findFirst();
+    }
+
     private ServerWorld getWorld() {
         return this.overworldSupplier.get();
     }
 
-    private static class DelayedBedPosition implements Delayed {
-
-        private final static long DELAY = 1000 * 10;
-
-        private final BlockPos pos;
-        private final long creationTime;
-
-        public DelayedBedPosition(BlockPos pos) {
-            this.pos = pos;
-            this.creationTime = System.currentTimeMillis();
-        }
-
-        @Override
-        public long getDelay(@NotNull TimeUnit unit) {
-            return unit.convert(creationTime + DELAY - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-        }
-
-        public BlockPos getPos() {
-            return pos;
-        }
-
-        @Override
-        public int compareTo(@NotNull Delayed o) {
-            if(o instanceof DelayedBedPosition bedPosition) {
-                return Long.compare(this.creationTime, bedPosition.creationTime);
-            }
-            return 0;
-        }
-    }
 }

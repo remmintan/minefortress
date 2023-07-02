@@ -1,0 +1,116 @@
+package org.minefortress.entity.ai.goal.hostile;
+
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.pathing.Path;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.buildings.FortressBuilding;
+import org.minefortress.fortress.server.FortressModServerManager;
+
+import java.util.EnumSet;
+
+
+public final class AttackBuildingGoal extends Goal {
+
+    private static final int ATTACK_DISTANCE = 10;
+
+    private final FortressModServerManager modServerManager;
+    private final HostileEntity mob;
+    private FortressBuilding targetBuilding;
+    private BlockPos targetPosition;
+    private Path path;
+    private long lastUpdateTime = 0;
+
+    private int cooldown = 0;
+
+    public AttackBuildingGoal(HostileEntity mob, FortressModServerManager modServerManager) {
+        this.mob = mob;
+        this.modServerManager = modServerManager;
+        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
+    }
+
+    @Override
+    public boolean canStart() {
+        if(lastUpdateTime + 20 > mob.world.getTime()) return false;
+        if(!mob.world.isNight()) return false;
+        lastUpdateTime = mob.world.getTime();
+        final var mobBlockPos = this.mob.getBlockPos();
+        this.modServerManager
+                .findReachableFortress(mobBlockPos, getFollowRange())
+                .map(FortressServerManager::getFortressBuildingManager)
+                .flatMap(it -> it.findNearest(mobBlockPos))
+                .ifPresent(building -> this.targetBuilding = building);
+
+        if(targetBuilding!=null) {
+            this.targetPosition = targetBuilding.getNearestCornerXZ(mobBlockPos, mob.world);
+            this.path = mob.getNavigation().findPathTo(targetPosition, ATTACK_DISTANCE);
+        }
+
+        if(path != null) {
+            return true;
+        } else {
+            stop();
+            return false;
+        }
+    }
+
+    @Override
+    public void start() {
+        this.mob.getNavigation().startMovingAlong(this.path, 1.2);
+    }
+
+    @Override
+    public void tick() {
+        final var navigation = mob.getNavigation();
+        if(!navigation.isFollowingPath() && didntReachTheTarget()) {
+            path = navigation.findPathTo(targetPosition, ATTACK_DISTANCE);
+            if(path != null)
+                navigation.startMovingAlong(path, 1.2);
+        }
+
+        attack();
+        cooldown--;
+    }
+
+    @Override
+    public boolean shouldContinue() {
+        return mob.world.isNight()
+                && path != null
+                && targetBuilding.getHealth() > 0
+                && (mob.getAttacker() == null || !mob.getAttacker().isAlive());
+    }
+
+    @Override
+    public boolean canStop() {
+        return false;
+    }
+
+    @Override
+    public void stop() {
+        this.targetBuilding = null;
+        this.targetPosition = null;
+        this.path = null;
+    }
+
+    private void attack() {
+        if(targetBuilding == null) return;
+        if(targetPosition == null) return;
+        if(didntReachTheTarget()) return;
+        this.mob.getLookControl().lookAt(targetPosition.getX(), targetPosition.getY(), targetPosition.getZ(), 30, 30);
+        if(cooldown <= 0) {
+            this.mob.swingHand(Hand.MAIN_HAND);
+            cooldown = this.getTickCount(20);
+        }
+    }
+
+    private boolean didntReachTheTarget() {
+        return targetPosition.getSquaredDistance(mob.getPos()) > ATTACK_DISTANCE * ATTACK_DISTANCE;
+    }
+
+    private double getFollowRange() {
+        return this.mob.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
+    }
+}

@@ -1,4 +1,4 @@
-package org.minefortress.mixins.entity;
+package org.minefortress.mixins.entity.player;
 
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;

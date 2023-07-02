@@ -533,8 +533,8 @@ public final class FortressServerManager extends AbstractFortressManager {
 
         final var radius = Math.sqrt(random.nextDouble());
         final var angle = random.nextDouble() * 2 * Math.PI;
-        final var x = (int) Math.round(radius * Math.cos(angle) * getHomeOuterRadius());
-        final var z = (int) Math.round(radius * Math.sin(angle) * getHomeOuterRadius());
+        final var x = (int) Math.round(radius * Math.cos(angle) * getCampfireWarmRadius());
+        final var z = (int) Math.round(radius * Math.sin(angle) * getCampfireWarmRadius());
 
         final var blockX = fortressCenter.getX() + x;
         final var blockZ = fortressCenter.getZ() + z;
@@ -543,7 +543,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Optional.of(new BlockPos(blockX, blockY, blockZ));
     }
 
-    public double getHomeOuterRadius() {
+    public double getCampfireWarmRadius() {
         return Math.max(Math.sqrt(getTotalColonistsCount()), 4);
     }
 
@@ -654,6 +654,25 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(minX > pos.getX()) minX = pos.getX();
         if(maxZ < pos.getZ()) maxZ = pos.getZ();
         if(minZ > pos.getZ()) minZ = pos.getZ();
+    }
+
+    public double getVillageRadius() {
+        final var radius1 = flatDistanceToCampfire(maxX, maxZ);
+        final var radius2 = flatDistanceToCampfire(minX, minZ);
+        final var radius3 = flatDistanceToCampfire(maxX, minZ);
+        final var radius4 = flatDistanceToCampfire(minX, maxZ);
+
+        return Math.max(Math.max(radius1, radius2), Math.max(radius3, radius4));
+    }
+
+    private double flatDistanceToCampfire(double x, double z) {
+        final var campfireX = fortressCenter.getX();
+        final var campfireZ = fortressCenter.getZ();
+
+        final var deltaX = x - campfireX;
+        final var deltaZ = z - campfireZ;
+
+        return Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
     }
 
 }

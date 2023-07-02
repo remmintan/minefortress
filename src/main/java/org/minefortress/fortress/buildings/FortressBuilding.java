@@ -8,11 +8,12 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
+import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.iterators.FarmBuildingIterator;
 
 import java.time.LocalDateTime;
@@ -133,6 +134,16 @@ public class FortressBuilding implements IAutomationArea {
 
     public BlockPos getEnd() {
         return end;
+    }
+
+    public BlockPos getCenter() {
+        return new BlockPos((start.getX() + end.getX()) / 2, (start.getY() + end.getY()) / 2, (start.getZ() + end.getZ()) / 2);
+    }
+
+    public BlockPos getNearestCornerXZ(BlockPos pos, World world) {
+        final var x = pos.getX() < start.getX() ? start.getX() : Math.min(pos.getX(), end.getX());
+        final var z = pos.getZ() < start.getZ() ? start.getZ() : Math.min(pos.getZ(), end.getZ());
+        return world.getTopPosition(Heightmap.Type.WORLD_SURFACE, new BlockPos(x, 0, z));
     }
 
     public Optional<BlockPos> getFreeBed(World world) {

@@ -57,6 +57,6 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
         final BlockPos fortressCenter = serverManager.getFortressCenter();
         if (fortressCenter == null) return false;
         final var distanseToCenter = Math.sqrt(colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()));
-        return distanseToCenter > serverManager.getHomeOuterRadius();
+        return distanseToCenter > serverManager.getCampfireWarmRadius();
     }
 }
