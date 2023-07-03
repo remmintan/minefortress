@@ -9,7 +9,9 @@ import java.util.UUID;
 
 public class C2SRepairBuilding implements FortressC2SPacket {
 
-    private UUID buildingId;
+    public static final String CHANNEL = "repair_building";
+
+    private final UUID buildingId;
 
     public C2SRepairBuilding(UUID buildingId) {
         this.buildingId = buildingId;

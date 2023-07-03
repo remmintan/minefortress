@@ -9,6 +9,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
+import org.minefortress.network.c2s.C2SRepairBuilding;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.WindowScreen;
 
 import java.util.Collections;
@@ -74,7 +76,8 @@ public class RepairBuildingScreen extends WindowScreen {
                 20,
                 Text.of("Repair"),
                 button -> {
-
+                    final var packet = new C2SRepairBuilding(buildingId);
+                    FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet);
                 }
         );
         this.addDrawableChild(confirmationButton);

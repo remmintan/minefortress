@@ -55,6 +55,7 @@ public class FortressServerNetworkHelper {
         FortressServerNetworkHelper.registerReceiver(C2SClearActiveBlueprint.CHANNEL, C2SClearActiveBlueprint::new);
         FortressServerNetworkHelper.registerReceiver(C2SDestroyBuilding.CHANNEL, C2SDestroyBuilding::new);
         FortressServerNetworkHelper.registerReceiver(C2SOpenRepairBuildingScreen.CHANNEL, C2SOpenRepairBuildingScreen::new);
+        FortressServerNetworkHelper.registerReceiver(C2SRepairBuilding.CHANNEL, C2SRepairBuilding::new);
     }
 
 }
