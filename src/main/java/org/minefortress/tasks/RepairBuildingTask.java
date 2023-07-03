@@ -25,6 +25,7 @@ public class RepairBuildingTask extends AbstractTask {
     public TaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
         final var part = parts.remove();
         final var taskBlocks = BlockPos.stream(part.getFirst(), part.getSecond())
+                .map(BlockPos::toImmutable)
                 .filter(blocksToRepair::containsKey)
                 .map(it -> {
                     final var state = blocksToRepair.get(it);
