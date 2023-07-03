@@ -682,12 +682,15 @@ public final class FortressServerManager extends AbstractFortressManager {
 
             final var blocksToRepair = building.getAllBlockStatesToRepairTheBuilding();
 
-            final var blockInfos = BlockInfoUtils.convertBlockStatesMapItemsMap(blocksToRepair)
-                    .entrySet()
-                    .stream()
-                    .map(it -> new ItemInfo(it.getKey(), it.getValue().intValue()))
-                    .toList();
-            resourceManager.reserveItems(taskId, blockInfos);
+            if(this.isSurvival()) {
+                final var blockInfos = BlockInfoUtils.convertBlockStatesMapItemsMap(blocksToRepair)
+                        .entrySet()
+                        .stream()
+                        .map(it -> new ItemInfo(it.getKey(), it.getValue().intValue()))
+                        .toList();
+                resourceManager.reserveItems(taskId, blockInfos);
+            }
+
             final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);
             taskManager.addTask(task, this);
         } catch (RuntimeException exp) {

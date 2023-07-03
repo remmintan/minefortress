@@ -14,10 +14,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.utils.ModUtils;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.minefortress.utils.BlockInfoUtils.convertBlockStatesMapItemsMap;
@@ -84,6 +81,7 @@ public class RepairBuildingScreen extends WindowScreen {
 
                     final var packet = new C2SRepairBuilding(taskId, buildingId);
                     FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet);
+                    Optional.ofNullable(this.client).ifPresent(it -> it.setScreen(null));
                 }
         );
         this.addDrawableChild(confirmationButton);
