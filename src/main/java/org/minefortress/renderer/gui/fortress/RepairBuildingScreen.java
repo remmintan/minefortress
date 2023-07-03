@@ -12,9 +12,11 @@ import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.network.c2s.C2SRepairBuilding;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.WindowScreen;
+import org.minefortress.utils.ModUtils;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,7 @@ public class RepairBuildingScreen extends WindowScreen {
     private Map<Item, Boolean> hasEnoughResources;
 
     private final ClientResourceManager clientResourceManager;
+    private final Set<BlockPos> blocksToRepair;
 
     private ButtonWidget confirmationButton;
 
@@ -35,6 +38,7 @@ public class RepairBuildingScreen extends WindowScreen {
         super(Text.of("Repair Building"));
         this.buildingId = buildingId;
         this.clientResourceManager = clientResourceManager;
+        this.blocksToRepair = blocksToRepair.keySet();
 
         requiredItems = convertBlockStatesMapItemsMap(blocksToRepair);
 
@@ -74,7 +78,11 @@ public class RepairBuildingScreen extends WindowScreen {
                 20,
                 Text.of("Repair"),
                 button -> {
-                    final var packet = new C2SRepairBuilding(buildingId);
+                    final var taskId = UUID.randomUUID();
+
+                    ModUtils.getClientTasksHolder().ifPresent(it -> it.addTask(taskId, blocksToRepair));
+
+                    final var packet = new C2SRepairBuilding(taskId, buildingId);
                     FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet);
                 }
         );

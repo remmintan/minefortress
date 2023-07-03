@@ -25,6 +25,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
@@ -44,11 +45,14 @@ import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.s2c.ClientboundSyncSpecialBlocksPacket;
+import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.RepairBuildingTask;
 import org.minefortress.tasks.TaskManager;
 import org.minefortress.utils.BlockInfoUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,6 +60,7 @@ import java.util.stream.Stream;
 
 public final class FortressServerManager extends AbstractFortressManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FortressServerManager.class);
     private static final BlockState DEFAULT_STATE_ABOVE_CAMPFIRE = Blocks.BARRIER.getDefaultState();
     private static final int DEFAULT_COLONIST_COUNT = 5;
     
@@ -667,26 +672,28 @@ public final class FortressServerManager extends AbstractFortressManager {
         return Math.max(Math.max(radius1, radius2), Math.max(radius3, radius4));
     }
 
-    public void repairBuilding(UUID buildingId) {
+    public void repairBuilding(ServerPlayerEntity player, UUID taskId, UUID buildingId) {
         final var buildingManager = getFortressBuildingManager();
         final var resourceManager = getServerResourceManager();
 
-        final var building = buildingManager.getBuildingById(buildingId)
-                .orElseThrow(() -> new IllegalStateException("Building not found"));
+        try {
+            final var building = buildingManager.getBuildingById(buildingId)
+                    .orElseThrow(() -> new IllegalStateException("Building not found"));
 
-        final var blocksToRepair = building.getAllBlockStatesToRepairTheBuilding();
+            final var blocksToRepair = building.getAllBlockStatesToRepairTheBuilding();
 
-
-
-        final var taskId = UUID.randomUUID();
-        final var blockInfos = BlockInfoUtils.convertBlockStatesMapItemsMap(blocksToRepair)
-                .entrySet()
-                .stream()
-                .map(it -> new ItemInfo(it.getKey(), it.getValue().intValue()))
-                .toList();
-        resourceManager.reserveItems(taskId, blockInfos);
-        final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);
-        taskManager.addTask(task, this);
+            final var blockInfos = BlockInfoUtils.convertBlockStatesMapItemsMap(blocksToRepair)
+                    .entrySet()
+                    .stream()
+                    .map(it -> new ItemInfo(it.getKey(), it.getValue().intValue()))
+                    .toList();
+            resourceManager.reserveItems(taskId, blockInfos);
+            final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);
+            taskManager.addTask(task, this);
+        } catch (RuntimeException exp) {
+            LogManager.getLogger().error("Error while repairing building", exp);
+            FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
+        }
     }
 
     private double flatDistanceToCampfire(double x, double z) {

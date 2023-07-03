@@ -11,13 +11,16 @@ public class C2SRepairBuilding implements FortressC2SPacket {
 
     public static final String CHANNEL = "repair_building";
 
+    private final UUID taskId;
     private final UUID buildingId;
 
-    public C2SRepairBuilding(UUID buildingId) {
+    public C2SRepairBuilding(UUID taskId, UUID buildingId) {
+        this.taskId = taskId;
         this.buildingId = buildingId;
     }
 
     public C2SRepairBuilding(PacketByteBuf buf) {
+        taskId = buf.readUuid();
         buildingId = buf.readUuid();
     }
 
@@ -25,11 +28,12 @@ public class C2SRepairBuilding implements FortressC2SPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final var serverManager = getFortressServerManager(server, player);
-        serverManager.repairBuilding(buildingId);
+        serverManager.repairBuilding(player, taskId, buildingId);
     }
 
     @Override
     public void write(PacketByteBuf buf) {
+        buf.writeUuid(taskId);
         buf.writeUuid(buildingId);
     }
 }
