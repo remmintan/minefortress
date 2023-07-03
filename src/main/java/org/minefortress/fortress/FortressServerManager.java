@@ -46,7 +46,9 @@ import org.minefortress.network.s2c.ClientboundSyncFortressManagerPacket;
 import org.minefortress.network.s2c.ClientboundSyncSpecialBlocksPacket;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.registries.FortressEntities;
+import org.minefortress.tasks.RepairBuildingTask;
 import org.minefortress.tasks.TaskManager;
+import org.minefortress.utils.BlockInfoUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -663,6 +665,28 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var radius4 = flatDistanceToCampfire(minX, maxZ);
 
         return Math.max(Math.max(radius1, radius2), Math.max(radius3, radius4));
+    }
+
+    public void repairBuilding(UUID buildingId) {
+        final var buildingManager = getFortressBuildingManager();
+        final var resourceManager = getServerResourceManager();
+
+        final var building = buildingManager.getBuildingById(buildingId)
+                .orElseThrow(() -> new IllegalStateException("Building not found"));
+
+        final var blocksToRepair = building.getAllBlockStatesToRepairTheBuilding();
+
+
+
+        final var taskId = UUID.randomUUID();
+        final var blockInfos = BlockInfoUtils.convertBlockStatesMapItemsMap(blocksToRepair)
+                .entrySet()
+                .stream()
+                .map(it -> new ItemInfo(it.getKey(), it.getValue().intValue()))
+                .toList();
+        resourceManager.reserveItems(taskId, blockInfos);
+        final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);
+        taskManager.addTask(task, this);
     }
 
     private double flatDistanceToCampfire(double x, double z) {

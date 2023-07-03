@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.IAutomationAreaProvider;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -41,9 +42,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
     }
 
     public void destroyBuilding(UUID id) {
-        buildings.stream()
-                .filter(it -> it.getId().equals(id))
-                .findFirst()
+        getBuildingById(id)
                 .ifPresent(it -> {
                     buildings.remove(it);
                     BlockPos.iterate(it.getStart(), it.getEnd())
@@ -162,14 +161,19 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
     }
 
     public void doRepairConfirmation(UUID id, ServerPlayerEntity player) {
-        final var statesThatNeedsToBeRepaired = buildings.stream()
-                .filter(it -> it.getId().equals(id))
-                .findFirst()
+        final var statesThatNeedsToBeRepaired = getBuildingById(id)
                 .map(FortressBuilding::getAllBlockStatesToRepairTheBuilding)
                 .orElse(Collections.emptyMap());
 
         final var packet = new S2COpenBuildingRepairScreen(id, statesThatNeedsToBeRepaired);
         FortressServerNetworkHelper.send(player, S2COpenBuildingRepairScreen.CHANNEL, packet);
+    }
+
+    @NotNull
+    public Optional<FortressBuilding> getBuildingById(UUID id) {
+        return buildings.stream()
+                .filter(it -> it.getId().equals(id))
+                .findFirst();
     }
 
     private ServerWorld getWorld() {

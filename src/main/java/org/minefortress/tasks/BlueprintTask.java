@@ -134,9 +134,4 @@ public class BlueprintTask extends AbstractTask {
         }
     }
 
-    private Item getItemFromState(BlockState state) {
-        final Block block = state.getBlock();
-        return block.asItem();
-    }
-
 }

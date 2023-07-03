@@ -1,6 +1,9 @@
 package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.Item;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -109,6 +112,11 @@ public abstract class AbstractTask implements Task {
 
     protected int getCompletedParts() {
         return completedParts;
+    }
+
+    protected static Item getItemFromState(BlockState state) {
+        final Block block = state.getBlock();
+        return block.asItem();
     }
 
     private BlockPos createPartEnd(BlockPos start, Vec3i direction) {

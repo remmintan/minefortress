@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.minefortress.utils.BlockInfoUtils.convertBlockStatesMapItemsMap;
+
 public class RepairBuildingScreen extends WindowScreen {
 
     private final UUID buildingId;
@@ -34,16 +36,7 @@ public class RepairBuildingScreen extends WindowScreen {
         this.blocksToRepair = blocksToRepair;
         this.clientResourceManager = clientResourceManager;
 
-        requiredItems = blocksToRepair
-                .entrySet()
-                .stream()
-                .collect(Collectors
-                        .groupingBy(it ->
-                                        Item.BLOCK_ITEMS.get(it.getValue().getBlock()),
-                                Collectors.counting()
-                        )
-                );
-
+        requiredItems = convertBlockStatesMapItemsMap(blocksToRepair);
 
         for (Item item : Collections.unmodifiableSet(requiredItems.keySet())) {
             final var defaultStack = item.getDefaultStack();

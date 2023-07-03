@@ -14,11 +14,14 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.FortressBlockPlaceContext;
 import org.minefortress.entity.ai.FortressUseOnContext;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class BlockInfoUtils {
 
@@ -118,6 +121,18 @@ public class BlockInfoUtils {
     private static BlockHitResult moveHitResult(BlockHitResult blockHitResult, BlockPos goal) {
         final BlockPos clickedPos = goal.offset(blockHitResult.getSide().getOpposite()).toImmutable();
         return blockHitResult.withBlockPos(clickedPos);
+    }
+
+    @NotNull
+    public static Map<Item, Long> convertBlockStatesMapItemsMap(Map<BlockPos, BlockState> blocksToRepair) {
+        return blocksToRepair
+                .entrySet()
+                .stream()
+                .collect(Collectors
+                        .groupingBy(it -> it.getValue().getBlock().asItem(),
+                                Collectors.counting()
+                        )
+                );
     }
 
 }
