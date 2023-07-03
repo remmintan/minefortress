@@ -162,6 +162,20 @@ class FortressBuildingBlockData {
         }
     }
 
+    Map<BlockPos, BlockState> getAllBlockStatesToRepairTheBuilding() {
+        final var map = new HashMap<BlockPos, BlockState>();
+        for (Map.Entry<BlockPos, BuildingBlockState> entry : actualState.entrySet()) {
+            final var pos = entry.getKey();
+            final var state = entry.getValue();
+            if(state == BuildingBlockState.PRESERVED)
+                continue;
+
+            final var block = referenceState.stream().filter(it -> it.pos.equals(pos)).findFirst().orElseThrow().block;
+            map.put(pos, block.getDefaultState());
+        }
+        return map;
+    }
+
     static FortressBuildingBlockData fromNbt(NbtCompound compound) {
         return new FortressBuildingBlockData(compound);
     }

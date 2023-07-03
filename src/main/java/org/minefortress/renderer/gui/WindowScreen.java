@@ -62,6 +62,10 @@ public class WindowScreen extends Screen {
         return this.x;
     }
 
+    protected final int getScreenBottomY() {
+        return this.y + BACKGROUND_HEIGHT;
+    }
+
     protected final int getScreenRightX() {
         return this.x + BACKGROUND_WIDTH;
     }

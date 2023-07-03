@@ -12,6 +12,7 @@ import org.minefortress.fortress.automation.IAutomationAreaProvider;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundSyncBuildingsPacket;
+import org.minefortress.network.s2c.S2COpenBuildingRepairScreen;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -160,10 +161,15 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
                 .findFirst();
     }
 
-    public void doRepairConfirmation(UUID id) {
-        buildings.stream()
+    public void doRepairConfirmation(UUID id, ServerPlayerEntity player) {
+        final var statesThatNeedsToBeRepaired = buildings.stream()
                 .filter(it -> it.getId().equals(id))
-                .findFirst();
+                .findFirst()
+                .map(FortressBuilding::getAllBlockStatesToRepairTheBuilding)
+                .orElse(Collections.emptyMap());
+
+        final var packet = new S2COpenBuildingRepairScreen(id, statesThatNeedsToBeRepaired);
+        FortressServerNetworkHelper.send(player, S2COpenBuildingRepairScreen.CHANNEL, packet);
     }
 
     private ServerWorld getWorld() {

@@ -31,6 +31,7 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
 
     @Override
     public boolean hasItems(final List<ItemInfo> stacks) {
+        if(ModUtils.getFortressClientManager().isCreative()) return true;
         return stacks
                 .stream()
                 .allMatch(it -> {

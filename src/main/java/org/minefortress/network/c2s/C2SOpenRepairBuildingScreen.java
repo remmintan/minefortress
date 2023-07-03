@@ -26,7 +26,7 @@ public class C2SOpenRepairBuildingScreen implements FortressC2SPacket {
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         getFortressServerManager(server, player)
                 .getFortressBuildingManager()
-                .doRepairConfirmation(buildingId);
+                .doRepairConfirmation(buildingId, player);
     }
 
     @Override

@@ -18,10 +18,7 @@ import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.iterators.FarmBuildingIterator;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -218,5 +215,9 @@ public class FortressBuilding implements IAutomationArea {
 
     public EssentialBuildingInfo toEssentialInfo(World world) {
         return new EssentialBuildingInfo(id, start, end, requirementId, getBedsCount(world), blueprintId, getHealth());
+    }
+
+    public Map<BlockPos, BlockState> getAllBlockStatesToRepairTheBuilding() {
+        return buildingBlockData == null ? Collections.emptyMap() : buildingBlockData.getAllBlockStatesToRepairTheBuilding();
     }
 }
