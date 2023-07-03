@@ -17,8 +17,8 @@ public class S2COpenBuildingRepairScreen implements FortressS2CPacket {
 
     public final static String CHANNEL = "open_building_repair_screen";
 
-    private UUID buildingId;
-    private Map<BlockPos, BlockState> blocksToRepair;
+    private final UUID buildingId;
+    private final Map<BlockPos, BlockState> blocksToRepair;
 
     public S2COpenBuildingRepairScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair) {
         this.buildingId = buildingId;

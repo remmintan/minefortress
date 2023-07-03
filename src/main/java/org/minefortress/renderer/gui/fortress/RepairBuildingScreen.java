@@ -23,7 +23,6 @@ import static org.minefortress.utils.BlockInfoUtils.convertBlockStatesMapItemsMa
 public class RepairBuildingScreen extends WindowScreen {
 
     private final UUID buildingId;
-    private final Map<BlockPos, BlockState> blocksToRepair;
 
     private final Map<Item, Long> requiredItems;
     private Map<Item, Boolean> hasEnoughResources;
@@ -35,7 +34,6 @@ public class RepairBuildingScreen extends WindowScreen {
     public RepairBuildingScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair, ClientResourceManager clientResourceManager) {
         super(Text.of("Repair Building"));
         this.buildingId = buildingId;
-        this.blocksToRepair = blocksToRepair;
         this.clientResourceManager = clientResourceManager;
 
         requiredItems = convertBlockStatesMapItemsMap(blocksToRepair);

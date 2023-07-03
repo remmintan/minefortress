@@ -30,9 +30,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
 
     @Shadow @Final public MinecraftServer server;
-
-    @Shadow public abstract void teleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch);
-
     @Shadow public ServerPlayNetworkHandler networkHandler;
     private Vec3d persistedPos;
     private Vec3d persistedVelocity;
