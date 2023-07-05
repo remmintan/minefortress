@@ -67,7 +67,13 @@ jobs:
           echo "Response:"
           echo ""
           echo "$response"
-          echo "response=$response" >> $GITHUB_OUTPUT
+          echo "$response" > ./response.txt
+
+      - name: Read response
+        id: read_response
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./response.txt
 
       - name: Create Release on GitHub
         uses: ncipollo/release-action@v1
@@ -76,6 +82,6 @@ jobs:
         with:
           tag: ${{ github.ref_name }}
           name: MineFortress ${{ github.ref_name }}
-          body: ${{ fromJson(steps.openai.outputs.response).choices[0].text }}
+          body: ${{ fromJson(steps.read_response.outputs.content).choices[0].text }}
           prerelease: false
           allowUpdates: true
