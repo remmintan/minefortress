@@ -103,7 +103,7 @@ class FortressBuildingBlockData {
             final var actualBlock = world.getBlockState(pos);
 
             final var previousState = actualState.getOrDefault(pos, BuildingBlockState.PRESERVED);
-            final var newState = Objects.equals(block, actualBlock)? BuildingBlockState.PRESERVED : BuildingBlockState.DESTROYED;
+            final var newState = Objects.equals(block.getBlock(), actualBlock.getBlock())? BuildingBlockState.PRESERVED : BuildingBlockState.DESTROYED;
 
             actualState.put(pos, newState);
 
