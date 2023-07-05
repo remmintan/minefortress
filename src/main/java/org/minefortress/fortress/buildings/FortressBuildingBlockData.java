@@ -5,7 +5,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtInt;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -13,6 +16,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.event.GameEvent;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 
@@ -70,8 +74,15 @@ class FortressBuildingBlockData {
             for (int i = 0; i < list.size(); i++) {
                 final var compound = list.getCompound(i);
                 final var pos = BlockPos.fromLong(compound.getLong("pos"));
-                final var block = BuildingBlockState.valueOf(compound.getString("blockState"));
-                actualState.put(pos, block);
+                final var blockState = compound.getString("blockState");
+                try {
+                    final var block = BuildingBlockState.valueOf(blockState);
+                    actualState.put(pos, block);
+                }catch (IllegalArgumentException e) {
+                    LogManager.getLogger().error("Invalid block state: " + blockState);
+                    throw e;
+                }
+
             }
         }
 

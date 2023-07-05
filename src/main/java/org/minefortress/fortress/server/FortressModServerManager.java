@@ -37,6 +37,7 @@ public class FortressModServerManager {
         if(serverManagers.containsKey(uuid)) {
             return serverManagers.get(uuid);
         } else {
+            // TODO: write some fallback logic to find the player
             throw new IllegalArgumentException("No server manager found for player with id " + uuid);
         }
     }
