@@ -10,6 +10,7 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
@@ -27,16 +28,31 @@ class FortressBuildingBlockData {
     private final Map<BlockPos, BuildingBlockState> actualState = new HashMap<>();
     private List<BlockPos> preservedPositions;
 
-    FortressBuildingBlockData(Map<BlockPos, BlockState> preservedState) {
+    FortressBuildingBlockData(Map<BlockPos, BlockState> preservedState, int floorYLevel) {
         for (Map.Entry<BlockPos, BlockState> entry : preservedState.entrySet()) {
             final var pos = entry.getKey();
             final var state = entry.getValue();
-            if(state.isAir())
+            if(shouldSkipBlock(pos, state, floorYLevel))
                 continue;
             final var positionedState = new PositionedState(pos, state);
             this.referenceState.add(positionedState);
             this.actualState.put(pos, BuildingBlockState.PRESERVED);
         }
+    }
+
+    private static boolean shouldSkipBlock(BlockPos pos, BlockState state, int floorYLevel) {
+
+        if(state.isAir() || state.getMaterial().isLiquid() || state.getBlock() == Blocks.STRUCTURE_VOID)
+            return true;
+
+        if(state.getBlock() == Blocks.STRUCTURE_BLOCK)
+            return true;
+
+        if(pos.getY() < floorYLevel) {
+            return state.isIn(BlockTags.DIRT);
+        }
+
+        return false;
     }
 
     private FortressBuildingBlockData(NbtCompound tag) {

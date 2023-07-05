@@ -22,7 +22,7 @@ public class BlueprintTask extends AbstractTask {
     private final Map<BlockPos, BlockState> blueprintData;
     private final Map<BlockPos, BlockState> blueprintEntityData;
     private final Map<BlockPos, BlockState> blueprintAutomaticData;
-    private final float floorLevel;
+    private final int floorLevel;
     private final String requirementId;
     private final String blueprintId;
 
@@ -103,6 +103,7 @@ public class BlueprintTask extends AbstractTask {
                     endingBlock,
                     requirementId,
                     blueprintId,
+                    floorLevel,
                     mergeBlockData
             );
             final var serverManager = colonist.getFortressServerManager().orElseThrow();

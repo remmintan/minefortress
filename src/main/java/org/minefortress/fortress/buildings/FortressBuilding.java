@@ -33,6 +33,7 @@ public class FortressBuilding implements IAutomationArea {
     private final String requirementId;
     @Nullable
     private final String blueprintId;
+    private final int floorLevel;
     @Nullable
     private FortressBuildingBlockData buildingBlockData;
     private LocalDateTime lastUpdated;
@@ -43,6 +44,7 @@ public class FortressBuilding implements IAutomationArea {
                             BlockPos end,
                             String requirementId,
                             @NotNull String blueprintId,
+                            int floorLevel,
                             Map<BlockPos, BlockState> buildingBlockData
     ) {
         this.id = id;
@@ -51,7 +53,8 @@ public class FortressBuilding implements IAutomationArea {
         this.requirementId = requirementId;
         final var blockData = buildingBlockData.entrySet().stream()
                 .collect(Collectors.toMap(it -> it.getKey().add(start).toImmutable(), Map.Entry::getValue));
-        this.buildingBlockData = new FortressBuildingBlockData(blockData);
+        this.floorLevel = floorLevel;
+        this.buildingBlockData = new FortressBuildingBlockData(blockData, start.getY() + floorLevel);
         this.lastUpdated = LocalDateTime.MIN;
         this.blueprintId = blueprintId;
     }
@@ -100,6 +103,11 @@ public class FortressBuilding implements IAutomationArea {
         } else {
             this.buildingBlockData = null;
         }
+
+        if (tag.contains("floorLevel"))
+            this.floorLevel = tag.getInt("floorLevel");
+        else
+            this.floorLevel = 0;
     }
 
     public boolean updateTheHealthState(ServerWorld world) {
@@ -110,7 +118,7 @@ public class FortressBuilding implements IAutomationArea {
         if(buildingBlockData == null) {
             final var blocks = BlockPos.stream(start, end)
                     .collect(Collectors.toMap(BlockPos::toImmutable, world::getBlockState));
-            buildingBlockData = new FortressBuildingBlockData(blocks);
+            buildingBlockData = new FortressBuildingBlockData(blocks, this.start.getY() + floorLevel);
         }
 
         return buildingBlockData.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world);
@@ -174,6 +182,7 @@ public class FortressBuilding implements IAutomationArea {
         if(buildingBlockData != null) {
             tag.put("buildingBlockData", buildingBlockData.toNbt());
         }
+        tag.putInt("floorLevel", floorLevel);
     }
 
     @Override
