@@ -9,6 +9,7 @@ import net.minecraft.item.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -19,6 +20,7 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.FortressBlockPlaceContext;
 import org.minefortress.entity.ai.FortressUseOnContext;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -125,7 +127,7 @@ public class BlockInfoUtils {
 
     @NotNull
     public static Map<Item, Long> convertBlockStatesMapItemsMap(Map<BlockPos, BlockState> blocksToRepair) {
-        return blocksToRepair
+        final var amountOfRequiredItems = blocksToRepair
                 .entrySet()
                 .stream()
                 .collect(Collectors
@@ -133,6 +135,17 @@ public class BlockInfoUtils {
                                 Collectors.counting()
                         )
                 );
+
+        for (Item item : Collections.unmodifiableSet(amountOfRequiredItems.keySet())) {
+            if(item instanceof BlockItem blockItem) {
+                final var defaultBlockState = blockItem.getBlock().getDefaultState();
+                if(defaultBlockState.isIn(BlockTags.DOORS) || defaultBlockState.isIn(BlockTags.BEDS)) {
+                    amountOfRequiredItems.put(item, amountOfRequiredItems.get(item) / 2);
+                }
+            }
+        }
+
+        return amountOfRequiredItems;
     }
 
 }

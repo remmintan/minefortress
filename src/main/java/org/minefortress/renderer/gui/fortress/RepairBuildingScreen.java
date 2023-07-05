@@ -4,7 +4,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
-import net.minecraft.tag.ItemTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -38,14 +37,6 @@ public class RepairBuildingScreen extends WindowScreen {
         this.blocksToRepair = blocksToRepair.keySet();
 
         requiredItems = convertBlockStatesMapItemsMap(blocksToRepair);
-
-        for (Item item : Collections.unmodifiableSet(requiredItems.keySet())) {
-            final var defaultStack = item.getDefaultStack();
-            if (defaultStack.isIn(ItemTags.DOORS) || defaultStack.isIn(ItemTags.BEDS)) {
-                final var numberOfRequiredItems = requiredItems.get(item);
-                requiredItems.put(item, numberOfRequiredItems / 2);
-            }
-        }
 
         recalculateResources();
     }
