@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.Structure;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -131,7 +132,10 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
 
         final Map<BlockPos, BlockState> allBlocksWithoutEntities = structureData.entrySet()
             .stream()
-            .filter(entry -> !(entry.getValue().getBlock() instanceof BlockEntityProvider) && entry.getValue().getFluidState().isEmpty())
+            .filter(entry -> {
+                final var state = entry.getValue();
+                return !(state.getBlock() instanceof BlockEntityProvider) && state.getFluidState().isEmpty() && !state.isIn(BlockTags.TRAPDOORS);
+            })
             .filter(entry -> {
                 final BlockPos pos = entry.getKey();
                 final BlockState state = entry.getValue();
