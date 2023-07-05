@@ -2,7 +2,7 @@
 data="{
            \"prompt\": \"$2\",
            \"model\": \"$3\",
-           \"max_tokens\": 1000,
+           \"max_tokens\": 750,
            \"temperature\": 0.1,
            \"frequency_penalty\": 0.5,
            \"stop\": \"attached\"
