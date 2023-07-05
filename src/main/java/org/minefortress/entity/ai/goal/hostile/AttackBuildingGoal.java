@@ -15,7 +15,7 @@ import java.util.EnumSet;
 
 public final class AttackBuildingGoal extends Goal {
 
-    private static final int ATTACK_DISTANCE = 5;
+    private static final int ATTACK_DISTANCE = 6;
 
     private final FortressModServerManager modServerManager;
     private final HostileEntity mob;
