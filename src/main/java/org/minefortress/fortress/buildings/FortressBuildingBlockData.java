@@ -5,8 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.*;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -28,10 +27,9 @@ class FortressBuildingBlockData {
         for (Map.Entry<BlockPos, BlockState> entry : preservedState.entrySet()) {
             final var pos = entry.getKey();
             final var state = entry.getValue();
-            final var block = state.getBlock();
-            if(block == Blocks.AIR)
+            if(state.isAir())
                 continue;
-            final var positionedState = new PositionedState(pos, block);
+            final var positionedState = new PositionedState(pos, state);
             this.referenceState.add(positionedState);
             this.actualState.put(pos, BuildingBlockState.PRESERVED);
         }
@@ -46,9 +44,24 @@ class FortressBuildingBlockData {
             for (int i = 0; i < list.size(); i++) {
                 final var compound = list.getCompound(i);
                 final var pos = BlockPos.fromLong(compound.getLong("pos"));
-                final var block = Registry.BLOCK.get(compound.getInt("block"));
-                final var positionedState = new PositionedState(pos, block);
-                referenceState.add(positionedState);
+                final var blockStateTag = compound.get("blockState");
+                if(blockStateTag != null) {
+                    final BlockState blockState;
+                    if(blockStateTag.getType() == NbtType.INT) {
+                        final var nbtInt = (NbtInt)blockStateTag;
+                        final var blockId = nbtInt.intValue();
+                        final var block = Registry.BLOCK.get(blockId);
+                        blockState = block.getDefaultState();
+                    } else if(blockStateTag.getType() == NbtType.COMPOUND) {
+                        final var compoundTag = (NbtCompound)blockStateTag;
+                        blockState = NbtHelper.toBlockState(compoundTag);
+                    } else {
+                        throw new IllegalArgumentException("Invalid block state tag");
+                    }
+
+                    final var positionedState = new PositionedState(pos, blockState);
+                    referenceState.add(positionedState);
+                }
             }
         }
 
@@ -57,7 +70,7 @@ class FortressBuildingBlockData {
             for (int i = 0; i < list.size(); i++) {
                 final var compound = list.getCompound(i);
                 final var pos = BlockPos.fromLong(compound.getLong("pos"));
-                final var block = BuildingBlockState.valueOf(compound.getString("block"));
+                final var block = BuildingBlockState.valueOf(compound.getString("blockState"));
                 actualState.put(pos, block);
             }
         }
@@ -74,9 +87,9 @@ class FortressBuildingBlockData {
             blockPointer = blockPointer % referenceState.size();
             final var state = referenceState.get(blockPointer);
             final var pos = state.pos;
-            final var block = state.block;
+            final var block = state.blockState;
 
-            final var actualBlock = world.getBlockState(pos).getBlock();
+            final var actualBlock = world.getBlockState(pos);
 
             final var previousState = actualState.getOrDefault(pos, BuildingBlockState.PRESERVED);
             final var newState = Objects.equals(block, actualBlock)? BuildingBlockState.PRESERVED : BuildingBlockState.DESTROYED;
@@ -111,10 +124,11 @@ class FortressBuildingBlockData {
     NbtCompound toNbt() {
         final var tag = new NbtCompound();
         final var preservedStateList = new NbtList();
-        for (PositionedState state : referenceState) {
+        for (PositionedState positionedState : referenceState) {
             final var compound = new NbtCompound();
-            compound.putLong("pos", state.pos.asLong());
-            compound.putInt("block", Registry.BLOCK.getRawId(state.block));
+            compound.putLong("pos", positionedState.pos.asLong());
+            final var blockState = positionedState.blockState;
+            compound.put("blockState", NbtHelper.fromBlockState(blockState));
             preservedStateList.add(compound);
         }
         tag.put("referenceState", preservedStateList);
@@ -123,7 +137,7 @@ class FortressBuildingBlockData {
         for (Map.Entry<BlockPos, BuildingBlockState> entry : actualState.entrySet()) {
             final var compound = new NbtCompound();
             compound.putLong("pos", entry.getKey().asLong());
-            compound.putString("block", entry.getValue().name());
+            compound.putString("blockState", entry.getValue().name());
             actualStateList.add(compound);
         }
 
@@ -170,8 +184,13 @@ class FortressBuildingBlockData {
             if(state == BuildingBlockState.PRESERVED)
                 continue;
 
-            final var block = referenceState.stream().filter(it -> it.pos.equals(pos)).findFirst().orElseThrow().block;
-            map.put(pos, block.getDefaultState());
+            final var blockState = referenceState
+                    .stream()
+                    .filter(it -> it.pos.equals(pos))
+                    .findFirst()
+                    .orElseThrow()
+                    .blockState;
+            map.put(pos, blockState);
         }
         return map;
     }
@@ -180,7 +199,7 @@ class FortressBuildingBlockData {
         return new FortressBuildingBlockData(compound);
     }
 
-    private record PositionedState(BlockPos pos, Block block) {}
+    private record PositionedState(BlockPos pos, BlockState blockState) {}
 
     private enum BuildingBlockState {
         DESTROYED,
