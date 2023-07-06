@@ -161,6 +161,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
 
         this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());
         this.targetSelector.add(2, new FortressColonistActiveTargetGoal(this));
+        this.targetSelector.add(3, new BuildingAttackerTargetGoal(this));
     }
 
     @Override

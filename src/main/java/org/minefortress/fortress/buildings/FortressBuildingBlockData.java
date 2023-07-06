@@ -174,7 +174,7 @@ class FortressBuildingBlockData {
         return tag;
     }
 
-    void attack(HostileEntity attacker) {
+    boolean attack(HostileEntity attacker) {
         final var world = attacker.getWorld();
         final var random = world.random;
         for (Map.Entry<BlockPos, BuildingBlockState> entries : actualState.entrySet()) {
@@ -192,7 +192,7 @@ class FortressBuildingBlockData {
                 );
                 world.setBlockState(pos, Blocks.AIR.getDefaultState());
                 world.emitGameEvent(GameEvent.BLOCK_DESTROY, pos);
-
+                return true;
             }
             break;
         }
@@ -201,6 +201,8 @@ class FortressBuildingBlockData {
             final var pos = preservedPositions.get(random.nextInt(preservedPositions.size()));
             world.setBlockBreakingInfo(attacker.getId(), pos, random.nextInt(10));
         }
+
+        return false;
     }
 
     Map<BlockPos, BlockState> getAllBlockStatesToRepairTheBuilding() {

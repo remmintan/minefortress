@@ -3,6 +3,7 @@ package org.minefortress.fortress.buildings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -174,6 +175,19 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
         return buildings.stream()
                 .filter(it -> it.getId().equals(id))
                 .findFirst();
+    }
+
+    public Optional<HostileEntity> getRandomBuildingAttacker() {
+        final var attackersList = this.buildings
+                .stream()
+                .map(FortressBuilding::getAttackers)
+                .flatMap(Collection::stream)
+                .toList();
+        if(attackersList.isEmpty())
+            return Optional.empty();
+
+        final var random = getWorld().random;
+        return Optional.of(attackersList.get(random.nextInt(attackersList.size())));
     }
 
     private ServerWorld getWorld() {

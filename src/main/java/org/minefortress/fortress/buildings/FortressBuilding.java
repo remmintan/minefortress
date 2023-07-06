@@ -39,6 +39,8 @@ public class FortressBuilding implements IAutomationArea {
     private LocalDateTime lastUpdated;
     private Iterator<AutomationBlockInfo> currentIterator;
 
+    private Set<HostileEntity> attackers = new HashSet<>();
+
     public FortressBuilding(UUID id,
                             BlockPos start,
                             BlockPos end,
@@ -219,7 +221,14 @@ public class FortressBuilding implements IAutomationArea {
 
     public void attack(HostileEntity attacker) {
         if(buildingBlockData != null)
-            buildingBlockData.attack(attacker);
+            if(buildingBlockData.attack(attacker)) {
+                this.attackers.add(attacker);
+            }
+    }
+
+    public Set<HostileEntity> getAttackers() {
+        attackers.removeIf(it -> !it.isAlive());
+        return attackers;
     }
 
     public EssentialBuildingInfo toEssentialInfo(World world) {
