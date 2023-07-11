@@ -106,6 +106,7 @@ class FortressBuildingBlockData {
     }
 
     boolean checkTheNextBlocksState(int blocksAmount, ServerWorld world) {
+        if(referenceState.isEmpty()) return false;
         if(world.getRegistryKey() != World.OVERWORLD)
             throw new IllegalArgumentException("The world must be the overworld");
 
@@ -143,6 +144,7 @@ class FortressBuildingBlockData {
     }
 
     int getHealth() {
+        if(actualState.size() == 0) return 0;
         final var preserved = actualState.values().stream().filter(state -> state == BuildingBlockState.PRESERVED).count();
         final var delta = (float) preserved / (float) actualState.size();
         return (int)MathHelper.clampedLerpFromProgress(delta, 0.5f, 1, 0, 100);
