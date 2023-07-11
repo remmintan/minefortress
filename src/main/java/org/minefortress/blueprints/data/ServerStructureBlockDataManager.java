@@ -127,7 +127,7 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
 
         final Map<BlockPos, BlockState> structureEntityData = structureData.entrySet()
             .stream()
-            .filter(entry -> entry.getValue().getBlock() instanceof BlockEntityProvider || !entry.getValue().getFluidState().isEmpty())
+            .filter(entry -> entry.getValue().getBlock() instanceof BlockEntityProvider || !entry.getValue().getFluidState().isEmpty() || entry.getValue().isIn(BlockTags.TRAPDOORS))
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
 
         final Map<BlockPos, BlockState> allBlocksWithoutEntities = structureData.entrySet()
