@@ -1,9 +1,9 @@
 package org.minefortress.renderer.gui.hud;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.Items;
-import org.apache.commons.lang3.StringUtils;
 import org.minefortress.fortress.resources.gui.craft.MissingCraftsmanScreen;
 import org.minefortress.fortress.resources.gui.smelt.MissingBlacksmithScreen;
 import org.minefortress.network.c2s.ServerboundOpenCraftingScreenPacket;
@@ -67,7 +67,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
                 Items.FURNACE,
                 btn -> {
                     if (hasProfessionInAVillage("blacksmith")){
-                        if(hasBuildingInAVillage("blacksmith")) {
+                        if(ModUtils.getFortressClientManager().hasRequiredBlock(Blocks.FURNACE, true, 0)) {
                             FortressClientNetworkHelper.send(
                                     FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE,
                                     new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE)
@@ -100,16 +100,6 @@ public class ColonistsHudLayer extends AbstractHudLayer {
 
     private boolean hasProfessionInAVillage(String professionId) {
         return ModUtils.isClientInFortressGamemode() && ModUtils.getProfessionManager().hasProfession(professionId);
-    }
-
-    private boolean hasBuildingInAVillage(String professionId) {
-        final var profession = ModUtils.getProfessionManager().getProfession(professionId);
-        final var buildingRequirement = profession.getBuildingRequirement();
-        if(buildingRequirement == null || StringUtils.isBlank(buildingRequirement) || buildingRequirement.equals("_")) {
-            return false;
-        }
-
-        return ModUtils.getFortressClientManager().hasRequiredBuilding(buildingRequirement, 0);
     }
 
     @Override

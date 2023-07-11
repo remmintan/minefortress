@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreen;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -12,15 +13,15 @@ import org.minefortress.renderer.gui.professions.ProfessionsScreen;
 
 public abstract class AbstractMissingProfessionScreen extends Screen {
 
-    protected final boolean missingBuilding;
+    protected final boolean irregularReson;
 
     public AbstractMissingProfessionScreen() {
         this(false);
     }
 
-    public AbstractMissingProfessionScreen(boolean missingBuilding) {
+    public AbstractMissingProfessionScreen(boolean irregularReson) {
         super(new LiteralText("Missing Profession"));
-        this.missingBuilding = missingBuilding;
+        this.irregularReson = irregularReson;
     }
 
     @Override
@@ -30,7 +31,7 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
                 this.client.setScreen(null);
         }));
 
-        if(!missingBuilding) {
+        if(!irregularReson) {
             this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 2 + 48 - 16, 204, 20, new LiteralText("To professions menu"), button -> {
                 if(this.client != null)
                     this.client.setScreen(new ProfessionsScreen(getClient()));
@@ -43,8 +44,8 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
         this.renderBackground(matrices);
         final var missingText = String.format("You need at least one %s in your village", getMissingObjectName());
         FortressCraftingScreen.drawCenteredText(matrices, this.textRenderer, missingText, this.width / 2, this.height / 2 - 40, 0xFFFFFF);
-        if(missingBuilding) {
-            FortressCraftingScreen.drawCenteredText(matrices, this.textRenderer, "Go to blueprints menu and build one", this.width / 2, this.height / 2 - 25, 0xFFFFFF);
+        if(irregularReson) {
+            FortressCraftingScreen.drawCenteredText(matrices, this.textRenderer, getActionText(), this.width / 2, this.height / 2 - 25, 0xFFFFFF);
         } else {
             FortressCraftingScreen.drawCenteredText(matrices, this.textRenderer, "Go to professions menu and hire one", this.width / 2, this.height / 2 - 25, 0xFFFFFF);
         }
@@ -53,6 +54,10 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
 
     @NotNull
     protected abstract String getMissingObjectName();
+
+    protected String getActionText() {
+        throw new NotImplementedException("This method should be implemented in child class");
+    }
 
     private FortressMinecraftClient getClient() {
         return (FortressMinecraftClient) MinecraftClient.getInstance();
