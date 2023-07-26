@@ -190,6 +190,13 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
         return Optional.of(attackersList.get(random.nextInt(attackersList.size())));
     }
 
+    public void reset() {
+        buildings.clear();
+        bedsCache.invalidateAll();
+        buildingPointer = 0;
+        this.scheduleSync();
+    }
+
     private ServerWorld getWorld() {
         return this.overworldSupplier.get();
     }

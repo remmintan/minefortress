@@ -51,8 +51,6 @@ import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.RepairBuildingTask;
 import org.minefortress.tasks.TaskManager;
 import org.minefortress.utils.BlockInfoUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,7 +58,6 @@ import java.util.stream.Stream;
 
 public final class FortressServerManager extends AbstractFortressManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FortressServerManager.class);
     private static final BlockState DEFAULT_STATE_ABOVE_CAMPFIRE = Blocks.BARRIER.getDefaultState();
     private static final int DEFAULT_COLONIST_COUNT = 5;
     
@@ -429,6 +426,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(tag.contains("maxX")) maxX = tag.getInt("maxX");
         if(tag.contains("maxZ")) maxZ = tag.getInt("maxZ");
 
+        fortressBuildingManager.reset();
         if(tag.contains("buildings")) {
             final NbtCompound buildingsTag = tag.getCompound("buildings");
             fortressBuildingManager.readFromNbt(buildingsTag);

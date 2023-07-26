@@ -11,6 +11,7 @@ import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
@@ -23,6 +24,12 @@ import java.util.*;
 
 class FortressBuildingBlockData {
 
+    private static final List<Block> IGNORED_BLOCKS = Arrays.asList(
+            Blocks.STRUCTURE_BLOCK,
+            Blocks.STRUCTURE_VOID,
+            Blocks.AIR
+    );
+
     private int blockPointer = 0;
     private final List<PositionedState> referenceState = new ArrayList<>();
     private final Map<BlockPos, BuildingBlockState> actualState = new HashMap<>();
@@ -32,12 +39,23 @@ class FortressBuildingBlockData {
         for (Map.Entry<BlockPos, BlockState> entry : preservedState.entrySet()) {
             final var pos = entry.getKey();
             final var state = entry.getValue();
-            if(shouldSkipBlock(pos, state, floorYLevel))
+            if(shouldSkipBlock(pos, state, floorYLevel) || shouldSkipState(state))
                 continue;
             final var positionedState = new PositionedState(pos, state);
             this.referenceState.add(positionedState);
             this.actualState.put(pos, BuildingBlockState.PRESERVED);
         }
+    }
+
+
+
+    private static boolean shouldSkipState(BlockState state) {
+        for (Block ignoredBlock : IGNORED_BLOCKS) {
+            if(state.isOf(ignoredBlock))
+                return true;
+        }
+
+        return false;
     }
 
     private static boolean shouldSkipBlock(BlockPos pos, BlockState state, int floorYLevel) {
@@ -59,6 +77,7 @@ class FortressBuildingBlockData {
         if(tag.contains("pointer", NbtType.NUMBER))
             blockPointer = tag.getInt("pointer");
 
+        final var skippedPositions = new ArrayList<BlockPos>();
         if(tag.contains("referenceState", NbtType.LIST)) {
             final var list = tag.getList("referenceState", NbtType.COMPOUND);
             for (int i = 0; i < list.size(); i++) {
@@ -79,6 +98,12 @@ class FortressBuildingBlockData {
                         throw new IllegalArgumentException("Invalid block state tag");
                     }
 
+                    if (shouldSkipState(blockState)) {
+                        skippedPositions.add(pos);
+                        continue;
+                    }
+
+
                     final var positionedState = new PositionedState(pos, blockState);
                     referenceState.add(positionedState);
                 }
@@ -90,6 +115,8 @@ class FortressBuildingBlockData {
             for (int i = 0; i < list.size(); i++) {
                 final var compound = list.getCompound(i);
                 final var pos = BlockPos.fromLong(compound.getLong("pos"));
+                if(skippedPositions.contains(pos))
+                    continue;
                 final var blockState = compound.getString("blockState");
                 try {
                     final var block = BuildingBlockState.valueOf(blockState);
@@ -115,12 +142,12 @@ class FortressBuildingBlockData {
             blockPointer = blockPointer % referenceState.size();
             final var state = referenceState.get(blockPointer);
             final var pos = state.pos;
-            final var block = state.blockState;
+            final var referenceBlock = state.blockState;
 
             final var actualBlock = world.getBlockState(pos);
 
             final var previousState = actualState.getOrDefault(pos, BuildingBlockState.PRESERVED);
-            final var newState = Objects.equals(block.getBlock(), actualBlock.getBlock())? BuildingBlockState.PRESERVED : BuildingBlockState.DESTROYED;
+            final var newState = areBlocksSimilar(referenceBlock, actualBlock) ? BuildingBlockState.PRESERVED : BuildingBlockState.DESTROYED;
 
             actualState.put(pos, newState);
 
@@ -133,6 +160,28 @@ class FortressBuildingBlockData {
 
 
         return stateUpdated;
+    }
+
+    private static final List<TagKey<Block>> TAGS = List.of(
+            BlockTags.DIRT,
+            BlockTags.SAND,
+            BlockTags.LOGS
+    );
+
+    private static boolean areBlocksSimilar(BlockState block, BlockState actualBlock) {
+        if(Objects.equals(block.getBlock(), actualBlock.getBlock()))
+            return true;
+
+        for (TagKey<Block> tag : TAGS) {
+            if(blockAreInTheSameBlockTag(block, actualBlock, tag))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static boolean blockAreInTheSameBlockTag(BlockState a, BlockState b, TagKey<Block> blockTag) {
+        return a.isIn(blockTag) && b.isIn(blockTag);
     }
 
     private void recalculatePreservedPositions() {
