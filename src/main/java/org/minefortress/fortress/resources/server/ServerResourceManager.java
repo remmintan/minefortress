@@ -17,7 +17,7 @@ public interface ServerResourceManager extends FortressResourceManager {
     void increaseItemAmount(Item item, int amount);
     void reserveItems(UUID uuid, List<ItemInfo> stacks);
     void removeReservedItem(UUID taskId, Item item);
-    void removeItemIfExists(Item item);
+    void removeItemIfExists(UUID taskId, Item item);
     void removeItems(List<ItemInfo> items);
     void returnReservedItems(UUID taskId);
 

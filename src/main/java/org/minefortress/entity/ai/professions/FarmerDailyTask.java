@@ -15,6 +15,7 @@ import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
+import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;
@@ -206,7 +207,10 @@ public class FarmerDailyTask implements ProfessionDailyTask{
                     return 3;
                 }));
 
-        itemOpt.ifPresent(serverResourceManager::removeItemIfExists);
+        itemOpt.ifPresent(
+                it -> serverResourceManager
+                    .removeItems(Collections.singletonList(new ItemInfo(it, 1)))
+        );
         return itemOpt.map(it -> (BlockItem) it);
     }
 

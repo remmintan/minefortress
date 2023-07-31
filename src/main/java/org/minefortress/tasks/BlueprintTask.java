@@ -126,7 +126,7 @@ public class BlueprintTask extends AbstractTask {
             if (SimilarItemsHelper.isIgnorable(item)) {
                 fortressManager
                         .getServerResourceManager()
-                        .removeItemIfExists(item);
+                        .removeItemIfExists(this.getId(), item);
             } else {
                 fortressManager
                         .getServerResourceManager()

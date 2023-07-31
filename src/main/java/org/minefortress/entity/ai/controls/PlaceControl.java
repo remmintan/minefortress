@@ -95,15 +95,16 @@ public class PlaceControl extends PositionedActionControl {
         final var fortressServerManager = colonist.getFortressServerManager().orElseThrow();
         final var taskControl = colonist.getTaskControl();
         if(fortressServerManager.isSurvival()) {
-            if (isIgnorable(item) || !taskControl.hasTask()) {
-                fortressServerManager
-                        .getServerResourceManager()
-                        .removeItemIfExists(item);
-            } else {
-                taskControl.getTaskId().ifPresent(it -> fortressServerManager
-                        .getServerResourceManager()
-                        .removeReservedItem(it, item));
-            }
+            taskControl
+                    .getTaskId()
+                    .ifPresent(it -> {
+                        final var resourceManager = fortressServerManager.getServerResourceManager();
+                        if (isIgnorable(item)) {
+                            resourceManager.removeItemIfExists(it, item);
+                        } else {
+                            resourceManager.removeReservedItem(it, item);
+                        }
+                    });
         }
 
         if(item instanceof BlockItem blockItem && fortressServerManager.isBlockSpecial(blockItem.getBlock())){

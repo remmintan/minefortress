@@ -99,6 +99,12 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
     @Override
     public void removeReservedItem(UUID taskId, Item item) {
+        boolean ignoreWhenNotEnough = false;
+
+        removeReservedItem(taskId, item, ignoreWhenNotEnough);
+    }
+
+    private void removeReservedItem(UUID taskId, Item item, boolean ignoreWhenNotEnough) {
         if(!(item instanceof BlockItem)) return;
 
         final var reservedItemsManager = this.getManagerFromTaskId(taskId);
@@ -111,17 +117,16 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
                 final var similarStack = nonEmptySimilarStacks.get(0);
                 similarStack.decrease();
             } else{
-                LogManager.getLogger().warn("Tried to remove reserved item, but not enough items: " + item.getName().asString());
+                if(!ignoreWhenNotEnough) {
+                    LogManager.getLogger().warn("Tried to remove reserved item, but not enough items: " + item.getName().asString());
+                }
             }
         }
     }
 
     @Override
-    public void removeItemIfExists(Item item) {
-        final var stack = resources.getStack(item);
-        if(stack.getAmount() <= 0) return;
-        stack.decrease();
-        synchronizer.syncItem(item, stack.getAmount());
+    public void removeItemIfExists(UUID taskId, Item item) {
+        removeReservedItem(taskId, item, true);
     }
 
     public void removeItems(List<ItemInfo> items) {
