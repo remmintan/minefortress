@@ -1,11 +1,14 @@
 package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.enums.BedPart;
 import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.interfaces.IFortressAwareEntity;
@@ -88,8 +91,11 @@ public class BlueprintTask extends AbstractTask {
                     .forEach((pos, state) -> {
                         final var realpos = pos.add(startingBlock);
                         world.setBlockState(realpos, state, 3);
-                        removeReservedItem(colonist, state.getBlock().asItem());
+
                         addSpecialBlueprintBlock(colonist, state.getBlock(), realpos);
+                        if(!state.isIn(BlockTags.BEDS) || state.get(BedBlock.PART) != BedPart.FOOT) {
+                            removeReservedItem(colonist, state.getBlock().asItem());
+                        }
                     });
             }
 
