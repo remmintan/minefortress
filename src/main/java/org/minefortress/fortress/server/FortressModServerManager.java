@@ -79,9 +79,10 @@ public class FortressModServerManager {
     public Optional<FortressServerManager> findReachableFortress(BlockPos pos, double reachRange) {
         for (FortressServerManager manager : serverManagers.values()) {
             final var fortressCenter = manager.getFortressCenter();
+            if(fortressCenter == null) continue;
             final var villageRadius = manager.getVillageRadius();
 
-            if(fortressCenter != null && fortressCenter.isWithinDistance(pos, villageRadius+reachRange)) {
+            if(fortressCenter.isWithinDistance(pos, villageRadius + reachRange)) {
                 return Optional.of(manager);
             }
         }

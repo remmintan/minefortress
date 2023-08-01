@@ -26,6 +26,7 @@ import org.minefortress.registries.FortressEntities;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -76,6 +77,7 @@ public class FortressServerPlayNetworkHandlerMixin {
         return realDistance;
     }
 
+    @Unique
     private static boolean canPlace(ServerPlayerEntity player, ItemStack stack) {
         if (stack.isEmpty()) {
             return false;
@@ -84,6 +86,7 @@ public class FortressServerPlayNetworkHandlerMixin {
         return (item instanceof BlockItem || item instanceof BucketItem) && !player.getItemCooldownManager().isCoolingDown(item);
     }
 
+    @Unique
     private void addCustomNbtToStack(ItemStack stack) {
         if(stack == null) return;
         if(stack.getItem() instanceof SpawnEggItem eggItem) {
