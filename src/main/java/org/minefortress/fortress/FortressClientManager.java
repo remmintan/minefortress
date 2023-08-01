@@ -321,6 +321,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     public void reset() {
         this.initialized = false;
         this.selectedPawn = null;
+        this.state= FortressState.BUILD;
     }
 
     // getter and setter for state
