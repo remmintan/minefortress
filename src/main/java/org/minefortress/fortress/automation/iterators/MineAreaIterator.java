@@ -1,10 +1,10 @@
 package org.minefortress.fortress.automation.iterators;
 
-import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
+import org.minefortress.registries.FortressBlocks;
 import org.minefortress.utils.BuildingHelper;
 
 import java.util.List;
@@ -20,7 +20,14 @@ public class MineAreaIterator extends AbstractFilteredIterator{
 
     @Override
     protected boolean filter(BlockPos pos) {
-        return BuildingHelper.canRemoveBlock(world, pos) && notWater(pos) && noWaterAround(pos);
+        return BuildingHelper.canRemoveBlock(world, pos) &&
+                notFluid(pos) &&
+                noFluidAround(pos) &&
+                notSkaffoldBlock(pos);
+    }
+
+    private boolean notSkaffoldBlock(BlockPos pos) {
+        return !world.getBlockState(pos).isOf(FortressBlocks.SCAFFOLD_OAK_PLANKS);
     }
 
     @Override
@@ -28,11 +35,11 @@ public class MineAreaIterator extends AbstractFilteredIterator{
         return new AutomationBlockInfo(pos, AutomationActionType.MINE);
     }
 
-    private boolean notWater(BlockPos pos) {
-        return !world.getFluidState(pos).isIn(FluidTags.WATER);
+    private boolean notFluid(BlockPos pos) {
+        return world.getFluidState(pos).isEmpty();
     }
 
-    private boolean noWaterAround(BlockPos pos) {
+    private boolean noFluidAround(BlockPos pos) {
         return world.getFluidState(pos.up()).isEmpty()
                 && world.getFluidState(pos.north()).isEmpty()
                 && world.getFluidState(pos.south()).isEmpty()
