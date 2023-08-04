@@ -1,12 +1,9 @@
 package org.minefortress.renderer.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.minefortress.renderer.gui.hire.HirePawnScreen;
 
 public class WindowScreen extends Screen {
 
@@ -31,11 +28,11 @@ public class WindowScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
-        super.renderBackground(matrices);
-        this.drawBackground(matrices);
-        super.render(matrices, mouseX, mouseY, delta);
-        HirePawnScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, getTitle(), this.getScreenCenterX(), this.getScreenTopY() + 10, 0xFFFFFF);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        super.renderBackground(drawContext);
+        this.drawBackground(drawContext);
+        super.render(drawContext, mouseX, mouseY, delta);
+        drawContext.drawCenteredTextWithShadow(this.textRenderer, getTitle(), this.getScreenCenterX(), this.getScreenTopY() + 10, 0xFFFFFF);
     }
 
     @Override
@@ -43,11 +40,8 @@ public class WindowScreen extends Screen {
         return false;
     }
 
-    private void drawBackground(MatrixStack matrices) {
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE_IDENTIFIER);
-        this.drawTexture(matrices, this.x, this.y, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+    private void drawBackground(DrawContext drawContext) {
+        drawContext.drawTexture(BACKGROUND_TEXTURE_IDENTIFIER, this.x, this.y, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
     }
 
     protected final int getScreenCenterX() {
