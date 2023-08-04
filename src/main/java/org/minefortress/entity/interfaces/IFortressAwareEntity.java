@@ -30,7 +30,7 @@ public interface IFortressAwareEntity {
     }
 
     default void sendMessageToMasterPlayer(String message) {
-        getMasterPlayer().ifPresent(it -> it.sendMessage(new LiteralTextContent(message), false));
+        getMasterPlayer().ifPresent(it -> it.sendMessage(Text.literal(message), false));
     }
 
     default boolean isScreenOpen(Class<? extends ScreenHandler> screenHandlerClass) {

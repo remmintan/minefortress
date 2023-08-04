@@ -23,7 +23,7 @@ public class HirePawnScreen extends WindowScreen {
     private final IHireScreenHandler handler;
 
     public HirePawnScreen(@NotNull IHireScreenHandler handler) {
-        super(new LiteralTextContent(handler.getScreenName()));
+        super(Text.literal(handler.getScreenName()));
         this.handler = handler;
     }
 
@@ -89,7 +89,7 @@ public class HirePawnScreen extends WindowScreen {
                 },
                 (btn, matrices, x, y) -> {
                     final var buttonTooltip = canIncreaseAmount(costs, profId) ? "Hire" : "Not enough resources/pawns";
-                    this.renderTooltip(matrices, new LiteralTextContent(buttonTooltip), x, y);
+                    this.renderTooltip(matrices, Text.literal(buttonTooltip), x, y);
                 }
         );
         this.addDrawableChild(hireButton);

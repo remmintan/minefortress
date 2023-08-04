@@ -21,7 +21,7 @@ public class DynamicTextButtonWidget extends ButtonWidget implements IHudButton 
 
     @Override
     public void tick() {
-        this.setMessage(new LiteralTextContent(textSupplier.get()));
+        this.setMessage(Text.literal(textSupplier.get()));
     }
 
     @Override

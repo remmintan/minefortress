@@ -20,7 +20,7 @@ public enum BlueprintGroup {
     BlueprintGroup(boolean topRow, Item item, String name) {
         this.topRow = topRow;
         this.icon = new ItemStack(item);
-        this.nameText = new LiteralTextContent(name);
+        this.nameText = Text.literal(name);
     }
 
     public boolean isTopRow() {

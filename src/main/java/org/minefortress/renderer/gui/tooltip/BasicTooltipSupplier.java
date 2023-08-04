@@ -11,7 +11,7 @@ public class BasicTooltipSupplier extends BaseTooltipSupplier {
     private final Text text;
 
     public BasicTooltipSupplier(String text) {
-        this.text = new LiteralTextContent(text);
+        this.text = Text.literal(text);
     }
 
     @Override

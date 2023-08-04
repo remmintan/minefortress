@@ -23,7 +23,7 @@ public class BlueprintSlot {
 
     public BlueprintSlot(BlueprintMetadata metadata, boolean enoughResources, StrctureBlockData blockData) {
         this.metadata = metadata;
-        this.tooltipText = new LiteralTextContent(metadata.getName());
+        this.tooltipText = Text.literal(metadata.getName());
         this.enoughResources = enoughResources;
         this.blockData = blockData;
     }

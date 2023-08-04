@@ -17,14 +17,14 @@ public class BlueprintListEntry extends AlwaysSelectedEntryListWidget.Entry<Blue
     public BlueprintListEntry(String value, TextRenderer textRenderer, BlueprintsListWidget widget) {
         this.value = value;
         //remove blueprints extensions with substring
-        this.text = new LiteralTextContent(value.substring(0, value.length() - MineFortressMod.BLUEPRINTS_EXTENSION.length()));
+        this.text = Text.literal(value.substring(0, value.length() - MineFortressMod.BLUEPRINTS_EXTENSION.length()));
         this.textRenderer = textRenderer;
         this.widget = widget;
     }
 
     @Override
     public Text getNarration() {
-        return new LiteralTextContent("Blueprints: " + value);
+        return Text.literal("Blueprints: " + value);
     }
 
     @Override

@@ -26,7 +26,7 @@ abstract class NamedPawnEntity extends BasePawnEntity {
     private void setCustomNameIfNeeded() {
         getFortressServerManager().ifPresent(it -> {
             if(!this.hasCustomName()) {
-                this.setCustomName(new LiteralTextContent(it.getNameGenerator().generateRandomName()));
+                this.setCustomName(Text.literal(it.getNameGenerator().generateRandomName()));
             }
         });
     }

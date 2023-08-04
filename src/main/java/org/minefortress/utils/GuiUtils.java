@@ -48,12 +48,12 @@ public class GuiUtils {
                 final int lastPartLength = part.length();
                 if (textRenderer.getWidth(stringBuilder.toString()) > (maxWidth)) {
                     stringBuilder.delete(stringBuilder.length() - lastPartLength - 1, stringBuilder.length());
-                    preparedTextParts.add(new LiteralTextContent(stringBuilder.toString()));
+                    preparedTextParts.add(Text.literal(stringBuilder.toString()));
                     stringBuilder.delete(0, stringBuilder.length());
                     stringBuilder.append(part).append(" ");
                 }
             }
-            preparedTextParts.add(new LiteralTextContent(stringBuilder.toString()));
+            preparedTextParts.add(Text.literal(stringBuilder.toString()));
         }
 
         return Collections.unmodifiableList(preparedTextParts);

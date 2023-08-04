@@ -19,8 +19,8 @@ public class FortressToast implements Toast {
     private final ItemStack itemStack;
 
     public FortressToast(String title, String descriptionFirstLine, Item item) {
-        this.title = new LiteralTextContent(title);
-        this.descriptionFirstLine = new LiteralTextContent(descriptionFirstLine);
+        this.title = Text.literal(title);
+        this.descriptionFirstLine = Text.literal(descriptionFirstLine);
         this.itemStack = new ItemStack(item);
     }
 

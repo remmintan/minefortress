@@ -48,7 +48,7 @@ public class FortressBookContents implements BookScreen.Contents {
 
     @Override
     public StringVisitable getPageUnchecked(int index) {
-        return new LiteralTextContent(pages.get(index));
+        return Text.literal(pages.get(index));
     }
 
 }

@@ -65,7 +65,7 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
             final var isBurning = furnace.getBurnTime() > 0;
             final var burningLabel = isBurning ? ("" + furnace.getCookProgress()+"%") : ("not burning");
 
-            btn.setMessage(new LiteralTextContent("Fur."+selectedLabel+": "+burningLabel));
+            btn.setMessage(Text.literal("Fur."+selectedLabel+": "+burningLabel));
         }
     }
 

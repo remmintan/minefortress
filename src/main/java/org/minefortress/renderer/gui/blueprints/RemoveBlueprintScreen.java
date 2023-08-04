@@ -48,7 +48,7 @@ public class RemoveBlueprintScreen extends Screen {
     public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
         Screen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width/2, 40, 0xFFFFFF);
-        Screen.drawCenteredTextWithShadow(matrices, this.textRenderer, new LiteralTextContent(String.format("Do you want to delete blueprint: %s", name)), 60, 30, 0xFFFFFF);
+        Screen.drawCenteredTextWithShadow(matrices, this.textRenderer, Text.literal(String.format("Do you want to delete blueprint: %s", name)), 60, 30, 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);
     }
 
