@@ -24,15 +24,15 @@ import java.util.List;
 
 public class ImportExportBlueprintsScreen extends Screen {
 
-    private static final LiteralTextContent DEFAULT_LABEL = new LiteralTextContent("Import/Export Blueprints");
-    private static final LiteralTextContent IMPORT_LABEL = new LiteralTextContent("Importing...");
-    private static final LiteralTextContent IMPORT_PROMPT_LABEL = new LiteralTextContent("Select blueprints to import");
-    private static final LiteralTextContent EXPORT_LABEL = new LiteralTextContent("Exporting...");
-    private static final LiteralTextContent EXPORT_PROMPT_LABEL = new LiteralTextContent("Enter file name:");
-    private static final LiteralTextContent IMPORT_SUCCESS = new LiteralTextContent("Imported successfully!");
-    private static final LiteralTextContent EXPORT_SUCCESS = new LiteralTextContent("Exported successfully!");
-    private static final LiteralTextContent IMPORT_FAILURE = new LiteralTextContent("Import failed!");
-    private static final LiteralTextContent EXPORT_FAILURE = new LiteralTextContent("Export failed!");
+    private static final LiteralTextContent DEFAULT_LABEL = Text.literal("Import/Export Blueprints");
+    private static final LiteralTextContent IMPORT_LABEL = Text.literal("Importing...");
+    private static final LiteralTextContent IMPORT_PROMPT_LABEL = Text.literal("Select blueprints to import");
+    private static final LiteralTextContent EXPORT_LABEL = Text.literal("Exporting...");
+    private static final LiteralTextContent EXPORT_PROMPT_LABEL = Text.literal("Enter file name:");
+    private static final LiteralTextContent IMPORT_SUCCESS = Text.literal("Imported successfully!");
+    private static final LiteralTextContent EXPORT_SUCCESS = Text.literal("Exported successfully!");
+    private static final LiteralTextContent IMPORT_FAILURE = Text.literal("Import failed!");
+    private static final LiteralTextContent EXPORT_FAILURE = Text.literal("Export failed!");
 
     private ScreenState state = ScreenState.DEFAULT;
 
@@ -53,7 +53,7 @@ public class ImportExportBlueprintsScreen extends Screen {
     private LiteralTextContent label = DEFAULT_LABEL;
 
     public ImportExportBlueprintsScreen() {
-        super(new LiteralTextContent("Import/Export Blueprints"));
+        super(Text.literal("Import/Export Blueprints"));
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y + listHeight,
                 width,
                 height,
-                new LiteralTextContent("Import"),
+                Text.literal("Import"),
                 (button) -> {
                     setState(ScreenState.IMPORTING);
                     final var selected = importsList.getSelectedOrNull();
@@ -117,7 +117,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y + listHeight + step,
                 width/2 - 1,
                 height,
-                new LiteralTextContent("Open Folder"),
+                Text.literal("Open Folder"),
                 (button) -> openBlueprintsFolder()
         );
         importOpenFolder.visible = false;
@@ -127,7 +127,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y + listHeight + step,
                 width/2 - 1,
                 height,
-                new LiteralTextContent("Refresh list"),
+                Text.literal("Refresh list"),
                 (button) -> refreshImportsList()
         );
         importRefresh.visible = false;
@@ -137,7 +137,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y + listHeight + step * 2,
                 width,
                 height,
-                new LiteralTextContent("Cancel"),
+                Text.literal("Cancel"),
                 (button) -> setState(ScreenState.DEFAULT)
         );
         importCancel.visible = false;
@@ -169,7 +169,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y,
                 width,
                 height,
-                new LiteralTextContent("")
+                Text.literal("")
         );
         exportName.visible = false;
 
@@ -178,7 +178,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y + step,
                 width,
                 height,
-                new LiteralTextContent("Export"),
+                Text.literal("Export"),
                 button -> {
                     setState(ScreenState.EXPORTING);
                     final var text = exportName.getText();
@@ -196,7 +196,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y +(step *2),
                 width,
                 height,
-                new LiteralTextContent("Cancel"),
+                Text.literal("Cancel"),
                 button -> setState(ScreenState.DEFAULT)
         );
         exportCancel.visible = false;
@@ -212,7 +212,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y,
                 width,
                 height,
-                new LiteralTextContent("Back"),
+                Text.literal("Back"),
                 button -> MinecraftClient.getInstance().setScreen(new BlueprintsScreen())
         );
 
@@ -221,7 +221,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y + step,
                 width,
                 height,
-                new LiteralTextContent("Export blueprints"),
+                Text.literal("Export blueprints"),
                 button -> setState(ScreenState.EXPORT_PROMPT)
         );
 
@@ -230,7 +230,7 @@ public class ImportExportBlueprintsScreen extends Screen {
                 y + (step * 2),
                 width,
                 height,
-                new LiteralTextContent("Import blueprints"),
+                Text.literal("Import blueprints"),
                 button -> {
                     setState(ScreenState.IMPORT_PROMPT);
                     refreshImportsList();
@@ -258,7 +258,7 @@ public class ImportExportBlueprintsScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         super.renderBackground(matrices);
         super.render(matrices, mouseX, mouseY, delta);
         GameMenuScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.label, this.width / 2, 40, 0xFFFFFF);

@@ -17,7 +17,7 @@ public class BlueprintSlot {
     private BlueprintSlot() {
         metadata = null;
         enoughResources = true;
-        tooltipText = new LiteralTextContent("");
+        tooltipText = Text.literal("");
         blockData = null;
     }
 

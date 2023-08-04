@@ -28,7 +28,7 @@ public class BlueprintListEntry extends AlwaysSelectedEntryListWidget.Entry<Blue
     }
 
     @Override
-    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+    public void render(DrawContext matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
         this.textRenderer.drawWithShadow(matrices, text, (float)(x + 2), (float)(y + 3), 0xFFFFFF);
     }
 

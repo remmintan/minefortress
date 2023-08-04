@@ -28,7 +28,7 @@ public class CostsWidget implements Drawable, Element {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         final var itemRenderer = getItemRenderer();
         int i = 0;
         for(var ent : costs) {

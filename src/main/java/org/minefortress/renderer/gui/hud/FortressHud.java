@@ -46,7 +46,7 @@ public class FortressHud {
         hudLayers.add(new UtilsHudLayer(client));
     }
 
-    public void render(MatrixStack p, float delta) {
+    public void render(DrawContext p, float delta) {
         if(isHudHidden()) return;
         prepareRenderSystem();
 

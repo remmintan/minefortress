@@ -26,7 +26,7 @@ public class ProfessionQueueWidget extends MinefortressWidget implements Drawabl
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         final var itemRenderer = getItemRenderer();
         final var stack = Items.PLAYER_HEAD.getDefaultStack();
         itemRenderer.renderGuiItemIcon(stack, x, y);

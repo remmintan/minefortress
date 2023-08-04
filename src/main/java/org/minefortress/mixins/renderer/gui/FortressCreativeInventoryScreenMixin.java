@@ -127,7 +127,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if(isFortressSurvival()) {
             this.renderBackground(matrices);
             super.render(matrices, mouseX, mouseY, delta);

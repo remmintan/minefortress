@@ -15,7 +15,7 @@ public class AddBlueprintScreen extends Screen {
     private final BlueprintGroup group;
 
     public AddBlueprintScreen(BlueprintGroup group) {
-        super(new LiteralTextContent("Add new Blueprint"));
+        super(Text.literal("Add new Blueprint"));
         this.group = group;
     }
 
@@ -26,13 +26,13 @@ public class AddBlueprintScreen extends Screen {
                 this.textRenderer,
                 this.width / 2 - 102,
                 this.height / 4 + 24 - 16, 204, 20,
-                new LiteralTextContent("Blueprint Name")
+                Text.literal("Blueprint Name")
         );
         this.addDrawableChild(textField);
         final var btn = new ButtonWidget(
                 this.width / 2 - 102,
                 this.height / 4 + 48 - 16, 204, 20,
-                new LiteralTextContent("Save blueprint"),
+                Text.literal("Save blueprint"),
                 button -> {
                     final var text = textField.getText();
                     if(Strings.isNotBlank(text)) {
@@ -48,7 +48,7 @@ public class AddBlueprintScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
         Screen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);

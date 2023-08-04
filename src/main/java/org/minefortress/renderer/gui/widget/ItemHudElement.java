@@ -19,7 +19,7 @@ public class ItemHudElement extends BasicHudElement implements IItemHudElement {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         this.itemRenderer.renderGuiItemIcon(itemStack, x, y);
         this.hovered = mouseX >= x && mouseY >= y && mouseX < x + 16 && mouseY < y + 16;
     }

@@ -27,7 +27,7 @@ public abstract class AbstractCustomRenderer {
         this.client = client;
     }
 
-    public void render(MatrixStack matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {
+    public void render(DrawContext matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {
         if(shouldRender()) {
             for(RenderLayer layer : getRenderLayers()) {
                 renderLayer(layer, matrices, cameraX, cameraY, cameraZ, projectionMatrix);

@@ -19,14 +19,14 @@ public class ProfessionsScreen extends Screen {
     private boolean startClick = false;
 
     public ProfessionsScreen(FortressMinecraftClient client) {
-        super(new LiteralTextContent("Professions"));
+        super(Text.literal("Professions"));
         this.professionsLayer = new ProfessionsLayer(client);
         this.fortressManager = client.getFortressClientManager();
         this.professionManager = client.getFortressClientManager().getProfessionManager();
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
 //        int screenX = (this.width - WINDOW_WIDTH) / 2;
 //        int screenY = (this.height - WINDOW_HEIGHT) / 2;
         int screenX = 0;

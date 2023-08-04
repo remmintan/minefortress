@@ -40,7 +40,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                 MinecraftClient.getInstance()
                         .inGameHud
                         .getChatHud()
-                        .addMessage(new LiteralTextContent("Please select an area type first!"));
+                        .addMessage(Text.literal("Please select an area type first!"));
                 return false;
             }
             final var blockPos = bhr.getBlockPos();
@@ -62,7 +62,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                     MinecraftClient.getInstance()
                             .inGameHud
                             .getChatHud()
-                            .addMessage(new LiteralTextContent("The selected area is not inside the fortress!"));
+                            .addMessage(Text.literal("The selected area is not inside the fortress!"));
                 }
                 resetSelection();
             }

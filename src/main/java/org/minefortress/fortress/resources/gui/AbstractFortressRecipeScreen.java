@@ -54,7 +54,7 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
         if (getRecipeBookWidget().isOpen() && this.narrow) {
             this.drawBackground(matrices, delta, mouseX, mouseY);

@@ -40,7 +40,7 @@ public class ProfessionNameWidget extends MinefortressWidget implements Element,
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         final var scaleFactor = getScaleFactor();
         matrices.push();
         matrices.scale(scaleFactor, scaleFactor, 1f);

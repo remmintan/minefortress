@@ -20,19 +20,19 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
     }
 
     public AbstractMissingProfessionScreen(boolean irregularReson) {
-        super(new LiteralTextContent("Missing Profession"));
+        super(Text.literal("Missing Profession"));
         this.irregularReson = irregularReson;
     }
 
     @Override
     protected void init() {
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 2 + 24 - 16, 204, 20, new LiteralTextContent("Back"), button -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 2 + 24 - 16, 204, 20, Text.literal("Back"), button -> {
             if(this.client != null)
                 this.client.setScreen(null);
         }));
 
         if(!irregularReson) {
-            this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 2 + 48 - 16, 204, 20, new LiteralTextContent("To professions menu"), button -> {
+            this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 2 + 48 - 16, 204, 20, Text.literal("To professions menu"), button -> {
                 if(this.client != null)
                     this.client.setScreen(new ProfessionsScreen(getClient()));
             }));
@@ -40,7 +40,7 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
         final var missingText = String.format("You need at least one %s in your village", getMissingObjectName());
         FortressCraftingScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, missingText, this.width / 2, this.height / 2 - 40, 0xFFFFFF);

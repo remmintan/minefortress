@@ -13,7 +13,7 @@ public class RemoveBlueprintScreen extends Screen {
     private final String name;
 
     public RemoveBlueprintScreen(String name) {
-        super(new LiteralTextContent("Remove Blueprint"));
+        super(Text.literal("Remove Blueprint"));
         this.name = name;
     }
 
@@ -25,7 +25,7 @@ public class RemoveBlueprintScreen extends Screen {
                 this.height / 4 + 48 - 16,
                 102,
                 20,
-                new LiteralTextContent("Yes"),
+                Text.literal("Yes"),
                 button -> {
                     final var removePacket = ServerboundEditBlueprintPacket.remove(name);
                     FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, removePacket);
@@ -36,7 +36,7 @@ public class RemoveBlueprintScreen extends Screen {
                 this.height / 4 + 48 - 16,
                 102,
                 20,
-                new LiteralTextContent("No"),
+                Text.literal("No"),
                 button -> {
                     this.client.setScreen(new BlueprintsScreen());
                 }
@@ -45,7 +45,7 @@ public class RemoveBlueprintScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
         Screen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width/2, 40, 0xFFFFFF);
         Screen.drawCenteredTextWithShadow(matrices, this.textRenderer, new LiteralTextContent(String.format("Do you want to delete blueprint: %s", name)), 60, 30, 0xFFFFFF);

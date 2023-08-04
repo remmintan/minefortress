@@ -32,9 +32,9 @@ public final class BlueprintsScreen extends Screen {
     private static final Identifier INVENTORY_TABS_TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
     private static final String BACKGROUND_TEXTURE = "textures/gui/container/creative_inventory/tab_items.png";
     private static final Identifier BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE = new Identifier("textures/gui/recipe_book.png");
-    private static final LiteralTextContent EDIT_BLUEPRINT_TEXT = new LiteralTextContent("right click to edit");
-    private static final LiteralTextContent ADD_BLUEPRINT_TEXT = new LiteralTextContent("click to add blueprint");
-    private static final LiteralTextContent DELETE_BLUEPRINT_TEXT = new LiteralTextContent("right click to delete");
+    private static final LiteralTextContent EDIT_BLUEPRINT_TEXT = Text.literal("right click to edit");
+    private static final LiteralTextContent ADD_BLUEPRINT_TEXT = Text.literal("click to add blueprint");
+    private static final LiteralTextContent DELETE_BLUEPRINT_TEXT = Text.literal("right click to delete");
 
     private final int backgroundWidth = 195;
     private final int backgroundHeight = 136;
@@ -54,7 +54,7 @@ public final class BlueprintsScreen extends Screen {
     private BlueprintScreenHandler handler;
 
     public BlueprintsScreen() {
-        super(new LiteralTextContent("Blueprints"));
+        super(Text.literal("Blueprints"));
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class BlueprintsScreen extends Screen {
                                     this.y - 22,
                                     120,
                                     20,
-                                    new LiteralTextContent("Import / Export"),
+                                    Text.literal("Import / Export"),
                                     btn -> client.setScreen(new ImportExportBlueprintsScreen())
                             )
                     );
@@ -182,7 +182,7 @@ public final class BlueprintsScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
         this.drawBackground(matrices);
         RenderSystem.disableDepthTest();

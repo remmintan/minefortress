@@ -10,7 +10,7 @@ public interface IHudElement {
     default void setPosBasedOn(int basepointX, int basepointY) {
         setPos(basepointX + getAnchorX(), basepointY + getAnchorY());
     }
-    void render(MatrixStack matrices, int mouseX, int mouseY, float delta);
+    void render(DrawContext matrices, int mouseX, int mouseY, float delta);
     default boolean shouldRender(boolean isCreative) {
         return true;
     }

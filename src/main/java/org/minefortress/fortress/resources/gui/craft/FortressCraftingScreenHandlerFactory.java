@@ -16,7 +16,7 @@ import org.minefortress.interfaces.FortressServerPlayerEntity;
 public class FortressCraftingScreenHandlerFactory implements NamedScreenHandlerFactory {
     @Override
     public Text getDisplayName() {
-        return new LiteralTextContent("Crafting");
+        return Text.literal("Crafting");
     }
 
     @Nullable

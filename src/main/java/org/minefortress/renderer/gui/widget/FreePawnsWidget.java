@@ -18,7 +18,7 @@ public class FreePawnsWidget extends MinefortressWidget implements Drawable, Ele
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         final var freePawns = getFreePawns();
         getTextRenderer().draw(matrices, "Free Pawns: " + freePawns, x, y, freePawns > 0 ? 0xFFFFFF : 0xFF0000);
     }

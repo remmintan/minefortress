@@ -94,7 +94,7 @@ public class RepairBuildingScreen extends WindowScreen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
 
         final var itemRenderer =  this.itemRenderer;

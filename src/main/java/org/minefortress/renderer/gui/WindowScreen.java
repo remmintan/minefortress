@@ -31,7 +31,7 @@ public class WindowScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         super.renderBackground(matrices);
         this.drawBackground(matrices);
         super.render(matrices, mouseX, mouseY, delta);

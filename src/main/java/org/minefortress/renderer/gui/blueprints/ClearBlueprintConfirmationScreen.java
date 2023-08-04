@@ -27,17 +27,17 @@ public class ClearBlueprintConfirmationScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20, new LiteralTextContent("Yes"), button -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20, Text.literal("Yes"), button -> {
             sendClear();
             if(super.client != null) {
                 super.client.setScreen(null);
             }
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, new LiteralTextContent("No"), button -> close()));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, Text.literal("No"), button -> close()));
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         super.renderBackground(matrices);
         GameMenuScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, CONFIRMATION_TEXT, this.width / 2, 40, 0xFFFFFF);
 

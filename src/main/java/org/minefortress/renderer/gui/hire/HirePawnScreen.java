@@ -81,7 +81,7 @@ public class HirePawnScreen extends WindowScreen {
                 rowY,
                 20,
                 20,
-                new LiteralTextContent("+"),
+                Text.literal("+"),
                 (btn) -> {
                     if(canIncreaseAmount(costs, profId)) {
                         this.handler.increaseAmount(profId);

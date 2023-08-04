@@ -29,7 +29,7 @@ public class ProfessionAmountWidget extends MinefortressWidget implements Drawab
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         final var itemRenderer = getItemRenderer();
         itemRenderer.renderGuiItemIcon(stack, x, y);
         final var amount = amountSupplier.get();

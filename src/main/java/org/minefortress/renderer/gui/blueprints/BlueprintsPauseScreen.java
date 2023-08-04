@@ -30,17 +30,17 @@ public class BlueprintsPauseScreen extends Screen {
     }
 
     private void initWidgets() {
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20, new LiteralTextContent("Back to game"), button -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20, Text.literal("Back to game"), button -> {
             closeMenu();
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, new LiteralTextContent("Save blueprint"), button -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, Text.literal("Save blueprint"), button -> {
             sendSave(true);
             closeMenu();
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 72 - 16, 204, 20, new LiteralTextContent("Clear blueprint"), button -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 72 - 16, 204, 20, Text.literal("Clear blueprint"), button -> {
             openClearConfirmationScreen();
         }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 96 - 16, 204, 20, new LiteralTextContent("Discard Blueprint"), button -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 96 - 16, 204, 20, Text.literal("Discard Blueprint"), button -> {
             sendSave(false);
             closeMenu();
         }));
@@ -64,7 +64,7 @@ public class BlueprintsPauseScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         if (this.showMenu) {
             this.renderBackground(matrices);
             GameMenuScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);

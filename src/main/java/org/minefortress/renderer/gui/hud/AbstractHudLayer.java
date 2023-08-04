@@ -61,7 +61,7 @@ public abstract class AbstractHudLayer extends DrawContext implements IHudLayer 
             button.tick();
     }
 
-    final public void render(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
+    final public void render(DrawContext p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
         if(basepointX == null || basepointY == null){
             throw new IllegalStateException("Basepoint not set!");
         }
