@@ -2,11 +2,9 @@ package org.minefortress.renderer.gui.blueprints;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.screen.GameMenuScreen;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import org.minefortress.network.c2s.C2SClearActiveBlueprint;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
@@ -27,21 +25,31 @@ public class ClearBlueprintConfirmationScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20, Text.literal("Yes"), button -> {
-            sendClear();
-            if(super.client != null) {
-                super.client.setScreen(null);
-            }
-        }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, Text.literal("No"), button -> close()));
+
+        final var yesBtn = ButtonWidget
+                .builder(Text.literal("Yes"), button -> {
+                    sendClear();
+                    if (super.client != null) {
+                        super.client.setScreen(null);
+                    }
+                })
+                .dimensions(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20)
+                .build();
+        this.addDrawableChild(yesBtn);
+
+        final var noBtn = ButtonWidget
+                .builder(Text.literal("No"), button -> close())
+                .dimensions(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20)
+                .build();
+        this.addDrawableChild(noBtn);
     }
 
     @Override
-    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
-        super.renderBackground(matrices);
-        GameMenuScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, CONFIRMATION_TEXT, this.width / 2, 40, 0xFFFFFF);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        super.renderBackground(drawContext);
+        drawContext.drawCenteredTextWithShadow(this.textRenderer, CONFIRMATION_TEXT, this.width / 2, 40, 0xFFFFFF);
 
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(drawContext, mouseX, mouseY, delta);
     }
 
     @Override

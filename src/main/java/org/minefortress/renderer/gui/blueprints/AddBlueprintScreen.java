@@ -1,10 +1,10 @@
 package org.minefortress.renderer.gui.blueprints;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.Text;
 import org.apache.logging.log4j.util.Strings;
 import org.minefortress.network.c2s.ServerboundEditBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -29,29 +29,26 @@ public class AddBlueprintScreen extends Screen {
                 Text.literal("Blueprint Name")
         );
         this.addDrawableChild(textField);
-        final var btn = new ButtonWidget(
-                this.width / 2 - 102,
-                this.height / 4 + 48 - 16, 204, 20,
-                Text.literal("Save blueprint"),
-                button -> {
-                    final var text = textField.getText();
-                    if(Strings.isNotBlank(text)) {
-                        final var packet = ServerboundEditBlueprintPacket.add(text, group);
-                        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
-                        if(this.client != null) this.client.setScreen(null);
 
-                    }
+        final var saveBlueprintBtn = ButtonWidget
+            .builder(Text.literal("Save Blueprint"), button -> {
+                final var text = textField.getText();
+                if(Strings.isNotBlank(text)) {
+                    final var packet = ServerboundEditBlueprintPacket.add(text, group);
+                    FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
+                    if(this.client != null) this.client.setScreen(null);
                 }
-
-        );
-        this.addDrawableChild(btn);
+            })
+            .dimensions(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20)
+            .build();
+        this.addDrawableChild(saveBlueprintBtn);
     }
 
     @Override
-    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
-        Screen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        this.renderBackground(drawContext);
+        drawContext.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
+        super.render(drawContext, mouseX, mouseY, delta);
     }
 
     @Override

@@ -2,11 +2,9 @@ package org.minefortress.renderer.gui.blueprints;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.screen.GameMenuScreen;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import org.minefortress.network.c2s.ServerboundFinishEditBlueprintPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -30,20 +28,37 @@ public class BlueprintsPauseScreen extends Screen {
     }
 
     private void initWidgets() {
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20, Text.literal("Back to game"), button -> {
-            closeMenu();
-        }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20, Text.literal("Save blueprint"), button -> {
-            sendSave(true);
-            closeMenu();
-        }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 72 - 16, 204, 20, Text.literal("Clear blueprint"), button -> {
-            openClearConfirmationScreen();
-        }));
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 102, this.height / 4 + 96 - 16, 204, 20, Text.literal("Discard Blueprint"), button -> {
-            sendSave(false);
-            closeMenu();
-        }));
+        final var backBtn = ButtonWidget
+                .builder(Text.literal("Back to game"), button -> closeMenu())
+                .dimensions(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20)
+                .build();
+        this.addDrawableChild(backBtn);
+
+        final var saveBtn = ButtonWidget
+                .builder(Text.literal("Save blueprint"), button -> {
+                    sendSave(true);
+                    closeMenu();
+                })
+                .dimensions(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20)
+                .build();
+        this.addDrawableChild(saveBtn);
+
+        final var clearBtn = ButtonWidget
+                .builder(Text.literal("Clear blueprint"), button -> {
+                    openClearConfirmationScreen();
+                })
+                .dimensions(this.width / 2 - 102, this.height / 4 + 72 - 16, 204, 20)
+                .build();
+        this.addDrawableChild(clearBtn);
+
+        final var discardBtn = ButtonWidget
+                .builder(Text.literal("Discard Blueprint"), button -> {
+                    sendSave(false);
+                    closeMenu();
+                })
+                .dimensions(this.width / 2 - 102, this.height / 4 + 96 - 16, 204, 20)
+                .build();
+        this.addDrawableChild(discardBtn);
     }
 
     private void sendSave(boolean shouldSave) {
@@ -64,14 +79,14 @@ public class BlueprintsPauseScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         if (this.showMenu) {
-            this.renderBackground(matrices);
-            GameMenuScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
+            this.renderBackground(drawContext);
+            drawContext.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
         } else {
-            GameMenuScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
+            drawContext.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
         }
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(drawContext, mouseX, mouseY, delta);
     }
 
 }
