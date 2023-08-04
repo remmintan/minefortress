@@ -7,8 +7,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.structure.Structure;
-import net.minecraft.structure.StructureManager;
+import net.minecraft.structure.StructureTemplate;
+import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -51,8 +51,8 @@ public class ServerboundFinishEditBlueprintPacket implements FortressC2SPacket {
         final String fileName = fortressServerWorld.getFileName();
 
         final Identifier updatedStructureIdentifier = new Identifier(MineFortressMod.MOD_ID, fileName.replaceAll("[^a-z0-9/._-]", "_"));
-        final StructureManager structureManager = server.getStructureManager();
-        final Structure structureToUpdate = structureManager.getStructureOrBlank(updatedStructureIdentifier);
+        final StructureTemplateManager structureManager = server.getStructureTemplateManager();
+        final StructureTemplate structureToUpdate = structureManager.getTemplateOrBlank(updatedStructureIdentifier);
         fortressServerWorld.enableSaveStructureMode();
 
         final BlockPos start = new BlockPos(0, 1, 0);

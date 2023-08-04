@@ -6,8 +6,8 @@ import net.minecraft.block.enums.BedPart;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.iterators.FarmBuildingIterator;
-
+import I;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;

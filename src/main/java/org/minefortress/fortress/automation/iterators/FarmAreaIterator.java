@@ -1,15 +1,17 @@
 package org.minefortress.fortress.automation.iterators;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.utils.BuildingHelper;
-
+import I;
+import Z;
 import java.util.List;
 
 public class FarmAreaIterator extends AbstractFilteredIterator{

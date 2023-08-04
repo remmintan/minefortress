@@ -5,15 +5,15 @@ import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
+import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class FortressBlocks {
 
     public static final Block SCAFFOLD_OAK_PLANKS = new Block(
             FabricBlockSettings
-                    .of(Material.WOOD)
+                    .create(Material.WOOD)
                     .strength(2.0f, 3.0f)
                     .sounds(BlockSoundGroup.WOOD)
     );

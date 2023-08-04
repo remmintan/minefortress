@@ -3,9 +3,11 @@ package org.minefortress.network.s2c;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.professions.hire.HireInfo;
+import org.minefortress.professions.hire.IHireScreenHandler;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
 
 import java.io.IOException;

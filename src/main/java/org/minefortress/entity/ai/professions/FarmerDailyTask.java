@@ -1,21 +1,25 @@
 package org.minefortress.entity.ai.professions;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CropBlock;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;

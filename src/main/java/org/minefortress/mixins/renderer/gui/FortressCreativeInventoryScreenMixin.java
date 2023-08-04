@@ -9,8 +9,8 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.search.ReloadableSearchProvider;
 import net.minecraft.client.search.SearchManager;
-import net.minecraft.client.search.SearchableContainer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,12 +19,12 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registry;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.tag.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -151,12 +151,12 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             ItemGroup itemGroup = ItemGroup.GROUPS[selectedTab];
             for (ItemGroup itemGroup2 : getResourceManager().getGroups()) {
-                RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
                 RenderSystem.setShaderTexture(0, TEXTURE);
                 if (itemGroup2.getIndex() == selectedTab) continue;
                 this.renderTabIcon(matrices, itemGroup2);
             }
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.setShaderTexture(0, new Identifier(TAB_TEXTURE_PREFIX + itemGroup.getTexture()));
             this.drawTexture(matrices, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
             this.searchBox.render(matrices, mouseX, mouseY, delta);
@@ -164,7 +164,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             int i = this.x + 175;
             int j = this.y + 18;
             int k = j + 112;
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.setShaderTexture(0, TEXTURE);
             if (itemGroup.hasScrollbar()) {
                 this.drawTexture(matrices, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
@@ -215,13 +215,13 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
                     item.appendStacks(ItemGroup.SEARCH, this.handler.itemList);
                 }
             } else {
-                SearchableContainer<ItemStack> searchable;
+                ReloadableSearchProvider<ItemStack> searchable;
                 if (string.startsWith("#")) {
                     string = string.substring(1);
-                    searchable = getClient().getSearchableContainer(SearchManager.ITEM_TAG);
+                    searchable = getClient().getSearchProvider(SearchManager.ITEM_TAG);
                     this.searchForTags(string);
                 } else {
-                    searchable = getClient().getSearchableContainer(SearchManager.ITEM_TOOLTIP);
+                    searchable = getClient().getSearchProvider(SearchManager.ITEM_TOOLTIP);
                 }
                 this.handler.itemList.addAll(searchable.findAll(string.toLowerCase(Locale.ROOT)));
             }

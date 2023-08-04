@@ -4,6 +4,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderStage;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.utils.ModUtils;
 
 import java.util.*;

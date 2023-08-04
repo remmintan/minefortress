@@ -21,10 +21,10 @@ public class ModeButtonWidget extends ItemButtonWidget {
 
     @Override
     public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, ItemButtonWidget.FORTRESS_BUTTON_TEXTURE);
         int v = 0;
-        if (this.isHovered() || isActiveSupplier.get()) {
+        if (this.isSelected() || isActiveSupplier.get()) {
             int hoveredVOffset = 20;
             v += hoveredVOffset;
         }

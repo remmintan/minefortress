@@ -3,10 +3,10 @@ package org.minefortress.renderer.custom;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -51,10 +51,10 @@ public abstract class AbstractCustomRenderer {
         layer.startDrawing();
 
         final VertexFormat vertexFormat = layer.getVertexFormat();
-        final Shader shader = RenderSystem.getShader();
+        final ShaderProgram shader = RenderSystem.getShader();
         if(shader == null) return;
 
-        BufferRenderer.unbindAll();
+        BufferRenderer.reset();
         int textureReference;
         for (int i = 0; i < 12; i++) {
             textureReference = RenderSystem.getShaderTexture(i);
@@ -125,7 +125,7 @@ public abstract class AbstractCustomRenderer {
         }
         shader.unbind();
         if(notEmpty) {
-            vertexFormat.endDrawing();
+            vertexFormat.clearState();
         }
 
         VertexBuffer.unbind();

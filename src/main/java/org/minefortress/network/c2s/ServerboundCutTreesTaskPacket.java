@@ -4,6 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.tasks.CutTreesTask;
 import org.minefortress.tasks.TaskManager;

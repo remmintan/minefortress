@@ -1,6 +1,8 @@
 package org.minefortress.blueprints.manager;
 
 import com.google.gson.stream.JsonReader;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.minefortress.MineFortressMod;

@@ -11,7 +11,9 @@ import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
@@ -21,7 +23,7 @@ import org.minefortress.network.c2s.ServerboundScrollCurrentScreenPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.interfaces.ScrollableHandler;
-
+import I;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -108,7 +110,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
 
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int index) {
+    public ItemStack quickMove(PlayerEntity player, int index) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
         if (slot.hasStack()) {
@@ -124,7 +126,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
                 return ItemStack.EMPTY;
             }
             if (itemStack2.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
+                slot.setStackNoCallbacks(ItemStack.EMPTY);
             } else {
                 slot.markDirty();
             }
@@ -145,8 +147,8 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof FortressServer fortressServer) {
             final var fortressServerManager = fortressServer.getFortressModServerManager().getByPlayer(serverPlayer);
             final var serverResourceManager = fortressServerManager.getServerResourceManager();
@@ -238,11 +240,11 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         }
 
         @Override
-        public void setStack(ItemStack stack) {
+        public void setStackNoCallbacks(ItemStack stack) {
             final var handler = AbstractFortressRecipeScreenHandler.this;
             if(handler.virtualInventory != null)
                 handler.virtualInventory.set(this.getIndex(), stack);
-            super.setStack(stack);
+            super.setStackNoCallbacks(stack);
         }
 
         @Override
@@ -269,12 +271,12 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
                         stack.decrement(count);
                     } else {
                         final var split = stack.split(count);
-                        this.setStack(split);
+                        this.setStackNoCallbacks(split);
                     }
                 }
             } else if (ItemStack.canCombine(itemStack, stack)) {
                 itemStack.increment(count);
-                this.setStack(itemStack);
+                this.setStackNoCallbacks(itemStack);
                 stack.decrement(count);
             }
             return stack;

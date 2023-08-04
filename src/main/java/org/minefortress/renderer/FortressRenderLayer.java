@@ -9,7 +9,7 @@ import java.util.OptionalDouble;
 
 public abstract class FortressRenderLayer extends RenderLayer {
 
-    public static final MultiPhase LINES_NO_DEPTH = RenderLayer.of("lines", VertexFormats.LINES, VertexFormat.DrawMode.LINES, 256, MultiPhaseParameters.builder().shader(LINES_SHADER).lineWidth(new RenderPhase.LineWidth(OptionalDouble.empty())).layering(VIEW_OFFSET_Z_LAYERING).transparency(TRANSLUCENT_TRANSPARENCY).target(ITEM_TARGET).writeMaskState(ALL_MASK).cull(DISABLE_CULLING).depthTest(ALWAYS_DEPTH_TEST).build(false));
+    public static final MultiPhase LINES_NO_DEPTH = RenderLayer.of("lines", VertexFormats.LINES, VertexFormat.DrawMode.LINES, 256, MultiPhaseParameters.builder().program(LINES_PROGRAM).lineWidth(new RenderPhase.LineWidth(OptionalDouble.empty())).layering(VIEW_OFFSET_Z_LAYERING).transparency(TRANSLUCENT_TRANSPARENCY).target(ITEM_ENTITY_TARGET).writeMaskState(ALL_MASK).cull(DISABLE_CULLING).depthTest(ALWAYS_DEPTH_TEST).build(false));
 
     public FortressRenderLayer(String name, VertexFormat vertexFormat, VertexFormat.DrawMode drawMode, int expectedBufferSize, boolean hasCrumbling, boolean translucent, Runnable startAction, Runnable endAction) {
         super(name, vertexFormat, drawMode, expectedBufferSize, hasCrumbling, translucent, startAction, endAction);

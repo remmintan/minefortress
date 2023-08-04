@@ -6,13 +6,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.structure.Structure;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
@@ -21,7 +22,8 @@ import org.minefortress.network.s2c.ClientboundAddBlueprintPacket;
 import org.minefortress.network.s2c.ClientboundUpdateBlueprintPacket;
 import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
-
+import I;
+import Z;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -91,13 +93,13 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
     }
 
     @Override
-    protected Optional<Structure> getStructure(String blueprintFileName) {
+    protected Optional<StructureTemplate> getStructure(String blueprintFileName) {
         if(removedDefaultStructures.contains(blueprintFileName)) {
             return Optional.empty();
         }
         if(updatedStructures.containsKey(blueprintFileName)) {
             final NbtCompound structureTag = updatedStructures.get(blueprintFileName).tag();
-            final Structure structure = new Structure();
+            final StructureTemplate structure = new StructureTemplate();
             structure.readNbt(structureTag);
             return Optional.of(structure);
         } else {
@@ -105,7 +107,7 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
         }
     }
 
-    private Optional<Structure> getDefaultStructure(String blueprintFileName) {
+    private Optional<StructureTemplate> getDefaultStructure(String blueprintFileName) {
         final Identifier id;
         try {
             id = new Identifier(MineFortressMod.MOD_ID, blueprintFileName);
@@ -113,12 +115,12 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
             return Optional.empty();
         }
         return server
-                .getStructureManager()
-                .getStructure(id);
+                .getStructureTemplateManager()
+                .getTemplate(id);
     }
 
     @Override
-    protected StrctureBlockData buildStructure(Structure structure, BlockRotation rotation, int floorLevel) {
+    protected StrctureBlockData buildStructure(StructureTemplate structure, BlockRotation rotation, int floorLevel) {
         final var sizeAndPivot = getSizeAndPivot(structure, rotation);
         final var size = sizeAndPivot.size();
         final var pivot = sizeAndPivot.pivot();

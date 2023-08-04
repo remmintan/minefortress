@@ -3,7 +3,8 @@ package org.minefortress.fortress.automation.areas;
 import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.LiteralText;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -39,7 +40,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                 MinecraftClient.getInstance()
                         .inGameHud
                         .getChatHud()
-                        .addMessage(new LiteralText("Please select an area type first!"));
+                        .addMessage(new LiteralTextContent("Please select an area type first!"));
                 return false;
             }
             final var blockPos = bhr.getBlockPos();
@@ -61,7 +62,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                     MinecraftClient.getInstance()
                             .inGameHud
                             .getChatHud()
-                            .addMessage(new LiteralText("The selected area is not inside the fortress!"));
+                            .addMessage(new LiteralTextContent("The selected area is not inside the fortress!"));
                 }
                 resetSelection();
             }

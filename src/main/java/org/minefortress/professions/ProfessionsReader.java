@@ -2,12 +2,14 @@ package org.minefortress.professions;
 
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registry;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;

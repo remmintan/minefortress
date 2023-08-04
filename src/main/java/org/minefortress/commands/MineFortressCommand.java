@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServer;
 
@@ -17,7 +18,7 @@ abstract class MineFortressCommand {
     }
 
     protected static FortressServerManager getFortressServerManager(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        final var srvPlayer = context.getSource().getPlayer();
+        final var srvPlayer = context.getSource().getPlayerOrThrow();
         final var server = (FortressServer) srvPlayer.getServer();
         if(server == null) {
             throw new RuntimeException("Server is null");

@@ -1,6 +1,6 @@
 package org.minefortress.renderer.gui.tooltip;
 
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.OrderedText;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,8 +28,8 @@ public class OptionalTooltipSupplier extends BaseTooltipSupplier{
             return List.of();
         }
         return tooltipTextSupplier.get()
-                .map(LiteralText::new)
-                .map(LiteralText::asOrderedText)
+                .map(LiteralTextContent::new)
+                .map(LiteralTextContent::asOrderedText)
                 .map(List::of)
                 .orElse(List.of());
     }

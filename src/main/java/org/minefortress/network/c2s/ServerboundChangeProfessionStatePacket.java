@@ -4,6 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.network.interfaces.FortressC2SPacket;
+import org.minefortress.professions.Profession;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.professions.hire.ProfessionsHireTypes;
 

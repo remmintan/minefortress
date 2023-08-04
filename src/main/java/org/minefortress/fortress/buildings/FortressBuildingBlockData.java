@@ -6,20 +6,23 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.event.GameEvent;
 import org.apache.logging.log4j.LogManager;
-
+import F;
+import I;
+import J;
 import java.util.*;
 
 class FortressBuildingBlockData {
@@ -196,7 +199,7 @@ class FortressBuildingBlockData {
         if(actualState.size() == 0) return 0;
         final var preserved = actualState.values().stream().filter(state -> state == BuildingBlockState.PRESERVED).count();
         final var delta = (float) preserved / (float) actualState.size();
-        return (int)MathHelper.clampedLerpFromProgress(delta, 0.5f, 1, 0, 100);
+        return (int)MathHelper.clampedMap(delta, 0.5f, 1, 0, 100);
     }
 
     NbtCompound toNbt() {
@@ -226,7 +229,7 @@ class FortressBuildingBlockData {
     }
 
     boolean attack(HostileEntity attacker) {
-        final var world = attacker.getWorld();
+        final var world = attacker.method_48926();
         final var random = world.random;
         for (Map.Entry<BlockPos, BuildingBlockState> entries : actualState.entrySet()) {
             final var pos = entries.getKey();

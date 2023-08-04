@@ -3,13 +3,22 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRotation;
 import org.minefortress.fight.ClientFightSelectionManager;
+import org.minefortress.fight.ClientFightSelectionManager.MousePos;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.utils.ModUtils;
 
 import static org.minefortress.renderer.gui.blueprints.BlueprintsScreen.convertItemIconInTheGUI;
+
+import D;
+import I;
+import Z;
+import java.util.List;
 
 class FightHudLayer extends AbstractHudLayer {
 

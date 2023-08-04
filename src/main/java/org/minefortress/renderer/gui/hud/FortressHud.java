@@ -6,6 +6,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import org.minefortress.blueprints.world.BlueprintsWorld;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.renderer.gui.hud.hints.*;
 import org.minefortress.renderer.gui.hud.interfaces.IHintsLayer;
 import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
@@ -75,7 +76,7 @@ public class FortressHud {
         RenderSystem.enableDepthTest();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
     }
 
     public void tick() {

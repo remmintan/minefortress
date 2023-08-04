@@ -1,5 +1,6 @@
 package org.minefortress.selections;
 
+import I;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -10,6 +11,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressWorldRenderer;
 import org.minefortress.selections.renderer.ISelectionInfoProvider;

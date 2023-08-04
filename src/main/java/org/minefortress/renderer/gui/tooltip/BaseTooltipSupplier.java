@@ -3,7 +3,7 @@ package org.minefortress.renderer.gui.tooltip;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -17,7 +17,7 @@ import net.minecraft.util.math.Matrix4f;
 import java.util.List;
 import java.util.stream.Collectors;
 
-abstract class BaseTooltipSupplier extends DrawableHelper implements ButtonWidget.TooltipSupplier {
+abstract class BaseTooltipSupplier extends DrawContext implements ButtonWidget.TooltipSupplier {
 
     protected abstract List<OrderedText> getTooltip();
 
@@ -63,7 +63,7 @@ abstract class BaseTooltipSupplier extends DrawableHelper implements ButtonWidge
         this.getItemRenderer().zOffset = 400.0f;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         Screen.fillGradient(matrix4f, bufferBuilder, l - 3, tooltipComponent - 4, l + k + 3, tooltipComponent - 3, 400, -267386864, -267386864);

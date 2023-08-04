@@ -2,9 +2,10 @@ package org.minefortress.blueprints.data;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.structure.Structure;
+import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import org.minefortress.blueprints.interfaces.BlueprintsTagsKeeper;
 
 import java.util.HashMap;
@@ -16,20 +17,20 @@ public final class ClientStructureBlockDataProvider extends AbstractStructureBlo
     private final Map<String, NbtCompound> blueprintTags = new HashMap<>();
 
     @Override
-    protected Optional<Structure> getStructure(String blueprintFileName) {
+    protected Optional<StructureTemplate> getStructure(String blueprintFileName) {
         if(!blueprintTags.containsKey(blueprintFileName)) return Optional.empty();
         final NbtCompound blueprintTag = blueprintTags.get(blueprintFileName);
-        final Structure structure = new Structure();
+        final StructureTemplate structure = new StructureTemplate();
         structure.readNbt(blueprintTag);
         return Optional.of(structure);
     }
 
     @Override
-    protected StrctureBlockData buildStructure(Structure structure, BlockRotation rotation, int floorLevel) {
+    protected StrctureBlockData buildStructure(StructureTemplate structure, BlockRotation rotation, int floorLevel) {
         return buildStructureForClient(structure, rotation);
     }
 
-    public static StrctureBlockData buildStructureForClient(Structure structure, BlockRotation rotation) {
+    public static StrctureBlockData buildStructureForClient(StructureTemplate structure, BlockRotation rotation) {
         final var sizeAndPivot = getSizeAndPivot(structure, rotation);
         final var size = sizeAndPivot.size();
         final var pivot = sizeAndPivot.pivot();

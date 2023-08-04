@@ -3,7 +3,7 @@ package org.minefortress.renderer.gui.blueprints.list;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import org.minefortress.MineFortressMod;
 
@@ -17,14 +17,14 @@ public class BlueprintListEntry extends AlwaysSelectedEntryListWidget.Entry<Blue
     public BlueprintListEntry(String value, TextRenderer textRenderer, BlueprintsListWidget widget) {
         this.value = value;
         //remove blueprints extensions with substring
-        this.text = new LiteralText(value.substring(0, value.length() - MineFortressMod.BLUEPRINTS_EXTENSION.length()));
+        this.text = new LiteralTextContent(value.substring(0, value.length() - MineFortressMod.BLUEPRINTS_EXTENSION.length()));
         this.textRenderer = textRenderer;
         this.widget = widget;
     }
 
     @Override
     public Text getNarration() {
-        return new LiteralText("Blueprints: " + value);
+        return new LiteralTextContent("Blueprints: " + value);
     }
 
     @Override

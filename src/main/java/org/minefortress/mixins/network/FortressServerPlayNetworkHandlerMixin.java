@@ -4,14 +4,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.MessageType;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -44,7 +44,7 @@ public class FortressServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onPlayerInteractBlock", at = @At(value = "INVOKE", target="Lnet/minecraft/server/network/ServerPlayerEntity;updateLastActionTime()V", shift = At.Shift.AFTER), cancellable = true)
     public void onPlayerInteractBlock(PlayerInteractBlockC2SPacket packet, CallbackInfo ci) {
-        ServerWorld serverWorld = this.player.getWorld();
+        ServerWorld serverWorld = this.player.method_48926();
         Hand hand = packet.getHand();
         ItemStack itemStack = this.player.getStackInHand(hand);
         BlockHitResult blockHitResult = packet.getBlockHitResult();
@@ -56,7 +56,7 @@ public class FortressServerPlayNetworkHandlerMixin {
                 this.addCustomNbtToStack(itemStack);
                 ActionResult actionResult = this.player.interactionManager.interactBlock(this.player, serverWorld, itemStack, hand, blockHitResult);
                 if (direction == Direction.UP && !actionResult.isAccepted() && blockPos.getY() >= i - 1 && FortressServerPlayNetworkHandlerMixin.canPlace(this.player, itemStack)) {
-                    MutableText text = new TranslatableText("build.tooHigh", i - 1).formatted(Formatting.RED);
+                    MutableText text = new TranslatableTextContent("build.tooHigh", i - 1).formatted(Formatting.RED);
                     this.player.sendMessage(text, MessageType.GAME_INFO, Util.NIL_UUID);
                 } else if (actionResult.shouldSwingHand()) {
                     this.player.swingHand(hand, true);

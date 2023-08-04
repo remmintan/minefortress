@@ -1,7 +1,7 @@
 package org.minefortress.renderer.gui.hire;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.network.c2s.C2SCloseHireMenuPacket;
@@ -10,9 +10,11 @@ import org.minefortress.professions.hire.IHireScreenHandler;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.renderer.gui.widget.*;
 import org.minefortress.utils.ModUtils;
-
+import I;
+import Z;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class HirePawnScreen extends WindowScreen {
 
@@ -21,7 +23,7 @@ public class HirePawnScreen extends WindowScreen {
     private final IHireScreenHandler handler;
 
     public HirePawnScreen(@NotNull IHireScreenHandler handler) {
-        super(new LiteralText(handler.getScreenName()));
+        super(new LiteralTextContent(handler.getScreenName()));
         this.handler = handler;
     }
 
@@ -79,7 +81,7 @@ public class HirePawnScreen extends WindowScreen {
                 rowY,
                 20,
                 20,
-                new LiteralText("+"),
+                new LiteralTextContent("+"),
                 (btn) -> {
                     if(canIncreaseAmount(costs, profId)) {
                         this.handler.increaseAmount(profId);
@@ -87,7 +89,7 @@ public class HirePawnScreen extends WindowScreen {
                 },
                 (btn, matrices, x, y) -> {
                     final var buttonTooltip = canIncreaseAmount(costs, profId) ? "Hire" : "Not enough resources/pawns";
-                    this.renderTooltip(matrices, new LiteralText(buttonTooltip), x, y);
+                    this.renderTooltip(matrices, new LiteralTextContent(buttonTooltip), x, y);
                 }
         );
         this.addDrawableChild(hireButton);

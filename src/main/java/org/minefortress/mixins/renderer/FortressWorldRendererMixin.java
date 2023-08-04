@@ -1,5 +1,7 @@
 package org.minefortress.mixins.renderer;
 
+import D;
+import Z;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
@@ -16,6 +18,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.border.WorldBorder;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.FortressBorder;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
@@ -135,13 +138,13 @@ public abstract class FortressWorldRendererMixin  {
     public void renderCustomWorldBorder(Camera camera, CallbackInfo ci) {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         WorldBorder worldBorder = getWorldBorder(this.world);
-        double viewDistance = this.client.options.getViewDistance() * 16;
+        double viewDistance = this.client.options.getClampedViewDistance() * 16;
         if (!(camera.getPos().x < worldBorder.getBoundEast() - viewDistance) || !(camera.getPos().x > worldBorder.getBoundWest() + viewDistance) || !(camera.getPos().z < worldBorder.getBoundSouth() - viewDistance) || !(camera.getPos().z > worldBorder.getBoundNorth() + viewDistance)) {
             double e = 1.0 - worldBorder.getDistanceInsideBorder(camera.getPos().x, camera.getPos().z) / viewDistance;
             e = Math.pow(e, 4.0);
             e = MathHelper.clamp(e, 0.0, 1.0);
 
-            double cameraDistance = this.client.gameRenderer.method_32796();
+            double cameraDistance = this.client.gameRenderer.getFarPlaneDistance();
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
             RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
@@ -155,7 +158,7 @@ public abstract class FortressWorldRendererMixin  {
             float k = (float)(i >> 8 & 255) / 255.0F;
             float l = (float)(i & 255) / 255.0F;
             RenderSystem.setShaderColor(j, k, l, (float)e);
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.polygonOffset(-3.0F, -3.0F);
             RenderSystem.enablePolygonOffset();
             RenderSystem.disableCull();

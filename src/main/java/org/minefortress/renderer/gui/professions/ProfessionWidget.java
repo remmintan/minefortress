@@ -1,9 +1,10 @@
 package org.minefortress.renderer.gui.professions;
 
+import Z;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -13,13 +14,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.minefortress.professions.Profession;
 import org.minefortress.professions.ProfessionManager;
+import org.minefortress.professions.ProfessionManager.CountProfessionals;
 import org.minefortress.professions.ProfessionResearchState;
 import org.minefortress.utils.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfessionWidget extends DrawableHelper {
+public class ProfessionWidget extends DrawContext {
 
     public static final float PROFESSION_WIDGET_WIDTH = 64f;
     public static final float PROFESSION_WIDGET_HEIGHT = 35f;
@@ -79,7 +81,7 @@ public class ProfessionWidget extends DrawableHelper {
         final boolean unlockedWithCount = isUnlocked(true) == ProfessionResearchState.UNLOCKED;
         final boolean unlocked = isUnlocked(false) == ProfessionResearchState.UNLOCKED;
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
         AdvancementObtainedStatus status = unlockedWithCount ? AdvancementObtainedStatus.OBTAINED : AdvancementObtainedStatus.UNOBTAINED;
         final int v = 128 + status.getSpriteIndex() * 26;
@@ -153,7 +155,7 @@ public class ProfessionWidget extends DrawableHelper {
         AdvancementObtainedStatus status = unlockedWithCount?AdvancementObtainedStatus.OBTAINED:AdvancementObtainedStatus.UNOBTAINED;
         int j = MathHelper.floor((float)this.width);
         int k = this.width - j;
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();

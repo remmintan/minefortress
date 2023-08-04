@@ -15,6 +15,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
+import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler.VirtualInventory;
 import org.minefortress.interfaces.FortressSimpleInventory;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
             if(!virtualInventory.hasItem(itemStack.getItem())) {
                 virtualInventory.addItem(itemStack);
             }
-            this.handler.getSlot(i).setStack(itemStack);
+            this.handler.getSlot(i).setStackNoCallbacks(itemStack);
         }
         this.handler.clearCraftingSlots();
     }
@@ -142,7 +143,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
         }
         itemStack.setCount(1);
         if (slot.getStack().isEmpty()) {
-            slot.setStack(itemStack);
+            slot.setStackNoCallbacks(itemStack);
         } else {
             slot.getStack().increment(1);
         }

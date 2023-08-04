@@ -2,10 +2,11 @@ package org.minefortress.utils;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 public class GuiUtils {
 
@@ -47,12 +48,12 @@ public class GuiUtils {
                 final int lastPartLength = part.length();
                 if (textRenderer.getWidth(stringBuilder.toString()) > (maxWidth)) {
                     stringBuilder.delete(stringBuilder.length() - lastPartLength - 1, stringBuilder.length());
-                    preparedTextParts.add(new LiteralText(stringBuilder.toString()));
+                    preparedTextParts.add(new LiteralTextContent(stringBuilder.toString()));
                     stringBuilder.delete(0, stringBuilder.length());
                     stringBuilder.append(part).append(" ");
                 }
             }
-            preparedTextParts.add(new LiteralText(stringBuilder.toString()));
+            preparedTextParts.add(new LiteralTextContent(stringBuilder.toString()));
         }
 
         return Collections.unmodifiableList(preparedTextParts);

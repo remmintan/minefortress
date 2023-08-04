@@ -99,7 +99,7 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        if(!this.isHovered()) return;
+        if(!this.isSelected()) return;
         super.onClick(mouseX, mouseY);
     }
 
@@ -114,8 +114,8 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
     }
 
     @Override
-    public boolean isHovered() {
-        return super.isHovered();
+    public boolean isSelected() {
+        return super.isSelected();
     }
 
     @Override

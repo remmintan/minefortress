@@ -1,7 +1,7 @@
 package org.minefortress.mixins.renderer;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
 import org.minefortress.fortress.FortressState;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
-public abstract class FortressGuiMixin extends DrawableHelper {
+public abstract class FortressGuiMixin extends DrawContext {
 
     @Shadow @Final private MinecraftClient client;
 

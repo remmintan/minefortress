@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.fortress.RepairBuildingScreen;
 import org.minefortress.utils.ModUtils;

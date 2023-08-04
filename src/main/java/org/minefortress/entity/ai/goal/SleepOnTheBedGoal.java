@@ -1,10 +1,13 @@
 package org.minefortress.entity.ai.goal;
 
 import net.minecraft.block.BedBlock;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
 

@@ -1,5 +1,6 @@
 package org.minefortress.renderer.gui.hud.hints;
 
+import I;
 import com.google.common.collect.Lists;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -32,10 +33,10 @@ abstract class AbstractHintsLayer  extends AbstractHudLayer implements IHintsLay
         for (int i = 0; i < hints.size(); i++) {
             final var hint = hints.get(i);
             final var y = screenHeight - 15 - (i * 10);
-            drawStringWithShadow(matrices, font, hint, 5, y, FortressHud.MOD_GUI_COLOR);
+            drawTextWithShadow(matrices, font, hint, 5, y, FortressHud.MOD_GUI_COLOR);
         }
 
-        getInfoText().ifPresent(info -> drawStringWithShadow(matrices, font, info, 5, 5, FortressHud.MOD_GUI_COLOR));
+        getInfoText().ifPresent(info -> drawTextWithShadow(matrices, font, info, 5, 5, FortressHud.MOD_GUI_COLOR));
     }
 
     @Override

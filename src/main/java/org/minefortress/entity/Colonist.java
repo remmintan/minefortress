@@ -23,8 +23,8 @@ import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -36,6 +36,7 @@ import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
 

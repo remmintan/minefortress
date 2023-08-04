@@ -23,6 +23,8 @@ import java.util.List;
 import static org.minefortress.MineFortressMod.FORTRESS_FURNACE_SCREEN_HANDLER;
 import static org.minefortress.fortress.resources.gui.smelt.FortressFurnacePropertyDelegate.TOTAL_FIELDS;
 
+import I;
+
 public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHandler<Inventory> implements FuelChecker{
 
     private final Inventory furnaceInventory;
@@ -65,8 +67,8 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
 
     @Override
     public void clearCraftingSlots() {
-        this.getSlot(0).setStack(ItemStack.EMPTY);
-        this.getSlot(2).setStack(ItemStack.EMPTY);
+        this.getSlot(0).setStackNoCallbacks(ItemStack.EMPTY);
+        this.getSlot(2).setStackNoCallbacks(ItemStack.EMPTY);
     }
 
     @Override
@@ -135,7 +137,7 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int index) {
+    public ItemStack quickMove(PlayerEntity player, int index) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
         if (slot != null && slot.hasStack()) {
@@ -153,7 +155,7 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
                 }
             }
             if (itemStack2.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
+                slot.setStackNoCallbacks(ItemStack.EMPTY);
             } else {
                 slot.markDirty();
             }

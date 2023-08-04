@@ -7,8 +7,9 @@ import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.TaskBlockInfo;
-
+import com.mojang.datafixers.util.Pair;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 

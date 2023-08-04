@@ -3,13 +3,15 @@ package org.minefortress.renderer.gui.hud;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.text.Text;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.interfaces.IProfessional;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.professions.Profession;
 import org.minefortress.utils.ModUtils;
 
@@ -32,10 +34,10 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
             final int colonistWinY = screenHeight - 85;
             int width = 120;
             final int height = 85;
-            DrawableHelper.fillGradient(matrices, colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, -1000);
+            DrawContext.fillGradient(matrices, colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, -1000);
 
-            final String name = Optional.ofNullable(pawn.getCustomName()).map(Text::asString).orElse("");
-            Screen.drawCenteredText(matrices, font, name, colonistWinX + width / 2, colonistWinY + 5, 0xFFFFFF);
+            final String name = Optional.ofNullable(pawn.getCustomName()).map(Text::getContent).orElse("");
+            Screen.drawCenteredTextWithShadow(matrices, font, name, colonistWinX + width / 2, colonistWinY + 5, 0xFFFFFF);
 
             final String healthString = String.format("%.0f/%.0f", pawn.getHealth(), pawn.getMaxHealth());
             int heartIconX = colonistWinX + 5;
@@ -67,7 +69,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
     private void renderIcon(MatrixStack matrices, int iconX, int iconY, int heartIconV) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShaderTexture(0, GUI_ICONS_TEXTURE);
-        DrawableHelper.drawTexture(matrices, iconX, iconY, 110, 52, heartIconV, 8, 8, 256, 256);
+        DrawContext.drawTexture(matrices, iconX, iconY, 110, 52, heartIconV, 8, 8, 256, 256);
     }
 
     @Override

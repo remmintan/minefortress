@@ -4,7 +4,7 @@ import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import org.minefortress.MineFortressMod;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,7 +37,7 @@ public abstract class FortressCyclingButtonMixin<T> extends PressableWidget {
             var newValues = new ArrayList(values.getCurrent());
             CreateWorldScreen.Mode.DEBUG.defaultGameMode = MineFortressMod.FORTRESS;
             CreateWorldScreen.Mode.DEBUG.translationSuffix = "fortress";
-            CreateWorldScreen.Mode.DEBUG.text = new TranslatableText("selectWorld.gameMode.fortress");
+            CreateWorldScreen.Mode.DEBUG.text = new TranslatableTextContent("selectWorld.gameMode.fortress");
             newValues.add(CreateWorldScreen.Mode.DEBUG);
 
             this.values = CyclingButtonWidget.Values.of(newValues);

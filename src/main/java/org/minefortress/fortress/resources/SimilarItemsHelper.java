@@ -1,10 +1,12 @@
 package org.minefortress.fortress.resources;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.TagKey;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import org.minefortress.blueprints.data.StrctureBlockData;
 
 import java.util.*;
@@ -48,7 +50,7 @@ public class SimilarItemsHelper {
             ItemTags.FLOWERS,
             ItemTags.LOGS,
             ItemTags.PLANKS,
-            ItemTags.CARPETS,
+            ItemTags.WOOL_CARPETS,
             ItemTags.WOOL
     );
 

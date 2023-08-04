@@ -7,10 +7,12 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.utils.GuiUtils;
 import org.minefortress.utils.ModUtils;
-
+import F;
+import I;
 import java.util.List;
 
 public class CostsWidget implements Drawable, Element {

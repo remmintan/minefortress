@@ -1,7 +1,7 @@
 package org.minefortress.renderer.gui.professions;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -15,7 +15,7 @@ import org.minefortress.professions.Profession;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ProfessionsLayer extends DrawableHelper {
+public class ProfessionsLayer extends DrawContext {
 
     private static final Identifier LAYER_BACKGROUND = new Identifier("textures/gui/advancements/backgrounds/stone.png");
     private int layerWidth = 234;
@@ -66,7 +66,7 @@ public class ProfessionsLayer extends DrawableHelper {
         this.init();
         matrices.push();
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, LAYER_BACKGROUND);
         int originX = MathHelper.floor(this.originX);
         int originY = MathHelper.floor(this.originY);

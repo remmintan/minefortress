@@ -1,6 +1,7 @@
 package org.minefortress.fortress.resources.gui.smelt;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -8,12 +9,16 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServer;
-
+import org.minefortress.professions.ServerProfessionManager;
+import I;
+import java.util.List;
 import java.util.Objects;
 
 public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
@@ -26,7 +31,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
 
     @Override
     public Text getDisplayName() {
-        return new LiteralText("Furnace Screen Factory");
+        return new LiteralTextContent("Furnace Screen Factory");
     }
 
     @Nullable

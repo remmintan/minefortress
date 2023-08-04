@@ -3,7 +3,7 @@ package org.minefortress.renderer.gui.professions;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import org.lwjgl.opengl.GL11;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -19,7 +19,7 @@ public class ProfessionsScreen extends Screen {
     private boolean startClick = false;
 
     public ProfessionsScreen(FortressMinecraftClient client) {
-        super(new LiteralText("Professions"));
+        super(new LiteralTextContent("Professions"));
         this.professionsLayer = new ProfessionsLayer(client);
         this.fortressManager = client.getFortressClientManager();
         this.professionManager = client.getFortressClientManager().getProfessionManager();

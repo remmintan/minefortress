@@ -5,8 +5,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.registry.Registry;
-
+import net.minecraft.registry.Registry;
+import Z;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

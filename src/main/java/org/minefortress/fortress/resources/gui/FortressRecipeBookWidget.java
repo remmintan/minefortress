@@ -9,8 +9,9 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.interfaces.FortressSimpleInventory;
-
+import I;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FortressRecipeBookWidget extends RecipeBookWidget {
 

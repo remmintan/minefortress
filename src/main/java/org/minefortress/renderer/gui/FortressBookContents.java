@@ -1,7 +1,7 @@
 package org.minefortress.renderer.gui;
 
 import net.minecraft.client.gui.screen.ingame.BookScreen;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.StringVisitable;
 
 import java.util.Arrays;
@@ -48,7 +48,7 @@ public class FortressBookContents implements BookScreen.Contents {
 
     @Override
     public StringVisitable getPageUnchecked(int index) {
-        return new LiteralText(pages.get(index));
+        return new LiteralTextContent(pages.get(index));
     }
 
 }

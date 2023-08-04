@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.function.Predicate;
 
 public final class SelectTargetToAttackGoal extends TrackTargetGoal {

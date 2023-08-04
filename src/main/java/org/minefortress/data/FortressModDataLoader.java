@@ -5,7 +5,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
-
+import ;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,7 +40,7 @@ public class FortressModDataLoader {
 
     public LevelStorage.Session getBlueprintsWorldSession() {
         try {
-            return fortressLevelStorage.createSession(WORLD_DIR_PREFIX);
+            return fortressLevelStorage.createSessionWithoutSymlinkCheck(WORLD_DIR_PREFIX);
         }catch (IOException e) {
             throw new RuntimeException(e);
         }

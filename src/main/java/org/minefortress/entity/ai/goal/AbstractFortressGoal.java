@@ -21,7 +21,7 @@ abstract class AbstractFortressGoal extends Goal {
     }
 
     protected String getColonistName() {
-        return colonist.getName().asString();
+        return colonist.getName().getContent();
     }
 
     protected boolean isStarving() {

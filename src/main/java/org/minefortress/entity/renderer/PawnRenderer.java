@@ -25,7 +25,9 @@ import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.interfaces.ITargetedPawn;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
-
+import F;
+import I;
+import Z;
 import java.util.Optional;
 
 public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel> {

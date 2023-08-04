@@ -1,7 +1,9 @@
 package org.minefortress.renderer.gui.fortress;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.text.Text;
@@ -17,6 +19,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.minefortress.utils.BlockInfoUtils.convertBlockStatesMapItemsMap;
+
+import I;
 
 public class RepairBuildingScreen extends WindowScreen {
 

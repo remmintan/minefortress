@@ -16,7 +16,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.biome.ColorResolver;
 import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.renderer.custom.BuiltModel;
@@ -33,7 +33,7 @@ public class BuiltBlueprint implements BuiltModel {
     private final Set<RenderLayer> nonEmptyLayers = new HashSet<>();
     private final Random random = new Random();
 
-    private BufferBuilder.State bufferState;
+    private BufferBuilder.TransparentSortingData bufferState;
     private ChunkOcclusionData occlusionData;
 
     private CompletableFuture<List<Void>> uploadsFuture;
@@ -140,7 +140,7 @@ public class BuiltBlueprint implements BuiltModel {
         if(nonEmptyLayers.contains(RenderLayer.getTranslucent())) {
             final BufferBuilder translucentBuilder = blockBufferBuilders.get(RenderLayer.getTranslucent());
             translucentBuilder.sortFrom(-minPos.getX(), -minPos.getY(), -minPos.getZ());
-            bufferState = translucentBuilder.popState();
+            bufferState = translucentBuilder.getSortingData();
         }
 
         initializedLayers.stream().map(blockBufferBuilders::get).forEach(BufferBuilder::end);

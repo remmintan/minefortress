@@ -8,19 +8,19 @@ import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 
 public class FortressToast implements Toast {
 
     private Toast.Visibility visibility = Visibility.SHOW;
 
-    private final LiteralText title;
-    private final LiteralText descriptionFirstLine;
+    private final LiteralTextContent title;
+    private final LiteralTextContent descriptionFirstLine;
     private final ItemStack itemStack;
 
     public FortressToast(String title, String descriptionFirstLine, Item item) {
-        this.title = new LiteralText(title);
-        this.descriptionFirstLine = new LiteralText(descriptionFirstLine);
+        this.title = new LiteralTextContent(title);
+        this.descriptionFirstLine = new LiteralTextContent(descriptionFirstLine);
         this.itemStack = new ItemStack(item);
     }
 

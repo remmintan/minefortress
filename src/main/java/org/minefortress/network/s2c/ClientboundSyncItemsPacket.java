@@ -5,10 +5,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import org.apache.logging.log4j.LogManager;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressS2CPacket;
-
+import I;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

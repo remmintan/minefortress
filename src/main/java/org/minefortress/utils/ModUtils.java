@@ -3,6 +3,8 @@ package org.minefortress.utils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,7 +21,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.tasks.ClientVisualTasksHolder;
-
+import Z;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;

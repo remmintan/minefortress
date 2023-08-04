@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressServerManager;
@@ -12,6 +13,9 @@ import org.minefortress.utils.BuildingHelper;
 
 import static org.minefortress.entity.colonist.FortressHungerManager.PASSIVE_EXHAUSTION;
 import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
+
+import I;
+import java.util.Random;
 
 public class ForesterDailyTask implements ProfessionDailyTask{
 

@@ -1,5 +1,6 @@
 package org.minefortress.fortress.resources.gui;
 
+import I;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
@@ -7,6 +8,7 @@ import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -132,7 +134,7 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
 
     private void renderScrollbar(MatrixStack matrices) {
         final var bounds = getScrollbarBounds();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, SCROLLBAR_TEXTURE);
         this.drawTexture(matrices, bounds.x1(), bounds.y1() + (int)((float)(bounds.y2() - bounds.y1() - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
     }

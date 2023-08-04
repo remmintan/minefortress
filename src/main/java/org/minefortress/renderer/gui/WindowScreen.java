@@ -35,7 +35,7 @@ public class WindowScreen extends Screen {
         super.renderBackground(matrices);
         this.drawBackground(matrices);
         super.render(matrices, mouseX, mouseY, delta);
-        HirePawnScreen.drawCenteredText(matrices, this.textRenderer, getTitle(), this.getScreenCenterX(), this.getScreenTopY() + 10, 0xFFFFFF);
+        HirePawnScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, getTitle(), this.getScreenCenterX(), this.getScreenTopY() + 10, 0xFFFFFF);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class WindowScreen extends Screen {
 
     private void drawBackground(MatrixStack matrices) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE_IDENTIFIER);
         this.drawTexture(matrices, this.x, this.y, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
     }

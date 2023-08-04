@@ -3,6 +3,7 @@ package org.minefortress.blueprints.renderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
@@ -169,9 +170,9 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
         VertexFormat vertexFormat = renderLayer.getVertexFormat();
 
-        Shader shader = RenderSystem.getShader();
+        ShaderProgram shader = RenderSystem.getShader();
         if(shader == null) throw new IllegalStateException("Shader is null while rendering blueprint");
-        BufferRenderer.unbindAll();
+        BufferRenderer.reset();
         int k;
         for (int i = 0; i < 12; ++i) {
             k = RenderSystem.getShaderTexture(i);
@@ -221,7 +222,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         if(chunkOffset != null) chunkOffset.set(Vec3f.ZERO);
         shader.unbind();
 
-        if(hasLayer) vertexFormat.endDrawing();
+        if(hasLayer) vertexFormat.clearState();
 
         VertexBuffer.unbind();
         VertexBuffer.unbindVertexArray();

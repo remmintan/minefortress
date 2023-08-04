@@ -14,14 +14,15 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
@@ -36,6 +37,7 @@ import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
+import org.minefortress.fortress.buildings.FortressBuilding;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -51,8 +53,13 @@ import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.RepairBuildingTask;
 import org.minefortress.tasks.TaskManager;
 import org.minefortress.utils.BlockInfoUtils;
-
+import D;
+import F;
+import I;
+import J;
+import Z;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -233,7 +240,7 @@ public final class FortressServerManager extends AbstractFortressManager {
                     if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
                         if(player != null) {
                             spawnPawnNearCampfire(player.getUuid())
-                                    .ifPresent(it -> player.sendMessage(new LiteralText(it.getName().asString()+" appeared in the village."), false));
+                                    .ifPresent(it -> player.sendMessage(new LiteralTextContent(it.getName().getContent()+" appeared in the village."), false));
 
                         }
                     }
@@ -300,7 +307,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public void jumpToCampfire(ServerPlayerEntity player) {
         if(fortressCenter == null) return;
-        if(player.getWorld().getRegistryKey() != World.OVERWORLD) return;
+        if(player.method_48926().getRegistryKey() != World.OVERWORLD) return;
         player.setPitch(60);
         player.setYaw(90 + 45);
         player.teleport(fortressCenter.getX() + 10, fortressCenter.getY() + 20, fortressCenter.getZ() + 10);

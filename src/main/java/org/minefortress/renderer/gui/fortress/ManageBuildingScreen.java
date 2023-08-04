@@ -5,6 +5,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
+import org.minefortress.blueprints.manager.BlueprintMetadataManager;
 import org.minefortress.fortress.buildings.EssentialBuildingInfo;
 import org.minefortress.network.c2s.C2SDestroyBuilding;
 import org.minefortress.network.c2s.C2SOpenRepairBuildingScreen;
@@ -12,7 +13,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.Profession;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.utils.ModUtils;
-
+import I;
 import java.util.Optional;
 
 public class ManageBuildingScreen extends WindowScreen {

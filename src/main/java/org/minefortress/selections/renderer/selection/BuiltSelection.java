@@ -173,7 +173,7 @@ public class BuiltSelection implements BuiltModel {
                                     if (t != null) {
                                         CrashReport crashReport = CrashReport.create(t, "Building selection lines");
                                         getClient()
-                                                .setCrashReportSupplier(() -> getClient().addDetailsToCrashReport(crashReport));
+                                                .setCrashReportSupplierAndAddDetails(() -> getClient().addDetailsToCrashReport(crashReport));
                                         return;
                                     }
 
@@ -186,7 +186,7 @@ public class BuiltSelection implements BuiltModel {
                                 .whenComplete((r, t) -> {
                                     if (t != null) {
                                         CrashReport crashReport = CrashReport.create(t, "Building selection blocks");
-                                        getClient().setCrashReportSupplier(() -> getClient().addDetailsToCrashReport(crashReport));
+                                        getClient().setCrashReportSupplierAndAddDetails(() -> getClient().addDetailsToCrashReport(crashReport));
                                         return;
                                     }
 

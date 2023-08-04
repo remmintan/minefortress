@@ -1,5 +1,7 @@
 package org.minefortress.fortress.resources.gui.smelt;
 
+import I;
+import Z;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.recipebook.FurnaceRecipeBookScreen;
@@ -8,10 +10,11 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.c2s.ServerboundOpenCraftingScreenPacket;
@@ -42,7 +45,7 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
             final var addedFurnaces = this.addedFurnaces.size();
             final var otherFurnace = furnaces.get(addedFurnaces);
             final var width = 100;
-            final var btn = new ButtonWidget(this.width - 5 - width, 5 + addedFurnaces * 25, width, 20, new LiteralText("Fur. " + addedFurnaces), (buttonWidget) -> {
+            final var btn = new ButtonWidget(this.width - 5 - width, 5 + addedFurnaces * 25, width, 20, new LiteralTextContent("Fur. " + addedFurnaces), (buttonWidget) -> {
                 final var posX = otherFurnace.getPosX();
                 final var posY = otherFurnace.getPosY();
                 final var posZ = otherFurnace.getPosZ();
@@ -62,7 +65,7 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
             final var isBurning = furnace.getBurnTime() > 0;
             final var burningLabel = isBurning ? ("" + furnace.getCookProgress()+"%") : ("not burning");
 
-            btn.setMessage(new LiteralText("Fur."+selectedLabel+": "+burningLabel));
+            btn.setMessage(new LiteralTextContent("Fur."+selectedLabel+": "+burningLabel));
         }
     }
 
@@ -85,7 +88,7 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
     @Override
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         int k;
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
         int i = this.x;

@@ -27,7 +27,7 @@ class TimeHudLayer extends AbstractHudLayer {
         final int timeMinutes = (int) Math.floor(timeOfDayTicks / 16.66667);
 
         final String timeText = String.format("Day: %d | %02d:%02d", timeDays, timeHours, timeMinutes);
-        TimeHudLayer.drawStringWithShadow(p, font, timeText, screenWidth - font.getWidth(timeText) - 5, screenHeight - 15, 0xFFFFFF);
+        TimeHudLayer.drawTextWithShadow(p, font, timeText, screenWidth - font.getWidth(timeText) - 5, screenHeight - 15, 0xFFFFFF);
     }
 
     @Override

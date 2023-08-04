@@ -1,6 +1,7 @@
 package org.minefortress.entity.components;
 
 import baritone.api.BaritoneAPI;
+import baritone.api.Settings;
 
 final class AbstractBaritoneComponent {
 

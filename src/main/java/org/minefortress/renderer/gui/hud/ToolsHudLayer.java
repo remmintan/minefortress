@@ -8,7 +8,7 @@ import org.minefortress.renderer.gui.widget.ItemButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemToggleWidget;
 import org.minefortress.selections.SelectionType;
 import org.minefortress.utils.ModUtils;
-
+import I;
 import java.util.Arrays;
 import java.util.Optional;
 

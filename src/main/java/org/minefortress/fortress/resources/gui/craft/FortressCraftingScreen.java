@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
 import org.minefortress.fortress.resources.gui.FortressRecipeBookWidget;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -23,7 +24,7 @@ public class FortressCraftingScreen extends AbstractFortressRecipeScreen<Fortres
 
     @Override
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int i = this.x;

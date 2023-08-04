@@ -1,5 +1,7 @@
 package org.minefortress.renderer.gui.blueprints;
 
+import I;
+import Z;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -10,13 +12,15 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.blueprints.renderer.BlueprintRenderer;
+import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 import org.minefortress.utils.ModUtils;
@@ -28,9 +32,9 @@ public final class BlueprintsScreen extends Screen {
     private static final Identifier INVENTORY_TABS_TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
     private static final String BACKGROUND_TEXTURE = "textures/gui/container/creative_inventory/tab_items.png";
     private static final Identifier BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE = new Identifier("textures/gui/recipe_book.png");
-    private static final LiteralText EDIT_BLUEPRINT_TEXT = new LiteralText("right click to edit");
-    private static final LiteralText ADD_BLUEPRINT_TEXT = new LiteralText("click to add blueprint");
-    private static final LiteralText DELETE_BLUEPRINT_TEXT = new LiteralText("right click to delete");
+    private static final LiteralTextContent EDIT_BLUEPRINT_TEXT = new LiteralTextContent("right click to edit");
+    private static final LiteralTextContent ADD_BLUEPRINT_TEXT = new LiteralTextContent("click to add blueprint");
+    private static final LiteralTextContent DELETE_BLUEPRINT_TEXT = new LiteralTextContent("right click to delete");
 
     private final int backgroundWidth = 195;
     private final int backgroundHeight = 136;
@@ -50,7 +54,7 @@ public final class BlueprintsScreen extends Screen {
     private BlueprintScreenHandler handler;
 
     public BlueprintsScreen() {
-        super(new LiteralText("Blueprints"));
+        super(new LiteralTextContent("Blueprints"));
     }
 
     @Override
@@ -73,7 +77,7 @@ public final class BlueprintsScreen extends Screen {
                                     this.y - 22,
                                     120,
                                     20,
-                                    new LiteralText("Import / Export"),
+                                    new LiteralTextContent("Import / Export"),
                                     btn -> client.setScreen(new ImportExportBlueprintsScreen())
                             )
                     );
@@ -193,7 +197,7 @@ public final class BlueprintsScreen extends Screen {
         RenderSystem.applyModelViewMatrix();
         this.handler.focusOnSlot(null);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 
         final List<BlueprintSlot> currentSlots = this.handler.getCurrentSlots();
         final int currentSlotsSize = currentSlots.size();
@@ -384,13 +388,13 @@ public final class BlueprintsScreen extends Screen {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         final BlueprintGroup selectedGroup = this.handler.getSelectedGroup();
         for (BlueprintGroup bg : BlueprintGroup.values()) {
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.setShaderTexture(0, INVENTORY_TABS_TEXTURE);
 
             if (selectedGroup == bg) continue;
             this.renderTabIcon(matrices, bg);
         }
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, new Identifier(BACKGROUND_TEXTURE));
         this.drawTexture(matrices, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
 //        this.searchBox.render(matrices, mouseX, mouseY, delta);
@@ -398,7 +402,7 @@ public final class BlueprintsScreen extends Screen {
         int i = this.x + 175;
         int j = this.y + 18;
         int k = j + 112;
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, INVENTORY_TABS_TEXTURE);
 
         this.drawTexture(matrices, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 232 + (this.handler.isNeedScrollbar() ? 0 : 12), 0, 12, 15);
@@ -407,7 +411,7 @@ public final class BlueprintsScreen extends Screen {
             this.renderTabIcon(matrices, selectedGroup);
 
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE);
 
         this.drawTexture(matrices, this.x + this.backgroundWidth + this.previewOffset, this.y, 15, 23, this.previewWidth, this.backgroundHeight);

@@ -5,6 +5,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.world.World;
 import org.minefortress.entity.ai.goal.hostile.AttackBuildingGoal;
+import org.minefortress.fortress.server.FortressModServerManager;
 import org.minefortress.interfaces.FortressServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

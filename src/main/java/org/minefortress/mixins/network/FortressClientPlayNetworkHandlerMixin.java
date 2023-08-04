@@ -2,7 +2,7 @@ package org.minefortress.mixins.network;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.util.telemetry.TelemetrySender;
+import net.minecraft.client.util.telemetry.TelemetryManager;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.world.GameMode;
@@ -20,7 +20,7 @@ public class FortressClientPlayNetworkHandlerMixin {
 
     @Shadow @Final private MinecraftClient client;
 
-    @Shadow @Final private TelemetrySender telemetrySender;
+    @Shadow @Final private TelemetryManager telemetrySender;
 
     @Inject(method = "onPlayerRespawn", at = @At("TAIL"))
     public void onPlayerRespawn(PlayerRespawnS2CPacket packet, CallbackInfo ci) {

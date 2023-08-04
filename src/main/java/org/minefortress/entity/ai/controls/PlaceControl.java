@@ -8,6 +8,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 

@@ -93,7 +93,7 @@ public class BuiltTasks implements BuiltModel {
                             CrashReport crashReport = CrashReport.create(throwable, "Building tasks model");
                             MinecraftClient
                                     .getInstance()
-                                    .setCrashReportSupplier(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashReport));
+                                    .setCrashReportSupplierAndAddDetails(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashReport));
                             return;
                         }
 
