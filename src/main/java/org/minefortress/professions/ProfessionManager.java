@@ -1,7 +1,5 @@
 package org.minefortress.professions;
 
-import I;
-import Z;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;

@@ -2,10 +2,10 @@ package org.minefortress.blueprints.data;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import org.minefortress.blueprints.interfaces.BlueprintsTagsKeeper;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public final class ClientStructureBlockDataProvider extends AbstractStructureBlo
         if(!blueprintTags.containsKey(blueprintFileName)) return Optional.empty();
         final NbtCompound blueprintTag = blueprintTags.get(blueprintFileName);
         final StructureTemplate structure = new StructureTemplate();
-        structure.readNbt(blueprintTag);
+        structure.readNbt(Registries.BLOCK.getReadOnlyWrapper(), blueprintTag);
         return Optional.of(structure);
     }
 
