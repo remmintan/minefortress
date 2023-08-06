@@ -1,6 +1,6 @@
 package org.minefortress.renderer.gui.professions;
 
-import Z;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

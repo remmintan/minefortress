@@ -2,7 +2,7 @@ package org.minefortress.entity.interfaces;
 
 import net.minecraft.entity.player.HungerManager;
 import org.minefortress.entity.ai.controls.EatControl;
-import I;
+
 import java.util.Optional;
 
 public interface IHungerAwareEntity extends IItemUsingEntity {

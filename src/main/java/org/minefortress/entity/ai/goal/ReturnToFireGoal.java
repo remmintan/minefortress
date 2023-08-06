@@ -4,7 +4,7 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
-import D;
+
 import java.util.EnumSet;
 
 public class ReturnToFireGoal extends AbstractFortressGoal {

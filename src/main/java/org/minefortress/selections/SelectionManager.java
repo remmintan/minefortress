@@ -1,6 +1,6 @@
 package org.minefortress.selections;
 
-import I;
+
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;

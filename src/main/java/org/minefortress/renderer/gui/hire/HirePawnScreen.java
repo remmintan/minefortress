@@ -10,8 +10,8 @@ import org.minefortress.professions.hire.IHireScreenHandler;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.renderer.gui.widget.*;
 import org.minefortress.utils.ModUtils;
-import I;
-import Z;
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

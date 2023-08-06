@@ -1,6 +1,6 @@
 package org.minefortress.fortress.resources.server;
 
-import I;
+
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registry;

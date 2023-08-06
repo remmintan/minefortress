@@ -16,7 +16,7 @@ import org.minefortress.fortress.resources.server.ServerStartingInventoryReader.
 import org.minefortress.network.s2c.ClientboundSyncItemsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import I;
+
 import java.util.*;
 
 public class ServerResourceManagerImpl implements ServerResourceManager {

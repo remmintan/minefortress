@@ -10,7 +10,7 @@ import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressS2CPacket;
-import I;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

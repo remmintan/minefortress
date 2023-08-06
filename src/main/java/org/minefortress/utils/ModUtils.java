@@ -21,7 +21,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.tasks.ClientVisualTasksHolder;
-import Z;
+
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;

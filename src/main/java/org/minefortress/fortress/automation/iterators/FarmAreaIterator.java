@@ -10,8 +10,8 @@ import net.minecraft.world.World;
 import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.utils.BuildingHelper;
-import I;
-import Z;
+
+
 import java.util.List;
 
 public class FarmAreaIterator extends AbstractFilteredIterator{

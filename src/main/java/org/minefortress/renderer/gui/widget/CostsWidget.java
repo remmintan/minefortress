@@ -11,8 +11,8 @@ import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.utils.GuiUtils;
 import org.minefortress.utils.ModUtils;
-import F;
-import I;
+
+
 import java.util.List;
 
 public class CostsWidget implements Drawable, Element {

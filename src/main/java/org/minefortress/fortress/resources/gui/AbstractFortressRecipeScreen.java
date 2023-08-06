@@ -1,6 +1,6 @@
 package org.minefortress.fortress.resources.gui;
 
-import I;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;

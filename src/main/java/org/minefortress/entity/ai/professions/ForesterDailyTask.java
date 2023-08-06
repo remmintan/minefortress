@@ -14,7 +14,7 @@ import org.minefortress.utils.BuildingHelper;
 import static org.minefortress.entity.colonist.FortressHungerManager.PASSIVE_EXHAUSTION;
 import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
 
-import I;
+
 import java.util.Random;
 
 public class ForesterDailyTask implements ProfessionDailyTask{

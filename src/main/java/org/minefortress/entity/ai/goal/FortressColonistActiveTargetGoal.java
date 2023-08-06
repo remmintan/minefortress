@@ -1,6 +1,6 @@
 package org.minefortress.entity.ai.goal;
 
-import Z;
+
 import java.util.Optional;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.mob.CreeperEntity;

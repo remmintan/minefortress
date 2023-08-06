@@ -23,7 +23,7 @@ import org.minefortress.network.c2s.ServerboundScrollCurrentScreenPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.interfaces.ScrollableHandler;
-import I;
+
 import java.util.*;
 import java.util.stream.Collectors;
 

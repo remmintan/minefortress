@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.utils.ModUtils;
-import I;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

@@ -19,7 +19,7 @@ import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.hire.ProfessionsHireTypes;
 import org.minefortress.utils.ModUtils;
-import Z;
+
 import java.util.*;
 
 public class ClientInfluenceManager extends BaseClientStructureManager {

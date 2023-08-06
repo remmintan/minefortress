@@ -19,8 +19,8 @@ import org.minefortress.fortress.resources.server.ServerResourceManager;
 
 import static org.minefortress.entity.colonist.FortressHungerManager.ACTIVE_EXHAUSTION;
 
-import I;
-import Z;
+
+
 import java.util.List;
 
 public class DigControl extends PositionedActionControl {

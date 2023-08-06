@@ -22,8 +22,8 @@ import org.minefortress.network.s2c.ClientboundAddBlueprintPacket;
 import org.minefortress.network.s2c.ClientboundUpdateBlueprintPacket;
 import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
-import I;
-import Z;
+
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;

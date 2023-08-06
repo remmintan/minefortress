@@ -1,6 +1,6 @@
 package org.minefortress.entity.ai;
 
-import Z;
+
 import baritone.api.IBaritone;
 import baritone.api.event.events.PathEvent;
 import baritone.api.event.listener.AbstractGameEventListener;

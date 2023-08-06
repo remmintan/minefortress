@@ -4,9 +4,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.FortressBorder;
-import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.utils.ModUtils;
-import Z;
+
 import java.util.*;
 
 public class ClientFortressBorderHolder extends BaseFortressBorderHolder {

@@ -1,8 +1,6 @@
 package org.minefortress.blueprints.manager;
 
 import com.google.gson.stream.JsonReader;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.minefortress.MineFortressMod;
@@ -25,8 +23,8 @@ public class BlueprintMetadataReader {
     void read() {
         predefinedBlueprints.clear();
         final var resourceManager = server.getResourceManager();
+        final var resource = resourceManager.getResource(PREDEFINED_BLUEPRINTS_ID).orElseThrow();
         try (
-                final var resource = resourceManager.getResource(PREDEFINED_BLUEPRINTS_ID);
                 final var isr = new InputStreamReader(resource.getInputStream());
                 final var jsonReader = new JsonReader(isr)
         ) {

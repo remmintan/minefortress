@@ -26,8 +26,8 @@ import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
-import I;
-import J;
+
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

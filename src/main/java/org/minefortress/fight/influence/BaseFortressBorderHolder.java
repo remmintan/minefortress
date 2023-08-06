@@ -1,7 +1,5 @@
 package org.minefortress.fight.influence;
 
-import F;
-import I;
 import net.minecraft.util.math.BlockPos;
 
 public class BaseFortressBorderHolder {

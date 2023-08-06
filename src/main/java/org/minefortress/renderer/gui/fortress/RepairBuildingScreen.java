@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static org.minefortress.utils.BlockInfoUtils.convertBlockStatesMapItemsMap;
 
-import I;
+
 
 public class RepairBuildingScreen extends WindowScreen {
 

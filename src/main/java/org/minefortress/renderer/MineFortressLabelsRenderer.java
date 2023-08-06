@@ -1,7 +1,7 @@
 package org.minefortress.renderer;
 
-import F;
-import I;
+
+
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

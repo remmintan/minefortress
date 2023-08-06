@@ -1,6 +1,6 @@
 package org.minefortress.entity.ai.goal;
 
-import Z;
+
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;

@@ -1,6 +1,6 @@
 package org.minefortress.fortress.automation.iterators;
 
-import Z;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.tag.BlockTags;

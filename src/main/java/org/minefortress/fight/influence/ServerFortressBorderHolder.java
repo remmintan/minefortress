@@ -2,7 +2,7 @@ package org.minefortress.fight.influence;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorderStage;
-import I;
+
 import java.util.HashSet;
 import java.util.Set;
 

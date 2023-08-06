@@ -20,9 +20,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.event.GameEvent;
 import org.apache.logging.log4j.LogManager;
-import F;
-import I;
-import J;
+
+
+
 import java.util.*;
 
 class FortressBuildingBlockData {

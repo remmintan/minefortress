@@ -23,7 +23,7 @@ import java.util.List;
 import static org.minefortress.MineFortressMod.FORTRESS_FURNACE_SCREEN_HANDLER;
 import static org.minefortress.fortress.resources.gui.smelt.FortressFurnacePropertyDelegate.TOTAL_FIELDS;
 
-import I;
+
 
 public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHandler<Inventory> implements FuelChecker{
 

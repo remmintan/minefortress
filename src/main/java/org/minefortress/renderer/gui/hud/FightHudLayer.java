@@ -15,9 +15,9 @@ import org.minefortress.utils.ModUtils;
 
 import static org.minefortress.renderer.gui.blueprints.BlueprintsScreen.convertItemIconInTheGUI;
 
-import D;
-import I;
-import Z;
+
+
+
 import java.util.List;
 
 class FightHudLayer extends AbstractHudLayer {

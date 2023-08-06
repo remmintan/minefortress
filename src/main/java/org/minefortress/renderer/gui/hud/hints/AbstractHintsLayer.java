@@ -1,6 +1,6 @@
 package org.minefortress.renderer.gui.hud.hints;
 
-import I;
+
 import com.google.common.collect.Lists;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

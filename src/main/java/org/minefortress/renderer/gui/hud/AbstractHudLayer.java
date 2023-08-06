@@ -10,7 +10,7 @@ import org.minefortress.renderer.gui.hud.interfaces.IHudElement;
 import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
 import org.minefortress.renderer.gui.hud.interfaces.IItemHudElement;
 import org.minefortress.utils.ModUtils;
-import I;
+
 import java.util.ArrayList;
 import java.util.List;
 
