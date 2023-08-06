@@ -2,14 +2,7 @@ accessWidener   v1  named
 accessible  class   net/minecraft/client/render/RenderLayer$MultiPhase
 accessible  method  net/minecraft/client/render/RenderLayer of  (Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;ILnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;
 accessible  class   net/minecraft/client/gui/widget/CyclingButtonWidget$Values
-accessible  class   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode
 mutable  field   net/minecraft/client/gui/widget/CyclingButtonWidget    values  Lnet/minecraft/client/gui/widget/CyclingButtonWidget$Values;
-accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode    defaultGameMode   Lnet/minecraft/world/GameMode;
-mutable  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode    defaultGameMode   Lnet/minecraft/world/GameMode;
-mutable  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode    text   Lnet/minecraft/text/Text;
-accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode    text   Lnet/minecraft/text/Text;
-mutable  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode   translationSuffix   Ljava/lang/String;
-accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode   translationSuffix   Ljava/lang/String;
 accessible  field   net/minecraft/structure/Structure   blockInfoLists  Ljava/util/List;
 accessible  class   net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
 accessible  field   net/minecraft/client/render/chunk/ChunkBuilder   buffers  Lnet/minecraft/client/render/chunk/BlockBufferBuilderStorage;
