@@ -3,7 +3,7 @@ accessible  class   net/minecraft/client/render/RenderLayer$MultiPhase
 accessible  method  net/minecraft/client/render/RenderLayer of  (Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;ILnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;
 accessible  class   net/minecraft/client/gui/widget/CyclingButtonWidget$Values
 mutable  field   net/minecraft/client/gui/widget/CyclingButtonWidget    values  Lnet/minecraft/client/gui/widget/CyclingButtonWidget$Values;
-accessible  field   net/minecraft/structure/Structure   blockInfoLists  Ljava/util/List;
+accessible  field   net/minecraft/structure/StructureTemplate   blockInfoLists  Ljava/util/List;
 accessible  class   net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
 accessible  field   net/minecraft/client/render/chunk/ChunkBuilder   buffers  Lnet/minecraft/client/render/chunk/BlockBufferBuilderStorage;
 accessible  field    net/minecraft/entity/player/HungerManager   foodLevel   I
@@ -13,13 +13,12 @@ accessible  field    net/minecraft/entity/player/HungerManager  saturationLevel 
 accessible  field    net/minecraft/entity/player/HungerManager  exhaustion  F
 accessible  class   net/minecraft/client/render/chunk/RenderedChunk
 mutable field   net/minecraft/client/gui/screen/ingame/HandledScreen handler Lnet/minecraft/screen/ScreenHandler;
-accessible  method   net/minecraft/item/Item    isIn    (Lnet/minecraft/item/ItemGroup;)Z
 extendable  class   net/minecraft/item/ItemStack
 accessible field net/minecraft/screen/ScreenHandler revision I
 accessible field net/minecraft/screen/ScreenHandler cursorStack Lnet/minecraft/item/ItemStack;
 accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeBook Lnet/minecraft/client/recipebook/ClientRecipeBook;
 accessible method net/minecraft/recipe/InputSlotFiller canReturnInputs ()Z
-accessible method net/minecraft/screen/CraftingScreenHandler updateResult (Lnet/minecraft/screen/ScreenHandler;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/inventory/CraftingInventory;Lnet/minecraft/inventory/CraftingResultInventory;)V
+accessible method net/minecraft/screen/CraftingScreenHandler updateResult (Lnet/minecraft/screen/ScreenHandler;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/inventory/CraftingResultInventory;)V
 accessible field  net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeFinder Lnet/minecraft/recipe/RecipeMatcher;
 accessible method net/minecraft/client/gui/screen/recipebook/RecipeBookWidget refreshResults (Z)V
 accessible field net/minecraft/screen/ScreenHandler slots Lnet/minecraft/util/collection/DefaultedList;
