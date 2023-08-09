@@ -6,7 +6,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.Vector3f;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.interfaces.FortressGameRenderer;
 
@@ -59,7 +59,7 @@ public class CameraTools {
     }
 
     private static Vec3d calculateResultingVector(FloatBuffer resultingViewBuffer) {
-        Vec3f resultingViewVector = new Vec3f(resultingViewBuffer.get(0), resultingViewBuffer.get(1), resultingViewBuffer.get(2));
+        Vector3f resultingViewVector = new Vector3f(resultingViewBuffer.get(0), resultingViewBuffer.get(1), resultingViewBuffer.get(2));
         resultingViewVector.normalize();
         return new Vec3d(resultingViewVector);
     }
@@ -68,8 +68,8 @@ public class CameraTools {
         Matrix4f modelViewMatrix = RenderSystem.getModelViewMatrix().copy();
         ClientPlayerEntity player = minecraft.player;
         if(player != null) {
-            modelViewMatrix.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(player.getRotationClient().x));
-            modelViewMatrix.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(player.getRotationClient().y + 180f));
+            modelViewMatrix.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(player.getRotationClient().x));
+            modelViewMatrix.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(player.getRotationClient().y + 180f));
         }
         FloatBuffer modelViewBuffer = FloatBuffer.allocate(16);
         modelViewMatrix.writeColumnMajor(modelViewBuffer);

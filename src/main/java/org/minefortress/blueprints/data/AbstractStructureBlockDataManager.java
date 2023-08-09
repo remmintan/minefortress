@@ -8,7 +8,6 @@ import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.StructureTemplate;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;

@@ -2,12 +2,10 @@ package org.minefortress.mixins.interaction;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.tutorial.TutorialManager;
 import net.minecraft.client.tutorial.TutorialStep;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,18 +15,13 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.fight.ClientFightManager;
-import org.minefortress.fight.ClientFightSelectionManager;
-import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
-import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.fortress.ManageBuildingScreen;
 import org.minefortress.selections.SelectionManager;
@@ -38,6 +31,7 @@ import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -48,6 +42,7 @@ import static org.minefortress.MineFortressConstants.PICK_DISTANCE_FLOAT;
 @Mixin(ClientPlayerInteractionManager.class)
 public abstract class FortressClientInteractionManagerMixin {
 
+    @Unique
     private static final GameMode FORTRESS = MineFortressMod.FORTRESS;
 
     @Shadow
@@ -153,6 +148,7 @@ public abstract class FortressClientInteractionManagerMixin {
         cir.setReturnValue(false);
     }
 
+    @Unique
     private static void openManageBuildingMenu(FortressClientManager fortressManager) {
         fortressManager
                 .getHoveredBuilding()
@@ -192,11 +188,12 @@ public abstract class FortressClientInteractionManagerMixin {
     }
 
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)
-    public void interactBlock(ClientPlayerEntity player, ClientWorld world, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
+    public void interactBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
         if(!ModUtils.isClientInFortressGamemode())return;
         syncSelectedSlot();
         BlockPos blockPos = hitResult.getBlockPos();
-        if(!world.getWorldBorder().contains(blockPos)) return;
+        final var world = this.client.world;
+        if(world!= null && !world.getWorldBorder().contains(blockPos)) return;
 
 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
@@ -263,6 +260,7 @@ public abstract class FortressClientInteractionManagerMixin {
         }
     }
 
+    @Unique
     private static void updateFightSelection(BlockHitResult hitResult, FortressClientManager fortressManager) {
         final var fightManager = fortressManager.getFightManager();
         final var selectionManager = fightManager.getSelectionManager();
@@ -298,6 +296,7 @@ public abstract class FortressClientInteractionManagerMixin {
             cir.setReturnValue(true);
     }
 
+    @Unique
     private void clickBuild(ItemUsageContext useOnContext, BlockState blockState) {
         BlockPos blockPos = useOnContext.getBlockPos();
         if(!BuildingHelper.canPlaceBlock(useOnContext.getWorld(), blockPos)){
@@ -307,6 +306,7 @@ public abstract class FortressClientInteractionManagerMixin {
         ((FortressMinecraftClient)client).getSelectionManager().selectBlock(blockPos, blockState);
     }
 
+    @Unique
     private void setFortressMode() {
         client.mouse.unlockCursor();
         client.gameRenderer.setRenderHand(false);
@@ -315,6 +315,7 @@ public abstract class FortressClientInteractionManagerMixin {
         tutorialManager.setStep(TutorialStep.NONE);
     }
 
+    @Unique
     private void unsetFortressMode() {
         client.mouse.lockCursor();
         client.gameRenderer.setRenderHand(true);

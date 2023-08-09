@@ -2,6 +2,7 @@ package org.minefortress.mixins.renderer.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -11,6 +12,7 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.search.ReloadableSearchProvider;
 import net.minecraft.client.search.SearchManager;
+import net.minecraft.client.search.SearchProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,11 +20,14 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.tag.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +42,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import java.util.List;
+
 import java.util.Locale;
 import java.util.Set;
 
@@ -46,7 +51,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Shadow @Final private static Identifier TEXTURE;
     @Shadow @Final private static String TAB_TEXTURE_PREFIX;
-    @Shadow private static int selectedTab;
+    @Shadow private static ItemGroup selectedTab = ItemGroups.getDefaultTab();
 
     @Shadow protected abstract void renderTabIcon(MatrixStack matrices, ItemGroup group);
 
@@ -58,7 +63,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     @Shadow private @Nullable Slot deleteItemSlot;
     @Shadow @Final private static Text DELETE_ITEM_SLOT_TEXT;
     @Shadow private boolean scrolling;
-    @Shadow @Final private Set<Tag<Item>> searchResultTags;
+    @Shadow @Final private Set<TagKey<Item>> searchResultTags;
 
     @Shadow protected abstract void searchForTags(String id2);
 
@@ -70,14 +75,12 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Shadow @Final static SimpleInventory INVENTORY;
 
-    @Shadow public abstract int getSelectedTab();
-
     public FortressCreativeInventoryScreenMixin(CreativeInventoryScreen.CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text) {
         super(screenHandler, playerInventory, text);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    void init(PlayerEntity player, CallbackInfo ci) {
+    void init(PlayerEntity player, FeatureSet enabledFeatures, boolean operatorTabEnabled, CallbackInfo ci) {
         if(isFortressSurvival()){
             super.handler = new FortressSurvivalInventoryScreenHandler(player, INVENTORY);
             player.currentScreenHandler = super.handler;
@@ -132,10 +135,10 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             this.renderBackground(matrices);
             super.render(matrices, mouseX, mouseY, delta);
             for (ItemGroup itemGroup : getResourceManager().getGroups()) {
-                if (this.renderTabTooltipIfHovered(matrices, itemGroup, mouseX, mouseY)) break;
+                if (this.renderTabTooltipIfHovered(matrices.getMatrices(), itemGroup, mouseX, mouseY)) break;
             }
-            if (this.deleteItemSlot != null && selectedTab == ItemGroup.INVENTORY.getIndex() && this.isPointWithinBounds(this.deleteItemSlot.x, this.deleteItemSlot.y, 16, 16, mouseX, mouseY)) {
-                this.renderTooltip(matrices, DELETE_ITEM_SLOT_TEXT, mouseX, mouseY);
+            if (this.deleteItemSlot != null && selectedTab.getType() == ItemGroup.Type.INVENTORY && this.isPointWithinBounds(this.deleteItemSlot.x, this.deleteItemSlot.y, 16, 16, mouseX, mouseY)) {
+                matrices.drawTooltip(this.textRenderer, DELETE_ITEM_SLOT_TEXT, mouseX, mouseY);
             }
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             this.drawMouseoverTooltip(matrices, mouseX, mouseY);
@@ -211,19 +214,19 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             this.searchResultTags.clear();
             String string = this.searchBox.getText();
             if (string.isEmpty()) {
-                for (Item item : Registry.ITEM) {
+                for (Item item : Registries.ITEM) {
                     item.appendStacks(ItemGroup.SEARCH, this.handler.itemList);
                 }
             } else {
-                ReloadableSearchProvider<ItemStack> searchable;
+                final SearchProvider searchProvider;
                 if (string.startsWith("#")) {
                     string = string.substring(1);
-                    searchable = getClient().getSearchProvider(SearchManager.ITEM_TAG);
+                    searchProvider = this.client.getSearchProvider(SearchManager.ITEM_TAG);
                     this.searchForTags(string);
                 } else {
-                    searchable = getClient().getSearchProvider(SearchManager.ITEM_TOOLTIP);
+                    searchProvider = getClient().getSearchProvider(SearchManager.ITEM_TOOLTIP);
                 }
-                this.handler.itemList.addAll(searchable.findAll(string.toLowerCase(Locale.ROOT)));
+                this.handler.itemList.addAll(searchProvider.findAll(string.toLowerCase(Locale.ROOT)));
             }
             this.scrollPosition = 0.0f;
             this.handler.scrollItems(0.0f);

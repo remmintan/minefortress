@@ -5,7 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.Vector4f;
+import org.joml.Vector4f;
 import org.minefortress.selections.ClickType;
 
 import java.util.Collections;
@@ -32,7 +32,7 @@ public class SelectionRenderInfo {
     }
 
     public Vector4f getColor() {
-        return new Vector4f(color.getX(), color.getY(), color.getZ(), color.getW());
+        return new Vector4f(color.x(), color.y(), color.z(), color.w());
     }
 
     public List<BlockPos> getPositions() {

@@ -1,8 +1,8 @@
 package org.minefortress.selections;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vector4f;
 import net.minecraft.world.World;
+import org.joml.Vector4f;
 
 import java.util.HashSet;
 import java.util.Set;

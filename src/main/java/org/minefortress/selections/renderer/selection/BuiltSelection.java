@@ -11,11 +11,15 @@ import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Util;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector4f;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.selections.ClickType;
@@ -46,14 +50,14 @@ public class BuiltSelection implements BuiltModel {
         this.selection = selection;
 
         for(RenderLayer layer : RenderLayer.getBlockLayers()) {
-            buffers.put(layer, new VertexBuffer());
+            buffers.put(layer, new VertexBuffer(VertexBuffer.Usage.STATIC));
         }
-        buffers.put(RenderLayer.getLines(), new VertexBuffer());
-        buffers.put(FortressRenderLayer.getLinesNoDepth(), new VertexBuffer());
+        buffers.put(RenderLayer.getLines(), new VertexBuffer(VertexBuffer.Usage.STATIC));
+        buffers.put(FortressRenderLayer.getLinesNoDepth(), new VertexBuffer(VertexBuffer.Usage.STATIC));
     }
 
     private BlockPos getBlockPos() {
-        return getClient().player!=null? getClient().player.getBlockPos():getWorld().getSpawnPos();
+        return Optional.ofNullable(getClient().player).map(PlayerEntity::getBlockPos).orElse(getWorld().getSpawnPos());
     }
 
     public void build(Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage) {
@@ -72,14 +76,14 @@ public class BuiltSelection implements BuiltModel {
         final List<BlockPos> positions = selection.getPositions()
                 .stream()
                 .filter(getShouldRenderPosPredicate(clickType))
-                .collect(Collectors.toList());
+                .toList();
         final BlockState blockState = selection.getBlockState();
         selectionBlockRenderView.setBlockStateSupplier((blockPos) -> positions.contains(blockPos)?blockState: Blocks.AIR.getDefaultState());
         for (BlockPos pos : positions) {
 
             matrices.push();
             matrices.translate(pos.getX(), pos.getY(), pos.getZ());
-            WorldRenderer.drawBox(matrices, linesBufferBuilder, BOX, color.getX(), color.getY(), color.getZ(), color.getW());
+            WorldRenderer.drawBox(matrices, linesBufferBuilder, BOX, color.x(), color.y(), color.z(), color.w());
             if(clickType == ClickType.BUILD || clickType == ClickType.ROADS) {
                 renderFluid(blockBufferBuilderStorage, pos, blockState);
                 renderBlock(blockBufferBuilderStorage, matrices, pos, blockState);
@@ -102,7 +106,7 @@ public class BuiltSelection implements BuiltModel {
                 final Box sizeBox = new Box(0, 0, 0, size.getX(), size.getY(), size.getZ());
                 matrices.push();
                 matrices.translate(start.getX(), start.getY(), start.getZ());
-                WorldRenderer.drawBox(matrices, linesNoDepthBufferBuilder, sizeBox, color.getX(), color.getY(), color.getZ(), color.getW());
+                WorldRenderer.drawBox(matrices, linesNoDepthBufferBuilder, sizeBox, color.x(), color.y(), color.z(), color.w());
                 matrices.pop();
 
                 nonEmptyLayers.add(FortressRenderLayer.getLinesNoDepth());
@@ -131,8 +135,8 @@ public class BuiltSelection implements BuiltModel {
             final BufferBuilder fluidBufferBuilder = blockBufferBuilderStorage.get(fluidRenderLayer);
             init(fluidRenderLayer, fluidBufferBuilder);
 
-            if(getBlockRenderManager().renderFluid(pos, selectionBlockRenderView, fluidBufferBuilder, blockState, fluidState))
-                nonEmptyLayers.add(fluidRenderLayer);
+            getBlockRenderManager().renderFluid(pos, selectionBlockRenderView, fluidBufferBuilder, blockState, fluidState);
+
         }
     }
 
@@ -144,9 +148,7 @@ public class BuiltSelection implements BuiltModel {
 
 
             final BlockRenderManager blockRenderer = getBlockRenderManager();
-            if(blockRenderer
-                    .renderBlock(blockState, pos, selectionBlockRenderView, matrices, blockBufferBuilder, true, getWorld().random))
-                nonEmptyLayers.add(blockLayer);
+            blockRenderer.renderBlock(blockState, pos, selectionBlockRenderView, matrices, blockBufferBuilder, true, getWorld().random);
         }
     }
 
@@ -167,34 +169,24 @@ public class BuiltSelection implements BuiltModel {
                     final VertexBuffer vertexBuffer = buffers.get(layer);
                     if (layer == RenderLayer.getLines() || layer == FortressRenderLayer.getLinesNoDepth()) {
                         final BufferBuilder bufferBuilder = lineBufferBuilderStorage.get(layer);
-                        return vertexBuffer
-                                .submitUpload(bufferBuilder)
-                                .whenComplete((r, t) -> {
-                                    if (t != null) {
-                                        CrashReport crashReport = CrashReport.create(t, "Building selection lines");
-                                        getClient()
-                                                .setCrashReportSupplierAndAddDetails(() -> getClient().addDetailsToCrashReport(crashReport));
-                                        return;
-                                    }
-
-                                    bufferBuilder.clear();
-                                });
+                        return scheduleUpload(bufferBuilder.end(), vertexBuffer);
                     } else {
                         final BufferBuilder buffer = blockBufferBuilderStorage.get(layer);
-                        return vertexBuffer
-                                .submitUpload(buffer)
-                                .whenComplete((r, t) -> {
-                                    if (t != null) {
-                                        CrashReport crashReport = CrashReport.create(t, "Building selection blocks");
-                                        getClient().setCrashReportSupplierAndAddDetails(() -> getClient().addDetailsToCrashReport(crashReport));
-                                        return;
-                                    }
-
-                                    buffer.clear();
-                                });
+                        return scheduleUpload(buffer.end(), vertexBuffer);
                     }
                 }).collect(Collectors.toList());
         this.upload = Util.combine(uploads);
+    }
+
+    public CompletableFuture<Void> scheduleUpload(BufferBuilder.BuiltBuffer builtBuffer, VertexBuffer glBuffer) {
+        Runnable runnable = () -> {
+            if (!glBuffer.isClosed()) {
+                glBuffer.bind();
+                glBuffer.upload(builtBuffer);
+                VertexBuffer.unbind();
+            }
+        };
+        return CompletableFuture.runAsync(runnable);
     }
 
     @Override

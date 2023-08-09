@@ -17,7 +17,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.Vector3f;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
@@ -81,9 +81,9 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
                 }
 
                 if(color == null) {
-                    color = new Vec3f(selecting ? 0.7f : 0.0f, selecting ? 0.7f : 1.0f, selecting ? 0.7f : 0.0f);
+                    color = new Vector3f(selecting ? 0.7f : 0.0f, selecting ? 0.7f : 1.0f, selecting ? 0.7f : 0.0f);
                     if(fightSelecting) {
-                        color = new Vec3f(0.0f, 1.0f, 0.0f);
+                        color = new Vector3f(0.0f, 1.0f, 0.0f);
                     }
                 }
 
@@ -104,7 +104,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     }
 
     @Nullable
-    private Vec3f getHealthFoodLevelColor(BasePawnEntity colonist) {
+    private Vector3f getHealthFoodLevelColor(BasePawnEntity colonist) {
         final var healthFoodLevel = getHealthFoodLevel(colonist);
         final var maxLevelOfEachColor = (float)0xFF;
         if(healthFoodLevel > 10) return null;
@@ -112,12 +112,12 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
             final var red = 0xFF / maxLevelOfEachColor;
             final var green = 0xAA / maxLevelOfEachColor;
             final var blue = 0x00 / maxLevelOfEachColor;
-            return new Vec3f(red, green, blue);
+            return new Vector3f(red, green, blue);
         }
         final var red = 0xFF / maxLevelOfEachColor;
         final var green = 0x55 / maxLevelOfEachColor;
         final var blue = 0x55 / maxLevelOfEachColor;
-        return new Vec3f(red, green, blue);
+        return new Vector3f(red, green, blue);
     }
 
     @Nullable
@@ -148,15 +148,15 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
         colonistModel.rightSleeve.visible = !colonist.isSleeping();
     }
 
-    private static void renderRhombus(MatrixStack matrices, VertexConsumer vertices, Entity entity, Vec3f color) {
+    private static void renderRhombus(MatrixStack matrices, VertexConsumer vertices, Entity entity, Vector3f color) {
         Box box = entity.getBoundingBox().offset(-entity.getX(), -entity.getY(), -entity.getZ());
         if (entity instanceof LivingEntity) {
             matrices.push();
             final double xCenter = (box.minX + box.maxX) / 2;
             final double zCenter = (box.minZ + box.maxZ) / 2;
             matrices.translate(xCenter, box.maxY * 1.5, zCenter);
-            final Quaternion xRotation = Vec3f.POSITIVE_X.getDegreesQuaternion(45.0f);
-            final Quaternion yRoation = Vec3f.POSITIVE_Y.getDegreesQuaternion(45.0f);
+            final Quaternion xRotation = Vector3f.POSITIVE_X.getDegreesQuaternion(45.0f);
+            final Quaternion yRoation = Vector3f.POSITIVE_Y.getDegreesQuaternion(45.0f);
             matrices.multiply(xRotation);
             matrices.multiply(yRoation);
             matrices.scale(0.3f, 0.3f, 0.3f);

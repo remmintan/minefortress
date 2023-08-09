@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Vector3f;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.custom.AbstractCustomRenderer;
 import org.minefortress.renderer.custom.BuiltModel;
@@ -19,8 +19,8 @@ import java.util.function.Supplier;
 
 public class SelectionRenderer extends AbstractCustomRenderer {
 
-    private static final Vec3f WRONG_PLACEMENT_COLOR = new Vec3f(1.0F, 0.5F, 0.5F);
-    private static final Vec3f CORRECT_PLACEMENT_COLOR = new Vec3f(1F, 1.0F, 1F);
+    private static final Vector3f WRONG_PLACEMENT_COLOR = new Vector3f(1.0F, 0.5F, 0.5F);
+    private static final Vector3f CORRECT_PLACEMENT_COLOR = new Vector3f(1F, 1.0F, 1F);
 
     private final Supplier<ISelectionInfoProvider> selectionInfoProviderSupplier;
     private final SelectionModelBuilder selectionModelBuilder;
@@ -72,7 +72,7 @@ public class SelectionRenderer extends AbstractCustomRenderer {
     }
 
     @Override
-    protected Vec3f getColorModulator() {
+    protected Vector3f getColorModulator() {
         return getSelectionInfoProvider().isInCorrectState() ? CORRECT_PLACEMENT_COLOR : WRONG_PLACEMENT_COLOR;
     }
 

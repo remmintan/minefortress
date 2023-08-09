@@ -10,8 +10,8 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 
@@ -27,7 +27,7 @@ public abstract class AbstractCustomRenderer {
         this.client = client;
     }
 
-    public void render(DrawContext matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {
+    public void render(MatrixStack matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {
         if(shouldRender()) {
             for(RenderLayer layer : getRenderLayers()) {
                 renderLayer(layer, matrices, cameraX, cameraY, cameraZ, projectionMatrix);
@@ -104,22 +104,22 @@ public abstract class AbstractCustomRenderer {
             final BuiltModel builtModel = builtModelOpt.get();
 
             if(offset != null) {
-                Vec3f cameraPosition = new Vec3f((float) cameraX, (float)cameraY, (float)cameraZ);
-                final Vec3f targetOffset = new Vec3f(renderTargetPosition.getX(), renderTargetPosition.getY(), renderTargetPosition.getZ());
-                targetOffset.subtract(cameraPosition);
-                offset.set(targetOffset.getX(), targetOffset.getY(), targetOffset.getZ());
+                Vector3f cameraPosition = new Vector3f((float) cameraX, (float)cameraY, (float)cameraZ);
+                final Vector3f targetOffset = new Vector3f(renderTargetPosition.getX(), renderTargetPosition.getY(), renderTargetPosition.getZ());
+                targetOffset.sub(cameraPosition);
+                offset.set(targetOffset);
                 offset.upload();
             }
 
             if(builtModel.hasLayer(layer)) {
                 final VertexBuffer buffer = builtModel.getBuffer(layer);
-                buffer.drawVertices();
+                buffer.draw();
                 notEmpty = true;
             }
         }
 
         if(offset != null) {
-            offset.set(Vec3f.ZERO);
+            offset.set(new Vector3f());
         } else {
             matrices.pop();
         }
@@ -129,7 +129,6 @@ public abstract class AbstractCustomRenderer {
         }
 
         VertexBuffer.unbind();
-        VertexBuffer.unbindVertexArray();
         layer.endDrawing();
     }
 
@@ -144,8 +143,8 @@ public abstract class AbstractCustomRenderer {
     public abstract void prepareForRender();
     public abstract void close();
 
-    protected Vec3f getColorModulator() {
-        return new Vec3f(1f, 1f, 1f);
+    protected Vector3f getColorModulator() {
+        return new Vector3f(1f, 1f, 1f);
     }
 
     protected FortressClientManager getClientManager() {
