@@ -65,7 +65,7 @@ public abstract class AbstractHudLayer implements IHudLayer {
         if(basepointX == null || basepointY == null){
             throw new IllegalStateException("Basepoint not set!");
         }
-        this.renderHud(drawContext, font, screenWidth, screenHeight);
+        this.renderHud(drawContext, screenWidth, screenHeight);
 
         final var baseX = switch (positionX) {
             case LEFT -> basepointX;
@@ -88,7 +88,7 @@ public abstract class AbstractHudLayer implements IHudLayer {
         }
     }
 
-    protected void renderHud(DrawContext drawContext, TextRenderer font, int screenWidth, int screenHeight) {}
+    protected void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {}
 
     final public boolean isHovered() {
         for (IHudElement fortressHudButton : fortressHudElements) {

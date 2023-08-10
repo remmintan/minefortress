@@ -1,11 +1,7 @@
 package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
-import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
 import org.minefortress.utils.ModUtils;
 
@@ -18,7 +14,7 @@ public class HoveredEntityHudLayer extends AbstractHudLayer{
     }
 
     @Override
-    protected void renderHud(DrawContext drawContext, TextRenderer font, int screenWidth, int screenHeight) {
+    protected void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {
         getHoveredEntityName()
                 .map(name -> name.replace("house", "").replace("House", ""))
                 .ifPresent(name -> {
@@ -37,7 +33,7 @@ public class HoveredEntityHudLayer extends AbstractHudLayer{
                     );
 
                     drawContext.drawCenteredTextWithShadow(
-                            font,
+                            textRenderer,
                             name,
                             colonistWinX + width / 2,
                             colonistWinY + 5,

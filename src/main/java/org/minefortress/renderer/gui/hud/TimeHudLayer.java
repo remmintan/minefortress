@@ -1,8 +1,7 @@
 package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.World;
 
@@ -16,7 +15,7 @@ class TimeHudLayer extends AbstractHudLayer {
     }
 
     @Override
-    protected void renderHud(MatrixStack p, TextRenderer font, int screenWidth, int screenHeight) {
+    protected void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {
         final Optional<ClientWorld> world = Optional.ofNullable(this.client.world);
         final long timeTicks = world.map(World::getTime).orElse(0L) + 6500L;
         long timeOfDayTicks = (world.map(World::getTimeOfDay).orElse(0L) + 6500L) % 24000L;
@@ -27,7 +26,7 @@ class TimeHudLayer extends AbstractHudLayer {
         final int timeMinutes = (int) Math.floor(timeOfDayTicks / 16.66667);
 
         final String timeText = String.format("Day: %d | %02d:%02d", timeDays, timeHours, timeMinutes);
-        TimeHudLayer.drawTextWithShadow(p, font, timeText, screenWidth - font.getWidth(timeText) - 5, screenHeight - 15, 0xFFFFFF);
+        drawContext.drawTextWithShadow(textRenderer, timeText, screenWidth - textRenderer.getWidth(timeText) - 5, screenHeight - 15, 0xFFFFFF);
     }
 
     @Override
