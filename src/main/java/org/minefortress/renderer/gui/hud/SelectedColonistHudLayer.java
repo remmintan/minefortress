@@ -25,7 +25,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
     }
 
     @Override
-    protected void renderHud(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight) {
+    protected void renderHud(DrawContext drawContext, TextRenderer font, int screenWidth, int screenHeight) {
         final var fortressManager = ModUtils.getFortressClientManager();
         if(fortressManager.isSelectingColonist()){
             final var pawn = fortressManager.getSelectedPawn();
@@ -34,10 +34,10 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
             final int colonistWinY = screenHeight - 85;
             int width = 120;
             final int height = 85;
-            DrawContext.fillGradient(matrices, colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, -1000);
+            drawContext.fillGradient(colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, -1000);
 
             final String name = Optional.ofNullable(pawn.getCustomName()).map(Text::getContent).orElse("");
-            Screen.drawCenteredTextWithShadow(matrices, font, name, colonistWinX + width / 2, colonistWinY + 5, 0xFFFFFF);
+            drawContext.drawCenteredTextWithShadow(font, name, colonistWinX + width / 2, colonistWinY + 5, 0xFFFFFF);
 
             final String healthString = String.format("%.0f/%.0f", pawn.getHealth(), pawn.getMaxHealth());
             int heartIconX = colonistWinX + 5;
@@ -66,10 +66,8 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
         }
     }
 
-    private void renderIcon(MatrixStack matrices, int iconX, int iconY, int heartIconV) {
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, GUI_ICONS_TEXTURE);
-        DrawContext.drawTexture(matrices, iconX, iconY, 110, 52, heartIconV, 8, 8, 256, 256);
+    private void renderIcon(DrawContext drawContext, int iconX, int iconY, int heartIconV) {
+        drawContext.drawTexture(GUI_ICONS_TEXTURE, iconX, iconY, 110, 52, heartIconV, 8, 8, 256, 256);
     }
 
     @Override

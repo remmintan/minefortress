@@ -2,12 +2,11 @@ package org.minefortress.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vector3f;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.minefortress.interfaces.FortressGameRenderer;
 
 import java.nio.FloatBuffer;
@@ -65,14 +64,17 @@ public class CameraTools {
     }
 
     private static FloatBuffer getModelViewMatrix(MinecraftClient minecraft) {
-        Matrix4f modelViewMatrix = RenderSystem.getModelViewMatrix().copy();
-        ClientPlayerEntity player = minecraft.player;
+        final var modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
+        final var player = minecraft.player;
         if(player != null) {
-            modelViewMatrix.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(player.getRotationClient().x));
-            modelViewMatrix.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(player.getRotationClient().y + 180f));
+            final var xRads = (float) Math.toRadians(player.getRotationClient().x);
+            modelViewMatrix.rotate(xRads, new Vector3f(1, 0,0));
+            final var yRads = (float) Math.toRadians(player.getRotationClient().y + 180f);
+            modelViewMatrix.rotate(yRads, new Vector3f(0, 1,0));
         }
         FloatBuffer modelViewBuffer = FloatBuffer.allocate(16);
-        modelViewMatrix.writeColumnMajor(modelViewBuffer);
+        modelViewMatrix.get(modelViewBuffer);
+
         modelViewBuffer.rewind();
         return modelViewBuffer;
     }
@@ -80,7 +82,7 @@ public class CameraTools {
     private  static FloatBuffer getProjectionMatrix(MinecraftClient minecraft) {
         Matrix4f projectionMatrix = getProjectionMatrix4f(minecraft);
         FloatBuffer projectionBuffer = FloatBuffer.allocate(16);
-        projectionMatrix.writeColumnMajor(projectionBuffer);
+        projectionMatrix.get(projectionBuffer);
         projectionBuffer.rewind();
         return projectionBuffer;
     }
@@ -95,7 +97,7 @@ public class CameraTools {
     @NotNull
     private static Matrix4f getProjectionMatrix4f(MinecraftClient minecraft, double fov) {
         final GameRenderer gameRenderer = minecraft.gameRenderer;
-        return gameRenderer.getBasicProjectionMatrix(fov).copy();
+        return new Matrix4f(gameRenderer.getBasicProjectionMatrix(fov));
     }
 
 }

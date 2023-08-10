@@ -5,12 +5,11 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vector4f;
 import net.minecraft.world.World;
+import org.joml.Vector4f;
 import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.selections.ClientSelection;
 
@@ -22,7 +21,7 @@ import java.util.function.BiFunction;
 public class BuiltTasks implements BuiltModel {
     private static final Box BOX = Box.from(new Vec3d(0, 0, 0));
 
-    private final VertexBuffer buffer = new VertexBuffer();
+    private final VertexBuffer buffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
     private final Set<ClientSelection> tasks;
 
     private boolean initialized = false;
@@ -72,7 +71,7 @@ public class BuiltTasks implements BuiltModel {
             if(!shouldRender.apply(getWorld(), pos)) continue;
             matrices.push();
             matrices.translate(pos.getX(), pos.getY(), pos.getZ());
-            WorldRenderer.drawBox(matrices, bufferBuilder, BOX, color.getX(), color.getY(), color.getZ(), color.getW());
+            WorldRenderer.drawBox(matrices, bufferBuilder, BOX, color.x(), color.y(), color.z(), color.w());
             matrices.pop();
             notEmpty = true;
         }
@@ -87,19 +86,19 @@ public class BuiltTasks implements BuiltModel {
 
     private void upload(BufferBuilder bufferBuilder){
         if(initialized) {
-            this.upload = buffer.submitUpload(bufferBuilder)
-                    .whenComplete((aVoid, throwable) -> {
-                        if (throwable != null) {
-                            CrashReport crashReport = CrashReport.create(throwable, "Building tasks model");
-                            MinecraftClient
-                                    .getInstance()
-                                    .setCrashReportSupplierAndAddDetails(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashReport));
-                            return;
-                        }
-
-                        bufferBuilder.clear();
-                    });
+            this.upload = scheduleUpload(bufferBuilder.end(), buffer);
         }
+    }
+
+    public CompletableFuture<Void> scheduleUpload(BufferBuilder.BuiltBuffer builtBuffer, VertexBuffer glBuffer) {
+        Runnable runnable = () -> {
+            if (!glBuffer.isClosed()) {
+                glBuffer.bind();
+                glBuffer.upload(builtBuffer);
+                VertexBuffer.unbind();
+            }
+        };
+        return CompletableFuture.runAsync(runnable);
     }
 
     private ClientWorld getWorld() {

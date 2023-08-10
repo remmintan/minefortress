@@ -18,7 +18,7 @@ public class HoveredEntityHudLayer extends AbstractHudLayer{
     }
 
     @Override
-    protected void renderHud(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight) {
+    protected void renderHud(DrawContext drawContext, TextRenderer font, int screenWidth, int screenHeight) {
         getHoveredEntityName()
                 .map(name -> name.replace("house", "").replace("House", ""))
                 .ifPresent(name -> {
@@ -26,8 +26,7 @@ public class HoveredEntityHudLayer extends AbstractHudLayer{
                     final int colonistWinY = screenHeight - 50;
                     int width = 120;
                     final int height = 20;
-                    DrawContext.fillGradient(
-                            matrices,
+                    drawContext.fillGradient(
                             colonistWinX,
                             colonistWinY,
                             colonistWinX + width,
@@ -37,8 +36,7 @@ public class HoveredEntityHudLayer extends AbstractHudLayer{
                             -1000
                     );
 
-                    Screen.drawCenteredTextWithShadow(
-                            matrices,
+                    drawContext.drawCenteredTextWithShadow(
                             font,
                             name,
                             colonistWinX + width / 2,

@@ -4,7 +4,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.hud.interfaces.IHudElement;
 import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
@@ -14,7 +13,7 @@ import org.minefortress.utils.ModUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractHudLayer extends DrawContext implements IHudLayer {
+public abstract class AbstractHudLayer implements IHudLayer {
 
     private final List<IHudElement> fortressHudElements = new ArrayList<>();
 
@@ -61,11 +60,12 @@ public abstract class AbstractHudLayer extends DrawContext implements IHudLayer 
             button.tick();
     }
 
-    final public void render(DrawContext p, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
+    @Override
+    final public void render(DrawContext drawContext, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta) {
         if(basepointX == null || basepointY == null){
             throw new IllegalStateException("Basepoint not set!");
         }
-        this.renderHud(p, font, screenWidth, screenHeight);
+        this.renderHud(drawContext, font, screenWidth, screenHeight);
 
         final var baseX = switch (positionX) {
             case LEFT -> basepointX;
@@ -83,12 +83,12 @@ public abstract class AbstractHudLayer extends DrawContext implements IHudLayer 
         for (IHudElement fortressHudButton : fortressHudElements) {
             fortressHudButton.setPosBasedOn(baseX, baseY);
             if(fortressHudButton.shouldRender(creative)) {
-                fortressHudButton.render(p, (int)mouseX, (int)mouseY, delta);
+                fortressHudButton.render(drawContext, (int)mouseX, (int)mouseY, delta);
             }
         }
     }
 
-    protected void renderHud(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight) {}
+    protected void renderHud(DrawContext drawContext, TextRenderer font, int screenWidth, int screenHeight) {}
 
     final public boolean isHovered() {
         for (IHudElement fortressHudButton : fortressHudElements) {

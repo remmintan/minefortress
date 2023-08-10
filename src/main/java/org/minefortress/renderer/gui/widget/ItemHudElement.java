@@ -1,5 +1,6 @@
 package org.minefortress.renderer.gui.widget;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
@@ -19,7 +20,8 @@ public class ItemHudElement extends BasicHudElement implements IItemHudElement {
     }
 
     @Override
-    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        drawContext
         this.itemRenderer.renderGuiItemIcon(itemStack, x, y);
         this.hovered = mouseX >= x && mouseY >= y && mouseX < x + 16 && mouseY < y + 16;
     }
