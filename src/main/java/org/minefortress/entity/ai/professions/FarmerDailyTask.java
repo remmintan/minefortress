@@ -44,7 +44,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
 
     @Override
     public boolean canStart(Colonist colonist) {
-        return colonist.world.isDay() && isEnoughTimeSinceLastTimePassed(colonist);
+        return colonist.getWorld().isDay() && isEnoughTimeSinceLastTimePassed(colonist);
     }
 
     @Override
@@ -87,21 +87,21 @@ public class FarmerDailyTask implements ProfessionDailyTask{
 
     private void doFarmCrops(Colonist colonist) {
         final var movementHelper = colonist.getMovementHelper();
-        final var goalBlockState = colonist.world.getBlockState(this.goal.pos());
+        final var goalBlockState = colonist.getWorld().getBlockState(this.goal.pos());
         if (goalBlockState.isOf(Blocks.DIRT) || goalBlockState.isOf(Blocks.GRASS_BLOCK)) {
             final var aboveBlock = goal.pos().up();
-            final var aboveBlockState = colonist.world.getBlockState(aboveBlock);
+            final var aboveBlockState = colonist.getWorld().getBlockState(aboveBlock);
             if(aboveBlockState.isIn(BlockTags.REPLACEABLE_PLANTS)) {
                 colonist.setGoal(new DigTaskBlockInfo(aboveBlock));
             } else {
                 colonist.putItemInHand(Items.WOODEN_HOE);
                 colonist.swingHand(Hand.MAIN_HAND);
-                colonist.world.setBlockState(goal.pos(), Blocks.FARMLAND.getDefaultState(), 3);
-                colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal.pos());
+                colonist.getWorld().setBlockState(goal.pos(), Blocks.FARMLAND.getDefaultState(), 3);
+                colonist.getWorld().emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal.pos());
             }
         } else if(goalBlockState.isOf(Blocks.FARMLAND)) {
             final var aboveBlock = goal.pos().up();
-            final var aboveGoal = colonist.world.getBlockState(aboveBlock);
+            final var aboveGoal = colonist.getWorld().getBlockState(aboveBlock);
 
             if(aboveGoal.isIn(BlockTags.CROPS) && aboveGoal.getBlock() instanceof CropBlock cropBlock) {
                 if(aboveGoal.get(cropBlock.getAgeProperty()) == cropBlock.getMaxAge()) {
@@ -129,23 +129,23 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private void doSetWater(Colonist colonist) {
-        final var goalBlockState = colonist.world.getBlockState(goal.pos());
+        final var goalBlockState = colonist.getWorld().getBlockState(goal.pos());
         if(goalBlockState.isIn(BlockTags.SHOVEL_MINEABLE)) {
             colonist.setGoal(new DigTaskBlockInfo(goal.pos()));
         } else if(goalBlockState.isAir()) {
             colonist.putItemInHand(Items.WATER_BUCKET);
             colonist.swingHand(Hand.MAIN_HAND);
-            colonist.world.setBlockState(goal.pos(), Blocks.WATER.getDefaultState(), 3);
-            colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal.pos());
+            colonist.getWorld().setBlockState(goal.pos(), Blocks.WATER.getDefaultState(), 3);
+            colonist.getWorld().emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal.pos());
         } else {
             this.goal = null;
         }
     }
 
     private boolean goalAlreadyInCorrectState(Colonist colonist) {
-        final var goalBlockState = colonist.world.getBlockState(goal.pos());
+        final var goalBlockState = colonist.getWorld().getBlockState(goal.pos());
         final var abovePos = goal.pos().up();
-        final var aboveBlockState = colonist.world.getBlockState(abovePos);
+        final var aboveBlockState = colonist.getWorld().getBlockState(abovePos);
 
         if(goal.info() == AutomationActionType.FARM_CROPS) {
             return goalBlockState.isOf(Blocks.FARMLAND)
@@ -165,13 +165,13 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     public void stop(Colonist colonist) {
         this.currentFarm = null;
         this.farmIterator = Collections.emptyIterator();
-        this.stopTime = colonist.world.getTime();
+        this.stopTime = colonist.getWorld().getTime();
         colonist.resetControls();
     }
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return colonist.world.isDay() && (farmIterator.hasNext() || this.goal != null);
+        return colonist.getWorld().isDay() && (farmIterator.hasNext() || this.goal != null);
     }
 
     private Optional<IAutomationArea> getFarm(Colonist colonist) {
@@ -181,7 +181,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {
-        return colonist.world.getTime() - this.stopTime > 100;
+        return colonist.getWorld().getTime() - this.stopTime > 100;
     }
 
     private void initIterator(Colonist pawn) {

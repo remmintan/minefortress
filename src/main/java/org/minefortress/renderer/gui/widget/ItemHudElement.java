@@ -21,7 +21,6 @@ public class ItemHudElement extends BasicHudElement implements IItemHudElement {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        drawContext
         this.itemRenderer.renderGuiItemIcon(itemStack, x, y);
         this.hovered = mouseX >= x && mouseY >= y && mouseX < x + 16 && mouseY < y + 16;
     }

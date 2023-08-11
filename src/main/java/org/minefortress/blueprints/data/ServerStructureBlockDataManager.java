@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.StructureTemplate;
@@ -13,16 +14,14 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.data.FortressModDataLoader;
+import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.network.s2c.ClientboundAddBlueprintPacket;
 import org.minefortress.network.s2c.ClientboundUpdateBlueprintPacket;
-import org.minefortress.network.interfaces.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
-
 
 import java.util.*;
 import java.util.function.Function;
@@ -100,7 +99,7 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
         if(updatedStructures.containsKey(blueprintFileName)) {
             final NbtCompound structureTag = updatedStructures.get(blueprintFileName).tag();
             final StructureTemplate structure = new StructureTemplate();
-            structure.readNbt(structureTag);
+            structure.readNbt(Registries.BLOCK.getReadOnlyWrapper(), structureTag);
             return Optional.of(structure);
         } else {
             return getDefaultStructure(blueprintFileName);

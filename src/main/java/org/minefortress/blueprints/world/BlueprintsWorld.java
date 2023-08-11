@@ -8,9 +8,9 @@ import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.resource.DataPackSettings;
+import net.minecraft.resource.DataConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,13 +18,16 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -53,10 +56,16 @@ public class BlueprintsWorld {
         gameRules.get(GameRules.DO_WEATHER_CYCLE).set(false, null);
         gameRules.get(GameRules.DO_DAYLIGHT_CYCLE).set(false, null);
     });
-    private static final LevelInfo EDIT_BLUEPRINT_LEVEL = new LevelInfo("Edit Blueprint Level", GameMode.CREATIVE, false, Difficulty.PEACEFUL, false, EDIT_BLUEPRINT_RULES, DataPackSettings.SAFE_MODE);
+    private static final LevelInfo EDIT_BLUEPRINT_LEVEL = new LevelInfo("Edit Blueprint Level",
+            GameMode.CREATIVE,
+            false,
+            Difficulty.PEACEFUL,
+            false,
+            EDIT_BLUEPRINT_RULES,
+            DataConfiguration.SAFE_MODE);
     private static final Identifier BLUEPRINTS_WORLD_ID = new Identifier("blueprints");
-    public static final RegistryKey<World> BLUEPRINTS_WORLD_REGISTRY_KEY = RegistryKey.of(Registry.WORLD_KEY, BLUEPRINTS_WORLD_ID);
-    private static final DimensionType BLUEPRINT_DIMENSION_TYPE = DimensionType.create(
+    public static final RegistryKey<World> BLUEPRINTS_WORLD_REGISTRY_KEY = RegistryKey.of(RegistryKeys.WORLD, BLUEPRINTS_WORLD_ID);
+    private static final DimensionType BLUEPRINT_DIMENSION_TYPE = new DimensionType(
             OptionalLong.of(10000),
             true,
             false,
@@ -65,15 +74,13 @@ public class BlueprintsWorld {
             1,
             false,
             true,
-            true,
-            false,
-            false,
             0,
             32,
             16,
             BlockTags.INFINIBURN_OVERWORLD,
             BLUEPRINTS_WORLD_ID,
-            0.0f
+            0.0f,
+            new DimensionType.MonsterSettings(false, false, UniformIntProvider.create(0, 7), 0)
     );
 
     private FortressServerWorld world;
@@ -112,39 +119,23 @@ public class BlueprintsWorld {
 
         this.fortressSession = FortressModDataLoader.getInstance().getBlueprintsWorldSession();
 
-        final Registry<Biome> biomeRegistry = dynamicRegistryManager.get(Registry.BIOME_KEY);
-        final Registry<DimensionType> dimensionTypeRegistry = dynamicRegistryManager.get(Registry.DIMENSION_TYPE_KEY);
+        final Registry<Biome> biomeRegistry = dynamicRegistryManager.get(RegistryKeys.BIOME);
+        final Registry<DimensionType> dimensionTypeRegistry = dynamicRegistryManager.get(RegistryKeys.DIMENSION_TYPE);
 
-        final Registry<DimensionOptions> dimensionOptions = DimensionType.createDefaultDimensionOptions(
-                dynamicRegistryManager,
-                0L
-        );
+        final ChunkGenerator chunkGenerator = new FlatChunkGenerator(getGeneratorConfig(biomeRegistry));
 
-        final ChunkGenerator chunkGenerator = new FlatChunkGenerator(dynamicRegistryManager.get(Registry.STRUCTURE_SET_KEY) ,getGeneratorConfig(biomeRegistry));
 
-        final Registry<DimensionOptions> updatedDimensionOptions = GeneratorOptions.getRegistryWithReplacedOverworldGenerator(
-                dimensionTypeRegistry,
-                dimensionOptions,
-                chunkGenerator
-        );
+        final GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
 
-        final GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false, updatedDimensionOptions);
-        final RegistryEntry.Direct<DimensionType> dimensionTypeDirectRef = new RegistryEntry.Direct<>(BLUEPRINT_DIMENSION_TYPE);
-
-        final LevelProperties levelProperties = new LevelProperties(EDIT_BLUEPRINT_LEVEL, generatorOptions, Lifecycle.stable());
+        final LevelProperties levelProperties = new LevelProperties(EDIT_BLUEPRINT_LEVEL, generatorOptions, LevelProperties.SpecialProperty.FLAT,  Lifecycle.stable());
         world = new FortressServerWorld(
                 server,
                 executor,
                 fortressSession,
                 levelProperties,
                 BLUEPRINTS_WORLD_REGISTRY_KEY,
-                dimensionTypeDirectRef,
-                ((FortressServer)server).getWorldGenerationProgressListener(),
-                chunkGenerator,
-                false,
-                0L,
-                Collections.emptyList(),
-                false
+                new DimensionOptions(dimensionTypeRegistry.getEntry(DimensionTypes.OVERWORLD).orElseThrow(), chunkGenerator),
+                ((FortressServer)server).getWorldGenerationProgressListener()
         );
     }
 
@@ -157,8 +148,8 @@ public class BlueprintsWorld {
                 new FlatChunkGeneratorLayer(1, Blocks.GRASS_BLOCK)
         );
 
-        return new FlatChunkGeneratorConfig(Optional.empty(), biomeRegistry)
-                .withLayers(flatChunkGeneratorLayers, Optional.empty());
+        return new FlatChunkGeneratorConfig(Optional.empty(), biomeRegistry.getEntry(BiomeKeys.PLAINS).orElseThrow(), Collections.emptyList())
+                .with(flatChunkGeneratorLayers, Optional.empty(), biomeRegistry.getEntry(BiomeKeys.PLAINS).orElseThrow());
     }
 
     public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel, BlueprintGroup group) {

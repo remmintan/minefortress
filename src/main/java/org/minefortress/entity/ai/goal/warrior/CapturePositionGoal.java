@@ -2,22 +2,17 @@ package org.minefortress.entity.ai.goal.warrior;
 
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.data.StrctureBlockData;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.entity.WarriorPawn;
 import org.minefortress.entity.ai.controls.BaritoneMoveControl;
 import org.minefortress.fight.influence.ServerInfluenceManager;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 
 import java.util.EnumSet;
-import java.util.Optional;
 
 public class CapturePositionGoal extends Goal {
 
@@ -79,7 +74,7 @@ public class CapturePositionGoal extends Goal {
                     influenceFlag.getLayer(BlueprintDataLayer.GENERAL)
                             .forEach((pos, state) -> {
                                 final var realpos = pos.add(targetPos);
-                                pawn.world.setBlockState(realpos, state, 3);
+                                pawn.getWorld().setBlockState(realpos, state, 3);
                                 if(it.isSurvival()) {
                                     resourceManager.removeReservedItem(target.taskId(), state.getBlock().asItem());
                                 }

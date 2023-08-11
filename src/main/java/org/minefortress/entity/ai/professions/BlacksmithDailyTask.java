@@ -59,7 +59,7 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
                 .map(it -> {
                     final var furnaces = it.getSpecialBlocksByType(Blocks.FURNACE, true);
                     for(BlockPos pos : furnaces){
-                        final var furnace = colonist.world.getBlockEntity(pos);
+                        final var furnace = colonist.getWorld().getBlockEntity(pos);
                         if(furnace instanceof FurnaceBlockEntity furnaceBlockEntity && furnaceBlockEntity.isBurning()){
                             return true;
                         }

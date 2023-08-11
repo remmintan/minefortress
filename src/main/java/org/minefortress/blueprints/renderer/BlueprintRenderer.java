@@ -15,7 +15,9 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
@@ -145,21 +147,20 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     }
 
     private void rotateScene(MatrixStack matrices, Vector3f cameraMove) {
-        final float yaw = 135f;
-        final float pitch = -30f;
+        final var yaw = 135f;
+        final var pitch = -30f;
+
+        final var radiansYaw = (float)Math.toRadians(yaw);
+        final var radiansPitch = (float)Math.toRadians(pitch);
 
         // calculating rotations
-        final Vector3f yawSceneRotationAxis = Vector3f.POSITIVE_Y;
-        final Vector3f yawMoveRotationAxis = Vector3f.NEGATIVE_Y;
-        final Quaternion yawSceneRotation = yawSceneRotationAxis.getDegreesQuaternion(yaw);
-        final Quaternion yawMoveRotation = yawMoveRotationAxis.getDegreesQuaternion(yaw);
+        final var yawSceneRotation = new Quaternionf().set(new AxisAngle4f(radiansYaw, 0, 1, 0));
+        final var yawMoveRotation = new Quaternionf().set(new AxisAngle4f(radiansYaw, 0, -1, 0));
 
-        final Vector3f pitchSceneRotationAxis = Vector3f.POSITIVE_X.copy();
-        final Vector3f pitchMoveRotationAxis = Vector3f.POSITIVE_X.copy();
-        pitchSceneRotationAxis.rotate(yawMoveRotation);
-        pitchMoveRotationAxis.rotate(yawMoveRotation);
-        final Quaternion pitchSceneRotation = pitchSceneRotationAxis.getDegreesQuaternion(pitch);
-        final Quaternion pitchMoveRotation = pitchMoveRotationAxis.getDegreesQuaternion(pitch);
+        final var pitchSceneRotationAxis = new Vector3f(1, 0, 0).rotate(yawMoveRotation);
+        final var pitchMoveRotationAxis = new Vector3f(1, 0, 0).rotate(yawMoveRotation);
+        final var pitchSceneRotation = new Quaternionf().set(new AxisAngle4f(radiansPitch, pitchSceneRotationAxis));
+        final var pitchMoveRotation = new Quaternionf().set(new AxisAngle4f(radiansPitch, pitchMoveRotationAxis));
 
         // rotating camera
         cameraMove.rotate(yawMoveRotation);

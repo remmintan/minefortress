@@ -22,7 +22,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     public ColonistExecuteTaskGoal(Colonist colonist) {
         super(colonist);
-        if(colonist.world instanceof ServerWorld sw) {
+        if(colonist.getWorld() instanceof ServerWorld sw) {
             this.world = sw;
         } else {
             throw new IllegalStateException("AI should run on the server entities!");

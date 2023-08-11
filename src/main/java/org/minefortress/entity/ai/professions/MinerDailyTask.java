@@ -23,7 +23,7 @@ public class MinerDailyTask implements ProfessionDailyTask{
 
     @Override
     public boolean canStart(Colonist colonist) {
-        return colonist.world.isDay() && isEnoughTimeSinceLastTimePassed(colonist);
+        return colonist.getWorld().isDay() && isEnoughTimeSinceLastTimePassed(colonist);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class MinerDailyTask implements ProfessionDailyTask{
     }
 
     private void doActionWithTheGoal(Colonist colonist) {
-        final var blockState = colonist.world.getBlockState(goal.pos());
+        final var blockState = colonist.getWorld().getBlockState(goal.pos());
         if(blockState.isAir() || blockState.getFluidState().isIn(FluidTags.WATER)) {
             colonist.getMovementHelper().reset();
             this.goal = null;
@@ -72,14 +72,14 @@ public class MinerDailyTask implements ProfessionDailyTask{
     public void stop(Colonist colonist) {
         this.currentMine = null;
         this.mineIterator = Collections.emptyIterator();
-        this.stopTime = colonist.world.getTime();
+        this.stopTime = colonist.getWorld().getTime();
         this.goal = null;
         colonist.resetControls();
     }
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return colonist.world.isDay() && (mineIterator.hasNext() || this.goal != null);
+        return colonist.getWorld().isDay() && (mineIterator.hasNext() || this.goal != null);
     }
 
     private void initIterator(Colonist colonist) {
@@ -87,7 +87,7 @@ public class MinerDailyTask implements ProfessionDailyTask{
             this.mineIterator = Collections.emptyIterator();
         } else {
             this.currentMine.update();
-            this.mineIterator = this.currentMine.iterator(colonist.world);
+            this.mineIterator = this.currentMine.iterator(colonist.getWorld());
         }
     }
 
@@ -97,6 +97,6 @@ public class MinerDailyTask implements ProfessionDailyTask{
     }
 
     private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {
-        return colonist.world.getTime() - 100L >= this.stopTime;
+        return colonist.getWorld().getTime() - 100L >= this.stopTime;
     }
 }

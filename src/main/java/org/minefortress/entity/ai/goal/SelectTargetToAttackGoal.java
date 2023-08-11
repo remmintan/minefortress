@@ -55,8 +55,8 @@ public final class SelectTargetToAttackGoal extends TrackTargetGoal {
 
     private void findClosestTarget() {
         final var searchBox = this.getSearchBox(this.getFollowRange());
-        final var targetEntitiesNearYou = this.mob.world.getEntitiesByClass(this.targetClass, searchBox, ALWAYS_TRUE);
-        this.targetEntity = this.mob.world.getClosestEntity(targetEntitiesNearYou, this.targetPredicate, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
+        final var targetEntitiesNearYou = this.mob.getWorld().getEntitiesByClass(this.targetClass, searchBox, ALWAYS_TRUE);
+        this.targetEntity = this.mob.getWorld().getClosestEntity(targetEntitiesNearYou, this.targetPredicate, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
     }
 
 }

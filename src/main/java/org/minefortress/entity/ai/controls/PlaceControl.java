@@ -8,8 +8,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 
@@ -84,8 +82,8 @@ public class PlaceControl extends PositionedActionControl {
     private void place(BlockStateTaskBlockInfo blockInfo) {
         final BlockState stateForPlacement = blockInfo.getState();
 
-        colonist.world.setBlockState(goal, stateForPlacement, 3);
-        colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal);
+        colonist.getWorld().setBlockState(goal, stateForPlacement, 3);
+        colonist.getWorld().emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal);
 
         decreaseResourcesAndAddSpecialBlocksAmount();
 

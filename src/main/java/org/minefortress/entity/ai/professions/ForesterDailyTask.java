@@ -26,7 +26,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
 
     @Override
     public boolean canStart(Colonist colonist) {
-        return colonist.world.isDay() && colonist.world.getTime() - this.stopTime > 400;
+        return colonist.getWorld().isDay() && colonist.getWorld().getTime() - this.stopTime > 400;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
         final MovementHelper movementHelper = colonist.getMovementHelper();
         if(movementHelper.hasReachedWorkGoal()) {
             if(workingTicks % 10 * colonist.getHungerMultiplier() == 0) {
-                colonist.swingHand(colonist.world.random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
+                colonist.swingHand(colonist.getWorld().random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
                 colonist.putItemInHand(Items.WOODEN_HOE);
                 colonist.addHunger(PASSIVE_EXHAUSTION);
                 this.interactionsCount++;
@@ -65,7 +65,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     public void stop(Colonist colonist) {
         this.workingTicks = 0;
         this.interactionsCount = 0;
-        this.stopTime = colonist.world.getTime();
+        this.stopTime = colonist.getWorld().getTime();
     }
 
     @Override
@@ -83,17 +83,17 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     }
 
     private Item getRandomForesterItem(Colonist colonist){
-        final var random = colonist.world.random;
+        final var random = colonist.getWorld().random;
         return FORESTER_ITEMS.get(random.nextInt(FORESTER_ITEMS.size()));
     }
 
     private boolean isSuccess(Colonist colonist){
-        final var random = colonist.world.random;
+        final var random = colonist.getWorld().random;
         return random.nextInt(100) < 18;
     }
 
     private void setGoal(Colonist colonist) {
-        final var world = colonist.world;
+        final var world = colonist.getWorld();
 
         final var fortressCenter = colonist.getFortressServerManager()
                 .map(FortressServerManager::getFortressCenter)

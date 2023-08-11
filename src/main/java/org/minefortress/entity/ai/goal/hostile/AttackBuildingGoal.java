@@ -1,7 +1,6 @@
 package org.minefortress.entity.ai.goal.hostile;
 
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
@@ -35,9 +34,9 @@ public final class AttackBuildingGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        if(lastUpdateTime + 20 > mob.world.getTime()) return false;
-        if(!mob.world.isNight()) return false;
-        lastUpdateTime = mob.world.getTime();
+        if(lastUpdateTime + 20 > mob.getWorld().getTime()) return false;
+        if(!mob.getWorld().isNight()) return false;
+        lastUpdateTime = mob.getWorld().getTime();
         final var mobBlockPos = this.mob.getBlockPos();
         this.modServerManager
                 .findReachableFortress(mobBlockPos, getFollowRange())
@@ -46,7 +45,7 @@ public final class AttackBuildingGoal extends Goal {
                 .ifPresent(building -> this.targetBuilding = building);
 
         if(targetBuilding!=null) {
-            this.targetPosition = targetBuilding.getNearestCornerXZ(mobBlockPos, mob.world);
+            this.targetPosition = targetBuilding.getNearestCornerXZ(mobBlockPos, mob.getWorld());
             this.path = mob.getNavigation().findPathTo(targetPosition, ATTACK_DISTANCE);
         }
 
@@ -78,7 +77,7 @@ public final class AttackBuildingGoal extends Goal {
 
     @Override
     public boolean shouldContinue() {
-        return mob.world.isNight()
+        return mob.getWorld().isNight()
                 && path != null
                 && targetBuilding.getHealth() > 0
                 && (mob.getAttacker() == null || !mob.getAttacker().isAlive());

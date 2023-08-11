@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.Registries;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
@@ -95,9 +96,7 @@ abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
                 final String stateString = final_state.asString();
                 BlockState blockState = null;
                 try {
-                    blockState = new BlockArgumentParser(new StringReader(stateString), false)
-                            .parse(false)
-                            .getBlockState();
+                    blockState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), new StringReader(stateString), false).blockState();
                 } catch (CommandSyntaxException e) {
                     e.printStackTrace();
                 }

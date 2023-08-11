@@ -43,7 +43,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
         if(movementHelper.stillTryingToReachGoal()) return;
         if(hasReachedTheBed()) {
             if(!colonist.isSleeping()) {
-                if(colonist.world.getBlockState(bedPos).isIn(BlockTags.BEDS)) {
+                if(colonist.getWorld().getBlockState(bedPos).isIn(BlockTags.BEDS)) {
                     colonist.sleep(bedPos);
                     colonist.putItemInHand(null);
                 }
@@ -83,11 +83,11 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
     }
 
     private boolean isNight() {
-        return colonist.world.isNight();
+        return colonist.getWorld().isNight();
     }
     private boolean bedStillValid() {
         if(bedPos == null) return false;
-        final var blockState = colonist.world.getBlockState(bedPos);
+        final var blockState = colonist.getWorld().getBlockState(bedPos);
         return blockState.isIn(BlockTags.BEDS) && (!blockState.get(BedBlock.OCCUPIED) || colonist.isSleeping());
     }
 

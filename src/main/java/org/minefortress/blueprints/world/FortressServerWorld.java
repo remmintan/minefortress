@@ -3,21 +3,19 @@ package org.minefortress.blueprints.world;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.RandomSequencesState;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
-import net.minecraft.world.spawner.Spawner;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.concurrent.Executor;
 
 public class FortressServerWorld extends ServerWorld {
@@ -31,8 +29,9 @@ public class FortressServerWorld extends ServerWorld {
     private int floorLevel;
     private BlueprintGroup blueprintGroup;
 
-    public FortressServerWorld(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, LevelProperties properties, RegistryKey<World> worldKey, RegistryEntry<DimensionType> dimensionType, WorldGenerationProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long seed, List<Spawner> spawners, boolean shouldTickTime) {
-        super(server, workerExecutor, session, properties, worldKey, dimensionType, worldGenerationProgressListener, chunkGenerator, debugWorld, seed, spawners, shouldTickTime);
+    public FortressServerWorld(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, LevelProperties properties, RegistryKey<World> worldKey, DimensionOptions dimensionOptions, WorldGenerationProgressListener worldGenerationProgressListener) {
+        super(server, workerExecutor, session, properties, worldKey, dimensionOptions, worldGenerationProgressListener, false, 0L, Collections.emptyList(), false, new RandomSequencesState(0));
+
         levelProperties = properties;
         blueprintsWorldBorder.setCenter(8, 8);
         blueprintsWorldBorder.setSize(16);
@@ -45,7 +44,7 @@ public class FortressServerWorld extends ServerWorld {
 
     @Override
     public boolean isFlat() {
-        return levelProperties.getGeneratorOptions().isFlatWorld();
+        return true;
     }
 
     @Override

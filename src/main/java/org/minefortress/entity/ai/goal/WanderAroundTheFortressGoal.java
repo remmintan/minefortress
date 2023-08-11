@@ -66,6 +66,6 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
     }
 
     private boolean isDay() {
-        return colonist.world.isDay();
+        return colonist.getWorld().isDay();
     }
 }

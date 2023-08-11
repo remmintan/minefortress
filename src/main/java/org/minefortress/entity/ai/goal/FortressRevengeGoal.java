@@ -18,7 +18,7 @@ public class FortressRevengeGoal extends RevengeGoal {
     protected void callSameTypeForRevenge() {
         double d = this.getFollowRange();
         Box box = Box.from(this.mob.getPos()).expand(d, 10.0, d);
-        List<Colonist> list = this.mob.world.getEntitiesByClass(Colonist.class, box, EntityPredicates.EXCEPT_SPECTATOR.and(this::fromTheSameFortress));
+        List<Colonist> list = this.mob.getWorld().getEntitiesByClass(Colonist.class, box, EntityPredicates.EXCEPT_SPECTATOR.and(this::fromTheSameFortress));
         for (Colonist colonist : list) {
             if (this.mob == colonist || colonist.getTarget() != null) continue;
             this.setMobEntityTarget(colonist, this.mob.getAttacker());
