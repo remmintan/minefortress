@@ -66,9 +66,8 @@ public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, PawnMode
         super(context);
     }
 
-
     @Override
-    public void render(DrawContext matrices, VertexConsumerProvider vertexConsumers, int light, BasePawnEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, BasePawnEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
         if(entity.isSleeping()) return;
         final var clothingId = entity.getClothingId();
         if(isWarrior(clothingId)) {

@@ -47,7 +47,7 @@ public class MovementHelper {
     }
 
     private String getColonistName() {
-        return colonist.getName().getContent();
+        return colonist.getName().getString();
     }
 
     public BlockPos getWorkGoal() {

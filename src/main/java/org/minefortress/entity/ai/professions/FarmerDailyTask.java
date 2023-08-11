@@ -1,6 +1,5 @@
 package org.minefortress.entity.ai.professions;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CropBlock;
 import net.minecraft.item.BlockItem;
@@ -10,16 +9,13 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
+import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;
@@ -91,7 +87,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         if (goalBlockState.isOf(Blocks.DIRT) || goalBlockState.isOf(Blocks.GRASS_BLOCK)) {
             final var aboveBlock = goal.pos().up();
             final var aboveBlockState = colonist.getWorld().getBlockState(aboveBlock);
-            if(aboveBlockState.isIn(BlockTags.REPLACEABLE_PLANTS)) {
+            if(aboveBlockState.isIn(BlockTags.REPLACEABLE)) {
                 colonist.setGoal(new DigTaskBlockInfo(aboveBlock));
             } else {
                 colonist.putItemInHand(Items.WOODEN_HOE);
@@ -104,7 +100,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             final var aboveGoal = colonist.getWorld().getBlockState(aboveBlock);
 
             if(aboveGoal.isIn(BlockTags.CROPS) && aboveGoal.getBlock() instanceof CropBlock cropBlock) {
-                if(aboveGoal.get(cropBlock.getAgeProperty()) == cropBlock.getMaxAge()) {
+                if(cropBlock.getAge(aboveGoal) == cropBlock.getMaxAge()) {
                     final var digTaskBlockInfo = new DigTaskBlockInfo(aboveBlock);
                     colonist.setGoal(digTaskBlockInfo);
                 } else {
@@ -151,7 +147,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             return goalBlockState.isOf(Blocks.FARMLAND)
                     && aboveBlockState.isIn(BlockTags.CROPS)
                     && aboveBlockState.getBlock() instanceof CropBlock crops
-                    && aboveBlockState.get(crops.getAgeProperty()) < crops.getMaxAge();
+                    && crops.getAge(aboveBlockState) < crops.getMaxAge();
         }
 
         if(goal.info() == AutomationActionType.FARM_WATER) {
@@ -189,7 +185,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             this.farmIterator = Collections.emptyIterator();
         } else {
             this.currentFarm.update();
-            this.farmIterator = this.currentFarm.iterator(pawn.world);
+            this.farmIterator = this.currentFarm.iterator(pawn.getWorld());
         }
     }
 
