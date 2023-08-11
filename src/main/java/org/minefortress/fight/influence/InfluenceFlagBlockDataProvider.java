@@ -1,9 +1,9 @@
 package org.minefortress.fight.influence;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.registry.Registries;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import org.minefortress.MineFortressMod;
@@ -14,7 +14,6 @@ import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class InfluenceFlagBlockDataProvider implements IBlockDataProvider {
 
@@ -28,7 +27,7 @@ public class InfluenceFlagBlockDataProvider implements IBlockDataProvider {
         if (influenceFlagData == null) {
             final var structure = new StructureTemplate();
             final var nbt = readTheStructureNbtTag();
-            structure.readNbt(nbt.getCompound("tag"));
+            structure.readNbt(Registries.BLOCK.getReadOnlyWrapper(),nbt.getCompound("tag"));
             influenceFlagData = ClientStructureBlockDataProvider.buildStructureForClient(structure, rotation);
         }
 

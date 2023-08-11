@@ -3,13 +3,11 @@ package org.minefortress.fortress.resources.server;
 
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
-import net.minecraft.registry.Registry;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +24,8 @@ final class ServerStartingInventoryReader {
 
     List<InventorySlotInfo> readStartingSlots() {
         final var resourceManager = server.getResourceManager();
+        final var resource = resourceManager.getResource(STARTING_INVENTORY_ID).orElseThrow();
         try(
-                final var resource = resourceManager.getResource(STARTING_INVENTORY_ID);
                 final var is = resource.getInputStream();
                 final var isr = new InputStreamReader(is);
                 final var jsonReader = new JsonReader(isr)
@@ -52,7 +50,7 @@ final class ServerStartingInventoryReader {
         while (jsonReader.hasNext()) {
             final var name = jsonReader.nextName();
             switch (name) {
-                case "item" -> item = Registry.ITEM.get(new Identifier(jsonReader.nextString()));
+                case "item" -> item = Registries.ITEM.get(new Identifier(jsonReader.nextString()));
                 case "amount" -> amount = jsonReader.nextInt();
                 default -> jsonReader.skipValue();
             }

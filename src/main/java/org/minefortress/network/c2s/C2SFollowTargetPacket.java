@@ -27,8 +27,8 @@ public class C2SFollowTargetPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var entity = player.world.getEntityById(id);
-        final var target = player.world.getEntityById(targetId);
+        final var entity = player.getWorld().getEntityById(id);
+        final var target = player.getWorld().getEntityById(targetId);
         if(entity instanceof ITargetedPawn pawn && target instanceof LivingEntity targetEntity) {
             pawn.setAttackTarget(targetEntity);
         }

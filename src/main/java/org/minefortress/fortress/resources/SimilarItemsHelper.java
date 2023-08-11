@@ -1,10 +1,8 @@
 package org.minefortress.fortress.resources;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import org.minefortress.blueprints.data.StrctureBlockData;
@@ -168,7 +166,7 @@ public class SimilarItemsHelper {
 
     public static List<Item> getItems(TagKey<Item> tag) {
         var items = new ArrayList<Item>();
-        for (var it : Registry.ITEM.iterateEntries(tag)) {
+        for (var it : Registries.ITEM.iterateEntries(tag)) {
             items.add(it.value());
         }
         return Collections.unmodifiableList(items);

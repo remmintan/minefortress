@@ -1,6 +1,5 @@
 package org.minefortress.fortress.automation.iterators;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.FluidTags;
@@ -10,7 +9,6 @@ import net.minecraft.world.World;
 import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.utils.BuildingHelper;
-
 
 import java.util.List;
 
@@ -37,7 +35,7 @@ public class FarmAreaIterator extends AbstractFilteredIterator{
 
         final var goalCorrect = blockState.isOf(Blocks.FARMLAND) || blockState.isOf(Blocks.DIRT) || blockState.isOf(Blocks.GRASS_BLOCK) || isGoalCorrectForWater(pos);
         final var aboveGoalState = world.getBlockState(pos.up());
-        final var aboveGoalCorrect = aboveGoalState.isIn(BlockTags.CROPS) || aboveGoalState.isAir() || aboveGoalState.isIn(BlockTags.REPLACEABLE_PLANTS);
+        final var aboveGoalCorrect = aboveGoalState.isIn(BlockTags.CROPS) || aboveGoalState.isAir() || aboveGoalState.isIn(BlockTags.REPLACEABLE);
         return goalCorrect && aboveGoalCorrect;
     }
 

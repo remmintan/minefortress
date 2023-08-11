@@ -1,7 +1,6 @@
 package org.minefortress.fortress.resources.gui.smelt;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -9,16 +8,11 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServer;
-import org.minefortress.professions.ServerProfessionManager;
 
-import java.util.List;
 import java.util.Objects;
 
 public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
@@ -50,7 +44,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
             final BlockPos selectedFurnacePos = furnacePos == null ? otherFurnaceBlocks.get(0) : furnacePos;
             final var otherFurnacesDelegates = otherFurnaceBlocks.stream()
                     .map(it -> {
-                        final var blockEnt = player.world.getBlockEntity(it);
+                        final var blockEnt = player.getWorld().getBlockEntity(it);
                         if (blockEnt instanceof FurnaceBlockEntity furnaceBlockEntity) {
                             return (PropertyDelegate)new FortressFurnacePropertyDelegateImpl(furnaceBlockEntity, furnaceBlockEntity.getPos().equals(selectedFurnacePos));
                         }
@@ -60,7 +54,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
                     .toList();
 
 
-            final var selectedBlockEnt = player.world.getBlockEntity(selectedFurnacePos);
+            final var selectedBlockEnt = player.getWorld().getBlockEntity(selectedFurnacePos);
             if(selectedBlockEnt instanceof FurnaceBlockEntity furnaceBlockEntity) {
                 final var resourceManager = manager.getServerResourceManager();
                 return new FortressFurnaceScreenHandler(syncId, inv, resourceManager, furnaceBlockEntity, furnaceBlockEntity.propertyDelegate, otherFurnacesDelegates);

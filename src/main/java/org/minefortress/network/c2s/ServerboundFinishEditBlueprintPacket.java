@@ -46,7 +46,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressC2SPacket {
     }
 
     private void updateBlueprint(MinecraftServer server, ServerPlayerEntity player) {
-        final FortressServerWorld fortressServerWorld = (FortressServerWorld) player.world;
+        final FortressServerWorld fortressServerWorld = (FortressServerWorld) player.getWorld();
 
         final String fileName = fortressServerWorld.getFileName();
 

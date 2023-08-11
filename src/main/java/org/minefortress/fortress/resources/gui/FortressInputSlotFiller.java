@@ -3,7 +3,6 @@ package org.minefortress.fortress.resources.gui;
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntListIterator;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -14,8 +13,6 @@ import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
-import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler.VirtualInventory;
 import org.minefortress.interfaces.FortressSimpleInventory;
 
 import java.util.ArrayList;
@@ -158,7 +155,8 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
             int k = ((FortressSimpleInventory)this.inventory).getOccupiedSlotWithRoomForStack(itemStack);
             if (k == -1 && list.size() <= i) {
                 for (ItemStack itemStack2 : list) {
-                    if (!itemStack2.isItemEqualIgnoreDamage(itemStack) || itemStack2.getCount() == itemStack2.getMaxCount() || itemStack2.getCount() + itemStack.getCount() > itemStack2.getMaxCount()) continue;
+
+                    if (!ItemStack.areEqual(itemStack2, itemStack) || itemStack2.getCount() == itemStack2.getMaxCount() || itemStack2.getCount() + itemStack.getCount() > itemStack2.getMaxCount()) continue;
                     itemStack2.increment(itemStack.getCount());
                     itemStack.setCount(0);
                     break;

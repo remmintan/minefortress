@@ -13,8 +13,8 @@ public class BaseFortressBorderHolder {
         final var zSign = Math.signum(z);
         final var nonZeroSignX = xSign == 0 ? 1 : xSign;
         final var nonZeroSignZ = zSign == 0 ? 1 : zSign;
-        final var adjustedX = x - x % FORTRESS_BORDER_SIZE + nonZeroSignX * FORTRESS_BORDER_SIZE / 2f;
-        final var adjustedZ = z - z % FORTRESS_BORDER_SIZE + nonZeroSignZ * FORTRESS_BORDER_SIZE / 2f;
+        final var adjustedX = (int) (x - x % FORTRESS_BORDER_SIZE + nonZeroSignX * FORTRESS_BORDER_SIZE / 2f);
+        final var adjustedZ = (int) (z - z % FORTRESS_BORDER_SIZE + nonZeroSignZ * FORTRESS_BORDER_SIZE / 2f);
         return new BlockPos(adjustedX, 0, adjustedZ);
     }
 

@@ -50,7 +50,7 @@ public class FortressServerPlayNetworkHandlerMixin {
         BlockHitResult blockHitResult = packet.getBlockHitResult();
         BlockPos blockPos = blockHitResult.getBlockPos();
         Direction direction = blockHitResult.getSide();
-        int i = this.player.world.getTopY();
+        int i = this.player.getWorld().getTopY();
         if (blockPos.getY() < i) {
             if (this.requestedTeleportPos == null && this.player.squaredDistanceTo((double)blockPos.getX() + 0.5, (double)blockPos.getY() + 0.5, (double)blockPos.getZ() + 0.5) < PICK_DISTANCE*PICK_DISTANCE && serverWorld.canPlayerModifyAt(this.player, blockPos)) {
                 this.addCustomNbtToStack(itemStack);

@@ -11,9 +11,7 @@ import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
@@ -42,7 +40,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         super(screenHandlerType, i);
         this.serverResourceManager = resourceManager;
         this.player = player;
-        this.world = player.world;
+        this.world = player.getWorld();
         this.virtualInventory = Objects.nonNull(serverResourceManager) ? new VirtualInventory(serverResourceManager.getAllItems()) : null;
     }
 

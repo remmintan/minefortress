@@ -27,7 +27,7 @@ public class C2SMoveTargetPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var entity = player.world.getEntityById(id);
+        final var entity = player.getWorld().getEntityById(id);
         if(entity instanceof ITargetedPawn pawn) {
             pawn.setMoveTarget(pos);
         }

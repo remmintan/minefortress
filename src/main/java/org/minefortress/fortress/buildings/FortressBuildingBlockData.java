@@ -6,11 +6,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
@@ -20,8 +19,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.event.GameEvent;
 import org.apache.logging.log4j.LogManager;
-
-
 
 import java.util.*;
 
@@ -63,7 +60,7 @@ class FortressBuildingBlockData {
 
     private static boolean shouldSkipBlock(BlockPos pos, BlockState state, int floorYLevel) {
 
-        if(state.isAir() || state.getMaterial().isLiquid() || state.getBlock() == Blocks.STRUCTURE_VOID)
+        if(state.isAir() || !state.getFluidState().isEmpty() || state.getBlock() == Blocks.STRUCTURE_VOID)
             return true;
 
         if(state.getBlock() == Blocks.STRUCTURE_BLOCK)
@@ -92,11 +89,11 @@ class FortressBuildingBlockData {
                     if(blockStateTag.getType() == NbtType.INT) {
                         final var nbtInt = (NbtInt)blockStateTag;
                         final var blockId = nbtInt.intValue();
-                        final var block = Registry.BLOCK.get(blockId);
+                        final var block = Registries.BLOCK.get(blockId);
                         blockState = block.getDefaultState();
                     } else if(blockStateTag.getType() == NbtType.COMPOUND) {
                         final var compoundTag = (NbtCompound)blockStateTag;
-                        blockState = NbtHelper.toBlockState(compoundTag);
+                        blockState = NbtHelper.toBlockState(Registries.BLOCK.getReadOnlyWrapper(), compoundTag);
                     } else {
                         throw new IllegalArgumentException("Invalid block state tag");
                     }
@@ -229,7 +226,7 @@ class FortressBuildingBlockData {
     }
 
     boolean attack(HostileEntity attacker) {
-        final var world = attacker.method_48926();
+        final var world = attacker.getWorld();
         final var random = world.random;
         for (Map.Entry<BlockPos, BuildingBlockState> entries : actualState.entrySet()) {
             final var pos = entries.getKey();
@@ -245,7 +242,7 @@ class FortressBuildingBlockData {
                         Block.getRawIdFromState(world.getBlockState(pos))
                 );
                 world.setBlockState(pos, Blocks.AIR.getDefaultState());
-                world.emitGameEvent(GameEvent.BLOCK_DESTROY, pos);
+                world.emitGameEvent(attacker, GameEvent.BLOCK_DESTROY, pos);
                 return true;
             }
             break;

@@ -27,6 +27,6 @@ public class ServerboundFortressCenterSetPacket implements FortressC2SPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final var fortressServerManager = this.getFortressServerManager(server, player);
-        fortressServerManager.setupCenter(pos, player.world, player);
+        fortressServerManager.setupCenter(pos, player.getWorld(), player);
     }
 }

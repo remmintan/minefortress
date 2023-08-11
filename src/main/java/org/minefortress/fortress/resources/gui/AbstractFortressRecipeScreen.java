@@ -1,14 +1,11 @@
 package org.minefortress.fortress.resources.gui;
 
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -54,20 +51,20 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
     }
 
     @Override
-    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        this.renderBackground(drawContext);
         if (getRecipeBookWidget().isOpen() && this.narrow) {
-            this.drawBackground(matrices, delta, mouseX, mouseY);
-            getRecipeBookWidget().render(matrices, mouseX, mouseY, delta);
+            this.drawBackground(drawContext, delta, mouseX, mouseY);
+            getRecipeBookWidget().render(drawContext, mouseX, mouseY, delta);
         } else {
-            getRecipeBookWidget().render(matrices, mouseX, mouseY, delta);
-            super.render(matrices, mouseX, mouseY, delta);
-            getRecipeBookWidget().drawGhostSlots(matrices, this.x, this.y, true, delta);
+            getRecipeBookWidget().render(drawContext, mouseX, mouseY, delta);
+            super.render(drawContext, mouseX, mouseY, delta);
+            getRecipeBookWidget().drawGhostSlots(drawContext, this.x, this.y, true, delta);
         }
-        super.render(matrices, mouseX, mouseY, delta);
-        renderScrollbar(matrices);
-        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
-        getRecipeBookWidget().drawTooltip(matrices, this.x, this.y, mouseX, mouseY);
+        super.render(drawContext, mouseX, mouseY, delta);
+        renderScrollbar(drawContext);
+        this.drawMouseoverTooltip(drawContext, mouseX, mouseY);
+        getRecipeBookWidget().drawTooltip(drawContext, this.x, this.y, mouseX, mouseY);
     }
 
     @Override
@@ -117,7 +114,7 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
 
     @Override
     public void removed() {
-        getRecipeBookWidget().close();
+        getRecipeBookWidget().reset();
         super.removed();
     }
 
@@ -132,11 +129,9 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
 
     abstract protected boolean professionRequirementSatisfied();
 
-    private void renderScrollbar(MatrixStack matrices) {
+    private void renderScrollbar(DrawContext drawContext) {
         final var bounds = getScrollbarBounds();
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderTexture(0, SCROLLBAR_TEXTURE);
-        this.drawTexture(matrices, bounds.x1(), bounds.y1() + (int)((float)(bounds.y2() - bounds.y1() - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
+        drawContext.drawTexture(SCROLLBAR_TEXTURE, bounds.x1(), bounds.y1() + (int)((float)(bounds.y2() - bounds.y1() - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
     }
 
     private AbstractFortressRecipeScreen.ScrollbarBounds getScrollbarBounds() {
