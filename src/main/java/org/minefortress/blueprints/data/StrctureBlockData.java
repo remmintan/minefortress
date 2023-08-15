@@ -2,14 +2,16 @@ package org.minefortress.blueprints.data;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.tag.ItemTags;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.spongepowered.include.com.google.common.collect.Sets;
+
 
 import java.util.*;
 import java.util.stream.Collectors;

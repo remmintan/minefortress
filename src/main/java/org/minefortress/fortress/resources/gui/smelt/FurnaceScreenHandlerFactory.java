@@ -8,7 +8,6 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +25,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
 
     @Override
     public Text getDisplayName() {
-        return new LiteralText("Furnace Screen Factory");
+        return Text.literal("Furnace Screen Factory");
     }
 
     @Nullable
@@ -45,7 +44,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
             final BlockPos selectedFurnacePos = furnacePos == null ? otherFurnaceBlocks.get(0) : furnacePos;
             final var otherFurnacesDelegates = otherFurnaceBlocks.stream()
                     .map(it -> {
-                        final var blockEnt = player.world.getBlockEntity(it);
+                        final var blockEnt = player.getWorld().getBlockEntity(it);
                         if (blockEnt instanceof FurnaceBlockEntity furnaceBlockEntity) {
                             return (PropertyDelegate)new FortressFurnacePropertyDelegateImpl(furnaceBlockEntity, furnaceBlockEntity.getPos().equals(selectedFurnacePos));
                         }
@@ -55,7 +54,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
                     .toList();
 
 
-            final var selectedBlockEnt = player.world.getBlockEntity(selectedFurnacePos);
+            final var selectedBlockEnt = player.getWorld().getBlockEntity(selectedFurnacePos);
             if(selectedBlockEnt instanceof FurnaceBlockEntity furnaceBlockEntity) {
                 final var resourceManager = manager.getServerResourceManager();
                 return new FortressFurnaceScreenHandler(syncId, inv, resourceManager, furnaceBlockEntity, furnaceBlockEntity.propertyDelegate, otherFurnacesDelegates);

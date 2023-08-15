@@ -2,9 +2,9 @@ package org.minefortress.professions;
 
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,8 +27,8 @@ public final class ProfessionsReader {
     List<ProfessionFullInfo> readProfessions() {
         final var resourceManager = server.getResourceManager();
         final var professions = new ArrayList<ProfessionFullInfo>();
+        final var resource = resourceManager.getResource(professionsResourceId).orElseThrow();
         try(
-                final var resource = resourceManager.getResource(professionsResourceId);
                 final var is = resource.getInputStream();
                 final var isr = new InputStreamReader(is);
                 final var jsonReader = new JsonReader(isr)
@@ -47,8 +47,9 @@ public final class ProfessionsReader {
 
     String readTreeJson() {
         final var resourceManager = server.getResourceManager();
+        final var resource = resourceManager.getResource(professionTreeId).orElseThrow();
         try(
-                final var resource = resourceManager.getResource(professionTreeId);
+
                 final var is = resource.getInputStream();
                 final var isr = new InputStreamReader(is);
                 final var br = new BufferedReader(isr)
@@ -91,7 +92,7 @@ public final class ProfessionsReader {
 
     private Item decodeIcon(JsonReader reader) throws IOException {
         final var iconName = reader.nextString();
-        return Registry.ITEM.get(new Identifier(iconName));
+        return Registries.ITEM.get(new Identifier(iconName));
     }
 
     private ProfessionFullInfo.Requirements readRequirements(JsonReader reader) throws IOException {
@@ -128,7 +129,7 @@ public final class ProfessionsReader {
         if(blockName == null) {
             throw new IllegalStateException("Block requirement must have a block");
         }
-        return new ProfessionFullInfo.BlockRequirement(Registry.BLOCK.get(new Identifier(blockName)), inBlueprint);
+        return new ProfessionFullInfo.BlockRequirement(Registries.BLOCK.get(new Identifier(blockName)), inBlueprint);
     }
 
     private List<ProfessionFullInfo.ItemRequirement> readItemRequirements(JsonReader reader) throws IOException {
@@ -157,7 +158,7 @@ public final class ProfessionsReader {
         if(itemName == null) {
             throw new IllegalStateException("Item requirement must have an item");
         }
-        return new ProfessionFullInfo.ItemRequirement(Registry.ITEM.get(new Identifier(itemName)), count);
+        return new ProfessionFullInfo.ItemRequirement(Registries.ITEM.get(new Identifier(itemName)), count);
     }
 
 }

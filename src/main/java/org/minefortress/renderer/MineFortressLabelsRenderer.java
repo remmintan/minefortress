@@ -1,15 +1,16 @@
 package org.minefortress.renderer;
 
+
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.StringUtils;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.minefortress.fortress.buildings.BuildingHealthRenderInfo;
 import org.minefortress.selections.SelectionManager;
 
@@ -27,7 +28,7 @@ public class MineFortressLabelsRenderer {
     private final Supplier<SelectionManager> selectionManagerSupplier;
     private final Supplier<List<BuildingHealthRenderInfo>> buildingsHealthSupplier;
     private Camera camera;
-    private Quaternion cameraOrientation;
+    private Quaternionf cameraOrientation;
 
     public MineFortressLabelsRenderer(TextRenderer font,
                                       Supplier<SelectionManager> selectionManagerSupplier,
@@ -79,7 +80,7 @@ public class MineFortressLabelsRenderer {
                         false,
                         matrix,
                         source,
-                        false,
+                        TextRenderer.TextLayerType.NORMAL,
                         BLACK,
                         packLightCoords
                 );
@@ -95,7 +96,7 @@ public class MineFortressLabelsRenderer {
                         false,
                         newMatrix,
                         source,
-                        false,
+                        TextRenderer.TextLayerType.NORMAL,
                         color,
                         packLightCoords
                 );
@@ -121,7 +122,7 @@ public class MineFortressLabelsRenderer {
                         false,
                         matrix,
                         source,
-                        false,
+                        TextRenderer.TextLayerType.NORMAL,
                         backgroundAlpha,
                         packLightCoords
                 );
@@ -141,7 +142,7 @@ public class MineFortressLabelsRenderer {
         final double a =  camera.getPos().distanceTo(pos);
         float verticalDistanceMultiplier = (float)a/10;
         matrixStack.scale(-0.075F * verticalDistanceMultiplier * size, -0.075F * verticalDistanceMultiplier * size, 0.075F * verticalDistanceMultiplier * size);
-        final Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+        final var matrix = matrixStack.peek().getPositionMatrix();
 
         renderAction.accept(matrix);
 

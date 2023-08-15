@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.fortress.resources.client.FortressItemStack;
+import org.minefortress.fortress.resources.server.ServerStartingInventoryReader.InventorySlotInfo;
 import org.minefortress.network.s2c.ClientboundSyncItemsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -118,7 +119,7 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
                 similarStack.decrease();
             } else{
                 if(!ignoreWhenNotEnough) {
-                    LogManager.getLogger().warn("Tried to remove reserved item, but not enough items: " + item.getName().asString());
+                    LogManager.getLogger().warn("Tried to remove reserved item, but not enough items: " + item.getName().getContent());
                 }
             }
         }

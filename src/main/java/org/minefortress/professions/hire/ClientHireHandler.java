@@ -3,6 +3,7 @@ package org.minefortress.professions.hire;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.network.c2s.C2SHirePawnWithScreenPacket;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import org.minefortress.professions.Profession;
 import org.minefortress.utils.ModUtils;
 
 import java.util.List;

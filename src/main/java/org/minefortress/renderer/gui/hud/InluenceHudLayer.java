@@ -2,6 +2,7 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
+import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.renderer.gui.widget.ItemToggleWidget;
 import org.minefortress.utils.ModUtils;
 

@@ -1,5 +1,6 @@
 package org.minefortress.blueprints.renderer;
 
+import com.mojang.blaze3d.systems.VertexSorter;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -16,10 +17,11 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.biome.ColorResolver;
 import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.renderer.custom.BuiltModel;
+import org.minefortress.selections.renderer.RenderHelper;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -33,7 +35,7 @@ public class BuiltBlueprint implements BuiltModel {
     private final Set<RenderLayer> nonEmptyLayers = new HashSet<>();
     private final Random random = new Random();
 
-    private BufferBuilder.State bufferState;
+    private BufferBuilder.TransparentSortingData bufferState;
     private ChunkOcclusionData occlusionData;
 
     private CompletableFuture<List<Void>> uploadsFuture;
@@ -41,7 +43,7 @@ public class BuiltBlueprint implements BuiltModel {
     private final Map<RenderLayer, VertexBuffer> vertexBuffers = RenderLayer
             .getBlockLayers()
             .stream()
-            .collect(Collectors.toMap(Function.identity(), it -> new VertexBuffer()));
+            .collect(Collectors.toMap(Function.identity(), it -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
 
     private final BlockRenderView blueprintData;
     private final Vec3i size;
@@ -85,10 +87,10 @@ public class BuiltBlueprint implements BuiltModel {
         final List<CompletableFuture<Void>> uploadFutures = initializedLayers
                 .stream()
                 .map(layer -> {
-                    final BufferBuilder bufferBuilder = blockBufferBuilders.get(layer);
-                    VertexBuffer vertexBuffer = vertexBuffers.get(layer);
+                    final var bufferBuilder = blockBufferBuilders.get(layer);
+                    final var vertexBuffer = vertexBuffers.get(layer);
 
-                    return vertexBuffer.submitUpload(bufferBuilder);
+                    return RenderHelper.scheduleUpload(bufferBuilder, vertexBuffer);
                 })
                 .collect(Collectors.toList());
 
@@ -118,9 +120,7 @@ public class BuiltBlueprint implements BuiltModel {
                 final BufferBuilder bufferBuilder = blockBufferBuilders.get(fluidRenderLayer);
                 initLayer(fluidRenderLayer, bufferBuilder);
 
-                if(blockRenderManager.renderFluid(pos, blueprintData, bufferBuilder, blockState, fluidState))
-                    nonEmptyLayers.add(fluidRenderLayer);
-
+                blockRenderManager.renderFluid(pos, blueprintData, bufferBuilder, blockState, fluidState);
             }
 
             if(blockState.getRenderType() == BlockRenderType.INVISIBLE) continue;
@@ -132,15 +132,15 @@ public class BuiltBlueprint implements BuiltModel {
             matrixStack.push();
             matrixStack.translate(pos.getX() & 0xf, pos.getY() & 0xf, pos.getZ() & 0xf);
 
-            if(blockRenderManager.renderBlock(blockState, pos, blueprintData, matrixStack, bufferBuilder,  true, random))
-                nonEmptyLayers.add(blockLayer);
+            blockRenderManager.renderBlock(blockState, pos, blueprintData, matrixStack, bufferBuilder,  true, getClient().world.random);
+            nonEmptyLayers.add(blockLayer);
 
             matrixStack.pop();
         }
         if(nonEmptyLayers.contains(RenderLayer.getTranslucent())) {
             final BufferBuilder translucentBuilder = blockBufferBuilders.get(RenderLayer.getTranslucent());
-            translucentBuilder.sortFrom(-minPos.getX(), -minPos.getY(), -minPos.getZ());
-            bufferState = translucentBuilder.popState();
+            translucentBuilder.setSorter(VertexSorter.BY_DISTANCE);
+            bufferState = translucentBuilder.getSortingData();
         }
 
         initializedLayers.stream().map(blockBufferBuilders::get).forEach(BufferBuilder::end);

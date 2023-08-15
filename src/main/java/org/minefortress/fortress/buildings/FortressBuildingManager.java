@@ -1,5 +1,6 @@
 package org.minefortress.fortress.buildings;
 
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.Blocks;

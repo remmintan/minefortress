@@ -26,7 +26,7 @@ public class BuildingHelper {
         return inWorldBounds(level, pos) && (
                 isAirOrFluid(state) ||
                 isGrass(level, state, pos) ||
-                state.getMaterial().isReplaceable() ||
+                state.isReplaceable() ||
 //                doesNotHaveCollisions(level, pos) ||
                 state.getBlock().equals(FortressBlocks.SCAFFOLD_OAK_PLANKS)
         );

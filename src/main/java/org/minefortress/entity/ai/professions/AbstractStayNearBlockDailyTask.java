@@ -17,7 +17,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
 
     @Override
     public boolean canStart(Colonist colonist) {
-        return colonist.world.isDay();
+        return colonist.getWorld().isDay();
     }
 
     @Override
@@ -32,7 +32,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
         final MovementHelper movementHelper = colonist.getMovementHelper();
         if(movementHelper.hasReachedWorkGoal()) {
             if(workingTicks % 10 * colonist.getHungerMultiplier() == 0) {
-                colonist.swingHand(colonist.world.random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
+                colonist.swingHand(colonist.getWorld().random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
                 colonist.putItemInHand(getWorkingItem());
                 colonist.addHunger(PASSIVE_EXHAUSTION);
             }
@@ -57,7 +57,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return blockPos != null && colonist.world.isDay();
+        return blockPos != null && colonist.getWorld().isDay();
     }
 
     private void setupTablePos(Colonist colonist) {

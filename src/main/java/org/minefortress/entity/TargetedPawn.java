@@ -26,7 +26,7 @@ public abstract class TargetedPawn extends NamedPawnEntity implements ITargetedP
     @Override
     public void setMoveTarget(@Nullable BlockPos pos) {
         if (pos != null) {
-            if (world.isClient) {
+            if (getWorld().isClient) {
                 final var packet = new C2SMoveTargetPacket(pos, this.getId());
                 FortressClientNetworkHelper.send(C2SMoveTargetPacket.CHANNEL, packet);
             } else {
@@ -41,7 +41,7 @@ public abstract class TargetedPawn extends NamedPawnEntity implements ITargetedP
     @Override
     @Nullable
     public BlockPos getMoveTarget() {
-        if (world.isClient) {
+        if (getWorld().isClient) {
             throw new IllegalStateException("Cannot get move target on client");
         }
         return moveTarget;
@@ -50,7 +50,7 @@ public abstract class TargetedPawn extends NamedPawnEntity implements ITargetedP
     @Override
     public void setAttackTarget(@Nullable LivingEntity entity) {
         if (entity != null) {
-            if (world.isClient) {
+            if (getWorld().isClient) {
                 final var followPacket = new C2SFollowTargetPacket(this.getId(), entity.getId());
                 FortressClientNetworkHelper.send(C2SFollowTargetPacket.CHANNEL, followPacket);
             } else {
@@ -66,7 +66,7 @@ public abstract class TargetedPawn extends NamedPawnEntity implements ITargetedP
     @Override
     @Nullable
     public LivingEntity getAttackTarget() {
-        if (world.isClient) {
+        if (getWorld().isClient) {
             throw new IllegalStateException("Cannot get attack target on client");
         }
         return attackTarget;

@@ -2,6 +2,7 @@ package org.minefortress.fortress;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
@@ -10,6 +11,7 @@ import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
+import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.buildings.BuildingHealthRenderInfo;
 import org.minefortress.fortress.buildings.EssentialBuildingInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
@@ -25,8 +27,10 @@ import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
+
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public final class FortressClientManager extends AbstractFortressManager {

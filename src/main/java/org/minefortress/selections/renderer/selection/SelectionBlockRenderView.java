@@ -2,7 +2,7 @@ package org.minefortress.selections.renderer.selection;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.biome.ColorResolver;
 import org.minefortress.renderer.custom.AbstractCustomBlockRenderView;
 
 import java.util.function.BiFunction;

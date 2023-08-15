@@ -26,8 +26,8 @@ final class ProfessionEntityTypesMapper {
     void read(MinecraftServer server) {
         final var resourceManager = server.getResourceManager();
         final Map<String, List<String>> entityTypeNamesMap;
+        final var resource = resourceManager.getResource(RESOURCE_ID).orElseThrow();
         try(
-                final var resource = resourceManager.getResource(RESOURCE_ID);
                 final var is = resource.getInputStream();
                 final var isr = new InputStreamReader(is)
         ) {

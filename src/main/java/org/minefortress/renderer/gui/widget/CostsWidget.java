@@ -2,10 +2,10 @@ package org.minefortress.renderer.gui.widget;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.utils.GuiUtils;
@@ -26,7 +26,7 @@ public class CostsWidget implements Drawable, Element {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         final var itemRenderer = getItemRenderer();
         int i = 0;
         for(var ent : costs) {
@@ -37,6 +37,7 @@ public class CostsWidget implements Drawable, Element {
             final var countLabel = amount + "/" + GuiUtils.formatSlotCount(actualItemAmount);
             final var textRenderer = getTextRenderer();
             final var countLabelWidth = textRenderer.getWidth(countLabel);
+            final var matrices = drawContext.getMatrices();
             matrices.push();
             final var scaleFactor = 0.5f;
             matrices.scale(scaleFactor, scaleFactor, 1f);
@@ -44,9 +45,9 @@ public class CostsWidget implements Drawable, Element {
 
             final var textX = x + i + countLabelWidth / 2f - 25 * scaleFactor;
             final var textY = y + 6 / scaleFactor;
-            textRenderer.drawWithShadow(matrices, countLabel, textX / scaleFactor, textY / scaleFactor, color);
+            drawContext.drawTextWithShadow(getTextRenderer(), countLabel, (int)(textX / scaleFactor), (int)(textY / scaleFactor), color);
             matrices.pop();
-            itemRenderer.renderGuiItemIcon(stack, x + i, y);
+            drawContext.drawItem(stack, x + i, y);
             i+=(9 + countLabelWidth) * scaleFactor;
         }
     }
@@ -76,4 +77,13 @@ public class CostsWidget implements Drawable, Element {
         return MinecraftClient.getInstance().textRenderer;
     }
 
+    @Override
+    public void setFocused(boolean focused) {
+
+    }
+
+    @Override
+    public boolean isFocused() {
+        return false;
+    }
 }

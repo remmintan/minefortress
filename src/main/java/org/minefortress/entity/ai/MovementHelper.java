@@ -1,5 +1,6 @@
 package org.minefortress.entity.ai;
 
+
 import baritone.api.IBaritone;
 import baritone.api.event.events.PathEvent;
 import baritone.api.event.listener.AbstractGameEventListener;
@@ -46,7 +47,7 @@ public class MovementHelper {
     }
 
     private String getColonistName() {
-        return colonist.getName().asString();
+        return colonist.getName().getString();
     }
 
     public BlockPos getWorkGoal() {

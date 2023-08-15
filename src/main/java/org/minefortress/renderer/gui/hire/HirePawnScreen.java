@@ -1,7 +1,6 @@
 package org.minefortress.renderer.gui.hire;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.network.c2s.C2SCloseHireMenuPacket;
@@ -21,7 +20,7 @@ public class HirePawnScreen extends WindowScreen {
     private final IHireScreenHandler handler;
 
     public HirePawnScreen(@NotNull IHireScreenHandler handler) {
-        super(new LiteralText(handler.getScreenName()));
+        super(Text.literal(handler.getScreenName()));
         this.handler = handler;
     }
 
@@ -64,8 +63,7 @@ public class HirePawnScreen extends WindowScreen {
         final var professionName = new ProfessionNameWidget(
                 IHireScreenHandler.getProfessionName(profId),
                 leftX + 10,
-                rowY + textRenderer.fontHeight / 2 + 3,
-                this::renderTooltip
+                rowY + textRenderer.fontHeight / 2 + 3
         );
         this.addDrawable(professionName);
         final var costs = new CostsWidget(
@@ -74,30 +72,30 @@ public class HirePawnScreen extends WindowScreen {
                 this.handler.getCost(profId)
         );
         this.addDrawable(costs);
-        final var hireButton = new ButtonWidget(
-                rightX - 100,
-                rowY,
-                20,
-                20,
-                new LiteralText("+"),
+        final var hireButton = ButtonWidget.builder(
+                Text.literal("+"),
                 (btn) -> {
                     if(canIncreaseAmount(costs, profId)) {
                         this.handler.increaseAmount(profId);
                     }
-                },
-                (btn, matrices, x, y) -> {
-                    final var buttonTooltip = canIncreaseAmount(costs, profId) ? "Hire" : "Not enough resources/pawns";
-                    this.renderTooltip(matrices, new LiteralText(buttonTooltip), x, y);
                 }
-        );
+        ).dimensions(rightX - 100,
+                rowY,
+                20,
+                20)
+                .narrationSupplier((it) -> {
+                    final var buttonTooltip = canIncreaseAmount(costs, profId) ? "Hire" : "Not enough resources/pawns";
+                    return Text.literal(buttonTooltip);
+                })
+                .build();
+
         this.addDrawableChild(hireButton);
         hireButtons.add(new HireButtonWithInfo(hireButton, costs, profId));
         this.addDrawable(
                 new ProfessionQueueWidget(
                         rightX - 80,
                         rowY,
-                        () -> handler.getHireQueue(profId),
-                        this::renderTooltip
+                        () -> handler.getHireQueue(profId)
                 )
         );
 
@@ -107,8 +105,7 @@ public class HirePawnScreen extends WindowScreen {
                         rowY,
                         IHireScreenHandler.getProfessionItem(profId),
                         () -> this.handler.getCurrentCount(profId),
-                        () -> this.handler.getMaxCount(profId),
-                        this::renderTooltip
+                        () -> this.handler.getMaxCount(profId)
                 )
         );
     }

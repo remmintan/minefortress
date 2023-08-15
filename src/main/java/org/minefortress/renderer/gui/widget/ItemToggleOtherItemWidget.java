@@ -1,6 +1,6 @@
 package org.minefortress.renderer.gui.widget;
 
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -19,11 +19,11 @@ public class ItemToggleOtherItemWidget extends ItemToggleWidget {
     }
 
     @Override
-    protected void renderItem(MatrixStack m) {
+    protected void renderItem(DrawContext drawContext) {
         if(toggledSupplier.get())
-            itemRenderer.renderInGui(otherState, this.x + 2, this.y + 2);
+            drawContext.drawItem(otherState, this.getX() + 2, this.getY() + 2);
         else
-            super.renderBareItem();
+            super.renderBareItem(drawContext);
 
     }
 

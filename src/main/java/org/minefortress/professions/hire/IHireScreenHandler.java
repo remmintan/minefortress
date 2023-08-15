@@ -4,6 +4,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.Profession;
 import org.minefortress.utils.ModUtils;
 

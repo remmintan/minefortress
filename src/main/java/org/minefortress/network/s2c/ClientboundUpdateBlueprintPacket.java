@@ -1,6 +1,7 @@
 package org.minefortress.network.s2c;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.interfaces.FortressMinecraftClient;

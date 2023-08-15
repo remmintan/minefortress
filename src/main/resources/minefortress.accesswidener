@@ -2,15 +2,8 @@ accessWidener   v1  named
 accessible  class   net/minecraft/client/render/RenderLayer$MultiPhase
 accessible  method  net/minecraft/client/render/RenderLayer of  (Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;ILnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;
 accessible  class   net/minecraft/client/gui/widget/CyclingButtonWidget$Values
-accessible  class   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode
 mutable  field   net/minecraft/client/gui/widget/CyclingButtonWidget    values  Lnet/minecraft/client/gui/widget/CyclingButtonWidget$Values;
-accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode    defaultGameMode   Lnet/minecraft/world/GameMode;
-mutable  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode    defaultGameMode   Lnet/minecraft/world/GameMode;
-mutable  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode    text   Lnet/minecraft/text/Text;
-accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode    text   Lnet/minecraft/text/Text;
-mutable  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode   translationSuffix   Ljava/lang/String;
-accessible  field   net/minecraft/client/gui/screen/world/CreateWorldScreen$Mode   translationSuffix   Ljava/lang/String;
-accessible  field   net/minecraft/structure/Structure   blockInfoLists  Ljava/util/List;
+accessible  field   net/minecraft/structure/StructureTemplate   blockInfoLists  Ljava/util/List;
 accessible  class   net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
 accessible  field   net/minecraft/client/render/chunk/ChunkBuilder   buffers  Lnet/minecraft/client/render/chunk/BlockBufferBuilderStorage;
 accessible  field    net/minecraft/entity/player/HungerManager   foodLevel   I
@@ -20,13 +13,12 @@ accessible  field    net/minecraft/entity/player/HungerManager  saturationLevel 
 accessible  field    net/minecraft/entity/player/HungerManager  exhaustion  F
 accessible  class   net/minecraft/client/render/chunk/RenderedChunk
 mutable field   net/minecraft/client/gui/screen/ingame/HandledScreen handler Lnet/minecraft/screen/ScreenHandler;
-accessible  method   net/minecraft/item/Item    isIn    (Lnet/minecraft/item/ItemGroup;)Z
 extendable  class   net/minecraft/item/ItemStack
 accessible field net/minecraft/screen/ScreenHandler revision I
 accessible field net/minecraft/screen/ScreenHandler cursorStack Lnet/minecraft/item/ItemStack;
 accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeBook Lnet/minecraft/client/recipebook/ClientRecipeBook;
 accessible method net/minecraft/recipe/InputSlotFiller canReturnInputs ()Z
-accessible method net/minecraft/screen/CraftingScreenHandler updateResult (Lnet/minecraft/screen/ScreenHandler;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/inventory/CraftingInventory;Lnet/minecraft/inventory/CraftingResultInventory;)V
+accessible method net/minecraft/screen/CraftingScreenHandler updateResult (Lnet/minecraft/screen/ScreenHandler;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/inventory/CraftingResultInventory;)V
 accessible field  net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeFinder Lnet/minecraft/recipe/RecipeMatcher;
 accessible method net/minecraft/client/gui/screen/recipebook/RecipeBookWidget refreshResults (Z)V
 accessible field net/minecraft/screen/ScreenHandler slots Lnet/minecraft/util/collection/DefaultedList;
@@ -38,3 +30,12 @@ accessible method net/minecraft/screen/ScreenHandler internalOnSlotClick (IILnet
 accessible field net/minecraft/item/BucketItem fluid Lnet/minecraft/fluid/Fluid;
 accessible method net/minecraft/entity/projectile/ProjectileEntity <init> (Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/World;)V
 accessible method net/minecraft/entity/projectile/PersistentProjectileEntity getEntityCollision (Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/hit/EntityHitResult;
+accessible field net/minecraft/client/gui/hud/InGameHud ICONS Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/structure/StructureTemplate$StructureBlockInfo pos Lnet/minecraft/util/math/BlockPos;
+accessible field net/minecraft/structure/StructureTemplate$StructureBlockInfo state Lnet/minecraft/block/BlockState;
+accessible field net/minecraft/structure/StructureTemplate$StructureBlockInfo nbt Lnet/minecraft/nbt/NbtCompound;
+mutable field net/minecraft/client/gui/screen/world/WorldCreator$Mode defaultGameMode Lnet/minecraft/world/GameMode;
+mutable field net/minecraft/client/gui/screen/world/WorldCreator$Mode name Lnet/minecraft/text/Text;
+accessible field net/minecraft/client/gui/screen/world/WorldCreator$Mode info Lnet/minecraft/text/Text;
+mutable field net/minecraft/client/gui/screen/world/WorldCreator$Mode info Lnet/minecraft/text/Text;
+

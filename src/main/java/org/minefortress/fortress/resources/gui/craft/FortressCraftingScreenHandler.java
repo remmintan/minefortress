@@ -111,10 +111,10 @@ public class FortressCraftingScreenHandler extends AbstractFortressRecipeScreenH
             }
             ItemStack itemStack = this.getStack();
             if (itemStack.isEmpty()) {
-                this.setStack(stack);
+                this.setStackNoCallbacks(stack);
             } else if (ItemStack.canCombine(itemStack, stack)) {
                 itemStack.increment(stack.getCount());
-                this.setStack(itemStack);
+                this.setStackNoCallbacks(itemStack);
             }
             return stack;
         }

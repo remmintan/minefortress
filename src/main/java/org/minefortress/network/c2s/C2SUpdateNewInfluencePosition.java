@@ -5,6 +5,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
+import org.minefortress.fight.influence.ServerInfluenceManager;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 
 public class C2SUpdateNewInfluencePosition implements FortressC2SPacket {

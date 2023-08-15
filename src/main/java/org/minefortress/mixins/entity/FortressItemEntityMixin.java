@@ -5,8 +5,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.tag.ItemTags;
 import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.world.BlueprintsWorld;
@@ -14,6 +14,7 @@ import org.minefortress.interfaces.FortressServer;
 import org.minefortress.professions.ServerProfessionManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -37,8 +38,8 @@ public abstract class FortressItemEntityMixin extends Entity {
             return;
         }
 
-        if(!this.world.isClient) {
-            final var closestPlayer = this.world.getClosestPlayer(this, 100.0D);
+        if(!this.getWorld().isClient) {
+            final var closestPlayer = this.getWorld().getClosestPlayer(this, 100.0D);
             if(closestPlayer instanceof ServerPlayerEntity srvP && srvP.interactionManager.getGameMode() == MineFortressMod.FORTRESS) {
                 final var fortressServer = (FortressServer) closestPlayer.getServer();
                 if(fortressServer != null) {
@@ -57,6 +58,7 @@ public abstract class FortressItemEntityMixin extends Entity {
         }
     }
 
+    @Unique
     private boolean shouldCollectInInventory(ServerProfessionManager serverProfessionManager, Item item) {
         if(item.getDefaultStack().isIn(ItemTags.SAPLINGS))
             return serverProfessionManager.hasProfession("forester");
@@ -70,8 +72,9 @@ public abstract class FortressItemEntityMixin extends Entity {
         return true;
     }
 
+    @Unique
     private boolean isBlueprintsWorld() {
-        return this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
+        return this.getWorld().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
     }
 
 }

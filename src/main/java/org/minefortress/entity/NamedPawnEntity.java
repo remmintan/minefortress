@@ -4,7 +4,7 @@ import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
@@ -26,7 +26,7 @@ abstract class NamedPawnEntity extends BasePawnEntity {
     private void setCustomNameIfNeeded() {
         getFortressServerManager().ifPresent(it -> {
             if(!this.hasCustomName()) {
-                this.setCustomName(new LiteralText(it.getNameGenerator().generateRandomName()));
+                this.setCustomName(Text.literal(it.getNameGenerator().generateRandomName()));
             }
         });
     }

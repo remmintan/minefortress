@@ -4,6 +4,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -117,7 +118,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
 
     @Override
     public final boolean isInvulnerableTo(DamageSource damageSource) {
-        if(damageSource == DamageSource.FALL) return true;
+        if(damageSource.isOf(DamageTypes.FALL)) return true;
         return super.isInvulnerableTo(damageSource);
     }
 
@@ -137,7 +138,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         super.tickMovement();
 
         Box boundingBox = this.getBoundingBox();
-        List<SlimeEntity> touchingSlimes = world.getEntitiesByClass(SlimeEntity.class, boundingBox, slimeEntity -> true);
+        List<SlimeEntity> touchingSlimes = getWorld().getEntitiesByClass(SlimeEntity.class, boundingBox, slimeEntity -> true);
         touchingSlimes.forEach(s -> ((FortressSlimeEntity)s).touchPawn(this));
     }
 

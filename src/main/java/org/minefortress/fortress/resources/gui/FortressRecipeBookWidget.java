@@ -10,8 +10,6 @@ import net.minecraft.screen.AbstractRecipeScreenHandler;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.interfaces.FortressSimpleInventory;
 
-import java.util.ArrayList;
-
 public class FortressRecipeBookWidget extends RecipeBookWidget {
 
     private int cachedInvChangeCount;
@@ -27,7 +25,6 @@ public class FortressRecipeBookWidget extends RecipeBookWidget {
         this.craftingScreenHandler = handler;
         client.player.currentScreenHandler = handler;
         this.recipeBook = client.player.getRecipeBook();
-        client.keyboard.setRepeatEvents(true);
 
         final var craftingRecipes = client.world.getRecipeManager().listAllOfType(recipeType);
         craftingRecipes
@@ -38,7 +35,7 @@ public class FortressRecipeBookWidget extends RecipeBookWidget {
 
         this.recipeBook = new ClientRecipeBook();
         this.recipeBook.setGuiOpen(this.craftingScreenHandler.getCategory(), true);
-        this.recipeBook.reload(new ArrayList<>(craftingRecipes));
+        this.recipeBook.reload(craftingRecipes, client.world.getRegistryManager());
         super.initialize(parentWidth, parentHeight, client, narrow, handler);
         this.setOpen(true);
     }

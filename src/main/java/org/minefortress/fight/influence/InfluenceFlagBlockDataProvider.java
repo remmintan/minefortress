@@ -3,7 +3,8 @@ package org.minefortress.fight.influence;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.structure.Structure;
+import net.minecraft.registry.Registries;
+import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.data.ClientStructureBlockDataProvider;
@@ -24,9 +25,9 @@ public class InfluenceFlagBlockDataProvider implements IBlockDataProvider {
             throw new IllegalArgumentException("Invalid file name for influence flag: " + fileName);
 
         if (influenceFlagData == null) {
-            final var structure = new Structure();
+            final var structure = new StructureTemplate();
             final var nbt = readTheStructureNbtTag();
-            structure.readNbt(nbt.getCompound("tag"));
+            structure.readNbt(Registries.BLOCK.getReadOnlyWrapper(),nbt.getCompound("tag"));
             influenceFlagData = ClientStructureBlockDataProvider.buildStructureForClient(structure, rotation);
         }
 

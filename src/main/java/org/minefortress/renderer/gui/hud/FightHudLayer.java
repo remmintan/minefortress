@@ -1,8 +1,7 @@
 package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRotation;
 import org.minefortress.fight.ClientFightSelectionManager;
@@ -21,7 +20,7 @@ class FightHudLayer extends AbstractHudLayer {
     }
 
     @Override
-    protected void renderHud(MatrixStack matrices, TextRenderer font, int screenWidth, int screenHeight) {
+    protected void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {
         final var influenceManager = ModUtils.getInfluenceManager();
         if(influenceManager.isSelecting() && ModUtils.getFortressClientManager().isSurvival()) {
             final var stacks = influenceManager.getBlockDataProvider()
@@ -36,8 +35,9 @@ class FightHudLayer extends AbstractHudLayer {
                 final var itemX = screenWidth/2 - 55 + i1%10 * 30;
                 final var itemY = i1/10 * 20 + screenHeight - 40;
                 final var convertedItem = convertItemIconInTheGUI(stack);
-                this.itemRenderer.renderInGui(new ItemStack(convertedItem), itemX, itemY);
-                this.textRenderer.draw(matrices, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000);
+
+                drawContext.drawItem(new ItemStack(convertedItem), itemX, itemY);
+                drawContext.drawText(this.textRenderer, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000, false);
             }
         }
 
@@ -54,10 +54,10 @@ class FightHudLayer extends AbstractHudLayer {
             final var selectionCurX = (int) (selectionCurPos.x() * widthScaleFactor);
             final var selectionCurY = (int) (selectionCurPos.y() * heightScaleFactor);
 
-            super.drawHorizontalLine(matrices, selectionStartX, selectionCurX, selectionStartY, SELECTION_COLOR);
-            super.drawVerticalLine(matrices, selectionCurX, selectionStartY, selectionCurY, SELECTION_COLOR);
-            super.drawHorizontalLine(matrices, selectionStartX, selectionCurX, selectionCurY, SELECTION_COLOR);
-            super.drawVerticalLine(matrices, selectionStartX, selectionStartY, selectionCurY, SELECTION_COLOR);
+            drawContext.drawHorizontalLine(selectionStartX, selectionCurX, selectionStartY, SELECTION_COLOR);
+            drawContext.drawVerticalLine(selectionCurX, selectionStartY, selectionCurY, SELECTION_COLOR);
+            drawContext.drawHorizontalLine(selectionStartX, selectionCurX, selectionCurY, SELECTION_COLOR);
+            drawContext.drawVerticalLine(selectionStartX, selectionStartY, selectionCurY, SELECTION_COLOR);
         }
     }
 

@@ -9,9 +9,9 @@ import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Util;
-import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.renderer.custom.BuiltModel;
+import org.minefortress.selections.renderer.RenderHelper;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -31,7 +31,7 @@ public class BuiltCampfire implements BuiltModel {
     private final Map<RenderLayer, VertexBuffer> vertexBuffers = RenderLayer
             .getBlockLayers()
             .stream()
-            .collect(Collectors.toMap(Function.identity(), it -> new VertexBuffer()));
+            .collect(Collectors.toMap(Function.identity(), it -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
 
     public void build(BlockBufferBuilderStorage blockBufferBuilders) {
         render(blockBufferBuilders);
@@ -72,8 +72,8 @@ public class BuiltCampfire implements BuiltModel {
         final BufferBuilder bufferBuilder = blockBufferBuilders.get(blockLayer);
         initLayer(blockLayer, bufferBuilder);
 
-        if(blockRenderManager.renderBlock(blockState, pos, blueprintData, new MatrixStack(), bufferBuilder,  true, random))
-            nonEmptyLayers.add(blockLayer);
+        blockRenderManager.renderBlock(blockState, pos, blueprintData, new MatrixStack(), bufferBuilder,  true, getClient().world.random);
+        nonEmptyLayers.add(blockLayer);
 
         initializedLayers.stream().map(blockBufferBuilders::get).forEach(BufferBuilder::end);
         BlockModelRenderer.disableBrightnessCache();
@@ -83,20 +83,10 @@ public class BuiltCampfire implements BuiltModel {
         final List<CompletableFuture<Void>> uploadFutures = initializedLayers
                 .stream()
                 .map(layer -> {
-                    final BufferBuilder bufferBuilder = blockBufferBuilders.get(layer);
-                    VertexBuffer vertexBuffer = vertexBuffers.get(layer);
+                    final var bufferBuilder = blockBufferBuilders.get(layer);
+                    final var vertexBuffer = vertexBuffers.get(layer);
 
-                    return vertexBuffer
-                            .submitUpload(bufferBuilder)
-                            .whenComplete((r, t) -> {
-                               if(t != null) {
-                                   CrashReport crashReport = CrashReport.create(t, "Building campfire");
-                                   MinecraftClient.getInstance().setCrashReportSupplier(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashReport));
-                                   return;
-                               }
-
-                               bufferBuilder.clear();
-                            });
+                    return RenderHelper.scheduleUpload(bufferBuilder, vertexBuffer);
                 })
                 .collect(Collectors.toList());
 

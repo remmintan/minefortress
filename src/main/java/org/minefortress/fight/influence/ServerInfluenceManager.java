@@ -7,6 +7,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorderStage;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;

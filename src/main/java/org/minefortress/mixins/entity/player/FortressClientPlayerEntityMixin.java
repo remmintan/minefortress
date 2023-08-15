@@ -50,7 +50,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
         Vec3d vec3 = this.getCameraPosVec(tickDelta);
         Vec3d vec31 = CameraTools.getMouseBasedViewVector(this.client, this.getPitch(), this.getYaw());
         Vec3d vec32 = vec3.add(vec31.x * maxDistance, vec31.y * maxDistance, vec31.z * maxDistance);
-        return this.world.raycast(new RaycastContext(vec3, vec32, RaycastContext.ShapeType.OUTLINE, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, this));
+        return this.getWorld().raycast(new RaycastContext(vec3, vec32, RaycastContext.ShapeType.OUTLINE, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, this));
     }
 
     @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)

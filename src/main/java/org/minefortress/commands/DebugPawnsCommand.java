@@ -2,7 +2,9 @@ package org.minefortress.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import java.util.UUID;
 import net.minecraft.server.command.ServerCommandSource;
+import org.minefortress.fortress.FortressServerManager;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -19,7 +21,7 @@ public class DebugPawnsCommand extends MineFortressCommand {
                                             int num = IntegerArgumentType.getInteger(context, "num");
                                             final var fortressServerManager = getFortressServerManager(context);
                                             for (int i = 0; i < num; i++) {
-                                                final var playerId = context.getSource().getPlayer().getUuid();
+                                                final var playerId = context.getSource().getPlayerOrThrow().getUuid();
                                                 fortressServerManager.spawnPawnNearCampfire(playerId);
                                             }
                                             return 1;

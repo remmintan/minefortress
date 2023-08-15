@@ -4,6 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 
 public class ServerboundFortressCenterSetPacket implements FortressC2SPacket {
@@ -26,6 +27,6 @@ public class ServerboundFortressCenterSetPacket implements FortressC2SPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final var fortressServerManager = this.getFortressServerManager(server, player);
-        fortressServerManager.setupCenter(pos, player.world, player);
+        fortressServerManager.setupCenter(pos, player.getWorld(), player);
     }
 }

@@ -5,7 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,10 +35,10 @@ public record ProfessionFullInfo(
             packet.writeString(requirements.building());
             final var blockRequirement = requirements.block();
             if(blockRequirement != null) {
-                packet.writeIdentifier(Registry.BLOCK.getId(blockRequirement.block()));
+                packet.writeIdentifier(Registries.BLOCK.getId(blockRequirement.block()));
                 packet.writeBoolean(blockRequirement.inBlueprint());
             } else {
-                packet.writeIdentifier(Registry.BLOCK.getId(Blocks.AIR));
+                packet.writeIdentifier(Registries.BLOCK.getId(Blocks.AIR));
                 packet.writeBoolean(false);
             }
             packet.writeVarInt(requirements.items().size());
@@ -47,7 +47,7 @@ public record ProfessionFullInfo(
             }
         } else {
             packet.writeString("");
-            packet.writeIdentifier(Registry.BLOCK.getId(Blocks.AIR));
+            packet.writeIdentifier(Registries.BLOCK.getId(Blocks.AIR));
             packet.writeBoolean(false);
             packet.writeVarInt(0);
         }
@@ -62,7 +62,7 @@ public record ProfessionFullInfo(
         final var unlockMoreMessage = packet.readString();
         final var cantRemove = packet.readBoolean();
         final var building = packet.readString();
-        final var block = Registry.BLOCK.get(packet.readIdentifier());
+        final var block = Registries.BLOCK.get(packet.readIdentifier());
         final var inBlueprint = packet.readBoolean();
         var items = packet
                 .readList(PacketByteBuf::readItemStack)

@@ -20,7 +20,6 @@ import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
-
 import java.util.*;
 import java.util.function.Supplier;
 

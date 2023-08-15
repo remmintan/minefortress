@@ -3,13 +3,22 @@ package org.minefortress.blueprints.renderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import org.joml.AxisAngle4f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
@@ -23,8 +32,8 @@ import java.util.function.Supplier;
 
 public final class BlueprintRenderer extends AbstractCustomRenderer {
 
-    private static final Vec3f WRONG_PLACEMENT_COLOR = new Vec3f(1.0F, 0.5F, 0.5F);
-    private static final Vec3f CORRECT_PLACEMENT_COLOR = new Vec3f(1F, 1.0F, 1F);
+    private static final Vector3f WRONG_PLACEMENT_COLOR = new Vector3f(1.0F, 0.5F, 0.5F);
+    private static final Vector3f CORRECT_PLACEMENT_COLOR = new Vector3f(1F, 1.0F, 1F);
 
     private final BlueprintsModelBuilder blueprintsModelBuilder;
 
@@ -55,7 +64,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     }
 
     @Override
-    protected Vec3f getColorModulator() {
+    protected Vector3f getColorModulator() {
         return getStructureRenderInfoProvider().canBuild() ? CORRECT_PLACEMENT_COLOR : WRONG_PLACEMENT_COLOR;
     }
 
@@ -106,12 +115,12 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         final MatrixStack matrices = RenderSystem.getModelViewStack();
         final Matrix4f projectionMatrix4f = RenderSystem.getProjectionMatrix();
 
-        final Vec3f cameraMove = new Vec3f(x, y, z);
+        final Vector3f cameraMove = new Vector3f(x, y, z);
         matrices.push();
 
         rotateScene(matrices, cameraMove);
         matrices.scale(scale, -scale, scale);
-        matrices.translate(cameraMove.getX(), cameraMove.getY(), cameraMove.getZ());
+        matrices.translate(cameraMove.x(), cameraMove.y(), cameraMove.z());
 
         this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
         this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
@@ -137,22 +146,21 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         return builtBlueprint;
     }
 
-    private void rotateScene(MatrixStack matrices, Vec3f cameraMove) {
-        final float yaw = 135f;
-        final float pitch = -30f;
+    private void rotateScene(MatrixStack matrices, Vector3f cameraMove) {
+        final var yaw = 135f;
+        final var pitch = -30f;
+
+        final var radiansYaw = (float)Math.toRadians(yaw);
+        final var radiansPitch = (float)Math.toRadians(pitch);
 
         // calculating rotations
-        final Vec3f yawSceneRotationAxis = Vec3f.POSITIVE_Y;
-        final Vec3f yawMoveRotationAxis = Vec3f.NEGATIVE_Y;
-        final Quaternion yawSceneRotation = yawSceneRotationAxis.getDegreesQuaternion(yaw);
-        final Quaternion yawMoveRotation = yawMoveRotationAxis.getDegreesQuaternion(yaw);
+        final var yawSceneRotation = new Quaternionf().set(new AxisAngle4f(radiansYaw, 0, 1, 0));
+        final var yawMoveRotation = new Quaternionf().set(new AxisAngle4f(radiansYaw, 0, -1, 0));
 
-        final Vec3f pitchSceneRotationAxis = Vec3f.POSITIVE_X.copy();
-        final Vec3f pitchMoveRotationAxis = Vec3f.POSITIVE_X.copy();
-        pitchSceneRotationAxis.rotate(yawMoveRotation);
-        pitchMoveRotationAxis.rotate(yawMoveRotation);
-        final Quaternion pitchSceneRotation = pitchSceneRotationAxis.getDegreesQuaternion(pitch);
-        final Quaternion pitchMoveRotation = pitchMoveRotationAxis.getDegreesQuaternion(pitch);
+        final var pitchSceneRotationAxis = new Vector3f(1, 0, 0).rotate(yawMoveRotation);
+        final var pitchMoveRotationAxis = new Vector3f(1, 0, 0).rotate(yawMoveRotation);
+        final var pitchSceneRotation = new Quaternionf().set(new AxisAngle4f(radiansPitch, pitchSceneRotationAxis));
+        final var pitchMoveRotation = new Quaternionf().set(new AxisAngle4f(radiansPitch, pitchMoveRotationAxis));
 
         // rotating camera
         cameraMove.rotate(yawMoveRotation);
@@ -169,9 +177,9 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
         VertexFormat vertexFormat = renderLayer.getVertexFormat();
 
-        Shader shader = RenderSystem.getShader();
+        ShaderProgram shader = RenderSystem.getShader();
         if(shader == null) throw new IllegalStateException("Shader is null while rendering blueprint");
-        BufferRenderer.unbindAll();
+        BufferRenderer.reset();
         int k;
         for (int i = 0; i < 12; ++i) {
             k = RenderSystem.getShaderTexture(i);
@@ -211,20 +219,19 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
             final VertexBuffer vertexBuffer = builtBlueprint.getBuffer(renderLayer);
 
             if (chunkOffset != null) {
-                chunkOffset.set(Vec3f.ZERO);
+                chunkOffset.set(new Vector3f(0));
                 chunkOffset.upload();
             }
 
-            vertexBuffer.drawVertices();
+            vertexBuffer.draw();
         }
 
-        if(chunkOffset != null) chunkOffset.set(Vec3f.ZERO);
+        if(chunkOffset != null) chunkOffset.set(new Vector3f(0));
         shader.unbind();
 
-        if(hasLayer) vertexFormat.endDrawing();
+        if(hasLayer) vertexFormat.clearState();
 
         VertexBuffer.unbind();
-        VertexBuffer.unbindVertexArray();
         renderLayer.endDrawing();
     }
 

@@ -1,9 +1,8 @@
 package org.minefortress.renderer.gui.widget;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
-import org.minefortress.renderer.gui.tooltip.BasicTooltipSupplier;
 
 public class TextButtonWidget extends ButtonWidget implements IHudButton {
 
@@ -11,15 +10,15 @@ public class TextButtonWidget extends ButtonWidget implements IHudButton {
     private final int anchorY;
 
     public TextButtonWidget(int anchorX, int anchorY, int width, int height, String message, PressAction onPress, String tooltipText) {
-        super(0, 0, width, height, new LiteralText(message), onPress, new BasicTooltipSupplier(tooltipText));
+        super(0, 0, width, height, Text.literal(message), onPress, (it) -> Text.literal(tooltipText));
         this.anchorX = anchorX;
         this.anchorY = anchorY;
     }
 
     @Override
     public void setPos(int x, int y) {
-        this.x = x;
-        this.y = y;
+        this.setX(x);
+        this.setY(y);
     }
 
     @Override

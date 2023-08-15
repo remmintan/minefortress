@@ -40,7 +40,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         super(screenHandlerType, i);
         this.serverResourceManager = resourceManager;
         this.player = player;
-        this.world = player.world;
+        this.world = player.getWorld();
         this.virtualInventory = Objects.nonNull(serverResourceManager) ? new VirtualInventory(serverResourceManager.getAllItems()) : null;
     }
 
@@ -108,7 +108,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
 
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int index) {
+    public ItemStack quickMove(PlayerEntity player, int index) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
         if (slot.hasStack()) {
@@ -124,7 +124,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
                 return ItemStack.EMPTY;
             }
             if (itemStack2.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
+                slot.setStackNoCallbacks(ItemStack.EMPTY);
             } else {
                 slot.markDirty();
             }
@@ -145,8 +145,8 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof FortressServer fortressServer) {
             final var fortressServerManager = fortressServer.getFortressModServerManager().getByPlayer(serverPlayer);
             final var serverResourceManager = fortressServerManager.getServerResourceManager();
@@ -238,11 +238,11 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         }
 
         @Override
-        public void setStack(ItemStack stack) {
+        public void setStackNoCallbacks(ItemStack stack) {
             final var handler = AbstractFortressRecipeScreenHandler.this;
             if(handler.virtualInventory != null)
                 handler.virtualInventory.set(this.getIndex(), stack);
-            super.setStack(stack);
+            super.setStackNoCallbacks(stack);
         }
 
         @Override
@@ -269,12 +269,12 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
                         stack.decrement(count);
                     } else {
                         final var split = stack.split(count);
-                        this.setStack(split);
+                        this.setStackNoCallbacks(split);
                     }
                 }
             } else if (ItemStack.canCombine(itemStack, stack)) {
                 itemStack.increment(count);
-                this.setStack(itemStack);
+                this.setStackNoCallbacks(itemStack);
                 stack.decrement(count);
             }
             return stack;

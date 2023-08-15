@@ -1,17 +1,13 @@
 package org.minefortress.renderer.gui.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.hud.interfaces.IItemHudElement;
-import org.minefortress.renderer.gui.tooltip.BasicTooltipSupplier;
-import org.minefortress.renderer.gui.tooltip.OptionalTooltipSupplier;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -28,7 +24,6 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
     public boolean checked = false;
 
     protected ItemRenderer itemRenderer;
-
     public ItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, String tooltipText) {
         super(
                 0,
@@ -39,11 +34,7 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
                 0,
                 20,
                 FORTRESS_BUTTON_TEXTURE,
-                32,
-                64,
-                clickAction,
-                new BasicTooltipSupplier(tooltipText),
-                Text.of("")
+                clickAction
         );
         this.itemStack = new ItemStack(item);
         this.anchorX = anchorX;
@@ -60,46 +51,35 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
                 0,
                 20,
                 FORTRESS_BUTTON_TEXTURE,
-                32,
-                64,
-                clickAction,
-                new OptionalTooltipSupplier(),
-                Text.of("")
+                clickAction
         );
-        ((OptionalTooltipSupplier)super.tooltipSupplier).provideTooltipText(() -> optTooltip.apply(this));
         this.itemStack = new ItemStack(item);
         this.anchorX = anchorX;
         this.anchorY = anchorY;
     }
 
     @Override
-    public void setItemRenderer(ItemRenderer renderer) {
-        this.itemRenderer = renderer;
-    }
-
-    @Override
-    public final void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
+    public final void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        super.render(drawContext, mouseX, mouseY, delta);
         if(!this.visible)return;
-        renderItem(matrices);
+        renderItem(drawContext);
 
         if(this.checked){
-            RenderSystem.setShaderTexture(0, ARROWS_TEXTURE);
-            this.drawTexture(matrices, x-15, y+2, 12, 208, 14, 18);
+            this.drawTexture(drawContext, ARROWS_TEXTURE, this.getX()-15, this.getY()+2, 12, 208, 20, 14, 18, 20, 32);
         }
     }
 
-    protected void renderItem(MatrixStack m) {
-        renderBareItem();
+    protected void renderItem(DrawContext drawContext) {
+        renderBareItem(drawContext);
     }
 
-    protected final void renderBareItem() {
-        itemRenderer.renderInGui(itemStack, x+2, y+2);
+    protected final void renderBareItem(DrawContext drawContext) {
+        drawContext.drawItem(itemStack, this.getX()+2, this.getY()+2);
     }
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        if(!this.isHovered()) return;
+        if(!this.isSelected()) return;
         super.onClick(mouseX, mouseY);
     }
 
@@ -114,12 +94,13 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
     }
 
     @Override
-    public boolean isHovered() {
-        return super.isHovered();
+    public boolean isSelected() {
+        return super.isSelected();
     }
 
     @Override
     public void setPos(int x, int y) {
-        super.setPos(x, y);
+        this.setX(x);
+        this.setY(y);
     }
 }

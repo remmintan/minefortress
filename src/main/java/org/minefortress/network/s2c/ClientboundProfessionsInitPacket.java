@@ -3,6 +3,7 @@ package org.minefortress.network.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.network.interfaces.FortressS2CPacket;
+import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.ProfessionFullInfo;
 import org.minefortress.utils.ModUtils;
 

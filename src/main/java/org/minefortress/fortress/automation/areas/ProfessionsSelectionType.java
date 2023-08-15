@@ -2,7 +2,7 @@ package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.util.math.Vector4f;
+import org.joml.Vector4f;
 
 import java.util.function.Predicate;
 

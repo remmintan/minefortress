@@ -1,10 +1,8 @@
 package org.minefortress.fortress.resources.gui.craft;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.text.Text;
@@ -22,13 +20,10 @@ public class FortressCraftingScreen extends AbstractFortressRecipeScreen<Fortres
     }
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    protected void drawBackground(DrawContext drawContext, float delta, int mouseX, int mouseY) {
         int i = this.x;
         int j = (this.height - this.backgroundHeight) / 2;
-        this.drawTexture(matrices, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        drawContext.drawTexture(TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
     }
 
     @Override

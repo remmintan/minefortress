@@ -38,7 +38,7 @@ public final class AreasServerManager {
         if(tickCounter++ % 20 == 0) {
             if(areas.isEmpty()) return;
             if(refreshPointer >= areas.size()) refreshPointer = 0;
-            areas.get(refreshPointer++).refresh(serverPlayer.world);
+            areas.get(refreshPointer++).refresh(serverPlayer.getWorld());
             sync();
         }
 

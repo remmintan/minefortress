@@ -1,7 +1,7 @@
 package org.minefortress.professions;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.network.c2s.ServerboundChangeProfessionStatePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
@@ -41,7 +41,7 @@ public class ClientProfessionManager extends ProfessionManager {
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
         } else if(profession.isHireMenu() && unlockedForHireMenu == ProfessionResearchState.LOCKED_PARENT) {
             final var parent = profession.getParent();
-            final var message = new LiteralText("§cCan't hire " + profession.getTitle() + "§c. " +
+            final var message = Text.literal("§cCan't hire " + profession.getTitle() + "§c. " +
                     "You need to unlock the " + parent.getTitle() + "§c profession first.");
             MinecraftClient.getInstance().setScreen(null);
 
@@ -56,7 +56,7 @@ public class ClientProfessionManager extends ProfessionManager {
         final var profession = this.getProfession(professionId);
         final var cantRemove = profession.isHireMenu();
         if(cantRemove){
-            final var message = new LiteralText("§cCan't remove pawn from profession: " + profession.getTitle());
+            final var message = Text.literal("§cCan't remove pawn from profession: " + profession.getTitle());
             MinecraftClient.getInstance().setScreen(null);
             Optional.ofNullable(MinecraftClient.getInstance().player)
                     .ifPresent(it -> it.sendMessage(message, true));

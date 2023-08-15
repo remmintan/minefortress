@@ -8,6 +8,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
+import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;

@@ -6,10 +6,10 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.*;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -35,7 +35,7 @@ public class BlockInfoUtils {
 
 
         final Block block = blockItem.getBlock();
-        final boolean solid = block.getDefaultState().getMaterial().isSolid();
+        final boolean solid = block.getDefaultState().isSolid();
         if(!solid) return true;
         return block instanceof BlockWithEntity;
     }

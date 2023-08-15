@@ -1,7 +1,7 @@
 package org.minefortress.tasks;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vector4f;
+import org.joml.Vector4f;
 import org.minefortress.network.c2s.ServerboundCancelTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;

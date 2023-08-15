@@ -1,5 +1,6 @@
 package org.minefortress.network.c2s;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -26,7 +27,7 @@ public class C2SMoveTargetPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var entity = player.world.getEntityById(id);
+        final var entity = player.getWorld().getEntityById(id);
         if(entity instanceof ITargetedPawn pawn) {
             pawn.setMoveTarget(pos);
         }

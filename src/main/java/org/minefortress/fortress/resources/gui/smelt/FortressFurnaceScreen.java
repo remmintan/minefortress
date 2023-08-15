@@ -1,14 +1,14 @@
 package org.minefortress.fortress.resources.gui.smelt;
 
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.recipebook.FurnaceRecipeBookScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -42,14 +42,26 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
             final var addedFurnaces = this.addedFurnaces.size();
             final var otherFurnace = furnaces.get(addedFurnaces);
             final var width = 100;
-            final var btn = new ButtonWidget(this.width - 5 - width, 5 + addedFurnaces * 25, width, 20, new LiteralText("Fur. " + addedFurnaces), (buttonWidget) -> {
+
+            final ButtonWidget.PressAction action = (buttonWidget) -> {
                 final var posX = otherFurnace.getPosX();
                 final var posY = otherFurnace.getPosY();
                 final var posZ = otherFurnace.getPosZ();
                 final var packet = new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE, new BlockPos(posX, posY, posZ));
                 if (this.client != null) this.close();
                 FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, packet);
-            });
+            };
+
+            final var btn = ButtonWidget
+                    .builder(Text.literal("Fur. " + addedFurnaces), action)
+                    .dimensions(
+                            this.width - 5 - width,
+                            5 + addedFurnaces * 25,
+                            width,
+                            20
+                    )
+                    .build();
+
             this.addDrawableChild(btn);
             this.addedFurnaces.add(new AddedFurnace(otherFurnace, btn));
         }
@@ -62,7 +74,7 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
             final var isBurning = furnace.getBurnTime() > 0;
             final var burningLabel = isBurning ? ("" + furnace.getCookProgress()+"%") : ("not burning");
 
-            btn.setMessage(new LiteralText("Fur."+selectedLabel+": "+burningLabel));
+            btn.setMessage(Text.literal("Fur."+selectedLabel+": "+burningLabel));
         }
     }
 
@@ -83,20 +95,20 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
     }
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+    protected void drawBackground(DrawContext drawContext, float delta, int mouseX, int mouseY) {
         int k;
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
         int i = this.x;
         int j = this.y;
-        this.drawTexture(matrices, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        drawContext.drawTexture(BACKGROUND_TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
         if (this.handler.isBurning()) {
             k = this.handler.getFuelProgress();
-            this.drawTexture(matrices, i + 56, j + 36 + 12 - k, 176, 12 - k, 14, k + 1);
+            drawContext.drawTexture(BACKGROUND_TEXTURE, i + 56, j + 36 + 12 - k, 176, 12 - k, 14, k + 1);
         }
         k = this.handler.getCookProgress();
-        this.drawTexture(matrices, i + 79, j + 34, 176, 14, k + 1, 16);
+        drawContext.drawTexture(BACKGROUND_TEXTURE, i + 79, j + 34, 176, 14, k + 1, 16);
     }
 
     private static record AddedFurnace(FortressFurnacePropertyDelegate furnace, ButtonWidget button) {}

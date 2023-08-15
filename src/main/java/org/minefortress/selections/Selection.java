@@ -81,7 +81,7 @@ public abstract class Selection {
         if(selectionEnd != null) {
             Vec3i difference = selectionEnd.subtract(selectionStart);
             Vec3d direction = new Vec3d(MathHelper.sign(difference.getX()), MathHelper.sign(difference.getY()), MathHelper.sign(difference.getZ()));
-            difference = difference.add(direction.x, direction.y, direction.z);
+            difference = difference.add((int)direction.x, (int)direction.y, (int)direction.z);
 
             Vec3d differenceVec = new Vec3d(difference.getX(), difference.getY(), difference.getZ());
 

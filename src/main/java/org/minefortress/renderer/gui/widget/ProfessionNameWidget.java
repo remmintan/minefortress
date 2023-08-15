@@ -1,8 +1,9 @@
 package org.minefortress.renderer.gui.widget;
 
+
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.minefortress.renderer.gui.widget.interfaces.TooltipRenderer;
 
@@ -14,10 +15,7 @@ public class ProfessionNameWidget extends MinefortressWidget implements Element,
     private final String shortName;
     private final int x;
     private final int y;
-
-    private final TooltipRenderer tooltipRenderer;
-
-    public ProfessionNameWidget(String fullName, int x, int y,  TooltipRenderer tooltipRenderer) {
+    public ProfessionNameWidget(String fullName, int x, int y) {
         this.fullName = fullName;
         this.x = x;
         this.y = y;
@@ -27,7 +25,6 @@ public class ProfessionNameWidget extends MinefortressWidget implements Element,
         } else {
             this.shortName = preparedName;
         }
-        this.tooltipRenderer = tooltipRenderer;
     }
 
     private int getMaxNameLength() {
@@ -39,17 +36,18 @@ public class ProfessionNameWidget extends MinefortressWidget implements Element,
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         final var scaleFactor = getScaleFactor();
+        final var matrices = drawContext.getMatrices();
         matrices.push();
         matrices.scale(scaleFactor, scaleFactor, 1f);
-        final var newX = x / scaleFactor;
-        final var newY = y / scaleFactor;
-        getTextRenderer().drawWithShadow(matrices, shortName, newX, newY, 0xFFFFFF);
+        final var newX = (int) (x / scaleFactor);
+        final var newY = (int) (y / scaleFactor);
+        drawContext.drawTextWithShadow(getTextRenderer(), shortName, newX, newY, 0xFFFFFF);
         matrices.pop();
         // if hovered, draw full areaType
         if (mouseX >= x && mouseX <= x + getTextRenderer().getWidth(shortName) * scaleFactor && mouseY >= y && mouseY <= y + getTextRenderer().fontHeight * scaleFactor) {
-            tooltipRenderer.render(matrices, Text.of(fullName), mouseX, mouseY);
+            drawContext.drawTooltip(getTextRenderer(), Text.of(fullName), mouseX, mouseY);
         }
     }
 
@@ -57,4 +55,13 @@ public class ProfessionNameWidget extends MinefortressWidget implements Element,
         return (int) (getTextRenderer().getWidth(shortName) * getScaleFactor());
     }
 
+    @Override
+    public void setFocused(boolean focused) {
+
+    }
+
+    @Override
+    public boolean isFocused() {
+        return false;
+    }
 }

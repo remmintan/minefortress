@@ -23,8 +23,8 @@ public class BlueprintMetadataReader {
     void read() {
         predefinedBlueprints.clear();
         final var resourceManager = server.getResourceManager();
+        final var resource = resourceManager.getResource(PREDEFINED_BLUEPRINTS_ID).orElseThrow();
         try (
-                final var resource = resourceManager.getResource(PREDEFINED_BLUEPRINTS_ID);
                 final var isr = new InputStreamReader(resource.getInputStream());
                 final var jsonReader = new JsonReader(isr)
         ) {

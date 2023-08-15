@@ -10,7 +10,6 @@ import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.automation.iterators.MineAreaIterator;
 import org.minefortress.fortress.automation.iterators.ResetableIterator;
 import org.minefortress.utils.AreasUtils;
-
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;

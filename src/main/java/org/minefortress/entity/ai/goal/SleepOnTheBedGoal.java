@@ -1,10 +1,13 @@
 package org.minefortress.entity.ai.goal;
 
 import net.minecraft.block.BedBlock;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
+import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
 
@@ -40,7 +43,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
         if(movementHelper.stillTryingToReachGoal()) return;
         if(hasReachedTheBed()) {
             if(!colonist.isSleeping()) {
-                if(colonist.world.getBlockState(bedPos).isIn(BlockTags.BEDS)) {
+                if(colonist.getWorld().getBlockState(bedPos).isIn(BlockTags.BEDS)) {
                     colonist.sleep(bedPos);
                     colonist.putItemInHand(null);
                 }
@@ -80,11 +83,11 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
     }
 
     private boolean isNight() {
-        return colonist.world.isNight();
+        return colonist.getWorld().isNight();
     }
     private boolean bedStillValid() {
         if(bedPos == null) return false;
-        final var blockState = colonist.world.getBlockState(bedPos);
+        final var blockState = colonist.getWorld().getBlockState(bedPos);
         return blockState.isIn(BlockTags.BEDS) && (!blockState.get(BedBlock.OCCUPIED) || colonist.isSleeping());
     }
 

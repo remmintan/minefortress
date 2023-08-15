@@ -2,7 +2,9 @@ package org.minefortress.fortress.resources.client;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,9 +37,9 @@ class StackGroupsManager {
     }
 
     ItemGroup getGroup(Item item) {
-        for (ItemGroup group : ItemGroup.GROUPS) {
-            if(group == ItemGroup.SEARCH) continue;
-            if(item.isIn(group)) {
+        for (ItemGroup group : ItemGroups.getGroups()) {
+            if(group == Registries.ITEM_GROUP.get(ItemGroups.SEARCH)) continue;
+            if(group.contains(item.getDefaultStack())) {
                 return group;
             }
         }

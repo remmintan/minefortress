@@ -1,9 +1,9 @@
 package org.minefortress.mixins.renderer.gui;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.minefortress.utils.GuiUtils;
@@ -20,14 +20,13 @@ public abstract class FortressHandledScreenMixin extends Screen {
         super(title);
     }
 
-    // redirect draw slot to draw slot with a different signature
-    @Redirect(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V"))
-    void renderSlotText(ItemRenderer instance, TextRenderer renderer, ItemStack stack, int x, int y, String countLabel) {
-        if(ModUtils.isClientInFortressGamemode() && Objects.isNull(countLabel) && stack.getCount() > 99) {
+    @Redirect(method = "drawSlot", at  = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V"))
+    void changeSlotText(DrawContext instance, TextRenderer textRenderer, ItemStack stack, int x, int y, String countOverride) {
+        if(ModUtils.isClientInFortressGamemode() && Objects.isNull(countOverride) && stack.getCount() > 99) {
             final var newCountLabel = GuiUtils.formatSlotCount(stack.getCount());
-            instance.renderGuiItemOverlay(renderer, stack, x, y, newCountLabel);
+            instance.drawItemInSlot(textRenderer, stack, x, y, newCountLabel);
         } else {
-            instance.renderGuiItemOverlay(renderer, stack, x, y, countLabel);
+            instance.drawItemInSlot(textRenderer, stack, x, y, countOverride);
         }
     }
 

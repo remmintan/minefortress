@@ -1,11 +1,14 @@
 package org.minefortress.mixins.renderer;
 
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -13,9 +16,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.border.WorldBorder;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.minefortress.fortress.FortressBorder;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
@@ -26,6 +32,7 @@ import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -41,12 +48,10 @@ public abstract class FortressWorldRendererMixin  {
     @Shadow private ClientWorld world;
     @Shadow @Final private BufferBuilderStorage bufferBuilders;
 
-    @Shadow private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
-
     private MineFortressLabelsRenderer entityRenderer;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    public void init(MinecraftClient client, BufferBuilderStorage bufferBuilders, CallbackInfo ci) {
+    public void init(MinecraftClient client, EntityRenderDispatcher entityRenderDispatcher, BlockEntityRenderDispatcher blockEntityRenderDispatcher, BufferBuilderStorage bufferBuilders, CallbackInfo ci) {
         final var fortressClient = (FortressMinecraftClient) client;
         this.entityRenderer = new MineFortressLabelsRenderer(
                 client.textRenderer,
@@ -65,7 +70,7 @@ public abstract class FortressWorldRendererMixin  {
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
-    public void render(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
+    public void render(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
         final Vec3d cameraPos = camera.getPos();
         final VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
 
@@ -75,10 +80,10 @@ public abstract class FortressWorldRendererMixin  {
         }
 
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        fortressClient.getBlueprintRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  matrix4f);
-        fortressClient.getCampfireRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
-        fortressClient.getSelectionRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
-        fortressClient.getTasksRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, matrix4f);
+        fortressClient.getBlueprintRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  projectionMatrix);
+        fortressClient.getCampfireRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
+        fortressClient.getSelectionRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
+        fortressClient.getTasksRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
 
         SelectionManager selectionManager = fortressClient.getSelectionManager();
         VertexConsumer vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
@@ -135,13 +140,13 @@ public abstract class FortressWorldRendererMixin  {
     public void renderCustomWorldBorder(Camera camera, CallbackInfo ci) {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         WorldBorder worldBorder = getWorldBorder(this.world);
-        double viewDistance = this.client.options.getViewDistance() * 16;
+        double viewDistance = this.client.options.getClampedViewDistance() * 16;
         if (!(camera.getPos().x < worldBorder.getBoundEast() - viewDistance) || !(camera.getPos().x > worldBorder.getBoundWest() + viewDistance) || !(camera.getPos().z < worldBorder.getBoundSouth() - viewDistance) || !(camera.getPos().z > worldBorder.getBoundNorth() + viewDistance)) {
             double e = 1.0 - worldBorder.getDistanceInsideBorder(camera.getPos().x, camera.getPos().z) / viewDistance;
             e = Math.pow(e, 4.0);
             e = MathHelper.clamp(e, 0.0, 1.0);
 
-            double cameraDistance = this.client.gameRenderer.method_32796();
+            double cameraDistance = this.client.gameRenderer.getFarPlaneDistance();
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
             RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
@@ -155,7 +160,7 @@ public abstract class FortressWorldRendererMixin  {
             float k = (float)(i >> 8 & 255) / 255.0F;
             float l = (float)(i & 255) / 255.0F;
             RenderSystem.setShaderColor(j, k, l, (float)e);
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.polygonOffset(-3.0F, -3.0F);
             RenderSystem.enablePolygonOffset();
             RenderSystem.disableCull();
@@ -172,8 +177,8 @@ public abstract class FortressWorldRendererMixin  {
                         .forEach(border -> renderParticularWorldBorder(bufferBuilder, border, viewDistance, camera, cameraDistance, shouldRenderBoundFunc));
             }
 
-            bufferBuilder.end();
-            BufferRenderer.draw(bufferBuilder);
+
+            BufferRenderer.draw(bufferBuilder.end());
             RenderSystem.enableCull();
             RenderSystem.polygonOffset(0.0F, 0.0F);
             RenderSystem.disablePolygonOffset();
@@ -268,15 +273,30 @@ public abstract class FortressWorldRendererMixin  {
         }
     }
 
+    @Unique
     private void renderTranslucent(MatrixStack matrices, Camera camera, Matrix4f matrix4f) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         fortressClient.getSelectionRenderer().renderTranslucent(matrices, camera.getPos().x, camera.getPos().y, camera.getPos().z, matrix4f);
         fortressClient.getBlueprintRenderer().renderTranslucent(matrices, camera.getPos().x, camera.getPos().y, camera.getPos().z, matrix4f);
     }
 
+    @Unique
     private void drawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState) {
         final Vector4f clickColors = ((FortressMinecraftClient) client).getSelectionManager().getClickColor();
-        drawShapeOutline(matrices, vertexConsumer, blockState.getOutlineShape(this.world, blockPos, ShapeContext.of(entity)), (double)blockPos.getX() - d, (double)blockPos.getY() - e, (double)blockPos.getZ() - f, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());
+        final var outlineShape = blockState.getOutlineShape(this.world, blockPos, ShapeContext.of(entity));
+        WorldRenderer.drawShapeOutline(
+                matrices,
+                vertexConsumer,
+                outlineShape,
+                (double)blockPos.getX() - d,
+                (double)blockPos.getY() - e,
+                (double)blockPos.getZ() - f,
+                clickColors.x(),
+                clickColors.y(),
+                clickColors.z(),
+                clickColors.w(),
+                true
+        );
     }
 
 }

@@ -10,6 +10,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.professions.ProfessionFullInfo.Requirements;
 import org.minefortress.utils.GuiUtils;
 
 import java.util.ArrayList;

@@ -10,6 +10,8 @@ import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
+import org.minefortress.fortress.FortressClientManager;
+import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.utils.BuildingHelper;

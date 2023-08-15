@@ -3,7 +3,7 @@ package org.minefortress.renderer.gui.blueprints;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 
 public enum BlueprintGroup {
@@ -20,7 +20,7 @@ public enum BlueprintGroup {
     BlueprintGroup(boolean topRow, Item item, String name) {
         this.topRow = topRow;
         this.icon = new ItemStack(item);
-        this.nameText = new LiteralText(name);
+        this.nameText = Text.literal(name);
     }
 
     public boolean isTopRow() {

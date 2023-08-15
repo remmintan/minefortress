@@ -7,6 +7,8 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
+import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -14,7 +16,7 @@ import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
-
+import java.util.List;
 import java.util.UUID;
 
 public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {

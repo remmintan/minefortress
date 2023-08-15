@@ -14,14 +14,14 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
@@ -151,8 +151,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var infoTag = getColonistInfoTag(masterId);
         infoTag.putString(ServerProfessionManager.PROFESSION_NBT_TAG, warriorId);
 
-        final var newWarrior = entityType.spawn(world, infoTag, name, null, pos, SpawnReason.EVENT, true, false);
-        colonist.damage(DamageSource.OUT_OF_WORLD, Float.MAX_VALUE);
+        final var newWarrior = entityType.spawn(world, infoTag, (it) -> {}, pos, SpawnReason.EVENT, true, false);
+        colonist.damage(getOutOfWorldDamageSource(), Float.MAX_VALUE);
         pawns.remove(colonist);
         pawns.add(newWarrior);
     }
@@ -161,10 +161,12 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(maxColonistsCount != -1 && getTotalColonistsCount() > maxColonistsCount) {
             final var deltaColonists = Math.max( pawns.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
 
+
+
             pawns.stream()
                     .filter(LivingEntity::isAlive)
                     .limit(deltaColonists)
-                    .forEach(it -> it.damage(DamageSource.OUT_OF_WORLD, 40f));
+                    .forEach(it -> it.damage(getOutOfWorldDamageSource(), 40f));
         }
 
         final var deadPawns = pawns.stream()
@@ -233,7 +235,7 @@ public final class FortressServerManager extends AbstractFortressManager {
                     if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
                         if(player != null) {
                             spawnPawnNearCampfire(player.getUuid())
-                                    .ifPresent(it -> player.sendMessage(new LiteralText(it.getName().asString()+" appeared in the village."), false));
+                                    .ifPresent(it -> player.sendMessage(Text.literal(it.getName().getContent()+" appeared in the village."), false));
 
                         }
                     }
@@ -250,7 +252,15 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void killAllPawns() {
-        pawns.forEach(it -> it.damage(DamageSource.OUT_OF_WORLD, 40f));
+        final var outOfWorldDamageSource = getOutOfWorldDamageSource();
+        pawns.forEach(it -> it.damage(outOfWorldDamageSource, 40f));
+    }
+
+    private DamageSource getOutOfWorldDamageSource() {
+        final var world = server.getWorld(World.OVERWORLD);
+        if(world == null)
+            throw new IllegalStateException("World is null");
+        return world.getDamageSources().outOfWorld();
     }
 
     private Stream<IWorkerPawn> getWorkersStream() {
@@ -270,7 +280,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var tag = getColonistInfoTag(masterPlayerId);
         final var colonistType = FortressEntities.COLONIST_ENTITY_TYPE;
         final var world = getWorld();
-        final var spawnedPawn = colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+        final var spawnedPawn = colonistType.spawn(world, tag, (it) -> {}, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
         return Optional.ofNullable(spawnedPawn);
     }
 
@@ -371,7 +381,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(!specialBlocks.isEmpty()) {
             final NbtCompound specialBlocksTag = new NbtCompound();
             for (var specialBlock : this.specialBlocks.entrySet()) {
-                final String blockId = Registry.BLOCK.getId(specialBlock.getKey()).toString();
+                final String blockId = Registries.BLOCK.getId(specialBlock.getKey()).toString();
                 final NbtList posList = new NbtList();
                 for (BlockPos pos : specialBlock.getValue()) {
                     posList.add(NbtHelper.fromBlockPos(pos));
@@ -384,7 +394,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(!blueprintsSpecialBlocks.isEmpty()) {
             final NbtCompound blueprintsSpecialBlocksTag = new NbtCompound();
             for (var specialBlock : this.blueprintsSpecialBlocks.entrySet()) {
-                final String blockId = Registry.BLOCK.getId(specialBlock.getKey()).toString();
+                final String blockId = Registries.BLOCK.getId(specialBlock.getKey()).toString();
                 final NbtList posList = new NbtList();
                 for (BlockPos pos : specialBlock.getValue()) {
                     posList.add(NbtHelper.fromBlockPos(pos));
@@ -436,7 +446,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if (tag.contains("specialBlocks")) {
             final NbtCompound specialBlocksTag = tag.getCompound("specialBlocks");
             for (String blockId : specialBlocksTag.getKeys()) {
-                final Block block = Registry.BLOCK.get(new Identifier(blockId));
+                final Block block = Registries.BLOCK.get(new Identifier(blockId));
                 final NbtList posList = specialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
                 final var positions = new ArrayList<BlockPos>();
                 for (int j = 0; j < posList.size(); j++) {
@@ -450,7 +460,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if (tag.contains("blueprintsSpecialBlocks")) {
             final NbtCompound blueprintsSpecialBlocksTag = tag.getCompound("blueprintsSpecialBlocks");
             for (String blockId : blueprintsSpecialBlocksTag.getKeys()) {
-                final Block block = Registry.BLOCK.get(new Identifier(blockId));
+                final Block block = Registries.BLOCK.get(new Identifier(blockId));
                 final NbtList posList = blueprintsSpecialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
                 final var positions = new ArrayList<BlockPos>();
                 for (int j = 0; j < posList.size(); j++) {

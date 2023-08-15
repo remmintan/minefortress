@@ -82,8 +82,8 @@ public class PlaceControl extends PositionedActionControl {
     private void place(BlockStateTaskBlockInfo blockInfo) {
         final BlockState stateForPlacement = blockInfo.getState();
 
-        colonist.world.setBlockState(goal, stateForPlacement, 3);
-        colonist.world.emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal);
+        colonist.getWorld().setBlockState(goal, stateForPlacement, 3);
+        colonist.getWorld().emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal);
 
         decreaseResourcesAndAddSpecialBlocksAmount();
 

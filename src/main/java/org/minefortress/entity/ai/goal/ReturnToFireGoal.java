@@ -18,7 +18,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(!colonist.world.isNight()) return false;
+        if(!colonist.getWorld().isNight()) return false;
         if(colonist.getTarget() != null && colonist.getTarget().isAlive()) return false;
         if(colonist.getTaskControl().hasTask()) return false;
         if(!isFarFromCenter()) return false;
@@ -39,7 +39,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return colonist.world.isNight() &&
+        return colonist.getWorld().isNight() &&
                 !colonist.getTaskControl().hasTask() &&
                 !colonist.getMovementHelper().isStuck() &&
                 (isFarFromCenter() || colonist.getMovementHelper().stillTryingToReachGoal());

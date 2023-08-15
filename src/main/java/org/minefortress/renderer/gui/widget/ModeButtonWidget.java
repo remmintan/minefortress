@@ -1,9 +1,8 @@
 package org.minefortress.renderer.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 
 import java.util.function.Supplier;
@@ -20,11 +19,9 @@ public class ModeButtonWidget extends ItemButtonWidget {
     }
 
     @Override
-    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, ItemButtonWidget.FORTRESS_BUTTON_TEXTURE);
+    public void renderButton(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         int v = 0;
-        if (this.isHovered() || isActiveSupplier.get()) {
+        if (this.isSelected() || isActiveSupplier.get()) {
             int hoveredVOffset = 20;
             v += hoveredVOffset;
         }
@@ -32,9 +29,9 @@ public class ModeButtonWidget extends ItemButtonWidget {
         int textureWidth = 32;
         int textureHeight = 64;
         int u = 0;
-        TexturedButtonWidget.drawTexture(matrices, this.x, this.y, u, v, this.width, this.height, textureWidth, textureHeight);
+        this.drawTexture(drawContext, FORTRESS_BUTTON_TEXTURE, this.getX(), this.getY(), u, v, 20, this.width, this.height, textureWidth, textureHeight);
         if (this.hovered) {
-            this.renderTooltip(matrices, mouseX, mouseY);
+            this.drawMessage(drawContext, MinecraftClient.getInstance().textRenderer, 0xFFFFFF);
         }
     }
 }

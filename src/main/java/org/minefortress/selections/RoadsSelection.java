@@ -6,7 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -95,6 +95,6 @@ public class RoadsSelection extends WallsSelection{
     }
 
     private boolean isAir(BlockState blockState) {
-        return blockState.isAir() || blockState.isIn(BlockTags.FLOWERS) || blockState.getMaterial().isReplaceable();
+        return blockState.isAir() || blockState.isIn(BlockTags.FLOWERS) || blockState.isReplaceable();
     }
 }

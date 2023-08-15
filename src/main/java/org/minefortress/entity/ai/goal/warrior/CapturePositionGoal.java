@@ -74,7 +74,7 @@ public class CapturePositionGoal extends Goal {
                     influenceFlag.getLayer(BlueprintDataLayer.GENERAL)
                             .forEach((pos, state) -> {
                                 final var realpos = pos.add(targetPos);
-                                pawn.world.setBlockState(realpos, state, 3);
+                                pawn.getWorld().setBlockState(realpos, state, 3);
                                 if(it.isSurvival()) {
                                     resourceManager.removeReservedItem(target.taskId(), state.getBlock().asItem());
                                 }

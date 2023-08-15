@@ -3,7 +3,7 @@ package org.minefortress.blueprints.renderer;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.biome.ColorResolver;
 import org.minefortress.renderer.custom.AbstractCustomBlockRenderView;
 
 import java.util.Map;

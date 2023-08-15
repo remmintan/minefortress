@@ -23,8 +23,8 @@ import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -97,7 +97,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     }
 
     public ServerWorld getServerWorld() {
-        return (ServerWorld) this.world;
+        return (ServerWorld) this.getWorld();
     }
 
     @Override
@@ -138,7 +138,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
             f /= 5.0F;
         }
 
-        if (!this.onGround) {
+        if (!this.isOnGround()) {
             f /= 5.0F;
         }
 
@@ -236,7 +236,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
             Vec3d eyePosition = this.getEyePos();
             Vec3d legsPos = new Vec3d(eyePosition.x, eyePosition.y - 1, eyePosition.z);
             Box aabb = Box.of(legsPos, getWidth(), 1.0E-6D, getWidth());
-            return this.world
+            return this.getWorld()
                     .getBlockCollisions(this, aabb).iterator().hasNext();
         }
     }
@@ -247,7 +247,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         } else {
             Box legsBox = Box.of(this.getPos(), getWidth()/1.4, 0.5, getWidth()/1.4);
             Box aboveTheHeadBox = legsBox.offset(0, 2.5, 0);
-            return this.world.getBlockCollisions(this, aboveTheHeadBox).iterator().hasNext();
+            return this.getWorld().getBlockCollisions(this, aboveTheHeadBox).iterator().hasNext();
         }
     }
 
@@ -256,7 +256,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
             return false;
         } else {
             Box aabb = Box.of(this.getEyePos(), getWidth(), 1.0E-6D, getWidth());
-            return this.world
+            return this.getWorld()
                     .getBlockCollisions(this, aabb).iterator().hasNext();
         }
     }

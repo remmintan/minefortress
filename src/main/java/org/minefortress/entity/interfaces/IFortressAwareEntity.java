@@ -3,7 +3,7 @@ package org.minefortress.entity.interfaces;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.server.FortressModServerManager;
 import org.minefortress.interfaces.FortressServer;
@@ -30,7 +30,7 @@ public interface IFortressAwareEntity {
     }
 
     default void sendMessageToMasterPlayer(String message) {
-        getMasterPlayer().ifPresent(it -> it.sendMessage(new LiteralText(message), false));
+        getMasterPlayer().ifPresent(it -> it.sendMessage(Text.literal(message), false));
     }
 
     default boolean isScreenOpen(Class<? extends ScreenHandler> screenHandlerClass) {

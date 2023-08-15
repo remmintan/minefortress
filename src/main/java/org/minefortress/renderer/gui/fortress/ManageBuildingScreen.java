@@ -1,8 +1,8 @@
 package org.minefortress.renderer.gui.fortress;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.fortress.buildings.EssentialBuildingInfo;
@@ -42,36 +42,33 @@ public class ManageBuildingScreen extends WindowScreen {
     @Override
     protected void init() {
         super.init();
-        this.addDrawableChild(new ButtonWidget(
-                getScreenRightX() - 25,
-                getScreenTopY() + 5,
-                20,
-                20,
-                Text.of("X"),
-                button -> super.closeScreen()
-        ));
+        final var xBtn = ButtonWidget
+                .builder(
+                        Text.literal("X"),
+                        button -> super.closeScreen()
+                )
+                .dimensions(getScreenRightX() - 25, getScreenTopY() + 5, 20, 20)
+                .build();
+        this.addDrawableChild(xBtn);
 
-        this.addDrawableChild(
-            new ButtonWidget(
-                getScreenCenterX() - 100,
-                getScreenTopY() + 55,
-                200,
-                20,
-                Text.of("Destroy Building"),
-                button -> showDestroyConfirmation()
-            )
-        );
+        final var destroyBuildingBtn = ButtonWidget
+                .builder(
+                        Text.literal("Destroy Building"),
+                        button -> showDestroyConfirmation()
+                )
+                .dimensions(getScreenCenterX() - 100, getScreenTopY() + 55, 200, 20)
+                .build();
+        this.addDrawableChild(destroyBuildingBtn);
 
         if(buildingInfo.getHealth() < 100) {
             this.addDrawableChild(
-                    new ButtonWidget(
-                            getScreenCenterX() - 100,
-                            getScreenTopY() + 80,
-                            200,
-                            20,
-                            Text.of("Repair Building"),
-                            button -> openRepairBuildingScreen()
-                    )
+                    ButtonWidget
+                            .builder(
+                                    Text.literal("Repair Building"),
+                                    button -> openRepairBuildingScreen()
+                            )
+                            .dimensions(getScreenCenterX() - 100, getScreenTopY() + 80, 200, 20)
+                            .build()
             );
         }
 
@@ -79,29 +76,28 @@ public class ManageBuildingScreen extends WindowScreen {
         Optional.ofNullable(profession).ifPresent(it -> {
             if(it.isHireMenu()) {
                 this.addDrawableChild(
-                        new ButtonWidget(
-                                getScreenCenterX() - 100,
-                                getScreenTopY() + 105,
-                                200,
-                                20,
-                                Text.of("Hire pawns"),
-                                button -> ModUtils
-                                        .getProfessionManager()
-                                        .increaseAmount(it.getId(), false)
-                        )
+                        ButtonWidget
+                                .builder(
+                                        Text.literal("Hire pawns"),
+                                        button -> ModUtils
+                                                .getProfessionManager()
+                                                .increaseAmount(it.getId(), false)
+                                )
+                                .dimensions(getScreenCenterX() - 100, getScreenTopY() + 105, 200, 20)
+                                .build()
                 );
             }
         });
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        super.render(drawContext, mouseX, mouseY, delta);
         // render health
         final var healthInPercents = buildingInfo.getHealth();
 
         final var healthText = Text.of("Health: " + healthInPercents + "%");
-        textRenderer.draw(matrices, healthText, getScreenLeftX() + 30, getScreenTopY() + 30, 0xFFFFFF);
+        drawContext.drawText(this.textRenderer, healthText, getScreenLeftX() + 30, getScreenTopY() + 30, 0xFFFFFF, false);
     }
 
     private void showDestroyConfirmation() {

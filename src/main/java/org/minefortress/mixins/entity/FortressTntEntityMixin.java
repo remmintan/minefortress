@@ -19,7 +19,7 @@ public abstract class FortressTntEntityMixin extends Entity {
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     void tick(CallbackInfo ci) {
-        if(this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
+        if(this.getWorld().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
             this.discard();
             ci.cancel();
         }

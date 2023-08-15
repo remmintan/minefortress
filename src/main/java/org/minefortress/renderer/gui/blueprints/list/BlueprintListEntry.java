@@ -1,9 +1,8 @@
 package org.minefortress.renderer.gui.blueprints.list;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.minefortress.MineFortressMod;
 
@@ -17,19 +16,19 @@ public class BlueprintListEntry extends AlwaysSelectedEntryListWidget.Entry<Blue
     public BlueprintListEntry(String value, TextRenderer textRenderer, BlueprintsListWidget widget) {
         this.value = value;
         //remove blueprints extensions with substring
-        this.text = new LiteralText(value.substring(0, value.length() - MineFortressMod.BLUEPRINTS_EXTENSION.length()));
+        this.text = Text.literal(value.substring(0, value.length() - MineFortressMod.BLUEPRINTS_EXTENSION.length()));
         this.textRenderer = textRenderer;
         this.widget = widget;
     }
 
     @Override
     public Text getNarration() {
-        return new LiteralText("Blueprints: " + value);
+        return Text.literal("Blueprints: " + value);
     }
 
     @Override
-    public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        this.textRenderer.drawWithShadow(matrices, text, (float)(x + 2), (float)(y + 3), 0xFFFFFF);
+    public void render(DrawContext drawContext, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        drawContext.drawTextWithShadow(this.textRenderer, text, x + 2, y + 3, 0xFFFFFF);
     }
 
     public String getValue() {

@@ -1,6 +1,6 @@
 package org.minefortress.renderer.gui.blueprints.handler;
 
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
@@ -17,13 +17,13 @@ public class BlueprintSlot {
     private BlueprintSlot() {
         metadata = null;
         enoughResources = true;
-        tooltipText = new LiteralText("");
+        tooltipText = Text.literal("");
         blockData = null;
     }
 
     public BlueprintSlot(BlueprintMetadata metadata, boolean enoughResources, StrctureBlockData blockData) {
         this.metadata = metadata;
-        this.tooltipText = new LiteralText(metadata.getName());
+        this.tooltipText = Text.literal(metadata.getName());
         this.enoughResources = enoughResources;
         this.blockData = blockData;
     }

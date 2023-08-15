@@ -3,8 +3,8 @@ package org.minefortress.renderer.gui.hud;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.renderer.gui.hud.hints.*;
 import org.minefortress.renderer.gui.hud.interfaces.IHintsLayer;
@@ -45,7 +45,7 @@ public class FortressHud {
         hudLayers.add(new UtilsHudLayer(client));
     }
 
-    public void render(MatrixStack p, float delta) {
+    public void render(DrawContext drawContext, float delta) {
         if(isHudHidden()) return;
         prepareRenderSystem();
 
@@ -59,13 +59,13 @@ public class FortressHud {
 
         for(IHintsLayer layer : hintsLayers) {
             if(layer.shouldRender(getState())) {
-                layer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+                layer.render(drawContext, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             }
         }
 
         for(IHudLayer layer : hudLayers) {
             if(layer.shouldRender(getState())) {
-                layer.render(p, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
+                layer.render(drawContext, font, scaledWidth, scaledHeight, mouseX, mouseY, delta);
             }
         }
     }
@@ -75,7 +75,7 @@ public class FortressHud {
         RenderSystem.enableDepthTest();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
     }
 
     public void tick() {

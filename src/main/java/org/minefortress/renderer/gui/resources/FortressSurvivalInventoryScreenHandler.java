@@ -69,10 +69,10 @@ public class FortressSurvivalInventoryScreenHandler extends CreativeInventoryScr
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int index) {
+    public ItemStack quickMove(PlayerEntity player, int index) {
         Slot slot;
         if (index >= this.slots.size() - 9 && index < this.slots.size() && (slot = this.slots.get(index)) != null && slot.hasStack()) {
-            slot.setStack(ItemStack.EMPTY);
+            slot.setStackNoCallbacks(ItemStack.EMPTY);
         }
         return ItemStack.EMPTY;
     }

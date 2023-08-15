@@ -3,6 +3,7 @@ package org.minefortress.network.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.fortress.automation.areas.AutomationAreaInfo;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 

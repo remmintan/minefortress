@@ -16,10 +16,11 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.interfaces.ITargetedPawn;
@@ -75,13 +76,13 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
             if(hovering || selecting || color != null || fightSelecting) {
                 final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
                 if(color != null && !(hovering || fightSelecting)) {
-                    color.scale(0.7f);
+                    color.mul(0.7f);
                 }
 
                 if(color == null) {
-                    color = new Vec3f(selecting ? 0.7f : 0.0f, selecting ? 0.7f : 1.0f, selecting ? 0.7f : 0.0f);
+                    color = new Vector3f(selecting ? 0.7f : 0.0f, selecting ? 0.7f : 1.0f, selecting ? 0.7f : 0.0f);
                     if(fightSelecting) {
-                        color = new Vec3f(0.0f, 1.0f, 0.0f);
+                        color = new Vector3f(0.0f, 1.0f, 0.0f);
                     }
                 }
 
@@ -102,7 +103,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     }
 
     @Nullable
-    private Vec3f getHealthFoodLevelColor(BasePawnEntity colonist) {
+    private Vector3f getHealthFoodLevelColor(BasePawnEntity colonist) {
         final var healthFoodLevel = getHealthFoodLevel(colonist);
         final var maxLevelOfEachColor = (float)0xFF;
         if(healthFoodLevel > 10) return null;
@@ -110,12 +111,12 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
             final var red = 0xFF / maxLevelOfEachColor;
             final var green = 0xAA / maxLevelOfEachColor;
             final var blue = 0x00 / maxLevelOfEachColor;
-            return new Vec3f(red, green, blue);
+            return new Vector3f(red, green, blue);
         }
         final var red = 0xFF / maxLevelOfEachColor;
         final var green = 0x55 / maxLevelOfEachColor;
         final var blue = 0x55 / maxLevelOfEachColor;
-        return new Vec3f(red, green, blue);
+        return new Vector3f(red, green, blue);
     }
 
     @Nullable
@@ -146,20 +147,23 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
         colonistModel.rightSleeve.visible = !colonist.isSleeping();
     }
 
-    private static void renderRhombus(MatrixStack matrices, VertexConsumer vertices, Entity entity, Vec3f color) {
+    private static void renderRhombus(MatrixStack matrices, VertexConsumer vertices, Entity entity, Vector3f color) {
         Box box = entity.getBoundingBox().offset(-entity.getX(), -entity.getY(), -entity.getZ());
         if (entity instanceof LivingEntity) {
             matrices.push();
             final double xCenter = (box.minX + box.maxX) / 2;
             final double zCenter = (box.minZ + box.maxZ) / 2;
             matrices.translate(xCenter, box.maxY * 1.5, zCenter);
-            final Quaternion xRotation = Vec3f.POSITIVE_X.getDegreesQuaternion(45.0f);
-            final Quaternion yRoation = Vec3f.POSITIVE_Y.getDegreesQuaternion(45.0f);
+
+            float radians = (float) Math.toRadians(45);
+
+            final Quaternionf xRotation = new Quaternionf().set(new AxisAngle4f(radians, 1, 0, 0));
+            final Quaternionf yRoation = new Quaternionf().set(new AxisAngle4f(radians, 0, 1, 0));
             matrices.multiply(xRotation);
             matrices.multiply(yRoation);
             matrices.scale(0.3f, 0.3f, 0.3f);
 
-            WorldRenderer.drawBox(matrices, vertices, -0.5f,  -0.5f, -0.5f, 0.5f,  0.5f, 0.5f, color.getX(), color.getY(), color.getZ(), 1.0f);
+            WorldRenderer.drawBox(matrices, vertices, -0.5f,  -0.5f, -0.5f, 0.5f,  0.5f, 0.5f, color.x(), color.y(), color.z(), 1.0f);
             matrices.pop();
         }
     }
