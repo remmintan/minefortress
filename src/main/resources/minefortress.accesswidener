@@ -34,3 +34,8 @@ accessible field net/minecraft/client/gui/hud/InGameHud ICONS Lnet/minecraft/uti
 accessible field net/minecraft/structure/StructureTemplate$StructureBlockInfo pos Lnet/minecraft/util/math/BlockPos;
 accessible field net/minecraft/structure/StructureTemplate$StructureBlockInfo state Lnet/minecraft/block/BlockState;
 accessible field net/minecraft/structure/StructureTemplate$StructureBlockInfo nbt Lnet/minecraft/nbt/NbtCompound;
+mutable field net/minecraft/client/gui/screen/world/WorldCreator$Mode defaultGameMode Lnet/minecraft/world/GameMode;
+mutable field net/minecraft/client/gui/screen/world/WorldCreator$Mode name Lnet/minecraft/text/Text;
+accessible field net/minecraft/client/gui/screen/world/WorldCreator$Mode info Lnet/minecraft/text/Text;
+mutable field net/minecraft/client/gui/screen/world/WorldCreator$Mode info Lnet/minecraft/text/Text;
+
