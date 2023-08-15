@@ -1,21 +1,17 @@
 package org.minefortress.renderer.gui.professions;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.advancement.AdvancementTab;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.ProfessionManager;
 import org.minefortress.professions.Profession;
+import org.minefortress.professions.ProfessionManager;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class ProfessionsLayer extends DrawContext {
+public class ProfessionsLayer {
 
     private static final Identifier LAYER_BACKGROUND = new Identifier("textures/gui/advancements/backgrounds/stone.png");
     private int layerWidth = 234;
@@ -62,19 +58,19 @@ public class ProfessionsLayer extends DrawContext {
         this.layerHeight = height;
     }
 
-    public void render(DrawContext matrices) {
+    public void render(DrawContext drawContext) {
         this.init();
+
+        final var matrices = drawContext.getMatrices();
         matrices.push();
 
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderTexture(0, LAYER_BACKGROUND);
         int originX = MathHelper.floor(this.originX);
         int originY = MathHelper.floor(this.originY);
         int startX = originX % 16;
         int startY = originY % 16;
         for (int x = -1; x <= (this.layerWidth/16)+1; ++x) {
             for (int y = -1; y <= (this.layerHeight/16)+1; ++y) {
-                ProfessionsLayer.drawTexture(matrices, startX + 16 * x, startY + 16 * y, 0.0f, 0.0f, 16, 16, 16, 16);
+                drawContext.drawTexture(LAYER_BACKGROUND, startX + 16 * x, startY + 16 * y, 0.0f, 0.0f, 16, 16, 16, 16);
             }
         }
 
@@ -126,10 +122,11 @@ public class ProfessionsLayer extends DrawContext {
         }
     }
 
-    public void drawWidgetTooltip(MatrixStack matrices, int mouseX, int mouseY, int x, int screenWidth) {
+    public void drawWidgetTooltip(DrawContext drawContext, int mouseX, int mouseY, int x, int screenWidth) {
+        final var matrices = drawContext.getMatrices();
         matrices.push();
         matrices.translate(0.0, 0.0, -200.0);
-        AdvancementTab.fill(matrices, 0, 0, layerWidth, layerHeight, MathHelper.floor(this.alpha * 255.0f) << 24);
+        drawContext.fill(0, 0, layerWidth, layerHeight, MathHelper.floor(this.alpha * 255.0f) << 24);
 
         int oX = MathHelper.floor(this.originX);
         int oY = MathHelper.floor(this.originY);

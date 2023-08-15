@@ -1,6 +1,6 @@
 package org.minefortress.renderer.gui.widget.interfaces;
 
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 @FunctionalInterface

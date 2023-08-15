@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import org.minefortress.entity.ArcherPawn;
@@ -22,7 +23,7 @@ public class FortressEntities {
     public static final float PAWN_WIDTH = 0.6f;
     public static final float PAWN_HEIGHT = 1.8f;
     public static final EntityType<Colonist> COLONIST_ENTITY_TYPE = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             new Identifier("minefortress", "colonist"),
             FabricEntityTypeBuilder
                     .create(SpawnGroup.CREATURE, Colonist::new)
@@ -31,7 +32,7 @@ public class FortressEntities {
     );
 
     public static final EntityType<WarriorPawn> WARRIOR_PAWN_ENTITY_TYPE = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             new Identifier("minefortress", "warrior_pawn"),
             FabricEntityTypeBuilder
                     .create(SpawnGroup.CREATURE, WarriorPawn::new)
@@ -40,7 +41,7 @@ public class FortressEntities {
     );
 
     public static final EntityType<ArcherPawn> ARCHER_PAWN_ENTITY_TYPE = Registry.register(
-            Registry.ENTITY_TYPE,
+            Registries.ENTITY_TYPE,
             new Identifier("minefortress", "archer_pawn"),
             FabricEntityTypeBuilder
                     .create(SpawnGroup.CREATURE, ArcherPawn::new)

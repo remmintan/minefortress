@@ -4,6 +4,5 @@ import net.minecraft.client.render.item.ItemRenderer;
 
 public interface IItemHudElement {
 
-    void setItemRenderer(ItemRenderer renderer);
 
 }

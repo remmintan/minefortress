@@ -25,16 +25,12 @@ public class ProgressArrowWidget implements Drawable, Element {
     }
 
     @Override
-    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, PROGRESS_TEXTURE);
-
-        DrawContext.drawTexture(matrices, x-11, y+2, 80, 35, 22, 15, 256, 256);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        drawContext.drawTexture(PROGRESS_TEXTURE, x-11, y+2, 80, 35, 22, 15, 256, 256);
         int rawProgress = progressSupplier.get();
         int progress = (int) (rawProgress * 0.22);
         if (progress > 0) {
-            DrawContext.drawTexture(matrices, x-11, y+2, 177, 14, progress + 1, 16, 256, 256);
+            drawContext.drawTexture(PROGRESS_TEXTURE, x-11, y+2, 177, 14, progress + 1, 16, 256, 256);
         }
     }
 }

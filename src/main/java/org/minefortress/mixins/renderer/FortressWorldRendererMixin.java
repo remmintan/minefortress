@@ -6,7 +6,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -20,7 +19,6 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.border.WorldBorder;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -34,6 +32,7 @@ import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -48,8 +47,6 @@ public abstract class FortressWorldRendererMixin  {
     @Shadow @Final private MinecraftClient client;
     @Shadow private ClientWorld world;
     @Shadow @Final private BufferBuilderStorage bufferBuilders;
-
-    @Shadow private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
 
     private MineFortressLabelsRenderer entityRenderer;
 
@@ -276,15 +273,30 @@ public abstract class FortressWorldRendererMixin  {
         }
     }
 
+    @Unique
     private void renderTranslucent(MatrixStack matrices, Camera camera, Matrix4f matrix4f) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
         fortressClient.getSelectionRenderer().renderTranslucent(matrices, camera.getPos().x, camera.getPos().y, camera.getPos().z, matrix4f);
         fortressClient.getBlueprintRenderer().renderTranslucent(matrices, camera.getPos().x, camera.getPos().y, camera.getPos().z, matrix4f);
     }
 
+    @Unique
     private void drawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState) {
         final Vector4f clickColors = ((FortressMinecraftClient) client).getSelectionManager().getClickColor();
-        drawShapeOutline(matrices, vertexConsumer, blockState.getOutlineShape(this.world, blockPos, ShapeContext.of(entity)), (double)blockPos.getX() - d, (double)blockPos.getY() - e, (double)blockPos.getZ() - f, clickColors.getX(), clickColors.getY(), clickColors.getZ(), clickColors.getW());
+        final var outlineShape = blockState.getOutlineShape(this.world, blockPos, ShapeContext.of(entity));
+        WorldRenderer.drawShapeOutline(
+                matrices,
+                vertexConsumer,
+                outlineShape,
+                (double)blockPos.getX() - d,
+                (double)blockPos.getY() - e,
+                (double)blockPos.getZ() - f,
+                clickColors.x(),
+                clickColors.y(),
+                clickColors.z(),
+                clickColors.w(),
+                true
+        );
     }
 
 }

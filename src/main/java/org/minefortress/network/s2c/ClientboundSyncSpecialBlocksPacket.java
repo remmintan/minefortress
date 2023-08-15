@@ -3,7 +3,7 @@ package org.minefortress.network.s2c;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +11,10 @@ import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressS2CPacket;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ClientboundSyncSpecialBlocksPacket implements FortressS2CPacket {
 
@@ -33,7 +36,7 @@ public class ClientboundSyncSpecialBlocksPacket implements FortressS2CPacket {
         final var specialBlocks = new HashMap<Block, List<BlockPos>>();
         int size = buf.readInt();
         for (int i = 0; i < size; i++) {
-            Block block = Registry.BLOCK.get(new Identifier(buf.readString()));
+            Block block = Registries.BLOCK.get(new Identifier(buf.readString()));
             int blocksAmount = buf.readInt();
             List<BlockPos> set = specialBlocks.computeIfAbsent(block, k -> new ArrayList<>());
             for (int j = 0; j < blocksAmount; j++) {
@@ -59,7 +62,7 @@ public class ClientboundSyncSpecialBlocksPacket implements FortressS2CPacket {
     private void writeSpecialBlocks(PacketByteBuf buf, Map<Block, List<BlockPos>> basicSpecialBlocks) {
         buf.writeInt(basicSpecialBlocks.size());
         for (Map.Entry<Block, List<BlockPos>> entry : basicSpecialBlocks.entrySet()) {
-            buf.writeString(Registry.BLOCK.getId(entry.getKey()).toString());
+            buf.writeString(Registries.BLOCK.getId(entry.getKey()).toString());
             buf.writeInt(entry.getValue().size());
             for (BlockPos pos : entry.getValue()) {
                 buf.writeBlockPos(pos);

@@ -1,27 +1,22 @@
 package org.minefortress.renderer.gui.professions;
 
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.minefortress.professions.Profession;
 import org.minefortress.professions.ProfessionManager;
-import org.minefortress.professions.ProfessionManager.CountProfessionals;
 import org.minefortress.professions.ProfessionResearchState;
 import org.minefortress.utils.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfessionWidget extends DrawContext {
+public class ProfessionWidget {
 
     public static final float PROFESSION_WIDGET_WIDTH = 64f;
     public static final float PROFESSION_WIDGET_HEIGHT = 35f;
@@ -49,7 +44,7 @@ public class ProfessionWidget extends DrawContext {
         this.width = maxTextLength + 8;
     }
 
-    public void renderLines(MatrixStack matrices, int x, int y, boolean bl) {
+    public void renderLines(DrawContext drawContext, int x, int y, boolean bl) {
         if (this.parent != null) {
             int i = x + this.parent.x + 13;
             int j = x + this.parent.x + 26 + 22;
@@ -58,54 +53,49 @@ public class ProfessionWidget extends DrawContext {
             int m = y + this.y + 13;
             int n = bl ? -16777216 : -1;
             if (bl) {
-                this.drawHorizontalLine(matrices, j, i, k - 1, n);
-                this.drawHorizontalLine(matrices, j + 1, i, k, n);
-                this.drawHorizontalLine(matrices, j, i, k + 1, n);
-                this.drawHorizontalLine(matrices, l, j - 1, m - 1, n);
-                this.drawHorizontalLine(matrices, l, j - 1, m, n);
-                this.drawHorizontalLine(matrices, l, j - 1, m + 1, n);
-                this.drawVerticalLine(matrices, j - 1, m, k, n);
-                this.drawVerticalLine(matrices, j + 1, m, k, n);
+                drawContext.drawHorizontalLine(j, i, k - 1, n);
+                drawContext.drawHorizontalLine(j + 1, i, k, n);
+                drawContext.drawHorizontalLine(j, i, k + 1, n);
+                drawContext.drawHorizontalLine(l, j - 1, m - 1, n);
+                drawContext.drawHorizontalLine(l, j - 1, m, n);
+                drawContext.drawHorizontalLine(l, j - 1, m + 1, n);
+                drawContext.drawVerticalLine(j - 1, m, k, n);
+                drawContext.drawVerticalLine(j + 1, m, k, n);
             } else {
-                this.drawHorizontalLine(matrices, j, i, k, n);
-                this.drawHorizontalLine(matrices, l, j, m, n);
-                this.drawVerticalLine(matrices, j, m, k, n);
+                drawContext.drawHorizontalLine(j, i, k, n);
+                drawContext.drawHorizontalLine(l, j, m, n);
+                drawContext.drawVerticalLine(j, m, k, n);
             }
         }
         for (ProfessionWidget child : this.children) {
-            child.renderLines(matrices, x, y, bl);
+            child.renderLines(drawContext, x, y, bl);
         }
     }
 
-    public void renderWidgets(MatrixStack matrices, int x, int y){
+    public void renderWidgets(DrawContext drawContext, int x, int y){
         final boolean unlockedWithCount = isUnlocked(true) == ProfessionResearchState.UNLOCKED;
         final boolean unlocked = isUnlocked(false) == ProfessionResearchState.UNLOCKED;
 
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
         AdvancementObtainedStatus status = unlockedWithCount ? AdvancementObtainedStatus.OBTAINED : AdvancementObtainedStatus.UNOBTAINED;
         final int v = 128 + status.getSpriteIndex() * 26;
         final int u = profession.getType().getTextureV();
-        this.drawTexture(matrices, x + this.x + 3, y + this.y, u, v, 26, 26);
+        drawContext.drawTexture(WIDGETS_TEXTURE, x + this.x + 3, y + this.y, u, v, 26, 26);
 
-        getItemRenderer().renderInGui(profession.getIcon(), x + this.x + 8, y + this.y + 5);
+        drawContext.drawItem(profession.getIcon(), x + this.x + 8, y + this.y + 5);
+        final var matrices = drawContext.getMatrices();
         matrices.push();
         matrices.translate(0.0, 0.0, 200.0);
         if(unlocked)
-            getTextRenderer().draw(matrices, String.valueOf(getAmount()), x + this.x + 6, y + this.y + 4, 0xFFFFFF);
+            drawContext.drawTextWithShadow(this.getTextRenderer(), String.valueOf(getAmount()), x + this.x + 6, y + this.y + 4, 0xFFFFFF);
         matrices.pop();
         final String title = profession.getTitle().contains("-") ? profession.getTitle().split("-")[0] : profession.getTitle();
         final String trimmedTitle = getTextRenderer().trimToWidth(title, (int) (PROFESSION_WIDGET_WIDTH - 4));
         final int titleWidth = getTextRenderer().getWidth(trimmedTitle);
-        getTextRenderer().draw(matrices, trimmedTitle, x + this.x + 4f  - titleWidth/2f + 13f  , y + this.y + 27, 0xFFFFFF);
+        drawContext.drawTextWithShadow(this.getTextRenderer(), trimmedTitle, x + this.x + 4  - titleWidth/2 + 13, y + this.y + 27, 0xFFFFFF);
 
         for (ProfessionWidget professionWidget : this.children) {
-            professionWidget.renderWidgets(matrices, x, y);
+            professionWidget.renderWidgets(drawContext, x, y);
         }
-    }
-
-    private ItemRenderer getItemRenderer() {
-        return getInstance().getItemRenderer();
     }
 
     private TextRenderer getTextRenderer() {
@@ -146,7 +136,7 @@ public class ProfessionWidget extends DrawContext {
         return mouseX < i || mouseX > j || mouseY < k || mouseY > l;
     }
 
-    public void drawTooltip(MatrixStack matrices, int originX, int originY, int x, int screenWidth) {
+    public void drawTooltip(DrawContext drawContext, int originX, int originY, int x, int screenWidth) {
         final var unlocked = isUnlocked(false) == ProfessionResearchState.UNLOCKED;
         final var unlockedWithCount = isUnlocked(true) == ProfessionResearchState.UNLOCKED;
 
@@ -155,10 +145,6 @@ public class ProfessionWidget extends DrawContext {
         AdvancementObtainedStatus status = unlockedWithCount?AdvancementObtainedStatus.OBTAINED:AdvancementObtainedStatus.UNOBTAINED;
         int j = MathHelper.floor((float)this.width);
         int k = this.width - j;
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.enableBlend();
         int l = originY + this.y;
         boolean bl = x + originX + this.x + this.width + 26 >= screenWidth;
         int m = bl ? originX + this.x - this.width + 26 + 6 : originX + this.x;
@@ -179,34 +165,35 @@ public class ProfessionWidget extends DrawContext {
         boolean bl2 = 113 - originY - this.y - 26 <= 6 + description.size() * client.textRenderer.fontHeight;
         if (!description.isEmpty()) {
             if (bl2) {
-                this.method_2324(matrices, m, l + 26 - n, this.width, n);
+                this.method_2324(drawContext, WIDGETS_TEXTURE, m, l + 26 - n, this.width, n);
             } else {
-                this.method_2324(matrices, m, l, this.width, n);
+                this.method_2324(drawContext, WIDGETS_TEXTURE, m, l, this.width, n);
             }
         }
-        this.drawTexture(matrices, m, l, 0, status.getSpriteIndex() * 26, j, 26);
-        this.drawTexture(matrices, m + j, l, 200 - k, status.getSpriteIndex() * 26, k, 26);
-        this.drawTexture(matrices, originX + this.x + 3, originY + this.y, this.profession.getType().getTextureV(), 128 + status.getSpriteIndex() * 26, 26, 26);
+        drawContext.drawTexture(WIDGETS_TEXTURE, m, l, 0, status.getSpriteIndex() * 26, j, 26);
+        drawContext.drawTexture(WIDGETS_TEXTURE, m + j, l, 200 - k, status.getSpriteIndex() * 26, k, 26);
+        drawContext.drawTexture(WIDGETS_TEXTURE, originX + this.x + 3, originY + this.y, this.profession.getType().getTextureV(), 128 + status.getSpriteIndex() * 26, 26, 26);
+        final var matrices = drawContext.getMatrices();
         matrices.push();
         matrices.translate(0.0, 0.0, 200.0);
         if(unlocked)
-            getTextRenderer().draw(matrices, String.valueOf(getAmount()), m + 6, originY + this.y + 4, 0xFFFFFFFF);
+            drawContext.drawTextWithShadow(getTextRenderer(), String.valueOf(getAmount()), m + 6, originY + this.y + 4, 0xFFFFFFFF);
         matrices.pop();
         if (bl) {
-            this.client.textRenderer.drawWithShadow(matrices, title, (float)(m + 5), (float)(originY + this.y + 9), 0xffffffff);
+            drawContext.drawTextWithShadow(getTextRenderer(), title, m + 5, originY + this.y + 9, 0xffffffff);
         } else {
-            this.client.textRenderer.drawWithShadow(matrices, title, (float)(originX + this.x + 32), (float)(originY + this.y + 9), -1);
+            drawContext.drawTextWithShadow(getTextRenderer(), title, originX + this.x + 32, originY + this.y + 9, -1);
         }
         if (bl2) {
             for (int o = 0; o < description.size(); ++o) {
-                this.client.textRenderer.draw(matrices, description.get(o), (float)(m + 5), (float)(l + 26 - n + 7 + o * this.client.textRenderer.fontHeight), -5592406);
+                drawContext.drawTextWithShadow(getTextRenderer(), description.get(o), m + 5, l + 26 - n + 7 + o * this.client.textRenderer.fontHeight, 0xffaaaaaa);
             }
         } else {
             for (int o = 0; o < description.size(); ++o) {
-                this.client.textRenderer.draw(matrices, description.get(o), (float)(m + 5), (float)(originY + this.y + 9 + 17 + o * this.client.textRenderer.fontHeight), -5592406);
+                drawContext.drawTextWithShadow(getTextRenderer(), description.get(o), m + 5, originY + this.y + 9 + 17 + o * this.client.textRenderer.fontHeight, 0xffaaaaaa);
             }
         }
-        this.client.getItemRenderer().renderInGui(this.profession.getIcon(), originX + this.x + 8, originY + this.y + 5);
+        drawContext.drawItem(this.profession.getIcon(), originX + this.x + 8, originY + this.y + 5);
     }
 
     private int getAmount() {
@@ -217,26 +204,26 @@ public class ProfessionWidget extends DrawContext {
         }
     }
 
-    protected void method_2324(MatrixStack matrices, int x, int y, int i, int j) {
-        this.drawTexture(matrices, x, y, 0, 52, 10, 10);
-        this.method_2321(matrices, x + 10, y, i - 10 - 10, 10, 10, 52, 200 - 10 - 10, 26);
-        this.drawTexture(matrices, x + i - 10, y, 200 - 10, 52, 10, 10);
-        this.drawTexture(matrices, x, y + j - 10, 0, 52 + 26 - 10, 10, 10);
-        this.method_2321(matrices, x + 10, y + j - 10, i - 10 - 10, 10, 10, 52 + 26 - 10, 200 - 10 - 10, 26);
-        this.drawTexture(matrices, x + i - 10, y + j - 10, 200 - 10, 52 + 26 - 10, 10, 10);
-        this.method_2321(matrices, x, y + 10, 10, j - 10 - 10, 0, 52 + 10, 200, 26 - 10 - 10);
-        this.method_2321(matrices, x + 10, y + 10, i - 10 - 10, j - 10 - 10, 10, 52 + 10, 200 - 10 - 10, 26 - 10 - 10);
-        this.method_2321(matrices, x + i - 10, y + 10, 10, j - 10 - 10, 200 - 10, 52 + 10, 200, 26 - 10 - 10);
+    protected void method_2324(DrawContext drawContext, Identifier identifier, int x, int y, int i, int j) {
+        drawContext.drawTexture(identifier, x, y, 0, 52, 10, 10);
+        this.method_2321(drawContext, identifier, x + 10, y, i - 10 - 10, 10, 10, 52, 200 - 10 - 10, 26);
+        drawContext.drawTexture(identifier, x + i - 10, y, 200 - 10, 52, 10, 10);
+        drawContext.drawTexture(identifier, x, y + j - 10, 0, 52 + 26 - 10, 10, 10);
+        this.method_2321(drawContext, identifier, x + 10, y + j - 10, i - 10 - 10, 10, 10, 52 + 26 - 10, 200 - 10 - 10, 26);
+        drawContext.drawTexture(identifier, x + i - 10, y + j - 10, 200 - 10, 52 + 26 - 10, 10, 10);
+        this.method_2321(drawContext, identifier, x, y + 10, 10, j - 10 - 10, 0, 52 + 10, 200, 26 - 10 - 10);
+        this.method_2321(drawContext, identifier, x + 10, y + 10, i - 10 - 10, j - 10 - 10, 10, 52 + 10, 200 - 10 - 10, 26 - 10 - 10);
+        this.method_2321(drawContext, identifier, x + i - 10, y + 10, 10, j - 10 - 10, 200 - 10, 52 + 10, 200, 26 - 10 - 10);
     }
 
-    protected void method_2321(MatrixStack matrices, int x, int y, int i, int j, int k, int l, int m, int n) {
+    protected void method_2321(DrawContext drawContext, Identifier identifier, int x, int y, int i, int j, int k, int l, int m, int n) {
         for (int o = 0; o < i; o += m) {
             int p = x + o;
             int q = Math.min(m, i - o);
             for (int r = 0; r < j; r += n) {
                 int s = y + r;
                 int t = Math.min(n, j - r);
-                this.drawTexture(matrices, p, s, k, l, q, t);
+                drawContext.drawTexture(identifier, p, s, k, l, q, t);
             }
         }
     }

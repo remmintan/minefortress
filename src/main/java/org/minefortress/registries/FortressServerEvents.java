@@ -1,7 +1,6 @@
 package org.minefortress.registries;
 
 
-
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -10,16 +9,13 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundFollowColonistPacket;
-import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.utils.ModUtils;
 
 public class FortressServerEvents {
@@ -66,7 +62,7 @@ public class FortressServerEvents {
         });
 
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-            final var inBlueprintWorldOnDisconnect = handler.player.method_48926().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
+            final var inBlueprintWorldOnDisconnect = handler.player.getWorld().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
             if(handler.player instanceof FortressServerPlayerEntity fortressPlayer) {
                 fortressPlayer.setWasInBlueprintWorldWhenLoggedOut(inBlueprintWorldOnDisconnect);
             }

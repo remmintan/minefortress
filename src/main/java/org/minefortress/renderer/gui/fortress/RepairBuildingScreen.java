@@ -1,10 +1,8 @@
 package org.minefortress.renderer.gui.fortress;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -63,11 +61,8 @@ public class RepairBuildingScreen extends WindowScreen {
     protected void init() {
         super.init();
 
-        confirmationButton = new ButtonWidget(
-                getScreenCenterX() - 10 - 100,
-                getScreenBottomY() - 30,
-                100,
-                20,
+        confirmationButton = ButtonWidget
+            .builder(
                 Text.of("Repair"),
                 button -> {
                     final var taskId = UUID.randomUUID();
@@ -78,37 +73,44 @@ public class RepairBuildingScreen extends WindowScreen {
                     FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet);
                     Optional.ofNullable(this.client).ifPresent(it -> it.setScreen(null));
                 }
-        );
+            )
+            .dimensions(
+                    getScreenCenterX() - 10 - 100,
+                    getScreenBottomY() - 30,
+                    100,
+                    20
+            )
+            .build();
         this.addDrawableChild(confirmationButton);
 
-        this.addDrawableChild(
-                new ButtonWidget(
+        final var cancel = ButtonWidget.builder(
+                Text.of("Cancel"),
+                button -> this.closeScreen()
+        )
+                .dimensions(
                         getScreenCenterX() + 10,
                         getScreenBottomY() - 30,
                         100,
-                        20,
-                        Text.of("Cancel"),
-                        button -> this.closeScreen()
-                )
-        );
+                        20
+                ).build();
+        this.addDrawableChild(cancel);
     }
 
     @Override
-    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        super.render(drawContext, mouseX, mouseY, delta);
 
-        final var itemRenderer =  this.itemRenderer;
         final var textRenderer = this.textRenderer;
 
         int x = getScreenLeftX() + 10;
         int y = getScreenTopY() + 30;
 
         for (Item item : requiredItems.keySet()) {
-            itemRenderer.renderInGuiWithOverrides(item.getDefaultStack(), x, y);
+            drawContext.drawItem(item.getDefaultStack(), x, y);
             final var itemsAmount = requiredItems.get(item);
             final var text = "x" + itemsAmount;
             final var color =  hasEnoughResources.get(item) ? 0xFFFFFF : 0xb81d13;
-            textRenderer.draw(matrices, text, x + 16 + 2, y + 6, color);
+            drawContext.drawText(textRenderer, text, x + 16 + 2, y + 6, color, false);
 
             final var columnWidth = 16 + textRenderer.getWidth(text);
             x += columnWidth + 5;
