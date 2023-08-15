@@ -4,6 +4,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.Items;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import org.minefortress.fortress.resources.gui.craft.MissingCraftsmanScreen;
 import org.minefortress.fortress.resources.gui.smelt.MissingBlacksmithScreen;
 import org.minefortress.network.c2s.ServerboundOpenCraftingScreenPacket;
@@ -47,7 +48,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
                 new ItemButtonWidget(
                         35+20, 0,
                         Items.CHEST,
-                        btn -> client.setScreen(new CreativeInventoryScreen(client.player)),
+                        btn -> client.setScreen(new CreativeInventoryScreen(client.player, FeatureSet.empty(), false)),
                         "Inventory"
                 )
         );

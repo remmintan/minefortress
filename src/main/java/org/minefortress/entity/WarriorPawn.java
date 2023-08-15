@@ -7,7 +7,6 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -74,7 +73,7 @@ public final class WarriorPawn extends TargetedPawn implements IProfessional, IW
 
     @Override
     public void resetProfession() {
-        this.damage(DamageSource.OUT_OF_WORLD, 40f);
+        this.damage(getWorld().getDamageSources().outOfWorld(), 40f);
     }
 
 

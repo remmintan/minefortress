@@ -1,7 +1,6 @@
 package org.minefortress.entity.colonist;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.world.GameRules;
 import org.minefortress.entity.interfaces.IFortressAwareEntity;
@@ -17,7 +16,7 @@ public class FortressHungerManager extends HungerManager implements IFortressHun
                 this.foodLevel = 20;
             }
         }
-        boolean naturalRegen = livingEntity.world.getGameRules().getBoolean(GameRules.NATURAL_REGENERATION);
+        boolean naturalRegen = livingEntity.getWorld().getGameRules().getBoolean(GameRules.NATURAL_REGENERATION);
         this.prevFoodLevel = this.foodLevel;
         if (this.exhaustion > 4.0f) {
             this.exhaustion -= 4.0f;
@@ -46,7 +45,7 @@ public class FortressHungerManager extends HungerManager implements IFortressHun
             ++this.foodTickTimer;
             if (this.foodTickTimer >= 80) {
                 if (livingEntity.getHealth() > 1.0f) {
-                    livingEntity.damage(DamageSource.STARVE, 1.0f);
+                    livingEntity.damage(livingEntity.getWorld().getDamageSources().starve(), 1.0f);
                 }
                 this.foodTickTimer = 0;
             }

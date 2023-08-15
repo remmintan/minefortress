@@ -111,7 +111,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
             cir.setReturnValue(teleportTarget);
         }
 
-        if(this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY && destination.getRegistryKey() == World.OVERWORLD) {
+        if(this.getWorld().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY && destination.getRegistryKey() == World.OVERWORLD) {
             final Vec3d position = this.persistedPos;
             final Vec3d velocity = this.persistedVelocity;
             final TeleportTarget teleportTarget = new TeleportTarget(position, velocity, this.persistedYaw, this.persistedPitch);
