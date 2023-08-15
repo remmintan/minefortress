@@ -14,11 +14,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +36,6 @@ import org.minefortress.entity.interfaces.IWorkerPawn;
 import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.automation.IAutomationArea;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
-import org.minefortress.fortress.buildings.FortressBuilding;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
 import org.minefortress.fortress.resources.FortressResourceManager;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -54,12 +52,7 @@ import org.minefortress.tasks.RepairBuildingTask;
 import org.minefortress.tasks.TaskManager;
 import org.minefortress.utils.BlockInfoUtils;
 
-
-
-
-
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -158,8 +151,8 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var infoTag = getColonistInfoTag(masterId);
         infoTag.putString(ServerProfessionManager.PROFESSION_NBT_TAG, warriorId);
 
-        final var newWarrior = entityType.spawn(world, infoTag, name, null, pos, SpawnReason.EVENT, true, false);
-        colonist.damage(DamageSource.OUT_OF_WORLD, Float.MAX_VALUE);
+        final var newWarrior = entityType.spawn(world, infoTag, (it) -> {}, pos, SpawnReason.EVENT, true, false);
+        colonist.damage(getOutOfWorldDamageSource(), Float.MAX_VALUE);
         pawns.remove(colonist);
         pawns.add(newWarrior);
     }
@@ -168,10 +161,12 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(maxColonistsCount != -1 && getTotalColonistsCount() > maxColonistsCount) {
             final var deltaColonists = Math.max( pawns.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
 
+
+
             pawns.stream()
                     .filter(LivingEntity::isAlive)
                     .limit(deltaColonists)
-                    .forEach(it -> it.damage(DamageSource.OUT_OF_WORLD, 40f));
+                    .forEach(it -> it.damage(getOutOfWorldDamageSource(), 40f));
         }
 
         final var deadPawns = pawns.stream()
@@ -257,7 +252,15 @@ public final class FortressServerManager extends AbstractFortressManager {
     }
 
     public void killAllPawns() {
-        pawns.forEach(it -> it.damage(DamageSource.OUT_OF_WORLD, 40f));
+        final var outOfWorldDamageSource = getOutOfWorldDamageSource();
+        pawns.forEach(it -> it.damage(outOfWorldDamageSource, 40f));
+    }
+
+    private DamageSource getOutOfWorldDamageSource() {
+        final var world = server.getWorld(World.OVERWORLD);
+        if(world == null)
+            throw new IllegalStateException("World is null");
+        return world.getDamageSources().outOfWorld();
     }
 
     private Stream<IWorkerPawn> getWorkersStream() {
@@ -277,7 +280,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var tag = getColonistInfoTag(masterPlayerId);
         final var colonistType = FortressEntities.COLONIST_ENTITY_TYPE;
         final var world = getWorld();
-        final var spawnedPawn = colonistType.spawn(world, tag, null, null, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+        final var spawnedPawn = colonistType.spawn(world, tag, (it) -> {}, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
         return Optional.ofNullable(spawnedPawn);
     }
 
@@ -307,7 +310,7 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     public void jumpToCampfire(ServerPlayerEntity player) {
         if(fortressCenter == null) return;
-        if(player.method_48926().getRegistryKey() != World.OVERWORLD) return;
+        if(player.getWorld().getRegistryKey() != World.OVERWORLD) return;
         player.setPitch(60);
         player.setYaw(90 + 45);
         player.teleport(fortressCenter.getX() + 10, fortressCenter.getY() + 20, fortressCenter.getZ() + 10);
@@ -378,7 +381,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(!specialBlocks.isEmpty()) {
             final NbtCompound specialBlocksTag = new NbtCompound();
             for (var specialBlock : this.specialBlocks.entrySet()) {
-                final String blockId = Registry.BLOCK.getId(specialBlock.getKey()).toString();
+                final String blockId = Registries.BLOCK.getId(specialBlock.getKey()).toString();
                 final NbtList posList = new NbtList();
                 for (BlockPos pos : specialBlock.getValue()) {
                     posList.add(NbtHelper.fromBlockPos(pos));
@@ -391,7 +394,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(!blueprintsSpecialBlocks.isEmpty()) {
             final NbtCompound blueprintsSpecialBlocksTag = new NbtCompound();
             for (var specialBlock : this.blueprintsSpecialBlocks.entrySet()) {
-                final String blockId = Registry.BLOCK.getId(specialBlock.getKey()).toString();
+                final String blockId = Registries.BLOCK.getId(specialBlock.getKey()).toString();
                 final NbtList posList = new NbtList();
                 for (BlockPos pos : specialBlock.getValue()) {
                     posList.add(NbtHelper.fromBlockPos(pos));
@@ -443,7 +446,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if (tag.contains("specialBlocks")) {
             final NbtCompound specialBlocksTag = tag.getCompound("specialBlocks");
             for (String blockId : specialBlocksTag.getKeys()) {
-                final Block block = Registry.BLOCK.get(new Identifier(blockId));
+                final Block block = Registries.BLOCK.get(new Identifier(blockId));
                 final NbtList posList = specialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
                 final var positions = new ArrayList<BlockPos>();
                 for (int j = 0; j < posList.size(); j++) {
@@ -457,7 +460,7 @@ public final class FortressServerManager extends AbstractFortressManager {
         if (tag.contains("blueprintsSpecialBlocks")) {
             final NbtCompound blueprintsSpecialBlocksTag = tag.getCompound("blueprintsSpecialBlocks");
             for (String blockId : blueprintsSpecialBlocksTag.getKeys()) {
-                final Block block = Registry.BLOCK.get(new Identifier(blockId));
+                final Block block = Registries.BLOCK.get(new Identifier(blockId));
                 final NbtList posList = blueprintsSpecialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
                 final var positions = new ArrayList<BlockPos>();
                 for (int j = 0; j < posList.size(); j++) {

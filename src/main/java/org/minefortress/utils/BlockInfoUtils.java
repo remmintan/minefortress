@@ -35,7 +35,7 @@ public class BlockInfoUtils {
 
 
         final Block block = blockItem.getBlock();
-        final boolean solid = block.getDefaultState().getMaterial().isSolid();
+        final boolean solid = block.getDefaultState().isSolid();
         if(!solid) return true;
         return block instanceof BlockWithEntity;
     }

@@ -23,6 +23,7 @@ import org.joml.Vector4f;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.selections.ClickType;
+import org.minefortress.selections.renderer.RenderHelper;
 import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
@@ -169,24 +170,13 @@ public class BuiltSelection implements BuiltModel {
                     final VertexBuffer vertexBuffer = buffers.get(layer);
                     if (layer == RenderLayer.getLines() || layer == FortressRenderLayer.getLinesNoDepth()) {
                         final BufferBuilder bufferBuilder = lineBufferBuilderStorage.get(layer);
-                        return scheduleUpload(bufferBuilder.end(), vertexBuffer);
+                        return RenderHelper.scheduleUpload(bufferBuilder, vertexBuffer);
                     } else {
                         final BufferBuilder buffer = blockBufferBuilderStorage.get(layer);
-                        return scheduleUpload(buffer.end(), vertexBuffer);
+                        return RenderHelper.scheduleUpload(buffer, vertexBuffer);
                     }
                 }).collect(Collectors.toList());
         this.upload = Util.combine(uploads);
-    }
-
-    public CompletableFuture<Void> scheduleUpload(BufferBuilder.BuiltBuffer builtBuffer, VertexBuffer glBuffer) {
-        Runnable runnable = () -> {
-            if (!glBuffer.isClosed()) {
-                glBuffer.bind();
-                glBuffer.upload(builtBuffer);
-                VertexBuffer.unbind();
-            }
-        };
-        return CompletableFuture.runAsync(runnable);
     }
 
     @Override

@@ -74,9 +74,9 @@ public class ProfessionsLayer {
             }
         }
 
-        this.root.renderLines(matrices, originX, originY, true);
-        this.root.renderLines(matrices, originX, originY, false);
-        this.root.renderWidgets(matrices, originX, originY);
+        this.root.renderLines(drawContext, originX, originY, true);
+        this.root.renderLines(drawContext, originX, originY, false);
+        this.root.renderWidgets(drawContext, originX, originY);
 
         matrices.pop();
     }
@@ -135,7 +135,7 @@ public class ProfessionsLayer {
             for (ProfessionWidget advancementWidget : this.widgets) {
                 if (advancementWidget.shouldNotRender(oX, oY, mouseX, mouseY)) continue;
                 bl = true;
-                advancementWidget.drawTooltip(matrices, oX, oY,  x, screenWidth);
+                advancementWidget.drawTooltip(drawContext, oX, oY,  x, screenWidth);
                 break;
             }
         }

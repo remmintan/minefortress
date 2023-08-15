@@ -7,10 +7,10 @@ import net.minecraft.client.render.item.ItemRenderer;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.hud.interfaces.IHudElement;
 import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
-import org.minefortress.renderer.gui.hud.interfaces.IItemHudElement;
 import org.minefortress.utils.ModUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractHudLayer implements IHudLayer {
@@ -44,11 +44,7 @@ public abstract class AbstractHudLayer implements IHudLayer {
     }
 
     protected final void addElement(IHudElement... buttons) {
-        for(IHudElement button : buttons) {
-            if(button instanceof IItemHudElement itemButton)
-                itemButton.setItemRenderer(itemRenderer);
-            fortressHudElements.add(button);
-        }
+        fortressHudElements.addAll(Arrays.asList(buttons));
     }
 
     public void tick() {

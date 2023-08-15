@@ -1,11 +1,8 @@
 package org.minefortress.renderer.gui.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 import java.util.function.Supplier;
@@ -32,5 +29,15 @@ public class ProgressArrowWidget implements Drawable, Element {
         if (progress > 0) {
             drawContext.drawTexture(PROGRESS_TEXTURE, x-11, y+2, 177, 14, progress + 1, 16, 256, 256);
         }
+    }
+
+    @Override
+    public void setFocused(boolean focused) {
+
+    }
+
+    @Override
+    public boolean isFocused() {
+        return false;
     }
 }

@@ -95,6 +95,6 @@ public class RoadsSelection extends WallsSelection{
     }
 
     private boolean isAir(BlockState blockState) {
-        return blockState.isAir() || blockState.isIn(BlockTags.FLOWERS) || blockState.getMaterial().isReplaceable();
+        return blockState.isAir() || blockState.isIn(BlockTags.FLOWERS) || blockState.isReplaceable();
     }
 }
