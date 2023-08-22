@@ -31,9 +31,12 @@ repositories {
 		url 'https://jitpack.io'
 	}
 	maven {
-		url "https://maven.jamieswhiteshirt.com/libs-release"
+		name = "Ladysnake Mods"
+		url = "https://maven.ladysnake.org/releases"
 		content {
-			includeGroup "com.jamieswhiteshirt"
+			includeGroup("io.github.ladysnake")
+			includeGroupByRegex("dev\\.emi.*")
+			includeGroupByRegex("dev\\.onyxstudios.*")
 		}
 	}
 	maven {
@@ -63,10 +66,10 @@ dependencies {
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
 
-	modImplementation include("io.github.ladysnake:automatone:0.9.2+minefortress")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.2.0+minefortress")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.2.0+minefortress")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.2.0+minefortress")
+	modImplementation include("io.github.ladysnake:automatone:1.0.1+minefortress")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.6+minefortress")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.6+minefortress")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.2.6+minefortress")
 }
 
 processResources {

@@ -38,9 +38,9 @@
   ],
   "accessWidener" : "minefortress.accesswidener",
   "depends": {
-    "fabricloader": ">=0.13.3",
-    "fabric": ">=0.51.0",
-    "minecraft": "1.18.2",
+    "fabricloader": ">=0.14.22",
+    "fabric": ">=0.86.1",
+    "minecraft": "1.20.1",
     "java": ">=17",
     "mm": ">=2.3"
   },
