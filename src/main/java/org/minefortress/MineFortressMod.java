@@ -11,10 +11,7 @@ import org.minefortress.commands.CommandsManager;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.registries.FortressBlocks;
-import org.minefortress.registries.FortressEntities;
-import org.minefortress.registries.FortressServerEvents;
-import org.minefortress.registries.FortressItems;
+import org.minefortress.registries.*;
 
 public class MineFortressMod implements ModInitializer {
 
@@ -30,6 +27,7 @@ public class MineFortressMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        FortressKeybindings.init();
         FortressBlocks.register();
         FortressEntities.register();
         FortressItems.register();

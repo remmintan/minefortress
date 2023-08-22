@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,7 +22,7 @@ public abstract class FortressFluidRendererMixin {
     private volatile BlockPos fortressFluidPos = null;
 
     @Inject(method = "render", at = @At(value = "HEAD"))
-    public void renderHead(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
+    public void renderHead(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfo ci) {
         if(world instanceof SelectionBlockRenderView) {
             this.fortressFluid.set(true);
             this.fortressFluidPos = pos;
@@ -31,7 +30,7 @@ public abstract class FortressFluidRendererMixin {
     }
 
     @Inject(method = "render", at = @At(value = "RETURN"))
-    public void renderReturn(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
+    public void renderReturn(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfo ci) {
         this.fortressFluid.set(false);
         this.fortressFluidPos = null;
     }
