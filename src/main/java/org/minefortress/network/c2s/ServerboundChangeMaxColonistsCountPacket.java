@@ -3,7 +3,6 @@ package org.minefortress.network.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 
@@ -27,7 +26,7 @@ public class ServerboundChangeMaxColonistsCountPacket implements FortressC2SPack
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final var fortressServer = (FortressServer) server;
-        final var manager = fortressServer.getFortressModServerManager().getByPlayer(player);
+        final var manager = fortressServer.get_FortressModServerManager().getByPlayer(player);
         switch (actionType) {
             case INCREASE -> manager.increaseMaxColonistsCount();
             case DECREASE -> manager.decreaseMaxColonistsCount();

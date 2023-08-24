@@ -32,7 +32,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         if(player instanceof ServerPlayerEntity fortressServerPlayer) {
-            final var manager = ((FortressServer)fortressServerPlayer.server).getFortressModServerManager().getByPlayer(fortressServerPlayer);
+            final var manager = ((FortressServer)fortressServerPlayer.server).get_FortressModServerManager().getByPlayer(fortressServerPlayer);
             final var professionManager = manager.getServerProfessionManager();
             final var blacksmithsCount = professionManager.getProfession("blacksmith").getAmount();
             final var otherFurnaceBlocks = manager.getSpecialBlocksByType(Blocks.FURNACE, true)

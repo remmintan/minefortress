@@ -47,7 +47,7 @@ public class FortressServerEvents {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             final var fortressServer = (FortressServer) server;
             final var player = handler.player;
-            final var fsm = fortressServer.getFortressModServerManager().getByPlayer(player);
+            final var fsm = fortressServer.get_FortressModServerManager().getByPlayer(player);
             fsm.syncOnJoin();
             final var serverProfessionManager = fsm.getServerProfessionManager();
             serverProfessionManager.sendProfessions(player);
@@ -70,20 +70,20 @@ public class FortressServerEvents {
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             if(server instanceof FortressServer fortressServer) {
-                fortressServer.getFortressModServerManager().load();
+                fortressServer.get_FortressModServerManager().load();
             }
         });
 
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
             if(server instanceof FortressServer fortressServer) {
-                fortressServer.getFortressModServerManager().save();
-                fortressServer.getBlueprintsWorld().closeSession();
+                fortressServer.get_FortressModServerManager().save();
+                fortressServer.get_BlueprintsWorld().closeSession();
             }
         });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             if(server instanceof FortressServer fortressServer) {
-                fortressServer.getFortressModServerManager().tick(server.getPlayerManager());
+                fortressServer.get_FortressModServerManager().tick(server.getPlayerManager());
             }
         });
 

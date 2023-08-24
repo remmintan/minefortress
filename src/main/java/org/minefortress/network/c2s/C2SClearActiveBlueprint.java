@@ -18,7 +18,7 @@ public class C2SClearActiveBlueprint implements FortressC2SPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         var fortressServer = (FortressServer) server;
-        fortressServer.getBlueprintsWorld().clearBlueprint(player);
+        fortressServer.get_BlueprintsWorld().clearBlueprint(player);
     }
 
     @Override
