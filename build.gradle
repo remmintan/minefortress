@@ -66,8 +66,7 @@ dependencies {
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
 
-//	modImplementation include("io.github.ladysnake:automatone:1.0.2+minefortress")
-	modImplementation files("/Users/remmintan/dev/mf/mod/lib/automatone/build/libs/automatone-0.7.0.jar")
+	modImplementation include("io.github.ladysnake:automatone:1.0.3+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.6+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.6+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.2.6+minefortress")
