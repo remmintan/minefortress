@@ -47,6 +47,9 @@ public abstract class AbstractCustomRenderer {
     }
 
     protected void renderLayer(RenderLayer layer, MatrixStack matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {
+        final Optional<BuiltModel> builtModelOpt = getBuiltModel();
+        if(!builtModelOpt.map(it -> it.hasLayer(layer)).orElse(false)) return;
+
         RenderSystem.assertOnRenderThread();
 
         layer.startDrawing();
@@ -97,10 +100,8 @@ public abstract class AbstractCustomRenderer {
 
 
         final Optional<BlockPos> renderTargetPositionOpt = getRenderTargetPosition();
-        final Optional<BuiltModel> builtModelOpt = getBuiltModel();
-
         boolean notEmpty = false;
-        if(renderTargetPositionOpt.isPresent() && builtModelOpt.isPresent()) {
+        if(renderTargetPositionOpt.isPresent()) {
             final BlockPos renderTargetPosition = renderTargetPositionOpt.get();
             final BuiltModel builtModel = builtModelOpt.get();
 
@@ -112,12 +113,10 @@ public abstract class AbstractCustomRenderer {
                 offset.upload();
             }
 
-            if(builtModel.hasLayer(layer)) {
-                final VertexBuffer buffer = builtModel.getBuffer(layer);
-                buffer.bind();
-                buffer.draw();
-                notEmpty = true;
-            }
+            final VertexBuffer buffer = builtModel.getBuffer(layer);
+            buffer.bind();
+            buffer.draw();
+            notEmpty = true;
         }
 
         if(offset != null) {
