@@ -1,15 +1,14 @@
-package org.minefortress.blueprints.renderer;
+package net.remmintan.panama.view;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.ColorResolver;
-import org.minefortress.renderer.custom.AbstractCustomBlockRenderView;
 
 import java.util.Map;
 import java.util.function.BiFunction;
 
-class BlueprintBlockRenderView extends AbstractCustomBlockRenderView {
+public class BlueprintBlockRenderView extends AbstractCustomBlockRenderView {
 
     private final Map<BlockPos, BlockState> blueprintData;
 

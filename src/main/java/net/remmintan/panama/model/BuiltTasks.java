@@ -1,4 +1,4 @@
-package org.minefortress.selections.renderer.tasks;
+package net.remmintan.panama.model;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
@@ -10,7 +10,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.joml.Vector4f;
-import org.minefortress.renderer.custom.BuiltModel;
+import net.remmintan.panama.model.BuiltModel;
 import org.minefortress.selections.ClientSelection;
 
 import java.util.HashSet;

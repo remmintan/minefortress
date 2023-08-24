@@ -1,4 +1,4 @@
-package org.minefortress.blueprints.renderer;
+package net.remmintan.panama.model;
 
 import com.mojang.blaze3d.systems.VertexSorter;
 import net.minecraft.block.BlockRenderType;
@@ -18,10 +18,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.ColorResolver;
-import org.minefortress.blueprints.data.StrctureBlockData;
+import net.remmintan.panama.view.BlueprintBlockRenderView;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.renderer.custom.BuiltModel;
-import org.minefortress.selections.renderer.RenderHelper;
+import org.minefortress.blueprints.data.StrctureBlockData;
+import net.remmintan.panama.RenderHelper;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;

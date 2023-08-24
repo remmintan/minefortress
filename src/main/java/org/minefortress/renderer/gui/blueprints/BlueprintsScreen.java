@@ -16,7 +16,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.blueprints.renderer.BlueprintRenderer;
+import net.remmintan.panama.renderer.BlueprintRenderer;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;

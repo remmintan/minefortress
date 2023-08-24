@@ -1,7 +1,9 @@
-package org.minefortress.selections.renderer.tasks;
+package net.remmintan.panama.model.builder;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.remmintan.panama.model.BuiltTasks;
 import org.minefortress.selections.ClientSelection;
+import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
 
 import java.util.Set;
 import java.util.function.Supplier;

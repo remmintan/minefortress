@@ -1,4 +1,4 @@
-package org.minefortress.blueprints.renderer;
+package net.remmintan.panama.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -14,6 +14,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.panama.model.BuiltBlueprint;
 import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
@@ -22,9 +23,9 @@ import org.joml.Vector3f;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
+import net.remmintan.panama.model.builder.BlueprintsModelBuilder;
 import org.minefortress.fortress.FortressState;
-import org.minefortress.renderer.custom.AbstractCustomRenderer;
-import org.minefortress.renderer.custom.BuiltModel;
+import net.remmintan.panama.model.BuiltModel;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;

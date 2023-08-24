@@ -1,4 +1,4 @@
-package org.minefortress.selections.renderer.selection;
+package net.remmintan.panama.model;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockRenderType;
@@ -21,9 +21,10 @@ import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4f;
 import org.minefortress.renderer.FortressRenderLayer;
-import org.minefortress.renderer.custom.BuiltModel;
 import org.minefortress.selections.ClickType;
-import org.minefortress.selections.renderer.RenderHelper;
+import net.remmintan.panama.RenderHelper;
+import net.remmintan.panama.view.SelectionBlockRenderView;
+import org.minefortress.selections.renderer.selection.SelectionRenderInfo;
 import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
@@ -71,14 +72,14 @@ public class BuiltSelection implements BuiltModel {
 
         final RenderLayer lines = RenderLayer.getLines();
         final BufferBuilder linesBufferBuilder = lineBufferBuilderStorage.get(lines);
-           init(lines, linesBufferBuilder);
-        final ClickType clickType = selection.getClickType();
-        final Vector4f color = selection.getColor();
-        final List<BlockPos> positions = selection.getPositions()
+        init(lines, linesBufferBuilder);
+        final ClickType clickType = selection.clickType();
+        final Vector4f color = selection.color();
+        final List<BlockPos> positions = selection.positions()
                 .stream()
                 .filter(getShouldRenderPosPredicate(clickType))
                 .toList();
-        final BlockState blockState = selection.getBlockState();
+        final BlockState blockState = selection.blockState();
         selectionBlockRenderView.setBlockStateSupplier((blockPos) -> positions.contains(blockPos)?blockState: Blocks.AIR.getDefaultState());
         for (BlockPos pos : positions) {
 
@@ -99,7 +100,7 @@ public class BuiltSelection implements BuiltModel {
             final BufferBuilder linesNoDepthBufferBuilder = lineBufferBuilderStorage.get(linesNoDepth);
             init(linesNoDepth, linesNoDepthBufferBuilder);
 
-            final List<Pair<Vec3i, Vec3i>> selectionDimensions = selection.getSelectionDimensions();
+            final List<Pair<Vec3i, Vec3i>> selectionDimensions = selection.selectionDimensions();
             for (Pair<Vec3i, Vec3i> dimension : selectionDimensions) {
                 final Vec3i size = dimension.getFirst();
                 final Vec3i start = dimension.getSecond();

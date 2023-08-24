@@ -1,4 +1,4 @@
-package org.minefortress.renderer.custom;
+package net.remmintan.panama.view;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;

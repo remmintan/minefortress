@@ -1,6 +1,7 @@
-package org.minefortress.selections.renderer.campfire;
+package net.remmintan.panama.model.builder;
 
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
+import net.remmintan.panama.model.BuiltCampfire;
 
 public class CampfireModelBuilder {
 

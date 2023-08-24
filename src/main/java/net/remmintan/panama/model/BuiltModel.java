@@ -1,4 +1,4 @@
-package org.minefortress.renderer.custom;
+package net.remmintan.panama.model;
 
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.RenderLayer;

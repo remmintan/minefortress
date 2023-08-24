@@ -1,4 +1,4 @@
-package org.minefortress.blueprints.renderer;
+package net.remmintan.panama.model.builder;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -6,13 +6,13 @@ import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.panama.model.BuiltBlueprint;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 

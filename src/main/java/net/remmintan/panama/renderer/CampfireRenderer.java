@@ -1,10 +1,10 @@
-package org.minefortress.selections.renderer.campfire;
+package net.remmintan.panama.renderer;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.renderer.custom.AbstractCustomRenderer;
-import org.minefortress.renderer.custom.BuiltModel;
+import net.remmintan.panama.model.BuiltModel;
+import net.remmintan.panama.model.builder.CampfireModelBuilder;
 
 import java.util.Optional;
 

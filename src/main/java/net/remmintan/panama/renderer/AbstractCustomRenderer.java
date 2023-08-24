@@ -1,4 +1,4 @@
-package org.minefortress.renderer.custom;
+package net.remmintan.panama.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -10,6 +10,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.panama.model.BuiltModel;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.minefortress.fortress.FortressClientManager;
@@ -113,6 +114,7 @@ public abstract class AbstractCustomRenderer {
 
             if(builtModel.hasLayer(layer)) {
                 final VertexBuffer buffer = builtModel.getBuffer(layer);
+                buffer.bind();
                 buffer.draw();
                 notEmpty = true;
             }

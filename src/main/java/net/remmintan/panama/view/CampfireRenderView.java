@@ -1,9 +1,8 @@
-package org.minefortress.selections.renderer.campfire;
+package net.remmintan.panama.view;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.renderer.custom.AbstractCustomBlockRenderView;
 
 public class CampfireRenderView extends AbstractCustomBlockRenderView {
     public CampfireRenderView() {

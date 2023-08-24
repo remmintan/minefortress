@@ -1,9 +1,11 @@
-package org.minefortress.selections.renderer.selection;
+package net.remmintan.panama.model.builder;
 
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
+import net.remmintan.panama.model.BuiltSelection;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
+import org.minefortress.selections.renderer.selection.SelectionRenderInfo;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -33,7 +35,8 @@ public class SelectionModelBuilder {
                 infoProvider.getClickColor(),
                 infoProvider.getSelectedBlocks(),
                 infoProvider.getClickingBlock(),
-                infoProvider.getSelectionDimensions());
+                infoProvider.getSelectionDimensions()
+        );
 
         if(this.builtSelection != null) {
             this.builtSelection.close();

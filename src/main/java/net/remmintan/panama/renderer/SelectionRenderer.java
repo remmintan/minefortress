@@ -1,13 +1,14 @@
-package org.minefortress.selections.renderer.selection;
+package net.remmintan.panama.renderer;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
+import net.remmintan.panama.model.builder.SelectionModelBuilder;
 import org.joml.Vector3f;
 import org.minefortress.renderer.FortressRenderLayer;
-import org.minefortress.renderer.custom.AbstractCustomRenderer;
-import org.minefortress.renderer.custom.BuiltModel;
+import net.remmintan.panama.renderer.AbstractCustomRenderer;
+import net.remmintan.panama.model.BuiltModel;
 import org.minefortress.selections.renderer.ISelectionInfoProvider;
 import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 
