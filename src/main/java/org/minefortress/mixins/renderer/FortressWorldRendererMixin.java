@@ -18,7 +18,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.border.WorldBorder;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -27,7 +26,6 @@ import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.MineFortressLabelsRenderer;
-import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -69,24 +67,19 @@ public abstract class FortressWorldRendererMixin  {
         fortressClient.get_TasksRenderer().prepareForRender();
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER))
-    public void render(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
-        final Vec3d cameraPos = camera.getPos();
-        final VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal=2, target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/util/math/MatrixStack;DDDLorg/joml/Matrix4f;)V", shift = At.Shift.AFTER))
+    public void renderObjectsOnTerrain(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
+        final var cameraPos = camera.getPos();
 
-        if(!client.options.hudHidden) {
-            this.entityRenderer.prepare(camera);
-            this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
-        }
-
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final var fortressClient = (FortressMinecraftClient) this.client;
         fortressClient.get_BlueprintRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  projectionMatrix);
         fortressClient.get_CampfireRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
         fortressClient.get_SelectionRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
         fortressClient.get_TasksRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
 
-        SelectionManager selectionManager = fortressClient.get_SelectionManager();
-        VertexConsumer vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
+        final var selectionManager = fortressClient.get_SelectionManager();
+        final var immediate = this.bufferBuilders.getEntityVertexConsumers();
+        final var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
         final FortressClientManager fcm = fortressClient.get_FortressClientManager();
         if (!selectionManager.isSelecting() && fcm.getState() == FortressState.BUILD) {
             if(ModUtils.isClientInFortressGamemode()) {
@@ -103,10 +96,19 @@ public abstract class FortressWorldRendererMixin  {
                                 }
                             }
                         }
-
                     }
                 }
             }
+        }
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal=11, target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", shift = At.Shift.AFTER))
+    public void renderSelectionLabels(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
+        if(!client.options.hudHidden) {
+            this.entityRenderer.prepare(camera);
+            final var cameraPos = camera.getPos();
+            final var immediate = this.bufferBuilders.getEntityVertexConsumers();
+            this.entityRenderer.render(cameraPos.x, cameraPos.y, cameraPos.z, matrices, immediate, LightmapTextureManager.pack(15, 15));
         }
     }
 
@@ -120,6 +122,7 @@ public abstract class FortressWorldRendererMixin  {
         renderTranslucent(matrices, camera, matrix4f);
     }
 
+    @Unique
     private WorldBorder getWorldBorder(ClientWorld instance) {
         final var selectingBlueprint = ModUtils.getBlueprintManager().isSelecting();
         final var selecting = ModUtils.getSelectionManager().isSelecting();
