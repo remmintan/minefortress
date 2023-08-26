@@ -37,6 +37,7 @@
     "renderer.FortressFluidRendererMixin",
     "renderer.FortressGameRendererMixin",
     "renderer.FortressGuiMixin",
+    "renderer.FortressInGameHudMixin",
     "renderer.FortressWorldRendererMixin",
     "renderer.gui.FortressCreativeInventoryScreenMixin",
     "renderer.gui.FortressHandledScreenMixin",
