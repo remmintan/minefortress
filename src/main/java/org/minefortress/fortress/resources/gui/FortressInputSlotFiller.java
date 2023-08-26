@@ -38,7 +38,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
             return;
         }
         this.matcher.clear();
-        ((FortressSimpleInventory)handler.getScreenInventory()).populateRecipeFinder(this.matcher);
+        ((FortressSimpleInventory)handler.getScreenInventory()).populate_RecipeFinder(this.matcher);
         this.handler.populateRecipeFinder(this.matcher);
         if (this.matcher.match(recipe, null)) {
             this.fillInputSlots(recipe, craftAll);
@@ -121,7 +121,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
     }
 
     private void fillInputSlot(Slot slot, ItemStack stack) {
-        int i = ((FortressSimpleInventory)this.inventory).indexOf(stack);
+        int i = ((FortressSimpleInventory)this.inventory).index_Of(stack);
         if (i == -1) {
             return;
         }
@@ -152,7 +152,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
         for (int j = 0; j < this.handler.getCraftingWidth() * this.handler.getCraftingHeight() + 1; ++j) {
             ItemStack itemStack;
             if (j == this.handler.getCraftingResultSlotIndex() || (itemStack = this.handler.getSlot(j).getStack().copy()).isEmpty()) continue;
-            int k = ((FortressSimpleInventory)this.inventory).getOccupiedSlotWithRoomForStack(itemStack);
+            int k = ((FortressSimpleInventory)this.inventory).get_OccupiedSlotWithRoomForStack(itemStack);
             if (k == -1 && list.size() <= i) {
                 for (ItemStack itemStack2 : list) {
 
@@ -176,7 +176,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
 
     private int getFreeInventorySlots() {
         int i = 0;
-        for (ItemStack itemStack : ((FortressSimpleInventory)this.inventory).getStacks()) {
+        for (ItemStack itemStack : ((FortressSimpleInventory)this.inventory).get_Stacks()) {
             if (!itemStack.isEmpty()) continue;
             ++i;
         }

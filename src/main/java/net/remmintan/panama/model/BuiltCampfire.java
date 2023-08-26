@@ -66,7 +66,7 @@ public class BuiltCampfire implements BuiltModel {
         final RenderLayer blockLayer = RenderLayers.getBlockLayer(blockState);
         final BufferBuilder bufferBuilder = blockBufferBuilders.get(blockLayer);
         initLayer(blockLayer, bufferBuilder);
-        blockRenderManager.renderBlock(blockState, pos, blueprintData, new MatrixStack(), bufferBuilder, true, world.random);
+        blockRenderManager.renderBlock(blockState, pos, blueprintData, new MatrixStack(), bufferBuilder, false, world.random);
         nonEmptyLayers.add(blockLayer);
 
         builtBuffers.put(blockLayer, bufferBuilder.end());

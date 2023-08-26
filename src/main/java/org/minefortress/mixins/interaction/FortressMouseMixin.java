@@ -32,7 +32,7 @@ public class FortressMouseMixin {
 
     @Inject(method = "updateMouse", at = @At("HEAD"), cancellable = true)
     public void updateMouse(CallbackInfo ci) {
-        if(((FortressMinecraftClient) this.client).isFortressGamemode() && !ModUtils.shouldReleaseCamera()) {
+        if(((FortressMinecraftClient) this.client).is_FortressGamemode() && !ModUtils.shouldReleaseCamera()) {
             ci.cancel();
         }
     }
@@ -40,7 +40,7 @@ public class FortressMouseMixin {
     @Inject(method = "onMouseButton", at = @At("HEAD"))
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        if(!fortressClient.isFortressGamemode()) {
+        if(!fortressClient.is_FortressGamemode()) {
             return;
         }
 
@@ -61,7 +61,7 @@ public class FortressMouseMixin {
         }
 
         if(isPress && button == 0 && client.currentScreen == null) {
-            fortressClient.getFortressHud().onClick(mouseX, mouseY);
+            fortressClient.get_FortressHud().onClick(mouseX, mouseY);
         }
 
     }

@@ -38,7 +38,7 @@ public class ClientboundAddBlueprintPacket implements FortressS2CPacket {
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressMinecraftClient) {
-            final ClientBlueprintManager blueprintManager = fortressMinecraftClient.getBlueprintManager();
+            final ClientBlueprintManager blueprintManager = fortressMinecraftClient.get_BlueprintManager();
             blueprintManager.add(group, name, fileName, floorLevel, requirementId, tag);
         }
     }

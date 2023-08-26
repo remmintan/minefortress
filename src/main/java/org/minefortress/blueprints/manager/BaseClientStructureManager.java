@@ -10,8 +10,6 @@ import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.utils.BuildingHelper;
@@ -45,7 +43,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         return structureBuildPos;
     }
     private void checkNotEnoughResources() {
-        final var fortressClientManager = ((FortressMinecraftClient)client).getFortressClientManager();
+        final var fortressClientManager = ((FortressMinecraftClient)client).get_FortressClientManager();
         if(fortressClientManager.isSurvival()) {
             final var resourceManager = fortressClientManager.getResourceManager();
             final var stacks = getBlockData().getStacks();
@@ -147,7 +145,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
                     .map(Map.Entry::getKey)
                     .map(it -> it.add(structureBuildPos.down(floorLevel)))
                     .collect(Collectors.toList());
-            world.getClientTasksHolder().addTask(taskId, blocks);
+            world.get_ClientTasksHolder().addTask(taskId, blocks);
         }
     }
 

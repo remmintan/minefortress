@@ -11,7 +11,7 @@ public interface FortressC2SPacket extends FortressPacket {
 
     default FortressServerManager getFortressServerManager(MinecraftServer server, ServerPlayerEntity player) {
         final var fortressServer = (FortressServer) server;
-        return fortressServer.getFortressModServerManager().getByPlayer(player);
+        return fortressServer.get_FortressModServerManager().getByPlayer(player);
     }
 
 }

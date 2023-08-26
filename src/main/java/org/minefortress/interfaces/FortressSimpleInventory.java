@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface FortressSimpleInventory extends Inventory {
 
-    List<ItemStack> getStacks();
-    int getOccupiedSlotWithRoomForStack(ItemStack stack);
-    int indexOf(ItemStack stack);
-    void populateRecipeFinder(RecipeMatcher recipeMatcher);
-    int getChangeCount();
+    List<ItemStack> get_Stacks();
+    int get_OccupiedSlotWithRoomForStack(ItemStack stack);
+    int index_Of(ItemStack stack);
+    void populate_RecipeFinder(RecipeMatcher recipeMatcher);
+    int get_ChangeCount();
 
 }

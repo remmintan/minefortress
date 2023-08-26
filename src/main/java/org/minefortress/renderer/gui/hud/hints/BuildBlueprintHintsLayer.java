@@ -34,6 +34,6 @@ public class BuildBlueprintHintsLayer extends AbstractHintsLayer {
     }
 
     private ClientBlueprintManager getBlueprintManager() {
-        return ModUtils.getFortressClient().getBlueprintManager();
+        return ModUtils.getFortressClient().get_BlueprintManager();
     }
 }

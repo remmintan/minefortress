@@ -148,7 +148,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     public void onClosed(PlayerEntity player) {
         super.onClosed(player);
         if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof FortressServer fortressServer) {
-            final var fortressServerManager = fortressServer.getFortressModServerManager().getByPlayer(serverPlayer);
+            final var fortressServerManager = fortressServer.get_FortressModServerManager().getByPlayer(serverPlayer);
             final var serverResourceManager = fortressServerManager.getServerResourceManager();
 
             returnInputs();
@@ -263,7 +263,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
             ItemStack itemStack = this.getStack();
             if (itemStack.isEmpty()) {
                 if(this.inventory instanceof FortressSimpleInventory fortressSimpleInventory) {
-                    final var i = fortressSimpleInventory.indexOf(stack);
+                    final var i = fortressSimpleInventory.index_Of(stack);
                     if(i != -1) {
                         this.inventory.getStack(i).increment(count);
                         stack.decrement(count);

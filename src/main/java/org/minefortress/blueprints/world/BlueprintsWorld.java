@@ -135,7 +135,7 @@ public class BlueprintsWorld {
                 levelProperties,
                 BLUEPRINTS_WORLD_REGISTRY_KEY,
                 new DimensionOptions(dimensionTypeRegistry.getEntry(DimensionTypes.OVERWORLD).orElseThrow(), chunkGenerator),
-                ((FortressServer)server).getWorldGenerationProgressListener()
+                ((FortressServer)server).get_WorldGenerationProgressListener()
         );
     }
 

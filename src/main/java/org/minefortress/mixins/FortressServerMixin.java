@@ -15,6 +15,7 @@ import org.minefortress.interfaces.FortressServer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -32,7 +33,9 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     @Shadow @Final private WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory;
     @Shadow protected abstract boolean shouldKeepTicking();
 
+    @Unique
     private BlueprintsWorld blueprintsWorld;
+    @Unique
     private FortressModServerManager fortressModServerManager;
 
     public FortressServerMixin(String string) {
@@ -76,17 +79,17 @@ public abstract class FortressServerMixin extends ReentrantThreadExecutor<Server
     }
 
     @Override
-    public BlueprintsWorld getBlueprintsWorld() {
+    public BlueprintsWorld get_BlueprintsWorld() {
         return blueprintsWorld;
     }
 
     @Override
-    public WorldGenerationProgressListener getWorldGenerationProgressListener() {
+    public WorldGenerationProgressListener get_WorldGenerationProgressListener() {
         return this.worldGenerationProgressListenerFactory.create(11);
     }
 
     @Override
-    public FortressModServerManager getFortressModServerManager() {
+    public FortressModServerManager get_FortressModServerManager() {
         return fortressModServerManager;
     }
 }

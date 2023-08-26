@@ -2,10 +2,8 @@ package org.minefortress.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServer;
 
@@ -23,7 +21,7 @@ abstract class MineFortressCommand {
         if(server == null) {
             throw new RuntimeException("Server is null");
         }
-        return server.getFortressModServerManager().getByPlayer(srvPlayer);
+        return server.get_FortressModServerManager().getByPlayer(srvPlayer);
     }
 
 }

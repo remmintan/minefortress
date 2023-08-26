@@ -34,12 +34,12 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
     }
 
     @Override
-    public List<ItemStack> getStacks() {
+    public List<ItemStack> get_Stacks() {
         return this.stacks;
     }
 
     @Override
-    public int getOccupiedSlotWithRoomForStack(ItemStack stack) {
+    public int get_OccupiedSlotWithRoomForStack(ItemStack stack) {
         for (int i = 0; i < this.stacks.size(); i++) {
             ItemStack itemStack = this.stacks.get(i);
             if(ItemStack.canCombine(itemStack, stack))
@@ -49,7 +49,7 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
     }
 
     @Override
-    public int indexOf(ItemStack stack) {
+    public int index_Of(ItemStack stack) {
         if(stack == null || stack.isEmpty()) return -1;
         return this.stacks.stream()
                 .filter(it -> it.getItem() == stack.getItem())
@@ -59,14 +59,14 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
     }
 
     @Override
-    public void populateRecipeFinder(RecipeMatcher recipeMatcher) {
+    public void populate_RecipeFinder(RecipeMatcher recipeMatcher) {
         for (ItemStack itemStack : this.stacks) {
             recipeMatcher.addInput(itemStack, Integer.MAX_VALUE);
         }
     }
 
     @Override
-    public int getChangeCount() {
+    public int get_ChangeCount() {
         return this.changeCount;
     }
 

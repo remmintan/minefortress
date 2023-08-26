@@ -7,8 +7,6 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
@@ -16,7 +14,7 @@ import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
-import java.util.List;
+
 import java.util.UUID;
 
 public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
@@ -56,7 +54,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         if(player instanceof final FortressServerPlayerEntity fortressServerPlayer) {
             final var fortressServerManager = this.getFortressServerManager(server, player);
-            final ServerBlueprintManager blueprintManager = fortressServerPlayer.getServerBlueprintManager();
+            final ServerBlueprintManager blueprintManager = fortressServerPlayer.get_ServerBlueprintManager();
             final BlueprintTask task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
 
             if(fortressServerManager.isSurvival()) {

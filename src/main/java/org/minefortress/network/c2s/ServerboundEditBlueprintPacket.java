@@ -8,7 +8,6 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
@@ -52,12 +51,12 @@ public class ServerboundEditBlueprintPacket implements FortressC2SPacket {
         if(server instanceof FortressServer fortressServer) {
             if(player instanceof FortressServerPlayerEntity fortressPlayer) {
                 if(type == Type.REMOVE) {
-                    fortressPlayer.getServerBlueprintManager().remove(blueprintFileName);
+                    fortressPlayer.get_ServerBlueprintManager().remove(blueprintFileName);
                 } else {
-                    final BlueprintsWorld blueprintsWorld = fortressServer.getBlueprintsWorld();
+                    final BlueprintsWorld blueprintsWorld = fortressServer.get_BlueprintsWorld();
                     if(type == Type.EDIT) {
                         final var blockData = fortressPlayer
-                                .getServerBlueprintManager()
+                                .get_ServerBlueprintManager()
                                 .getBlockDataManager()
                                 .getBlockData(blueprintFileName, BlockRotation.NONE);
                         final Map<BlockPos, BlockState> blueprintData = blockData

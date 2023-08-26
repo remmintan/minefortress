@@ -33,7 +33,7 @@ public class ClientboundTaskExecutedPacket implements FortressS2CPacket {
         UUID taskId = this.getTaskId();
         final FortressClientWorld world = (FortressClientWorld) client.world;
         if (world != null) {
-            world.getClientTasksHolder().removeTask(taskId);
+            world.get_ClientTasksHolder().removeTask(taskId);
         }
     }
 }

@@ -2,7 +2,6 @@ package org.minefortress.fortress;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
@@ -11,7 +10,6 @@ import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.fight.ClientFightManager;
-import org.minefortress.fight.ClientFightSelectionManager;
 import org.minefortress.fortress.buildings.BuildingHealthRenderInfo;
 import org.minefortress.fortress.buildings.EssentialBuildingInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
@@ -27,10 +25,8 @@ import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
-
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public final class FortressClientManager extends AbstractFortressManager {
@@ -67,7 +63,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private FortressState state = FortressState.BUILD;
 
     public FortressClientManager() {
-        professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
+        professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).get_FortressClientManager());
     }
 
     public void select(BasePawnEntity colonist) {
@@ -153,7 +149,7 @@ public final class FortressClientManager extends AbstractFortressManager {
                 }
             }
 
-            final BlockPos hoveredBlockPos = fortressClient.getHoveredBlockPos();
+            final BlockPos hoveredBlockPos = fortressClient.get_HoveredBlockPos();
             if(hoveredBlockPos!=null && !hoveredBlockPos.equals(BlockPos.ORIGIN)) {
                 if(hoveredBlockPos.equals(oldPosAppropriateForCenter)) return;
 
@@ -253,14 +249,14 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
-        final var reuiredBuilding = buildings.stream()
+        final var requiredBuilding = buildings.stream()
                 .filter(b -> b.getRequirementId().equals(requirementId));
         if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
-            return reuiredBuilding
+            return requiredBuilding
                     .mapToLong(it -> it.getBedsCount() * 10)
                     .sum() > minCount;
         }
-        final var count = reuiredBuilding.count();
+        final var count = requiredBuilding.count();
         if(requirementId.equals("shooting_gallery"))
             return count * 10 > minCount;
 

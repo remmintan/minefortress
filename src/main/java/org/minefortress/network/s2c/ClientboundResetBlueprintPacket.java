@@ -13,7 +13,7 @@ public class ClientboundResetBlueprintPacket implements FortressS2CPacket {
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getBlueprintManager().reset();
+            fortressClient.get_BlueprintManager().reset();
         }
     }
 

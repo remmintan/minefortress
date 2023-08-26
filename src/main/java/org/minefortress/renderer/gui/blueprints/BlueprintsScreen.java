@@ -65,7 +65,7 @@ public final class BlueprintsScreen extends Screen {
                 this.y = (this.height - backgroundHeight) / 2;
 
                 this.handler = new BlueprintScreenHandler(this.client);
-                this.blueprintRenderer = ModUtils.getFortressClient().getBlueprintRenderer();
+                this.blueprintRenderer = ModUtils.getFortressClient().get_BlueprintRenderer();
                 final var connectedToTheServer = ModUtils.getFortressClientManager().isConnectedToTheServer();
                 if(!connectedToTheServer) {
                     final var impExpBtn = ButtonWidget

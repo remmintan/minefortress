@@ -32,7 +32,7 @@ public class RoadsSelection extends WallsSelection{
             final UUID digTaskId = UUID.randomUUID();
             final UUID placeTaskId = UUID.randomUUID();
 
-            final ClientVisualTasksHolder tasksHolder = ((FortressClientWorld) level).getClientTasksHolder();
+            final ClientVisualTasksHolder tasksHolder = ((FortressClientWorld) level).get_ClientTasksHolder();
             tasksHolder.addTask(digTaskId, getSelection(), TaskType.REMOVE);
             tasksHolder.addTask(placeTaskId, getSelection(), TaskType.BUILD);
 

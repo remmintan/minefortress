@@ -6,10 +6,10 @@ import org.minefortress.blueprints.manager.ServerBlueprintManager;
 
 public interface FortressServerPlayerEntity {
 
-    ServerBlueprintManager getServerBlueprintManager();
-    boolean wasInBlueprintWorldWhenLoggedOut();
-    void setWasInBlueprintWorldWhenLoggedOut(boolean wasInBlueprintWorldWhenLoggedOut);
+    ServerBlueprintManager get_ServerBlueprintManager();
+    boolean was_InBlueprintWorldWhenLoggedOut();
+    void set_WasInBlueprintWorldWhenLoggedOut(boolean wasInBlueprintWorldWhenLoggedOut);
 
     @Nullable
-    Vec3d getPersistedPos();
+    Vec3d get_PersistedPos();
 }

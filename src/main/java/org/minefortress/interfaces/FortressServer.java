@@ -6,8 +6,8 @@ import org.minefortress.fortress.server.FortressModServerManager;
 
 public interface FortressServer {
 
-    BlueprintsWorld getBlueprintsWorld();
-    WorldGenerationProgressListener getWorldGenerationProgressListener();
-    FortressModServerManager getFortressModServerManager();
+    BlueprintsWorld get_BlueprintsWorld();
+    WorldGenerationProgressListener get_WorldGenerationProgressListener();
+    FortressModServerManager get_FortressModServerManager();
 
 }

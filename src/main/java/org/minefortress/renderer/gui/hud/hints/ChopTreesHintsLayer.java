@@ -31,7 +31,7 @@ public class ChopTreesHintsLayer extends AbstractHintsLayer {
     }
 
     private SelectionManager getSelectionManager() {
-        return ModUtils.getFortressClient().getSelectionManager();
+        return ModUtils.getFortressClient().get_SelectionManager();
     }
 
 }

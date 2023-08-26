@@ -5,7 +5,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
@@ -47,28 +46,22 @@ public abstract class AbstractCustomRenderer {
     }
 
     protected void renderLayer(RenderLayer layer, MatrixStack matrices, double cameraX, double cameraY, double cameraZ, Matrix4f projectionMatrix) {
+        final Optional<BuiltModel> builtModelOpt = getBuiltModel();
+        if(!builtModelOpt.map(it -> it.hasLayer(layer)).orElse(false)) return;
+
         RenderSystem.assertOnRenderThread();
 
         layer.startDrawing();
 
         final VertexFormat vertexFormat = layer.getVertexFormat();
         final ShaderProgram shader = RenderSystem.getShader();
-        if(shader == null) return;
+        if(shader == null) throw new IllegalStateException("Shader is null");
 
-        BufferRenderer.reset();
-        int textureReference;
+
         for (int i = 0; i < 12; i++) {
-            textureReference = RenderSystem.getShaderTexture(i);
+            int textureReference = RenderSystem.getShaderTexture(i);
             shader.addSampler("Sampler" + i, textureReference);
         }
-
-        final GlUniform offset = shader.chunkOffset;
-
-        if(offset == null) {
-            matrices.push();
-            matrices.translate(-cameraX, -cameraY, -cameraZ);
-        }
-
         if(shader.modelViewMat != null) {
             final Matrix4f modelViewMatrix = matrices.peek().getPositionMatrix();
             shader.modelViewMat.set(modelViewMatrix);
@@ -78,6 +71,9 @@ public abstract class AbstractCustomRenderer {
         }
         if (shader.colorModulator != null) {
             shader.colorModulator.set(getColorModulator());
+        }
+        if (shader.glintAlpha != null) {
+            shader.glintAlpha.set(RenderSystem.getShaderGlintAlpha());
         }
         if(shader.fogStart != null && shader.fogEnd != null && shader.fogColor != null && shader.fogShape != null) {
             shader.fogStart.set(RenderSystem.getShaderFogStart());
@@ -94,30 +90,30 @@ public abstract class AbstractCustomRenderer {
 
         RenderSystem.setupShaderLights(shader);
         shader.bind();
+        final GlUniform offset = shader.chunkOffset;
 
+        if(offset == null) {
+            matrices.push();
+            matrices.translate(-cameraX, -cameraY, -cameraZ);
+        }
 
         final Optional<BlockPos> renderTargetPositionOpt = getRenderTargetPosition();
-        final Optional<BuiltModel> builtModelOpt = getBuiltModel();
-
-        boolean notEmpty = false;
-        if(renderTargetPositionOpt.isPresent() && builtModelOpt.isPresent()) {
+//        boolean notEmpty = false;
+        if(renderTargetPositionOpt.isPresent()) {
             final BlockPos renderTargetPosition = renderTargetPositionOpt.get();
             final BuiltModel builtModel = builtModelOpt.get();
 
             if(offset != null) {
                 Vector3f cameraPosition = new Vector3f((float) cameraX, (float)cameraY, (float)cameraZ);
                 final Vector3f targetOffset = new Vector3f(renderTargetPosition.getX(), renderTargetPosition.getY(), renderTargetPosition.getZ());
-                targetOffset.sub(cameraPosition);
-                offset.set(targetOffset);
+                offset.set(targetOffset.sub(cameraPosition));
                 offset.upload();
             }
 
-            if(builtModel.hasLayer(layer)) {
-                final VertexBuffer buffer = builtModel.getBuffer(layer);
-                buffer.bind();
-                buffer.draw();
-                notEmpty = true;
-            }
+            final VertexBuffer buffer = builtModel.getBuffer(layer);
+            buffer.bind();
+            buffer.draw();
+//            notEmpty = true;
         }
 
         if(offset != null) {
@@ -126,9 +122,9 @@ public abstract class AbstractCustomRenderer {
             matrices.pop();
         }
         shader.unbind();
-        if(notEmpty) {
-            vertexFormat.clearState();
-        }
+//        if(notEmpty) {
+//            vertexFormat.clearState();
+//        }
 
         VertexBuffer.unbind();
         layer.endDrawing();
@@ -150,7 +146,7 @@ public abstract class AbstractCustomRenderer {
     }
 
     protected FortressClientManager getClientManager() {
-        return ((FortressMinecraftClient) client).getFortressClientManager();
+        return ((FortressMinecraftClient) client).get_FortressClientManager();
     }
 
 }

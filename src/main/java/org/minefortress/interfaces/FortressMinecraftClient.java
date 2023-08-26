@@ -19,16 +19,16 @@ import java.util.Map;
 public interface FortressMinecraftClient {
 
     void openHireScreen(MinecraftClient client, String screenName1, Map<String, HireInfo> professions1);
-    SelectionManager getSelectionManager();
-    FortressHud getFortressHud();
-    AreasClientManager getAreasClientManager();
-    ClientBlueprintManager getBlueprintManager();
-    BlueprintRenderer getBlueprintRenderer();
-    CampfireRenderer getCampfireRenderer();
-    SelectionRenderer getSelectionRenderer();
-    TasksRenderer getTasksRenderer();
-    FortressClientManager getFortressClientManager();
-    boolean isFortressGamemode();
-    BlockPos getHoveredBlockPos();
-    ClientInfluenceManager getInfluenceManager();
+    SelectionManager get_SelectionManager();
+    FortressHud get_FortressHud();
+    AreasClientManager get_AreasClientManager();
+    ClientBlueprintManager get_BlueprintManager();
+    BlueprintRenderer get_BlueprintRenderer();
+    CampfireRenderer get_CampfireRenderer();
+    SelectionRenderer get_SelectionRenderer();
+    TasksRenderer get_TasksRenderer();
+    FortressClientManager get_FortressClientManager();
+    boolean is_FortressGamemode();
+    BlockPos get_HoveredBlockPos();
+    ClientInfluenceManager get_InfluenceManager();
 }

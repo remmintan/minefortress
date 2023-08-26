@@ -20,7 +20,7 @@ public abstract class FortressGuiMixin {
 
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
     private void renderCrosshair(DrawContext context, CallbackInfo ci) {
-        if (((FortressMinecraftClient)client).isFortressGamemode()) {
+        if (((FortressMinecraftClient)client).is_FortressGamemode()) {
             ci.cancel();
         }
     }

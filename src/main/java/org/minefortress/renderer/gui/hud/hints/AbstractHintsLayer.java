@@ -40,6 +40,6 @@ abstract class AbstractHintsLayer  extends AbstractHudLayer implements IHintsLay
 
     @Override
     public boolean shouldRender(HudState hudState) {
-        return !ModUtils.getFortressClient().getFortressClientManager().isSelectingColonist();
+        return !ModUtils.getFortressClient().get_FortressClientManager().isSelectingColonist();
     }
 }

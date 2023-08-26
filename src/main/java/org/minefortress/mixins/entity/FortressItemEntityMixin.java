@@ -43,7 +43,7 @@ public abstract class FortressItemEntityMixin extends Entity {
             if(closestPlayer instanceof ServerPlayerEntity srvP && srvP.interactionManager.getGameMode() == MineFortressMod.FORTRESS) {
                 final var fortressServer = (FortressServer) closestPlayer.getServer();
                 if(fortressServer != null) {
-                    final var fortressServerManager = fortressServer.getFortressModServerManager().getByPlayer((ServerPlayerEntity) closestPlayer);
+                    final var fortressServerManager = fortressServer.get_FortressModServerManager().getByPlayer((ServerPlayerEntity) closestPlayer);
                     if(fortressServerManager.isSurvival()) {
                         final var resourceManager = fortressServerManager.getServerResourceManager();
                         final var stack = this.getStack();

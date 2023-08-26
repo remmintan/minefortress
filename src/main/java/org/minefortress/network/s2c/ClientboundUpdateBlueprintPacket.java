@@ -1,7 +1,6 @@
 package org.minefortress.network.s2c;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -33,10 +32,10 @@ public class ClientboundUpdateBlueprintPacket implements FortressS2CPacket {
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
             if(type == Type.UPDATE)
-                fortressClient.getBlueprintManager().update(file, tag, newFloorLevel);
+                fortressClient.get_BlueprintManager().update(file, tag, newFloorLevel);
             else if(type == Type.REMOVE) {
-                fortressClient.getBlueprintManager().clearStructure();
-                fortressClient.getBlueprintManager().remove(file);
+                fortressClient.get_BlueprintManager().clearStructure();
+                fortressClient.get_BlueprintManager().remove(file);
                 final var currentScreen = MinecraftClient.getInstance().currentScreen;
                 if(currentScreen instanceof BlueprintsScreen bps) {
                     bps.updateSlots();

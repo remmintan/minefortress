@@ -34,8 +34,8 @@ public class FortressCraftingScreen extends AbstractFortressRecipeScreen<Fortres
     @Override
     protected boolean professionRequirementSatisfied() {
         final var fortressClient = getClient();
-        final var clientManager = fortressClient.getFortressClientManager();
-        return fortressClient.isFortressGamemode() && clientManager.getProfessionManager().hasProfession("crafter");
+        final var clientManager = fortressClient.get_FortressClientManager();
+        return fortressClient.is_FortressGamemode() && clientManager.getProfessionManager().hasProfession("crafter");
     }
 
     private FortressMinecraftClient getClient() {

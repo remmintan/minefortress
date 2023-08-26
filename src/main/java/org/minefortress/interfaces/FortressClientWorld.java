@@ -4,6 +4,6 @@ import org.minefortress.tasks.ClientVisualTasksHolder;
 
 public interface FortressClientWorld {
 
-    ClientVisualTasksHolder getClientTasksHolder();
+    ClientVisualTasksHolder get_ClientTasksHolder();
 
 }

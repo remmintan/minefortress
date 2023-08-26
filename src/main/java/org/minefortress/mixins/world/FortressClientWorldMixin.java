@@ -40,7 +40,7 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
     }
 
     @Override
-    public ClientVisualTasksHolder getClientTasksHolder() {
+    public ClientVisualTasksHolder get_ClientTasksHolder() {
         return tasksHolder;
     }
 
@@ -48,8 +48,8 @@ public abstract class FortressClientWorldMixin extends World implements Fortress
     public void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         if(shouldKeepTicking.getAsBoolean()) {
             if(client instanceof FortressMinecraftClient fortressClient){
-                fortressClient.getBlueprintManager().tick();
-                fortressClient.getInfluenceManager().tick();
+                fortressClient.get_BlueprintManager().tick();
+                fortressClient.get_InfluenceManager().tick();
             }
         }
     }

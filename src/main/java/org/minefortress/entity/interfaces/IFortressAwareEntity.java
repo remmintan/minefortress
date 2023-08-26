@@ -19,7 +19,7 @@ public interface IFortressAwareEntity {
     default Optional<FortressModServerManager> getFortressModServerManager() {
         final var server = getServer();
         if(server instanceof FortressServer fortressServer) {
-            return Optional.of(fortressServer.getFortressModServerManager());
+            return Optional.of(fortressServer.get_FortressModServerManager());
         } else {
             return Optional.empty();
         }

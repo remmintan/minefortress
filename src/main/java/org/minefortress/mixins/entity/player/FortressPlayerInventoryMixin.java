@@ -1,13 +1,11 @@
 package org.minefortress.mixins.entity.player;
 
-import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.interfaces.FortressServer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,7 +24,7 @@ public abstract class FortressPlayerInventoryMixin {
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             final var player = (ServerPlayerEntity) this.player;
             final var server = (FortressServer)player.getServer();
-            final var serverManager = server.getFortressModServerManager().getByPlayer(player);
+            final var serverManager = server.get_FortressModServerManager().getByPlayer(player);
             final var allItems = serverManager.getServerResourceManager().getAllItems();
             finder.clear();
             allItems.forEach(it -> finder.addInput(it, Integer.MAX_VALUE));

@@ -19,8 +19,8 @@ public class FortressInGameHudMixin {
     @Inject(method = "render", at = @At("TAIL"))
     public void render(DrawContext context, float tickDelta, CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        if(client.currentScreen == null && fortressClient.isFortressGamemode())
-            fortressClient.getFortressHud().render(context, tickDelta);
+        if(client.currentScreen == null && fortressClient.is_FortressGamemode())
+            fortressClient.get_FortressHud().render(context, tickDelta);
     }
 
 }

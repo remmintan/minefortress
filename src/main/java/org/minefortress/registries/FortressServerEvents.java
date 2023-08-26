@@ -47,15 +47,15 @@ public class FortressServerEvents {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             final var fortressServer = (FortressServer) server;
             final var player = handler.player;
-            final var fsm = fortressServer.getFortressModServerManager().getByPlayer(player);
+            final var fsm = fortressServer.get_FortressModServerManager().getByPlayer(player);
             fsm.syncOnJoin();
             final var serverProfessionManager = fsm.getServerProfessionManager();
             serverProfessionManager.sendProfessions(player);
             serverProfessionManager.scheduleSync();
 
             if(player instanceof FortressServerPlayerEntity fortressPlayer) {
-                if(fortressPlayer.wasInBlueprintWorldWhenLoggedOut() && fortressPlayer.getPersistedPos() != null) {
-                    final var pos = fortressPlayer.getPersistedPos();
+                if(fortressPlayer.was_InBlueprintWorldWhenLoggedOut() && fortressPlayer.get_PersistedPos() != null) {
+                    final var pos = fortressPlayer.get_PersistedPos();
                     player.teleport(pos.x, pos.y, pos.z);
                 }
             }
@@ -64,26 +64,26 @@ public class FortressServerEvents {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             final var inBlueprintWorldOnDisconnect = handler.player.getWorld().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
             if(handler.player instanceof FortressServerPlayerEntity fortressPlayer) {
-                fortressPlayer.setWasInBlueprintWorldWhenLoggedOut(inBlueprintWorldOnDisconnect);
+                fortressPlayer.set_WasInBlueprintWorldWhenLoggedOut(inBlueprintWorldOnDisconnect);
             }
         });
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             if(server instanceof FortressServer fortressServer) {
-                fortressServer.getFortressModServerManager().load();
+                fortressServer.get_FortressModServerManager().load();
             }
         });
 
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
             if(server instanceof FortressServer fortressServer) {
-                fortressServer.getFortressModServerManager().save();
-                fortressServer.getBlueprintsWorld().closeSession();
+                fortressServer.get_FortressModServerManager().save();
+                fortressServer.get_BlueprintsWorld().closeSession();
             }
         });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             if(server instanceof FortressServer fortressServer) {
-                fortressServer.getFortressModServerManager().tick(server.getPlayerManager());
+                fortressServer.get_FortressModServerManager().tick(server.getPlayerManager());
             }
         });
 

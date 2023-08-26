@@ -28,7 +28,7 @@ public class ClientboundFollowColonistPacket implements FortressS2CPacket {
             final Entity entity = world.getEntityById(entityId);
             if(entity == null) throw new NullPointerException("Entity with id " + entityId + " does not exist!");
             if(entity instanceof BasePawnEntity pawn) {
-                fortressMinecraftClient.getFortressClientManager().select(pawn);
+                fortressMinecraftClient.get_FortressClientManager().select(pawn);
             } else {
                 throw new IllegalArgumentException("Entity with id " + entityId + " is not a Colonist!");
             }

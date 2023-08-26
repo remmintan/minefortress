@@ -44,10 +44,10 @@ public class FortressRecipeBookWidget extends RecipeBookWidget {
         super.update();
         if(this.craftingScreenHandler instanceof FortressCraftingScreenHandler fortressHandler) {
             final var screenInventory = (FortressSimpleInventory) fortressHandler.getScreenInventory();
-            final var changeCount = screenInventory.getChangeCount();
+            final var changeCount = screenInventory.get_ChangeCount();
             if (this.cachedInvChangeCount != changeCount) {
                 this.recipeFinder.clear();
-                screenInventory.populateRecipeFinder(this.recipeFinder);
+                screenInventory.populate_RecipeFinder(this.recipeFinder);
                 this.craftingScreenHandler.populateRecipeFinder(this.recipeFinder);
                 this.refreshResults(false);
                 this.cachedInvChangeCount = changeCount;
