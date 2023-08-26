@@ -149,7 +149,7 @@ public abstract class AbstractCustomRenderer {
     }
 
     protected FortressClientManager getClientManager() {
-        return ((FortressMinecraftClient) client).getFortressClientManager();
+        return ((FortressMinecraftClient) client).get_FortressClientManager();
     }
 
 }

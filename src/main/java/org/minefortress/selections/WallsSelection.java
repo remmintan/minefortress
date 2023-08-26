@@ -179,7 +179,7 @@ public class WallsSelection extends Selection {
                 getCornerPairs()
                         .forEach(p -> {
                             UUID uuid = UUID.randomUUID();
-                            ((FortressClientWorld)level).getClientTasksHolder().addTask(uuid, getSelection(), taskType, supertaskUuid);
+                            ((FortressClientWorld)level).get_ClientTasksHolder().addTask(uuid, getSelection(), taskType, supertaskUuid);
                             ServerboundSimpleSelectionTaskPacket packet = new ServerboundSimpleSelectionTaskPacket(
                                     uuid,
                                     taskType,

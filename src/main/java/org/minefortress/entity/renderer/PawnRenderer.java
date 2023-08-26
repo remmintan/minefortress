@@ -134,7 +134,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     }
 
     private FortressClientManager getFortressClientManager() {
-        return getFortressClient().getFortressClientManager();
+        return getFortressClient().get_FortressClientManager();
     }
 
     private void setClothesVilibility(MobEntity colonist) {

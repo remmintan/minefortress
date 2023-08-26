@@ -49,7 +49,7 @@ public class ClientboundSyncSpecialBlocksPacket implements FortressS2CPacket {
     @Override
     public void handle(MinecraftClient client) {
         final FortressMinecraftClient fortressMinecraftClient = (FortressMinecraftClient) client;
-        final FortressClientManager fortressClientManager = fortressMinecraftClient.getFortressClientManager();
+        final FortressClientManager fortressClientManager = fortressMinecraftClient.get_FortressClientManager();
         fortressClientManager.setSpecialBlocks(basicSpecialBlocks, blueprintSpecialBlocks);
     }
 

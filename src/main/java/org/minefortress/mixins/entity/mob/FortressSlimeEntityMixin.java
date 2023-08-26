@@ -24,7 +24,7 @@ public abstract class FortressSlimeEntityMixin extends MobEntity implements Fort
     protected abstract void damage(LivingEntity entity);
 
     @Override
-    public void touchPawn(BasePawnEntity colonist) {
+    public void touch_Pawn(BasePawnEntity colonist) {
         if(canAttack()) {
             damage(colonist);
         }

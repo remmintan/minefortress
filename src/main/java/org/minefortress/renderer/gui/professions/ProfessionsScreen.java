@@ -22,8 +22,8 @@ public class ProfessionsScreen extends Screen {
     public ProfessionsScreen(FortressMinecraftClient client) {
         super(Text.literal("Professions"));
         this.professionsLayer = new ProfessionsLayer(client);
-        this.fortressManager = client.getFortressClientManager();
-        this.professionManager = client.getFortressClientManager().getProfessionManager();
+        this.fortressManager = client.get_FortressClientManager();
+        this.professionManager = client.get_FortressClientManager().getProfessionManager();
     }
 
     @Override

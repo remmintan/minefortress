@@ -93,7 +93,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressC2SPacket {
         if(player instanceof FortressServerPlayerEntity fortressServerPlayer) {
             final NbtCompound updatedStructure = new NbtCompound();
             structureToUpdate.writeNbt(updatedStructure);
-            fortressServerPlayer.getServerBlueprintManager().update(fileName, updatedStructure, newFloorLevel, fortressServerWorld.getBlueprintGroup());
+            fortressServerPlayer.get_ServerBlueprintManager().update(fileName, updatedStructure, newFloorLevel, fortressServerWorld.getBlueprintGroup());
         }
 
 

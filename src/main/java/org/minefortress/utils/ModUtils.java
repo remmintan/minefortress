@@ -3,8 +3,6 @@ package org.minefortress.utils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.option.GameOptions;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -74,7 +72,7 @@ public class ModUtils {
     }
 
     public static FortressClientManager getFortressClientManager() {
-        return getFortressClient().getFortressClientManager();
+        return getFortressClient().get_FortressClientManager();
     }
 
     public static ClientProfessionManager getProfessionManager() {
@@ -82,14 +80,14 @@ public class ModUtils {
     }
 
     public static ClientBlueprintManager getBlueprintManager() {
-        return getFortressClient().getBlueprintManager();
+        return getFortressClient().get_BlueprintManager();
     }
     public static ClientInfluenceManager getInfluenceManager() {
-        return getFortressClient().getInfluenceManager();
+        return getFortressClient().get_InfluenceManager();
     }
 
     public static SelectionManager getSelectionManager() {
-        return getFortressClient().getSelectionManager();
+        return getFortressClient().get_SelectionManager();
     }
 
     public static Optional<FortressClientWorld> getFortressClientWorld() {
@@ -99,7 +97,7 @@ public class ModUtils {
     }
 
     public static Optional<ClientVisualTasksHolder> getClientTasksHolder() {
-        return getFortressClientWorld().map(FortressClientWorld::getClientTasksHolder);
+        return getFortressClientWorld().map(FortressClientWorld::get_ClientTasksHolder);
     }
 
     @NotNull
@@ -108,7 +106,7 @@ public class ModUtils {
     }
 
     public static AreasClientManager getAreasClientManager() {
-        return getFortressClient().getAreasClientManager();
+        return getFortressClient().get_AreasClientManager();
     }
 
 

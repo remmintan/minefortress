@@ -48,6 +48,7 @@ import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -60,16 +61,27 @@ import static java.util.Map.entry;
 @Mixin(MinecraftClient.class)
 public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecutor<Runnable> implements FortressMinecraftClient {
 
+    @Unique
     private SelectionManager selectionManager;
+    @Unique
     private FortressHud fortressHud;
+    @Unique
     private FortressClientManager fortressClientManager;
+    @Unique
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
+    @Unique
     private ClientBlueprintManager clientBlueprintManager;
+    @Unique
     private ClientInfluenceManager influenceManager;
+    @Unique
     private BlueprintRenderer blueprintRenderer;
+    @Unique
     private CampfireRenderer campfireRenderer;
+    @Unique
     private SelectionRenderer selectionRenderer;
+    @Unique
     private TasksRenderer tasksRenderer;
+    @Unique
     private AreasClientManager areasClientManager;
 
     @Shadow
@@ -144,7 +156,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
             final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
             if(fortressWorld == null) return null;
-            return fortressWorld.getClientTasksHolder();
+            return fortressWorld.get_ClientTasksHolder();
         };
 
         final Supplier<ITasksModelBuilderInfoProvider> clientBlueprintManagerSupplier = () -> {
@@ -153,7 +165,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
             final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
             if(fortressWorld == null) return null;
-            return fortressWorld.getClientTasksHolder();
+            return fortressWorld.get_ClientTasksHolder();
         };
 
         tasksRenderer = new TasksRenderer(client,
@@ -163,12 +175,12 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public SelectionManager getSelectionManager() {
+    public SelectionManager get_SelectionManager() {
         return selectionManager;
     }
 
     @Override
-    public boolean isFortressGamemode() {
+    public boolean is_FortressGamemode() {
         return this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
     }
 
@@ -176,10 +188,10 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private void handleInputEvents(CallbackInfo ci) {
         if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS) {
             if(this.options.sprintKey.isPressed()) {
-                if(this.getBlueprintManager().isSelecting()) {
-                    this.getBlueprintManager().rotateSelectedStructureClockwise();
+                if(this.get_BlueprintManager().isSelecting()) {
+                    this.get_BlueprintManager().rotateSelectedStructureClockwise();
                 } else {
-                    this.getSelectionManager().moveSelectionUp();
+                    this.get_SelectionManager().moveSelectionUp();
                 }
             }
         }
@@ -187,7 +199,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreenMix(Screen screen, CallbackInfo ci) {
-        if(isFortressGamemode()) {
+        if(is_FortressGamemode()) {
             if(this.options.sprintKey.isPressed() && screen instanceof InventoryScreen) {
                 ci.cancel();
             }
@@ -196,23 +208,23 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method="doItemPick", at=@At("HEAD"), cancellable = true)
     public void doItemPick(CallbackInfo ci) {
-        if(this.isFortressGamemode()) {
+        if(this.is_FortressGamemode()) {
             ci.cancel();
         }
     }
 
     @Override
-    public FortressHud getFortressHud() {
+    public FortressHud get_FortressHud() {
         return fortressHud;
     }
 
     @Override
-    public FortressClientManager getFortressClientManager() {
+    public FortressClientManager get_FortressClientManager() {
         return fortressClientManager;
     }
 
     @Override
-    public BlockPos getHoveredBlockPos() {
+    public BlockPos get_HoveredBlockPos() {
         final HitResult hitResult = this.crosshairTarget;
         if(hitResult instanceof BlockHitResult) {
             return ((BlockHitResult) hitResult).getBlockPos();
@@ -236,37 +248,37 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public BlueprintRenderer getBlueprintRenderer() {
+    public BlueprintRenderer get_BlueprintRenderer() {
         return blueprintRenderer;
     }
 
     @Override
-    public CampfireRenderer getCampfireRenderer() {
+    public CampfireRenderer get_CampfireRenderer() {
         return campfireRenderer;
     }
 
     @Override
-    public SelectionRenderer getSelectionRenderer() {
+    public SelectionRenderer get_SelectionRenderer() {
         return selectionRenderer;
     }
 
     @Override
-    public TasksRenderer getTasksRenderer() {
+    public TasksRenderer get_TasksRenderer() {
         return tasksRenderer;
     }
 
     @Override
-    public ClientBlueprintManager getBlueprintManager() {
+    public ClientBlueprintManager get_BlueprintManager() {
         return this.clientBlueprintManager;
     }
 
     @Override
-    public AreasClientManager getAreasClientManager() {
+    public AreasClientManager get_AreasClientManager() {
         return this.areasClientManager;
     }
 
     @Override
-    public ClientInfluenceManager getInfluenceManager() {
+    public ClientInfluenceManager get_InfluenceManager() {
         return this.influenceManager;
     }
 
@@ -285,11 +297,12 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.selectionRenderer.close();
     }
 
+    @Unique
     private IBlockDataProvider getProperBlockDataProviderBasedOnState() {
         if(fortressClientManager.getState() == FortressState.COMBAT) {
-            return this.getInfluenceManager().getBlockDataProvider();
+            return this.get_InfluenceManager().getBlockDataProvider();
         }
 
-        return this.getBlueprintManager().getBlockDataProvider();
+        return this.get_BlueprintManager().getBlockDataProvider();
     }
 }

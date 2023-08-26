@@ -41,7 +41,7 @@ public class ClientboundProfessionSyncPacket implements FortressS2CPacket {
     @Override
     public void handle(MinecraftClient client) {
         final FortressMinecraftClient fortressCleint = (FortressMinecraftClient) client;
-        final ProfessionManager professionManager = fortressCleint.getFortressClientManager().getProfessionManager();
+        final ProfessionManager professionManager = fortressCleint.get_FortressClientManager().getProfessionManager();
         final ClientProfessionManager clientManager = (ClientProfessionManager) professionManager;
         clientManager.updateProfessions(this.professions);
     }

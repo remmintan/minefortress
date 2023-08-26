@@ -51,7 +51,7 @@ public class TreeSelection extends Selection {
             if(!treeRoots.isEmpty()) {
                 this.selectedTreeBlocks.remove(start);
                 final UUID newTaskId = UUID.randomUUID();
-                ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelection(), TaskType.REMOVE);
+                ((FortressClientWorld)level).get_ClientTasksHolder().addTask(newTaskId, getSelection(), TaskType.REMOVE);
                 final ServerboundCutTreesTaskPacket packet = new ServerboundCutTreesTaskPacket(newTaskId, Collections.unmodifiableList(treeRoots));
                 FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_CUT_TREES_TASK, packet);
             }

@@ -90,7 +90,7 @@ public class CameraTools {
     @NotNull
     public static Matrix4f getProjectionMatrix4f(MinecraftClient minecraft) {
         final GameRenderer gameRenderer = minecraft.gameRenderer;
-        double fov = ((FortressGameRenderer)gameRenderer).getFov(1.0f, true);
+        double fov = ((FortressGameRenderer)gameRenderer).get_Fov(1.0f, true);
         return getProjectionMatrix4f(minecraft, fov);
     }
 

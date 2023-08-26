@@ -139,7 +139,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
 
         Box boundingBox = this.getBoundingBox();
         List<SlimeEntity> touchingSlimes = getWorld().getEntitiesByClass(SlimeEntity.class, boundingBox, slimeEntity -> true);
-        touchingSlimes.forEach(s -> ((FortressSlimeEntity)s).touchPawn(this));
+        touchingSlimes.forEach(s -> ((FortressSlimeEntity)s).touch_Pawn(this));
     }
 
     @Nullable

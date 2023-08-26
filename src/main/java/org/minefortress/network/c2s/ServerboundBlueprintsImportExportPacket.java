@@ -74,7 +74,7 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
     private void handleExport(MinecraftServer server, ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
         byte[] bytes;
         try {
-            final var sbm = serverPlayer.getServerBlueprintManager();
+            final var sbm = serverPlayer.get_ServerBlueprintManager();
             sbm.write();
             final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
             final var blueprintsPath = FortressModDataLoader.getFolderAbsolutePath(blueprintsFolderPath, server.session);
@@ -92,7 +92,7 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
 
     private void handleImport(MinecraftServer server, ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
         try {
-            final var sbm = serverPlayer.getServerBlueprintManager();
+            final var sbm = serverPlayer.get_ServerBlueprintManager();
             final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
             final var pathString = FortressModDataLoader.getFolderAbsolutePath(blueprintsFolderPath, server.session);
             final var path = Paths.get(pathString);

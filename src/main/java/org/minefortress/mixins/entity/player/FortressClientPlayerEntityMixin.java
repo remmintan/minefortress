@@ -39,11 +39,11 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     @Override
     public HitResult raycast(double maxDistance, float tickDelta, boolean includeFluids) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        if(!fortressClient.isFortressGamemode() || this.client.options.pickItemKey.isPressed()){
+        if(!fortressClient.is_FortressGamemode() || this.client.options.pickItemKey.isPressed()){
             return super.raycast(maxDistance, tickDelta, includeFluids);
         }
 
-        if(fortressClient.getFortressHud().isHovered()) {
+        if(fortressClient.get_FortressHud().isHovered()) {
             return BlockHitResult.createMissed(new Vec3d(0, 0, 0), null, null);
         }
 
@@ -58,11 +58,11 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
         if(ModUtils.isClientInFortressGamemode()) {
             if(client.options.sprintKey.isPressed()) {
                 final FortressMinecraftClient fortressClient = ModUtils.getFortressClient();
-                final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+                final ClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
                 if(clientBlueprintManager.isSelecting()) {
                     clientBlueprintManager.rotateSelectedStructureCounterClockwise();
                 } else {
-                    final SelectionManager selectionManager = fortressClient.getSelectionManager();
+                    final SelectionManager selectionManager = fortressClient.get_SelectionManager();
                     selectionManager.moveSelectionDown();
                 }
             }

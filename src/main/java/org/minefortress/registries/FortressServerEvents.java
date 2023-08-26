@@ -54,8 +54,8 @@ public class FortressServerEvents {
             serverProfessionManager.scheduleSync();
 
             if(player instanceof FortressServerPlayerEntity fortressPlayer) {
-                if(fortressPlayer.wasInBlueprintWorldWhenLoggedOut() && fortressPlayer.getPersistedPos() != null) {
-                    final var pos = fortressPlayer.getPersistedPos();
+                if(fortressPlayer.was_InBlueprintWorldWhenLoggedOut() && fortressPlayer.get_PersistedPos() != null) {
+                    final var pos = fortressPlayer.get_PersistedPos();
                     player.teleport(pos.x, pos.y, pos.z);
                 }
             }
@@ -64,7 +64,7 @@ public class FortressServerEvents {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             final var inBlueprintWorldOnDisconnect = handler.player.getWorld().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
             if(handler.player instanceof FortressServerPlayerEntity fortressPlayer) {
-                fortressPlayer.setWasInBlueprintWorldWhenLoggedOut(inBlueprintWorldOnDisconnect);
+                fortressPlayer.set_WasInBlueprintWorldWhenLoggedOut(inBlueprintWorldOnDisconnect);
             }
         });
 

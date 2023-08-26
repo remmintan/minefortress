@@ -5,9 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import org.apache.logging.log4j.LogManager;
-import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.network.interfaces.FortressS2CPacket;
 
@@ -40,7 +38,7 @@ public class ClientboundSyncItemsPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        final var fortressClientManager = ((FortressMinecraftClient) client).getFortressClientManager();
+        final var fortressClientManager = ((FortressMinecraftClient) client).get_FortressClientManager();
         final var resourceManager = fortressClientManager.getResourceManager();
         if(needReset) resourceManager.reset();
         for (ItemInfo info : itemInfo) {

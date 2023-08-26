@@ -4,6 +4,6 @@ import org.minefortress.entity.BasePawnEntity;
 
 public interface FortressSlimeEntity {
 
-    void touchPawn(BasePawnEntity colonist);
+    void touch_Pawn(BasePawnEntity colonist);
 
 }

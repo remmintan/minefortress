@@ -30,7 +30,7 @@ public class ClientboundSyncBuildingsPacket implements FortressS2CPacket {
     @Override
     public void handle(MinecraftClient client) {
         if(client instanceof FortressMinecraftClient fortressClient) {
-            final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
+            final FortressClientManager fortressClientManager = fortressClient.get_FortressClientManager();
             fortressClientManager.updateBuildings(houses);
         }
     }

@@ -51,12 +51,12 @@ public class ServerboundEditBlueprintPacket implements FortressC2SPacket {
         if(server instanceof FortressServer fortressServer) {
             if(player instanceof FortressServerPlayerEntity fortressPlayer) {
                 if(type == Type.REMOVE) {
-                    fortressPlayer.getServerBlueprintManager().remove(blueprintFileName);
+                    fortressPlayer.get_ServerBlueprintManager().remove(blueprintFileName);
                 } else {
                     final BlueprintsWorld blueprintsWorld = fortressServer.get_BlueprintsWorld();
                     if(type == Type.EDIT) {
                         final var blockData = fortressPlayer
-                                .getServerBlueprintManager()
+                                .get_ServerBlueprintManager()
                                 .getBlockDataManager()
                                 .getBlockData(blueprintFileName, BlockRotation.NONE);
                         final Map<BlockPos, BlockState> blueprintData = blockData

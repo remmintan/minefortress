@@ -44,20 +44,20 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
     @Shadow public abstract void reset();
 
     @Override
-    public double getFov(float f, boolean b) {
+    public double get_Fov(float f, boolean b) {
         return this.getFov(this.getCamera(), f, b);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick(CallbackInfo ci) {
         final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        final SelectionManager selectionManager = fortressClient.getSelectionManager();
-        final FortressClientManager fortressClientManager = fortressClient.getFortressClientManager();
+        final SelectionManager selectionManager = fortressClient.get_SelectionManager();
+        final FortressClientManager fortressClientManager = fortressClient.get_FortressClientManager();
         final var fightSelectionManager = fortressClientManager
                 .getFightManager()
                 .getSelectionManager();
         final var areasClientManager = ModUtils.getAreasClientManager();
-        if (fortressClient.isFortressGamemode()) {
+        if (fortressClient.is_FortressGamemode()) {
             if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
                 if(fortressClientManager.isCenterNotSet()) {
                     resetAllSelectionManagers();
@@ -65,7 +65,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                     return;
                 }
 
-                final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+                final ClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
                 if(clientBlueprintManager.isSelecting()) {
                     resetAllSelectionManagers();
                     return;

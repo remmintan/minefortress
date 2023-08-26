@@ -63,7 +63,7 @@ public final class FortressClientManager extends AbstractFortressManager {
     private FortressState state = FortressState.BUILD;
 
     public FortressClientManager() {
-        professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).getFortressClientManager());
+        professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).get_FortressClientManager());
     }
 
     public void select(BasePawnEntity colonist) {
@@ -149,7 +149,7 @@ public final class FortressClientManager extends AbstractFortressManager {
                 }
             }
 
-            final BlockPos hoveredBlockPos = fortressClient.getHoveredBlockPos();
+            final BlockPos hoveredBlockPos = fortressClient.get_HoveredBlockPos();
             if(hoveredBlockPos!=null && !hoveredBlockPos.equals(BlockPos.ORIGIN)) {
                 if(hoveredBlockPos.equals(oldPosAppropriateForCenter)) return;
 

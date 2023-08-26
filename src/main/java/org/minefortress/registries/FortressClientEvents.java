@@ -35,8 +35,8 @@ public class FortressClientEvents {
             }
         }
 
-        fortressClient.getFortressHud().tick();
-        final var fortressClientManager = fortressClient.getFortressClientManager();
+        fortressClient.get_FortressHud().tick();
+        final var fortressClientManager = fortressClient.get_FortressClientManager();
         fortressClientManager.tick(fortressClient);
         if(fortressClientManager.gamemodeNeedsInitialization() && !(client.currentScreen instanceof ChooseModeScreen)) {
             client.setScreen(new ChooseModeScreen());
@@ -46,18 +46,18 @@ public class FortressClientEvents {
     private static void endClientTick(MinecraftClient client) {
         while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
             final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
-            final ClientBlueprintManager clientBlueprintManager = fortressClient.getBlueprintManager();
+            final ClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
             if(clientBlueprintManager.isSelecting()) {
-                fortressClient.getBlueprintManager().selectNext();
+                fortressClient.get_BlueprintManager().selectNext();
             } else {
-                fortressClient.getSelectionManager().toggleSelectionType();
+                fortressClient.get_SelectionManager().toggleSelectionType();
             }
         }
 
         while (FortressKeybindings.cancelTaskKeybinding.wasPressed()) {
             final ClientWorld world = client.world;
             if(world != null) {
-                final ClientVisualTasksHolder clientVisualTasksHolder = ((FortressClientWorld) world).getClientTasksHolder();
+                final ClientVisualTasksHolder clientVisualTasksHolder = ((FortressClientWorld) world).get_ClientTasksHolder();
 
                 if(client.options.sprintKey.isPressed()) {
                     clientVisualTasksHolder.cancelAllTasks();

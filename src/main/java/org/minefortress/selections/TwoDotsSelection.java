@@ -56,7 +56,7 @@ public class TwoDotsSelection extends Selection {
             if(pickedBlock != null && hitResult instanceof BlockHitResult && click == this.clickType && connection != null && selectionEnd != null) {
                 UUID newTaskId = UUID.randomUUID();
                 TaskType taskType = mapClickTypeToTaskType(clickType);
-                ((FortressClientWorld)level).getClientTasksHolder().addTask(newTaskId, getSelection(), taskType);
+                ((FortressClientWorld)level).get_ClientTasksHolder().addTask(newTaskId, getSelection(), taskType);
                 ServerboundSimpleSelectionTaskPacket packet = new ServerboundSimpleSelectionTaskPacket(
                         newTaskId,
                         taskType,

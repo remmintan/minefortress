@@ -34,7 +34,7 @@ public class ProfessionsLayer {
 
 
     public ProfessionsLayer(FortressMinecraftClient client) {
-        final ProfessionManager professionManager = client.getFortressClientManager().getProfessionManager();
+        final ProfessionManager professionManager = client.get_FortressClientManager().getProfessionManager();
         ProfessionWidget root = createProfessionsTree(professionManager);
 
         ProfessionsPositioner.arrangeForTree(root);

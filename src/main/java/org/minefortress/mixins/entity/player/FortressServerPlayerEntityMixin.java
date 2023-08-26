@@ -85,14 +85,14 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     }
 
     @Override
-    public ServerBlueprintManager getServerBlueprintManager() {
+    public ServerBlueprintManager get_ServerBlueprintManager() {
         return serverBlueprintManager;
     }
 
     @Inject(method = "copyFrom", at = @At("TAIL"))
     public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         if(oldPlayer instanceof FortressServerPlayerEntity fortressServerPlayer) {
-            this.serverBlueprintManager = fortressServerPlayer.getServerBlueprintManager();
+            this.serverBlueprintManager = fortressServerPlayer.get_ServerBlueprintManager();
         }
     }
 
@@ -139,18 +139,18 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     }
 
     @Override
-    public boolean wasInBlueprintWorldWhenLoggedOut() {
+    public boolean was_InBlueprintWorldWhenLoggedOut() {
         return wasInBlueprintWorldWhenLoggedOut;
     }
 
     @Override
-    public void setWasInBlueprintWorldWhenLoggedOut(boolean wasInBlueprintWorldWhenLoggedOut) {
+    public void set_WasInBlueprintWorldWhenLoggedOut(boolean wasInBlueprintWorldWhenLoggedOut) {
         this.wasInBlueprintWorldWhenLoggedOut = wasInBlueprintWorldWhenLoggedOut;
     }
 
     @Override
     @Nullable
-    public Vec3d getPersistedPos() {
+    public Vec3d get_PersistedPos() {
         return persistedPos;
     }
 

@@ -109,15 +109,15 @@ public class ToolsHudLayer extends AbstractHudLayer {
     }
 
     private boolean treeCutterSelected() {
-        return ModUtils.getFortressClient().getSelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
+        return ModUtils.getFortressClient().get_SelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
     }
 
     private boolean roadsSelected() {
-        return ModUtils.getFortressClient().getSelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
+        return ModUtils.getFortressClient().get_SelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
     }
 
     private boolean blueprintSelected() {
-        return ModUtils.getFortressClient().getBlueprintManager().isSelecting();
+        return ModUtils.getFortressClient().get_BlueprintManager().isSelecting();
     }
 
 }

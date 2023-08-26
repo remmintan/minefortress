@@ -47,8 +47,8 @@ public final class BlueprintScreenHandler {
     }
 
     public void scroll(float scrollPosition) {
-        final var blueprintManager = fortressClient.getBlueprintManager();
-        final var fortressClientManager = fortressClient.getFortressClientManager();
+        final var blueprintManager = fortressClient.get_BlueprintManager();
+        final var fortressClientManager = fortressClient.get_FortressClientManager();
         final var resourceManager = fortressClientManager.getResourceManager();
         final List<BlueprintMetadata> allBlueprint = blueprintManager.getAllBlueprints(selectedGroup);
         this.totalSize = allBlueprint.size();
@@ -117,7 +117,7 @@ public final class BlueprintScreenHandler {
             }
             return;
         }
-        fortressClient.getBlueprintManager().select(focusedSlot.getMetadata());
+        fortressClient.get_BlueprintManager().select(focusedSlot.getMetadata());
     }
 
     public int getSelectedGroupSize() {

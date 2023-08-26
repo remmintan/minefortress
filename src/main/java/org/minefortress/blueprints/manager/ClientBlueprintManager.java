@@ -110,7 +110,7 @@ public final class ClientBlueprintManager extends BaseClientStructureManager {
         blockDataManager.setBlueprint(fileName, tag);
         blockDataManager.invalidateBlueprint(fileName);
         if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().invalidateBlueprint(fileName);
+            fortressClient.get_BlueprintRenderer().getBlueprintsModelBuilder().invalidateBlueprint(fileName);
         }
     }
 
@@ -126,7 +126,7 @@ public final class ClientBlueprintManager extends BaseClientStructureManager {
         this.blockDataManager.reset();
         if(client instanceof FortressMinecraftClient fortressClient) {
             try {
-                fortressClient.getBlueprintRenderer().getBlueprintsModelBuilder().reset();
+                fortressClient.get_BlueprintRenderer().getBlueprintsModelBuilder().reset();
             }catch (Exception ignore) {}
         }
     }
