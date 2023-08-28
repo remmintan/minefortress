@@ -10,7 +10,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.joml.Vector4f;
-import net.remmintan.panama.model.BuiltModel;
 import org.minefortress.selections.ClientSelection;
 
 import java.util.HashSet;
@@ -18,11 +17,14 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
+import static net.remmintan.panama.RenderHelper.scheduleUpload;
+
 public class BuiltTasks implements BuiltModel {
     private static final Box BOX = Box.from(new Vec3d(0, 0, 0));
 
     private final VertexBuffer buffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
     private final Set<ClientSelection> tasks;
+    private BufferBuilder.BuiltBuffer builtBuffer;
 
     private boolean initialized = false;
     private boolean notEmpty = false;
@@ -35,7 +37,7 @@ public class BuiltTasks implements BuiltModel {
 
     public void build(BufferBuilder bufferBuilder) {
         this.render(bufferBuilder);
-        this.upload(bufferBuilder);
+        this.upload();
     }
 
     @Override
@@ -75,6 +77,10 @@ public class BuiltTasks implements BuiltModel {
             matrices.pop();
             notEmpty = true;
         }
+
+        if(initialized) {
+            builtBuffer = bufferBuilder.end();
+        }
     }
 
     private void init(BufferBuilder bufferBuilder) {
@@ -84,21 +90,10 @@ public class BuiltTasks implements BuiltModel {
         }
     }
 
-    private void upload(BufferBuilder bufferBuilder){
+    private void upload(){
         if(initialized) {
-            this.upload = scheduleUpload(bufferBuilder.end(), buffer);
+            this.upload = scheduleUpload(builtBuffer, buffer);
         }
-    }
-
-    public CompletableFuture<Void> scheduleUpload(BufferBuilder.BuiltBuffer builtBuffer, VertexBuffer glBuffer) {
-        Runnable runnable = () -> {
-            if (!glBuffer.isClosed()) {
-                glBuffer.bind();
-                glBuffer.upload(builtBuffer);
-                VertexBuffer.unbind();
-            }
-        };
-        return CompletableFuture.runAsync(runnable);
     }
 
     private ClientWorld getWorld() {

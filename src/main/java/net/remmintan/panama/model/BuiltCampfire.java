@@ -9,6 +9,7 @@ import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.panama.RenderHelper;
 import net.remmintan.panama.view.CampfireRenderView;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,16 +79,10 @@ public class BuiltCampfire implements BuiltModel {
         final var uploadFutures = initializedLayers
                 .stream()
                 .map(layer -> {
-                    final var vertexBuffer = vertexBuffers.get(layer);
                     final var builtBuffer = builtBuffers.get(layer);
+                    final var vertexBuffer = vertexBuffers.get(layer);
 
-                    return CompletableFuture.runAsync(() -> {
-                        if (!vertexBuffer.isClosed()) {
-                            vertexBuffer.bind();
-                            vertexBuffer.upload(builtBuffer);
-                            VertexBuffer.unbind();
-                        }
-                    }, getClient());
+                    return RenderHelper.scheduleUpload(builtBuffer, vertexBuffer);
                 })
                 .toArray(CompletableFuture[]::new);
 
