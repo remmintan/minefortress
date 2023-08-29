@@ -62,8 +62,9 @@ public class BuiltTasks implements BuiltModel {
         for(ClientSelection selection: tasks)
             renderBlock(bufferBuilder, matrices, selection::shouldRenderBlock, selection, selection.getColor());
 
-
-        if(initialized) bufferBuilder.end();
+        if(initialized) {
+            builtBuffer = bufferBuilder.end();
+        }
     }
 
     private void renderBlock(BufferBuilder bufferBuilder, MatrixStack matrices, BiFunction<World, BlockPos, Boolean> shouldRender, ClientSelection selection, Vector4f color) {
@@ -76,10 +77,6 @@ public class BuiltTasks implements BuiltModel {
             WorldRenderer.drawBox(matrices, bufferBuilder, BOX, color.x(), color.y(), color.z(), color.w());
             matrices.pop();
             notEmpty = true;
-        }
-
-        if(initialized) {
-            builtBuffer = bufferBuilder.end();
         }
     }
 

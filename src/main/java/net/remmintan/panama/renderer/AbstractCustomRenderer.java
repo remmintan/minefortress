@@ -53,7 +53,6 @@ public abstract class AbstractCustomRenderer {
 
         layer.startDrawing();
 
-        final VertexFormat vertexFormat = layer.getVertexFormat();
         final ShaderProgram shader = RenderSystem.getShader();
         if(shader == null) throw new IllegalStateException("Shader is null");
 
@@ -63,9 +62,13 @@ public abstract class AbstractCustomRenderer {
             shader.addSampler("Sampler" + i, textureReference);
         }
         if(shader.modelViewMat != null) {
-            final Matrix4f modelViewMatrix = matrices.peek().getPositionMatrix();
+            matrices.push();
+            Matrix4f modelViewMatrix = matrices.peek().getPositionMatrix();
+            modelViewMatrix.translate((float)-cameraX, (float)-cameraY, (float)-cameraZ);
             shader.modelViewMat.set(modelViewMatrix);
+            matrices.pop();
         }
+
         if(shader.projectionMat != null) {
             shader.projectionMat.set(projectionMatrix);
         }
@@ -92,39 +95,26 @@ public abstract class AbstractCustomRenderer {
         shader.bind();
         final GlUniform offset = shader.chunkOffset;
 
-        if(offset == null) {
-            matrices.push();
-            matrices.translate(-cameraX, -cameraY, -cameraZ);
-        }
-
         final Optional<BlockPos> renderTargetPositionOpt = getRenderTargetPosition();
-//        boolean notEmpty = false;
         if(renderTargetPositionOpt.isPresent()) {
             final BlockPos renderTargetPosition = renderTargetPositionOpt.get();
             final BuiltModel builtModel = builtModelOpt.get();
 
             if(offset != null) {
-                Vector3f cameraPosition = new Vector3f((float) cameraX, (float)cameraY, (float)cameraZ);
                 final Vector3f targetOffset = new Vector3f(renderTargetPosition.getX(), renderTargetPosition.getY(), renderTargetPosition.getZ());
-                offset.set(targetOffset.sub(cameraPosition));
+                offset.set(targetOffset);
                 offset.upload();
             }
 
             final VertexBuffer buffer = builtModel.getBuffer(layer);
             buffer.bind();
             buffer.draw();
-//            notEmpty = true;
         }
 
         if(offset != null) {
             offset.set(new Vector3f());
-        } else {
-            matrices.pop();
         }
         shader.unbind();
-//        if(notEmpty) {
-//            vertexFormat.clearState();
-//        }
 
         VertexBuffer.unbind();
         layer.endDrawing();
