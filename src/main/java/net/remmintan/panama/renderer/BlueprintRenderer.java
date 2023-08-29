@@ -113,20 +113,19 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         DiffuseLighting.enableGuiDepthLighting();
 
         // calculating matrix
-        final MatrixStack matrices = RenderSystem.getModelViewStack();
-        final Matrix4f projectionMatrix4f = RenderSystem.getProjectionMatrix();
+        final var matrices = RenderSystem.getModelViewStack();
+        final var projectionMatrix = RenderSystem.getProjectionMatrix();
 
-        final Vector3f cameraMove = new Vector3f(x, y, z);
+        final var cameraMove = new Vector3f(x, y, z);
         matrices.push();
-
         rotateScene(matrices, cameraMove);
         matrices.scale(scale, -scale, scale);
         matrices.translate(cameraMove.x(), cameraMove.y(), cameraMove.z());
 
-        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
-        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
-        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
-        this.renderLayer(RenderLayer.getTranslucent(), builtBlueprint, matrices, projectionMatrix4f, isEnoughResources);
+        this.renderLayer(RenderLayer.getSolid(), builtBlueprint, matrices, projectionMatrix, isEnoughResources);
+        this.renderLayer(RenderLayer.getCutout(), builtBlueprint, matrices, projectionMatrix, isEnoughResources);
+        this.renderLayer(RenderLayer.getCutoutMipped(), builtBlueprint, matrices, projectionMatrix, isEnoughResources);
+        this.renderLayer(RenderLayer.getTranslucent(), builtBlueprint, matrices, projectionMatrix, isEnoughResources);
 
         matrices.pop();
         super.client.getProfiler().pop();

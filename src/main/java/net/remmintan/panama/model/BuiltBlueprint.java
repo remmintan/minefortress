@@ -1,6 +1,5 @@
 package net.remmintan.panama.model;
 
-import com.mojang.blaze3d.systems.VertexSorter;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -9,21 +8,21 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
-import net.minecraft.client.render.chunk.ChunkOcclusionData;
-import net.minecraft.client.render.chunk.ChunkOcclusionDataBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.ColorResolver;
+import net.remmintan.panama.RenderHelper;
 import net.remmintan.panama.view.BlueprintBlockRenderView;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.StrctureBlockData;
-import net.remmintan.panama.RenderHelper;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -33,19 +32,14 @@ public class BuiltBlueprint implements BuiltModel {
 
     private final Set<RenderLayer> initializedLayers = new HashSet<>();
     private final Set<RenderLayer> nonEmptyLayers = new HashSet<>();
-
-    private final Map<RenderLayer, BufferBuilder.BuiltBuffer> builtBuffers = new HashMap<>();
-
-    private BufferBuilder.TransparentSortingData bufferState;
-    private ChunkOcclusionData occlusionData;
-
-    private CompletableFuture<List<Void>> uploadsFuture;
-
     private final Map<RenderLayer, VertexBuffer> vertexBuffers = RenderLayer
             .getBlockLayers()
             .stream()
             .collect(Collectors.toMap(Function.identity(), it -> new VertexBuffer(VertexBuffer.Usage.STATIC)));
+    private final Map<RenderLayer, BufferBuilder.BuiltBuffer> builtBuffers = new HashMap<>();
 
+
+    private CompletableFuture<Void> uploadsFuture;
     private final BlockRenderView blueprintData;
     private final Vec3i size;
 
@@ -85,7 +79,7 @@ public class BuiltBlueprint implements BuiltModel {
     }
 
     private void uploadBuffers() {
-        final List<CompletableFuture<Void>> uploadFutures = initializedLayers
+        final var uploadFutures = initializedLayers
                 .stream()
                 .map(layer -> {
                     final var bufferBuilder = builtBuffers.get(layer);
@@ -93,9 +87,9 @@ public class BuiltBlueprint implements BuiltModel {
 
                     return RenderHelper.scheduleUpload(bufferBuilder, vertexBuffer);
                 })
-                .collect(Collectors.toList());
+                .toArray(CompletableFuture[]::new);
 
-        uploadsFuture = Util.combine(uploadFutures);
+        uploadsFuture = CompletableFuture.allOf(uploadFutures);
     }
 
 
@@ -104,16 +98,12 @@ public class BuiltBlueprint implements BuiltModel {
         BlockPos maxPos = minPos.add(15, 15,15);
 
         MatrixStack matrixStack = new MatrixStack();
-        ChunkOcclusionDataBuilder chunkOcclusionDataBuilder = new ChunkOcclusionDataBuilder();
 
         BlockModelRenderer.enableBrightnessCache();
         final BlockRenderManager blockRenderManager = getClient().getBlockRenderManager();
 
         for(BlockPos pos : BlockPos.iterate(minPos, maxPos)) {
             final BlockState blockState = blueprintData.getBlockState(pos);
-            if(blockState.isOpaqueFullCube(blueprintData, pos)) {
-                chunkOcclusionDataBuilder.markClosed(pos);
-            }
             // TODO: add block entity rendering
             final FluidState fluidState = blueprintData.getFluidState(pos);
             if(!fluidState.isEmpty()) {
@@ -131,17 +121,12 @@ public class BuiltBlueprint implements BuiltModel {
             initLayer(blockLayer, bufferBuilder);
 
             matrixStack.push();
-            matrixStack.translate(pos.getX() & 0xf, pos.getY() & 0xf, pos.getZ() & 0xf);
+            matrixStack.translate(pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF);
 
             blockRenderManager.renderBlock(blockState, pos, blueprintData, matrixStack, bufferBuilder,  true, getClient().world.random);
             nonEmptyLayers.add(blockLayer);
 
             matrixStack.pop();
-        }
-        if(nonEmptyLayers.contains(RenderLayer.getTranslucent())) {
-            final BufferBuilder translucentBuilder = blockBufferBuilders.get(RenderLayer.getTranslucent());
-            translucentBuilder.setSorter(VertexSorter.BY_DISTANCE);
-            bufferState = translucentBuilder.getSortingData();
         }
 
         for (RenderLayer layer : initializedLayers) {
@@ -149,8 +134,6 @@ public class BuiltBlueprint implements BuiltModel {
         }
 
         BlockModelRenderer.disableBrightnessCache();
-
-        occlusionData = chunkOcclusionDataBuilder.build();
     }
 
     private void initLayer(RenderLayer renderLayer, BufferBuilder bufferBuilder) {
