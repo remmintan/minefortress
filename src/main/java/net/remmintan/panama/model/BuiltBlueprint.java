@@ -33,7 +33,8 @@ public class BuiltBlueprint implements BuiltModel {
 
     private final Set<RenderLayer> initializedLayers = new HashSet<>();
     private final Set<RenderLayer> nonEmptyLayers = new HashSet<>();
-    private final Random random = new Random();
+
+    private final Map<RenderLayer, BufferBuilder.BuiltBuffer> builtBuffers = new HashMap<>();
 
     private BufferBuilder.TransparentSortingData bufferState;
     private ChunkOcclusionData occlusionData;
@@ -57,7 +58,7 @@ public class BuiltBlueprint implements BuiltModel {
 
     public void build(BlockBufferBuilderStorage blockBufferBuilders) {
         render(blockBufferBuilders);
-        uploadBuffers(blockBufferBuilders);
+        uploadBuffers();
     }
 
     public boolean buffersUploaded() {
@@ -83,11 +84,11 @@ public class BuiltBlueprint implements BuiltModel {
         return size;
     }
 
-    private void uploadBuffers(BlockBufferBuilderStorage blockBufferBuilders) {
+    private void uploadBuffers() {
         final List<CompletableFuture<Void>> uploadFutures = initializedLayers
                 .stream()
                 .map(layer -> {
-                    final var bufferBuilder = blockBufferBuilders.get(layer);
+                    final var bufferBuilder = builtBuffers.get(layer);
                     final var vertexBuffer = vertexBuffers.get(layer);
 
                     return RenderHelper.scheduleUpload(bufferBuilder, vertexBuffer);
@@ -143,7 +144,10 @@ public class BuiltBlueprint implements BuiltModel {
             bufferState = translucentBuilder.getSortingData();
         }
 
-        initializedLayers.stream().map(blockBufferBuilders::get).forEach(BufferBuilder::end);
+        for (RenderLayer layer : initializedLayers) {
+            builtBuffers.put(layer, blockBufferBuilders.get(layer).end());
+        }
+
         BlockModelRenderer.disableBrightnessCache();
 
         occlusionData = chunkOcclusionDataBuilder.build();

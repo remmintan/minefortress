@@ -31,8 +31,8 @@ public class FortressToast implements Toast {
 
         renderItem(drawContext);
 
-        drawContext.drawTextWithShadow(textRenderer, this.title, 30, 7, 0xff500050);
-        drawContext.drawTextWithShadow(textRenderer, this.descriptionFirstLine, 30, 18, 0xff000000);
+        drawContext.drawText(textRenderer, this.title, 30, 7, 0xff500050, false);
+        drawContext.drawText(textRenderer, this.descriptionFirstLine, 30, 18, 0xff000000, false);
 
         return visibility;
     }
@@ -44,7 +44,7 @@ public class FortressToast implements Toast {
     private void renderItem(DrawContext drawContext) {
         RenderSystem.enableBlend();
         drawContext.drawItem(itemStack, 6, 6);
-        RenderSystem.enableBlend();
+        RenderSystem.disableBlend();
     }
 
 }

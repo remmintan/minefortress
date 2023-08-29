@@ -13,24 +13,22 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.panama.RenderHelper;
+import net.remmintan.panama.view.SelectionBlockRenderView;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4f;
 import org.minefortress.renderer.FortressRenderLayer;
 import org.minefortress.selections.ClickType;
-import net.remmintan.panama.RenderHelper;
-import net.remmintan.panama.view.SelectionBlockRenderView;
 import org.minefortress.selections.renderer.selection.SelectionRenderInfo;
 import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class BuiltSelection implements BuiltModel {
 
@@ -40,8 +38,9 @@ public class BuiltSelection implements BuiltModel {
 
     private final Set<RenderLayer> initializedLayers = new HashSet<>();
     private final Set<RenderLayer> nonEmptyLayers = new HashSet<>();
-    private final Map<RenderLayer, VertexBuffer> buffers = new HashMap<>();
-    private CompletableFuture<List<Void>> upload;
+    private final Map<RenderLayer, VertexBuffer> vertexBuffers = new HashMap<>();
+    private final Map<RenderLayer, BufferBuilder.BuiltBuffer> builtBufferMap = new HashMap<>();
+    private CompletableFuture<Void> upload;
 
     private final SelectionRenderInfo selection;
 
@@ -52,10 +51,10 @@ public class BuiltSelection implements BuiltModel {
         this.selection = selection;
 
         for(RenderLayer layer : RenderLayer.getBlockLayers()) {
-            buffers.put(layer, new VertexBuffer(VertexBuffer.Usage.STATIC));
+            vertexBuffers.put(layer, new VertexBuffer(VertexBuffer.Usage.STATIC));
         }
-        buffers.put(RenderLayer.getLines(), new VertexBuffer(VertexBuffer.Usage.STATIC));
-        buffers.put(FortressRenderLayer.getLinesNoDepth(), new VertexBuffer(VertexBuffer.Usage.STATIC));
+        vertexBuffers.put(RenderLayer.getLines(), new VertexBuffer(VertexBuffer.Usage.STATIC));
+        vertexBuffers.put(FortressRenderLayer.getLinesNoDepth(), new VertexBuffer(VertexBuffer.Usage.STATIC));
     }
 
     private BlockPos getBlockPos() {
@@ -64,7 +63,7 @@ public class BuiltSelection implements BuiltModel {
 
     public void build(Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage) {
         render(lineBufferBuilderStorage, blockBufferBuilderStorage);
-        uploadBuffers(lineBufferBuilderStorage, blockBufferBuilderStorage);
+        uploadBuffers();
     }
 
     private void render(Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage) {
@@ -82,7 +81,6 @@ public class BuiltSelection implements BuiltModel {
         final BlockState blockState = selection.blockState();
         selectionBlockRenderView.setBlockStateSupplier((blockPos) -> positions.contains(blockPos)?blockState: Blocks.AIR.getDefaultState());
         for (BlockPos pos : positions) {
-
             matrices.push();
             matrices.translate(pos.getX(), pos.getY(), pos.getZ());
             WorldRenderer.drawBox(matrices, linesBufferBuilder, BOX, color.x(), color.y(), color.z(), color.w());
@@ -115,11 +113,14 @@ public class BuiltSelection implements BuiltModel {
             }
         }
 
-        for(RenderLayer initializedLayer : this.initializedLayers) {
-            if(initializedLayer == RenderLayer.getLines() || initializedLayer == FortressRenderLayer.getLinesNoDepth())
-                lineBufferBuilderStorage.get(initializedLayer).end();
-            else
-                blockBufferBuilderStorage.get(initializedLayer).end();
+        for(var layer : this.initializedLayers) {
+            final BufferBuilder.BuiltBuffer builtBuffer;
+            if(layer == RenderLayer.getLines() || layer == FortressRenderLayer.getLinesNoDepth()) {
+                builtBuffer = lineBufferBuilderStorage.get(layer).end();
+            } else {
+                builtBuffer = blockBufferBuilderStorage.get(layer).end();
+            }
+            this.builtBufferMap.put(layer, builtBuffer);
         }
     }
 
@@ -148,9 +149,10 @@ public class BuiltSelection implements BuiltModel {
             final BufferBuilder blockBufferBuilder = blockBufferBuilderStorage.get(blockLayer);
             init(blockLayer, blockBufferBuilder);
 
-
             final BlockRenderManager blockRenderer = getBlockRenderManager();
             blockRenderer.renderBlock(blockState, pos, selectionBlockRenderView, matrices, blockBufferBuilder, true, getWorld().random);
+
+            nonEmptyLayers.add(blockLayer);
         }
     }
 
@@ -164,35 +166,33 @@ public class BuiltSelection implements BuiltModel {
         }
     }
 
-    private void uploadBuffers(Map<RenderLayer, BufferBuilder> lineBufferBuilderStorage, BlockBufferBuilderStorage blockBufferBuilderStorage) {
-        final List<CompletableFuture<Void>> uploads = initializedLayers
+    private void uploadBuffers() {
+        final var uploads = initializedLayers
                 .stream()
                 .map(layer -> {
-                    final VertexBuffer vertexBuffer = buffers.get(layer);
-                    if (layer == RenderLayer.getLines() || layer == FortressRenderLayer.getLinesNoDepth()) {
-                        final BufferBuilder bufferBuilder = lineBufferBuilderStorage.get(layer);
-                        return RenderHelper.scheduleUpload(bufferBuilder, vertexBuffer);
-                    } else {
-                        final BufferBuilder buffer = blockBufferBuilderStorage.get(layer);
-                        return RenderHelper.scheduleUpload(buffer, vertexBuffer);
-                    }
-                }).collect(Collectors.toList());
-        this.upload = Util.combine(uploads);
+                    final var vertexBuffer = vertexBuffers.get(layer);
+                    final var builtBuffer = builtBufferMap.get(layer);
+                    return RenderHelper.scheduleUpload(builtBuffer, vertexBuffer);
+                }).toArray(CompletableFuture[]::new);
+        this.upload = CompletableFuture.allOf(uploads);
     }
 
     @Override
     public boolean hasLayer(RenderLayer layer) {
+        if(upload.isCompletedExceptionally())
+            throw new IllegalStateException("Render buffers uploads failed");
+
         return upload.isDone() && nonEmptyLayers.contains(layer);
     }
 
     @Override
     public VertexBuffer getBuffer(RenderLayer layer) {
-        return buffers.get(layer);
+        return vertexBuffers.get(layer);
     }
 
     @Override
     public void close() {
-        buffers.values().forEach(VertexBuffer::close);
+        vertexBuffers.values().forEach(VertexBuffer::close);
     }
 
     private ClientWorld getWorld() {
