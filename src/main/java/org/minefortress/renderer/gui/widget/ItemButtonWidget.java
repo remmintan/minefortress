@@ -36,6 +36,8 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
                 0,
                 20,
                 FORTRESS_BUTTON_TEXTURE,
+                FORTRESS_BUTTON_WIDTH,
+                FORTRESS_BUTTON_HEIGHT,
                 clickAction
         );
         this.itemStack = new ItemStack(item);
