@@ -1,14 +1,19 @@
 package org.minefortress.renderer.gui.widget;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.hud.interfaces.IItemHudElement;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -40,6 +45,7 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
                 FORTRESS_BUTTON_HEIGHT,
                 clickAction
         );
+        this.setTooltip(Tooltip.of(Text.literal(tooltipText)));
         this.itemStack = new ItemStack(item);
         this.anchorX = anchorX;
         this.anchorY = anchorY;
@@ -72,6 +78,16 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
 
         if(this.checked){
             this.drawTexture(drawContext, ARROWS_TEXTURE, this.getX()-15, this.getY()+2, 12, 208, 0, 14, 18, 512, 512);
+        }
+
+        if(this.hovered) {
+            final var client = MinecraftClient.getInstance();
+            final var textRenderer = client.textRenderer;
+            final var tooltip = this.getTooltip();
+            if (tooltip != null) {
+                final List<OrderedText> lines = tooltip.getLines(client);
+                drawContext.drawTooltip(textRenderer, lines, this.getTooltipPositioner(), mouseX, mouseY);
+            }
         }
     }
 
