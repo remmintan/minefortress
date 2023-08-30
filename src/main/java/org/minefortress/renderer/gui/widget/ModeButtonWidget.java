@@ -21,7 +21,7 @@ public class ModeButtonWidget extends ItemButtonWidget {
     @Override
     public void renderButton(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         int v = 0;
-        if (this.isSelected() || isActiveSupplier.get()) {
+        if (isActiveSupplier.get() && !this.isSelected()) {
             int hoveredVOffset = 20;
             v += hoveredVOffset;
         }
