@@ -15,7 +15,6 @@ import org.minefortress.utils.ModUtils;
 public class FortressClientEvents {
 
     public static void register() {
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ModUtils.getFortressClientManager().reset());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ModUtils.getFortressClientManager().reset());
         ClientTickEvents.START_CLIENT_TICK.register(FortressClientEvents::startClientTick);
         ClientTickEvents.END_CLIENT_TICK.register(FortressClientEvents::endClientTick);

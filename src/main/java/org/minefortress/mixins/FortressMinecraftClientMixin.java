@@ -284,7 +284,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
 
     @Override
-    public void openHireScreen(MinecraftClient client, String screenName, Map<String, HireInfo> professions) {
+    public void open_HireScreen(MinecraftClient client, String screenName, Map<String, HireInfo> professions) {
         final var handler = new ClientHireHandler(screenName, professions);
         final var screen = new HirePawnScreen(handler);
         client.setScreen(screen);

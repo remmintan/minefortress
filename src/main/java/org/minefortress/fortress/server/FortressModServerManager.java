@@ -4,6 +4,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.fortress.FortressServerManager;
@@ -24,7 +25,7 @@ public class FortressModServerManager {
     }
 
     public FortressServerManager getByPlayer(ServerPlayerEntity player) {
-        final var playerId = player.getUuid();
+        final var playerId = Uuids.getUuidFromProfile(player.getGameProfile());
         return serverManagers.computeIfAbsent(playerId, (it) -> new FortressServerManager(server));
     }
 

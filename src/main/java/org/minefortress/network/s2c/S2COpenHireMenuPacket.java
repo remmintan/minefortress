@@ -46,6 +46,6 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        client.execute(() -> ModUtils.getFortressClient().openHireScreen(client, screenName, professions));
+        client.execute(() -> ModUtils.getFortressClient().open_HireScreen(client, screenName, professions));
     }
 }

@@ -18,7 +18,7 @@ import java.util.Map;
 
 public interface FortressMinecraftClient {
 
-    void openHireScreen(MinecraftClient client, String screenName1, Map<String, HireInfo> professions1);
+    void open_HireScreen(MinecraftClient client, String screenName1, Map<String, HireInfo> professions1);
     SelectionManager get_SelectionManager();
     FortressHud get_FortressHud();
     AreasClientManager get_AreasClientManager();

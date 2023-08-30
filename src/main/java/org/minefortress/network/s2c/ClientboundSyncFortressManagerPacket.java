@@ -41,9 +41,7 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        if(client instanceof FortressMinecraftClient fortressClient) {
-            fortressClient.get_FortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.connectedToTheServer, this.maxColonistsCount, reservedColonistsCount);
-        }
+        ((FortressMinecraftClient)client).get_FortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.connectedToTheServer, this.maxColonistsCount, reservedColonistsCount);
     }
 
     @Override
