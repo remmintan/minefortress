@@ -8,7 +8,6 @@ import net.minecraft.item.Item;
 import java.util.function.Supplier;
 
 public class ModeButtonWidget extends ItemButtonWidget {
-
     private final Supplier<Boolean> isActiveSupplier;
 
     public ModeButtonWidget(
@@ -20,16 +19,26 @@ public class ModeButtonWidget extends ItemButtonWidget {
 
     @Override
     public void renderButton(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        int u = 0;
         int v = 0;
         if (isActiveSupplier.get() && !this.isSelected()) {
             int hoveredVOffset = 20;
             v += hoveredVOffset;
         }
         RenderSystem.enableDepthTest();
-        int textureWidth = 32;
-        int textureHeight = 64;
-        int u = 0;
-        this.drawTexture(drawContext, FORTRESS_BUTTON_TEXTURE, this.getX(), this.getY(), u, v, 20, this.width, this.height, textureWidth, textureHeight);
+        this.drawTexture(
+                drawContext,
+                FORTRESS_BUTTON_TEXTURE,
+                this.getX(),
+                this.getY(),
+                u,
+                v,
+                20,
+                this.width,
+                this.height,
+                FORTRESS_BUTTON_WIDTH,
+                FORTRESS_BUTTON_HEIGHT
+        );
         if (this.hovered) {
             this.drawMessage(drawContext, MinecraftClient.getInstance().textRenderer, 0xFFFFFF);
         }

@@ -15,6 +15,8 @@ import java.util.function.Function;
 public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton, IItemHudElement {
 
     protected static final Identifier FORTRESS_BUTTON_TEXTURE = new Identifier("minefortress","textures/gui/button.png");
+    protected static final int FORTRESS_BUTTON_HEIGHT = 64;
+    protected static final int FORTRESS_BUTTON_WIDTH = 32;
     private static final Identifier ARROWS_TEXTURE = new Identifier("textures/gui/recipe_book.png");
 
     protected final ItemStack itemStack;
@@ -51,6 +53,8 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
                 0,
                 20,
                 FORTRESS_BUTTON_TEXTURE,
+                FORTRESS_BUTTON_WIDTH,
+                FORTRESS_BUTTON_HEIGHT,
                 clickAction
         );
         this.itemStack = new ItemStack(item);
@@ -65,7 +69,7 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         renderItem(drawContext);
 
         if(this.checked){
-            this.drawTexture(drawContext, ARROWS_TEXTURE, this.getX()-15, this.getY()+2, 12, 208, 20, 14, 18, 20, 32);
+            this.drawTexture(drawContext, ARROWS_TEXTURE, this.getX()-15, this.getY()+2, 12, 208, 0, 14, 18, 512, 512);
         }
     }
 
