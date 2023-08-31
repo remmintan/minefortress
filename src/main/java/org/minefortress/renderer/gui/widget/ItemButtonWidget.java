@@ -4,12 +4,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.hud.interfaces.IItemHudElement;
 
@@ -29,8 +29,7 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
     private final int anchorY;
 
     public boolean checked = false;
-
-    protected ItemRenderer itemRenderer;
+    private final Function<ItemButtonWidget, Optional<String>> tooltipTextProvider;
     public ItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, String tooltipText) {
         super(
                 0,
@@ -49,6 +48,7 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         this.itemStack = new ItemStack(item);
         this.anchorX = anchorX;
         this.anchorY = anchorY;
+        this.tooltipTextProvider = null;
     }
 
     public ItemButtonWidget(int anchorX, int anchorY, Item item, PressAction clickAction, Function<ItemButtonWidget, Optional<String>> optTooltip) {
@@ -68,6 +68,7 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         this.itemStack = new ItemStack(item);
         this.anchorX = anchorX;
         this.anchorY = anchorY;
+        this.tooltipTextProvider = optTooltip;
     }
 
     @Override
@@ -83,12 +84,25 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         if(this.hovered) {
             final var client = MinecraftClient.getInstance();
             final var textRenderer = client.textRenderer;
-            final var tooltip = this.getTooltip();
+            final var tooltip = constructTooltip();
             if (tooltip != null) {
                 final List<OrderedText> lines = tooltip.getLines(client);
                 drawContext.drawTooltip(textRenderer, lines, this.getTooltipPositioner(), mouseX, mouseY);
             }
         }
+    }
+
+    @Nullable
+    private Tooltip constructTooltip() {
+        if(tooltipTextProvider != null) {
+            final var tooltipText = tooltipTextProvider.apply(this);
+            if(tooltipText.isPresent()) {
+                return Tooltip.of(Text.of(tooltipText.get()));
+            }
+        } else {
+            return this.getTooltip();
+        }
+        return null;
     }
 
     protected void renderItem(DrawContext drawContext) {
