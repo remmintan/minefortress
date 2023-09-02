@@ -235,7 +235,7 @@ public final class FortressServerManager extends AbstractFortressManager {
                     if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
                         if(player != null) {
                             spawnPawnNearCampfire(player.getUuid())
-                                    .ifPresent(it -> player.sendMessage(Text.literal(it.getName().getContent()+" appeared in the village."), false));
+                                    .ifPresent(it -> player.sendMessage(Text.literal(it.getName().getString() + " appeared in the village."), false));
 
                         }
                     }
