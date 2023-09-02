@@ -57,8 +57,6 @@ public final class BlueprintsScreen extends Screen {
     @Override
     protected void init() {
         if(this.client != null) {
-//            this.client.keyboard.setRepeatEvents(true);
-
             if(ModUtils.isClientInFortressGamemode()) {
                 super.init();
                 this.x = (this.width - backgroundWidth - previewWidth - previewOffset) / 2;
@@ -176,7 +174,7 @@ public final class BlueprintsScreen extends Screen {
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext);
-        this.drawBackground(drawContext);
+        this.drawBackground(drawContext, mouseX, mouseY);
         RenderSystem.disableDepthTest();
         super.render(drawContext, mouseX, mouseY, delta);
 
@@ -251,10 +249,6 @@ public final class BlueprintsScreen extends Screen {
         matrixStack.pop();
         RenderSystem.applyModelViewMatrix();
         RenderSystem.enableDepthTest();
-
-        for(BlueprintGroup group : BlueprintGroup.values()) {
-            this.renderTabTooltipIfHovered(drawContext, group, mouseX, mouseY);
-        }
 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         this.drawMouseoverTooltip(drawContext, mouseX, mouseY);
@@ -352,17 +346,16 @@ public final class BlueprintsScreen extends Screen {
 
     }
 
-    private void drawBackground(DrawContext drawContext) {
+    private void drawBackground(DrawContext drawContext, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         final BlueprintGroup selectedGroup = this.handler.getSelectedGroup();
         for (BlueprintGroup bg : BlueprintGroup.values()) {
             if (selectedGroup == bg) continue;
             this.renderTabIcon(drawContext, bg);
+            this.renderTabTooltipIfHovered(drawContext, bg, mouseX, mouseY);
         }
 
         drawContext.drawTexture(new Identifier(BACKGROUND_TEXTURE), this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
-
-//        this.searchBox.render(drawContext, mouseX, mouseY, delta);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         int i = this.x + 175;
         int j = this.y + 18;
@@ -381,9 +374,12 @@ public final class BlueprintsScreen extends Screen {
     private void renderTabIcon(DrawContext drawContext, BlueprintGroup group) {
         boolean isSelectedGroup = group == this.handler.getSelectedGroup();
         int columnNumber = group.ordinal() % 7;
-        int texX = columnNumber * 28;
+
+        int buttonWidth = 26;
+
+        int texX = columnNumber * buttonWidth;
         int texY = 0;
-        int x = this.x + 28 * columnNumber;
+        int x = this.x + buttonWidth * columnNumber;
         int y = this.y;
         if (columnNumber > 0) {
             x += columnNumber;
@@ -398,17 +394,16 @@ public final class BlueprintsScreen extends Screen {
         if (isSelectedGroup) {
             texY += 32;
         }
-        drawContext.drawTexture(INVENTORY_TABS_TEXTURE, x, y, texX, texY, 28, 32);
+        drawContext.drawTexture(INVENTORY_TABS_TEXTURE, x, y, texX, texY, buttonWidth, 32);
         int yIconDelta = topRow ? 1 : -1;
         ItemStack icon = group.getIcon();
 
-        drawContext.drawItem(icon, x += 6, y += 8 + yIconDelta);
-        drawContext.drawItemTooltip(this.textRenderer, icon, x, y);
+        drawContext.drawItem(icon, x + 5, y + 8 + yIconDelta);
     }
 
     private void renderTabTooltipIfHovered(DrawContext drawContext, BlueprintGroup group, int mouseX, int mouseY) {
         int columnNumber = group.ordinal();
-        int x = 28 * columnNumber + this.x;
+        int x = 26 * columnNumber + this.x;
         int y = this.y;
         if (columnNumber > 0) {
             x += columnNumber;
