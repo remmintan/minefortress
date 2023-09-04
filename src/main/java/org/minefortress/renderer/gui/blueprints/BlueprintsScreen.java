@@ -371,7 +371,7 @@ public final class BlueprintsScreen extends Screen {
             this.renderTabIcon(drawContext, selectedGroup);
 
 
-        drawContext.drawTexture(BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE, this.x + this.backgroundWidth + this.previewOffset, this.y, 15, 23, this.previewWidth, this.backgroundHeight);
+        drawContext.drawTexture(BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE, this.x + this.backgroundWidth + this.previewOffset, this.y, 250, 230, this.previewWidth, this.backgroundHeight, 1000, 1000);
     }
 
 
