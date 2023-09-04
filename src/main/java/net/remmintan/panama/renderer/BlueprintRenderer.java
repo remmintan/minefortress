@@ -181,7 +181,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
             shader.addSampler("Sampler" + i, textureReference);
         }
         if (shader.modelViewMat != null) {
-            shader.modelViewMat.set(matrices.peek().getPositionMatrix().transpose());
+            shader.modelViewMat.set(matrices.peek().getPositionMatrix());
         }
 
         if (shader.projectionMat != null) {
