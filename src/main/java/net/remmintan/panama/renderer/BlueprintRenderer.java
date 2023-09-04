@@ -5,16 +5,16 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.remmintan.panama.model.BuiltBlueprint;
+import net.remmintan.panama.model.BuiltModel;
+import net.remmintan.panama.model.builder.BlueprintsModelBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
@@ -23,9 +23,7 @@ import org.joml.Vector3f;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
-import net.remmintan.panama.model.builder.BlueprintsModelBuilder;
 import org.minefortress.fortress.FortressState;
-import net.remmintan.panama.model.BuiltModel;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;
@@ -74,7 +72,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         return getStructureRenderInfoProvider().getStructureRenderPos();
     }
 
-    public void renderBlueprintPreview(String fileName, BlockRotation blockRotation) {
+    public void renderBlueprintPreview(MatrixStack matrices, String fileName, BlockRotation blockRotation) {
         final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
 
         final Vec3i size = builtBlueprint.getSize();
@@ -86,36 +84,36 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         final float y = -60f * scaleFactor;
         final float z = 45f * scaleFactor;
 
-        renderBlueprintInGui(builtBlueprint, scale, x, y, z, true);
+        renderBlueprintInGui(matrices, builtBlueprint, scale, x, y, z, true);
     }
 
-    public void renderBlueprintInGui(String fileName, BlockRotation blockRotation, int slotColumn, int slotRow, boolean isEnoughResources) {
+    public void renderBlueprintInGui(MatrixStack matrices, String fileName, BlockRotation blockRotation, int slotColumn, int slotRow, boolean isEnoughResources) {
         final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
 
         final Vec3i size = builtBlueprint.getSize();
         final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
 
-        final float scale = 1.6f * 7 / biggestSideSize;
+        final float scale = 11.2f / biggestSideSize;
         final float scaleFactor = 2f/scale;
         final float x = 8.5f * scaleFactor + 11.25f * slotColumn * scaleFactor / 1.25f;
         final float y = -17f * scaleFactor - 11.25f * slotRow  * scaleFactor / 1.25f;
         final float z = 22f * scaleFactor;
 
-        renderBlueprintInGui(builtBlueprint, scale, x, y, z, isEnoughResources);
+        renderBlueprintInGui(matrices, builtBlueprint, scale, x, y, z, isEnoughResources);
     }
 
     public BlueprintsModelBuilder getBlueprintsModelBuilder() {
         return blueprintsModelBuilder;
     }
 
-    private void renderBlueprintInGui(BuiltBlueprint builtBlueprint, float scale, float x, float y, float z, boolean isEnoughResources) {
+    private void renderBlueprintInGui(MatrixStack matrices2, BuiltBlueprint builtBlueprint, float scale, float x, float y, float z, boolean isEnoughResources) {
         super.client.getProfiler().push("blueprint_render_model");
         DiffuseLighting.enableGuiDepthLighting();
 
         // calculating matrix
-        final var matrices = RenderSystem.getModelViewStack();
         final var projectionMatrix = RenderSystem.getProjectionMatrix();
 
+        final var matrices = RenderSystem.getModelViewStack();
         final var cameraMove = new Vector3f(x, y, z);
         matrices.push();
         rotateScene(matrices, cameraMove);
@@ -175,33 +173,31 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
         renderLayer.startDrawing();
 
-        VertexFormat vertexFormat = renderLayer.getVertexFormat();
-
         ShaderProgram shader = RenderSystem.getShader();
         if(shader == null) throw new IllegalStateException("Shader is null while rendering blueprint");
-        BufferRenderer.reset();
-        int k;
-        for (int i = 0; i < 12; ++i) {
-            k = RenderSystem.getShaderTexture(i);
-            shader.addSampler("Sampler" + i, k);
+
+        for (int i = 0; i < 12; i++) {
+            int textureReference = RenderSystem.getShaderTexture(i);
+            shader.addSampler("Sampler" + i, textureReference);
         }
         if (shader.modelViewMat != null) {
-            shader.modelViewMat.set(matrices.peek().getPositionMatrix());
+            shader.modelViewMat.set(matrices.peek().getPositionMatrix().transpose());
         }
+
         if (shader.projectionMat != null) {
             shader.projectionMat.set(matrix4f);
         }
         if (shader.colorModulator != null) {
             shader.colorModulator.set(isEnoughResources?CORRECT_PLACEMENT_COLOR:WRONG_PLACEMENT_COLOR);
         }
-        if (shader.fogStart != null) {
+        if (shader.glintAlpha != null) {
+            shader.glintAlpha.set(RenderSystem.getShaderGlintAlpha());
+        }
+        if(shader.fogStart != null && shader.fogEnd != null && shader.fogColor != null && shader.fogShape != null) {
             shader.fogStart.set(RenderSystem.getShaderFogStart());
-        }
-        if (shader.fogEnd != null) {
             shader.fogEnd.set(RenderSystem.getShaderFogEnd());
-        }
-        if (shader.fogColor != null) {
             shader.fogColor.set(RenderSystem.getShaderFogColor());
+            shader.fogShape.set(0);
         }
         if (shader.textureMat != null) {
             shader.textureMat.set(RenderSystem.getTextureMatrix());
@@ -216,20 +212,18 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
         final boolean hasLayer = builtBlueprint.hasLayer(renderLayer);
         if(hasLayer) {
-            final VertexBuffer vertexBuffer = builtBlueprint.getBuffer(renderLayer);
-
             if (chunkOffset != null) {
-                chunkOffset.set(new Vector3f(0));
+                chunkOffset.set(new Vector3f());
                 chunkOffset.upload();
             }
 
-            vertexBuffer.draw();
+            final VertexBuffer buffer = builtBlueprint.getBuffer(renderLayer);
+            buffer.bind();
+            buffer.draw();
         }
 
-        if(chunkOffset != null) chunkOffset.set(new Vector3f(0));
+        if(chunkOffset != null) chunkOffset.set(new Vector3f());
         shader.unbind();
-
-        if(hasLayer) vertexFormat.clearState();
 
         VertexBuffer.unbind();
         renderLayer.endDrawing();

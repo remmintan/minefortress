@@ -221,7 +221,7 @@ public final class BlueprintsScreen extends Screen {
                     }
                 }
 
-                this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getId(), BlockRotation.NONE);
+                this.blueprintRenderer.renderBlueprintPreview(drawContext.getMatrices(), blueprintSlot.getMetadata().getId(), BlockRotation.NONE);
             }
         }
 
@@ -330,17 +330,21 @@ public final class BlueprintsScreen extends Screen {
     }
 
     private void drawSlot(DrawContext drawContext, BlueprintSlot slot, int slotColumn, int slotRow) {
-
         RenderSystem.enableDepthTest();
         int slotX = slotColumn * 18 + 9 + 5;
         int slotY = slotRow * 18 + 18 + 5;
         if(slot == BlueprintSlot.EMPTY){
-            drawContext.drawItemInSlot(this.textRenderer, new ItemStack(Items.BRICK), slotX, slotY);
+            final var scaleFactor = 0.5f;
+            final var matrices = drawContext.getMatrices();
+            matrices.push();
+            matrices.scale(scaleFactor, scaleFactor, scaleFactor);
+            drawContext.drawItem(new ItemStack(Items.BRICK), (int)(slotX/scaleFactor), (int)(slotY/scaleFactor));
+            matrices.pop();
         } else {
             final BlueprintMetadata metadata = slot.getMetadata();
             final var enoughResources = !ModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
             if(this.client != null){
-                this.blueprintRenderer.renderBlueprintInGui(metadata.getId(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
+                this.blueprintRenderer.renderBlueprintInGui(drawContext.getMatrices(), metadata.getId(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
             }
         }
 
