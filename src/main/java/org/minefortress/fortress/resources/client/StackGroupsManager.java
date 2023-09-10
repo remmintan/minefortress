@@ -1,10 +1,12 @@
 package org.minefortress.fortress.resources.client;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +39,18 @@ class StackGroupsManager {
     }
 
     ItemGroup getGroup(Item item) {
+        return getGroup(item, null);
+    }
+
+    ItemGroup getGroup(Item item, FeatureSet enabledFeatures) {
+        if(enabledFeatures != null) {
+            final var client = MinecraftClient.getInstance();
+            if(client == null) throw new IllegalStateException("Client is null");
+            final var world = client.world;
+            if(world != null) {
+                ItemGroups.updateDisplayContext(enabledFeatures, false, world.getRegistryManager());
+            }
+        }
         for (ItemGroup group : ItemGroups.getGroups()) {
             if(group == Registries.ITEM_GROUP.get(ItemGroups.SEARCH)) continue;
             if(group.contains(item.getDefaultStack())) {

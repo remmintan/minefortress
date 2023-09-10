@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import org.apache.logging.log4j.LogManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.interfaces.FortressMinecraftClient;
@@ -37,7 +38,7 @@ public class ClientboundSyncItemsPacket implements FortressS2CPacket {
     }
 
     @Override
-    public void handle(MinecraftClient client) {
+    public void handle(MinecraftClient client, FeatureSet enabledFeatures) {
         final var fortressClientManager = ((FortressMinecraftClient) client).get_FortressClientManager();
         final var resourceManager = fortressClientManager.getResourceManager();
         if(needReset) resourceManager.reset();
@@ -45,7 +46,7 @@ public class ClientboundSyncItemsPacket implements FortressS2CPacket {
             final var item = info.item();
             if(item == Items.STRUCTURE_VOID) continue;
             try {
-                resourceManager.setItemAmount(item, info.amount());
+                resourceManager.setItemAmount(item, info.amount(), enabledFeatures);
             } catch (IllegalArgumentException e) {
                 LogManager.getLogger().warn("Failed to set item amount for item: " + item.getName().getString());
                 LogManager.getLogger().warn("error: " + e.getMessage());

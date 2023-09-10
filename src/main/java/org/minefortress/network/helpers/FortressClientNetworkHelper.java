@@ -42,7 +42,7 @@ public class FortressClientNetworkHelper {
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressS2CPacket> packetConstructor) {
         ClientPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName),
-                (client, handler, buf, sender) -> packetConstructor.apply(buf).handle(client));
+                (client, handler, buf, sender) -> packetConstructor.apply(buf).handle(client, handler.getEnabledFeatures()));
     }
 
 }
