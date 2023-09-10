@@ -149,7 +149,6 @@ public abstract class FortressWorldRendererMixin  {
             e = Math.pow(e, 4.0);
             e = MathHelper.clamp(e, 0.0, 1.0);
 
-            double cameraDistance = this.client.gameRenderer.getFarPlaneDistance();
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
             RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
@@ -159,9 +158,9 @@ public abstract class FortressWorldRendererMixin  {
             matrixStack.push();
             RenderSystem.applyModelViewMatrix();
             int i = worldBorder.getStage().getColor();
-            float j = (float)(i >> 16 & 255) / 255.0F;
-            float k = (float)(i >> 8 & 255) / 255.0F;
-            float l = (float)(i & 255) / 255.0F;
+            float j = (float) (i >> 16 & 0xFF) / 255.0F;
+            float k = (float) (i >> 8 & 0xFF) / 255.0F;
+            float l = (float) (i & 0xFF) / 255.0F;
             RenderSystem.setShaderColor(j, k, l, (float)e);
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.polygonOffset(-3.0F, -3.0F);
@@ -170,17 +169,13 @@ public abstract class FortressWorldRendererMixin  {
 
 
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-
             BiFunction<Double, Double, Boolean> shouldRenderBoundFunc = (x, z) -> worldBorder instanceof FortressBorder fb && fb.shouldRenderBound(x, z);
-
-            renderParticularWorldBorder(bufferBuilder, worldBorder, viewDistance, camera, cameraDistance, shouldRenderBoundFunc);
+            renderParticularBorder(camera, bufferBuilder, worldBorder, viewDistance, shouldRenderBoundFunc);
             if(worldBorder instanceof FortressBorder fortressBorder) {
                 fortressBorder
                         .getAdditionalBorders()
-                        .forEach(border -> renderParticularWorldBorder(bufferBuilder, border, viewDistance, camera, cameraDistance, shouldRenderBoundFunc));
+                        .forEach(border -> renderParticularBorder(camera, bufferBuilder, border, viewDistance, shouldRenderBoundFunc));
             }
-
-
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.enableCull();
             RenderSystem.polygonOffset(0.0F, 0.0F);
@@ -195,20 +190,18 @@ public abstract class FortressWorldRendererMixin  {
         ci.cancel();
     }
 
-    private static void renderParticularWorldBorder(BufferBuilder bufferBuilder,
-                                                    WorldBorder worldBorder,
-                                                    double viewDistance,
-                                                    Camera camera,
-                                                    double cameraDistance,
-                                                    BiFunction<Double, Double, Boolean> shouldRenderBound) {
-        float m = (float)(Util.getMeasuringTimeMs() % 3000L) / 3000.0F;
+    private void renderParticularBorder(Camera camera, BufferBuilder bufferBuilder, WorldBorder worldBorder, double viewDistance, BiFunction<Double, Double, Boolean> shouldRenderBound) {
+        float m = (float) (Util.getMeasuringTimeMs() % 3000L) / 3000.0f;
+        float n = (float) (-MathHelper.fractionalPart(camera.getPos().y * 0.5));
         double cameraX = camera.getPos().x;
         double cameraZ = camera.getPos().z;
+        double cameraDistance = this.client.gameRenderer.getFarPlaneDistance();
+        float o = n + (float) cameraDistance;
         final var boundNorth = worldBorder.getBoundNorth();
-        double q = Math.max(MathHelper.floor(cameraZ - viewDistance), boundNorth);
+        double p = Math.max(MathHelper.floor(cameraZ - viewDistance), boundNorth);
         final var boundSouth = worldBorder.getBoundSouth();
-        double r = Math.min(MathHelper.ceil(cameraZ + viewDistance), boundSouth);
-        float p = (float)(cameraDistance - MathHelper.fractionalPart(camera.getPos().y));
+        double q = Math.min(MathHelper.ceil(cameraZ + viewDistance), boundSouth);
+        float r = (float) (MathHelper.floor(p) & 1) * 0.5f;
         float v;
         float s;
         double t;
@@ -219,61 +212,64 @@ public abstract class FortressWorldRendererMixin  {
 
         final var boundEast = worldBorder.getBoundEast();
         if (cameraX > boundEast - viewDistance && shouldRenderBound.apply(boundEast, centerZ)) {
-            s = 0.0F;
-
-            for(t = q; t < r; s += 0.5F) {
-                u = Math.min(1.0, r - t);
-                v = (float)u * 0.5F;
-                bufferBuilder.vertex(boundEast - cameraX, -cameraDistance, t - cameraZ).texture(m - s, m + p).next();
-                bufferBuilder.vertex(boundEast - cameraX, -cameraDistance, t + u - cameraZ).texture(m - (v + s), m + p).next();
-                bufferBuilder.vertex(boundEast - cameraX, cameraDistance, t + u - cameraZ).texture(m - (v + s), m + 0.0F).next();
-                bufferBuilder.vertex(boundEast - cameraX, cameraDistance, t - cameraZ).texture(m - s, m + 0.0F).next();
-                ++t;
+            s = r;
+            t = p;
+            while (t < q) {
+                u = Math.min(1.0, q - t);
+                v = (float) u * 0.5f;
+                bufferBuilder.vertex(boundEast - cameraX, -cameraDistance, t - cameraZ).texture(m - s, m + o).next();
+                bufferBuilder.vertex(boundEast - cameraX, -cameraDistance, t + u - cameraZ).texture(m - (v + s), m + o).next();
+                bufferBuilder.vertex(boundEast - cameraX, cameraDistance, t + u - cameraZ).texture(m - (v + s), m + n).next();
+                bufferBuilder.vertex(boundEast - cameraX, cameraDistance, t - cameraZ).texture(m - s, m + n).next();
+                t += 1.0;
+                s += 0.5f;
             }
         }
-
         final var boundWest = worldBorder.getBoundWest();
         if (cameraX < boundWest + viewDistance && shouldRenderBound.apply(boundWest, centerZ)) {
-            s = 0.0F;
-
-            for(t = q; t < r; s += 0.5F) {
-                u = Math.min(1.0, r - t);
-                v = (float)u * 0.5F;
-                bufferBuilder.vertex(boundWest - cameraX, -cameraDistance, t - cameraZ).texture(m + s, m + p).next();
-                bufferBuilder.vertex(boundWest - cameraX, -cameraDistance, t + u - cameraZ).texture(m + v + s, m + p).next();
-                bufferBuilder.vertex(boundWest - cameraX, cameraDistance, t + u - cameraZ).texture(m + v + s, m + 0.0F).next();
-                bufferBuilder.vertex(boundWest - cameraX, cameraDistance, t - cameraZ).texture(m + s, m + 0.0F).next();
-                ++t;
+            s = r;
+            t = p;
+            while (t < q) {
+                u = Math.min(1.0, q - t);
+                v = (float) u * 0.5f;
+                bufferBuilder.vertex(boundWest - cameraX, -cameraDistance, t - cameraZ).texture(m + s, m + o).next();
+                bufferBuilder.vertex(boundWest - cameraX, -cameraDistance, t + u - cameraZ).texture(m + v + s, m + o).next();
+                bufferBuilder.vertex(boundWest - cameraX, cameraDistance, t + u - cameraZ).texture(m + v + s, m + n).next();
+                bufferBuilder.vertex(boundWest - cameraX, cameraDistance, t - cameraZ).texture(m + s, m + n).next();
+                t += 1.0;
+                s += 0.5f;
             }
         }
-
-        q = Math.max(MathHelper.floor(cameraX - viewDistance), boundWest);
-        r = Math.min(MathHelper.ceil(cameraX + viewDistance), boundEast);
+        p = Math.max(MathHelper.floor(cameraX - viewDistance), boundWest);
+        q = Math.min(MathHelper.ceil(cameraX + viewDistance), boundEast);
+        r = (float) (MathHelper.floor(p) & 1) * 0.5f;
         if (cameraZ > boundSouth - viewDistance && shouldRenderBound.apply(centerX, boundSouth)) {
-            s = 0.0F;
-
-            for(t = q; t < r; s += 0.5F) {
-                u = Math.min(1.0, r - t);
-                v = (float)u * 0.5F;
-                bufferBuilder.vertex(t - cameraX, -cameraDistance, boundSouth - cameraZ).texture(m + s, m + p).next();
-                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, boundSouth - cameraZ).texture(m + v + s, m + p).next();
-                bufferBuilder.vertex(t + u - cameraX, cameraDistance, boundSouth - cameraZ).texture(m + v + s, m + 0.0F).next();
-                bufferBuilder.vertex(t - cameraX, cameraDistance, boundSouth - cameraZ).texture(m + s, m + 0.0F).next();
-                ++t;
+            s = r;
+            t = p;
+            while (t < q) {
+                u = Math.min(1.0, q - t);
+                v = (float) u * 0.5f;
+                bufferBuilder.vertex(t - cameraX, -cameraDistance, boundSouth - cameraZ).texture(m + s, m + o).next();
+                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, boundSouth - cameraZ).texture(m + v + s, m + o).next();
+                bufferBuilder.vertex(t + u - cameraX, cameraDistance, boundSouth - cameraZ).texture(m + v + s, m + n).next();
+                bufferBuilder.vertex(t - cameraX, cameraDistance, boundSouth - cameraZ).texture(m + s, m + n).next();
+                t += 1.0;
+                s += 0.5f;
             }
         }
 
         if (cameraZ < boundNorth + viewDistance && shouldRenderBound.apply(centerX, boundNorth)) {
-            s = 0.0F;
-
-            for(t = q; t < r; s += 0.5F) {
-                u = Math.min(1.0, r - t);
-                v = (float)u * 0.5F;
-                bufferBuilder.vertex(t - cameraX, -cameraDistance, boundNorth - cameraZ).texture(m - s, m + p).next();
-                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, boundNorth - cameraZ).texture(m - (v + s), m + p).next();
-                bufferBuilder.vertex(t + u - cameraX, cameraDistance, boundNorth - cameraZ).texture(m - (v + s), m + 0.0F).next();
-                bufferBuilder.vertex(t - cameraX, cameraDistance, boundNorth - cameraZ).texture(m - s, m + 0.0F).next();
-                ++t;
+            s = r;
+            t = p;
+            while (t < q) {
+                u = Math.min(1.0, q - t);
+                v = (float) u * 0.5f;
+                bufferBuilder.vertex(t - cameraX, -cameraDistance, boundNorth - cameraZ).texture(m - s, m + o).next();
+                bufferBuilder.vertex(t + u - cameraX, -cameraDistance, boundNorth - cameraZ).texture(m - (v + s), m + o).next();
+                bufferBuilder.vertex(t + u - cameraX, cameraDistance, boundNorth - cameraZ).texture(m - (v + s), m + n).next();
+                bufferBuilder.vertex(t - cameraX, cameraDistance, boundNorth - cameraZ).texture(m - s, m + n).next();
+                t += 1.0;
+                s += 0.5f;
             }
         }
     }
