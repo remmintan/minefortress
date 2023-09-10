@@ -181,13 +181,15 @@ public abstract class FortressWorldRendererMixin  {
             }
 
 
-            BufferRenderer.draw(bufferBuilder.end());
+            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.enableCull();
             RenderSystem.polygonOffset(0.0F, 0.0F);
             RenderSystem.disablePolygonOffset();
             RenderSystem.disableBlend();
+            RenderSystem.defaultBlendFunc();
             matrixStack.pop();
             RenderSystem.applyModelViewMatrix();
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             RenderSystem.depthMask(true);
         }
         ci.cancel();
