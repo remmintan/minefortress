@@ -120,7 +120,7 @@ public class BaritoneMoveControl {
         private void checkFailedToCalc(PathEvent pathEvent) {
             if(pathEvent == PathEvent.CALC_FAILED) {
                 if(entity instanceof IFortressAwareEntity fae && entity instanceof TargetedPawn targetedPawn)  {
-                    fae.sendMessageToMasterPlayer(getPawnType(fae) + " " + entity.getName().getContent() + " can't reach the target");
+                    fae.sendMessageToMasterPlayer(getPawnType(fae) + " " + entity.getName().getString() + " can't reach the target");
                     targetedPawn.resetTargets();
                 }
                 stuck = true;
