@@ -20,12 +20,13 @@ public class FreePawnsWidget extends MinefortressWidget implements Drawable, Ele
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         final var freePawns = getFreePawns();
-        drawContext.drawTextWithShadow(
+        drawContext.drawText(
                 this.getTextRenderer(),
                 "Free Pawns: " + freePawns,
                 x,
                 y,
-                freePawns > 0 ? 0xFFFFFF : 0xFF0000
+                freePawns > 0 ? 0xFFFFFF : 0xFF0000,
+                false
         );
     }
 

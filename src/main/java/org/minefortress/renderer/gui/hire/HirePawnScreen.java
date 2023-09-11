@@ -79,15 +79,9 @@ public class HirePawnScreen extends WindowScreen {
                         this.handler.increaseAmount(profId);
                     }
                 }
-        ).dimensions(rightX - 100,
-                rowY,
-                20,
-                20)
-                .narrationSupplier((it) -> {
-                    final var buttonTooltip = canIncreaseAmount(costs, profId) ? "Hire" : "Not enough resources/pawns";
-                    return Text.literal(buttonTooltip);
-                })
-                .build();
+        )
+        .dimensions(rightX - 100, rowY, 20, 20)
+        .build();
 
         this.addDrawableChild(hireButton);
         hireButtons.add(new HireButtonWithInfo(hireButton, costs, profId));
@@ -101,7 +95,7 @@ public class HirePawnScreen extends WindowScreen {
 
         this.addDrawable(
                 new ProfessionAmountWidget(
-                        rightX - 25,
+                        rightX - 35,
                         rowY,
                         IHireScreenHandler.getProfessionItem(profId),
                         () -> this.handler.getCurrentCount(profId),

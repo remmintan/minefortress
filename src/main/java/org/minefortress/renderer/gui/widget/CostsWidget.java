@@ -41,11 +41,11 @@ public class CostsWidget implements Drawable, Element {
             matrices.push();
             final var scaleFactor = 0.5f;
             matrices.scale(scaleFactor, scaleFactor, 1f);
-            matrices.translate(0, 0, 500);
+            matrices.translate(30, 0, 500);
 
             final var textX = x + i + countLabelWidth / 2f - 25 * scaleFactor;
             final var textY = y + 6 / scaleFactor;
-            drawContext.drawTextWithShadow(getTextRenderer(), countLabel, (int)(textX / scaleFactor), (int)(textY / scaleFactor), color);
+            drawContext.drawText(getTextRenderer(), countLabel, (int)(textX / scaleFactor), (int)(textY / scaleFactor), color, false);
             matrices.pop();
             drawContext.drawItem(stack, x + i, y);
             i+=(9 + countLabelWidth) * scaleFactor;

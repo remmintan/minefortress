@@ -22,10 +22,9 @@ public class ProfessionQueueWidget extends MinefortressWidget implements Drawabl
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        final var itemRenderer = getItemRenderer();
         final var stack = Items.PLAYER_HEAD.getDefaultStack();
         drawContext.drawItem(stack, x, y);
-        drawContext.drawTextWithShadow(getTextRenderer(), String.valueOf(amountSupplier.get()), x, y, 0xFFFFFF);
+        drawContext.drawText(getTextRenderer(), String.valueOf(amountSupplier.get()), x+14, y+10, 0xFFFFFF, false);
 
         if (mouseX >= x && mouseX <= x + 16 && mouseY >= y && mouseY <= y + 16) {
             drawContext.drawTooltip(getTextRenderer(), Text.of("Number of pawns in queue"), mouseX, mouseY);
