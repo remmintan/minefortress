@@ -139,4 +139,9 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         this.setX(x);
         this.setY(y);
     }
+
+    @Override
+    public boolean isHovered() {
+        return super.isHovered();
+    }
 }

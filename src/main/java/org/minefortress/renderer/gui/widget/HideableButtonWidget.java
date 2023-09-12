@@ -23,4 +23,9 @@ public class HideableButtonWidget extends TextButtonWidget {
     public boolean shouldRender(boolean isCreative) {
         return shouldRender.get();
     }
+
+    @Override
+    public boolean isHovered() {
+        return super.isHovered();
+    }
 }

@@ -47,4 +47,8 @@ public class TextButtonWidget extends ButtonWidget implements IHudButton {
         return anchorY;
     }
 
+    @Override
+    public boolean isHovered() {
+        return super.isHovered();
+    }
 }
