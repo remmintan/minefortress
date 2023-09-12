@@ -1,5 +1,6 @@
 package org.minefortress.fortress.resources.client;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
@@ -41,7 +42,7 @@ class StackGroupsManager {
     }
 
     ItemGroup getGroup(Item item) {
-        if(!itemGroupsInitialized()) LOGGER.warn("Item groups are not initialized");
+        tryInitGroups();
         for (ItemGroup group : ItemGroups.getGroups()) {
             if(group == Registries.ITEM_GROUP.get(ItemGroups.SEARCH)) continue;
             if(group.contains(item.getDefaultStack())) {
@@ -50,6 +51,19 @@ class StackGroupsManager {
         }
 
         throw new IllegalArgumentException("Item " + item + " is not in any group");
+    }
+
+    private static void tryInitGroups() {
+        if(!itemGroupsInitialized()) {
+            final var client = MinecraftClient.getInstance();
+            final var handler = client.getNetworkHandler();
+            final var world = client.world;
+            if(handler != null && world != null) {
+                ItemGroups.updateDisplayContext(handler.getEnabledFeatures(), false, world.getRegistryManager());
+            } else {
+                LOGGER.warn("Item groups are not initialized");
+            }
+        }
     }
 
     private static boolean itemGroupsInitialized() {

@@ -174,10 +174,13 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         }
     }
 
-    @Inject(method = "handledScreenTick", at = @At("HEAD"))
+    @Inject(method = "handledScreenTick", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo ci) {
-        if(this.isInventoryTabSelected() && ModUtils.isClientInFortressGamemode()) {
-            this.setSelectedTab(Registries.ITEM_GROUP.get(ItemGroups.BUILDING_BLOCKS));
+        if(ModUtils.isClientInFortressGamemode() && ModUtils.getFortressClientManager().isSurvival()) {
+            if(this.isInventoryTabSelected()) {
+                this.setSelectedTab(Registries.ITEM_GROUP.get(ItemGroups.BUILDING_BLOCKS));
+            }
+            ci.cancel();
         }
     }
 
