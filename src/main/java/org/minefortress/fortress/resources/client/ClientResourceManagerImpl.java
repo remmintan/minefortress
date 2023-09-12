@@ -3,7 +3,6 @@ package org.minefortress.fortress.resources.client;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.resource.featuretoggle.FeatureSet;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.utils.ModUtils;
@@ -77,8 +76,8 @@ public class ClientResourceManagerImpl implements ClientResourceManager {
     }
 
     @Override
-    public void setItemAmount(Item item, int amount, FeatureSet enabledFeatures) {
-        final var group = groupManager.getGroup(item, enabledFeatures);
+    public void setItemAmount(Item item, int amount) {
+        final var group = groupManager.getGroup(item);
         final var manager = groupManager.getStacksManager(group);
         manager.getStack(item).setCount(amount);
     }

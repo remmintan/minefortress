@@ -1,18 +1,22 @@
 package org.minefortress.fortress.resources.client;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
-import net.minecraft.resource.featuretoggle.FeatureSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 class StackGroupsManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StackGroupsManager.class);
 
     private final Map<ItemGroup, ClientItemStacksManager> groups = new HashMap<>();
 
@@ -37,20 +41,7 @@ class StackGroupsManager {
     }
 
     ItemGroup getGroup(Item item) {
-        final var enabledFeatures = Optional.ofNullable(MinecraftClient.getInstance().getNetworkHandler())
-                .map(ClientPlayNetworkHandler::getEnabledFeatures).orElse(null);
-        return getGroup(item, enabledFeatures);
-    }
-
-    ItemGroup getGroup(Item item, FeatureSet enabledFeatures) {
-        if(enabledFeatures != null) {
-            final var client = MinecraftClient.getInstance();
-            if(client == null) throw new IllegalStateException("Client is null");
-            final var world = client.world;
-            if(world != null) {
-                ItemGroups.updateDisplayContext(enabledFeatures, false, world.getRegistryManager());
-            }
-        }
+        if(!itemGroupsInitialized()) LOGGER.warn("Item groups are not initialized");
         for (ItemGroup group : ItemGroups.getGroups()) {
             if(group == Registries.ITEM_GROUP.get(ItemGroups.SEARCH)) continue;
             if(group.contains(item.getDefaultStack())) {
@@ -59,6 +50,11 @@ class StackGroupsManager {
         }
 
         throw new IllegalArgumentException("Item " + item + " is not in any group");
+    }
+
+    private static boolean itemGroupsInitialized() {
+        final var nativeGroups = ItemGroups.getGroups();
+        return !nativeGroups.isEmpty() && !nativeGroups.get(0).getSearchTabStacks().isEmpty();
     }
 
     List<FortressItemStack> getNonEmptySimilarStacks(Item item) {

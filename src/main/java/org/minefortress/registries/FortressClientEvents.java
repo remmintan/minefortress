@@ -5,9 +5,12 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.ItemGroups;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.interfaces.FortressClientWorld;
 import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.network.c2s.C2SRequestResourcesRefresh;
+import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.tasks.ClientVisualTasksHolder;
 import org.minefortress.utils.ModUtils;
@@ -18,6 +21,11 @@ public class FortressClientEvents {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ModUtils.getFortressClientManager().reset());
         ClientTickEvents.START_CLIENT_TICK.register(FortressClientEvents::startClientTick);
         ClientTickEvents.END_CLIENT_TICK.register(FortressClientEvents::endClientTick);
+        ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> {
+            ItemGroups.updateDisplayContext(handler.getEnabledFeatures(), false, client.world.getRegistryManager());
+            final var packet = new C2SRequestResourcesRefresh();
+            FortressClientNetworkHelper.send(C2SRequestResourcesRefresh.CHANNEL, packet);
+        }));
     }
 
     private static void startClientTick(MinecraftClient client) {

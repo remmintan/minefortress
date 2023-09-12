@@ -12,10 +12,9 @@ import org.apache.logging.log4j.LogManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.fortress.resources.client.FortressItemStack;
-import org.minefortress.fortress.resources.server.ServerStartingInventoryReader.InventorySlotInfo;
-import org.minefortress.network.s2c.ClientboundSyncItemsPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import org.minefortress.network.s2c.ClientboundSyncItemsPacket;
 
 import java.util.*;
 
@@ -32,7 +31,6 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
         for(var slot : inventoryStartingSlots) {
             resources.getStack(slot.item()).increaseBy(slot.amount());
         }
-        this.syncAll();
     }
 
     @Override
@@ -192,7 +190,6 @@ public class ServerResourceManagerImpl implements ServerResourceManager {
 
                 this.resources.getStack(item).increaseBy(amount);
             }
-            this.syncAll();
         }
     }
 

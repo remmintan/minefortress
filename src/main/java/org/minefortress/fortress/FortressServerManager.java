@@ -336,8 +336,6 @@ public final class FortressServerManager extends AbstractFortressManager {
     public void syncOnJoin() {
         this.needSync = true;
         this.needSyncSpecialBlocks = true;
-        final var resourceManager = (ServerResourceManager) this.getResourceManager();
-        resourceManager.syncAll();
         areasServerManager.sync();
         influenceManager.sync();
     }
