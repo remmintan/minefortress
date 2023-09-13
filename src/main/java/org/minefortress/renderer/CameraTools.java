@@ -7,6 +7,7 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.system.MemoryUtil;
 import org.minefortress.interfaces.FortressGameRenderer;
 
 import java.nio.FloatBuffer;
@@ -37,7 +38,8 @@ public class CameraTools {
         int winWidth = minecraft.getWindow().getWidth();
         int winHeight = minecraft.getWindow().getHeight();
 
-        FloatBuffer resultingViewBuffer = FloatBuffer.allocate(3);
+        FloatBuffer resultingViewBuffer = MemoryUtil.memAllocFloat(3);
+        resultingViewBuffer.position(0);
         FloatBuffer modelViewBuffer = getModelViewMatrix(minecraft);
         FloatBuffer projectionBuffer = getProjectionMatrix(minecraft);
         IntBuffer viewport = getViewport(winWidth, winHeight);
@@ -48,7 +50,8 @@ public class CameraTools {
     }
 
     private static IntBuffer getViewport(int winWidth, int winHeight) {
-        IntBuffer viewport = IntBuffer.allocate(4);
+        IntBuffer viewport = MemoryUtil.memAllocInt(4);
+        viewport.position(0);
         viewport.put(0);
         viewport.put(0);
         viewport.put(winWidth);
@@ -72,7 +75,8 @@ public class CameraTools {
             final var yRads = (float) Math.toRadians(player.getRotationClient().y + 180f);
             modelViewMatrix.rotate(yRads, new Vector3f(0, 1,0));
         }
-        FloatBuffer modelViewBuffer = FloatBuffer.allocate(16);
+        FloatBuffer modelViewBuffer = MemoryUtil.memAllocFloat(16);
+        modelViewBuffer.position(0);
         modelViewMatrix.get(modelViewBuffer);
 
         modelViewBuffer.rewind();
@@ -81,7 +85,8 @@ public class CameraTools {
 
     private  static FloatBuffer getProjectionMatrix(MinecraftClient minecraft) {
         Matrix4f projectionMatrix = getProjectionMatrix4f(minecraft);
-        FloatBuffer projectionBuffer = FloatBuffer.allocate(16);
+        FloatBuffer projectionBuffer = MemoryUtil.memAllocFloat(16);
+        projectionBuffer.position(0);
         projectionMatrix.get(projectionBuffer);
         projectionBuffer.rewind();
         return projectionBuffer;
