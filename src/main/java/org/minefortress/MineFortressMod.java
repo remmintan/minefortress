@@ -27,7 +27,7 @@ public class MineFortressMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        FortressKeybindings.init();
+
         FortressBlocks.register();
         FortressEntities.register();
         FortressItems.register();
