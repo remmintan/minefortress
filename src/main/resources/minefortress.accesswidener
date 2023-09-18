@@ -38,4 +38,4 @@ mutable field net/minecraft/client/gui/screen/world/WorldCreator$Mode defaultGam
 mutable field net/minecraft/client/gui/screen/world/WorldCreator$Mode name Lnet/minecraft/text/Text;
 accessible field net/minecraft/client/gui/screen/world/WorldCreator$Mode info Lnet/minecraft/text/Text;
 mutable field net/minecraft/client/gui/screen/world/WorldCreator$Mode info Lnet/minecraft/text/Text;
-
+accessible class net/minecraft/client/gui/screen/GameModeSelectionScreen$GameModeSelection

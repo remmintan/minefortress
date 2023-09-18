@@ -4,6 +4,7 @@ package org.minefortress;
 import com.chocohead.mm.api.ClassTinkerers;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
+import net.minecraft.client.gui.screen.GameModeSelectionScreen;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
@@ -11,11 +12,15 @@ import org.minefortress.commands.CommandsManager;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.registries.*;
+import org.minefortress.registries.FortressBlocks;
+import org.minefortress.registries.FortressEntities;
+import org.minefortress.registries.FortressItems;
+import org.minefortress.registries.FortressServerEvents;
 
 public class MineFortressMod implements ModInitializer {
 
     public static final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
+    public static final GameModeSelectionScreen.GameModeSelection FORTRESS_SELECTION = ClassTinkerers.getEnum(GameModeSelectionScreen.GameModeSelection.class, "FORTRESS");
     public static final String BLUEPRINTS_FOLDER_NAME = "minefortress-blueprints";
     public static final String BLUEPRINTS_EXTENSION = ".blueprints";
     public static final String MOD_ID = "minefortress";
@@ -27,7 +32,6 @@ public class MineFortressMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
         FortressBlocks.register();
         FortressEntities.register();
         FortressItems.register();

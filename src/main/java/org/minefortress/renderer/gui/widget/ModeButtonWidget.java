@@ -1,7 +1,6 @@
 package org.minefortress.renderer.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 
@@ -39,8 +38,5 @@ public class ModeButtonWidget extends ItemButtonWidget {
                 FORTRESS_BUTTON_WIDTH,
                 FORTRESS_BUTTON_HEIGHT
         );
-        if (this.hovered) {
-            this.drawMessage(drawContext, MinecraftClient.getInstance().textRenderer, 0xFFFFFF);
-        }
     }
 }

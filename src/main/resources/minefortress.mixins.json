@@ -41,6 +41,7 @@
     "renderer.FortressWorldRendererMixin",
     "renderer.gui.FortressCreativeInventoryScreenMixin",
     "renderer.gui.FortressHandledScreenMixin",
+    "renderer.gui.GameModeSelectionScreenMixin",
     "world.FortressClientWorldMixin",
     "world.WorldLoadedEventMixin"
   ],
