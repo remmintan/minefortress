@@ -29,7 +29,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
             final int colonistWinY = screenHeight - 85;
             int width = 120;
             final int height = 85;
-            drawContext.fillGradient(colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, 0xc0101010, 0xd0101010, -1000);
+            drawContext.fillGradient(colonistWinX, colonistWinY, colonistWinX + width, colonistWinY + height, -1000,0xc0101010, 0xd0101010);
 
             final String name = Optional.ofNullable(pawn.getCustomName()).map(Text::getString).orElse("");
             drawContext.drawCenteredTextWithShadow(textRenderer, name, colonistWinX + width / 2, colonistWinY + 5, 0xFFFFFF);

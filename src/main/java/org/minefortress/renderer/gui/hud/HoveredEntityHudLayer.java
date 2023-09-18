@@ -27,9 +27,9 @@ public class HoveredEntityHudLayer extends AbstractHudLayer{
                             colonistWinY,
                             colonistWinX + width,
                             colonistWinY + height,
+                            -1000,
                             0xc0101010,
-                            0xd0101010,
-                            -1000
+                            0xd0101010
                     );
 
                     drawContext.drawCenteredTextWithShadow(
