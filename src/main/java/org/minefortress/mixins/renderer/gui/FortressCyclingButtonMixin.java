@@ -1,4 +1,4 @@
-package org.minefortress.mixins.renderer;
+package org.minefortress.mixins.renderer.gui;
 
 import net.minecraft.client.gui.screen.world.WorldCreator;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;

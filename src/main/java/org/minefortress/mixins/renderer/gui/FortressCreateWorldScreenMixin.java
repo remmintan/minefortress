@@ -1,4 +1,4 @@
-package org.minefortress.mixins.renderer;
+package org.minefortress.mixins.renderer.gui;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
