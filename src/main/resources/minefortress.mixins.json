@@ -42,6 +42,7 @@
     "renderer.gui.FortressHandledScreenMixin",
     "renderer.gui.FortressInGameHudMixin",
     "renderer.gui.GameModeSelectionScreenMixin",
+    "renderer.gui.GameTabMixin",
     "world.FortressClientWorldMixin",
     "world.WorldCreatorMixin",
     "world.WorldLoadedEventMixin"
