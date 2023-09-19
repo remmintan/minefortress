@@ -33,7 +33,7 @@ public class GameModeEarlyRiser implements Runnable{
 
         ClassTinkerers
                 .enumBuilder(gameModeSelectionClassName, textDescriptor, String.class, itemStackDescriptor)
-                .addEnum("FORTRESS", () -> new Object[] {Text.of("Fortress"), "fortress", Items.RED_BED.getDefaultStack()})
+                .addEnum("FORTRESS", () -> new Object[] {Text.of("Fortress"), "gamemode fortress", Items.RED_BED.getDefaultStack()})
                 .build();
     }
 }
