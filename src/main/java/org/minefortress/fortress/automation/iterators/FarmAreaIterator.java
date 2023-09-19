@@ -1,5 +1,6 @@
 package org.minefortress.fortress.automation.iterators;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.FluidTags;
@@ -20,6 +21,12 @@ public class FarmAreaIterator extends AbstractFilteredIterator{
         this.world = world;
     }
 
+    public static boolean blockCanBeRemovedToPlantCrops(BlockState blockState) {
+        return blockState.isOf(Blocks.GRASS) ||
+                blockState.isIn(BlockTags.HOE_MINEABLE) ||
+                blockState.isIn(BlockTags.FLOWERS);
+    }
+
     @Override
     protected boolean filter(BlockPos pos) {
         final var topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING, pos.getX(), pos.getZ());
@@ -35,7 +42,7 @@ public class FarmAreaIterator extends AbstractFilteredIterator{
 
         final var goalCorrect = blockState.isOf(Blocks.FARMLAND) || blockState.isOf(Blocks.DIRT) || blockState.isOf(Blocks.GRASS_BLOCK) || isGoalCorrectForWater(pos);
         final var aboveGoalState = world.getBlockState(pos.up());
-        final var aboveGoalCorrect = aboveGoalState.isIn(BlockTags.CROPS) || aboveGoalState.isAir() || aboveGoalState.isIn(BlockTags.REPLACEABLE);
+        final var aboveGoalCorrect = aboveGoalState.isIn(BlockTags.CROPS) || aboveGoalState.isAir() || blockCanBeRemovedToPlantCrops(aboveGoalState);
         return goalCorrect && aboveGoalCorrect;
     }
 

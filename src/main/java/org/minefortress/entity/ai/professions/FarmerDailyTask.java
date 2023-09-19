@@ -15,6 +15,7 @@ import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.automation.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.fortress.automation.IAutomationArea;
+import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
@@ -84,11 +85,11 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     private void doFarmCrops(Colonist colonist) {
         final var movementHelper = colonist.getMovementHelper();
         final var goalBlockState = colonist.getWorld().getBlockState(this.goal.pos());
+        final var aboveBlockPos = goal.pos().up();
+        final var aboveBlockState = colonist.getWorld().getBlockState(aboveBlockPos);
         if (goalBlockState.isOf(Blocks.DIRT) || goalBlockState.isOf(Blocks.GRASS_BLOCK)) {
-            final var aboveBlock = goal.pos().up();
-            final var aboveBlockState = colonist.getWorld().getBlockState(aboveBlock);
-            if(aboveBlockState.isIn(BlockTags.REPLACEABLE)) {
-                colonist.setGoal(new DigTaskBlockInfo(aboveBlock));
+            if(FarmAreaIterator.blockCanBeRemovedToPlantCrops(aboveBlockState)) {
+                colonist.setGoal(new DigTaskBlockInfo(aboveBlockPos));
             } else {
                 colonist.putItemInHand(Items.WOODEN_HOE);
                 colonist.swingHand(Hand.MAIN_HAND);
@@ -96,26 +97,25 @@ public class FarmerDailyTask implements ProfessionDailyTask{
                 colonist.getWorld().emitGameEvent(colonist, GameEvent.BLOCK_PLACE, goal.pos());
             }
         } else if(goalBlockState.isOf(Blocks.FARMLAND)) {
-            final var aboveBlock = goal.pos().up();
-            final var aboveGoal = colonist.getWorld().getBlockState(aboveBlock);
-
-            if(aboveGoal.isIn(BlockTags.CROPS) && aboveGoal.getBlock() instanceof CropBlock cropBlock) {
-                if(cropBlock.getAge(aboveGoal) == cropBlock.getMaxAge()) {
-                    final var digTaskBlockInfo = new DigTaskBlockInfo(aboveBlock);
+            if(aboveBlockState.isIn(BlockTags.CROPS) && aboveBlockState.getBlock() instanceof CropBlock cropBlock) {
+                if(cropBlock.getAge(aboveBlockState) == cropBlock.getMaxAge()) {
+                    final var digTaskBlockInfo = new DigTaskBlockInfo(aboveBlockPos);
                     colonist.setGoal(digTaskBlockInfo);
                 } else {
                     this.goal = null;
                 }
-            } else if (aboveGoal.isAir()) {
+            } else if (aboveBlockState.isAir()) {
                 final var seedsOpt = getSeeds(colonist);
                 if(seedsOpt.isPresent()) {
                     final var blockItem = (BlockItem) seedsOpt.get();
-                    final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlock, blockItem.getBlock().getDefaultState());
+                    final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlockPos, blockItem.getBlock().getDefaultState());
                     colonist.setGoal(bsTaskBlockInfo);
-                    movementHelper.goTo(aboveBlock, Colonist.FAST_MOVEMENT_SPEED);
+                    movementHelper.goTo(aboveBlockPos, Colonist.FAST_MOVEMENT_SPEED);
                 } else {
                     this.goal = null;
                 }
+            } else if (FarmAreaIterator.blockCanBeRemovedToPlantCrops(aboveBlockState)) {
+                colonist.setGoal(new DigTaskBlockInfo(aboveBlockPos));
             } else {
                 this.goal = null;
             }
