@@ -60,7 +60,8 @@ public final class FortressServerManager extends AbstractFortressManager {
 
     private static final BlockState DEFAULT_STATE_ABOVE_CAMPFIRE = Blocks.BARRIER.getDefaultState();
     private static final int DEFAULT_COLONIST_COUNT = 5;
-    
+    public static final BlockState CAMPFIRE_DEFAULT_STATE = Blocks.CAMPFIRE.getDefaultState();
+
     private final MinecraftServer server;
     
     private final Set<LivingEntity> pawns = new HashSet<>();
@@ -156,7 +157,6 @@ public final class FortressServerManager extends AbstractFortressManager {
         final var pos = getRandomSpawnPosition();
         final var world = (ServerWorld) colonist.getEntityWorld();
         final var masterId = colonist.getMasterId().orElseThrow(() -> new IllegalStateException("Colonist has no master!"));
-        final var name = colonist.getName();
 
         final var infoTag = getColonistInfoTag(masterId);
         infoTag.putString(ServerProfessionManager.PROFESSION_NBT_TAG, warriorId);
@@ -223,19 +223,10 @@ public final class FortressServerManager extends AbstractFortressManager {
         }
 
         if(this.fortressCenter != null) {
-            final BlockState blockState = getWorld().getBlockState(this.fortressCenter);
-            if(blockState != Blocks.CAMPFIRE.getDefaultState()) {
-                getWorld().setBlockState(fortressCenter, getStateForCampCenter(), 3);
-                if(player != null)
-                    getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
-            }
-            final BlockPos aboveTheCenter = this.fortressCenter.up();
-            final BlockState blockStateAbove = getWorld().getBlockState(aboveTheCenter);
-            if(blockStateAbove != DEFAULT_STATE_ABOVE_CAMPFIRE) {
-                getWorld().setBlockState(aboveTheCenter, DEFAULT_STATE_ABOVE_CAMPFIRE, 3);
-                if(player != null)
-                    getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
-            }
+            if(this.campfireEnabled)
+                setTheCampfireState(player);
+            else
+                resetCampfireState(player);
 
             final var colonistsCount = this.pawns.size();
             final var spawnFactor = MathHelper.clampedLerp(82, 99, colonistsCount / 50f);
@@ -246,11 +237,42 @@ public final class FortressServerManager extends AbstractFortressManager {
                         if(player != null) {
                             spawnPawnNearCampfire(player.getUuid())
                                     .ifPresent(it -> player.sendMessage(Text.literal(it.getName().getString() + " appeared in the village."), false));
-
                         }
                     }
                 }
             }
+        }
+    }
+
+    private void setTheCampfireState(@Nullable ServerPlayerEntity player) {
+        final BlockState blockState = getWorld().getBlockState(this.fortressCenter);
+        if(blockState != CAMPFIRE_DEFAULT_STATE) {
+            getWorld().setBlockState(fortressCenter, CAMPFIRE_DEFAULT_STATE, 3);
+            if(player != null)
+                getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
+        }
+        final BlockPos aboveTheCenter = this.fortressCenter.up();
+        final BlockState blockStateAbove = getWorld().getBlockState(aboveTheCenter);
+        if(blockStateAbove != DEFAULT_STATE_ABOVE_CAMPFIRE) {
+            getWorld().setBlockState(aboveTheCenter, DEFAULT_STATE_ABOVE_CAMPFIRE, 3);
+            if(player != null)
+                getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
+        }
+    }
+
+    private void resetCampfireState(@Nullable ServerPlayerEntity player) {
+        final BlockState blockState = getWorld().getBlockState(this.fortressCenter);
+        if(blockState == CAMPFIRE_DEFAULT_STATE) {
+            getWorld().setBlockState(fortressCenter, Blocks.AIR.getDefaultState(), 3);
+            if(player != null)
+                getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
+        }
+        final BlockPos aboveTheCenter = this.fortressCenter.up();
+        final BlockState blockStateAbove = getWorld().getBlockState(aboveTheCenter);
+        if(blockStateAbove == DEFAULT_STATE_ABOVE_CAMPFIRE) {
+            getWorld().setBlockState(aboveTheCenter, Blocks.AIR.getDefaultState(), 3);
+            if(player != null)
+                getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
         }
     }
 
@@ -300,8 +322,9 @@ public final class FortressServerManager extends AbstractFortressManager {
         if(!(world instanceof ServerWorld))
             throw new IllegalArgumentException("World must be a server world");
 
-        getWorld().setBlockState(fortressCenter, getStateForCampCenter(), 3);
-        getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
+        if(this.campfireEnabled) {
+            setTheCampfireState(player);
+        }
 
         if(minX > this.fortressCenter.getX()-10) minX = this.fortressCenter.getX()-10;
         if(minZ > this.fortressCenter.getZ()-10) minZ = this.fortressCenter.getZ()-10;
