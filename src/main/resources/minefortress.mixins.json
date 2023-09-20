@@ -21,7 +21,8 @@
     "network.FortressPacketByteBufMixin",
     "network.FortressServerPlayNetworkHandlerMixin",
     "renderer.gui.FortressScreenHandler",
-    "renderer.gui.FortressSimpleInventoryMixin"
+    "renderer.gui.FortressSimpleInventoryMixin",
+    "renderer.gui.worldcreator.LevelPropertiesMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",
@@ -35,16 +36,16 @@
     "renderer.FortressFluidRendererMixin",
     "renderer.FortressGameRendererMixin",
     "renderer.FortressWorldRendererMixin",
-    "renderer.gui.FortressCreateWorldScreenMixin",
     "renderer.gui.FortressCreativeInventoryScreenMixin",
-    "renderer.gui.FortressCyclingButtonMixin",
     "renderer.gui.FortressGuiMixin",
     "renderer.gui.FortressHandledScreenMixin",
     "renderer.gui.FortressInGameHudMixin",
     "renderer.gui.GameModeSelectionScreenMixin",
-    "renderer.gui.GameTabMixin",
+    "renderer.gui.worldcreator.FortressCreateWorldScreenMixin",
+    "renderer.gui.worldcreator.FortressCyclingButtonMixin",
+    "renderer.gui.worldcreator.GameTabMixin",
+    "renderer.gui.worldcreator.WorldCreatorMixin",
     "world.FortressClientWorldMixin",
-    "world.WorldCreatorMixin",
     "world.WorldLoadedEventMixin"
   ],
   "server": [],

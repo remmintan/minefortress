@@ -15,14 +15,25 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
     private final boolean connectedToTheServer;
     private final int maxColonistsCount;
     private final int reservedColonistsCount;
+    private final boolean campfireEnabled;
+    private final boolean borderEnabled;
 
-    public ClientboundSyncFortressManagerPacket(int colonistsCount, BlockPos fortressPos, FortressGamemode fortressGamemode, boolean connectedToTheServer, int maxColonistsCount, int reservedColonistsCount) {
+    public ClientboundSyncFortressManagerPacket(int colonistsCount,
+                                                BlockPos fortressPos,
+                                                FortressGamemode fortressGamemode,
+                                                boolean connectedToTheServer,
+                                                int maxColonistsCount,
+                                                int reservedColonistsCount,
+                                                boolean campfireEnabled,
+                                                boolean borderEnabled) {
         this.colonistsCount = colonistsCount;
         this.fortressPos = fortressPos;
         this.fortressGamemode = fortressGamemode;
         this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
         this.reservedColonistsCount = reservedColonistsCount;
+        this.campfireEnabled = campfireEnabled;
+        this.borderEnabled = borderEnabled;
     }
 
     public ClientboundSyncFortressManagerPacket(PacketByteBuf buf) {
@@ -37,11 +48,24 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
         this.maxColonistsCount = buf.readInt();
         this.connectedToTheServer = buf.readBoolean();
         this.reservedColonistsCount = buf.readInt();
+        this.campfireEnabled = buf.readBoolean();
+        this.borderEnabled = buf.readBoolean();
     }
 
     @Override
     public void handle(MinecraftClient client) {
-        ((FortressMinecraftClient)client).get_FortressClientManager().sync(colonistsCount, fortressPos, this.fortressGamemode, this.connectedToTheServer, this.maxColonistsCount, reservedColonistsCount);
+        ((FortressMinecraftClient)client)
+                .get_FortressClientManager()
+                .sync(
+                    colonistsCount,
+                    fortressPos,
+                    this.fortressGamemode,
+                    this.connectedToTheServer,
+                    this.maxColonistsCount,
+                    reservedColonistsCount,
+                    campfireEnabled,
+                    borderEnabled
+                );
     }
 
     @Override
@@ -56,5 +80,7 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
         buf.writeInt(maxColonistsCount);
         buf.writeBoolean(connectedToTheServer);
         buf.writeInt(reservedColonistsCount);
+        buf.writeBoolean(campfireEnabled);
+        buf.writeBoolean(borderEnabled);
     }
 }

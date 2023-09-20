@@ -1,4 +1,4 @@
-package org.minefortress.mixins.renderer.gui;
+package org.minefortress.mixins.renderer.gui.worldcreator;
 
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldScreenOptionGrid;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class GameTabMixin {
 
     @Unique
-    private static final Text SHOW_CAMPFIRE = Text.literal("Visible campfire");
+    private static final Text SHOW_CAMPFIRE = Text.literal("Campfire enabled");
     @Unique
     private static final Text SHOW_CAMPFIRE_INFO = Text.literal("When enabled you place a campfire in the world otherwise just select village center");
     @Unique

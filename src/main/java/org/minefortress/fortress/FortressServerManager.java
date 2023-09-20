@@ -90,6 +90,9 @@ public final class FortressServerManager extends AbstractFortressManager {
     private BlockPos fortressCenter = null;
     private int maxColonistsCount = -1;
 
+    private boolean campfireEnabled;
+    private boolean borderEnabled;
+
     public FortressServerManager(MinecraftServer server) {
         this.server = server;
         this.serverProfessionManager = new ServerProfessionManager(() -> this, server);
@@ -132,8 +135,15 @@ public final class FortressServerManager extends AbstractFortressManager {
         fortressBuildingManager.tick(player);
         if(!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
-        final var packet = new ClientboundSyncFortressManagerPacket(pawns.size(), fortressCenter, gamemode, isServer, maxColonistsCount, getReservedPawnsCount());
-        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, packet);
+        final var syncFortressPacket = new ClientboundSyncFortressManagerPacket(pawns.size(),
+                fortressCenter,
+                gamemode,
+                isServer,
+                maxColonistsCount,
+                getReservedPawnsCount(),
+                campfireEnabled,
+                borderEnabled);
+        FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, syncFortressPacket);
         if(needSyncSpecialBlocks){
             final var syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks, blueprintsSpecialBlocks);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, syncBlocks);
@@ -333,7 +343,9 @@ public final class FortressServerManager extends AbstractFortressManager {
         return new BlockPos(spawnX, spawnY, spawnZ);
     }
 
-    public void syncOnJoin() {
+    public void syncOnJoin(boolean campfireEnabled, boolean borderEnabled) {
+        this.campfireEnabled = campfireEnabled;
+        this.borderEnabled = borderEnabled;
         this.needSync = true;
         this.needSyncSpecialBlocks = true;
         areasServerManager.sync();

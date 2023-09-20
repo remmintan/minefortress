@@ -13,6 +13,7 @@ import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.interfaces.FortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
+import org.minefortress.interfaces.FortressWorldCreator;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressServerNetworkHelper;
 import org.minefortress.network.s2c.ClientboundFollowColonistPacket;
@@ -47,8 +48,9 @@ public class FortressServerEvents {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             final var fortressServer = (FortressServer) server;
             final var player = handler.player;
-            final var fsm = fortressServer.get_FortressModServerManager().getByPlayer(player);
-            fsm.syncOnJoin();
+            final var fortressModServerManager = fortressServer.get_FortressModServerManager();
+            final var fsm = fortressModServerManager.getByPlayer(player);
+            fsm.syncOnJoin(fortressModServerManager.isCampfireEnabled(), fortressModServerManager.isBorderEnabled());
             final var serverProfessionManager = fsm.getServerProfessionManager();
             serverProfessionManager.sendProfessions(player);
             serverProfessionManager.scheduleSync();
@@ -70,7 +72,12 @@ public class FortressServerEvents {
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             if(server instanceof FortressServer fortressServer) {
-                fortressServer.get_FortressModServerManager().load();
+                final var saveProps = server.getSaveProperties();
+                if(saveProps instanceof FortressWorldCreator wcProps) {
+                    fortressServer.get_FortressModServerManager().load(wcProps.is_ShowCampfire(), wcProps.is_BorderEnabled());
+                } else {
+                    fortressServer.get_FortressModServerManager().load();
+                }
             }
         });
 

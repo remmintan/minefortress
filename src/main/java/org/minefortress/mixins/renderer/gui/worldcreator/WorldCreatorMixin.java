@@ -1,4 +1,4 @@
-package org.minefortress.mixins.world;
+package org.minefortress.mixins.renderer.gui.worldcreator;
 
 import net.minecraft.client.gui.screen.world.WorldCreator;
 import net.minecraft.world.Difficulty;

@@ -62,6 +62,9 @@ public final class FortressClientManager extends AbstractFortressManager {
 
     private FortressState state = FortressState.BUILD;
 
+    private boolean campfireEnabled = true;
+    private boolean borderEnabled = true;
+
     public FortressClientManager() {
         professionManager = new ClientProfessionManager(() -> ((FortressMinecraftClient) MinecraftClient.getInstance()).get_FortressClientManager());
     }
@@ -111,13 +114,24 @@ public final class FortressClientManager extends AbstractFortressManager {
         return reservedColonistCount;
     }
 
-    public void sync(int colonistsCount, BlockPos fortressCenter, FortressGamemode gamemode, boolean connectedToTheServer, int maxColonistsCount, int reservedColonistCount) {
+    public void sync(
+             int colonistsCount,
+             BlockPos fortressCenter,
+             FortressGamemode gamemode,
+             boolean connectedToTheServer,
+             int maxColonistsCount,
+             int reservedColonistCount,
+             boolean campfireEnabled,
+             boolean borderEnabled
+        ) {
         this.colonistsCount = colonistsCount;
         this.fortressCenter = fortressCenter;
         this.gamemode = gamemode;
         this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
         this.reservedColonistCount = reservedColonistCount;
+        this.campfireEnabled = campfireEnabled;
+        this.borderEnabled = borderEnabled;
         this.initialized = true;
     }
 

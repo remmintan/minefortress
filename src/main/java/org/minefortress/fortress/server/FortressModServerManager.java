@@ -20,6 +20,9 @@ public class FortressModServerManager {
     private final MinecraftServer server;
     private final Map<UUID, FortressServerManager> serverManagers = new HashMap<>();
 
+    private boolean campfireEnabled;
+    private boolean borderEnabled;
+
     public FortressModServerManager(MinecraftServer server) {
         this.server = server;
     }
@@ -57,18 +60,48 @@ public class FortressModServerManager {
             nbt.put(id.toString(), fortressNbt);
         }
 
+        nbt.putBoolean("campfireEnabled", campfireEnabled);
+        nbt.putBoolean("borderEnabled", borderEnabled);
+
         FortressModDataLoader.saveNbt(nbt, MANAGERS_FILE_NAME, server.session);
     }
 
     public void load() {
+        load(true, true);
+    }
+
+    public void load(boolean campfireEnabled, boolean borderEnabled) {
         final var nbtCompound = FortressModDataLoader.readNbt(MANAGERS_FILE_NAME, server.session);
+
+        boolean campfireEnabledSet = false;
+        boolean borderEnabledSet = false;
+
         for (String key : nbtCompound.getKeys()) {
+            if(key.equals("campfireEnabled")) {
+                this.campfireEnabled = nbtCompound.getBoolean(key);
+                campfireEnabledSet = true;
+                continue;
+            }
+
+            if(key.equals("borderEnabled")) {
+                this.borderEnabled = nbtCompound.getBoolean(key);
+                borderEnabledSet = true;
+                continue;
+            }
+
             final var managerNbt = nbtCompound.getCompound(key);
             final var masterPlayerId = UUID.fromString(key);
             final var manager = new FortressServerManager(server);
             manager.readFromNbt(managerNbt);
 
             serverManagers.put(masterPlayerId, manager);
+        }
+
+        if(!campfireEnabledSet) {
+            this.campfireEnabled = campfireEnabled;
+        }
+        if(!borderEnabledSet) {
+            this.borderEnabled = borderEnabled;
         }
     }
 
@@ -85,4 +118,11 @@ public class FortressModServerManager {
         return Optional.empty();
     }
 
+    public boolean isCampfireEnabled() {
+        return campfireEnabled;
+    }
+
+    public boolean isBorderEnabled() {
+        return borderEnabled;
+    }
 }
