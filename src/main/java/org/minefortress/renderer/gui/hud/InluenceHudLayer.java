@@ -42,6 +42,6 @@ public class InluenceHudLayer extends AbstractHudLayer {
 
     @Override
     public void tick() {
-        this.captureButton.visible = !ModUtils.getFortressClientManager().isCreative();
+        this.captureButton.visible = ClientInfluenceManager.influenceEnabled();
     }
 }

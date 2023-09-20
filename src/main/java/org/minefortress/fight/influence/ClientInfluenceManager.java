@@ -16,7 +16,6 @@ import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.network.c2s.C2SCaptureInfluencePositionPacket;
 import org.minefortress.network.c2s.C2SUpdateNewInfluencePosition;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.hire.ProfessionsHireTypes;
 import org.minefortress.utils.ModUtils;
 
@@ -36,6 +35,11 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         super(client);
     }
 
+    public static boolean influenceEnabled() {
+        final var fortressClientManager = ModUtils.getFortressClientManager();
+        return fortressClientManager.isSurvival() && fortressClientManager.isBorderEnabled();
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -43,11 +47,12 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
     }
 
     public Optional<WorldBorder> getFortressBorder() {
-        if(ModUtils.getFortressClientManager().isCreative())
+        if(influenceEnabled()) {
+            return clientFortressBorderHolder.getFortressBorder();
+        } else {
             return Optional.ofNullable(MinecraftClient.getInstance().world)
                     .map(ClientWorld::getWorldBorder);
-        else
-            return clientFortressBorderHolder.getFortressBorder();
+        }
     }
 
     public void startSelectingInfluencePosition() {

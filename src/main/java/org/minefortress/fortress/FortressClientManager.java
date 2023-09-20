@@ -383,4 +383,11 @@ public final class FortressClientManager extends AbstractFortressManager {
         return new BuildingHealthRenderInfo(center, health);
     }
 
+    public boolean isCampfireEnabled() {
+        return campfireEnabled;
+    }
+
+    public boolean isBorderEnabled() {
+        return borderEnabled;
+    }
 }
