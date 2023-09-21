@@ -4,7 +4,6 @@ package org.minefortress;
 import com.chocohead.mm.api.ClassTinkerers;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
-import net.minecraft.client.gui.screen.GameModeSelectionScreen;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
@@ -20,7 +19,6 @@ import org.minefortress.registries.FortressServerEvents;
 public class MineFortressMod implements ModInitializer {
 
     public static final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
-    public static final GameModeSelectionScreen.GameModeSelection FORTRESS_SELECTION = ClassTinkerers.getEnum(GameModeSelectionScreen.GameModeSelection.class, "FORTRESS");
     public static final String BLUEPRINTS_FOLDER_NAME = "minefortress-blueprints";
     public static final String BLUEPRINTS_EXTENSION = ".blueprints";
     public static final String MOD_ID = "minefortress";
