@@ -1,6 +1,7 @@
 package org.minefortress.fortress;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
@@ -21,6 +22,7 @@ import org.minefortress.network.c2s.ServerboundSetGamemodePacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.ClientProfessionManager;
+import org.minefortress.renderer.gui.fortress.RepairBuildingScreen;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
@@ -383,11 +385,11 @@ public final class FortressClientManager extends AbstractFortressManager {
         return new BuildingHealthRenderInfo(center, health);
     }
 
-    public boolean isCampfireEnabled() {
-        return campfireEnabled;
-    }
-
     public boolean isBorderEnabled() {
         return borderEnabled;
+    }
+
+    public void openRepairBuildingScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair) {
+        MinecraftClient.getInstance().setScreen(new RepairBuildingScreen(buildingId, blocksToRepair, resourceManager));
     }
 }

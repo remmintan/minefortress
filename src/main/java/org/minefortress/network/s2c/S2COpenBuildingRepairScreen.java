@@ -5,9 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.network.interfaces.FortressS2CPacket;
-import org.minefortress.renderer.gui.fortress.RepairBuildingScreen;
 import org.minefortress.utils.ModUtils;
 
 import java.util.HashMap;
@@ -52,7 +50,7 @@ public class S2COpenBuildingRepairScreen implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        final var resourceManager = ModUtils.getFortressClientManager().getResourceManager();
-        client.execute(() -> client.setScreen(new RepairBuildingScreen(buildingId, blocksToRepair, resourceManager)));
+        final var manager = ModUtils.getFortressClientManager();
+        client.execute(() -> manager.openRepairBuildingScreen(buildingId, blocksToRepair));
     }
 }
