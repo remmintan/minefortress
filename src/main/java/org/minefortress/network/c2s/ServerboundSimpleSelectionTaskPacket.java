@@ -8,7 +8,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.network.interfaces.FortressC2SPacket;
 import org.minefortress.selections.SelectionType;
 import org.minefortress.selections.ServerSelectionType;

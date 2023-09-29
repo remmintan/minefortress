@@ -1,6 +1,4 @@
 accessWidener   v1  named
-accessible  class   net/minecraft/client/render/RenderLayer$MultiPhase
-accessible  method  net/minecraft/client/render/RenderLayer of  (Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;ILnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;
 accessible  class   net/minecraft/client/gui/widget/CyclingButtonWidget$Values
 mutable  field   net/minecraft/client/gui/widget/CyclingButtonWidget    values  Lnet/minecraft/client/gui/widget/CyclingButtonWidget$Values;
 accessible  field   net/minecraft/structure/StructureTemplate   blockInfoLists  Ljava/util/List;

@@ -10,3 +10,5 @@ pluginManagement {
 }
 
 rootProject.name="MineFortress"
+
+include 'panama', 'gobi', 'utils'
