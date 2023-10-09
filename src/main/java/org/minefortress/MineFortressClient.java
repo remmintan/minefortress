@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.minecraft.client.gui.screen.GameModeSelectionScreen;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreen;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreen;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.registries.FortressClientEvents;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressKeybindings;

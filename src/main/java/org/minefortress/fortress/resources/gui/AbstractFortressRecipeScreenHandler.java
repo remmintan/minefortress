@@ -15,11 +15,11 @@ import net.minecraft.world.World;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
-import org.minefortress.interfaces.FortressServer;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.minefortress.interfaces.FortressSimpleInventory;
-import org.minefortress.network.c2s.ServerboundScrollCurrentScreenPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundScrollCurrentScreenPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.interfaces.ScrollableHandler;
 
 import java.util.*;
@@ -147,8 +147,8 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     @Override
     public void onClosed(PlayerEntity player) {
         super.onClosed(player);
-        if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof FortressServer fortressServer) {
-            final var fortressServerManager = fortressServer.get_FortressModServerManager().getByPlayer(serverPlayer);
+        if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof IFortressServer IFortressServer) {
+            final var fortressServerManager = IFortressServer.get_FortressModServerManager().getByPlayer(serverPlayer);
             final var serverResourceManager = fortressServerManager.getServerResourceManager();
 
             returnInputs();

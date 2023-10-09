@@ -23,7 +23,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.entity.interfaces.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.ITargetedPawn;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
 

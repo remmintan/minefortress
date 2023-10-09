@@ -7,8 +7,6 @@ import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.remmintan.panama.model.BuiltModel;
 import net.remmintan.panama.model.builder.SelectionModelBuilder;
 import org.joml.Vector3f;
-import org.minefortress.selections.renderer.ISelectionInfoProvider;
-import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
 
 import java.util.Arrays;
 import java.util.List;

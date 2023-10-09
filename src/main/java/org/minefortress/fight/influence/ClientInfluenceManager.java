@@ -13,9 +13,9 @@ import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.manager.BaseClientStructureManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.network.c2s.C2SCaptureInfluencePositionPacket;
-import org.minefortress.network.c2s.C2SUpdateNewInfluencePosition;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.C2SCaptureInfluencePositionPacket;
+import net.remmintan.mods.minefortress.networking.c2s.C2SUpdateNewInfluencePosition;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.professions.hire.ProfessionsHireTypes;
 import org.minefortress.utils.ModUtils;
 

@@ -10,7 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.world.BlueprintsWorld;
-import org.minefortress.interfaces.FortressServer;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.minefortress.professions.ServerProfessionManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,7 +41,7 @@ public abstract class FortressItemEntityMixin extends Entity {
         if(!this.getWorld().isClient) {
             final var closestPlayer = this.getWorld().getClosestPlayer(this, 100.0D);
             if(closestPlayer instanceof ServerPlayerEntity srvP && srvP.interactionManager.getGameMode() == MineFortressMod.FORTRESS) {
-                final var fortressServer = (FortressServer) closestPlayer.getServer();
+                final var fortressServer = (IFortressServer) closestPlayer.getServer();
                 if(fortressServer != null) {
                     final var fortressServerManager = fortressServer.get_FortressModServerManager().getByPlayer((ServerPlayerEntity) closestPlayer);
                     if(fortressServerManager.isSurvival()) {

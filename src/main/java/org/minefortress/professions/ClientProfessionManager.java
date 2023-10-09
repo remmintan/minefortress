@@ -3,9 +3,9 @@ package org.minefortress.professions;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import org.minefortress.fortress.AbstractFortressManager;
-import org.minefortress.network.c2s.ServerboundChangeProfessionStatePacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundChangeProfessionStatePacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 
 import java.util.List;
 import java.util.Optional;

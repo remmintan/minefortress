@@ -13,12 +13,13 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.interfaces.FortressWorldRenderer;
-import org.minefortress.selections.renderer.ISelectionInfoProvider;
-import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionModelBuilderInfoProvider;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
@@ -28,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class SelectionManager implements FortressWorldRenderer, ISelectionModelBuilderInfoProvider, ISelectionInfoProvider {
+public class SelectionManager implements ISelectionModelBuilderInfoProvider, ISelectionInfoProvider {
 
     private final MinecraftClient client;
 

@@ -8,8 +8,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
-import org.minefortress.network.c2s.C2SRepairBuilding;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.C2SRepairBuilding;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.utils.ModUtils;
 

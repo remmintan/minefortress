@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.HungryEntity;
 import org.minefortress.entity.ai.controls.EatControl;
-import org.minefortress.entity.interfaces.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.IFortressAwareEntity;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
 

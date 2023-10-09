@@ -9,13 +9,14 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
+import net.remmintan.mods.minefortress.networking.s2c.S2COpenBuildingRepairScreen;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.fortress.automation.IAutomationArea;
-import org.minefortress.fortress.automation.IAutomationAreaProvider;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundSyncBuildingsPacket;
-import org.minefortress.network.s2c.S2COpenBuildingRepairScreen;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FortressBuildingManager implements IAutomationAreaProvider {
+public class FortressBuildingManager implements IAutomationAreaProvider, IServerBuildingsManager {
 
     private int buildingPointer = 0;
     private final List<FortressBuilding> buildings = new ArrayList<>();
@@ -43,6 +44,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
         this.scheduleSync();
     }
 
+    @Override
     public void destroyBuilding(UUID id) {
         getBuildingById(id)
                 .ifPresent(it -> {

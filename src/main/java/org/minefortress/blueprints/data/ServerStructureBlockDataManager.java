@@ -18,9 +18,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.data.FortressModDataLoader;
-import org.minefortress.network.interfaces.FortressS2CPacket;
-import org.minefortress.network.s2c.ClientboundAddBlueprintPacket;
-import org.minefortress.network.s2c.ClientboundUpdateBlueprintPacket;
+import net.remmintan.mods.minefortress.networking.interfaces.FortressS2CPacket;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundAddBlueprintPacket;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundUpdateBlueprintPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.util.*;

@@ -5,6 +5,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
@@ -13,12 +14,12 @@ import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.fortress.AbstractFortressManager;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundProfessionSyncPacket;
-import org.minefortress.network.s2c.ClientboundProfessionsInitPacket;
-import org.minefortress.network.s2c.S2COpenHireMenuPacket;
-import org.minefortress.network.s2c.SyncHireProgress;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionSyncPacket;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionsInitPacket;
+import net.remmintan.mods.minefortress.networking.s2c.S2COpenHireMenuPacket;
+import net.remmintan.mods.minefortress.networking.s2c.SyncHireProgress;
 import org.minefortress.professions.hire.ProfessionsHireTypes;
 import org.minefortress.professions.hire.ServerHireHandler;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
-public class ServerProfessionManager extends ProfessionManager{
+public class ServerProfessionManager extends ProfessionManager implements IServerProfessionsManager {
     public static final String PROFESSION_NBT_TAG = "professionId";
 
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
@@ -55,10 +56,12 @@ public class ServerProfessionManager extends ProfessionManager{
         FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
     }
 
+    @Override
     public void closeHireMenu() {
         currentHireHandler = null;
     }
 
+    @Override
     public void sendHireRequestToCurrentHandler(String professionId) {
         if(currentHireHandler != null) {
             final var profession = getProfession(professionId);

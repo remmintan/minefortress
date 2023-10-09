@@ -28,7 +28,7 @@ import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
-import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.interfaces.ITasksInformationHolder;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.professions.hire.HireInfo;
@@ -154,7 +154,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             if(fortressClientManager.getState() == FortressState.AREAS_SELECTION)
                 return areasClientManager.getSavedAreasHolder();
 
-            final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
+            final ITasksInformationHolder fortressWorld = (ITasksInformationHolder) this.world;
             if(fortressWorld == null) return null;
             return fortressWorld.get_ClientTasksHolder();
         };
@@ -163,7 +163,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             if(fortressClientManager.getState() == FortressState.AREAS_SELECTION)
                 return areasClientManager.getSavedAreasHolder();
 
-            final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
+            final ITasksInformationHolder fortressWorld = (ITasksInformationHolder) this.world;
             if(fortressWorld == null) return null;
             return fortressWorld.get_ClientTasksHolder();
         };

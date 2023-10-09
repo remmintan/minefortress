@@ -2,11 +2,10 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.BookScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Items;
-import org.minefortress.network.c2s.ServerboundSleepPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundSleepPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.FortressBookContents;
 import org.minefortress.renderer.gui.widget.ItemButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemToggleOtherItemWidget;

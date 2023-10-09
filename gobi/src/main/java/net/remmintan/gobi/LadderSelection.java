@@ -2,7 +2,7 @@ package net.remmintan.gobi;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.remmintan.mods.minefortress.utils.PathUtils;
+import net.remmintan.mods.minefortress.core.utils.PathUtils;
 
 import java.util.List;
 

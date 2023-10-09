@@ -7,11 +7,11 @@ import net.minecraft.item.Item;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.remmintan.mods.minefortress.utils.PathUtils;
+import net.remmintan.mods.minefortress.core.utils.PathUtils;
 import org.minefortress.entity.interfaces.IWorkerPawn;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
 import org.minefortress.tasks.interfaces.Task;
 
 import java.util.*;

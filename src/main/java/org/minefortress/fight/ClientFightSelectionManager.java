@@ -2,20 +2,18 @@ package org.minefortress.fight;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.interfaces.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.ITargetedPawn;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class ClientFightSelectionManager {

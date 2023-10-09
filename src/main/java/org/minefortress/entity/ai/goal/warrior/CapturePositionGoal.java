@@ -5,12 +5,12 @@ import net.minecraft.util.BlockRotation;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.entity.WarriorPawn;
-import org.minefortress.entity.ai.controls.BaritoneMoveControl;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.IBaritoneMoveControl;
 import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
 
 import java.util.EnumSet;
 
@@ -55,7 +55,7 @@ public class CapturePositionGoal extends Goal {
         }
     }
 
-    private void teleportToGoal(BaritoneMoveControl moveControl) {
+    private void teleportToGoal(IBaritoneMoveControl moveControl) {
         if(target == null) return;
         moveControl.reset();
         final var pos = target.pos();

@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
-import org.minefortress.fortress.automation.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import org.minefortress.fortress.automation.iterators.FarmBuildingIterator;
 
 import java.time.LocalDateTime;

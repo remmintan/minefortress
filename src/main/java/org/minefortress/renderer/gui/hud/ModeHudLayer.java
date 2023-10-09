@@ -2,7 +2,6 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
-import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.FortressState;
 import org.minefortress.renderer.gui.widget.ModeButtonWidget;
 import org.minefortress.utils.ModUtils;

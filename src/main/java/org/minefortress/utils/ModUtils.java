@@ -9,12 +9,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
-import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.interfaces.ITasksInformationHolder;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.selections.SelectionManager;
@@ -90,14 +89,14 @@ public class ModUtils {
         return getFortressClient().get_SelectionManager();
     }
 
-    public static Optional<FortressClientWorld> getFortressClientWorld() {
+    public static Optional<ITasksInformationHolder> getFortressClientWorld() {
         return Optional.ofNullable(MinecraftClient.getInstance())
                 .map(it -> it.world)
-                .map(FortressClientWorld.class::cast);
+                .map(ITasksInformationHolder.class::cast);
     }
 
     public static Optional<ClientVisualTasksHolder> getClientTasksHolder() {
-        return getFortressClientWorld().map(FortressClientWorld::get_ClientTasksHolder);
+        return getFortressClientWorld().map(ITasksInformationHolder::get_ClientTasksHolder);
     }
 
     @NotNull

@@ -12,9 +12,9 @@ import org.apache.logging.log4j.LogManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.fortress.resources.client.FortressItemStack;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundSyncItemsPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncItemsPacket;
 
 import java.util.*;
 

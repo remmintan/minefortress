@@ -6,6 +6,7 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
 import org.minefortress.data.FortressModDataLoader;
 import org.minefortress.fortress.FortressServerManager;
 
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FortressModServerManager {
+public class FortressModServerManager implements IFortressModServerManager {
 
     private static final String MANAGERS_FILE_NAME = "server-managers.nbt";
     private final MinecraftServer server;

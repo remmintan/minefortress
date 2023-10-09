@@ -17,7 +17,7 @@ import org.minefortress.entity.ai.goal.EatGoal;
 import org.minefortress.entity.colonist.FakeHungerManager;
 import org.minefortress.entity.colonist.FortressHungerManager;
 import org.minefortress.entity.colonist.IFortressHungerManager;
-import org.minefortress.entity.interfaces.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.IFortressAwareEntity;
 import org.minefortress.entity.interfaces.IHungerAwareEntity;
 
 import java.util.Optional;

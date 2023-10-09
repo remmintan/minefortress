@@ -2,6 +2,7 @@ package org.minefortress.interfaces;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import net.remmintan.panama.renderer.BlueprintRenderer;
 import org.minefortress.fight.influence.ClientInfluenceManager;
@@ -31,4 +32,6 @@ public interface FortressMinecraftClient {
     boolean is_FortressGamemode();
     BlockPos get_HoveredBlockPos();
     ClientInfluenceManager get_InfluenceManager();
+
+    IAutomationAreaManager get_AutomationAreaReader();
 }

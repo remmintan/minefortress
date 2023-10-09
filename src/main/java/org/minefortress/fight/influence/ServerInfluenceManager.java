@@ -6,16 +6,16 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorderStage;
+import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluenceManager;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
-import org.minefortress.network.s2c.S2CSyncInfluence;
-import org.minefortress.network.s2c.S2CUpdateInfluenceBorderStage;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
+import net.remmintan.mods.minefortress.networking.s2c.S2CSyncInfluence;
+import net.remmintan.mods.minefortress.networking.s2c.S2CUpdateInfluenceBorderStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class ServerInfluenceManager  {
+public class ServerInfluenceManager implements IServerInfluenceManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfluenceManager.class);
     private final Deque<CaptureTask> captureTasksQueue = new ConcurrentLinkedDeque<>();
@@ -40,6 +40,7 @@ public class ServerInfluenceManager  {
         this.fortressServerManager = fortressServerManager;
     }
 
+    @Override
     public void addCapturePosition(UUID taskId, BlockPos pos, ServerPlayerEntity player) {
         final var stage = this.fortressBorderHolder.getStage(pos);
         final var resourceManager = (ServerResourceManager)this.fortressServerManager.getResourceManager();

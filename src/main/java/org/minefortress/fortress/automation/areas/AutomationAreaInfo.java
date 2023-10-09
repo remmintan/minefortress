@@ -2,6 +2,7 @@ package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType;
 
 import java.util.ArrayList;
 import java.util.List;

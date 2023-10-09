@@ -10,7 +10,7 @@ import org.minefortress.blueprints.data.BlueprintDataLayer;
 import org.minefortress.blueprints.data.StrctureBlockData;
 import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
-import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.interfaces.ITasksInformationHolder;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
@@ -132,7 +132,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     }
 
     protected void addTaskToTasksHolder(UUID taskId) {
-        final FortressClientWorld world = (FortressClientWorld) client.world;
+        final ITasksInformationHolder world = (ITasksInformationHolder) client.world;
         if(world != null) {
             final StrctureBlockData blockData = getBlockData();
             final Map<BlockPos, BlockState> structureData = blockData

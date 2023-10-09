@@ -1,6 +1,5 @@
 package org.minefortress.mixins.item;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BoneMealItem;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;

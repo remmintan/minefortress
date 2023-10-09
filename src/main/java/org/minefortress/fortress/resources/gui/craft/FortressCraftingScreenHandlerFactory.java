@@ -7,7 +7,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.interfaces.FortressServer;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 
 public class FortressCraftingScreenHandlerFactory implements NamedScreenHandlerFactory {
     @Override
@@ -18,7 +18,7 @@ public class FortressCraftingScreenHandlerFactory implements NamedScreenHandlerF
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        final var fortressServer = (FortressServer) player.getServer();
+        final var fortressServer = (IFortressServer) player.getServer();
         final var serverResourceManager = fortressServer.get_FortressModServerManager().getByPlayer((ServerPlayerEntity) player).getServerResourceManager();
         return new FortressCraftingScreenHandler(syncId, inv, serverResourceManager);
     }

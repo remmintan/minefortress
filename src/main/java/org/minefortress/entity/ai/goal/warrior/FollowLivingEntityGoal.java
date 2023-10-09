@@ -2,7 +2,7 @@ package org.minefortress.entity.ai.goal.warrior;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
-import org.minefortress.entity.interfaces.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.ITargetedPawn;
 
 import java.util.EnumSet;
 

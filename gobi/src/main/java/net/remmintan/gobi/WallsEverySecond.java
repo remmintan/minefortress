@@ -6,6 +6,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 
 import java.util.ArrayList;
 import java.util.List;

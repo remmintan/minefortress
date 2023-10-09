@@ -7,10 +7,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemGroups;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.interfaces.FortressClientWorld;
+import org.minefortress.interfaces.ITasksInformationHolder;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.c2s.C2SRequestResourcesRefresh;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.C2SRequestResourcesRefresh;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.tasks.ClientVisualTasksHolder;
 import org.minefortress.utils.ModUtils;
@@ -64,7 +64,7 @@ public class FortressClientEvents {
         while (FortressKeybindings.cancelTaskKeybinding.wasPressed()) {
             final ClientWorld world = client.world;
             if(world != null) {
-                final ClientVisualTasksHolder clientVisualTasksHolder = ((FortressClientWorld) world).get_ClientTasksHolder();
+                final ClientVisualTasksHolder clientVisualTasksHolder = ((ITasksInformationHolder) world).get_ClientTasksHolder();
 
                 if(client.options.sprintKey.isPressed()) {
                     clientVisualTasksHolder.cancelAllTasks();

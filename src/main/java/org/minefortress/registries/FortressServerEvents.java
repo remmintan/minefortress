@@ -11,12 +11,12 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.interfaces.FortressServer;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressWorldCreator;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundFollowColonistPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundFollowColonistPacket;
 import org.minefortress.utils.ModUtils;
 
 public class FortressServerEvents {
@@ -46,7 +46,7 @@ public class FortressServerEvents {
 
         // initialising the fortress server on join
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            final var fortressServer = (FortressServer) server;
+            final var fortressServer = (IFortressServer) server;
             final var player = handler.player;
             final var fortressModServerManager = fortressServer.get_FortressModServerManager();
             final var fsm = fortressModServerManager.getByPlayer(player);
@@ -71,26 +71,26 @@ public class FortressServerEvents {
         });
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            if(server instanceof FortressServer fortressServer) {
+            if(server instanceof IFortressServer IFortressServer) {
                 final var saveProps = server.getSaveProperties();
                 if(saveProps instanceof FortressWorldCreator wcProps) {
-                    fortressServer.get_FortressModServerManager().load(wcProps.is_ShowCampfire(), wcProps.is_BorderEnabled());
+                    IFortressServer.get_FortressModServerManager().load(wcProps.is_ShowCampfire(), wcProps.is_BorderEnabled());
                 } else {
-                    fortressServer.get_FortressModServerManager().load();
+                    IFortressServer.get_FortressModServerManager().load();
                 }
             }
         });
 
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-            if(server instanceof FortressServer fortressServer) {
-                fortressServer.get_FortressModServerManager().save();
-                fortressServer.get_BlueprintsWorld().closeSession();
+            if(server instanceof IFortressServer IFortressServer) {
+                IFortressServer.get_FortressModServerManager().save();
+                IFortressServer.get_BlueprintsWorld().closeSession();
             }
         });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if(server instanceof FortressServer fortressServer) {
-                fortressServer.get_FortressModServerManager().tick(server.getPlayerManager());
+            if(server instanceof IFortressServer IFortressServer) {
+                IFortressServer.get_FortressModServerManager().tick(server.getPlayerManager());
             }
         });
 

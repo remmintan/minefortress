@@ -17,7 +17,7 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.interfaces.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.IFortressAwareEntity;
 import org.minefortress.entity.interfaces.IProfessional;
 import org.minefortress.interfaces.FortressSlimeEntity;
 

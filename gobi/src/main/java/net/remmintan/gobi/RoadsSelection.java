@@ -10,12 +10,12 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.minefortress.interfaces.FortressClientWorld;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import org.minefortress.network.c2s.ServerboundRoadsTaskPacket;
 import org.minefortress.network.helpers.FortressChannelNames;
 import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.tasks.ClientVisualTasksHolder;
-import org.minefortress.tasks.TaskType;
 
 import java.util.*;
 
@@ -32,9 +32,8 @@ public class RoadsSelection extends WallsSelection{
             final UUID digTaskId = UUID.randomUUID();
             final UUID placeTaskId = UUID.randomUUID();
 
-            final ClientVisualTasksHolder tasksHolder = ((FortressClientWorld) level).get_ClientTasksHolder();
-            tasksHolder.addTask(digTaskId, getSelection(), TaskType.REMOVE);
-            tasksHolder.addTask(placeTaskId, getSelection(), TaskType.BUILD);
+            final IClientTasksHolder tasksHolder = ((ITasksInformationHolder) level).get_ClientTasksHolder();
+            tasksHolder.addRoadsSelectionTask(digTaskId, placeTaskId, getSelection());
 
             final ServerboundRoadsTaskPacket packet = new ServerboundRoadsTaskPacket(digTaskId, placeTaskId, selection);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_ROADS_TASK, packet);

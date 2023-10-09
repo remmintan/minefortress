@@ -4,9 +4,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import org.minefortress.blueprints.data.ClientStructureBlockDataProvider;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.c2s.ServerboundBlueprintTaskPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundBlueprintTaskPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 import org.slf4j.LoggerFactory;
 

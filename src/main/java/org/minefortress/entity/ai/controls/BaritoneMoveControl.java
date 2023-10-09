@@ -10,17 +10,18 @@ import baritone.api.utils.BetterBlockPos;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.IBaritoneMoveControl;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.BaritonableEntity;
 import org.minefortress.entity.TargetedPawn;
 import org.minefortress.entity.WarriorPawn;
-import org.minefortress.entity.interfaces.IFortressAwareEntity;
-import org.minefortress.entity.interfaces.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.pawns.ITargetedPawn;
 import org.minefortress.entity.interfaces.IWarrior;
 
 import java.util.Optional;
 
-public class BaritoneMoveControl {
+public class BaritoneMoveControl implements IBaritoneMoveControl {
 
     private final IBaritone baritone;
     private final BaritonableEntity entity;
@@ -37,6 +38,7 @@ public class BaritoneMoveControl {
         this.baritone.getGameEventHandler().registerEventListener(new StuckOnFailEventListener());
     }
 
+    @Override
     public void moveTo(@NotNull BlockPos pos) {
         this.reset(true);
         this.updateReachRange(false);
@@ -46,6 +48,7 @@ public class BaritoneMoveControl {
         baritone.getCustomGoalProcess().setGoalAndPath(goal);
     }
 
+    @Override
     public void moveTo(@NotNull LivingEntity entity) {
         this.reset(true);
         this.updateReachRange(true);
@@ -55,6 +58,7 @@ public class BaritoneMoveControl {
         baritone.getFollowProcess().follow(it -> it.equals(entity));
     }
 
+    @Override
     public void reset() {
         reset(false);
     }
@@ -71,6 +75,7 @@ public class BaritoneMoveControl {
         currentReachRange = 0;
     }
 
+    @Override
     public boolean isStuck() {
         return stuck;
     }
