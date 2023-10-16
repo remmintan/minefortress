@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressS2CPacket;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 import org.minefortress.professions.hire.HireInfo;
 import org.minefortress.utils.ModUtils;
 

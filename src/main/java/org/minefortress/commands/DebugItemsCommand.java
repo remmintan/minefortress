@@ -7,10 +7,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.command.ServerCommandSource;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
+
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -65,7 +64,7 @@ public class DebugItemsCommand extends MineFortressCommand {
                             context -> {
                                 int num = IntegerArgumentType.getInteger(context, "num");
                                 final FortressServerManager serverManager = getFortressServerManager(context);
-                                final var resourceManager = serverManager.getServerResourceManager();
+                                final var resourceManager = serverManager.getResourceManager();
 
                                 final var random = context.getSource().getWorld().random;
                                 for (int i = 0; i < num; i++) {
@@ -86,7 +85,7 @@ public class DebugItemsCommand extends MineFortressCommand {
                                 .executes(
                                         context -> {
                                             final FortressServerManager serverManager = getFortressServerManager(context);
-                                            final var resourceManager = serverManager.getServerResourceManager();
+                                            final var resourceManager = serverManager.getResourceManager();
 
                                             resourceManager
                                                     .getAllItems()

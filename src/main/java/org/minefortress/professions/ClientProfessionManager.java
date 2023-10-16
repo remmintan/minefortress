@@ -2,7 +2,9 @@ package org.minefortress.professions;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
-import org.minefortress.fortress.AbstractFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
+import org.minefortress.fortress.IFortressManager;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundChangeProfessionStatePacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -14,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class ClientProfessionManager extends ProfessionManager {
 
-    public ClientProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
+    public ClientProfessionManager(Supplier<IFortressManager> fortressManagerSupplier) {
         super(fortressManagerSupplier);
     }
 
@@ -71,7 +73,7 @@ public class ClientProfessionManager extends ProfessionManager {
 
     public void updateProfessions(List<ProfessionEssentialInfo> info) {
         for(ProfessionEssentialInfo professionEssentialInfo : info) {
-            final Profession profession = getProfession(professionEssentialInfo.getId());
+            final IProfession profession = getProfession(professionEssentialInfo.getId());
             if(profession != null) {
                 profession.setAmount(professionEssentialInfo.getAmount());
             }

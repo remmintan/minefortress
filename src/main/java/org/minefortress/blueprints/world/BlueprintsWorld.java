@@ -14,6 +14,7 @@ import net.minecraft.resource.DataConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -40,9 +41,9 @@ import net.minecraft.world.level.storage.LevelStorage;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintsWorld;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.data.FortressModDataLoader;
+import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 
 import java.io.IOException;
 import java.util.*;
@@ -94,7 +95,7 @@ public class BlueprintsWorld implements IBlueprintsWorld {
         this.server = server;
     }
 
-    public FortressServerWorld getWorld() {
+    public ServerWorld getWorld() {
         if(world == null) {
             create();
         }
@@ -118,7 +119,7 @@ public class BlueprintsWorld implements IBlueprintsWorld {
         final Executor executor = Util.getMainWorkerExecutor();
         final DynamicRegistryManager dynamicRegistryManager = server.getRegistryManager();
 
-        this.fortressSession = FortressModDataLoader.getInstance().getBlueprintsWorldSession();
+        this.fortressSession = ModPathUtils.getInstance().getBlueprintsWorldSession();
 
         final Registry<Biome> biomeRegistry = dynamicRegistryManager.get(RegistryKeys.BIOME);
         final Registry<DimensionType> dimensionTypeRegistry = dynamicRegistryManager.get(RegistryKeys.DIMENSION_TYPE);

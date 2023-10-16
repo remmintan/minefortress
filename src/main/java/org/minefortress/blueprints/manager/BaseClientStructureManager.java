@@ -6,10 +6,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.data.StrctureBlockData;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
-import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureRenderInfoProvider;
 import org.minefortress.interfaces.ITasksInformationHolder;
 import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.utils.BuildingHelper;
@@ -62,7 +62,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
             cantBuild = true;
             return;
         }
-        final StrctureBlockData blockData = getBlockData();
+        final IStructureBlockData blockData = getBlockData();
         final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL)
                 .entrySet()
                 .stream()
@@ -91,7 +91,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
     }
 
-    private StrctureBlockData getBlockData() {
+    private IStructureBlockData getBlockData() {
         final var blockDataProvider = getBlockDataProvider();
         final var selectedStructure = getSelectedStructure();
         return blockDataProvider
@@ -112,7 +112,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         if(getSelectedStructure() == null) return pos;
 
         final boolean posSolid = !BuildingHelper.doesNotHaveCollisions(client.world, pos);
-        final StrctureBlockData blockData = getBlockData();
+        final IStructureBlockData blockData = getBlockData();
         final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
         BlockPos movedPos = pos.subtract(halfSize);
@@ -134,7 +134,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     protected void addTaskToTasksHolder(UUID taskId) {
         final ITasksInformationHolder world = (ITasksInformationHolder) client.world;
         if(world != null) {
-            final StrctureBlockData blockData = getBlockData();
+            final IStructureBlockData blockData = getBlockData();
             final Map<BlockPos, BlockState> structureData = blockData
                     .getLayer(BlueprintDataLayer.GENERAL);
             final int floorLevel = getSelectedStructure().getFloorLevel();

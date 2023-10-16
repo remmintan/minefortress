@@ -4,9 +4,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandlerFactory;
-import org.minefortress.fortress.resources.gui.smelt.FurnaceScreenHandlerFactory;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.ScreenType;
 
 public class ServerboundOpenCraftingScreenPacket implements FortressC2SPacket {
 
@@ -42,15 +41,7 @@ public class ServerboundOpenCraftingScreenPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        switch (screenType) {
-            case CRAFTING -> player.openHandledScreen(new FortressCraftingScreenHandlerFactory());
-            case FURNACE -> player.openHandledScreen(new FurnaceScreenHandlerFactory(blockPos));
-        }
-
-    }
-
-    public enum ScreenType {
-        FURNACE, CRAFTING
+        getFortressManager(server, player).openHandledScreen(screenType, player, blockPos);
     }
 
 }

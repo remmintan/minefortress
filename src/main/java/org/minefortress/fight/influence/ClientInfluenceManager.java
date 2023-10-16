@@ -7,16 +7,16 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderStage;
-import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.data.StrctureBlockData;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import org.minefortress.blueprints.manager.BaseClientStructureManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.fortress.FortressClientManager;
 import net.remmintan.mods.minefortress.networking.c2s.C2SCaptureInfluencePositionPacket;
 import net.remmintan.mods.minefortress.networking.c2s.C2SUpdateNewInfluencePosition;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import org.minefortress.professions.hire.ProfessionsHireTypes;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionsHireTypes;
 import org.minefortress.utils.ModUtils;
 
 import java.util.*;
@@ -121,7 +121,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         return hasAnyWarrior;
     }
 
-    private void sendCaptureTaskPacket(BlockPos pos, StrctureBlockData blockData) {
+    private void sendCaptureTaskPacket(BlockPos pos, IStructureBlockData blockData) {
         final var taskId = UUID.randomUUID();
         ModUtils.getClientTasksHolder()
                 .ifPresent(it -> {

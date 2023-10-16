@@ -8,5 +8,6 @@ import java.util.UUID;
 public interface IServerInfluenceManager {
 
     void addCapturePosition(UUID taskId, BlockPos pos, ServerPlayerEntity player);
+    void checkNewPositionAndUpdateClientState(BlockPos pos, ServerPlayerEntity player);
 
 }

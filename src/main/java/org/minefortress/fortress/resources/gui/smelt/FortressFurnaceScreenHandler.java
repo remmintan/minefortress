@@ -15,7 +15,7 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
         this(syncId, inventory, null, new SimpleInventory(3), new ArrayPropertyDelegate(4), new ArrayList<>());
     }
 
-    public FortressFurnaceScreenHandler(int syncId, PlayerInventory inventory, ServerResourceManager resourceManager, Inventory furnace, PropertyDelegate propertyDelegate, List<PropertyDelegate> otherFurnaces) {
+    public FortressFurnaceScreenHandler(int syncId, PlayerInventory inventory, IServerResourceManager resourceManager, Inventory furnace, PropertyDelegate propertyDelegate, List<PropertyDelegate> otherFurnaces) {
         super(FORTRESS_FURNACE_SCREEN_HANDLER, syncId, resourceManager, inventory.player);
 
         this.furnaceInventory = furnace;

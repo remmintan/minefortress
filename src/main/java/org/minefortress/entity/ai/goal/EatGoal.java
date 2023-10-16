@@ -5,9 +5,9 @@ import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.HungryEntity;
 import org.minefortress.entity.ai.controls.EatControl;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -39,11 +39,11 @@ public class EatGoal extends Goal {
         return super.shouldContinue() && getEatControl().isEating();
     }
 
-    private Optional<ServerResourceManager> getResourceManager() {
+    private Optional<IServerResourceManager> getResourceManager() {
         return entity instanceof IFortressAwareEntity f ?
                 f.getFortressServerManager()
                 .map(FortressServerManager::getResourceManager)
-                .map(ServerResourceManager.class::cast) :
+                .map(IServerResourceManager.class::cast) :
                 Optional.empty();
     }
 

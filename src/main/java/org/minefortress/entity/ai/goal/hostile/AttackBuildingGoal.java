@@ -40,7 +40,7 @@ public final class AttackBuildingGoal extends Goal {
         final var mobBlockPos = this.mob.getBlockPos();
         this.modServerManager
                 .findReachableFortress(mobBlockPos, getFollowRange())
-                .map(FortressServerManager::getFortressBuildingManager)
+                .map(FortressServerManager::getBuildingsManager)
                 .flatMap(it -> it.findNearest(mobBlockPos))
                 .ifPresent(building -> this.targetBuilding = building);
 

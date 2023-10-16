@@ -5,17 +5,17 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
+import net.remmintan.mods.minefortress.networking.NetworkActionType;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
+import net.remmintan.mods.minefortress.networking.helpers.NetworkUtils;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundBlueprintsProcessImportExportPacket;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.util.Strings;
-import org.minefortress.data.FortressModDataLoader;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.renderer.gui.blueprints.NetworkActionType;
-import org.minefortress.utils.NetworkUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -65,8 +65,8 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
 
         if(player instanceof FortressServerPlayerEntity serverPlayer) {
             switch (type) {
-                case NetworkActionType.EXPORT -> handleExport(server, player, serverPlayer);
-                case NetworkActionType.IMPORT -> handleImport(server, player, serverPlayer);
+                case EXPORT -> handleExport(server, player, serverPlayer);
+                case IMPORT -> handleImport(server, player, serverPlayer);
             }
         }
     }
@@ -77,7 +77,7 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
             final var sbm = serverPlayer.get_ServerBlueprintManager();
             sbm.write();
             final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
-            final var blueprintsPath = FortressModDataLoader.getFolderAbsolutePath(blueprintsFolderPath, server.session);
+            final var blueprintsPath = ModPathUtils.getFolderAbsolutePath(blueprintsFolderPath, server.session);
             bytes = zipBlueprintsFolderToByteArray(blueprintsPath);
         }catch (RuntimeException | IOException exp) {
             exp.printStackTrace();
@@ -94,7 +94,7 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
         try {
             final var sbm = serverPlayer.get_ServerBlueprintManager();
             final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
-            final var pathString = FortressModDataLoader.getFolderAbsolutePath(blueprintsFolderPath, server.session);
+            final var pathString = ModPathUtils.getFolderAbsolutePath(blueprintsFolderPath, server.session);
             final var path = Paths.get(pathString);
             final var target = path.toFile();
             FileUtils.deleteDirectory(target);

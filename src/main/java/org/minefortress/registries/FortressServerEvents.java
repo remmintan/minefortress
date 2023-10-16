@@ -12,7 +12,7 @@ import net.minecraft.util.math.Direction;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.BasePawnEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressWorldCreator;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -49,7 +49,7 @@ public class FortressServerEvents {
             final var fortressServer = (IFortressServer) server;
             final var player = handler.player;
             final var fortressModServerManager = fortressServer.get_FortressModServerManager();
-            final var fsm = fortressModServerManager.getByPlayer(player);
+            final var fsm = fortressModServerManager.getManagersProvider(player);
             fsm.syncOnJoin(fortressModServerManager.isCampfireEnabled(), fortressModServerManager.isBorderEnabled());
             final var serverProfessionManager = fsm.getServerProfessionManager();
             serverProfessionManager.sendProfessions(player);

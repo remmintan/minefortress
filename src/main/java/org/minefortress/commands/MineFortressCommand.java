@@ -21,7 +21,7 @@ abstract class MineFortressCommand {
         if(server == null) {
             throw new RuntimeException("Server is null");
         }
-        return server.get_FortressModServerManager().getByPlayer(srvPlayer);
+        return server.get_FortressModServerManager().getManagersProvider(srvPlayer);
     }
 
 }

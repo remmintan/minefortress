@@ -1,13 +1,10 @@
 package org.minefortress.entity.ai.goal;
 
 import net.minecraft.block.BedBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
 
@@ -78,7 +75,7 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
     private Optional<BlockPos> getFreeBed() {
         return colonist
                 .getFortressServerManager()
-                .map(FortressServerManager::getFortressBuildingManager)
+                .map(FortressServerManager::getBuildingsManager)
                 .flatMap(FortressBuildingManager::getFreeBed);
     }
 

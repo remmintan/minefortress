@@ -2,7 +2,7 @@ package org.minefortress.entity.ai.controls;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.Hand;
-import org.minefortress.entity.interfaces.IHungerAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwareEntity;
 
 public class EatControl {
 

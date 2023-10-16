@@ -3,8 +3,8 @@ package net.remmintan.mods.minefortress.networking.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.renderer.gui.interfaces.ScrollableHandler;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IScrollableHandler;
 
 public class ServerboundScrollCurrentScreenPacket implements FortressC2SPacket {
 
@@ -25,7 +25,7 @@ public class ServerboundScrollCurrentScreenPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        if(player.currentScreenHandler instanceof ScrollableHandler handler) {
+        if(player.currentScreenHandler instanceof IScrollableHandler handler) {
             handler.scrollItems(scrollPosition);
         }
     }

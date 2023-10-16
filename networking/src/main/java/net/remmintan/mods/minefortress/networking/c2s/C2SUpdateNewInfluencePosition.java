@@ -4,10 +4,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.fight.influence.ServerInfluenceManager;
-import org.minefortress.fortress.FortressServerManager;
 
 public class C2SUpdateNewInfluencePosition implements FortressC2SPacket {
 
@@ -24,7 +22,7 @@ public class C2SUpdateNewInfluencePosition implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressServerManager = getFortressServerManager(server, player);
+        final var fortressServerManager = getManagersProvider(server, player);
         final var influenceManager = fortressServerManager.getInfluenceManager();
         influenceManager.checkNewPositionAndUpdateClientState(pos, player);
     }

@@ -4,6 +4,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
@@ -11,6 +12,7 @@ import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.automation.iterators.MineAreaIterator;
 import org.minefortress.fortress.automation.iterators.ResetableIterator;
 import org.minefortress.utils.AreasUtils;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,7 +23,7 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
     private ResetableIterator<AutomationBlockInfo> currentIterator;
     private boolean reset = false;
 
-    public ServerAutomationAreaInfo(AutomationAreaInfo info) {
+    public ServerAutomationAreaInfo(IAutomationAreaInfo info) {
         this(info.getClientArea(), info.getAreaType(), info.getId(), LocalDateTime.MIN);
     }
 

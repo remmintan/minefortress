@@ -6,7 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressS2CPacket;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 
 public class ClientboundFollowColonistPacket implements FortressS2CPacket {
 

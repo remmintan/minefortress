@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressS2CPacket;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 
 public class ClientboundUpdateBlueprintPacket implements FortressS2CPacket {

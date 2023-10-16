@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressS2CPacket;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 
 import java.util.ArrayList;
 import java.util.HashMap;

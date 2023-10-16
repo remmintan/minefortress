@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import net.remmintan.panama.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;

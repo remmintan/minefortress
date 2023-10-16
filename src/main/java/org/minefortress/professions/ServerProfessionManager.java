@@ -5,22 +5,25 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
+import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.entity.Colonist;
-import org.minefortress.entity.interfaces.IProfessional;
-import org.minefortress.fortress.AbstractFortressManager;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionSyncPacket;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionsInitPacket;
 import net.remmintan.mods.minefortress.networking.s2c.S2COpenHireMenuPacket;
 import net.remmintan.mods.minefortress.networking.s2c.SyncHireProgress;
-import org.minefortress.professions.hire.ProfessionsHireTypes;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.minefortress.entity.BasePawnEntity;
+import org.minefortress.entity.Colonist;
+import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.IFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionsHireTypes;
 import org.minefortress.professions.hire.ServerHireHandler;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +35,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
-public class ServerProfessionManager extends ProfessionManager implements IServerProfessionsManager {
+public final class ServerProfessionManager extends ProfessionManager implements IServerProfessionsManager {
     public static final String PROFESSION_NBT_TAG = "professionId";
 
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
@@ -43,7 +46,7 @@ public class ServerProfessionManager extends ProfessionManager implements IServe
 
     private final Map<ProfessionsHireTypes, ServerHireHandler> hireHandlers = new HashMap<>();
     private ServerHireHandler currentHireHandler;
-    public ServerProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier, MinecraftServer server) {
+    public ServerProfessionManager(Supplier<IFortressManager> fortressManagerSupplier, MinecraftServer server) {
         super(fortressManagerSupplier);
         this.server = server;
     }
@@ -71,7 +74,7 @@ public class ServerProfessionManager extends ProfessionManager implements IServe
             final var canHire = isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
             final var abstractFortressManager = fortressManagerSupplier.get();
             if(canHire == ProfessionResearchState.UNLOCKED && getFreeColonists() > 0 && abstractFortressManager instanceof FortressServerManager fsm) {
-                final var resourceManager = (ServerResourceManager) abstractFortressManager
+                final var resourceManager = (IServerResourceManager) abstractFortressManager
                         .getResourceManager();
                 resourceManager.removeItems(profession.getItemsRequirement());
                 fsm.getPawnWithoutAProfession().ifPresent(Colonist::reserveColonist);
@@ -85,7 +88,7 @@ public class ServerProfessionManager extends ProfessionManager implements IServe
 
     @Override
     public void increaseAmount(String professionId, boolean itemsAlreadyCharged) {
-        final Profession profession = super.getProfession(professionId);
+        final IProfession profession = super.getProfession(professionId);
         if(profession == null) return;
         if (profession.isHireMenu()) {
             if(this.fortressManagerSupplier.get() instanceof FortressServerManager fsm && fsm.getReservedPawnsCount() <= 0) {
@@ -98,7 +101,7 @@ public class ServerProfessionManager extends ProfessionManager implements IServe
         if(super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, !itemsAlreadyCharged) != ProfessionResearchState.UNLOCKED) return;
 
         if(!itemsAlreadyCharged) {
-            final var resourceManager = (ServerResourceManager) fortressManagerSupplier
+            final var resourceManager = (IServerResourceManager) fortressManagerSupplier
                     .get()
                     .getResourceManager();
             resourceManager.removeItems(profession.getItemsRequirement());
@@ -114,7 +117,7 @@ public class ServerProfessionManager extends ProfessionManager implements IServe
     }
 
     public void decreaseAmount(String professionId, boolean force) {
-        final Profession profession = super.getProfession(professionId);
+        final IProfession profession = super.getProfession(professionId);
         if(profession == null) return;
         if(profession.getAmount() <= 0) return;
         if(profession.isHireMenu() && !force) return;
@@ -165,9 +168,9 @@ public class ServerProfessionManager extends ProfessionManager implements IServe
     }
 
     private void tickRemoveFromProfession() {
-        for(Map.Entry<String, Profession> entry : getProfessions().entrySet()) {
+        for(Map.Entry<String, IProfession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
-            final Profession profession = entry.getValue();
+            final IProfession profession = entry.getValue();
             final List<IProfessional> pawnsWithProf = this.getPawnsWithProfession(professionId);
             final int redundantProfCount = pawnsWithProf.size() - profession.getAmount();
             if(redundantProfCount <= 0) continue;
@@ -190,7 +193,7 @@ public class ServerProfessionManager extends ProfessionManager implements IServe
     public void readFromNbt(NbtCompound tag) {
         initProfessionsIfNeeded();
         for(String key : tag.getKeys()){
-            final Profession profession = super.getProfession(key);
+            final IProfession profession = super.getProfession(key);
             if(profession == null) continue;
             profession.readNbt(tag.getCompound(key));
             scheduleSync();
@@ -198,9 +201,9 @@ public class ServerProfessionManager extends ProfessionManager implements IServe
     }
 
     public Optional<String> getProfessionsWithAvailablePlaces(boolean professionRequiresReservation) {
-        for(Map.Entry<String, Profession> entry : getProfessions().entrySet()) {
+        for(Map.Entry<String, IProfession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
-            final Profession profession = entry.getValue();
+            final IProfession profession = entry.getValue();
 
             if(professionRequiresReservation && !profession.isHireMenu()) continue;
             if(!professionRequiresReservation && profession.isHireMenu()) continue;

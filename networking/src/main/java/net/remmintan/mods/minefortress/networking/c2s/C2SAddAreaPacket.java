@@ -4,8 +4,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
-import net.remmintan.mods.minefortress.networking.helpers.NetworkingReadersRegistry;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
+import net.remmintan.mods.minefortress.networking.registries.NetworkingReadersRegistry;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 public class C2SAddAreaPacket implements FortressC2SPacket {
 

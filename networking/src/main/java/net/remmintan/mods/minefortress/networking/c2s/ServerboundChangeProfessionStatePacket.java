@@ -3,10 +3,8 @@ package net.remmintan.mods.minefortress.networking.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.professions.Profession;
-import org.minefortress.professions.ServerProfessionManager;
-import org.minefortress.professions.hire.ProfessionsHireTypes;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionsHireTypes;
 
 public class ServerboundChangeProfessionStatePacket implements FortressC2SPacket {
 
@@ -31,7 +29,7 @@ public class ServerboundChangeProfessionStatePacket implements FortressC2SPacket
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final ServerProfessionManager manager = this.getFortressServerManager(server, player).getServerProfessionManager();
+        final var manager = getManagersProvider(server, player).getProfessionsManager();
         if (amountChange == AmountChange.ADD) {
             final var profession = manager.getProfession(professionId);
             if(profession.isHireMenu()) {

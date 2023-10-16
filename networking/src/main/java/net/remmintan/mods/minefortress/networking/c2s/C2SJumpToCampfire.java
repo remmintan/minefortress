@@ -3,8 +3,7 @@ package net.remmintan.mods.minefortress.networking.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.fortress.FortressServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 public class C2SJumpToCampfire implements FortressC2SPacket {
 
@@ -16,7 +15,7 @@ public class C2SJumpToCampfire implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressServerManager = getFortressServerManager(server, player);
+        final var fortressServerManager = getFortressManager(server, player);
         fortressServerManager.jumpToCampfire(player);
     }
 

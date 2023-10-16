@@ -3,7 +3,7 @@ package net.remmintan.mods.minefortress.networking.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressS2CPacket;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 import org.minefortress.fortress.FortressGamemode;
 import org.minefortress.interfaces.FortressMinecraftClient;
 

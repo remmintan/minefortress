@@ -4,7 +4,7 @@ import com.google.gson.stream.JsonReader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.minefortress.MineFortressMod;
-import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import org.apache.logging.log4j.util.Strings;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundEditBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;

@@ -4,7 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 public class C2SClearActiveBlueprint implements FortressC2SPacket {
 

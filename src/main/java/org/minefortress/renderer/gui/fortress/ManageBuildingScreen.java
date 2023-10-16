@@ -9,7 +9,7 @@ import org.minefortress.fortress.buildings.EssentialBuildingInfo;
 import net.remmintan.mods.minefortress.networking.c2s.C2SDestroyBuilding;
 import net.remmintan.mods.minefortress.networking.c2s.C2SOpenRepairBuildingScreen;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import org.minefortress.professions.Profession;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.utils.ModUtils;
 
@@ -18,7 +18,7 @@ import java.util.Optional;
 public class ManageBuildingScreen extends WindowScreen {
 
     private final EssentialBuildingInfo buildingInfo;
-    private final Profession profession;
+    private final IProfession profession;
     private final Text screenName;
 
     public ManageBuildingScreen(EssentialBuildingInfo essentialBuildingInfo) {

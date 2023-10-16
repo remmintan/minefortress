@@ -6,8 +6,10 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
-import org.minefortress.data.FortressModDataLoader;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
 import org.minefortress.fortress.FortressServerManager;
 
 import java.util.HashMap;
@@ -28,12 +30,24 @@ public class FortressModServerManager implements IFortressModServerManager {
         this.server = server;
     }
 
-    public FortressServerManager getByPlayer(ServerPlayerEntity player) {
+    public IServerManagersProvider getManagersProvider(ServerPlayerEntity player) {
+        return getByPlayer(player);
+    }
+
+    private FortressServerManager getByPlayer(ServerPlayerEntity player) {
         final var playerId = Uuids.getUuidFromProfile(player.getGameProfile());
         return serverManagers.computeIfAbsent(playerId, (it) -> new FortressServerManager(server));
     }
 
-    public FortressServerManager getByPlayerId(UUID uuid) {
+    public IServerManagersProvider getManagersProvider(UUID uuid) {
+        return getByPlayer(uuid);
+    }
+
+    public IServerFortressManager getFortressManager(ServerPlayerEntity player) {
+        return getByPlayer(player);
+    }
+
+    private FortressServerManager getByPlayer(UUID uuid) {
         if(serverManagers.containsKey(uuid)) {
             return serverManagers.get(uuid);
         } else {
@@ -64,7 +78,7 @@ public class FortressModServerManager implements IFortressModServerManager {
         nbt.putBoolean("campfireEnabled", campfireEnabled);
         nbt.putBoolean("borderEnabled", borderEnabled);
 
-        FortressModDataLoader.saveNbt(nbt, MANAGERS_FILE_NAME, server.session);
+        ModPathUtils.saveNbt(nbt, MANAGERS_FILE_NAME, server.session);
     }
 
     public void load() {
@@ -72,7 +86,7 @@ public class FortressModServerManager implements IFortressModServerManager {
     }
 
     public void load(boolean campfireEnabled, boolean borderEnabled) {
-        final var nbtCompound = FortressModDataLoader.readNbt(MANAGERS_FILE_NAME, server.session);
+        final var nbtCompound = ModPathUtils.readNbt(MANAGERS_FILE_NAME, server.session);
 
         boolean campfireEnabledSet = false;
         boolean borderEnabledSet = false;

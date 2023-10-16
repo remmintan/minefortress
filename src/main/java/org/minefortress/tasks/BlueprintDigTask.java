@@ -2,7 +2,7 @@ package org.minefortress.tasks;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.selections.ServerSelectionType;
+import net.remmintan.mods.minefortress.core.TaskType;
 
 import java.util.UUID;
 

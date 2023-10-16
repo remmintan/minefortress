@@ -1,9 +1,8 @@
 package org.minefortress.professions.hire;
 
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.professions.Profession;
 import org.minefortress.professions.ProfessionManager;
-import org.minefortress.professions.ProfessionResearchState;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
 import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.*;

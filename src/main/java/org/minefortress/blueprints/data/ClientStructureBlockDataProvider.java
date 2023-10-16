@@ -6,7 +6,9 @@ import net.minecraft.registry.Registries;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.blueprints.interfaces.BlueprintsTagsKeeper;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintsTagsKeeper;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,17 +28,17 @@ public final class ClientStructureBlockDataProvider extends AbstractStructureBlo
     }
 
     @Override
-    protected StrctureBlockData buildStructure(StructureTemplate structure, BlockRotation rotation, int floorLevel) {
+    protected IStructureBlockData buildStructure(StructureTemplate structure, BlockRotation rotation, int floorLevel) {
         return buildStructureForClient(structure, rotation);
     }
 
-    public static StrctureBlockData buildStructureForClient(StructureTemplate structure, BlockRotation rotation) {
+    public static IStructureBlockData buildStructureForClient(StructureTemplate structure, BlockRotation rotation) {
         final var sizeAndPivot = getSizeAndPivot(structure, rotation);
         final var size = sizeAndPivot.size();
         final var pivot = sizeAndPivot.pivot();
 
         final Map<BlockPos, BlockState> structureData = getStrcutureData(structure, rotation, pivot);
-        return StrctureBlockData
+        return StructureBlockData
                 .withBlueprintSize(size)
                 .setLayer(BlueprintDataLayer.GENERAL, structureData).build();
     }

@@ -1,19 +1,14 @@
 package net.remmintan.mods.minefortress.networking.c2s;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.selections.SelectionType;
-import org.minefortress.selections.ServerSelectionType;
-import org.minefortress.tasks.SimpleSelectionTask;
-import org.minefortress.tasks.TaskManager;
-import org.minefortress.tasks.TaskType;
+import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -27,13 +22,13 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
     private final HitResult hitResult;
     private final String selectionType;
 
-    public ServerboundSimpleSelectionTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, SelectionType selectionType) {
+    public ServerboundSimpleSelectionTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, String selectionType) {
         this.id = id;
         this.taskType = taskType;
         this.start = start;
         this.end = end;
         this.hitResult = hitResult;
-        this.selectionType = selectionType.name();
+        this.selectionType = selectionType;
     }
 
     public ServerboundSimpleSelectionTaskPacket(PacketByteBuf buffer) {
@@ -90,24 +85,17 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressServerManager = this.getFortressServerManager(server, player);
-        UUID id = this.getId();
-        TaskType taskType = this.getTaskType();
-        TaskManager taskManager = fortressServerManager.getTaskManager();
-        BlockPos startingBlock = this.getStart();
-        BlockPos endingBlock = this.getEnd();
-        HitResult hitResult = this.getHitResult();
-        ServerSelectionType selectionType = this.getSelectionType();
-        SimpleSelectionTask simpleSelectionTask = new SimpleSelectionTask(id, taskType, startingBlock, endingBlock, hitResult, selectionType);
-        if(simpleSelectionTask.getTaskType() == TaskType.BUILD) {
-            final ItemStack itemInHand = player.getStackInHand(Hand.MAIN_HAND);
-            if(itemInHand != ItemStack.EMPTY) {
-                simpleSelectionTask.setPlacingItem(itemInHand.getItem());
-            } else {
-                throw new IllegalStateException();
-            }
-        }
+        final var provider = getManagersProvider(server, player);
+        final var id = this.getId();
+        final var taskType = this.getTaskType();
+        final var taskManager = provider.getTaskManager();
+        final var startingBlock = this.getStart();
+        final var endingBlock = this.getEnd();
+        final var hitResult = this.getHitResult();
+        final var selectionType = this.getSelectionType();
+        final var task = taskManager.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, player);
+        final var manager = getFortressManager(server, player);
 
-        taskManager.addTask(simpleSelectionTask, fortressServerManager);
+        taskManager.addTask(task, provider, manager);
     }
 }

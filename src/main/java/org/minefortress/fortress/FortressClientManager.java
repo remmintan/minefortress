@@ -7,6 +7,7 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.FortressGamemode;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.entity.BasePawnEntity;
@@ -31,7 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public final class FortressClientManager extends AbstractFortressManager {
+public final class FortressClientManager implements IFortressManager {
 
     private static final Object KEY = new Object();
     private final ClientProfessionManager professionManager;

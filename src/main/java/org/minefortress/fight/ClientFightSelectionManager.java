@@ -8,7 +8,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.utils.ModUtils;
 

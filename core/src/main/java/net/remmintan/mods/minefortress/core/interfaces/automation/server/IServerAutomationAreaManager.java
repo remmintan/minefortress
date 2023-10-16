@@ -12,7 +12,6 @@ public interface IServerAutomationAreaManager {
     void addArea(IAutomationAreaInfo area);
     void removeArea(UUID id);
     void tick(ServerPlayerEntity serverPlayer);
-
-    Stream<IAutomationArea> getByRequirement(String requirement)
+    Stream<IAutomationArea> getByRequirement(String requirement);
 
 }

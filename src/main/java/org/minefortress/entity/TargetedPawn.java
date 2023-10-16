@@ -8,11 +8,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.controls.BaritoneMoveControl;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.networking.c2s.C2SFollowTargetPacket;
 import net.remmintan.mods.minefortress.networking.c2s.C2SMoveTargetPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.IBaritoneMoveControl;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IBaritoneMoveControl;
 
 public abstract class TargetedPawn extends NamedPawnEntity implements ITargetedPawn {
     protected final IBaritoneMoveControl moveControl;

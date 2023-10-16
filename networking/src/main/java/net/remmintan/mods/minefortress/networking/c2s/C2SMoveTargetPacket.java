@@ -4,8 +4,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.entity.interfaces.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 public class C2SMoveTargetPacket implements FortressC2SPacket {
 

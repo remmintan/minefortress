@@ -10,14 +10,14 @@ import baritone.api.utils.BetterBlockPos;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.IBaritoneMoveControl;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IBaritoneMoveControl;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.BaritonableEntity;
 import org.minefortress.entity.TargetedPawn;
 import org.minefortress.entity.WarriorPawn;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.IFortressAwareEntity;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.ITargetedPawn;
-import org.minefortress.entity.interfaces.IWarrior;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 
 import java.util.Optional;
 

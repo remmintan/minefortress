@@ -3,8 +3,7 @@ package net.remmintan.mods.minefortress.networking.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.interfaces.FortressServer;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 public class ServerboundChangeMaxColonistsCountPacket implements FortressC2SPacket {
 
@@ -25,8 +24,7 @@ public class ServerboundChangeMaxColonistsCountPacket implements FortressC2SPack
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressServer = (FortressServer) server;
-        final var manager = fortressServer.get_FortressModServerManager().getByPlayer(player);
+        final var manager = getFortressManager(server, player);
         switch (actionType) {
             case INCREASE -> manager.increaseMaxColonistsCount();
             case DECREASE -> manager.decreaseMaxColonistsCount();

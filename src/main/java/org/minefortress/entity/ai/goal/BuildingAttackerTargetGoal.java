@@ -30,7 +30,7 @@ public class BuildingAttackerTargetGoal extends TrackTargetGoal {
     private void findRandomBuildingAttacker() {
         pawn
             .getFortressServerManager()
-            .map(FortressServerManager::getFortressBuildingManager)
+            .map(FortressServerManager::getBuildingsManager)
             .flatMap(FortressBuildingManager::getRandomBuildingAttacker)
             .ifPresent(target -> this.targetEntity = target);
     }

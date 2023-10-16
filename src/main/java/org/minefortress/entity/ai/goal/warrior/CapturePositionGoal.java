@@ -3,11 +3,11 @@ package org.minefortress.entity.ai.goal.warrior;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.BlockRotation;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.data.BlueprintDataLayer;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
 import org.minefortress.entity.WarriorPawn;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.IBaritoneMoveControl;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IBaritoneMoveControl;
 import org.minefortress.fight.influence.ServerInfluenceManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
@@ -66,7 +66,7 @@ public class CapturePositionGoal extends Goal {
         if(target == null) return;
         pawn.getFortressServerManager()
                 .ifPresent(it -> {
-                    final var resourceManager = (ServerResourceManager)it.getResourceManager();
+                    final var resourceManager = (IServerResourceManager)it.getResourceManager();
                     final var influenceManager = it.getInfluenceManager();
                     final var flagDataProvider = influenceManager.getBlockDataProvider();
                     final var influenceFlag = flagDataProvider.getBlockData("influence_flag", BlockRotation.NONE);

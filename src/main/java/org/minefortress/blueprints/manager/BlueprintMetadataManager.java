@@ -1,6 +1,6 @@
 package org.minefortress.blueprints.manager;
 
-import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 
 import java.util.*;
 

@@ -4,10 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.tasks.CutTreesTask;
-import org.minefortress.tasks.TaskManager;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +33,10 @@ public class ServerboundCutTreesTaskPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressServerManager = this.getFortressServerManager(server, player);
-        TaskManager taskManager = fortressServerManager.getTaskManager();
-        final CutTreesTask cutTreesTask = new CutTreesTask(uuid, treeRoots);
-        taskManager.addTask(cutTreesTask, fortressServerManager);
+        final var provider = getManagersProvider(server, player);
+        final var taskManager = provider.getTaskManager();
+        final var cutTreesTask = taskManager.createCutTreesTask(uuid, treeRoots);
+        final var manager = getFortressManager(server, player);
+        taskManager.addTask(cutTreesTask, provider, manager);
     }
 }

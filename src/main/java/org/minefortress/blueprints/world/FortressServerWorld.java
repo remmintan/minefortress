@@ -13,7 +13,7 @@ import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
-import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 
 import java.util.Collections;
 import java.util.concurrent.Executor;

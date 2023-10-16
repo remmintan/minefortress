@@ -3,9 +3,10 @@ package org.minefortress.fortress.automation.areas;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
-import net.remmintan.mods.minefortress.networking.c2s.S2CSyncAreasPacket;
+import net.remmintan.mods.minefortress.networking.s2c.S2CSyncAreasPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public final class AreasServerManager implements IServerAutomationAreaManager {
     private int tickCounter = 0;
     private int refreshPointer = 0;
 
-    public void addArea(AutomationAreaInfo area) {
+    public void addArea(IAutomationAreaInfo area) {
         areas.add(new ServerAutomationAreaInfo(area));
         sync();
     }

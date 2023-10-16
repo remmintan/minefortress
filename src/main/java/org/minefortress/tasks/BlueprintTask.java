@@ -10,13 +10,15 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import org.jetbrains.annotations.NotNull;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.IFortressAwareEntity;
-import org.minefortress.entity.interfaces.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import org.minefortress.fortress.buildings.FortressBuilding;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 
 import java.util.*;
 
@@ -50,19 +52,19 @@ public class BlueprintTask extends AbstractTask {
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
+    public ITaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
         final Pair<BlockPos, BlockPos> partStartAndEnd = parts.poll();
-        List<TaskBlockInfo> blockInfos = getTaskBlockInfos(partStartAndEnd);
+        List<ITaskBlockInfo> blockInfos = getTaskBlockInfos(partStartAndEnd);
         return new TaskPart(partStartAndEnd, blockInfos, this);
     }
 
     @NotNull
-    private List<TaskBlockInfo> getTaskBlockInfos(Pair<BlockPos, BlockPos> partStartAndEnd) {
+    private List<ITaskBlockInfo> getTaskBlockInfos(Pair<BlockPos, BlockPos> partStartAndEnd) {
         final BlockPos start = partStartAndEnd.getFirst();
         final BlockPos delta = start.subtract(startingBlock);
         final Iterable<BlockPos> allPositionsInPart = BlockPos.iterate(start, partStartAndEnd.getSecond());
 
-        List<TaskBlockInfo> blockInfos = new ArrayList<>();
+        List<ITaskBlockInfo> blockInfos = new ArrayList<>();
         for (BlockPos pos : allPositionsInPart) {
             final BlockState state = blueprintData.getOrDefault(pos.subtract(start).add(delta), pos.subtract(start).add(delta).getY()<floorLevel?Blocks.DIRT.getDefaultState():Blocks.AIR.getDefaultState());
             if(state.isAir()) continue;
@@ -73,7 +75,7 @@ public class BlueprintTask extends AbstractTask {
     }
 
     @Override
-    public void finishPart(TaskPart part, IWorkerPawn colonist) {
+    public void finishPart(ITaskPart part, IWorkerPawn colonist) {
         final ServerWorld world = colonist.getServerWorld();
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
             if(blueprintEntityData != null) {

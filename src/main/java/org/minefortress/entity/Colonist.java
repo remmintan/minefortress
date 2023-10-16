@@ -30,14 +30,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
-import org.minefortress.entity.interfaces.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.registries.FortressEntities;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 
 import java.util.Optional;
 
@@ -58,7 +59,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     private final DigControl digControl;
     private final PlaceControl placeControl;
     private final ScaffoldsControl scaffoldsControl;
-    private final TaskControl taskControl;
+    private final ITaskControl taskControl;
     private final MovementHelper movementHelper;
     private final IBaritone baritone;
 
@@ -202,7 +203,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId) || RESERVE_PROFESSION_ID.equals(professionId)) {
             getFortressServerManager()
-                    .map(FortressServerManager::getServerProfessionManager)
+                    .map(FortressServerManager::getProfessionManager)
                     .flatMap(it -> it.getProfessionsWithAvailablePlaces(RESERVE_PROFESSION_ID.equals(professionId)))
                     .ifPresent(this::setProfession);
         }
@@ -287,7 +288,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
 
     private BlockPos goal;
 
-    public void setGoal(TaskBlockInfo taskBlockInfo) {
+    public void setGoal(ITaskBlockInfo taskBlockInfo) {
         this.goal = taskBlockInfo.getPos();
         Item placingItem = taskBlockInfo.getPlacingItem();
         if(placingItem != null) {
@@ -376,7 +377,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         this.setProfession(DEFAULT_PROFESSION_ID);
     }
 
-    public TaskControl getTaskControl() {
+    public ITaskControl getTaskControl() {
         return taskControl;
     }
 

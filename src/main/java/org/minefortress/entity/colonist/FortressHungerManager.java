@@ -3,7 +3,7 @@ package org.minefortress.entity.colonist;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.world.GameRules;
-import net.remmintan.mods.minefortress.core.interfaces.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import org.minefortress.fortress.FortressServerManager;
 
 public class FortressHungerManager extends HungerManager implements IFortressHungerManager {

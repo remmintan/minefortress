@@ -3,15 +3,15 @@ package org.minefortress.entity.ai.controls;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 
 abstract class PositionedActionControl  {
 
     protected BlockPos goal;
     protected Item item;
-    protected TaskBlockInfo taskBlockInfo;
+    protected ITaskBlockInfo taskBlockInfo;
 
-    public void set(TaskBlockInfo taskBlockInfo) {
+    public void set(ITaskBlockInfo taskBlockInfo) {
         this.taskBlockInfo = taskBlockInfo;
         this.goal = taskBlockInfo.getPos();
         this.item = taskBlockInfo.getPlacingItem();

@@ -8,9 +8,10 @@ import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import org.minefortress.professions.Profession;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
 import org.minefortress.professions.ProfessionManager;
-import org.minefortress.professions.ProfessionResearchState;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
 import org.minefortress.utils.GuiUtils;
 
 import java.util.ArrayList;
@@ -24,8 +25,8 @@ public class ProfessionWidget {
 
     private ProfessionWidget parent;
     private final List<ProfessionWidget> children = new ArrayList<>();
-    private final Profession profession;
-    private final ProfessionManager professionManager;
+    private final IProfession profession;
+    private final IProfessionsManager professionManager;
 
     private int x = 0;
     private int y = 0;
@@ -33,7 +34,7 @@ public class ProfessionWidget {
     private final int width;
     private final MinecraftClient client;
 
-    public ProfessionWidget(Profession profession, ProfessionManager professionManager) {
+    public ProfessionWidget(IProfession profession, IProfessionsManager professionManager) {
         this.profession = profession;
         this.professionManager = professionManager;
         client = MinecraftClient.getInstance();

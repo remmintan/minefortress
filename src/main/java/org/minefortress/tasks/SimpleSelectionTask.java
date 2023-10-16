@@ -9,15 +9,17 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
+import net.remmintan.mods.minefortress.core.utils.PathUtils;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.interfaces.IWorkerPawn;
-import org.minefortress.selections.ServerSelectionType;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
 import org.minefortress.utils.BlockInfoUtils;
-import org.minefortress.utils.PathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,15 +84,15 @@ public class SimpleSelectionTask extends AbstractTask {
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld world, IWorkerPawn colonist) {
+    public ITaskPart getNextPart(ServerWorld world, IWorkerPawn colonist) {
         Pair<BlockPos, BlockPos> startAndEnd = parts.poll();
         if(startAndEnd == null) throw new IllegalStateException("Null part for task!");
-        final List<TaskBlockInfo> blocks = getPartBlocksInfo(startAndEnd, world, colonist);
+        final List<ITaskBlockInfo> blocks = getPartBlocksInfo(startAndEnd, world, colonist);
         return new TaskPart(startAndEnd, blocks, this);
     }
 
-    private List<TaskBlockInfo> getPartBlocksInfo(Pair<BlockPos, BlockPos> startAndEnd, ServerWorld world, IWorkerPawn colonist) {
-        final List<TaskBlockInfo> blocksInfo = new ArrayList<>();
+    private List<ITaskBlockInfo> getPartBlocksInfo(Pair<BlockPos, BlockPos> startAndEnd, ServerWorld world, IWorkerPawn colonist) {
+        final List<ITaskBlockInfo> blocksInfo = new ArrayList<>();
         getBlocksForPart(startAndEnd).spliterator().forEachRemaining(pos -> {
             pos = pos.toImmutable();
             if(placingItem != null) {
@@ -116,7 +118,7 @@ public class SimpleSelectionTask extends AbstractTask {
         } else if(selectionType == ServerSelectionType.LADDER_Z_DIRECTION) {
             return PathUtils.getLadderSelection(this.startingBlock, part.getFirst(), part.getSecond(), Direction.Axis.Z);
         } else {
-            return PathUtils.fromStartToEnd(part.getFirst(), part.getSecond(), selectionType);
+            return PathUtils.fromStartToEnd(part.getFirst(), part.getSecond(), selectionType==ServerSelectionType.WALLS_EVERY_SECOND);
         }
     }
 

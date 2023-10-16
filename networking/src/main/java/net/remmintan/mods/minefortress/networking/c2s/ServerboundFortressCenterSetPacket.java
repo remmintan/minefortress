@@ -4,8 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.fortress.FortressServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 public class ServerboundFortressCenterSetPacket implements FortressC2SPacket {
 
@@ -26,7 +25,7 @@ public class ServerboundFortressCenterSetPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressServerManager = this.getFortressServerManager(server, player);
+        final var fortressServerManager = getFortressManager(server, player);
         fortressServerManager.setupCenter(pos, player.getWorld(), player);
     }
 }

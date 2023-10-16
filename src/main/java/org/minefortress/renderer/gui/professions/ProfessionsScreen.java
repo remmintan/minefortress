@@ -8,13 +8,13 @@ import net.minecraft.text.Text;
 import org.lwjgl.opengl.GL11;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.ProfessionManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
 
 public class ProfessionsScreen extends Screen {
 
     private final ProfessionsLayer professionsLayer;
     private final FortressClientManager fortressManager;
-    private final ProfessionManager professionManager;
+    private final IProfessionsManager professionManager;
 
     private boolean movingLayer = false;
     private boolean startClick = false;

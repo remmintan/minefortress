@@ -12,26 +12,27 @@ import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
 
-    private final Map<String, StrctureBlockData> blueprints = new HashMap<>();
+    private final Map<String, IStructureBlockData> blueprints = new HashMap<>();
 
-    public StrctureBlockData getBlockData(String blueprintId, BlockRotation rotation) {
+    public IStructureBlockData getBlockData(String blueprintId, BlockRotation rotation) {
         return getBlockData(blueprintId, rotation, 0);
     }
 
-    public StrctureBlockData getBlockData(String blueprintId, BlockRotation rotation, int floorLevel) {
+    public IStructureBlockData getBlockData(String blueprintId, BlockRotation rotation, int floorLevel) {
         final String key = getKey(blueprintId, rotation);
         if(!blueprints.containsKey(key)) {
             final StructureTemplate structure = getStructure(blueprintId)
                     .orElseThrow(() -> new IllegalStateException("Blueprint not found " + blueprintId));
-            final StrctureBlockData blueprintBlockData = buildStructure(structure, rotation, floorLevel);
+            final IStructureBlockData blueprintBlockData = buildStructure(structure, rotation, floorLevel);
             blueprints.put(key, blueprintBlockData);
         }
 
@@ -43,7 +44,7 @@ abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
     }
 
     protected abstract Optional<StructureTemplate> getStructure(String blueprintFileName);
-    protected abstract StrctureBlockData buildStructure(StructureTemplate structure, BlockRotation rotation, int floorLevel);
+    protected abstract IStructureBlockData buildStructure(StructureTemplate structure, BlockRotation rotation, int floorLevel);
 
     @NotNull
     protected static Map<BlockPos, BlockState> getStrcutureData(StructureTemplate structure, BlockRotation rotation, BlockPos pivot) {

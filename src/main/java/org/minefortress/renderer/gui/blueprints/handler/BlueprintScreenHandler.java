@@ -8,7 +8,7 @@ import org.minefortress.interfaces.FortressMinecraftClient;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundEditBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 
 import java.util.ArrayList;
 import java.util.List;

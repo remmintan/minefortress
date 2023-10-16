@@ -5,8 +5,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.Profession;
-import org.minefortress.professions.ProfessionManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class ProfessionsLayer {
 
 
     public ProfessionsLayer(FortressMinecraftClient client) {
-        final ProfessionManager professionManager = client.get_FortressClientManager().getProfessionManager();
+        final IProfessionsManager professionManager = client.get_FortressClientManager().getProfessionManager();
         ProfessionWidget root = createProfessionsTree(professionManager);
 
         ProfessionsPositioner.arrangeForTree(root);
@@ -100,8 +100,8 @@ public class ProfessionsLayer {
     }
 
     @NotNull
-    private ProfessionWidget createProfessionsTree(ProfessionManager professionManager) {
-        final Profession rootProfession = professionManager.getRootProfession();
+    private ProfessionWidget createProfessionsTree(IProfessionsManager professionManager) {
+        final IProfession rootProfession = professionManager.getRootProfession();
         final ProfessionWidget rootWidget = new ProfessionWidget(rootProfession, professionManager);
 
         createTreeNode(rootWidget, rootProfession, professionManager);
@@ -109,10 +109,10 @@ public class ProfessionsLayer {
         return rootWidget;
     }
 
-    private void createTreeNode(ProfessionWidget parentWidget, Profession parent, ProfessionManager professionManager) {
-        final List<Profession> children = parent.getChildren();
+    private void createTreeNode(ProfessionWidget parentWidget, IProfession parent, IProfessionsManager professionManager) {
+        final List<IProfession> children = parent.getChildren();
         this.widgets.add(parentWidget);
-        for(Profession child:children) {
+        for(IProfession child:children) {
             final ProfessionWidget childWidget = new ProfessionWidget(child, professionManager);
 
             childWidget.setParent(parentWidget);

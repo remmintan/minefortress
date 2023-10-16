@@ -8,9 +8,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorderStage;
 import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluenceManager;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
@@ -43,7 +43,7 @@ public class ServerInfluenceManager implements IServerInfluenceManager {
     @Override
     public void addCapturePosition(UUID taskId, BlockPos pos, ServerPlayerEntity player) {
         final var stage = this.fortressBorderHolder.getStage(pos);
-        final var resourceManager = (ServerResourceManager)this.fortressServerManager.getResourceManager();
+        final var resourceManager = (IServerResourceManager)this.fortressServerManager.getResourceManager();
         final var influenceFlag = influenceFlagBlockDataProvider.getBlockData("influence_flag", BlockRotation.NONE);
         final var stacks = influenceFlag.getStacks();
         if(stage == WorldBorderStage.GROWING && (resourceManager.hasItems(stacks) || fortressServerManager.isCreative())) {
@@ -99,6 +99,7 @@ public class ServerInfluenceManager implements IServerInfluenceManager {
         tag.put("influenceManager", nbt);
     }
 
+    @Override
     public void checkNewPositionAndUpdateClientState(BlockPos pos, ServerPlayerEntity player) {
         final var packet = new S2CUpdateInfluenceBorderStage(fortressBorderHolder.getStage(pos));
         FortressServerNetworkHelper.send(player, S2CUpdateInfluenceBorderStage.CHANNEL, packet);

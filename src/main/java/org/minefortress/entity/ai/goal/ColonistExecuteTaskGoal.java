@@ -5,9 +5,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.entity.ai.controls.TaskControl;
-import org.minefortress.tasks.TaskType;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
+import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import org.minefortress.utils.BuildingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +112,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         LOGGER.debug("{} moving to next block", getColonistName());
         getMovementHelper().reset();
         workGoal = null;
-        TaskBlockInfo taskBlockInfo = null;
+        ITaskBlockInfo taskBlockInfo = null;
         while (getTaskControl().partHasMoreBlocks()) {
             LOGGER.debug("{} task is not finished yet", getColonistName());
             taskBlockInfo = getTaskControl().getNextBlock();
@@ -156,7 +156,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         }
     }
 
-    private TaskControl getTaskControl() {
+    private ITaskControl getTaskControl() {
         return this.colonist.getTaskControl();
     }
 

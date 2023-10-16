@@ -7,12 +7,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.world.BlueprintsWorld;
-import org.minefortress.interfaces.FortressServer;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
-import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintsWorld;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,12 +48,12 @@ public class ServerboundEditBlueprintPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        if(server instanceof FortressServer fortressServer) {
+        if(server instanceof IFortressServer fortressServer) {
             if(player instanceof FortressServerPlayerEntity fortressPlayer) {
                 if(type == Type.REMOVE) {
                     fortressPlayer.get_ServerBlueprintManager().remove(blueprintFileName);
                 } else {
-                    final BlueprintsWorld blueprintsWorld = fortressServer.get_BlueprintsWorld();
+                    final IBlueprintsWorld blueprintsWorld = fortressServer.get_BlueprintsWorld();
                     if(type == Type.EDIT) {
                         final var blockData = fortressPlayer
                                 .get_ServerBlueprintManager()

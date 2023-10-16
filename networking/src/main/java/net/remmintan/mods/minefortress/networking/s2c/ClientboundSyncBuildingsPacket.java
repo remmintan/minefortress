@@ -5,7 +5,7 @@ import net.minecraft.network.PacketByteBuf;
 import org.minefortress.fortress.buildings.EssentialBuildingInfo;
 import org.minefortress.fortress.FortressClientManager;
 import org.minefortress.interfaces.FortressMinecraftClient;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressS2CPacket;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 
 import java.util.Collections;
 import java.util.List;

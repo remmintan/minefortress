@@ -4,7 +4,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.professions.Profession;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import org.minefortress.utils.ModUtils;
 
 import java.util.List;
@@ -21,19 +21,19 @@ public interface IHireScreenHandler {
     int getHireQueue(String professionId);
     List<ItemInfo> getCost(String professionId);
     static ItemStack getProfessionItem(String professionId) {
-        return getProfession(professionId).map(Profession::getIcon).orElse(Items.PLAYER_HEAD.getDefaultStack());
+        return getProfession(professionId).map(IProfession::getIcon).orElse(Items.PLAYER_HEAD.getDefaultStack());
     }
     int getCurrentCount(String professionId);
     int getMaxCount(String professionId);
     void increaseAmount(String professionId);
     static String getProfessionName(String professionId) {
         return getProfession(professionId)
-                .map(Profession::getTitle)
+                .map(IProfession::getTitle)
                 .orElse("Unknown");
     }
 
     @NotNull
-    private static Optional<Profession> getProfession(String professionId) {
+    private static Optional<IProfession> getProfession(String professionId) {
         final var manager = ModUtils.getProfessionManager();
         final var profession = manager.getProfession(professionId);
         return Optional.ofNullable(profession);

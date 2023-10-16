@@ -164,6 +164,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
                 .findFirst();
     }
 
+    @Override
     public void doRepairConfirmation(UUID id, ServerPlayerEntity player) {
         final var statesThatNeedsToBeRepaired = getBuildingById(id)
                 .map(FortressBuilding::getAllBlockStatesToRepairTheBuilding)

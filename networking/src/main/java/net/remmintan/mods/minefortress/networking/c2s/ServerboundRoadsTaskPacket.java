@@ -5,13 +5,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.networking.interfaces.FortressC2SPacket;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
-import org.minefortress.tasks.RoadsTask;
-import org.minefortress.tasks.TaskManager;
-import org.minefortress.tasks.TaskType;
+import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,18 +41,20 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressServerManager = this.getFortressServerManager(server, player);
-        final var taskManager = fortressServerManager.getTaskManager();
-        final var serverResourceManager = fortressServerManager.getServerResourceManager();
-        final var itemInHand = player.getStackInHand(Hand.MAIN_HAND);
-        final var item = itemInHand.getItem();
-        final var buildTask = new RoadsTask(placeUuid, TaskType.BUILD, blocks, item);
-        final Runnable onDigComplete = () -> taskManager.addTask(buildTask, fortressServerManager);
+        final var provider = getManagersProvider(server, player);
+        final var taskManager = provider.getTaskManager();
+        final var resourceManager = provider.getResourceManager();
 
-        if(fortressServerManager.isSurvival())
-            serverResourceManager.reserveItems(placeUuid, Collections.singletonList(new ItemInfo(item, blocks.size())));
+        final var stackInHand = player.getStackInHand(Hand.MAIN_HAND);
+        final var item = stackInHand.getItem();
+        final var buildTask = taskManager.createRoadsTask(digUuid, TaskType.BUILD, placeUuid, blocks, item);
+        final var manager = getFortressManager(server, player);
+        final Runnable onDigComplete = () -> taskManager.addTask(buildTask, provider, manager);
 
-        final var digTask = new RoadsTask(digUuid, TaskType.REMOVE, blocks, null, onDigComplete);
-        taskManager.addTask(digTask, fortressServerManager);
+        if(manager.isSurvival())
+            resourceManager.reserveItems(placeUuid, Collections.singletonList(resourceManager.createItemInfo(item, blocks.size())));
+
+        final var digTask = taskManager.createRoadsTask(digUuid, TaskType.REMOVE, placeUuid, blocks, item, onDigComplete);
+        taskManager.addTask(digTask, provider, manager);
     }
 }

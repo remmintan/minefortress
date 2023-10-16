@@ -6,21 +6,23 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
+import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.interfaces.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import org.minefortress.entity.ai.controls.DigControl;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
-import org.minefortress.tasks.interfaces.Task;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import org.minefortress.utils.TreeBlocks;
 import org.minefortress.utils.TreeHelper;
 
 import java.util.*;
 
-public class CutTreesTask implements Task {
+public class CutTreesTask implements ITask {
 
     private final UUID uuid;
     private final Queue<BlockPos> treeRoots;
@@ -50,10 +52,10 @@ public class CutTreesTask implements Task {
     }
 
     @Override
-    public TaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
+    public ITaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
         if(!treeRoots.isEmpty()) {
             final BlockPos root = treeRoots.remove();
-            final TaskBlockInfo rootBlockInfo = new DigTaskBlockInfo( root);
+            final ITaskBlockInfo rootBlockInfo = new DigTaskBlockInfo( root);
             return new TaskPart(Pair.of(root, root), Collections.singletonList(rootBlockInfo), this);
         } else {
             return null;
@@ -67,7 +69,7 @@ public class CutTreesTask implements Task {
     }
 
     @Override
-    public void finishPart(TaskPart part, IWorkerPawn colonist) {
+    public void finishPart(ITaskPart part, IWorkerPawn colonist) {
         final ServerWorld world = colonist.getServerWorld();
         if(part != null && part.getStartAndEnd() != null && part.getStartAndEnd().getFirst() != null) {
             final BlockPos root = part.getStartAndEnd().getFirst();
