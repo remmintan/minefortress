@@ -27,7 +27,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
-import net.remmintan.mods.minefortress.core.interfaces.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
@@ -48,6 +49,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
@@ -161,7 +163,7 @@ public final class FortressServerManager  implements IFortressManager, IServerMa
         needSync = false;
     }
 
-    public void replaceColonistWithTypedPawn(Colonist colonist, String warriorId, EntityType<? extends BasePawnEntity> entityType) {
+    public void replaceColonistWithTypedPawn(Colonist colonist, String warriorId, EntityType<? extends IPawn> entityType) {
         final var pos = getRandomSpawnPosition();
         final var world = (ServerWorld) colonist.getEntityWorld();
         final var masterId = colonist.getMasterId().orElseThrow(() -> new IllegalStateException("Colonist has no master!"));

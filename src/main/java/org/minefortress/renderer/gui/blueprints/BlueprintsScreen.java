@@ -16,8 +16,8 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
-import org.minefortress.blueprints.manager.BlueprintMetadata;
 import net.remmintan.panama.renderer.BlueprintRenderer;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
@@ -342,7 +342,7 @@ public final class BlueprintsScreen extends Screen {
             drawContext.drawItem(new ItemStack(Items.BRICK), (int)(slotX/scaleFactor), (int)(slotY/scaleFactor));
             matrices.pop();
         } else {
-            final BlueprintMetadata metadata = slot.getMetadata();
+            final IBlueprintMetadata metadata = slot.getMetadata();
             final var enoughResources = !ModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
             if(this.client != null){
                 this.blueprintRenderer.renderBlueprintInGui(drawContext.getMatrices(), metadata.getId(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);

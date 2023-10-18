@@ -7,7 +7,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.professions.ProfessionsScreen;
 
 public abstract class AbstractMissingProfessionScreen extends Screen {
@@ -76,8 +76,8 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
         throw new NotImplementedException("This method should be implemented in child class");
     }
 
-    private FortressMinecraftClient getClient() {
-        return (FortressMinecraftClient) MinecraftClient.getInstance();
+    private IFortressMinecraftClient getClient() {
+        return (IFortressMinecraftClient) MinecraftClient.getInstance();
     }
 
 }

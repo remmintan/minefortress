@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
 import org.minefortress.fortress.resources.gui.FortressRecipeBookWidget;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 
 public class FortressCraftingScreen extends AbstractFortressRecipeScreen<FortressCraftingScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/crafting_table.png");
@@ -38,7 +38,7 @@ public class FortressCraftingScreen extends AbstractFortressRecipeScreen<Fortres
         return fortressClient.is_FortressGamemode() && clientManager.getProfessionManager().hasProfession("crafter");
     }
 
-    private FortressMinecraftClient getClient() {
-        return (FortressMinecraftClient) MinecraftClient.getInstance();
+    private IHoveredBlockProvider getClient() {
+        return (IHoveredBlockProvider) MinecraftClient.getInstance();
     }
 }

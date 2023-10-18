@@ -30,6 +30,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
@@ -223,7 +224,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     }
 
     private void tickAllControls() {
-        if(getEatControl().map(EatControl::isEating).orElse(false)) return;
+        if(getEatControl().map(IEatControl::isEating).orElse(false)) return;
         if(getDigControl() != null) getDigControl().tick();
         if(getPlaceControl() != null) getPlaceControl().tick();
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();

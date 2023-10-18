@@ -21,10 +21,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.border.WorldBorder;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.minefortress.fortress.ClientFortressManager;
 import org.minefortress.fortress.FortressBorder;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.fortress.FortressState;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import net.remmintan.mods.minefortress.core.FortressState;
+import org.minefortress.interfaces.IFortressMinecraftClient;
+import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import org.minefortress.renderer.MineFortressLabelsRenderer;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -50,7 +51,7 @@ public abstract class FortressWorldRendererMixin  {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(MinecraftClient client, EntityRenderDispatcher entityRenderDispatcher, BlockEntityRenderDispatcher blockEntityRenderDispatcher, BufferBuilderStorage bufferBuilders, CallbackInfo ci) {
-        final var fortressClient = (FortressMinecraftClient) client;
+        final var fortressClient = (IHoveredBlockProvider) client;
         this.entityRenderer = new MineFortressLabelsRenderer(
                 client.textRenderer,
                 fortressClient::get_SelectionManager,
@@ -60,7 +61,7 @@ public abstract class FortressWorldRendererMixin  {
 
     @Inject(method = "setupTerrain", at = @At("TAIL"))
     public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci) {
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
         fortressClient.get_BlueprintRenderer().prepareForRender();
         fortressClient.get_CampfireRenderer().prepareForRender();
         fortressClient.get_SelectionRenderer().prepareForRender();
@@ -71,7 +72,7 @@ public abstract class FortressWorldRendererMixin  {
     public void renderObjectsOnTerrain(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
         final var cameraPos = camera.getPos();
 
-        final var fortressClient = (FortressMinecraftClient) this.client;
+        final var fortressClient = (IHoveredBlockProvider) this.client;
         fortressClient.get_BlueprintRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  projectionMatrix);
         fortressClient.get_CampfireRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
         fortressClient.get_SelectionRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
@@ -80,7 +81,7 @@ public abstract class FortressWorldRendererMixin  {
         final var selectionManager = fortressClient.get_SelectionManager();
         final var immediate = this.bufferBuilders.getEntityVertexConsumers();
         final var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
-        final FortressClientManager fcm = fortressClient.get_FortressClientManager();
+        final ClientFortressManager fcm = fortressClient.get_FortressClientManager();
         if (!selectionManager.isSelecting() && fcm.getState() == FortressState.BUILD) {
             if(ModUtils.isClientInFortressGamemode()) {
                 final HitResult crosshairTarget = client.crosshairTarget;
@@ -276,14 +277,14 @@ public abstract class FortressWorldRendererMixin  {
 
     @Unique
     private void renderTranslucent(MatrixStack matrices, Camera camera, Matrix4f matrix4f) {
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
         fortressClient.get_SelectionRenderer().renderTranslucent(matrices, camera.getPos().x, camera.getPos().y, camera.getPos().z, matrix4f);
         fortressClient.get_BlueprintRenderer().renderTranslucent(matrices, camera.getPos().x, camera.getPos().y, camera.getPos().z, matrix4f);
     }
 
     @Unique
     private void drawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState) {
-        final Vector4f clickColors = ((FortressMinecraftClient) client).get_SelectionManager().getClickColor();
+        final Vector4f clickColors = ((IHoveredBlockProvider) client).get_SelectionManager().getClickColor();
         final var outlineShape = blockState.getOutlineShape(this.world, blockPos, ShapeContext.of(entity));
         WorldRenderer.drawShapeOutline(
                 matrices,

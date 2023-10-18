@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
 import org.minefortress.entity.ai.goal.SelectTargetToAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
@@ -22,7 +23,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 
 public class ArcherPawn extends TargetedPawn implements IWarrior, RangedAttackMob, IProfessional {
 
-    public ArcherPawn(EntityType<? extends BasePawnEntity> entityType, World world) {
+    public ArcherPawn(EntityType<? extends IPawn> entityType, World world) {
         super(entityType, world, false);
     }
 

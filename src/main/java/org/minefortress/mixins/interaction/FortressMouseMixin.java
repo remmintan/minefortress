@@ -2,7 +2,7 @@ package org.minefortress.mixins.interaction;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,14 +32,14 @@ public class FortressMouseMixin {
 
     @Inject(method = "updateMouse", at = @At("HEAD"), cancellable = true)
     public void updateMouse(CallbackInfo ci) {
-        if(((FortressMinecraftClient) this.client).is_FortressGamemode() && !ModUtils.shouldReleaseCamera()) {
+        if(((IFortressMinecraftClient) this.client).is_FortressGamemode() && !ModUtils.shouldReleaseCamera()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "onMouseButton", at = @At("HEAD"))
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
         if(!fortressClient.is_FortressGamemode()) {
             return;
         }

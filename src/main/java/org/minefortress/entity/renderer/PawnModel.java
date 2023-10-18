@@ -5,8 +5,9 @@ import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.item.Items;
 import org.minefortress.entity.BasePawnEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
 
-public class PawnModel extends PlayerEntityModel<BasePawnEntity> {
+public class PawnModel extends PlayerEntityModel<IPawn> {
 
     public PawnModel(EntityRendererFactory.Context context) {
         super(context.getPart(EntityModelLayers.PLAYER), false);

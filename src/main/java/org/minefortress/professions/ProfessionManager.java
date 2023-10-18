@@ -7,7 +7,7 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.*;
 import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import org.minefortress.fortress.IFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 
 import java.io.IOException;
 import java.io.StringReader;

@@ -89,6 +89,8 @@ dependencies {
 
 	implementation project(':core')
 	implementation project(':networking')
+	implementation project(':panama')
+	implementation project(':selections')
 }
 
 processResources {

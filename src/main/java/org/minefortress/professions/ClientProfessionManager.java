@@ -2,26 +2,31 @@ package org.minefortress.professions;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionEssentialInfo;
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
+import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
-import org.minefortress.fortress.IFortressManager;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundChangeProfessionStatePacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class ClientProfessionManager extends ProfessionManager {
+public final class ClientProfessionManager extends ProfessionManager implements IClientProfessionManager {
 
     public ClientProfessionManager(Supplier<IFortressManager> fortressManagerSupplier) {
         super(fortressManagerSupplier);
     }
 
+    @Override
     public void initProfessions(List<ProfessionFullInfo> fullInfos, String treeJson) {
-        final var professionsMap = fullInfos.stream().collect(Collectors.toMap(ProfessionFullInfo::key, Profession::new));
+        final var professionsMap = fullInfos.stream().collect(Collectors.toMap(ProfessionFullInfo::key, it -> (IProfession) new Profession(it)));
         super.setProfessions(professionsMap);
         super.createProfessionTree(treeJson);
     }
@@ -71,6 +76,7 @@ public class ClientProfessionManager extends ProfessionManager {
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
     }
 
+    @Override
     public void updateProfessions(List<ProfessionEssentialInfo> info) {
         for(ProfessionEssentialInfo professionEssentialInfo : info) {
             final IProfession profession = getProfession(professionEssentialInfo.getId());

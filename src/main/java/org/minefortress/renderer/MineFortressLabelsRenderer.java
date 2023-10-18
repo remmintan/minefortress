@@ -11,7 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.StringUtils;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.minefortress.fortress.buildings.BuildingHealthRenderInfo;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import org.minefortress.selections.SelectionManager;
 
 import java.util.List;

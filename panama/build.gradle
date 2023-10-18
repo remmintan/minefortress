@@ -3,5 +3,5 @@ loom {
 }
 
 dependencies {
-    implementation project(':gobi')
+    implementation project(':selections')
 }

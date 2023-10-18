@@ -4,7 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
 
@@ -33,7 +33,7 @@ public class ProfessionsLayer {
     private final int panExpand = 100;
 
 
-    public ProfessionsLayer(FortressMinecraftClient client) {
+    public ProfessionsLayer(IFortressMinecraftClient client) {
         final IProfessionsManager professionManager = client.get_FortressClientManager().getProfessionManager();
         ProfessionWidget root = createProfessionsTree(professionManager);
 

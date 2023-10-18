@@ -6,9 +6,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemGroups;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import org.minefortress.interfaces.ITasksInformationHolder;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import net.remmintan.mods.minefortress.networking.c2s.C2SRequestResourcesRefresh;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.ChooseModeScreen;
@@ -52,8 +52,8 @@ public class FortressClientEvents {
 
     private static void endClientTick(MinecraftClient client) {
         while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
-            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
-            final ClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
+            final IHoveredBlockProvider fortressClient = (IHoveredBlockProvider) client;
+            final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
             if(clientBlueprintManager.isSelecting()) {
                 fortressClient.get_BlueprintManager().selectNext();
             } else {

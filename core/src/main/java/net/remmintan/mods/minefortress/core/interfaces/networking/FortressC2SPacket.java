@@ -2,7 +2,7 @@ package net.remmintan.mods.minefortress.core.interfaces.networking;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.remmintan.mods.minefortress.core.interfaces.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 

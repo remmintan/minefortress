@@ -5,17 +5,21 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightSelectionManager;
 import org.minefortress.entity.Colonist;
 import org.minefortress.utils.ModUtils;
 
-public class ClientFightManager {
+public class ClientFightManager implements IClientFightManager {
 
-    private final ClientFightSelectionManager selectionManager = new ClientFightSelectionManager();
+    private final IClientFightSelectionManager selectionManager = new ClientFightSelectionManager();
 
-    public ClientFightSelectionManager getSelectionManager() {
+    @Override
+    public IClientFightSelectionManager getSelectionManager() {
         return selectionManager;
     }
 
+    @Override
     public void setTarget(HitResult hitResult) {
         if(hitResult instanceof BlockHitResult blockHitResult) {
             final var blockPos = blockHitResult.getBlockPos();
@@ -33,6 +37,7 @@ public class ClientFightManager {
         }
     }
 
+    @Override
     public void setTarget(Entity entity) {
         if(!(entity instanceof LivingEntity livingEntity)) return;
         if(entity instanceof Colonist col) {

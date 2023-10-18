@@ -6,6 +6,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.controls.BaritoneMoveControl;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
@@ -19,7 +20,7 @@ public abstract class TargetedPawn extends NamedPawnEntity implements ITargetedP
     private BlockPos moveTarget;
     private LivingEntity attackTarget;
 
-    public TargetedPawn(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
+    public TargetedPawn(EntityType<? extends IPawn> entityType, World world, boolean enableHunger) {
         super(entityType, world, enableHunger);
         moveControl = world instanceof ServerWorld ? new BaritoneMoveControl(this) : null;
     }

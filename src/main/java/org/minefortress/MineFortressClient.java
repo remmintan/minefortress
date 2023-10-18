@@ -22,6 +22,7 @@ public class MineFortressClient implements ClientModInitializer {
     public void onInitializeClient() {
         FortressKeybindings.init();
         FortressEntities.registerRenderers();
+        NetworkReaders.register();
 
         ScreenRegistry.register(FORTRESS_CRAFTING_SCREEN_HANDLER, FortressCraftingScreen::new);
         ScreenRegistry.register(FORTRESS_FURNACE_SCREEN_HANDLER, FortressFurnaceScreen::new);

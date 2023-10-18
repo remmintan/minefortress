@@ -11,7 +11,7 @@ public class NetworkingReadersRegistry {
     public static HashSet<INetworkingReader<?>> registeredReaders =
             new HashSet<>(new ConcurrentHashMap<INetworkingReader<?>, Objects>().keySet());
 
-    public static void registerReader(INetworkingReader<?> reader) {
+    public static void addReader(INetworkingReader<?> reader) {
         registeredReaders.add(reader);
     }
 

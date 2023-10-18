@@ -12,7 +12,8 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBloc
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import org.minefortress.blueprints.manager.BaseClientStructureManager;
 import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.fortress.FortressClientManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import org.minefortress.fortress.ClientFortressManager;
 import net.remmintan.mods.minefortress.networking.c2s.C2SCaptureInfluencePositionPacket;
 import net.remmintan.mods.minefortress.networking.c2s.C2SUpdateNewInfluencePosition;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -23,7 +24,7 @@ import java.util.*;
 
 public class ClientInfluenceManager extends BaseClientStructureManager {
 
-    private static final BlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0, null);
+    private static final IBlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0, null);
 
     private final InfluenceFlagBlockDataProvider blockDataProvider = new InfluenceFlagBlockDataProvider();
     private final ClientFortressBorderHolder clientFortressBorderHolder = new ClientFortressBorderHolder(this);
@@ -110,8 +111,8 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         influencePosStateHolder.reset();
     }
 
-    private static boolean isHasAnyWarrior(FortressClientManager fortressClientManager) {
-        final var professionManager = fortressClientManager.getProfessionManager();
+    private static boolean isHasAnyWarrior(ClientFortressManager clientFortressManager) {
+        final var professionManager = clientFortressManager.getProfessionManager();
         final var warriorIds = ProfessionsHireTypes.WARRIORS.getIds();
         var hasAnyWarrior = false;
         for (String warriorId : warriorIds) {
@@ -153,7 +154,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
     }
 
     @Override
-    public BlueprintMetadata getSelectedStructure() {
+    public IBlueprintMetadata getSelectedStructure() {
         return INFLUENCE_FLAG_METADATA;
     }
 

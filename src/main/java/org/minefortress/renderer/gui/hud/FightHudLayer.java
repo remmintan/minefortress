@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRotation;
-import org.minefortress.fight.ClientFightSelectionManager;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightSelectionManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.utils.ModUtils;
 
@@ -61,7 +61,7 @@ class FightHudLayer extends AbstractHudLayer {
         }
     }
 
-    private ClientFightSelectionManager getFightSelectionManager() {
+    private IClientFightSelectionManager getFightSelectionManager() {
         return ModUtils.getFortressClientManager().getFightManager().getSelectionManager();
     }
 

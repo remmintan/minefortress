@@ -3,12 +3,7 @@ package net.remmintan.mods.minefortress.networking.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import org.minefortress.renderer.gui.blueprints.ImportExportBlueprintsScreen;
-import org.minefortress.renderer.gui.blueprints.NetworkActionType;
-import org.minefortress.utils.ModUtils;
-
-import java.io.IOException;
-import java.nio.file.Files;
+import net.remmintan.mods.minefortress.networking.NetworkActionType;
 
 public class ClientboundBlueprintsProcessImportExportPacket implements FortressS2CPacket {
 
@@ -40,54 +35,18 @@ public class ClientboundBlueprintsProcessImportExportPacket implements FortressS
 
     @Override
     public void handle(MinecraftClient client) {
+        final var provider = getManagersProvider();
+        final var blueprintManager = provider.get_BlueprintManager();
+
         if(action == CurrentScreenAction.FAILURE) {
-            this.fail();
+            blueprintManager.handleImportExportFailure();
         } else {
             switch (type) {
-                case NetworkActionType.EXPORT -> handleExport();
-                case NetworkActionType.IMPORT -> handleImport();
+                case EXPORT -> blueprintManager.handleBlueprintsExport(name, bytes);
+                case IMPORT -> blueprintManager.handleBlueprintsImport();
             }
         }
 
-    }
-
-    private void handleImport() {
-        this.success();
-    }
-
-    private void handleExport() {
-        final var blueprintsFolder = ModUtils.getBlueprintsFolder();
-        if(!blueprintsFolder.toFile().exists()) {
-            blueprintsFolder.toFile().mkdirs();
-        }
-        final var path = blueprintsFolder.resolve(name);
-        final var file = path.toFile();
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-                Files.write(path, bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-                this.fail();
-                return;
-            }
-        }
-
-        this.success();
-    }
-
-    private void fail() {
-        final var currentScreen = MinecraftClient.getInstance().currentScreen;
-        if(currentScreen instanceof ImportExportBlueprintsScreen iebs) {
-            iebs.fail();
-        }
-    }
-
-    private void success() {
-        final var currentScreen = MinecraftClient.getInstance().currentScreen;
-        if(currentScreen instanceof ImportExportBlueprintsScreen iebs) {
-            iebs.success();
-        }
     }
 
     @Override

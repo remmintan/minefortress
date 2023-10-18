@@ -11,6 +11,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
@@ -231,7 +232,7 @@ public class FortressBuilding implements IAutomationArea {
         return attackers;
     }
 
-    public EssentialBuildingInfo toEssentialInfo(World world) {
+    public IEssentialBuildingInfo toEssentialInfo(World world) {
         return new EssentialBuildingInfo(id, start, end, requirementId, getBedsCount(world), blueprintId, getHealth());
     }
 

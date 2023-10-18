@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ClientResourceManagerImpl implements ClientResourceManager {
+public class ClientResourceManagerImpl implements IClientResourceManager {
 
     private final StackGroupsManager groupManager = new StackGroupsManager();
 

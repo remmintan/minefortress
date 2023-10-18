@@ -50,6 +50,6 @@ public class S2CSyncAreasPacket implements FortressS2CPacket {
 
     private static IAutomationAreaManager getAutomationAreaManager() {
         final var provider = CoreModUtils.getMineFortressManagersProvider();
-        return provider.getAutomationAreaManager();
+        return provider.get_AutomationAreaManager();
     }
 }

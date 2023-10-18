@@ -3,8 +3,8 @@ package org.minefortress.renderer.gui.blueprints.handler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
-import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundEditBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public final class BlueprintScreenHandler {
 
-    private final FortressMinecraftClient fortressClient;
+    private final IFortressMinecraftClient fortressClient;
 
     private BlueprintGroup selectedGroup = BlueprintGroup.LIVING_HOUSES;
 
@@ -26,9 +26,9 @@ public final class BlueprintScreenHandler {
     private BlueprintSlot focusedSlot;
 
     public BlueprintScreenHandler(MinecraftClient client){
-        if(!(client instanceof FortressMinecraftClient))
+        if(!(client instanceof IFortressMinecraftClient))
             throw new IllegalArgumentException("Client must be an instance of FortressMinecraftClient");
-        this.fortressClient = (FortressMinecraftClient)client;
+        this.fortressClient = (IFortressMinecraftClient)client;
         this.scroll(0f);
     }
 
@@ -50,7 +50,7 @@ public final class BlueprintScreenHandler {
         final var blueprintManager = fortressClient.get_BlueprintManager();
         final var fortressClientManager = fortressClient.get_FortressClientManager();
         final var resourceManager = fortressClientManager.getResourceManager();
-        final List<BlueprintMetadata> allBlueprint = blueprintManager.getAllBlueprints(selectedGroup);
+        final List<IBlueprintMetadata> allBlueprint = blueprintManager.getAllBlueprints(selectedGroup);
         this.totalSize = allBlueprint.size();
         this.currentSlots = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public final class BlueprintScreenHandler {
             for (int column = 0; column < 9; ++column) {
                 int m = column + (row + skippedRows) * 9;
                 if (m >= 0 && m < this.totalSize) {
-                    final BlueprintMetadata blueprintMetadata = allBlueprint.get(m);
+                    final IBlueprintMetadata blueprintMetadata = allBlueprint.get(m);
                     final var blockData = blueprintManager.getBlockDataProvider().getBlockData(blueprintMetadata.getId(), BlockRotation.NONE);
                     if(fortressClientManager.isSurvival()) {
                         final var stacks = blockData.getStacks();
@@ -85,7 +85,7 @@ public final class BlueprintScreenHandler {
     }
 
     public void sendEditPacket() {
-        final BlueprintMetadata metadata = this.focusedSlot.getMetadata();
+        final IBlueprintMetadata metadata = this.focusedSlot.getMetadata();
         final String file = metadata.getId();
         final int floorLevel = metadata.getFloorLevel();
         final ServerboundEditBlueprintPacket packet = ServerboundEditBlueprintPacket.edit(file, floorLevel, selectedGroup);

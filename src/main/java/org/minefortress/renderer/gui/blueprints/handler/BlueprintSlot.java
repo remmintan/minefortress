@@ -2,13 +2,13 @@ package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
-import org.minefortress.blueprints.manager.BlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 
 public class BlueprintSlot {
 
     public static final BlueprintSlot EMPTY = new BlueprintSlot();
 
-    private final BlueprintMetadata metadata;
+    private final IBlueprintMetadata metadata;
     private final boolean enoughResources;
     private final Text tooltipText;
     private final IStructureBlockData blockData;
@@ -20,7 +20,7 @@ public class BlueprintSlot {
         blockData = null;
     }
 
-    public BlueprintSlot(BlueprintMetadata metadata, boolean enoughResources, IStructureBlockData blockData) {
+    public BlueprintSlot(IBlueprintMetadata metadata, boolean enoughResources, IStructureBlockData blockData) {
         this.metadata = metadata;
         this.tooltipText = Text.literal(metadata.getName());
         this.enoughResources = enoughResources;
@@ -31,7 +31,7 @@ public class BlueprintSlot {
         return tooltipText;
     }
 
-    public BlueprintMetadata getMetadata() {
+    public IBlueprintMetadata getMetadata() {
         return metadata;
     }
 

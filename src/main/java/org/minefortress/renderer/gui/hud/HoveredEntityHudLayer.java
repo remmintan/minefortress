@@ -2,7 +2,7 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import org.minefortress.fortress.FortressState;
+import net.remmintan.mods.minefortress.core.FortressState;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;

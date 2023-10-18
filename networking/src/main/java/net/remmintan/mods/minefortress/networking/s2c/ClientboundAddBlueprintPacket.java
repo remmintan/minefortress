@@ -3,10 +3,8 @@ package net.remmintan.mods.minefortress.networking.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 public class ClientboundAddBlueprintPacket implements FortressS2CPacket {
 
@@ -37,10 +35,10 @@ public class ClientboundAddBlueprintPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        if(client instanceof FortressMinecraftClient fortressMinecraftClient) {
-            final ClientBlueprintManager blueprintManager = fortressMinecraftClient.get_BlueprintManager();
-            blueprintManager.add(group, name, fileName, floorLevel, requirementId, tag);
-        }
+        final var provider = getManagersProvider();
+        final var blueprintManager = provider.get_BlueprintManager();
+        blueprintManager.add(group, name, fileName, floorLevel, requirementId, tag);
+
     }
 
     @Override

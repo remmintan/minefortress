@@ -8,5 +8,6 @@ import java.util.UUID;
 public interface IClientTasksHolder {
 
     void addRoadsSelectionTask(UUID digTaskId, UUID placeTaskId, List<BlockPos> positions);
+    void addTask(UUID uuid, Iterable<BlockPos> blocks);
 
 }

@@ -1,16 +1,16 @@
 package org.minefortress.tasks;
 
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.gobi.ClientSelection;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
-import org.joml.Vector4f;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundCancelTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import org.minefortress.selections.ClientSelection;
+import org.joml.Vector4f;
 import org.minefortress.utils.BuildingHelper;
 
 import java.util.*;
@@ -22,7 +22,7 @@ public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, 
     private final Map<UUID, UUID> subtasksMap = new HashMap<>();
 
     private final Map<UUID, IClientTask> removeTasks = new HashMap<>();
-    private final Map<UUID, ClientSelection> buildTasks = new HashMap<>();
+    private final Map<UUID, IClientTask> buildTasks = new HashMap<>();
 
     private final Stack<UUID> tasksStack = new Stack<>();
 
@@ -61,7 +61,7 @@ public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, 
     }
 
     public void addTask(UUID uuid, Iterable<BlockPos> blocks, TaskType type, UUID superTaskId) {
-        ClientSelection newTask = new ClientSelection(
+        IClientTask newTask = new ClientSelection(
                 blocks,
                 type == TaskType.REMOVE ? DESTROY_COLOR: BUILD_COLOR,
                 (w, p) -> type == TaskType.REMOVE ? BuildingHelper.canRemoveBlock(w, p) : BuildingHelper.canPlaceBlock(w, p)

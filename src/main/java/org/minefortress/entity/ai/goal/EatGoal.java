@@ -4,8 +4,8 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.HungryEntity;
-import org.minefortress.entity.ai.controls.EatControl;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import org.minefortress.fortress.FortressServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 
@@ -48,7 +48,7 @@ public class EatGoal extends Goal {
     }
 
     @NotNull
-    private EatControl getEatControl() {
+    private IEatControl getEatControl() {
         return entity.getEatControl().orElseThrow();
     }
 

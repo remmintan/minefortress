@@ -4,9 +4,9 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -40,8 +40,8 @@ public interface IFortressAwareEntity {
                 .orElse(false);
     }
 
-    default Optional<IServerManagersProvider> getFortressServerManager() {
-        return getMasterId().flatMap(it -> getFortressModServerManager().map(fms -> fms.getManagersProvider(it)));
+    default Optional<IServerFortressManager> getFortressServerManager() {
+        return getMasterId().flatMap(it -> getFortressModServerManager().map(fms -> fms.getFortressManager(it)));
     }
 
 }

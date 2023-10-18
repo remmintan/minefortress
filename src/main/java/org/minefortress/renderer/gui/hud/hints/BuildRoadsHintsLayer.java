@@ -1,5 +1,6 @@
 package org.minefortress.renderer.gui.hud.hints;
 
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import org.minefortress.renderer.gui.hud.HudState;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.selections.SelectionType;
@@ -32,7 +33,7 @@ public class BuildRoadsHintsLayer extends AbstractHintsLayer{
         return super.shouldRender(hudState) && hudState == HudState.BUILD && sm.getCurrentSelectionType() == SelectionType.ROADS;
     }
 
-    private SelectionManager getSelectionManager() {
+    private ISelectionManager getSelectionManager() {
         return ModUtils.getFortressClient().get_SelectionManager();
     }
 }

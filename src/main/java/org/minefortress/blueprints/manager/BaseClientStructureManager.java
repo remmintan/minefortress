@@ -5,13 +5,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import org.jetbrains.annotations.Nullable;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureRenderInfoProvider;
-import org.minefortress.interfaces.ITasksInformationHolder;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
@@ -31,7 +28,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     }
 
     protected abstract IBlockDataProvider getBlockDataProvider();
-    public abstract BlueprintMetadata getSelectedStructure();
+    public abstract IBlueprintMetadata getSelectedStructure();
     public void tick() {
         if(!isSelecting()) return;
         structureBuildPos = getSelectedPos();
@@ -43,7 +40,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         return structureBuildPos;
     }
     private void checkNotEnoughResources() {
-        final var fortressClientManager = ((FortressMinecraftClient)client).get_FortressClientManager();
+        final var fortressClientManager = ((IFortressMinecraftClient)client).get_FortressClientManager();
         if(fortressClientManager.isSurvival()) {
             final var resourceManager = fortressClientManager.getResourceManager();
             final var stacks = getBlockData().getStacks();
@@ -122,7 +119,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
 
     @Override
     public final Optional<BlockPos> getStructureRenderPos() {
-        final var floorLevel = Optional.ofNullable(getSelectedStructure()).map(BlueprintMetadata::getFloorLevel).orElse(0);
+        final var floorLevel = Optional.ofNullable(getSelectedStructure()).map(IBlueprintMetadata::getFloorLevel).orElse(0);
         return Optional.ofNullable(structureBuildPos).map(it -> it.down(floorLevel));
     }
 

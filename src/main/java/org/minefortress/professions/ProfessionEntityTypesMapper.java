@@ -6,7 +6,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
-import org.minefortress.entity.BasePawnEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
 import org.minefortress.registries.FortressEntities;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ final class ProfessionEntityTypesMapper {
     private static final Type ENTITY_TYPES_MAP_TYPE = TypeToken.getParameterized(Map.class, String.class, TypeToken.getParameterized(List.class, String.class).getType()).getType();
     private static final Identifier RESOURCE_ID = new Identifier("minefortress", "professions/entitytypemap.json");
     private final Gson gson = new Gson();
-    private final Map<String, EntityType<? extends BasePawnEntity>> entityTypeMap = new HashMap<>();
+    private final Map<String, EntityType<? extends IPawn>> entityTypeMap = new HashMap<>();
 
     void read(MinecraftServer server) {
         final var resourceManager = server.getResourceManager();
@@ -39,7 +39,7 @@ final class ProfessionEntityTypesMapper {
         entityTypeMap.clear();
         for (Map.Entry<String, List<String>> entry : entityTypeNamesMap.entrySet()) {
             final var typeLabel = entry.getKey();
-            final EntityType<? extends BasePawnEntity> type = convert(typeLabel);
+            final EntityType<? extends IPawn> type = convert(typeLabel);
             for (String professionLabel : entry.getValue()) {
                 entityTypeMap.put(professionLabel, type);
             }
@@ -47,11 +47,11 @@ final class ProfessionEntityTypesMapper {
 
     }
 
-    EntityType<? extends BasePawnEntity> getEntityTypeForProfession(String profession) {
+    EntityType<? extends IPawn> getEntityTypeForProfession(String profession) {
         return entityTypeMap.getOrDefault(profession, FortressEntities.COLONIST_ENTITY_TYPE);
     }
 
-    private EntityType<? extends BasePawnEntity> convert(String entityType) {
+    private EntityType<? extends IPawn> convert(String entityType) {
         return switch (entityType) {
             case "warrior" -> FortressEntities.WARRIOR_PAWN_ENTITY_TYPE;
             case "archer" -> FortressEntities.ARCHER_PAWN_ENTITY_TYPE;

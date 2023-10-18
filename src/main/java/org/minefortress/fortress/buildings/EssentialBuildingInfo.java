@@ -2,13 +2,14 @@ package org.minefortress.fortress.buildings;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public class EssentialBuildingInfo {
+public class EssentialBuildingInfo implements IEssentialBuildingInfo {
 
     public static final String DEFAULT_BLUEPRINT_ID = "default-file-36d9a49d-4d47-45c8-9201-23d71e156da1";
 
@@ -47,36 +48,44 @@ public class EssentialBuildingInfo {
         this.health = buf.readInt();
     }
 
+    @Override
     public BlockPos getStart() {
         return start;
     }
 
+    @Override
     public BlockPos getEnd() {
         return end;
     }
 
+    @Override
     public String getRequirementId() {
         return requirementId;
     }
 
+    @Override
     public long getBedsCount() {
         return bedsCount;
     }
 
+    @Override
     public UUID getId() {
         return id;
     }
 
+    @Override
     @NotNull
     public Optional<String> getBlueprintId() {
         if(blueprintId.equals(DEFAULT_BLUEPRINT_ID)) return Optional.empty();
         return Optional.of(blueprintId);
     }
 
+    @Override
     public int getHealth() {
         return health;
     }
 
+    @Override
     public void write(PacketByteBuf buffer) {
         buffer.writeUuid(id);
         buffer.writeBlockPos(start);

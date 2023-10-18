@@ -1,9 +1,12 @@
 package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.selections.ClientSelection;
-import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
-import org.minefortress.selections.renderer.tasks.ITasksRenderInfoProvider;
+import net.remmintan.gobi.ClientSelection;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ISavedAreasHolder;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
 import org.minefortress.utils.BuildingHelper;
 
 import java.util.Collections;
@@ -12,12 +15,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class SavedAreasHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider {
+public final class SavedAreasHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider, ISavedAreasHolder {
 
     private boolean needsUpdate = true;
-    private List<AutomationAreaInfo> savedAreas = Collections.emptyList();
+    private List<IAutomationAreaInfo> savedAreas = Collections.emptyList();
 
-    public void setSavedAreas(List<AutomationAreaInfo> savedAreas) {
+    @Override
+    public void setSavedAreas(List<IAutomationAreaInfo> savedAreas) {
         this.savedAreas = Collections.unmodifiableList(savedAreas);
         this.setNeedRebuild(true);
     }
@@ -33,13 +37,14 @@ public final class SavedAreasHolder implements ITasksModelBuilderInfoProvider, I
     }
 
     @Override
-    public Set<ClientSelection> getAllSelections() {
+    public Set<IClientTask> getAllSelections() {
         return savedAreas.stream()
                 .map(this::toClientSelection)
                 .collect(Collectors.toSet());
     }
 
-    public Optional<AutomationAreaInfo> getHovered(BlockPos pos) {
+    @Override
+    public Optional<IAutomationAreaInfo> getHovered(BlockPos pos) {
         return savedAreas.stream().filter(it -> it.contains(pos)).findAny();
     }
 
@@ -48,7 +53,7 @@ public final class SavedAreasHolder implements ITasksModelBuilderInfoProvider, I
         return !savedAreas.isEmpty();
     }
 
-    private ClientSelection toClientSelection(AutomationAreaInfo info) {
+    private IClientTask toClientSelection(IAutomationAreaInfo info) {
         return new ClientSelection(
                 info.getClientArea(),
                 info.getAreaType().getColor(),

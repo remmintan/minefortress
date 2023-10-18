@@ -49,8 +49,8 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
             final ClientboundResetBlueprintPacket resetpacket = new ClientboundResetBlueprintPacket();
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESET_BLUEPRINT, resetpacket);
 
-            for(Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : blueprintMetadataReader.getPredefinedBlueprints().entrySet()) {
-                for(BlueprintMetadata blueprintMetadata : entry.getValue()) {
+            for(Map.Entry<BlueprintGroup, List<IBlueprintMetadata>> entry : blueprintMetadataReader.getPredefinedBlueprints().entrySet()) {
+                for(IBlueprintMetadata blueprintMetadata : entry.getValue()) {
                     final String file = blueprintMetadata.getId();
                     blockDataManager.getStructureNbt(file)
                             .ifPresent(it -> {
@@ -226,6 +226,6 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                 .flatMap(Collection::stream)
                 .filter(blueprintMetadata -> blueprintMetadata.getId().equals(blueprintId))
                 .findFirst()
-                .map(BlueprintMetadata::getRequirementId);
+                .map(IBlueprintMetadata::getRequirementId);
     }
 }

@@ -19,10 +19,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import org.minefortress.MineFortressMod;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.fortress.FortressState;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
+import org.minefortress.fortress.ClientFortressManager;
+import net.remmintan.mods.minefortress.core.FortressState;
+import org.minefortress.interfaces.IFortressMinecraftClient;
+import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import org.minefortress.renderer.gui.fortress.ManageBuildingScreen;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
@@ -57,7 +58,7 @@ public abstract class FortressClientInteractionManagerMixin {
 
     @Inject(method = "setGameModes", at = @At("RETURN"))
     public void setGameModes(GameMode gameMode, GameMode previousGameMode, CallbackInfo ci) {
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
+        final IHoveredBlockProvider fortressClient = (IHoveredBlockProvider) this.client;
         final SelectionManager selectionManager = fortressClient.get_SelectionManager();
         if(selectionManager.isSelecting()) {
             selectionManager.resetSelection();
@@ -83,9 +84,9 @@ public abstract class FortressClientInteractionManagerMixin {
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if(!ModUtils.isClientInFortressGamemode()) return;
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        final ClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
-        final FortressClientManager fortressManager = fortressClient.get_FortressClientManager();
+        final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
+        final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
+        final ClientFortressManager fortressManager = fortressClient.get_FortressClientManager();
 
         if(fortressManager.getState() == FortressState.COMBAT) {
             final var influenceManager = ModUtils.getInfluenceManager();
@@ -149,7 +150,7 @@ public abstract class FortressClientInteractionManagerMixin {
     }
 
     @Unique
-    private static void openManageBuildingMenu(FortressClientManager fortressManager) {
+    private static void openManageBuildingMenu(ClientFortressManager fortressManager) {
         fortressManager
                 .getHoveredBuilding()
                 .ifPresent(it -> {
@@ -167,8 +168,8 @@ public abstract class FortressClientInteractionManagerMixin {
     @Inject(method = "interactEntity", at = @At("HEAD"), cancellable = true)
     public void interactEntity(PlayerEntity player, Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         if(getCurrentGameMode() == FORTRESS) {
-            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-            final FortressClientManager fcm = fortressClient.get_FortressClientManager();
+            final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
+            final ClientFortressManager fcm = fortressClient.get_FortressClientManager();
             if (fcm.getState() == FortressState.COMBAT) {
                 final var fightManager = fcm.getFightManager();
                 final var selectionManager = fightManager.getSelectionManager();
@@ -196,9 +197,9 @@ public abstract class FortressClientInteractionManagerMixin {
         if(world!= null && !world.getWorldBorder().contains(blockPos)) return;
 
 
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        final ClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
-        final FortressClientManager fortressManager = fortressClient.get_FortressClientManager();
+        final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
+        final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
+        final ClientFortressManager fortressManager = fortressClient.get_FortressClientManager();
 
         if(fortressManager.getState() == FortressState.COMBAT) {
             final var influenceManager = ModUtils.getInfluenceManager();
@@ -261,7 +262,7 @@ public abstract class FortressClientInteractionManagerMixin {
     }
 
     @Unique
-    private static void updateFightSelection(BlockHitResult hitResult, FortressClientManager fortressManager) {
+    private static void updateFightSelection(BlockHitResult hitResult, ClientFortressManager fortressManager) {
         final var fightManager = fortressManager.getFightManager();
         final var selectionManager = fightManager.getSelectionManager();
         if(selectionManager.isSelecting())
@@ -303,7 +304,7 @@ public abstract class FortressClientInteractionManagerMixin {
             blockPos = blockPos.offset(useOnContext.getSide());
         }
 
-        ((FortressMinecraftClient)client).get_SelectionManager().selectBlock(blockPos, blockState);
+        ((IHoveredBlockProvider)client).get_SelectionManager().selectBlock(blockPos, blockState);
     }
 
     @Unique

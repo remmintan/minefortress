@@ -1,7 +1,7 @@
 package net.remmintan.mods.minefortress.core.interfaces.entities.pawns;
 
 import net.minecraft.entity.player.HungerManager;
-import org.minefortress.entity.ai.controls.EatControl;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 
 import java.util.Optional;
 
@@ -11,7 +11,7 @@ public interface IHungerAwareEntity extends IItemUsingEntity {
     HungerManager getHungerManager();
     int getCurrentFoodLevel();
 
-    default Optional<EatControl> getEatControl() {return Optional.empty();}
+    default Optional<IEatControl> getEatControl() {return Optional.empty();}
 
     default void addHunger(float hunger) {
         getHungerManager().addExhaustion(hunger);

@@ -2,11 +2,11 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
+import net.remmintan.gobi.SelectionType;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.widget.HideableButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemToggleWidget;
-import org.minefortress.selections.SelectionType;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Arrays;

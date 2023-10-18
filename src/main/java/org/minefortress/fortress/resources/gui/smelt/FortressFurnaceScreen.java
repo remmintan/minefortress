@@ -13,10 +13,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundOpenCraftingScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,8 +90,8 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
         return fortressClient.is_FortressGamemode() && clientManager.getProfessionManager().hasProfession("blacksmith");
     }
 
-    private FortressMinecraftClient getClient() {
-        return (FortressMinecraftClient) MinecraftClient.getInstance();
+    private IHoveredBlockProvider getClient() {
+        return (IHoveredBlockProvider) MinecraftClient.getInstance();
     }
 
     @Override

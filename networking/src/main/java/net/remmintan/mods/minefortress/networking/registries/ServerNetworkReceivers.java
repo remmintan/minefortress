@@ -11,13 +11,6 @@ import java.util.function.Function;
 
 public class ServerNetworkReceivers {
 
-    private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {
-        ServerPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName), (server, player, handler, buf, sender) -> {
-            final FortressC2SPacket packet = packetConstructor.apply(buf);
-            server.execute(() -> packet.handle(server, player));
-        });
-    }
-
     public static void registerReceivers() {
         registerReceiver(FortressChannelNames.NEW_SELECTION_TASK, ServerboundSimpleSelectionTaskPacket::new);
         registerReceiver(FortressChannelNames.NEW_BLUEPRINT_TASK, ServerboundBlueprintTaskPacket::new);
@@ -48,6 +41,13 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SOpenRepairBuildingScreen.CHANNEL, C2SOpenRepairBuildingScreen::new);
         registerReceiver(C2SRepairBuilding.CHANNEL, C2SRepairBuilding::new);
         registerReceiver(C2SRequestResourcesRefresh.CHANNEL, C2SRequestResourcesRefresh::new);
+    }
+
+    private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {
+        ServerPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName), (server, player, handler, buf, sender) -> {
+            final FortressC2SPacket packet = packetConstructor.apply(buf);
+            server.execute(() -> packet.handle(server, player));
+        });
     }
 
 }
