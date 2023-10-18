@@ -5,6 +5,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
+import net.remmintan.mods.minefortress.core.dtos.professions.IProfessionEssentialInfo;
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
@@ -28,10 +29,7 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionsHi
 import org.minefortress.professions.hire.ServerHireHandler;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -139,7 +137,13 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         tickRemoveFromProfession();
 
         if(needsUpdate) {
-            ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(getProfessions());
+            final var essentialInfos = new ArrayList<IProfessionEssentialInfo>();
+            for(Map.Entry<String, IProfession> entry : getProfessions().entrySet())  {
+                final ProfessionEssentialInfo professionEssentialInfo = new ProfessionEssentialInfo(entry.getKey(), entry.getValue().getAmount());
+                essentialInfos.add(professionEssentialInfo);
+            }
+
+            ClientboundProfessionSyncPacket packet = new ClientboundProfessionSyncPacket(essentialInfos);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             needsUpdate = false;
         }

@@ -2,56 +2,45 @@ package net.remmintan.mods.minefortress.networking.s2c;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
+import net.remmintan.mods.minefortress.core.dtos.professions.IProfessionEssentialInfo;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.ClientProfessionManager;
-import org.minefortress.professions.Profession;
-import org.minefortress.professions.ProfessionEssentialInfo;
-import org.minefortress.professions.ProfessionManager;
+import net.remmintan.mods.minefortress.networking.registries.NetworkingReadersRegistry;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class ClientboundProfessionSyncPacket implements FortressS2CPacket {
 
-    private final List<ProfessionEssentialInfo> professions = new ArrayList<>();
+    private final List<IProfessionEssentialInfo> professions;
 
-    public ClientboundProfessionSyncPacket(Map<String, Profession> professions) {
-        for(Map.Entry<String, Profession> entry : professions.entrySet())  {
-            final ProfessionEssentialInfo professionEssentialInfo = new ProfessionEssentialInfo();
-            professionEssentialInfo.setId(entry.getKey());
-            professionEssentialInfo.setAmount(entry.getValue().getAmount());
-
-            this.professions.add(professionEssentialInfo);
-        }
+    public ClientboundProfessionSyncPacket(List<IProfessionEssentialInfo> essentialInfos) {
+        professions = Collections.unmodifiableList(essentialInfos);
     }
 
     public ClientboundProfessionSyncPacket(PacketByteBuf buf) {
+        this.professions = new ArrayList<>();
         int size = buf.readInt();
+        final var reader = NetworkingReadersRegistry.findReader(IProfessionEssentialInfo.class);
         for(int i = 0; i < size; i++) {
-            final ProfessionEssentialInfo professionEssentialInfo = new ProfessionEssentialInfo();
-            professionEssentialInfo.setId(buf.readString());
-            professionEssentialInfo.setAmount(buf.readInt());
-
-            this.professions.add(professionEssentialInfo);
+            final var info = reader.readBuffer(buf);
+            this.professions.add(info);
         }
     }
 
     @Override
     public void handle(MinecraftClient client) {
-        final FortressMinecraftClient fortressCleint = (FortressMinecraftClient) client;
-        final ProfessionManager professionManager = fortressCleint.get_FortressClientManager().getProfessionManager();
-        final ClientProfessionManager clientManager = (ClientProfessionManager) professionManager;
-        clientManager.updateProfessions(this.professions);
+        final var fortressManager = getManagersProvider().get_ClientFortressManager();
+        final var professionManager1 = fortressManager.getProfessionManager();
+        professionManager1.updateProfessions(professions);
     }
 
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeInt(this.professions.size());
-        for(ProfessionEssentialInfo professionEssentialInfo : this.professions) {
-            buf.writeString(professionEssentialInfo.getId());
-            buf.writeInt(professionEssentialInfo.getAmount());
+        for(IProfessionEssentialInfo professionEssentialInfo : this.professions) {
+            buf.writeString(professionEssentialInfo.id());
+            buf.writeInt(professionEssentialInfo.amount());
         }
     }
 }

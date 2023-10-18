@@ -2,8 +2,9 @@ package org.minefortress.professions;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
-import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionEssentialInfo;
+import net.remmintan.mods.minefortress.core.dtos.professions.IProfessionEssentialInfo;
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
+import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
@@ -11,7 +12,6 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionRes
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundChangeProfessionStatePacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -77,11 +77,11 @@ public final class ClientProfessionManager extends ProfessionManager implements 
     }
 
     @Override
-    public void updateProfessions(List<ProfessionEssentialInfo> info) {
-        for(ProfessionEssentialInfo professionEssentialInfo : info) {
-            final IProfession profession = getProfession(professionEssentialInfo.getId());
+    public void updateProfessions(List<IProfessionEssentialInfo> info) {
+        for(var professionEssentialInfo : info) {
+            final IProfession profession = getProfession(professionEssentialInfo.id());
             if(profession != null) {
-                profession.setAmount(professionEssentialInfo.getAmount());
+                profession.setAmount(professionEssentialInfo.amount());
             }
         }
     }

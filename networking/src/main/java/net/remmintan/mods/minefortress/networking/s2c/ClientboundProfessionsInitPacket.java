@@ -24,8 +24,9 @@ public class ClientboundProfessionsInitPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        final var professionManager = ModUtils.getFortressClient().get_FortressClientManager().getProfessionManager();
-        professionManager.initProfessions(this.professions, this.treeJson);
+        final var provider = getManagersProvider();
+        final var professionsManager = provider.get_ClientFortressManager().getProfessionManager();
+        professionsManager.initProfessions(this.professions, this.treeJson);
     }
 
     @Override
