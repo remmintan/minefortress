@@ -35,7 +35,7 @@ import net.remmintan.mods.minefortress.core.FortressState;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.professions.hire.ClientHireHandler;
-import org.minefortress.professions.hire.HireInfo;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
@@ -275,14 +275,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public ClientInfluenceManager get_InfluenceManager() {
         return this.influenceManager;
-    }
-
-
-    @Override
-    public void open_HireScreen(MinecraftClient client, String screenName, Map<String, HireInfo> professions) {
-        final var handler = new ClientHireHandler(screenName, professions);
-        final var screen = new HirePawnScreen(handler);
-        client.setScreen(screen);
     }
 
     @Inject(method = "close", at = @At("HEAD"))

@@ -3,6 +3,8 @@ package org.minefortress.fortress.resources.client;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.utils.ModUtils;
@@ -30,7 +32,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
     }
 
     @Override
-    public boolean hasItems(final List<ItemInfo> stacks) {
+    public boolean hasItems(final List<IItemInfo> stacks) {
         if(ModUtils.getFortressClientManager().isCreative()) return true;
         return stacks
                 .stream()
@@ -42,13 +44,13 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
     }
 
     @Override
-    public boolean hasItem(ItemInfo itemInfo, List<ItemInfo> items) {
+    public boolean hasItem(IItemInfo itemInfo, List<IItemInfo> items) {
         final var item = itemInfo.item();
         final var amount = itemInfo.amount();
         return hasItem(item, amount, items);
     }
 
-    private boolean hasItem(Item item, int amount, List<ItemInfo> items) {
+    private boolean hasItem(Item item, int amount, List<IItemInfo> items) {
         final var group = groupManager.getGroup(item);
         final var manager = groupManager.getStacksManager(group);
         final var stack = manager.getStack(item);

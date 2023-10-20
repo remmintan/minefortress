@@ -1,5 +1,7 @@
 package org.minefortress.professions.hire;
 
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireCost;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.professions.ProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
@@ -20,7 +22,7 @@ public class ServerHireHandler {
         this.professionManager = professionManager;
     }
 
-    public Map<String, HireInfo> getProfessions() {
+    public Map<String, IHireInfo> getProfessions() {
         return getUnlockedProfessions()
                 .stream()
                 .map(it ->
@@ -36,7 +38,7 @@ public class ServerHireHandler {
                             );
                         }
                 )
-                .collect(Collectors.toMap(HireInfo::professionId, it -> it));
+                .collect(Collectors.toMap(IHireInfo::professionId, it -> it));
     }
 
     public void hire(String professionId) {
@@ -49,7 +51,7 @@ public class ServerHireHandler {
         return hireRequests.computeIfAbsent(professionId, k -> new ArrayDeque<>());
     }
 
-    private List<HireCost> getCost(String it) {
+    private List<IHireCost> getCost(String it) {
         return professionManager.getProfession(it)
                 .getItemsRequirement()
                 .stream()

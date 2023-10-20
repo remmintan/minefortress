@@ -4,10 +4,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
-import org.apache.logging.log4j.LogManager;
-import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
+import net.remmintan.mods.minefortress.networking.registries.NetworkingReadersRegistry;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,21 +15,22 @@ import java.util.List;
 
 public class ClientboundSyncItemsPacket implements FortressS2CPacket {
 
-    private final List<ItemInfo> itemInfo;
+    private final List<IItemInfo> itemInfo;
     private final boolean needReset;
 
-    public ClientboundSyncItemsPacket(List<ItemInfo> itemInfo, boolean needReset) {
+    public ClientboundSyncItemsPacket(List<IItemInfo> itemInfo, boolean needReset) {
         this.itemInfo = Collections.unmodifiableList(itemInfo);
         this.needReset = needReset;
     }
 
     public ClientboundSyncItemsPacket(PacketByteBuf buf) {
         final int size = buf.readInt();
-        final var tempList = new ArrayList<ItemInfo>();
+        final var tempList = new ArrayList<IItemInfo>();
+        final var reader = NetworkingReadersRegistry.findReader(IItemInfo.class);
         for(int i = 0; i < size; i++) {
             final int id = buf.readInt();
             final int amount = buf.readInt();
-            tempList.add(new ItemInfo(Item.byRawId(id), amount));
+            tempList.add(reader.readBuffer(buf));
         }
 
         this.itemInfo = Collections.unmodifiableList(tempList);
@@ -38,10 +39,10 @@ public class ClientboundSyncItemsPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        final var fortressClientManager = ((FortressMinecraftClient) client).get_FortressClientManager();
-        final var resourceManager = fortressClientManager.getResourceManager();
+        final var provider = getManagersProvider();
+        final var resourceManager = provider.get_ClientFortressManager().getResourceManager();
         if(needReset) resourceManager.reset();
-        for (ItemInfo info : itemInfo) {
+        for (IItemInfo info : itemInfo) {
             final var item = info.item();
             if(item == Items.STRUCTURE_VOID) continue;
             try {
@@ -56,7 +57,7 @@ public class ClientboundSyncItemsPacket implements FortressS2CPacket {
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeInt(itemInfo.size());
-        for(ItemInfo itemInfo : itemInfo) {
+        for(IItemInfo itemInfo : itemInfo) {
             final var item = itemInfo.item();
             final var amount = itemInfo.amount();
 

@@ -8,6 +8,7 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.blueprints.data.ClientStructureBlockDataProvider;
 import org.minefortress.interfaces.IFortressMinecraftClient;
+import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.blueprints.ImportExportBlueprintsScreen;
 import org.minefortress.utils.ModUtils;
 import org.slf4j.LoggerFactory;
@@ -192,6 +193,14 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
             try {
                 fortressClient.get_BlueprintRenderer().getBlueprintsModelBuilder().reset();
             }catch (Exception ignore) {}
+        }
+    }
+
+    @Override
+    public void updateSlotsInBlueprintsScreen() {
+        final var currentScreen = MinecraftClient.getInstance().currentScreen;
+        if(currentScreen instanceof BlueprintsScreen bps) {
+            bps.updateSlots();
         }
     }
 

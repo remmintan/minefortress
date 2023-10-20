@@ -1,5 +1,7 @@
 package org.minefortress.professions.hire;
 
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireCost;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import org.minefortress.fortress.resources.ItemInfo;
 import net.remmintan.mods.minefortress.networking.c2s.C2SHirePawnWithScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -12,9 +14,9 @@ import java.util.Set;
 public final class ClientHireHandler implements IHireScreenHandler {
 
     private final String screenName;
-    private Map<String, HireInfo> professions;
+    private Map<String, IHireInfo> professions;
 
-    public ClientHireHandler(String screenName, Map<String, HireInfo> professions) {
+    public ClientHireHandler(String screenName, Map<String, IHireInfo> professions) {
         this.screenName = screenName;
         this.professions = professions;
     }
@@ -41,7 +43,7 @@ public final class ClientHireHandler implements IHireScreenHandler {
 
     @Override
     public List<ItemInfo> getCost(String professionId) {
-        return professions.get(professionId).cost().stream().map(HireCost::toItemInfo).toList();
+        return professions.get(professionId).cost().stream().map(IHireCost::toItemInfo).toList();
     }
 
     @Override
@@ -69,7 +71,7 @@ public final class ClientHireHandler implements IHireScreenHandler {
     }
 
     @Override
-    public void sync(Map<String, HireInfo> professions) {
+    public void sync(Map<String, IHireInfo> professions) {
         if(professions == null) {
             throw new IllegalArgumentException("Professions cannot be null");
         }

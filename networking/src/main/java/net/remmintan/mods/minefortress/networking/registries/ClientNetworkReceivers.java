@@ -35,7 +35,10 @@ public class ClientNetworkReceivers {
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressS2CPacket> packetConstructor) {
         ClientPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName),
-                (client, handler, buf, sender) -> packetConstructor.apply(buf).handle(client, handler.getEnabledFeatures()));
+                (client, handler, buf, sender) -> {
+                    final var packet = packetConstructor.apply(buf);
+                    client.execute(() -> packet.handle(client, handler.getEnabledFeatures()));
+                });
     }
 
 }

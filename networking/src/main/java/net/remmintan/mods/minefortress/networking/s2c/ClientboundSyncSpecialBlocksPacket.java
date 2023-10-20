@@ -6,10 +6,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.NotNull;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,9 +46,9 @@ public class ClientboundSyncSpecialBlocksPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        final FortressMinecraftClient fortressMinecraftClient = (FortressMinecraftClient) client;
-        final FortressClientManager fortressClientManager = fortressMinecraftClient.get_FortressClientManager();
-        fortressClientManager.setSpecialBlocks(basicSpecialBlocks, blueprintSpecialBlocks);
+        final var provider = getManagersProvider();
+        final var manager = provider.get_ClientFortressManager();
+        manager.setSpecialBlocks(basicSpecialBlocks, blueprintSpecialBlocks);
     }
 
     @Override

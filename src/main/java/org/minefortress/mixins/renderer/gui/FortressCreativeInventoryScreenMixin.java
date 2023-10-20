@@ -28,7 +28,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.resources.client.IClientResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;

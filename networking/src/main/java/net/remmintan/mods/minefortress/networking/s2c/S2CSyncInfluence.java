@@ -4,7 +4,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 
@@ -29,6 +28,7 @@ public class S2CSyncInfluence implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        ModUtils.getInfluenceManager().sync(influencePositions);
+        final var provider = getManagersProvider();
+        provider.get_InfluenceManager().sync(influencePositions);
     }
 }

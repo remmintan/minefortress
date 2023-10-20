@@ -3,9 +3,7 @@ package net.remmintan.mods.minefortress.networking.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 
 public class ClientboundUpdateBlueprintPacket implements FortressS2CPacket {
 
@@ -30,17 +28,15 @@ public class ClientboundUpdateBlueprintPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        if(client instanceof FortressMinecraftClient fortressClient) {
-            if(type == Type.UPDATE)
-                fortressClient.get_BlueprintManager().update(file, tag, newFloorLevel);
-            else if(type == Type.REMOVE) {
-                fortressClient.get_BlueprintManager().clearStructure();
-                fortressClient.get_BlueprintManager().remove(file);
-                final var currentScreen = MinecraftClient.getInstance().currentScreen;
-                if(currentScreen instanceof BlueprintsScreen bps) {
-                    bps.updateSlots();
-                }
-            }
+        final var provider = getManagersProvider();
+        final var blueprintManager = provider.get_BlueprintManager();
+
+        if(type == Type.UPDATE)
+            blueprintManager.update(file, tag, newFloorLevel);
+        else if(type == Type.REMOVE) {
+            blueprintManager.clearStructure();
+            blueprintManager.remove(file);
+            blueprintManager.updateSlotsInBlueprintsScreen();
         }
     }
 

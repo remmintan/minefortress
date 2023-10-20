@@ -7,6 +7,7 @@ import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,5 +33,7 @@ public interface IServerFortressManager {
     void setGamemode(FortressGamemode fortressGamemode);
 
     void addColonist(LivingEntity pawn);
+
+    IServerResourceManager getResourceManager();
 
 }

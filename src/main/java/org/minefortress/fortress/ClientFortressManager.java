@@ -12,9 +12,13 @@ import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 import net.remmintan.mods.minefortress.networking.c2s.C2SJumpToCampfire;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundFortressCenterSetPacket;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSetGamemodePacket;
@@ -22,13 +26,12 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.MineFortressMod;
 import org.minefortress.fight.ClientFightManager;
-import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
-import org.minefortress.fortress.resources.client.IClientResourceManager;
 import org.minefortress.interfaces.IFortressMinecraftClient;
-import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import org.minefortress.professions.ClientProfessionManager;
+import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.renderer.gui.fortress.RepairBuildingScreen;
+import org.minefortress.renderer.gui.hire.HirePawnScreen;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
@@ -194,6 +197,13 @@ public final class ClientFortressManager implements IClientFortressManager {
                 posAppropriateForCenter = cursor.toImmutable();
             }
         }
+    }
+
+    @Override
+    public void open_HireScreen(MinecraftClient client, String screenName, Map<String, IHireInfo> professions) {
+        final var handler = new ClientHireHandler(screenName, professions);
+        final var screen = new HirePawnScreen(handler);
+        client.setScreen(screen);
     }
 
     @Override

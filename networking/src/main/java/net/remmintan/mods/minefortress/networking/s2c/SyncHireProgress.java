@@ -5,9 +5,7 @@ import io.netty.buffer.ByteBufOutputStream;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import org.minefortress.professions.hire.HireInfo;
-import org.minefortress.professions.hire.IHireScreenHandler;
-import org.minefortress.renderer.gui.hire.HirePawnScreen;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,16 +16,16 @@ public class SyncHireProgress implements FortressS2CPacket {
 
     public static final String CHANNEL = "sync_hire_progress";
 
-    private Map<String, HireInfo> professions;
+    private Map<String, IHireInfo> professions;
 
-    public SyncHireProgress(Map<String, HireInfo> professions) {
+    public SyncHireProgress(Map<String, IHireInfo> professions) {
         this.professions = professions;
     }
 
     @SuppressWarnings("unchecked")
     public SyncHireProgress(PacketByteBuf buf) {
         try (var ois = new ObjectInputStream(new ByteBufInputStream(buf))) {
-            this.professions = (Map<String, HireInfo>) ois.readObject();
+            this.professions = (Map<String, IHireInfo>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -44,14 +42,7 @@ public class SyncHireProgress implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        client.execute(() -> {
-            final var currentScreen = client.currentScreen;
-            if (currentScreen instanceof HirePawnScreen screen) {
-                final var handler = screen.getHandler();
-                if(handler != null) {
-                    handler.sync(professions);
-                }
-            }
-        });
+        final var professions = getManagersProvider().get_ClientFortressManager().getProfessionManager();
+        professions.syncCurrentScreenHandler(this.professions);
     }
 }

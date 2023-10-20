@@ -5,15 +5,14 @@ import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.dtos.professions.IProfessionEssentialInfo;
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
-import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
+import net.remmintan.mods.minefortress.core.interfaces.professions.*;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundChangeProfessionStatePacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import org.minefortress.renderer.gui.hire.HirePawnScreen;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -82,6 +81,17 @@ public final class ClientProfessionManager extends ProfessionManager implements 
             final IProfession profession = getProfession(professionEssentialInfo.id());
             if(profession != null) {
                 profession.setAmount(professionEssentialInfo.amount());
+            }
+        }
+    }
+
+    @Override
+    public void syncCurrentScreenHandler(Map<String, IHireInfo> hireInfos) {
+        final var currentScreen = MinecraftClient.getInstance().currentScreen;
+        if (currentScreen instanceof HirePawnScreen screen) {
+            final var handler = screen.getHandler();
+            if(handler != null) {
+                handler.sync(hireInfos);
             }
         }
     }

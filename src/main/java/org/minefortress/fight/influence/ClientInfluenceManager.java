@@ -8,27 +8,29 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderStage;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
-import org.minefortress.blueprints.manager.BaseClientStructureManager;
-import org.minefortress.blueprints.manager.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
-import org.minefortress.fortress.ClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.infuence.IClientInfluenceManager;
+import net.remmintan.mods.minefortress.core.interfaces.infuence.IInfluencePosStateHolder;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionsHireTypes;
 import net.remmintan.mods.minefortress.networking.c2s.C2SCaptureInfluencePositionPacket;
 import net.remmintan.mods.minefortress.networking.c2s.C2SUpdateNewInfluencePosition;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionsHireTypes;
+import org.minefortress.blueprints.manager.BaseClientStructureManager;
+import org.minefortress.blueprints.manager.BlueprintMetadata;
 import org.minefortress.utils.ModUtils;
 
 import java.util.*;
 
-public class ClientInfluenceManager extends BaseClientStructureManager {
+public class ClientInfluenceManager extends BaseClientStructureManager implements IClientInfluenceManager {
 
     private static final IBlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0, null);
 
     private final InfluenceFlagBlockDataProvider blockDataProvider = new InfluenceFlagBlockDataProvider();
     private final ClientFortressBorderHolder clientFortressBorderHolder = new ClientFortressBorderHolder(this);
-    private final InfluencePosStateHolder influencePosStateHolder = new InfluencePosStateHolder();
+    private final IInfluencePosStateHolder influencePosStateHolder = new InfluencePosStateHolder();
 
     private boolean isSelectingInfluencePosition = false;
 
@@ -47,6 +49,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         influencePosStateHolder.syncNewPos(getStructureBuildPos());
     }
 
+    @Override
     public Optional<WorldBorder> getFortressBorder() {
         if(influenceEnabled()) {
             return clientFortressBorderHolder.getFortressBorder();
@@ -56,20 +59,24 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         }
     }
 
+    @Override
     public void startSelectingInfluencePosition() {
         isSelectingInfluencePosition = true;
     }
 
+    @Override
     public void cancelSelectingInfluencePosition() {
         super.reset();
         isSelectingInfluencePosition = false;
         influencePosStateHolder.reset();
     }
 
+    @Override
     public void sync(List<BlockPos> positions) {
         clientFortressBorderHolder.syncInfluencePositions(positions);
     }
 
+    @Override
     public void selectInfluencePosition() {
         isSelectingInfluencePosition = false;
         final var pos = getStructureBuildPos();
@@ -111,7 +118,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         influencePosStateHolder.reset();
     }
 
-    private static boolean isHasAnyWarrior(ClientFortressManager clientFortressManager) {
+    private static boolean isHasAnyWarrior(IClientFortressManager clientFortressManager) {
         final var professionManager = clientFortressManager.getProfessionManager();
         final var warriorIds = ProfessionsHireTypes.WARRIORS.getIds();
         var hasAnyWarrior = false;
@@ -122,7 +129,8 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
         return hasAnyWarrior;
     }
 
-    private void sendCaptureTaskPacket(BlockPos pos, IStructureBlockData blockData) {
+    @Override
+    public void sendCaptureTaskPacket(BlockPos pos, IStructureBlockData blockData) {
         final var taskId = UUID.randomUUID();
         ModUtils.getClientTasksHolder()
                 .ifPresent(it -> {
@@ -140,7 +148,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
 
         final var packet = new C2SCaptureInfluencePositionPacket(taskId, pos);
         FortressClientNetworkHelper.send(C2SCaptureInfluencePositionPacket.CHANNEL, packet);
-        super.reset();
+        reset();
     }
 
     @Override
@@ -164,15 +172,17 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
                 && super.canBuild();
     }
 
-    public InfluencePosStateHolder getInfluencePosStateHolder() {
+    @Override
+    public IInfluencePosStateHolder getInfluencePosStateHolder() {
         return influencePosStateHolder;
     }
 
-    public static class InfluencePosStateHolder {
+    public static class InfluencePosStateHolder implements IInfluencePosStateHolder {
         private WorldBorderStage worldBorderStage = WorldBorderStage.STATIONARY;
         private BlockPos lastPos = null;
 
-        void syncNewPos(BlockPos newPos) {
+        @Override
+        public void syncNewPos(BlockPos newPos) {
             if(newPos == null) {
                 setCorrect(WorldBorderStage.STATIONARY);
                 lastPos = null;
@@ -188,15 +198,18 @@ public class ClientInfluenceManager extends BaseClientStructureManager {
             lastPos = alignedPos;
         }
 
+        @Override
         public void setCorrect(WorldBorderStage state) {
             worldBorderStage = state;
         }
 
+        @Override
         public WorldBorderStage getWorldBorderStage() {
             return worldBorderStage;
         }
 
-        void reset() {
+        @Override
+        public void reset() {
             worldBorderStage = WorldBorderStage.STATIONARY;
             lastPos = null;
         }

@@ -6,7 +6,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import org.minefortress.utils.ModUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +49,8 @@ public class S2COpenBuildingRepairScreen implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        final var manager = ModUtils.getFortressClientManager();
-        client.execute(() -> manager.openRepairBuildingScreen(buildingId, blocksToRepair));
+        final var provider = getManagersProvider();
+        final var manager = provider.get_ClientFortressManager();
+        manager.openRepairBuildingScreen(buildingId, blocksToRepair);
     }
 }

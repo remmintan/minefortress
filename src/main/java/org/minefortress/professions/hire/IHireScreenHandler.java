@@ -2,6 +2,7 @@ package org.minefortress.professions.hire;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.resources.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
@@ -39,7 +40,7 @@ public interface IHireScreenHandler {
         return Optional.ofNullable(profession);
     }
 
-    void sync(Map<String, HireInfo> professions);
+    void sync(Map<String, IHireInfo> professions);
 
 
 }

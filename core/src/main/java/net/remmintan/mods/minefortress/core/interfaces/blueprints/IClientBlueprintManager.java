@@ -35,4 +35,6 @@ public interface IClientBlueprintManager extends IStructureRenderInfoProvider {
     void remove(String filename);
 
     void reset();
+
+    void updateSlotsInBlueprintsScreen();
 }

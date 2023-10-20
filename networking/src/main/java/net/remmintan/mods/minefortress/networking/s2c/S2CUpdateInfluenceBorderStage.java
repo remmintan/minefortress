@@ -3,9 +3,7 @@ package net.remmintan.mods.minefortress.networking.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.world.border.WorldBorderStage;
-import org.minefortress.fight.influence.ClientInfluenceManager;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import org.minefortress.utils.ModUtils;
 
 public class S2CUpdateInfluenceBorderStage implements FortressS2CPacket {
 
@@ -27,7 +25,8 @@ public class S2CUpdateInfluenceBorderStage implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        final var influenceManager = ModUtils.getInfluenceManager();
+        final var provider = getManagersProvider();
+        final var influenceManager = provider.get_InfluenceManager();
         influenceManager.getInfluencePosStateHolder().setCorrect(worldBorderStage);
     }
 }

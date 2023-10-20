@@ -2,6 +2,7 @@ package net.remmintan.mods.minefortress.core.interfaces.client;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -12,6 +13,8 @@ import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +35,8 @@ public interface IClientFortressManager extends IFortressManager {
     LivingEntity getSelectedPawn();
 
     void stopSelectingColonist();
+
+    void open_HireScreen(MinecraftClient client, String screenName, Map<String, IHireInfo> professions);
 
     void sync(
             int colonistsCount,
@@ -90,4 +95,6 @@ public interface IClientFortressManager extends IFortressManager {
     boolean isBorderEnabled();
 
     void openRepairBuildingScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair);
+
+    IClientResourceManager getResourceManager();
 }

@@ -5,8 +5,7 @@ import io.netty.buffer.ByteBufOutputStream;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import org.minefortress.professions.hire.HireInfo;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,9 +16,9 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
 
     public static final String CHANNEL = "open_hire_menu";
     private final String screenName;
-    private final Map<String, HireInfo> professions;
+    private final Map<String, IHireInfo> professions;
 
-    public S2COpenHireMenuPacket(String screenName, Map<String, HireInfo> professions) {
+    public S2COpenHireMenuPacket(String screenName, Map<String, IHireInfo> professions) {
         this.screenName = screenName;
         this.professions = professions;
     }
@@ -28,7 +27,7 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
     public S2COpenHireMenuPacket(PacketByteBuf buf) {
         this.screenName = buf.readString();
         try(var stream = new ObjectInputStream(new ByteBufInputStream(buf))) {
-            this.professions = (Map<String, HireInfo>) stream.readObject();
+            this.professions = (Map<String, IHireInfo>) stream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -46,6 +45,7 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        client.execute(() -> ModUtils.getFortressClient().open_HireScreen(client, screenName, professions));
+        final var manager = getManagersProvider().get_ClientFortressManager();
+        manager.open_HireScreen(client, screenName, professions);
     }
 }
