@@ -203,7 +203,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     private void tickProfessionCheck() {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId) || RESERVE_PROFESSION_ID.equals(professionId)) {
-            getFortressServerManager()
+            getServerFortressManager()
                     .map(FortressServerManager::getProfessionManager)
                     .flatMap(it -> it.getProfessionsWithAvailablePlaces(RESERVE_PROFESSION_ID.equals(professionId)))
                     .ifPresent(this::setProfession);
@@ -362,7 +362,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         }
     }
     public void setProfession(String professionId) {
-        getFortressServerManager().ifPresent(it -> {
+        getServerFortressManager().ifPresent(it -> {
             final var spm = it.getServerProfessionManager();
             final var type = spm.getEntityTypeForProfession(professionId);
             if(type == FortressEntities.COLONIST_ENTITY_TYPE) {

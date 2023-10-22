@@ -2,12 +2,12 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.minefortress.entity.HungryEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
-import org.minefortress.fortress.FortressServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import org.jetbrains.annotations.NotNull;
+import org.minefortress.entity.HungryEntity;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -41,8 +41,8 @@ public class EatGoal extends Goal {
 
     private Optional<IServerResourceManager> getResourceManager() {
         return entity instanceof IFortressAwareEntity f ?
-                f.getFortressServerManager()
-                .map(FortressServerManager::getResourceManager)
+                f.getServerFortressManager()
+                .map(IServerFortressManager::getResourceManager)
                 .map(IServerResourceManager.class::cast) :
                 Optional.empty();
     }

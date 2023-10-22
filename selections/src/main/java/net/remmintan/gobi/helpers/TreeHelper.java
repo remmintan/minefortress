@@ -1,4 +1,4 @@
-package org.minefortress.utils;
+package net.remmintan.gobi.helpers;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;

@@ -17,7 +17,7 @@ import net.remmintan.mods.minefortress.networking.c2s.C2SAddAreaPacket;
 import net.remmintan.mods.minefortress.networking.c2s.C2SRemoveAutomationAreaPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.joml.Vector4f;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Collections;

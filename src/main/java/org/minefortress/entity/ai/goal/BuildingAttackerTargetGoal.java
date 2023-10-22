@@ -2,9 +2,9 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.TrackTargetGoal;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.buildings.FortressBuildingManager;
 
 public class BuildingAttackerTargetGoal extends TrackTargetGoal {
 
@@ -29,9 +29,9 @@ public class BuildingAttackerTargetGoal extends TrackTargetGoal {
 
     private void findRandomBuildingAttacker() {
         pawn
-            .getFortressServerManager()
-            .map(FortressServerManager::getBuildingsManager)
-            .flatMap(FortressBuildingManager::getRandomBuildingAttacker)
+            .getManagersProvider()
+            .map(IServerManagersProvider::getBuildingsManager)
+            .flatMap(IServerBuildingsManager::getRandomBuildingAttacker)
             .ifPresent(target -> this.targetEntity = target);
     }
 

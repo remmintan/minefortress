@@ -3,6 +3,7 @@ package net.remmintan.gobi;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
@@ -13,10 +14,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelection;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionType;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 
@@ -97,11 +100,11 @@ public class SelectionManager implements ISelectionManager {
         if(this.selection.needUpdate(pickedPos, upSelectionDelta)) {
             this.selection.update(pickedPos, upSelectionDelta);
             this.setNeedsUpdate(true);
-
-            final var clientManager = ((FortressMinecraftClient) client).get_FortressClientManager();
+            final var provider = CoreModUtils.getMineFortressManagersProvider();
+            final var clientManager = provider.get_ClientFortressManager();
             if((clickType == ClickType.BUILD || clickType == ClickType.ROADS)&& clickingBlockState != null) {
                 if(clientManager.isSurvival()){
-                    if(BlockUtils.isCountableBlock(clickingBlockState)) {
+                    if(isCountableBlock(clickingBlockState)) {
                         final var blocksAmount = this.selection.getSelection().size();
                         final var item = clickingBlockState.getBlock().asItem();
                         final var resourceManager = clientManager.getResourceManager();
@@ -117,7 +120,8 @@ public class SelectionManager implements ISelectionManager {
                 inCorrectState = true;
             }
 
-            ModUtils.getInfluenceManager()
+            provider
+                    .get_InfluenceManager()
                     .getFortressBorder()
                     .ifPresent(border ->
                             inCorrectState = inCorrectState && selection
@@ -138,6 +142,14 @@ public class SelectionManager implements ISelectionManager {
 
     public List<Pair<Vec3i, Vec3i>> getSelectionDimensions() {
         return this.selection.getSelectionDimensions();
+    }
+
+    private static boolean isCountableBlock(BlockState state) {
+        if(!state.getFluidState().isEmpty()) return false;
+        final var block = state.getBlock();
+        if(block == Blocks.FIRE) return false;
+        if(block == Blocks.AIR) return false;
+        return block != Blocks.BARRIER;
     }
 
     @Override

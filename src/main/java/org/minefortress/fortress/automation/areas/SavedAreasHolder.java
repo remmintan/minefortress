@@ -7,7 +7,7 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ISavedAreasHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 
 import java.util.Collections;
 import java.util.List;

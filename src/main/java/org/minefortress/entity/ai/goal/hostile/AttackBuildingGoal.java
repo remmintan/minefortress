@@ -6,8 +6,8 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.buildings.FortressBuilding;
 import org.minefortress.fortress.server.FortressModServerManager;
 
 import java.util.EnumSet;
@@ -19,7 +19,7 @@ public final class AttackBuildingGoal extends Goal {
 
     private final FortressModServerManager modServerManager;
     private final HostileEntity mob;
-    private FortressBuilding targetBuilding;
+    private IFortressBuilding targetBuilding;
     private BlockPos targetPosition;
     private Path path;
     private long lastUpdateTime = 0;

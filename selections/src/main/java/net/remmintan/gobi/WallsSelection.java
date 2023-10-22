@@ -10,11 +10,10 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionType;
-import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.network.c2s.ServerboundSimpleSelectionTaskPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.tasks.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundSimpleSelectionTaskPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -177,18 +176,20 @@ public class WallsSelection extends Selection {
         } else {
             if(this.clickType == click) {
                 UUID supertaskUuid = UUID.randomUUID();
-                final TaskType taskType = mapClickTypeToTaskType(clickType);
+                final var taskType = mapClickTypeToTaskType(clickType);
                 getCornerPairs()
                         .forEach(p -> {
                             UUID uuid = UUID.randomUUID();
-                            ((FortressClientWorld)level).get_ClientTasksHolder().addTask(uuid, getSelection(), taskType, supertaskUuid);
-                            ServerboundSimpleSelectionTaskPacket packet = new ServerboundSimpleSelectionTaskPacket(
+                            if(level instanceof ITasksInformationHolder holder)
+                                holder.get_ClientTasksHolder().addTask(uuid, getSelection(), taskType, supertaskUuid);
+                            final var packet = new ServerboundSimpleSelectionTaskPacket(
                                     uuid,
                                     taskType,
                                     p.getFirst(),
                                     p.getSecond().up(upDelta),
                                     hitResult,
-                                    getSelectionType());
+                                    getSelectionType().getName()
+                            );
 
                             FortressClientNetworkHelper.send(FortressChannelNames.NEW_SELECTION_TASK, packet);
                         });

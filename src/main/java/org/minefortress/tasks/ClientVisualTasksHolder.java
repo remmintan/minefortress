@@ -11,7 +11,7 @@ import net.remmintan.mods.minefortress.networking.c2s.ServerboundCancelTaskPacke
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.joml.Vector4f;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 
 import java.util.*;
 

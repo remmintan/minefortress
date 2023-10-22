@@ -172,7 +172,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
 
     private Optional<IAutomationArea> getFarm(Colonist colonist) {
         return colonist
-            .getFortressServerManager()
+            .getServerFortressManager()
             .flatMap(it -> it.getAutomationAreaByRequirementId("farmer"));
     }
 
@@ -193,7 +193,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         if(isCreative(colonist)) {
             return Optional.of((BlockItem) Items.WHEAT_SEEDS);
         }
-        final var serverResourceManager = colonist.getFortressServerManager().orElseThrow().getServerResourceManager();
+        final var serverResourceManager = colonist.getServerFortressManager().orElseThrow().getServerResourceManager();
         final var itemOpt = serverResourceManager
                 .getAllItems()
                 .stream()
@@ -215,6 +215,6 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private static boolean isCreative(Colonist colonist) {
-        return colonist.getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
+        return colonist.getServerFortressManager().map(FortressServerManager::isCreative).orElse(false);
     }
 }

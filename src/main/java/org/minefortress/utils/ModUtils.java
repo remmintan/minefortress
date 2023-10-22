@@ -9,6 +9,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
@@ -96,7 +97,7 @@ public class ModUtils {
                 .map(ITasksInformationHolder.class::cast);
     }
 
-    public static Optional<ClientVisualTasksHolder> getClientTasksHolder() {
+    public static Optional<IClientTasksHolder> getClientTasksHolder() {
         return getFortressClientWorld().map(ITasksInformationHolder::get_ClientTasksHolder);
     }
 

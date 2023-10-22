@@ -10,6 +10,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPaw
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface IServerFortressManager {
@@ -19,6 +20,9 @@ public interface IServerFortressManager {
     void repairBuilding(ServerPlayerEntity player, UUID taskId, UUID buildingId);
 
     boolean isSurvival();
+
+    boolean isCreative();
+    Optional<BlockPos> getRandomPosWithinFortress();
 
     List<IWorkerPawn> getFreeColonists();
 
@@ -35,5 +39,8 @@ public interface IServerFortressManager {
     void addColonist(LivingEntity pawn);
 
     IServerResourceManager getResourceManager();
+
+    BlockPos getFortressCenter();
+    Optional<BlockPos> getRandomPositionAroundCampfire();
 
 }

@@ -7,6 +7,7 @@ import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -40,8 +41,12 @@ public interface IFortressAwareEntity {
                 .orElse(false);
     }
 
-    default Optional<IServerFortressManager> getFortressServerManager() {
+    default Optional<IServerFortressManager> getServerFortressManager() {
         return getMasterId().flatMap(it -> getFortressModServerManager().map(fms -> fms.getFortressManager(it)));
+    }
+
+    default Optional<IServerManagersProvider> getManagersProvider() {
+        return getMasterId().flatMap(it -> getFortressModServerManager().map(fms -> fms.getManagersProvider(it)));
     }
 
 }

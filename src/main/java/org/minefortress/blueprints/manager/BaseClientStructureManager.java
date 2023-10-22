@@ -6,10 +6,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.interfaces.IFortressMinecraftClient;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
 import java.util.*;
@@ -40,7 +40,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         return structureBuildPos;
     }
     private void checkNotEnoughResources() {
-        final var fortressClientManager = ((IFortressMinecraftClient)client).get_FortressClientManager();
+        final var fortressClientManager = ((IClientManagersProvider)client).get_ClientFortressManager();
         if(fortressClientManager.isSurvival()) {
             final var resourceManager = fortressClientManager.getResourceManager();
             final var stacks = getBlockData().getStacks();

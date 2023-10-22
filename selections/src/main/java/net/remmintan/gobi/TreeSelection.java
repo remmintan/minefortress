@@ -9,17 +9,17 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import net.remmintan.gobi.helpers.TreeBlocks;
+import net.remmintan.gobi.helpers.TreeHelper;
+import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
-import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.network.c2s.ServerboundCutTreesTaskPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.tasks.TaskType;
-import org.minefortress.utils.TreeBlocks;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundCutTreesTaskPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 
 import java.util.*;
 
-import static org.minefortress.utils.TreeHelper.*;
 
 public class TreeSelection extends Selection {
 
@@ -52,8 +52,10 @@ public class TreeSelection extends Selection {
             if(!treeRoots.isEmpty()) {
                 this.selectedTreeBlocks.remove(start);
                 final UUID newTaskId = UUID.randomUUID();
-                ((FortressClientWorld)level).get_ClientTasksHolder().addTask(newTaskId, getSelection(), TaskType.REMOVE);
-                final ServerboundCutTreesTaskPacket packet = new ServerboundCutTreesTaskPacket(newTaskId, Collections.unmodifiableList(treeRoots));
+                if(level instanceof ITasksInformationHolder holder) {
+                    holder.get_ClientTasksHolder().addTask(newTaskId, getSelection(), TaskType.REMOVE);
+                }
+                final var packet = new ServerboundCutTreesTaskPacket(newTaskId, Collections.unmodifiableList(treeRoots));
                 FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_CUT_TREES_TASK, packet);
             }
 
@@ -134,7 +136,7 @@ public class TreeSelection extends Selection {
     private void updateTreeData(World world) {
         this.selectedTreeBlocks.clear();
         for(BlockPos root: new ArrayList<>(treeRoots)) {
-            final Optional<TreeBlocks> treeBlocks = TreeHelper.getTreeBlocks(root, world);
+            final var treeBlocks = TreeHelper.getTreeBlocks(root, world);
             if(treeBlocks.isEmpty()){
                 treeRoots.remove(root);
             } else {

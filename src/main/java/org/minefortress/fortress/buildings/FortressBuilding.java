@@ -11,11 +11,11 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.automation.AutomationBlockInfo;
-import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import org.minefortress.fortress.automation.iterators.FarmBuildingIterator;
 
 import java.time.LocalDateTime;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class FortressBuilding implements IAutomationArea {
+public class FortressBuilding implements IFortressBuilding {
 
     private static final int MAX_BLOCKS_PER_UPDATE = 10;
 
@@ -38,7 +38,7 @@ public class FortressBuilding implements IAutomationArea {
     @Nullable
     private FortressBuildingBlockData buildingBlockData;
     private LocalDateTime lastUpdated;
-    private Iterator<AutomationBlockInfo> currentIterator;
+    private Iterator<IAutomationBlockInfo> currentIterator;
 
     private Set<HostileEntity> attackers = new HashSet<>();
 
@@ -113,6 +113,7 @@ public class FortressBuilding implements IAutomationArea {
             this.floorLevel = 0;
     }
 
+    @Override
     public boolean updateTheHealthState(ServerWorld world) {
         if(world == null || world.getRegistryKey() != World.OVERWORLD) {
             return false;
@@ -127,34 +128,41 @@ public class FortressBuilding implements IAutomationArea {
         return buildingBlockData.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world);
     }
 
+    @Override
     public int getHealth() {
         return buildingBlockData == null ? 0 : buildingBlockData.getHealth();
     }
 
+    @Override
     public boolean isPartOfTheBuilding(BlockPos pos) {
         return start.getX() <= pos.getX() && pos.getX() <= end.getX()
                 && start.getY()-1 <= pos.getY() && pos.getY() <= end.getY() + 1
                 && start.getZ() <= pos.getZ() && pos.getZ() <= end.getZ();
     }
 
+    @Override
     public BlockPos getStart() {
         return start;
     }
 
+    @Override
     public BlockPos getEnd() {
         return end;
     }
 
+    @Override
     public BlockPos getCenter() {
         return new BlockPos((start.getX() + end.getX()) / 2, (start.getY() + end.getY()) / 2, (start.getZ() + end.getZ()) / 2);
     }
 
+    @Override
     public BlockPos getNearestCornerXZ(BlockPos pos, World world) {
         final var x = pos.getX() < start.getX() ? start.getX() : Math.min(pos.getX(), end.getX());
         final var z = pos.getZ() < start.getZ() ? start.getZ() : Math.min(pos.getZ(), end.getZ());
         return world.getTopPosition(Heightmap.Type.WORLD_SURFACE, new BlockPos(x, 0, z));
     }
 
+    @Override
     public Optional<BlockPos> getFreeBed(World world) {
         return streamBeds(world)
                 .filter(pos -> !world.getBlockState(pos).get(BedBlock.OCCUPIED))
@@ -169,10 +177,12 @@ public class FortressBuilding implements IAutomationArea {
                 .map(BlockPos::toImmutable);
     }
 
+    @Override
     public long getBedsCount(World world) {
         return streamBeds(world).count();
     }
 
+    @Override
     public void writeToNbt(NbtCompound tag) {
         tag.putUuid("id", id);
         tag.putLong("start", start.asLong());
@@ -189,7 +199,7 @@ public class FortressBuilding implements IAutomationArea {
     }
 
     @Override
-    public Iterator<AutomationBlockInfo> iterator(World world) {
+    public Iterator<IAutomationBlockInfo> iterator(World world) {
         if (currentIterator == null || !currentIterator.hasNext()) {
             if (requirementId.startsWith("farm")) {
                 this.currentIterator = new FarmBuildingIterator(start, end, world);
@@ -202,10 +212,12 @@ public class FortressBuilding implements IAutomationArea {
         return currentIterator;
     }
 
+    @Override
     public boolean satisfiesRequirement(String requirementId) {
         return this.requirementId != null && this.requirementId.equals(requirementId);
     }
 
+    @Override
     public UUID getId() {
         return id;
     }
@@ -220,6 +232,7 @@ public class FortressBuilding implements IAutomationArea {
         return lastUpdated;
     }
 
+    @Override
     public void attack(HostileEntity attacker) {
         if(buildingBlockData != null)
             if(buildingBlockData.attack(attacker)) {
@@ -227,15 +240,18 @@ public class FortressBuilding implements IAutomationArea {
             }
     }
 
+    @Override
     public Set<HostileEntity> getAttackers() {
         attackers.removeIf(it -> !it.isAlive());
         return attackers;
     }
 
+    @Override
     public IEssentialBuildingInfo toEssentialInfo(World world) {
         return new EssentialBuildingInfo(id, start, end, requirementId, getBedsCount(world), blueprintId, getHealth());
     }
 
+    @Override
     public Map<BlockPos, BlockState> getAllBlockStatesToRepairTheBuilding() {
         return buildingBlockData == null ? Collections.emptyMap() : buildingBlockData.getAllBlockStatesToRepairTheBuilding();
     }

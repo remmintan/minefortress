@@ -17,8 +17,8 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkH
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
-import org.minefortress.utils.TreeBlocks;
-import org.minefortress.utils.TreeHelper;
+import net.remmintan.gobi.helpers.TreeBlocks;
+import net.remmintan.gobi.helpers.TreeHelper;
 
 import java.util.*;
 

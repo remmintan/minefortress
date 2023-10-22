@@ -90,7 +90,7 @@ public class MinerDailyTask implements ProfessionDailyTask{
     }
 
     private Optional<IAutomationArea> getMine(Colonist colonist) {
-        return colonist.getFortressServerManager()
+        return colonist.getServerFortressManager()
                 .flatMap(it -> it.getAutomationAreaByRequirementId("miner"));
     }
 

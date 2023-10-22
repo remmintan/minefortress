@@ -1,4 +1,4 @@
-package org.minefortress.utils;
+package net.remmintan.mods.minefortress.building;
 
 
 import net.minecraft.block.BlockState;
@@ -11,7 +11,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.registries.FortressBlocks;
+import net.remmintan.mods.minefortress.building.FortressBlocks;
 
 public class BuildingHelper {
 

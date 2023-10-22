@@ -8,11 +8,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.spongepowered.include.com.google.common.collect.Sets;
-
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,7 +69,7 @@ public final class StructureBlockData implements IStructureBlockData {
 
     private final Vec3i size;
     private final Map<BlueprintDataLayer, Map<BlockPos, BlockState>> layers = new HashMap<>();
-    private List<ItemInfo> stacks;
+    private List<IItemInfo> stacks;
 
     private StructureBlockData(Vec3i size) {
         this.size = size;
@@ -91,7 +91,7 @@ public final class StructureBlockData implements IStructureBlockData {
     }
 
     @Override
-    public List<ItemInfo> getStacks() {
+    public List<IItemInfo> getStacks() {
         return stacks;
     }
 
@@ -137,7 +137,7 @@ public final class StructureBlockData implements IStructureBlockData {
         }
 
         @NotNull
-        private ItemInfo getItemInfo(Map.Entry<Item, Long> it) {
+        private IItemInfo getItemInfo(Map.Entry<Item, Long> it) {
             return new ItemInfo(it.getKey(), getItemAmount(it));
         }
 

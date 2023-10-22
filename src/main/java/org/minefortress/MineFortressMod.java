@@ -11,7 +11,7 @@ import net.remmintan.mods.minefortress.networking.registries.ServerNetworkReceiv
 import org.minefortress.commands.CommandsManager;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
-import org.minefortress.registries.FortressBlocks;
+import net.remmintan.mods.minefortress.building.FortressBlocks;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressItems;
 import org.minefortress.registries.FortressServerEvents;

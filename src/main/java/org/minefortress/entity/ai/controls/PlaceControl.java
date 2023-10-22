@@ -92,7 +92,7 @@ public class PlaceControl extends PositionedActionControl {
     }
 
     private void decreaseResourcesAndAddSpecialBlocksAmount() {
-        final var fortressServerManager = colonist.getFortressServerManager().orElseThrow();
+        final var fortressServerManager = colonist.getServerFortressManager().orElseThrow();
         final var taskControl = colonist.getTaskControl();
         if(fortressServerManager.isSurvival()) {
             taskControl

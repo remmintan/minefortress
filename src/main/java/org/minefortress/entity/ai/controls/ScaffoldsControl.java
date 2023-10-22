@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.minefortress.entity.Colonist;
-import org.minefortress.registries.FortressBlocks;
+import net.remmintan.mods.minefortress.building.FortressBlocks;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;

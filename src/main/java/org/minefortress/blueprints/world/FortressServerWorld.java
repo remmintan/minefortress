@@ -14,11 +14,12 @@ import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.server.IBlueprintEditingWorld;
 
 import java.util.Collections;
 import java.util.concurrent.Executor;
 
-public class FortressServerWorld extends ServerWorld {
+public class FortressServerWorld extends ServerWorld implements IBlueprintEditingWorld {
 
     private final LevelProperties levelProperties;
     private WorldBorder blueprintsWorldBorder;
@@ -69,34 +70,42 @@ public class FortressServerWorld extends ServerWorld {
         return blockState;
     }
 
+    @Override
     public String getFileName() {
         return fileName;
     }
 
+    @Override
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
+    @Override
     public int getFloorLevel() {
         return floorLevel;
     }
 
+    @Override
     public void setFloorLevel(int floorLevel) {
         this.floorLevel = floorLevel;
     }
 
+    @Override
     public BlueprintGroup getBlueprintGroup() {
         return blueprintGroup;
     }
 
+    @Override
     public void setBlueprintGroup(BlueprintGroup blueprintGroup) {
         this.blueprintGroup = blueprintGroup;
     }
 
+    @Override
     public void enableSaveStructureMode() {
         saveModeEnabled = true;
     }
 
+    @Override
     public void disableSaveStructureMode() {
         saveModeEnabled = false;
     }

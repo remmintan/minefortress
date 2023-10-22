@@ -14,7 +14,6 @@ import net.minecraft.resource.DataConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -38,12 +37,13 @@ import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintsWorld;
+import net.remmintan.mods.minefortress.core.interfaces.server.IBlueprintEditingWorld;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
-import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 
 import java.io.IOException;
 import java.util.*;
@@ -95,7 +95,7 @@ public class BlueprintsWorld implements IBlueprintsWorld {
         this.server = server;
     }
 
-    public ServerWorld getWorld() {
+    public IBlueprintEditingWorld getWorld() {
         if(world == null) {
             create();
         }
@@ -156,7 +156,7 @@ public class BlueprintsWorld implements IBlueprintsWorld {
 
     public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel, BlueprintGroup group) {
         this.preparedBlueprintData = blueprintData;
-        final FortressServerWorld world = getWorld();
+        final var world = getWorld();
         world.setFileName(blueprintFileName);
         world.setFloorLevel(floorLevel);
         world.setBlueprintGroup(group);

@@ -13,9 +13,9 @@ import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
-import org.minefortress.network.c2s.ServerboundRoadsTaskPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundRoadsTaskPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 
 import java.util.*;
 
@@ -35,7 +35,7 @@ public class RoadsSelection extends WallsSelection{
             final IClientTasksHolder tasksHolder = ((ITasksInformationHolder) level).get_ClientTasksHolder();
             tasksHolder.addRoadsSelectionTask(digTaskId, placeTaskId, getSelection());
 
-            final ServerboundRoadsTaskPacket packet = new ServerboundRoadsTaskPacket(digTaskId, placeTaskId, selection);
+            final var packet = new ServerboundRoadsTaskPacket(digTaskId, placeTaskId, selection);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_ROADS_TASK, packet);
             return true;
         }

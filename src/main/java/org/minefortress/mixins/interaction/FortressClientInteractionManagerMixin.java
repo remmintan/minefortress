@@ -27,7 +27,7 @@ import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvi
 import org.minefortress.renderer.gui.fortress.ManageBuildingScreen;
 import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

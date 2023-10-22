@@ -33,7 +33,7 @@ import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.renderer.gui.fortress.RepairBuildingScreen;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
 import org.minefortress.utils.BlockUtils;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
 import java.util.*;

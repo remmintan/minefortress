@@ -3,6 +3,10 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.block.BedBlock;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
@@ -46,8 +50,8 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
                 }
             }
         } else if(movementHelper.isStuck()) {
-            colonist.getFortressServerManager()
-                    .flatMap(FortressServerManager::getRandomPositionAroundCampfire)
+            colonist.getServerFortressManager()
+                    .flatMap(IServerFortressManager::getRandomPositionAroundCampfire)
                     .ifPresent(it -> {
                         final var pos = it.up();
                         colonist.resetControls();
@@ -74,9 +78,9 @@ public class SleepOnTheBedGoal extends AbstractFortressGoal {
     @NotNull
     private Optional<BlockPos> getFreeBed() {
         return colonist
-                .getFortressServerManager()
-                .map(FortressServerManager::getBuildingsManager)
-                .flatMap(FortressBuildingManager::getFreeBed);
+                .getManagersProvider()
+                .map(IServerManagersProvider::getBuildingsManager)
+                .flatMap(IServerBuildingsManager::getFreeBed);
     }
 
     private boolean isNight() {

@@ -4,8 +4,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
-import org.minefortress.registries.FortressBlocks;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.building.FortressBlocks;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 
 import java.util.List;
 

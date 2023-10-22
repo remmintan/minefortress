@@ -23,7 +23,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
         if(colonist.getTaskControl().hasTask()) return false;
         if(!isFarFromCenter()) return false;
 
-        colonist.getFortressServerManager()
+        colonist.getServerFortressManager()
                 .flatMap(FortressServerManager::getRandomPositionAroundCampfire)
                 .ifPresent(pos -> positionAroundCampfire = pos);
 
@@ -53,7 +53,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     }
 
     private boolean isFarFromCenter() {
-        final var serverManager = colonist.getFortressServerManager().orElseThrow();
+        final var serverManager = colonist.getServerFortressManager().orElseThrow();
         final BlockPos fortressCenter = serverManager.getFortressCenter();
         if (fortressCenter == null) return false;
         final var distanseToCenter = Math.sqrt(colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()));

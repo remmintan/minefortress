@@ -4,14 +4,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.world.GameRules;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
-import org.minefortress.fortress.FortressServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 
 public class FortressHungerManager extends HungerManager implements IFortressHungerManager {
 
     @Override
     public void update(LivingEntity livingEntity) {
         if(livingEntity instanceof IFortressAwareEntity fae) {
-            final var creative = fae.getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
+            final var creative = fae.getServerFortressManager().map(IServerFortressManager::isCreative).orElse(false);
             if(creative) {
                 this.foodLevel = 20;
             }

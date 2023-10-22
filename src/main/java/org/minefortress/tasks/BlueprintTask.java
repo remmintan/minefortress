@@ -114,7 +114,7 @@ public class BlueprintTask extends AbstractTask {
                     floorLevel,
                     mergeBlockData
             );
-            final var serverManager = colonist.getFortressServerManager().orElseThrow();
+            final var serverManager = colonist.getServerFortressManager().orElseThrow();
             serverManager.expandTheVillage(fortressBuilding.getStart());
             serverManager.expandTheVillage(fortressBuilding.getEnd());
 
@@ -125,11 +125,11 @@ public class BlueprintTask extends AbstractTask {
     }
 
     private void addSpecialBlueprintBlock(IWorkerPawn colonist, Block block, BlockPos pos) {
-        colonist.getFortressServerManager().orElseThrow().addSpecialBlocks(block, pos, true);
+        colonist.getServerFortressManager().orElseThrow().addSpecialBlocks(block, pos, true);
     }
 
     private void removeReservedItem(IFortressAwareEntity colonist, Item item) {
-        final var fortressManager = colonist.getFortressServerManager().orElseThrow();
+        final var fortressManager = colonist.getServerFortressManager().orElseThrow();
         if(fortressManager.isSurvival()) {
             if (SimilarItemsHelper.isIgnorable(item)) {
                 fortressManager

@@ -2,11 +2,12 @@ package org.minefortress.entity.ai.goal.warrior;
 
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.BlockRotation;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.jetbrains.annotations.Nullable;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
 import org.minefortress.entity.WarriorPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IBaritoneMoveControl;
-import org.minefortress.fight.influence.ServerInfluenceManager;
+import net.remmintan.mods.minefortress.core.interfaces.infuence.ICaptureTask;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -18,7 +19,7 @@ public class CapturePositionGoal extends Goal {
 
     private final WarriorPawn pawn;
     @Nullable
-    private ServerInfluenceManager.CaptureTask target;
+    private ICaptureTask target;
 
     public CapturePositionGoal(WarriorPawn pawn) {
         this.pawn = pawn;
@@ -26,7 +27,7 @@ public class CapturePositionGoal extends Goal {
     }
     @Override
     public boolean canStart() {
-        final var fsmOpt = pawn.getFortressServerManager();
+        final var fsmOpt = pawn.getManagersProvider();
         if(fsmOpt.isEmpty())
             return false;
         final var fsm = fsmOpt.get();
@@ -64,7 +65,7 @@ public class CapturePositionGoal extends Goal {
 
     private void finish() {
         if(target == null) return;
-        pawn.getFortressServerManager()
+        pawn.getManagersProvider()
                 .ifPresent(it -> {
                     final var resourceManager = (IServerResourceManager)it.getResourceManager();
                     final var influenceManager = it.getInfluenceManager();
@@ -75,7 +76,7 @@ public class CapturePositionGoal extends Goal {
                             .forEach((pos, state) -> {
                                 final var realpos = pos.add(targetPos);
                                 pawn.getWorld().setBlockState(realpos, state, 3);
-                                if(it.isSurvival()) {
+                                if(pawn.getServerFortressManager().map(IServerFortressManager::isSurvival).orElse(false)) {
                                     resourceManager.removeReservedItem(target.taskId(), state.getBlock().asItem());
                                 }
                             });
@@ -104,7 +105,7 @@ public class CapturePositionGoal extends Goal {
     @Override
     public void stop() {
         if(target != null) {
-            pawn.getFortressServerManager()
+            pawn.getManagersProvider()
                     .ifPresent(it -> it.getInfluenceManager().failCaptureTask(target));
             target = null;
         }

@@ -12,8 +12,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.event.GameEvent;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
 
 import static org.minefortress.entity.colonist.FortressHungerManager.ACTIVE_EXHAUSTION;
 
@@ -65,9 +65,10 @@ public class DigControl extends PositionedActionControl {
         final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(g, blockState) : null;
         final var drop = Block.getDroppedStacks(blockState, w, g, blockEntity);
 
-        final var fortressServerManager = c.getFortressServerManager().orElseThrow();
-        if(fortressServerManager.isSurvival()) {
-            final var serverResourceManager = fortressServerManager.getServerResourceManager();
+        final var provider = c.getManagersProvider().orElseThrow();
+        final var manager = c.getServerFortressManager().orElseThrow();
+        if(manager.isSurvival()) {
+            final var serverResourceManager = provider.getResourceManager();
             for (ItemStack itemStack : drop) {
                 final var item = itemStack.getItem();
                 final var count = itemStack.getCount();
@@ -77,7 +78,7 @@ public class DigControl extends PositionedActionControl {
     }
 
     private void putProperItemInHand() {
-        final var creative = colonist.getFortressServerManager().orElseThrow().isCreative();
+        final var creative = colonist.getServerFortressManager().orElseThrow().isCreative();
 
         final BlockState blockState = level.getBlockState(goal);
         Item item = null;
@@ -132,7 +133,7 @@ public class DigControl extends PositionedActionControl {
     }
 
     private float getDestroyProgress(BlockState state, Colonist pawn, StructureWorldAccess world, BlockPos pos) {
-        final boolean creative = colonist.getFortressServerManager().map(FortressServerManager::isCreative).orElse(false);
+        final boolean creative = colonist.getServerFortressManager().map(IServerFortressManager::isCreative).orElse(false);
         if(creative) return 1.0f;
 
         float f = state.getHardness(world, pos);

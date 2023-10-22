@@ -8,7 +8,7 @@ import org.minefortress.entity.ai.MovementHelper;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,7 +147,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     private boolean blockInCorrectState(BlockPos pos) {
         if(pos == null) return false;
         if(getTaskControl().is(TaskType.REMOVE)) {
-            if(pos.equals(colonist.getFortressServerManager().orElseThrow().getFortressCenter())) return false;
+            if(pos.equals(colonist.getServerFortressManager().orElseThrow().getFortressCenter())) return false;
             return BuildingHelper.canRemoveBlock(world, pos);
         } else if(getTaskControl().is(TaskType.BUILD)) {
             return BuildingHelper.canPlaceBlock(world, pos);

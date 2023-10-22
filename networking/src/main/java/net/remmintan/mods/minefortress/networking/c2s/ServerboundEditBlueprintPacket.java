@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -68,7 +69,7 @@ public class ServerboundEditBlueprintPacket implements FortressC2SPacket {
                         blueprintsWorld.prepareBlueprint(new HashMap<>(), blueprintFileName, floorLevel, blueprintGroup);
                         blueprintsWorld.putBlueprintInAWorld(player, new Vec3i(1, 1, 1));
                     }
-                    player.moveToWorld(blueprintsWorld.getWorld());
+                    player.moveToWorld((ServerWorld) blueprintsWorld.getWorld());
                 }
             }
         }

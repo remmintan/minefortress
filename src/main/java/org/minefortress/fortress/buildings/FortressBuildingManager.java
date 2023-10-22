@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
@@ -27,7 +28,7 @@ import java.util.stream.Stream;
 public class FortressBuildingManager implements IAutomationAreaProvider, IServerBuildingsManager {
 
     private int buildingPointer = 0;
-    private final List<FortressBuilding> buildings = new ArrayList<>();
+    private final List<IFortressBuilding> buildings = new ArrayList<>();
     private final Supplier<ServerWorld> overworldSupplier;
     private final Cache<BlockPos, Object> bedsCache =
             CacheBuilder.newBuilder()
@@ -39,7 +40,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         this.overworldSupplier = overworldSupplier;
     }
 
-    public void addBuilding(FortressBuilding building) {
+    public void addBuilding(IFortressBuilding building) {
         buildings.add(building);
         this.scheduleSync();
     }
@@ -122,7 +123,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     public NbtCompound toNbt() {
         int i = 0;
         final NbtCompound buildingsTag = new NbtCompound();
-        for (FortressBuilding building : this.buildings) {
+        for (IFortressBuilding building : this.buildings) {
             final NbtCompound buildingTag = new NbtCompound();
             building.writeToNbt(buildingTag);
             buildingsTag.put("building" + i++, buildingTag);
@@ -156,7 +157,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         return buildings.stream().anyMatch(it -> it.isPartOfTheBuilding(pos));
     }
 
-    public Optional<FortressBuilding> findNearest(BlockPos pos) {
+    public Optional<IFortressBuilding> findNearest(BlockPos pos) {
         return buildings
                 .stream()
                 .sorted(Comparator.comparing(it -> it.getCenter().getSquaredDistance(pos)))
@@ -167,7 +168,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     @Override
     public void doRepairConfirmation(UUID id, ServerPlayerEntity player) {
         final var statesThatNeedsToBeRepaired = getBuildingById(id)
-                .map(FortressBuilding::getAllBlockStatesToRepairTheBuilding)
+                .map(IFortressBuilding::getAllBlockStatesToRepairTheBuilding)
                 .orElse(Collections.emptyMap());
 
         final var packet = new S2COpenBuildingRepairScreen(id, statesThatNeedsToBeRepaired);
@@ -175,7 +176,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     }
 
     @NotNull
-    public Optional<FortressBuilding> getBuildingById(UUID id) {
+    public Optional<IFortressBuilding> getBuildingById(UUID id) {
         return buildings.stream()
                 .filter(it -> it.getId().equals(id))
                 .findFirst();
@@ -184,7 +185,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     public Optional<HostileEntity> getRandomBuildingAttacker() {
         final var attackersList = this.buildings
                 .stream()
-                .map(FortressBuilding::getAttackers)
+                .map(IFortressBuilding::getAttackers)
                 .flatMap(Collection::stream)
                 .toList();
         if(attackersList.isEmpty())

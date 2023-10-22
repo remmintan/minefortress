@@ -27,7 +27,7 @@ public class TaskControl implements ITaskControl {
 
     private boolean doingEverydayTasks = false;
     private ITask task;
-    private TaskPart taskPart;
+    private ITaskPart taskPart;
     private Iterator<ITaskBlockInfo> blocks;
     private Consumer<ITaskPart> onTaskFailed;
     private Supplier<Boolean> cancelled;
@@ -43,7 +43,7 @@ public class TaskControl implements ITaskControl {
     }
 
     @Override
-    public void setTask(@NotNull ITask task, TaskPart taskPart, Consumer<ITaskPart> onTaskFailed, Supplier<Boolean> cancelled) {
+    public void setTask(@NotNull ITask task, ITaskPart taskPart, Consumer<ITaskPart> onTaskFailed, Supplier<Boolean> cancelled) {
         this.task = task;
         this.taskPart = taskPart;
         this.blocks = taskPart.getBlocks().iterator();
