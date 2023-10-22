@@ -11,9 +11,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import org.minefortress.entity.BasePawnEntity;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
 
-public class PawnClothesFeature extends FeatureRenderer<IPawn, PawnModel> {
+public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, PawnModel> {
 
     private static final Identifier ARCHER = new Identifier("minefortress", "textures/skins/archer.png");
     private static final Identifier ARMORER = new Identifier("minefortress", "textures/skins/armorer.png");
@@ -62,7 +61,7 @@ public class PawnClothesFeature extends FeatureRenderer<IPawn, PawnModel> {
     private static final Identifier SOLDIER_YELLOW = new Identifier("minefortress", "textures/skins/soldier/soldier_yellow.png");
 
     public PawnClothesFeature(
-            FeatureRendererContext<IPawn, PawnModel> context
+            FeatureRendererContext<BasePawnEntity, PawnModel> context
     ) {
         super(context);
     }

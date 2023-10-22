@@ -2,8 +2,8 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
 
 import java.util.EnumSet;
 
@@ -24,7 +24,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
         if(!isFarFromCenter()) return false;
 
         colonist.getServerFortressManager()
-                .flatMap(FortressServerManager::getRandomPositionAroundCampfire)
+                .flatMap(IServerFortressManager::getRandomPositionAroundCampfire)
                 .ifPresent(pos -> positionAroundCampfire = pos);
 
         return  positionAroundCampfire != null;

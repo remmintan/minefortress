@@ -12,7 +12,7 @@ import net.minecraft.util.math.Direction;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.BasePawnEntity;
 import org.minefortress.interfaces.FortressWorldCreator;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -96,7 +96,7 @@ public class FortressServerEvents {
 
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
             if(ModUtils.isFortressGamemode(player)) {
-                if (player instanceof ServerPlayerEntity serverPlayer && entity instanceof IPawn pawn) {
+                if (player instanceof ServerPlayerEntity serverPlayer && entity instanceof BasePawnEntity pawn) {
                     final var id = pawn.getId();
                     final var packet = new ClientboundFollowColonistPacket(id);
                     FortressServerNetworkHelper.send(serverPlayer, FortressChannelNames.FORTRESS_SELECT_COLONIST, packet);

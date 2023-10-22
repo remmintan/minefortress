@@ -27,6 +27,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
         final var itemInfos = stacks
                 .stream()
                 .map(it -> new ItemInfo(it.getItem(), it.getCount()))
+                .map(IItemInfo.class::cast)
                 .toList();
         return hasItems(itemInfos);
     }
@@ -66,7 +67,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
         final var similarItemsSet = new HashSet<>(SimilarItemsHelper.getSimilarItems(item));
         final var requiredSimilarItems = items.stream()
                 .filter(it -> similarItemsSet.contains(it.item()))
-                .mapToInt(ItemInfo::amount)
+                .mapToInt(IItemInfo::amount)
                 .sum();
 
         return (amountOfNonEmptySimilarElements - requiredSimilarItems + availableAmount) >= amount;

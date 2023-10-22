@@ -149,7 +149,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
         super.onClosed(player);
         if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof IFortressServer IFortressServer) {
             final var fortressServerManager = IFortressServer.get_FortressModServerManager().getManagersProvider(serverPlayer);
-            final var serverResourceManager = fortressServerManager.getServerResourceManager();
+            final var serverResourceManager = fortressServerManager.getResourceManager();
 
             returnInputs();
 

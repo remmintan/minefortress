@@ -1,17 +1,16 @@
 package org.minefortress.professions;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.remmintan.mods.minefortress.core.dtos.professions.IProfessionEssentialInfo;
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
+import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
-import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
-import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
+import net.remmintan.mods.minefortress.core.interfaces.professions.*;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -21,11 +20,9 @@ import net.remmintan.mods.minefortress.networking.s2c.S2COpenHireMenuPacket;
 import net.remmintan.mods.minefortress.networking.s2c.SyncHireProgress;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
 import org.minefortress.fortress.FortressServerManager;
-import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionsHireTypes;
 import org.minefortress.professions.hire.ServerHireHandler;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +165,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         }
     }
 
-    public EntityType<? extends IPawn> getEntityTypeForProfession(String professionId) {
+    public EntityType<? extends LivingEntity> getEntityTypeForProfession(String professionId) {
         return profToEntityMapper.getEntityTypeForProfession(professionId);
     }
 

@@ -8,12 +8,11 @@ import net.minecraft.text.Text;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
 import org.jetbrains.annotations.Nullable;
 
 abstract class NamedPawnEntity extends BasePawnEntity {
 
-    protected NamedPawnEntity(EntityType<? extends IPawn> entityType, World world, boolean enableHunger) {
+    protected NamedPawnEntity(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world, enableHunger);
     }
 
@@ -25,7 +24,7 @@ abstract class NamedPawnEntity extends BasePawnEntity {
     }
 
     private void setCustomNameIfNeeded() {
-        getFortressServerManager().ifPresent(it -> {
+        getServerFortressManager().ifPresent(it -> {
             if(!this.hasCustomName()) {
                 this.setCustomName(Text.literal(it.getNameGenerator().generateRandomName()));
             }

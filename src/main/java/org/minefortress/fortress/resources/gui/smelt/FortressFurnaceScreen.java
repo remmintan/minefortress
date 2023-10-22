@@ -12,11 +12,13 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
+import net.remmintan.mods.minefortress.core.ScreenType;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundOpenCraftingScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
+import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +49,10 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
                 final var posX = otherFurnace.getPosX();
                 final var posY = otherFurnace.getPosY();
                 final var posZ = otherFurnace.getPosZ();
-                final var packet = new ServerboundOpenCraftingScreenPacket(ServerboundOpenCraftingScreenPacket.ScreenType.FURNACE, new BlockPos(posX, posY, posZ));
+                final var packet = new ServerboundOpenCraftingScreenPacket(
+                        ScreenType.FURNACE,
+                        new BlockPos(posX, posY, posZ)
+                );
                 if (this.client != null) this.close();
                 FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, packet);
             };
@@ -72,7 +77,7 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
 
             final var selectedLabel = furnace.isSelected() ? "*" : "";
             final var isBurning = furnace.getBurnTime() > 0;
-            final var burningLabel = isBurning ? ("" + furnace.getCookProgress()+"%") : ("not burning");
+            final var burningLabel = isBurning ? (furnace.getCookProgress()+"%") : ("not burning");
 
             btn.setMessage(Text.literal("Fur."+selectedLabel+": "+burningLabel));
         }
@@ -85,13 +90,17 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
 
     @Override
     protected boolean professionRequirementSatisfied() {
-        final var fortressClient = getClient();
-        final var clientManager = fortressClient.get_FortressClientManager();
-        return fortressClient.is_FortressGamemode() && clientManager.getProfessionManager().hasProfession("blacksmith");
+        final var provider = getManagerProvider();
+        final var clientManager = provider.get_ClientFortressManager();
+        return getFortressClient().is_FortressGamemode() && clientManager.getProfessionManager().hasProfession("blacksmith");
     }
 
-    private IHoveredBlockProvider getClient() {
-        return (IHoveredBlockProvider) MinecraftClient.getInstance();
+    private IClientManagersProvider getManagerProvider() {
+        return (IClientManagersProvider) MinecraftClient.getInstance();
+    }
+
+    private IFortressMinecraftClient getFortressClient() {
+        return (IFortressMinecraftClient) MinecraftClient.getInstance();
     }
 
     @Override
@@ -111,5 +120,5 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
         drawContext.drawTexture(BACKGROUND_TEXTURE, i + 79, j + 34, 176, 14, k + 1, 16);
     }
 
-    private static record AddedFurnace(FortressFurnacePropertyDelegate furnace, ButtonWidget button) {}
+    private record AddedFurnace(FortressFurnacePropertyDelegate furnace, ButtonWidget button) {}
 }

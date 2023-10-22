@@ -8,6 +8,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionModelBuilderInfoProvider;
@@ -17,7 +19,6 @@ import net.remmintan.mods.minefortress.networking.c2s.C2SAddAreaPacket;
 import net.remmintan.mods.minefortress.networking.c2s.C2SRemoveAutomationAreaPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.joml.Vector4f;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Collections;
@@ -32,7 +33,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     private ProfessionsSelectionType selectionType;
     private BlockPos selectionStart;
     private BlockPos selectionEnd;
-    private AutomationAreaInfo hoveredArea;
+    private IAutomationAreaInfo hoveredArea;
     private boolean isCorrectState = true;
 
     @Override
@@ -169,7 +170,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     @Override
     public Optional<String> getHoveredAreaName() {
         return Optional.ofNullable(hoveredArea)
-                .map(AutomationAreaInfo::getAreaType)
+                .map(IAutomationAreaInfo::getAreaType)
                 .map(ProfessionsSelectionType::getTitle);
     }
 

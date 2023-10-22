@@ -16,6 +16,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressSlimeEntity;
@@ -25,7 +26,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
-public abstract class BasePawnEntity extends HungryEntity {
+public abstract class BasePawnEntity extends HungryEntity implements IFortressAwareEntity {
 
     public static final String FORTRESS_ID_NBT_KEY = "fortress_id";
     private static final String BODY_TEXTURE_ID_NBT_KEY = "body_texture_id";
@@ -66,7 +67,7 @@ public abstract class BasePawnEntity extends HungryEntity {
     }
 
     private void addThisPawnToFortress() {
-        getFortressServerManager().ifPresent(fsm -> fsm.addColonist(this));
+        getServerFortressManager().ifPresent(fsm -> fsm.addColonist(this));
     }
 
     private void setMasterId(UUID fortressId) {

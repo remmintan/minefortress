@@ -27,9 +27,9 @@ public class FortressColonistActiveTargetGoal extends ActiveTargetGoal<HostileEn
         }
 
         if(this.targetEntity != null) {
-            final var fortressServerManagerOpt = this.colonist.getServerFortressManager();
-            if(fortressServerManagerOpt.isPresent()) {
-                final var serverManager = fortressServerManagerOpt.get();
+            final var manager = this.colonist.getServerFortressManager();
+            if(manager.isPresent()) {
+                final var serverManager = manager.get();
                 final var targetWithinFortress = serverManager.isPositionWithinFortress(this.targetEntity.getBlockPos());
                 if(targetWithinFortress) {
                     return true;

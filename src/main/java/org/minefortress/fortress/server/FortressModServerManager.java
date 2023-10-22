@@ -47,6 +47,11 @@ public class FortressModServerManager implements IFortressModServerManager {
         return getByPlayer(player);
     }
 
+    @Override
+    public IServerFortressManager getFortressManager(UUID id) {
+        return getByPlayer(id);
+    }
+
     private FortressServerManager getByPlayer(UUID uuid) {
         if(serverManagers.containsKey(uuid)) {
             return serverManagers.get(uuid);

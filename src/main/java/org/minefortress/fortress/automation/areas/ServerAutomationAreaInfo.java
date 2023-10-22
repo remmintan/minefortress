@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
-import org.minefortress.fortress.automation.AutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.automation.iterators.MineAreaIterator;
 import org.minefortress.fortress.automation.iterators.ResetableIterator;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public final class ServerAutomationAreaInfo extends AutomationAreaInfo implements IAutomationArea {
 
     private LocalDateTime updated;
-    private ResetableIterator<AutomationBlockInfo> currentIterator;
+    private ResetableIterator<IAutomationBlockInfo> currentIterator;
     private boolean reset = false;
 
     public ServerAutomationAreaInfo(IAutomationAreaInfo info) {
@@ -44,7 +44,7 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
     }
 
     @Override
-    public Iterator<AutomationBlockInfo> iterator(World world) {
+    public Iterator<IAutomationBlockInfo> iterator(World world) {
         if(this.reset) {
             return Collections.emptyIterator();
         }

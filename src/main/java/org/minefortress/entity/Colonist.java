@@ -32,6 +32,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
@@ -203,8 +205,8 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     private void tickProfessionCheck() {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId) || RESERVE_PROFESSION_ID.equals(professionId)) {
-            getServerFortressManager()
-                    .map(FortressServerManager::getProfessionManager)
+            getManagersProvider()
+                    .map(IServerManagersProvider::getProfessionsManager)
                     .flatMap(it -> it.getProfessionsWithAvailablePlaces(RESERVE_PROFESSION_ID.equals(professionId)))
                     .ifPresent(this::setProfession);
         }
@@ -362,13 +364,13 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         }
     }
     public void setProfession(String professionId) {
-        getServerFortressManager().ifPresent(it -> {
-            final var spm = it.getServerProfessionManager();
+        getManagersProvider().ifPresent(it -> {
+            final var spm = it.getProfessionsManager();
             final var type = spm.getEntityTypeForProfession(professionId);
             if(type == FortressEntities.COLONIST_ENTITY_TYPE) {
                 this.dataTracker.set(PROFESSION_ID, professionId);
             } else if (type == FortressEntities.WARRIOR_PAWN_ENTITY_TYPE || type == FortressEntities.ARCHER_PAWN_ENTITY_TYPE) {
-                it.replaceColonistWithTypedPawn(this, professionId, type);
+                getServerFortressManager().ifPresent(m -> m.replaceColonistWithTypedPawn(this, professionId, type));
             }
             it.scheduleSync();
         });

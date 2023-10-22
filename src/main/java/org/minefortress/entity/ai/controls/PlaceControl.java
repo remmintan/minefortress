@@ -92,13 +92,14 @@ public class PlaceControl extends PositionedActionControl {
     }
 
     private void decreaseResourcesAndAddSpecialBlocksAmount() {
-        final var fortressServerManager = colonist.getServerFortressManager().orElseThrow();
+        final var provider = colonist.getManagersProvider().orElseThrow();
+        final var manager = colonist.getServerFortressManager().orElseThrow();
         final var taskControl = colonist.getTaskControl();
-        if(fortressServerManager.isSurvival()) {
+        if(manager.isSurvival()) {
             taskControl
                     .getTaskId()
                     .ifPresent(it -> {
-                        final var resourceManager = fortressServerManager.getServerResourceManager();
+                        final var resourceManager = provider.getResourceManager();
                         if (isIgnorable(item)) {
                             resourceManager.removeItemIfExists(it, item);
                         } else {
@@ -107,8 +108,8 @@ public class PlaceControl extends PositionedActionControl {
                     });
         }
 
-        if(item instanceof BlockItem blockItem && fortressServerManager.isBlockSpecial(blockItem.getBlock())){
-            fortressServerManager.addSpecialBlocks(blockItem.getBlock(), goal, taskControl.isBlueprintTask());
+        if(item instanceof BlockItem blockItem && manager.isBlockSpecial(blockItem.getBlock())){
+            manager.addSpecialBlocks(blockItem.getBlock(), goal, taskControl.isBlueprintTask());
         }
     }
 

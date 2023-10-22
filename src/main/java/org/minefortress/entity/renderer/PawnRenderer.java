@@ -17,20 +17,20 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.BasePawnEntity;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
-import org.minefortress.fortress.ClientFortressManager;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 
 import java.util.Optional;
 
-public class PawnRenderer extends BipedEntityRenderer<IPawn, PawnModel> {
+public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel> {
 
     private static final Identifier GUY = new Identifier("minefortress", "textures/skins/guy.png");
     private static final Identifier GUY2 = new Identifier("minefortress", "textures/skins/guy2.png");
@@ -43,7 +43,7 @@ public class PawnRenderer extends BipedEntityRenderer<IPawn, PawnModel> {
     }
 
     @Override
-    public Identifier getTexture(IPawn pawn) {
+    public Identifier getTexture(BasePawnEntity pawn) {
         final var bodyTextureId = pawn.getBodyTextureId();
         return switch (bodyTextureId) {
             case 0 -> GUY;
@@ -54,7 +54,7 @@ public class PawnRenderer extends BipedEntityRenderer<IPawn, PawnModel> {
     }
 
     @Override
-    protected boolean hasLabel(IPawn colonist) {
+    protected boolean hasLabel(BasePawnEntity colonist) {
         return colonist.hasCustomName();
     }
 
@@ -92,11 +92,11 @@ public class PawnRenderer extends BipedEntityRenderer<IPawn, PawnModel> {
         }
     }
 
-    private boolean selectedAsTargeted (IPawn pawn) {
+    private boolean selectedAsTargeted (BasePawnEntity pawn) {
         return pawn instanceof ITargetedPawn tp && getFortressClientManager().getFightManager().getSelectionManager().isSelected(tp);
     }
 
-    private float getHealthFoodLevel(IPawn colonist) {
+    private float getHealthFoodLevel(BasePawnEntity colonist) {
         final var health = colonist.getHealth();
         final var foodLevel = colonist.getCurrentFoodLevel();
 
@@ -104,7 +104,7 @@ public class PawnRenderer extends BipedEntityRenderer<IPawn, PawnModel> {
     }
 
     @Nullable
-    private Vector3f getHealthFoodLevelColor(IPawn colonist) {
+    private Vector3f getHealthFoodLevelColor(BasePawnEntity colonist) {
         final var healthFoodLevel = getHealthFoodLevel(colonist);
         final var maxLevelOfEachColor = (float)0xFF;
         if(healthFoodLevel > 10) return null;
@@ -134,12 +134,16 @@ public class PawnRenderer extends BipedEntityRenderer<IPawn, PawnModel> {
         return (IFortressMinecraftClient) getClient();
     }
 
-    private ClientFortressManager getFortressClientManager() {
-        return getFortressClient().get_FortressClientManager();
+    private IClientManagersProvider getManagersProvider() {
+        return (IClientManagersProvider) getClient();
+    }
+
+    private IClientFortressManager getFortressClientManager() {
+        return  getManagersProvider().get_ClientFortressManager();
     }
 
     private void setClothesVilibility(MobEntity colonist) {
-        final var colonistModel = (PlayerEntityModel<IPawn>)this.getModel();
+        final var colonistModel = (PlayerEntityModel<BasePawnEntity>)this.getModel();
         colonistModel.hat.visible = true;
         colonistModel.jacket.visible = !colonist.isSleeping();
         colonistModel.leftPants.visible = !colonist.isSleeping();

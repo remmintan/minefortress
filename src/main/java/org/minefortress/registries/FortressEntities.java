@@ -10,7 +10,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.BasePawnEntity;
 import org.minefortress.entity.*;
 import org.minefortress.entity.renderer.PawnRenderer;
 
@@ -55,7 +55,7 @@ public class FortressEntities {
 
     public static void register() {
         FabricDefaultAttributeRegistry.register(FortressEntities.COLONIST_ENTITY_TYPE, Colonist.createAttributes());
-        FabricDefaultAttributeRegistry.register(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, IPawn.createAttributes());
+        FabricDefaultAttributeRegistry.register(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, BasePawnEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(FortressEntities.ARCHER_PAWN_ENTITY_TYPE, ArcherPawn.createAttributes());
     }
 

@@ -228,7 +228,7 @@ public class ServerResourceManager implements IServerResourceManager {
                 final var similarItemsSet = new HashSet<>(SimilarItemsHelper.getSimilarItems(item));
                 final var requiredSimilarItems = infos.stream()
                         .filter(it -> similarItemsSet.contains(it.item()))
-                        .mapToInt(ItemInfo::amount)
+                        .mapToInt(IItemInfo::amount)
                         .sum();
 
                 if(sumAmountOfSimilarItems - requiredSimilarItems + stack.getAmount() < amount) return false;

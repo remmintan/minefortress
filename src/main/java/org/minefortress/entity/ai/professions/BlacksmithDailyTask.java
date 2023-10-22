@@ -30,7 +30,8 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     @Override
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
-        return colonist.getServerFortressManager()
+        return colonist
+                .getServerFortressManager()
                 .flatMap(it -> it
                         .getSpecialBlocksByType(Blocks.FURNACE, true)
                         .stream()

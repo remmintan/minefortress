@@ -45,7 +45,7 @@ public final class AreasServerManager implements IServerAutomationAreaManager {
         }
 
         if(needSync) {
-            final var automationAreaInfos = areas.stream().map(AutomationAreaInfo.class::cast).toList();
+            final var automationAreaInfos = areas.stream().map(IAutomationAreaInfo.class::cast).toList();
             FortressServerNetworkHelper.send(serverPlayer, S2CSyncAreasPacket.CHANNEL, new S2CSyncAreasPacket(automationAreaInfos));
             needSync = false;
         }

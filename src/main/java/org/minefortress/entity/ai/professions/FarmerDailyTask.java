@@ -10,11 +10,11 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.world.event.GameEvent;
-import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
-import org.minefortress.fortress.automation.AutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
@@ -35,8 +35,8 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     );
 
     private IAutomationArea currentFarm;
-    private Iterator<AutomationBlockInfo> farmIterator;
-    private AutomationBlockInfo goal;
+    private Iterator<IAutomationBlockInfo> farmIterator;
+    private IAutomationBlockInfo goal;
     private long stopTime = 0L;
 
     @Override
@@ -193,7 +193,10 @@ public class FarmerDailyTask implements ProfessionDailyTask{
         if(isCreative(colonist)) {
             return Optional.of((BlockItem) Items.WHEAT_SEEDS);
         }
-        final var serverResourceManager = colonist.getServerFortressManager().orElseThrow().getServerResourceManager();
+        final var serverResourceManager = colonist
+                .getManagersProvider()
+                .orElseThrow()
+                .getResourceManager();
         final var itemOpt = serverResourceManager
                 .getAllItems()
                 .stream()
@@ -215,6 +218,9 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     private static boolean isCreative(Colonist colonist) {
-        return colonist.getServerFortressManager().map(FortressServerManager::isCreative).orElse(false);
+        return colonist
+                .getServerFortressManager()
+                .map(IServerFortressManager::isCreative)
+                .orElse(false);
     }
 }

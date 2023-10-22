@@ -49,8 +49,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawn;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
+import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
@@ -88,7 +88,7 @@ public final class FortressServerManager  implements IFortressManager, IServerMa
     private final IServerAutomationAreaManager automationAreaManager = new AreasServerManager();
     private final IServerInfluenceManager influenceManager = new ServerInfluenceManager(this);
     
-    private ColonistNameGenerator nameGenerator = new ColonistNameGenerator();
+    private IPawnNameGenerator nameGenerator = new ColonistNameGenerator();
 
     private int maxX = Integer.MIN_VALUE;
     private int maxZ = Integer.MIN_VALUE;
@@ -163,10 +163,10 @@ public final class FortressServerManager  implements IFortressManager, IServerMa
         needSync = false;
     }
 
-    public void replaceColonistWithTypedPawn(Colonist colonist, String warriorId, EntityType<? extends IPawn> entityType) {
+    public void replaceColonistWithTypedPawn(LivingEntity colonist, String warriorId, EntityType<? extends LivingEntity> entityType) {
         final var pos = getRandomSpawnPosition();
         final var world = (ServerWorld) colonist.getEntityWorld();
-        final var masterId = colonist.getMasterId().orElseThrow(() -> new IllegalStateException("Colonist has no master!"));
+        final var masterId = ((Colonist)colonist).getMasterId().orElseThrow(() -> new IllegalStateException("Colonist has no master!"));
 
         final var infoTag = getColonistInfoTag(masterId);
         infoTag.putString(ServerProfessionManager.PROFESSION_NBT_TAG, warriorId);
@@ -556,7 +556,7 @@ public final class FortressServerManager  implements IFortressManager, IServerMa
                 .min(Comparator.comparing(IAutomationArea::getUpdated));
     }
 
-    public ColonistNameGenerator getNameGenerator() {
+    public IPawnNameGenerator getNameGenerator() {
         return nameGenerator;
     }
 
