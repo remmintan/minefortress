@@ -1,8 +1,0 @@
-loom {
-    accessWidenerPath = file("src/main/resources/networking.accesswidener")
-}
-
-dependencies {
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    implementation project(':core')
-}

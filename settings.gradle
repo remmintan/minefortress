@@ -10,5 +10,3 @@ pluginManagement {
 }
 
 rootProject.name="MineFortress"
-
-include 'panama', 'selections', 'core', 'networking', 'building'

@@ -1,9 +1,0 @@
-loom {
-    accessWidenerPath = file("src/main/resources/panama.accesswidener")
-}
-
-dependencies {
-    implementation project(':selections')
-    implementation project(':core')
-    implementation project(':building')
-}

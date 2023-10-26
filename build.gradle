@@ -16,68 +16,77 @@ if(System.getenv("BUILD_NUMBER") != null) {
 	}
 }
 
+sourceSets {
+	core {
+		compileClasspath += main.compileClasspath
+	}
+	building {
+		compileClasspath += main.compileClasspath
+	}
+	networking {
+		compileClasspath += main.compileClasspath + core.output + building.output
+	}
+	selections {
+		compileClasspath += main.compileClasspath + core.output + building.output + networking.output
+	}
+	panama {
+		compileClasspath += main.compileClasspath + core.output + selections.output + building.output
+	}
+	main {
+		compileClasspath += core.output + networking.output + building.output + panama.output + selections.output
+	}
+
+}
+
 group = project.maven_group
 
-allprojects {
-	apply plugin: 'fabric-loom'
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
-
-	repositories {
-		// Add repositories to retrieve artifacts from in here.
-		// You should only use this when depending on other mods because
-		// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-		// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-		// for more information about repositories.
-		maven {
-			url 'https://jitpack.io'
-		}
-		maven {
-			name = "Ladysnake Mods"
-			url = "https://maven.ladysnake.org/releases"
-			content {
-				includeGroup("io.github.ladysnake")
-				includeGroupByRegex("dev\\.emi.*")
-				includeGroupByRegex("dev\\.onyxstudios.*")
-			}
-		}
-		maven {
-			url = "https://maven.pkg.github.com/minefortress-mod/minefortress-cc-api"
-			credentials {
-				username = System.getenv("GITHUB_USERNAME")
-				password = System.getenv("GITHUB_TOKEN")
-			}
-		}
-		maven {
-			url = "https://maven.pkg.github.com/minefortress-mod/automatone"
-			credentials {
-				username = System.getenv("GITHUB_USERNAME")
-				password = System.getenv("GITHUB_TOKEN")
-			}
+repositories {
+	// Add repositories to retrieve artifacts from in here.
+	// You should only use this when depending on other mods because
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+	// for more information about repositories.
+	maven {
+		url 'https://jitpack.io'
+	}
+	maven {
+		name = "Ladysnake Mods"
+		url = "https://maven.ladysnake.org/releases"
+		content {
+			includeGroup("io.github.ladysnake")
+			includeGroupByRegex("dev\\.emi.*")
+			includeGroupByRegex("dev\\.onyxstudios.*")
 		}
 	}
-
-	tasks.withType(JavaCompile).configureEach {
-		// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-		it.options.release.set(17)
+	maven {
+		url = "https://maven.pkg.github.com/minefortress-mod/minefortress-cc-api"
+		credentials {
+			username = System.getenv("GITHUB_USERNAME")
+			password = System.getenv("GITHUB_TOKEN")
+		}
 	}
-
-	dependencies {
-		minecraft "com.mojang:minecraft:${project.minecraft_version}"
-		mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	maven {
+		url = "https://maven.pkg.github.com/minefortress-mod/automatone"
+		credentials {
+			username = System.getenv("GITHUB_USERNAME")
+			password = System.getenv("GITHUB_TOKEN")
+		}
 	}
 }
 
-subprojects {
-	group = 'net.remmintan.minefortress.libs'
-
-	apply plugin: 'java-library'
+tasks.withType(JavaCompile).configureEach {
+	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+	it.options.release.set(17)
 }
 
 dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
@@ -86,12 +95,6 @@ dependencies {
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.6+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.6+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.2.6+minefortress")
-
-	implementation project(':core')
-	implementation project(':networking')
-	implementation project(':panama')
-	implementation project(':selections')
-	implementation project(':building')
 }
 
 processResources {
