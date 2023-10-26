@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.Items;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.remmintan.mods.minefortress.core.ScreenType;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundOpenCraftingScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -41,7 +42,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
             new ItemButtonWidget(
                     35, 0,
                 Items.PLAYER_HEAD,
-                btn -> client.setScreen(new ProfessionsScreen(ModUtils.getFortressClient())),
+                btn -> client.setScreen(new ProfessionsScreen(CoreModUtils.getMineFortressManagersProvider())),
                 "Manage professions"
             )
         );
