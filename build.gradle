@@ -34,8 +34,8 @@ sourceSets {
 	}
 	main {
 		compileClasspath += core.output + networking.output + building.output + panama.output + selections.output
+		runtimeClasspath += core.output + networking.output + building.output + panama.output + selections.output
 	}
-
 }
 
 group = project.maven_group
@@ -110,6 +110,8 @@ loom {
 }
 
 jar {
+//	from sourceSets.core.output, sourceSets.networking.output, sourceSets.building.output, sourceSets.selections.output, sourceSets.panama.output
+
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
 	}
