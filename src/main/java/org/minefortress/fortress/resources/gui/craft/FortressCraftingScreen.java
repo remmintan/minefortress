@@ -10,7 +10,6 @@ import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
 import org.minefortress.fortress.resources.gui.FortressRecipeBookWidget;
-import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 
 public class FortressCraftingScreen extends AbstractFortressRecipeScreen<FortressCraftingScreenHandler> {
@@ -38,10 +37,6 @@ public class FortressCraftingScreen extends AbstractFortressRecipeScreen<Fortres
         final var fortressClient = clientManagersProvider();
         final var clientManager = fortressClient.get_ClientFortressManager();
         return fortressMinecraftClient().is_FortressGamemode() && clientManager.getProfessionManager().hasProfession("crafter");
-    }
-
-    private IHoveredBlockProvider hoveredBlockProvider() {
-        return (IHoveredBlockProvider) MinecraftClient.getInstance();
     }
 
     private IClientManagersProvider clientManagersProvider() {

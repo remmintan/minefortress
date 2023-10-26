@@ -10,7 +10,6 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.BasePawnEntity;
 import org.minefortress.entity.*;
 import org.minefortress.entity.renderer.PawnRenderer;
 

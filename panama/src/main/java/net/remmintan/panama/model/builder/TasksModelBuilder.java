@@ -1,9 +1,10 @@
 package net.remmintan.panama.model.builder;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.remmintan.gobi.ClientSelection;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.panama.model.BuiltTasks;
-import org.minefortress.selections.ClientSelection;
-import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
 
 import java.util.Set;
 import java.util.function.Supplier;
@@ -29,7 +30,7 @@ public class TasksModelBuilder {
         if(this.builtTasks != null)
             builtTasks.close();
 
-        final Set<ClientSelection> allBuildTasks = tasksHolder.getAllSelections();
+        final Set<IClientTask> allBuildTasks = tasksHolder.getAllSelections();
         builtTasks = new BuiltTasks(allBuildTasks);
         builtTasks.build(bufferBuilder);
     }

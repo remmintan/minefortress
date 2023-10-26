@@ -15,5 +15,6 @@ public interface IBlueprintsWorld {
     void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel, BlueprintGroup group);
     IBlueprintEditingWorld getWorld();
     void putBlueprintInAWorld(final ServerPlayerEntity player, Vec3i blueprintSize);
+    void closeSession();
 
 }

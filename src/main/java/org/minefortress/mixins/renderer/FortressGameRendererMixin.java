@@ -7,13 +7,12 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
-import org.minefortress.fortress.ClientFortressManager;
 import net.remmintan.mods.minefortress.core.FortressState;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import org.minefortress.interfaces.FortressGameRenderer;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
-import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,6 +42,8 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Shadow public abstract void reset();
 
+    @Shadow public abstract MinecraftClient getClient();
+
     @Override
     public double get_Fov(float f, boolean b) {
         return this.getFov(this.getCamera(), f, b);
@@ -50,14 +51,14 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick(CallbackInfo ci) {
-        final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
-        final SelectionManager selectionManager = fortressClient.get_SelectionManager();
-        final ClientFortressManager clientFortressManager = fortressClient.get_FortressClientManager();
+        final var provider = (IClientManagersProvider) this.client;
+        final var selectionManager = provider.get_SelectionManager();
+        final var clientFortressManager = provider.get_ClientFortressManager();
         final var fightSelectionManager = clientFortressManager
                 .getFightManager()
                 .getSelectionManager();
         final var areasClientManager = ModUtils.getAreasClientManager();
-        if (fortressClient.is_FortressGamemode()) {
+        if (((IFortressMinecraftClient)getClient()).is_FortressGamemode()) {
             if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
                 if(clientFortressManager.isCenterNotSet()) {
                     resetAllSelectionManagers();
@@ -65,7 +66,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                     return;
                 }
 
-                final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
+                final IClientBlueprintManager clientBlueprintManager = provider.get_BlueprintManager();
                 if(clientBlueprintManager.isSelecting()) {
                     resetAllSelectionManagers();
                     return;

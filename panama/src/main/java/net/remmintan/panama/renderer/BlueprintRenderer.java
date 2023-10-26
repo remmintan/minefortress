@@ -12,6 +12,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.mods.minefortress.core.FortressState;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureRenderInfoProvider;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.panama.model.BuiltBlueprint;
 import net.remmintan.panama.model.BuiltModel;
 import net.remmintan.panama.model.builder.BlueprintsModelBuilder;
@@ -20,11 +25,6 @@ import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
-import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
-import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.fortress.FortressState;
-import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -45,7 +45,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     public void prepareForRender() {
         final IStructureRenderInfoProvider clientBlueprintManager = getStructureRenderInfoProvider();
         if(clientBlueprintManager.isSelecting()) {
-            final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
+            final IBlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
             final BlockRotation blockRotation = selectedStructure.getRotation();
             final String fileName = selectedStructure.getId();
             blueprintsModelBuilder.getOrBuildBlueprint(fileName, blockRotation);
@@ -131,7 +131,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     protected Optional<BuiltModel> getBuiltModel() {
-        final BlueprintMetadata selectedStructure = getStructureRenderInfoProvider().getSelectedStructure();
+        final IBlueprintMetadata selectedStructure = getStructureRenderInfoProvider().getSelectedStructure();
         final BuiltBlueprint nullableBlueprint = this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getId(), selectedStructure.getRotation());
         return Optional.ofNullable(nullableBlueprint);
     }
@@ -231,11 +231,13 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @NotNull
     private static IStructureRenderInfoProvider getStructureRenderInfoProvider() {
-        final var state = ModUtils.getFortressClientManager().getState();
+        final var provider = CoreModUtils.getMineFortressManagersProvider();
+        final var manager = provider.get_ClientFortressManager();
+        final var state = manager.getState();
         if(state == FortressState.COMBAT) {
-            return ModUtils.getInfluenceManager();
+            return provider.get_InfluenceManager();
         }
-        return ModUtils.getBlueprintManager();
+        return provider.get_BlueprintManager();
     }
 
 }

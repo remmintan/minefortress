@@ -25,7 +25,7 @@ public abstract class FortressPlayerInventoryMixin {
             final var player = (ServerPlayerEntity) this.player;
             final var server = (IFortressServer)player.getServer();
             final var serverManager = server.get_FortressModServerManager().getManagersProvider(player);
-            final var allItems = serverManager.getServerResourceManager().getAllItems();
+            final var allItems = serverManager.getResourceManager().getAllItems();
             finder.clear();
             allItems.forEach(it -> finder.addInput(it, Integer.MAX_VALUE));
             ci.cancel();

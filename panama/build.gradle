@@ -4,4 +4,6 @@ loom {
 
 dependencies {
     implementation project(':selections')
+    implementation project(':core')
+    implementation project(':building')
 }

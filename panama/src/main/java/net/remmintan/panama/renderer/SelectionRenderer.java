@@ -4,6 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionModelBuilderInfoProvider;
 import net.remmintan.panama.model.BuiltModel;
 import net.remmintan.panama.model.builder.SelectionModelBuilder;
 import org.joml.Vector3f;

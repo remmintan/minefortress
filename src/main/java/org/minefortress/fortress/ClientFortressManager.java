@@ -8,12 +8,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
@@ -27,13 +29,11 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkH
 import org.minefortress.MineFortressMod;
 import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
-import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.renderer.gui.fortress.RepairBuildingScreen;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
 import org.minefortress.utils.BlockUtils;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
 import java.util.*;
@@ -77,7 +77,10 @@ public final class ClientFortressManager implements IClientFortressManager {
     private boolean borderEnabled = true;
 
     public ClientFortressManager() {
-        professionManager = new ClientProfessionManager(() -> ((IFortressMinecraftClient) MinecraftClient.getInstance()).get_FortressClientManager());
+        professionManager = new ClientProfessionManager(
+                () -> ((IClientManagersProvider) MinecraftClient.getInstance())
+                        .get_ClientFortressManager()
+        );
     }
 
     @Override

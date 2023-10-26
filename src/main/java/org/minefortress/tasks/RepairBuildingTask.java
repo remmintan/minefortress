@@ -5,10 +5,10 @@ import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
 
 import java.util.Collections;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class RepairBuildingTask extends AbstractTask {
                     final var item = Item.BLOCK_ITEMS.get(state.getBlock());
                     return new BlockStateTaskBlockInfo(item, it, state);
                 })
-                .map(TaskBlockInfo.class::cast)
+                .map(ITaskBlockInfo.class::cast)
                 .toList();
 
         return new TaskPart(part, taskBlocks, this);

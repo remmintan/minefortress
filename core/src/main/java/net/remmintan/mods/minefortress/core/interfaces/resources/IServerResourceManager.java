@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IServerResourceManager extends IResourceManager {
-
     void syncAll();
 
     IItemInfo createItemInfo(Item item, int amount);

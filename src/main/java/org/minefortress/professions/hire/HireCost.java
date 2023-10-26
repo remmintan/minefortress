@@ -14,7 +14,7 @@ public record HireCost(int itemId, int amount) implements Serializable, IHireCos
         return new ItemInfo(Item.byRawId(itemId), amount);
     }
 
-    static IHireCost fromItemInfo(ItemInfo info) {
+    static IHireCost fromItemInfo(IItemInfo info) {
         return new HireCost(Item.getRawId(info.item()), info.amount());
     }
 

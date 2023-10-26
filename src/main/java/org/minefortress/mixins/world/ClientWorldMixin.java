@@ -11,9 +11,9 @@ import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
-import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.tasks.ClientVisualTasksHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -48,7 +48,7 @@ public abstract class ClientWorldMixin extends World implements ITasksInformatio
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         if(shouldKeepTicking.getAsBoolean()) {
-            if(client instanceof IFortressMinecraftClient fortressClient){
+            if(client instanceof IClientManagersProvider fortressClient){
                 fortressClient.get_BlueprintManager().tick();
                 fortressClient.get_InfluenceManager().tick();
             }

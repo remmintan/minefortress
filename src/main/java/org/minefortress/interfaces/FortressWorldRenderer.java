@@ -1,6 +1,7 @@
 package org.minefortress.interfaces;
 
-import org.minefortress.selections.ClickType;
+
+import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 
 public interface FortressWorldRenderer {
 

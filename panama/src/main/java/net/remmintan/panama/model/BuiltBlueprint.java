@@ -14,10 +14,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.ColorResolver;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
 import net.remmintan.panama.RenderHelper;
 import net.remmintan.panama.view.BlueprintBlockRenderView;
-import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.data.StrctureBlockData;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,7 +43,7 @@ public class BuiltBlueprint implements BuiltModel {
     private final BlockRenderView blueprintData;
     private final Vec3i size;
 
-    public BuiltBlueprint(StrctureBlockData blockData, BiFunction<BlockState, ColorResolver, Integer> colorProvider) {
+    public BuiltBlueprint(IStructureBlockData blockData, BiFunction<BlockState, ColorResolver, Integer> colorProvider) {
         if(blockData == null) throw new IllegalArgumentException("Block data cannot be null");
         if(!blockData.hasLayer(BlueprintDataLayer.GENERAL)) throw new IllegalArgumentException("Block data must have a general layer");
         this.blueprintData = new BlueprintBlockRenderView(blockData.getLayer(BlueprintDataLayer.GENERAL), colorProvider);

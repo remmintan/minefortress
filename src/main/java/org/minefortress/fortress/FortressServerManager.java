@@ -28,6 +28,8 @@ import net.minecraft.world.event.GameEvent;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
@@ -316,7 +318,7 @@ public final class FortressServerManager  implements IFortressManager, IServerMa
         return getWorkersStream().noneMatch(it -> it.getTaskControl().hasTask());
     }
 
-    public Optional<Colonist> spawnPawnNearCampfire(UUID masterPlayerId) {
+    public Optional<LivingEntity> spawnPawnNearCampfire(UUID masterPlayerId) {
         final var randomSpawnPosition = getRandomSpawnPosition();
 
         final var tag = getColonistInfoTag(masterPlayerId);
@@ -548,12 +550,15 @@ public final class FortressServerManager  implements IFortressManager, IServerMa
     }
 
     public Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement) {
-        final var buildings = fortressBuildingManager.getAutomationAreasByRequirement(requirement);
-        final var areas = automationAreaManager.getByRequirement(requirement);
+        if(fortressBuildingManager instanceof IAutomationAreaProvider provider) {
+            final var buildings = provider.getAutomationAreasByRequirement(requirement);
+            final var areas = automationAreaManager.getByRequirement(requirement);
 
-        return Stream
-                .concat(buildings, areas)
-                .min(Comparator.comparing(IAutomationArea::getUpdated));
+            return Stream
+                    .concat(buildings, areas)
+                    .min(Comparator.comparing(IAutomationArea::getUpdated));
+        }
+        return Optional.empty();
     }
 
     public IPawnNameGenerator getNameGenerator() {
@@ -747,12 +752,13 @@ public final class FortressServerManager  implements IFortressManager, IServerMa
                         .entrySet()
                         .stream()
                         .map(it -> new ItemInfo(it.getKey(), it.getValue().intValue()))
+                        .map(IItemInfo.class::cast)
                         .toList();
                 resourceManager.reserveItems(taskId, blockInfos);
             }
 
             final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);
-            taskManager.addTask(task, this);
+            taskManager.addTask(task, this, this);
         } catch (RuntimeException exp) {
             LogManager.getLogger().error("Error while repairing building", exp);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));

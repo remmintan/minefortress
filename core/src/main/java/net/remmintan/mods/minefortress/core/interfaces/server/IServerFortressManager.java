@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IServerFortressManager {
+    void scheduleSync();
+    void syncOnJoin(boolean campfireEnabled, boolean borderEnabled);
     IPawnNameGenerator getNameGenerator();
     void replaceColonistWithTypedPawn(LivingEntity colonist, String warriorId, EntityType<? extends LivingEntity> entityType);
     Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement);
@@ -47,6 +49,7 @@ public interface IServerFortressManager {
     void openHandledScreen(ScreenType type, ServerPlayerEntity player, BlockPos pos);
 
     void setGamemode(FortressGamemode fortressGamemode);
+    void expandTheVillage(BlockPos pos);
 
     void addColonist(LivingEntity pawn);
 

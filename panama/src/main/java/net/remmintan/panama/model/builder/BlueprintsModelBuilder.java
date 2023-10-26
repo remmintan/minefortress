@@ -6,10 +6,10 @@ import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
 import net.remmintan.panama.model.BuiltBlueprint;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.blueprints.data.StrctureBlockData;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,7 +44,7 @@ public class BlueprintsModelBuilder {
 
         String key = getKey(fileName, rotation);
         if(!this.builtBlueprints.containsKey(key)) {
-            final StrctureBlockData blockData = this.blockDataManagerSupplier.get().getBlockData(fileName, rotation);
+            final IStructureBlockData blockData = this.blockDataManagerSupplier.get().getBlockData(fileName, rotation);
             final BuiltBlueprint builtBlueprint = new BuiltBlueprint(blockData, (p, c) -> getWorld().getColor(getBlockPos(), c));
             builtBlueprint.build(this.blockBufferBuilders);
             this.builtBlueprints.put(key, builtBlueprint);

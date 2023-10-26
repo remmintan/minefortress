@@ -11,14 +11,14 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
-import org.jetbrains.annotations.NotNull;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.buildings.FortressBuilding;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 
 import java.util.*;
 
@@ -114,11 +114,12 @@ public class BlueprintTask extends AbstractTask {
                     floorLevel,
                     mergeBlockData
             );
-            final var serverManager = colonist.getServerFortressManager().orElseThrow();
-            serverManager.expandTheVillage(fortressBuilding.getStart());
-            serverManager.expandTheVillage(fortressBuilding.getEnd());
+            final var manager = colonist.getServerFortressManager().orElseThrow();
+            manager.expandTheVillage(fortressBuilding.getStart());
+            manager.expandTheVillage(fortressBuilding.getEnd());
 
-            final var buildingManager = serverManager.getFortressBuildingManager();
+            final var provider = colonist.getManagersProvider().orElseThrow();
+            final var buildingManager = provider.getBuildingsManager();
             buildingManager.addBuilding(fortressBuilding);
         }
         super.finishPart(part, colonist);
@@ -129,15 +130,16 @@ public class BlueprintTask extends AbstractTask {
     }
 
     private void removeReservedItem(IFortressAwareEntity colonist, Item item) {
-        final var fortressManager = colonist.getServerFortressManager().orElseThrow();
-        if(fortressManager.isSurvival()) {
+        final var provider = colonist.getManagersProvider().orElseThrow();
+        final var manager = colonist.getServerFortressManager().orElseThrow();
+        if(manager.isSurvival()) {
+            final var resourceManager = provider
+                    .getResourceManager();
             if (SimilarItemsHelper.isIgnorable(item)) {
-                fortressManager
-                        .getServerResourceManager()
+                resourceManager
                         .removeItemIfExists(this.getId(), item);
             } else {
-                fortressManager
-                        .getServerResourceManager()
+                resourceManager
                         .removeReservedItem(this.getId(), item);
             }
         }

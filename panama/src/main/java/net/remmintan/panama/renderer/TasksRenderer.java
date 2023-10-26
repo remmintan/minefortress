@@ -3,9 +3,9 @@ package net.remmintan.panama.renderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
 import net.remmintan.panama.model.BuiltModel;
-import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
-import org.minefortress.selections.renderer.tasks.ITasksRenderInfoProvider;
 import net.remmintan.panama.model.builder.TasksModelBuilder;
 
 import java.util.Collections;

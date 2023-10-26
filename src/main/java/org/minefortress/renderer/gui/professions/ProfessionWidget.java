@@ -8,9 +8,9 @@ import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
-import org.minefortress.professions.ProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
 import org.minefortress.utils.GuiUtils;
 
@@ -238,9 +238,9 @@ public class ProfessionWidget {
     }
 
     public ProfessionResearchState isUnlocked(boolean countProfessionals) {
-        var shouldCountProfs = countProfessionals ? ProfessionManager.CountProfessionals.INCREASE : ProfessionManager.CountProfessionals.DONT_COUNT;
+        var shouldCountProfs = countProfessionals ? CountProfessionals.INCREASE : CountProfessionals.DONT_COUNT;
         if(profession.isHireMenu()) {
-            shouldCountProfs = ProfessionManager.CountProfessionals.DONT_COUNT;
+            shouldCountProfs = CountProfessionals.DONT_COUNT;
         }
         return this.professionManager.isRequirementsFulfilled(
                 this.profession,

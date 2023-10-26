@@ -6,7 +6,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.BasePawnEntity;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.controls.BaritoneMoveControl;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;

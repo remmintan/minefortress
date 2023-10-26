@@ -74,14 +74,14 @@ public record ProfessionFullInfo(
         return new ProfessionFullInfo(key, title, icon, description, unlockMessage, unlockMoreMessage, cantRemove, requirements);
     }
 
-    record BlockRequirement(Block block, boolean inBlueprint) {
+    public record BlockRequirement(Block block, boolean inBlueprint) {
         @Override
         public Block block() {
             return Optional.ofNullable(block).orElse(Blocks.AIR);
         }
     }
 
-    record ItemRequirement(Item item, int count) {
+    public record ItemRequirement(Item item, int count) {
 
         private ItemStack toStack() {
             return new ItemStack(item, count);
@@ -93,7 +93,7 @@ public record ProfessionFullInfo(
 
     }
 
-    record Requirements(String building, BlockRequirement block, List<ItemRequirement> items) {
+    public record Requirements(String building, BlockRequirement block, List<ItemRequirement> items) {
         @Override
         public String building() {
             return Optional.ofNullable(building).orElse("_");

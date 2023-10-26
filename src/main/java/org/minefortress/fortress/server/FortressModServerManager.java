@@ -125,7 +125,7 @@ public class FortressModServerManager implements IFortressModServerManager {
         }
     }
 
-    public Optional<FortressServerManager> findReachableFortress(BlockPos pos, double reachRange) {
+    public Optional<IServerManagersProvider> findReachableFortress(BlockPos pos, double reachRange) {
         for (FortressServerManager manager : serverManagers.values()) {
             final var fortressCenter = manager.getFortressCenter();
             if(fortressCenter == null) continue;

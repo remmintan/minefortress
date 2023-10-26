@@ -17,6 +17,6 @@ public interface ITask {
     void returnPart(Pair<BlockPos, BlockPos> partStartAndEnd);
     void finishPart(ITaskPart part, IWorkerPawn colonist);
 
-    void addFinishListener(Runnable listener);
+    default void addFinishListener(Runnable listener) {}
 
 }

@@ -12,6 +12,7 @@ import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.professions.*;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionSyncPacket;
@@ -20,7 +21,6 @@ import net.remmintan.mods.minefortress.networking.s2c.S2COpenHireMenuPacket;
 import net.remmintan.mods.minefortress.networking.s2c.SyncHireProgress;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.professions.hire.ServerHireHandler;
@@ -68,7 +68,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
                 throw new IllegalArgumentException("Profession " + professionId + " is not a hire menu profession");
             }
             final var canHire = isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
-            final var abstractFortressManager = fortressManagerSupplier.get();
+            final var abstractFortressManager = (IServerFortressManager)fortressManagerSupplier.get();
             if(canHire == ProfessionResearchState.UNLOCKED && getFreeColonists() > 0 && abstractFortressManager instanceof FortressServerManager fsm) {
                 final var resourceManager = (IServerResourceManager) abstractFortressManager
                         .getResourceManager();
@@ -97,8 +97,8 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         if(super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, !itemsAlreadyCharged) != ProfessionResearchState.UNLOCKED) return;
 
         if(!itemsAlreadyCharged) {
-            final var resourceManager = (IServerResourceManager) fortressManagerSupplier
-                    .get()
+            final var resourceManager = (IServerResourceManager) ((IServerFortressManager)fortressManagerSupplier
+                    .get())
                     .getResourceManager();
             resourceManager.removeItems(profession.getItemsRequirement());
         }
@@ -159,7 +159,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
             professionsTree = professionsReader.readTreeJson();
             final var professionsMap = professionsInfos
                     .stream()
-                    .collect(Collectors.toMap(ProfessionFullInfo::key, Profession::new));
+                    .collect(Collectors.toMap(ProfessionFullInfo::key, it -> (IProfession)new Profession(it)));
             setProfessions(professionsMap);
             profToEntityMapper.read(server);
         }

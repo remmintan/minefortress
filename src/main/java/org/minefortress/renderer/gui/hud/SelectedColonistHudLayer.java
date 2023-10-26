@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwareEntity;
 import org.minefortress.entity.Colonist;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
@@ -40,10 +41,13 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
             renderIcon(drawContext, heartIconX, heartIconY, 0);
             drawContext.drawTextWithShadow(textRenderer, healthString, heartIconX + 10, heartIconY + 2, 0xFFFFFF);
 
-            final String hungerString = String.format("%d/%d", pawn.getCurrentFoodLevel(), HungerConstants.FULL_FOOD_LEVEL);
-            int hungerIconX = colonistWinX + width/2 + 5;
-            renderIcon(drawContext, hungerIconX, heartIconY, 28);
-            drawContext.drawTextWithShadow(textRenderer, hungerString, hungerIconX + 10, heartIconY + 2, 0xFFFFFF);
+
+            if(pawn instanceof IHungerAwareEntity hungerAwareEntity) {
+                final String hungerString = String.format("%d/%d", hungerAwareEntity.getCurrentFoodLevel(), HungerConstants.FULL_FOOD_LEVEL);
+                int hungerIconX = colonistWinX + width/2 + 5;
+                renderIcon(drawContext, hungerIconX, heartIconY, 28);
+                drawContext.drawTextWithShadow(textRenderer, hungerString, hungerIconX + 10, heartIconY + 2, 0xFFFFFF);
+            }
 
             if(pawn instanceof IProfessional professional) {
                 final String professionId = professional.getProfessionId();

@@ -3,10 +3,10 @@ package org.minefortress.renderer.gui.professions;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import org.jetbrains.annotations.NotNull;
-import org.minefortress.interfaces.IFortressMinecraftClient;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,8 +33,8 @@ public class ProfessionsLayer {
     private final int panExpand = 100;
 
 
-    public ProfessionsLayer(IFortressMinecraftClient client) {
-        final IProfessionsManager professionManager = client.get_FortressClientManager().getProfessionManager();
+    public ProfessionsLayer(IClientManagersProvider client) {
+        final IProfessionsManager professionManager = client.get_ClientFortressManager().getProfessionManager();
         ProfessionWidget root = createProfessionsTree(professionManager);
 
         ProfessionsPositioner.arrangeForTree(root);

@@ -4,11 +4,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
-import org.minefortress.fortress.ClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundChangeMaxColonistsCountPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import org.minefortress.utils.ModUtils;
 
 public class ColonistsScreen extends Screen {
 
@@ -76,8 +76,8 @@ public class ColonistsScreen extends Screen {
         return getFortressClientManager().getTotalColonistsCount();
     }
 
-    private ClientFortressManager getFortressClientManager() {
-        return ModUtils.getFortressClient().get_FortressClientManager();
+    private IClientFortressManager getFortressClientManager() {
+        return CoreModUtils.getMineFortressManagersProvider().get_ClientFortressManager();
     }
 
     @Override

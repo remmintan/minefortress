@@ -6,7 +6,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAre
 import java.util.List;
 import java.util.Optional;
 
-public interface ISavedAreasHolder {
+public interface ISavedAreasHolder extends ITasksRenderInfoProvider, ITasksModelBuilderInfoProvider {
     void setSavedAreas(List<IAutomationAreaInfo> savedAreas);
 
     Optional<IAutomationAreaInfo> getHovered(BlockPos pos);

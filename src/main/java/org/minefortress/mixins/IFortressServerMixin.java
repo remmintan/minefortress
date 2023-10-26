@@ -3,15 +3,16 @@ package org.minefortress.mixins;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.*;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ApiServices;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.level.storage.LevelStorage;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fortress.server.FortressModServerManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -71,7 +72,8 @@ public abstract class IFortressServerMixin extends ReentrantThreadExecutor<Serve
     @Inject(method = "runOneTask", at = @At(value = "TAIL", shift = At.Shift.BEFORE), cancellable = true)
     public void executeOneTask(CallbackInfoReturnable<Boolean> cir) {
         if(this.shouldKeepTicking() && blueprintsWorld.hasWorld()) {
-            final boolean executed = blueprintsWorld.getWorld().getChunkManager().executeQueuedTasks();
+            final var world = blueprintsWorld.getWorld();
+            final boolean executed = world instanceof ServerWorld w && w.getChunkManager().executeQueuedTasks();
             if(executed) {
                 cir.setReturnValue(true);
             }

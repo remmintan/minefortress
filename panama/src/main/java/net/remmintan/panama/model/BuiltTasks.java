@@ -9,8 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import org.joml.Vector4f;
-import org.minefortress.selections.ClientSelection;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class BuiltTasks implements BuiltModel {
     private static final Box BOX = Box.from(new Vec3d(0, 0, 0));
 
     private final VertexBuffer buffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-    private final Set<ClientSelection> tasks;
+    private final Set<IClientTask> tasks;
     private BufferBuilder.BuiltBuffer builtBuffer;
 
     private boolean initialized = false;
@@ -31,7 +31,7 @@ public class BuiltTasks implements BuiltModel {
 
     private CompletableFuture<Void> upload;
 
-    public BuiltTasks(Set<ClientSelection> tasks) {
+    public BuiltTasks(Set<IClientTask> tasks) {
         this.tasks = new HashSet<>(tasks);
     }
 
@@ -59,7 +59,7 @@ public class BuiltTasks implements BuiltModel {
     private void render(BufferBuilder bufferBuilder) {
         final MatrixStack matrices = new MatrixStack();
 
-        for(ClientSelection selection: tasks)
+        for(IClientTask selection: tasks)
             renderBlock(bufferBuilder, matrices, selection::shouldRenderBlock, selection, selection.getColor());
 
         if(initialized) {
@@ -67,7 +67,7 @@ public class BuiltTasks implements BuiltModel {
         }
     }
 
-    private void renderBlock(BufferBuilder bufferBuilder, MatrixStack matrices, BiFunction<World, BlockPos, Boolean> shouldRender, ClientSelection selection, Vector4f color) {
+    private void renderBlock(BufferBuilder bufferBuilder, MatrixStack matrices, BiFunction<World, BlockPos, Boolean> shouldRender, IClientTask selection, Vector4f color) {
         init(bufferBuilder);
         final Set<BlockPos> positions = selection.getBlockPositions();
         for(BlockPos pos: positions) {

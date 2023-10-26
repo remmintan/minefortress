@@ -19,11 +19,16 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.remmintan.gobi.SelectionManager;
+import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionModelBuilderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.panama.renderer.*;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
@@ -31,13 +36,9 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.ClientFortressManager;
-import net.remmintan.mods.minefortress.core.FortressState;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.interfaces.IFortressMinecraftClient;
-import org.minefortress.professions.hire.ClientHireHandler;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
-import org.minefortress.renderer.gui.hire.HirePawnScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -129,12 +130,15 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
                 entry(FortressRenderLayer.getLinesNoDepth(), new BufferBuilder(256))
         );
 
+        final var provider = CoreModUtils.getMineFortressManagersProvider();
+        final var manager = provider.get_ClientFortressManager();
+
         final Supplier<ISelectionInfoProvider> selectInfProvSup = () ->
-                ModUtils.getFortressClientManager().getState() == FortressState.BUILD ?
+                manager.getState() == FortressState.BUILD ?
                         ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
 
         final Supplier<ISelectionModelBuilderInfoProvider> selModBuildInfProv = () ->
-                ModUtils.getFortressClientManager().getState() == FortressState.BUILD ?
+                manager.getState() == FortressState.BUILD ?
                         ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
 
         selectionRenderer = new SelectionRenderer(

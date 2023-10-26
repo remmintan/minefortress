@@ -39,7 +39,6 @@ import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.registries.FortressEntities;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 
@@ -372,7 +371,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
             } else if (type == FortressEntities.WARRIOR_PAWN_ENTITY_TYPE || type == FortressEntities.ARCHER_PAWN_ENTITY_TYPE) {
                 getServerFortressManager().ifPresent(m -> m.replaceColonistWithTypedPawn(this, professionId, type));
             }
-            it.scheduleSync();
+            getServerFortressManager().ifPresent(IServerFortressManager::scheduleSync);
         });
     }
 

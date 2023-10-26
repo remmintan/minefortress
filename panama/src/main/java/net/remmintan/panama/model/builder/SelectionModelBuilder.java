@@ -3,9 +3,9 @@ package net.remmintan.panama.model.builder;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
+import net.remmintan.gobi.renderer.selection.SelectionRenderInfo;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionModelBuilderInfoProvider;
 import net.remmintan.panama.model.BuiltSelection;
-import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
-import org.minefortress.selections.renderer.selection.SelectionRenderInfo;
 
 import java.util.Map;
 import java.util.function.Supplier;

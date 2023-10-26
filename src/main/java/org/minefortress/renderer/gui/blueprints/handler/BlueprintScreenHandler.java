@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundEditBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public final class BlueprintScreenHandler {
 
-    private final IFortressMinecraftClient fortressClient;
+    private final IClientManagersProvider managersProvider;
 
     private BlueprintGroup selectedGroup = BlueprintGroup.LIVING_HOUSES;
 
@@ -28,7 +29,7 @@ public final class BlueprintScreenHandler {
     public BlueprintScreenHandler(MinecraftClient client){
         if(!(client instanceof IFortressMinecraftClient))
             throw new IllegalArgumentException("Client must be an instance of FortressMinecraftClient");
-        this.fortressClient = (IFortressMinecraftClient)client;
+        this.managersProvider = (IClientManagersProvider)client;
         this.scroll(0f);
     }
 
@@ -47,8 +48,8 @@ public final class BlueprintScreenHandler {
     }
 
     public void scroll(float scrollPosition) {
-        final var blueprintManager = fortressClient.get_BlueprintManager();
-        final var fortressClientManager = fortressClient.get_FortressClientManager();
+        final var blueprintManager = managersProvider.get_BlueprintManager();
+        final var fortressClientManager = managersProvider.get_ClientFortressManager();
         final var resourceManager = fortressClientManager.getResourceManager();
         final List<IBlueprintMetadata> allBlueprint = blueprintManager.getAllBlueprints(selectedGroup);
         this.totalSize = allBlueprint.size();
@@ -117,7 +118,7 @@ public final class BlueprintScreenHandler {
             }
             return;
         }
-        fortressClient.get_BlueprintManager().select(focusedSlot.getMetadata());
+        managersProvider.get_BlueprintManager().select(focusedSlot.getMetadata());
     }
 
     public int getSelectedGroupSize() {

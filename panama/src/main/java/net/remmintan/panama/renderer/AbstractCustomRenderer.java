@@ -8,11 +8,11 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.panama.model.BuiltModel;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
 
 import java.util.Arrays;
 import java.util.List;
@@ -134,8 +134,8 @@ public abstract class AbstractCustomRenderer {
         return new Vector3f(1f, 1f, 1f);
     }
 
-    protected FortressClientManager getClientManager() {
-        return ((FortressMinecraftClient) client).get_FortressClientManager();
+    protected IClientFortressManager getClientManager() {
+        return ((IClientManagersProvider) client).get_ClientFortressManager();
     }
 
 }

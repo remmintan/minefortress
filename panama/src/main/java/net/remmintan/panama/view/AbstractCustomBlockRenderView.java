@@ -31,7 +31,7 @@ public abstract class AbstractCustomBlockRenderView implements BlockRenderView {
 
     private float getMultiplyerFromDirection(Direction direction) {
         return switch (direction) {
-            case Direction.NORTH, Direction.EAST -> 0.5f;
+            case NORTH, EAST -> 0.5f;
             default -> 1f;
         };
     }

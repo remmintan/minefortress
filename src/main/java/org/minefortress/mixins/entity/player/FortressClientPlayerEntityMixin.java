@@ -10,10 +10,9 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.interfaces.IFortressMinecraftClient;
-import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import org.minefortress.renderer.CameraTools;
-import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -58,12 +57,12 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
         if(ModUtils.isClientInFortressGamemode()) {
             if(client.options.sprintKey.isPressed()) {
-                final IHoveredBlockProvider fortressClient = ModUtils.getFortressClient();
+                final var fortressClient = CoreModUtils.getMineFortressManagersProvider();
                 final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
                 if(clientBlueprintManager.isSelecting()) {
                     clientBlueprintManager.rotateSelectedStructureCounterClockwise();
                 } else {
-                    final SelectionManager selectionManager = fortressClient.get_SelectionManager();
+                    final var selectionManager = fortressClient.get_SelectionManager();
                     selectionManager.moveSelectionDown();
                 }
             }

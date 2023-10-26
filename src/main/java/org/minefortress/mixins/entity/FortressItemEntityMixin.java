@@ -8,10 +8,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.world.BlueprintsWorld;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import org.minefortress.professions.ServerProfessionManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -43,12 +43,15 @@ public abstract class FortressItemEntityMixin extends Entity {
             if(closestPlayer instanceof ServerPlayerEntity srvP && srvP.interactionManager.getGameMode() == MineFortressMod.FORTRESS) {
                 final var fortressServer = (IFortressServer) closestPlayer.getServer();
                 if(fortressServer != null) {
-                    final var fortressServerManager = fortressServer.get_FortressModServerManager().getManagersProvider((ServerPlayerEntity) closestPlayer);
-                    if(fortressServerManager.isSurvival()) {
-                        final var resourceManager = fortressServerManager.getServerResourceManager();
+                    final var modServerManager = fortressServer.get_FortressModServerManager();
+                    final var closestSPE = (ServerPlayerEntity) closestPlayer;
+                    final var provider = modServerManager.getManagersProvider(closestSPE);
+                    final var manager = modServerManager.getFortressManager(closestSPE);
+                    if(manager.isSurvival()) {
+                        final var resourceManager = provider.getResourceManager();
                         final var stack = this.getStack();
                         final var item = stack.getItem();
-                        if(shouldCollectInInventory(fortressServerManager.getServerProfessionManager(), item))
+                        if(shouldCollectInInventory(provider.getProfessionsManager(), item))
                             resourceManager.increaseItemAmount(item, stack.getCount());
 
                     }
@@ -59,7 +62,7 @@ public abstract class FortressItemEntityMixin extends Entity {
     }
 
     @Unique
-    private boolean shouldCollectInInventory(ServerProfessionManager serverProfessionManager, Item item) {
+    private boolean shouldCollectInInventory(IServerProfessionsManager serverProfessionManager, Item item) {
         if(item.getDefaultStack().isIn(ItemTags.SAPLINGS))
             return serverProfessionManager.hasProfession("forester");
 

@@ -4,6 +4,7 @@ import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.interfaces.professions.*;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -69,7 +70,7 @@ public abstract class ProfessionManager implements IProfessionsManager {
             return ProfessionResearchState.UNLOCKED;
         }
 
-        final IFortressManager fortressManager = fortressManagerSupplier.get();
+        final var fortressManager = fortressManagerSupplier.get();
         var minRequirementCount = 0;
         if(countProfessionals == CountProfessionals.INCREASE) {
             minRequirementCount = profession.getAmount();
@@ -84,7 +85,7 @@ public abstract class ProfessionManager implements IProfessionsManager {
         if(countItems) {
             final var itemsRequirement = profession.getItemsRequirement();
             if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement)) {
-                final var hasItems = fortressManager.getResourceManager().hasItems(itemsRequirement);
+                final var hasItems = fortressManager instanceof IServerFortressManager sfm && sfm.getResourceManager().hasItems(itemsRequirement);
                 satisfied = satisfied && hasItems;
             }
         }

@@ -1,10 +1,10 @@
 package org.minefortress.professions.hire;
 
+import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireCost;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
-import org.jetbrains.annotations.NotNull;
-import org.minefortress.professions.ProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.*;
@@ -85,7 +85,7 @@ public class ServerHireHandler {
 
     private boolean professionUnlocked(String it) {
         final var profession = professionManager.getProfession(it);
-        return professionManager.isRequirementsFulfilled(profession, ProfessionManager.CountProfessionals.DONT_COUNT, false) == ProfessionResearchState.UNLOCKED;
+        return professionManager.isRequirementsFulfilled(profession, CountProfessionals.DONT_COUNT, false) == ProfessionResearchState.UNLOCKED;
     }
 
     private static class HireRequest {

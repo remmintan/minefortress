@@ -9,14 +9,14 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
-import org.minefortress.blueprints.world.BlueprintsWorld;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.BasePawnEntity;
-import org.minefortress.interfaces.FortressWorldCreator;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundFollowColonistPacket;
+import org.minefortress.blueprints.world.BlueprintsWorld;
+import org.minefortress.entity.BasePawnEntity;
+import org.minefortress.interfaces.FortressWorldCreator;
 import org.minefortress.utils.ModUtils;
 
 public class FortressServerEvents {
@@ -49,9 +49,10 @@ public class FortressServerEvents {
             final var fortressServer = (IFortressServer) server;
             final var player = handler.player;
             final var fortressModServerManager = fortressServer.get_FortressModServerManager();
-            final var fsm = fortressModServerManager.getManagersProvider(player);
-            fsm.syncOnJoin(fortressModServerManager.isCampfireEnabled(), fortressModServerManager.isBorderEnabled());
-            final var serverProfessionManager = fsm.getServerProfessionManager();
+            final var manager = fortressModServerManager.getFortressManager(player);
+            final var provider = fortressModServerManager.getManagersProvider(player);
+            manager.syncOnJoin(fortressModServerManager.isCampfireEnabled(), fortressModServerManager.isBorderEnabled());
+            final var serverProfessionManager = provider.getProfessionsManager();
             serverProfessionManager.sendProfessions(player);
             serverProfessionManager.scheduleSync();
 
@@ -82,9 +83,9 @@ public class FortressServerEvents {
         });
 
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-            if(server instanceof IFortressServer IFortressServer) {
-                IFortressServer.get_FortressModServerManager().save();
-                IFortressServer.get_BlueprintsWorld().closeSession();
+            if(server instanceof IFortressServer aserver) {
+                aserver.get_FortressModServerManager().save();
+                aserver.get_BlueprintsWorld().closeSession();
             }
         });
 

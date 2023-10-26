@@ -5,7 +5,7 @@ import net.minecraft.nbt.NbtCompound;
 import java.util.List;
 
 public interface IClientBlueprintManager extends IStructureRenderInfoProvider {
-
+    void tick();
     void handleBlueprintsImport();
     void handleBlueprintsExport(String name, byte[] bytes);
     void handleImportExportFailure();
