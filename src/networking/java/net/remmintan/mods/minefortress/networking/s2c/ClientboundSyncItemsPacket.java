@@ -28,8 +28,6 @@ public class ClientboundSyncItemsPacket implements FortressS2CPacket {
         final var tempList = new ArrayList<IItemInfo>();
         final var reader = NetworkingReadersRegistry.findReader(IItemInfo.class);
         for(int i = 0; i < size; i++) {
-            final int id = buf.readInt();
-            final int amount = buf.readInt();
             tempList.add(reader.readBuffer(buf));
         }
 
