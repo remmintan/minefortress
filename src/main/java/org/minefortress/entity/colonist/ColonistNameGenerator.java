@@ -24,7 +24,8 @@ public class ColonistNameGenerator implements IPawnNameGenerator {
             "Brandon",
             "Aki",
             "Grungy",
-            "Jukotzu"
+            "Jukotzu",
+            "Telis"
     );
 
     private static final List<String> RANDOM_NAMES = Arrays.asList(
