@@ -1,6 +1,5 @@
 package org.minefortress.utils;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
@@ -24,14 +23,6 @@ public class BlockUtils {
         }
 
         return null;
-    }
-
-    public static boolean isCountableBlock(BlockState state) {
-        if(!state.getFluidState().isEmpty()) return false;
-        final var block = state.getBlock();
-        if(block == Blocks.FIRE) return false;
-        if(block == Blocks.AIR) return false;
-        return block != Blocks.BARRIER;
     }
 
     public static boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {

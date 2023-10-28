@@ -1,13 +1,11 @@
 package org.minefortress.entity.ai.goal;
 
 
-import java.util.Optional;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
 
 public class FortressColonistActiveTargetGoal extends ActiveTargetGoal<HostileEntity> {
     private final Colonist colonist;
@@ -29,9 +27,9 @@ public class FortressColonistActiveTargetGoal extends ActiveTargetGoal<HostileEn
         }
 
         if(this.targetEntity != null) {
-            final var fortressServerManagerOpt = this.colonist.getFortressServerManager();
-            if(fortressServerManagerOpt.isPresent()) {
-                final var serverManager = fortressServerManagerOpt.get();
+            final var manager = this.colonist.getServerFortressManager();
+            if(manager.isPresent()) {
+                final var serverManager = manager.get();
                 final var targetWithinFortress = serverManager.isPositionWithinFortress(this.targetEntity.getBlockPos());
                 if(targetWithinFortress) {
                     return true;

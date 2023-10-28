@@ -4,12 +4,15 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
-import org.minefortress.fortress.automation.IAutomationArea;
-import org.minefortress.fortress.automation.AutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
+import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.automation.iterators.MineAreaIterator;
 import org.minefortress.fortress.automation.iterators.ResetableIterator;
 import org.minefortress.utils.AreasUtils;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,10 +20,10 @@ import java.util.stream.Collectors;
 public final class ServerAutomationAreaInfo extends AutomationAreaInfo implements IAutomationArea {
 
     private LocalDateTime updated;
-    private ResetableIterator<AutomationBlockInfo> currentIterator;
+    private ResetableIterator<IAutomationBlockInfo> currentIterator;
     private boolean reset = false;
 
-    public ServerAutomationAreaInfo(AutomationAreaInfo info) {
+    public ServerAutomationAreaInfo(IAutomationAreaInfo info) {
         this(info.getClientArea(), info.getAreaType(), info.getId(), LocalDateTime.MIN);
     }
 
@@ -41,7 +44,7 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
     }
 
     @Override
-    public Iterator<AutomationBlockInfo> iterator(World world) {
+    public Iterator<IAutomationBlockInfo> iterator(World world) {
         if(this.reset) {
             return Collections.emptyIterator();
         }

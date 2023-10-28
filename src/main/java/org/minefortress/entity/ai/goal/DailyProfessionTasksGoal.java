@@ -1,7 +1,7 @@
 package org.minefortress.entity.ai.goal;
 
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.controls.TaskControl;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
 import org.minefortress.entity.ai.professions.*;
 
 import java.util.Map;
@@ -27,7 +27,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
     @Override
     public boolean canStart() {
         if(this.isStarving()) return false;
-        final TaskControl taskControl = getTaskControl();
+        final ITaskControl taskControl = getTaskControl();
         if(taskControl.hasTask()) return false;
         final String professionId = colonist.getProfessionId();
 
@@ -75,7 +75,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
         return this.isStarving();
     }
 
-    private TaskControl getTaskControl() {
+    private ITaskControl getTaskControl() {
         return colonist.getTaskControl();
     }
 }

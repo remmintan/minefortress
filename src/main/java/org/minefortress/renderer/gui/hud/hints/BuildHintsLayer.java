@@ -1,12 +1,11 @@
 package org.minefortress.renderer.gui.hud.hints;
 
 
-
+import net.remmintan.gobi.SelectionType;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.renderer.gui.hud.HudState;
-import org.minefortress.selections.ClickType;
-import org.minefortress.selections.SelectionManager;
-import org.minefortress.selections.SelectionType;
-import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,11 +53,11 @@ public class BuildHintsLayer extends AbstractHintsLayer{
 
     @Override
     protected Optional<String> getInfoText() {
-        final var name = getSelectionManager().getCurrentSelectionType().getName();
+        final var name = getSelectionManager().getCurrentSelectionType().getDisplayName();
         return Optional.of("Selection type: " + name);
     }
 
-    private SelectionManager getSelectionManager() {
-        return ModUtils.getFortressClient().get_SelectionManager();
+    private ISelectionManager getSelectionManager() {
+        return CoreModUtils.getMineFortressManagersProvider().get_SelectionManager();
     }
 }

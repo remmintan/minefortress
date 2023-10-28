@@ -1,6 +1,7 @@
 package org.minefortress.fortress.automation.iterators;
 
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 
 import java.util.Iterator;
@@ -8,7 +9,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.StreamSupport;
 
-abstract class AbstractFilteredIterator implements ResetableIterator<AutomationBlockInfo> {
+abstract class AbstractFilteredIterator implements ResetableIterator<IAutomationBlockInfo> {
 
     private boolean reset = false;
     private final Iterator<AutomationBlockInfo> iterator;

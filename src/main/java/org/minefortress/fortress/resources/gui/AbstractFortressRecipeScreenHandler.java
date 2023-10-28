@@ -14,34 +14,34 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.FortressItemStack;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
-import org.minefortress.interfaces.FortressServer;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.minefortress.interfaces.FortressSimpleInventory;
-import org.minefortress.network.c2s.ServerboundScrollCurrentScreenPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.renderer.gui.interfaces.ScrollableHandler;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundScrollCurrentScreenPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IScrollableHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> extends AbstractRecipeScreenHandler<T> implements ScrollableHandler {
+public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> extends AbstractRecipeScreenHandler<T> implements IScrollableHandler {
 
     private final SimpleInventory screenInventory = new SimpleInventory(999);
     private final VirtualInventory virtualInventory;
-    private final ServerResourceManager serverResourceManager;
+    private final IServerResourceManager IServerResourceManager;
 
     private int clientCurrentRow = 5;
 
     protected final PlayerEntity player;
     protected final World world;
 
-    public AbstractFortressRecipeScreenHandler(ScreenHandlerType<?> screenHandlerType, int i, ServerResourceManager resourceManager, PlayerEntity player) {
+    public AbstractFortressRecipeScreenHandler(ScreenHandlerType<?> screenHandlerType, int i, IServerResourceManager resourceManager, PlayerEntity player) {
         super(screenHandlerType, i);
-        this.serverResourceManager = resourceManager;
+        this.IServerResourceManager = resourceManager;
         this.player = player;
         this.world = player.getWorld();
-        this.virtualInventory = Objects.nonNull(serverResourceManager) ? new VirtualInventory(serverResourceManager.getAllItems()) : null;
+        this.virtualInventory = Objects.nonNull(IServerResourceManager) ? new VirtualInventory(IServerResourceManager.getAllItems()) : null;
     }
 
     public int getRowsCount() {
@@ -86,7 +86,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
             this.addSlot(new FortressNotInsertableSlot(this.screenInventory, column + 27, 8 + column * 18, 142));
         }
 
-        if(this.serverResourceManager != null) {
+        if(this.IServerResourceManager != null) {
             int rowsCount = getRowsCount();
             if(rowsCount > 4) {
                 for (int row = 0; row < rowsCount-4; row++) {
@@ -147,9 +147,9 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     @Override
     public void onClosed(PlayerEntity player) {
         super.onClosed(player);
-        if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof FortressServer fortressServer) {
-            final var fortressServerManager = fortressServer.get_FortressModServerManager().getByPlayer(serverPlayer);
-            final var serverResourceManager = fortressServerManager.getServerResourceManager();
+        if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof IFortressServer IFortressServer) {
+            final var fortressServerManager = IFortressServer.get_FortressModServerManager().getManagersProvider(serverPlayer);
+            final var serverResourceManager = fortressServerManager.getResourceManager();
 
             returnInputs();
 
@@ -175,7 +175,7 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
     @Override
     public void scrollItems(float position) {
-        if(serverResourceManager == null) {
+        if(IServerResourceManager == null) {
             final var packet = new ServerboundScrollCurrentScreenPacket(position);
             FortressClientNetworkHelper.send(FortressChannelNames.SCROLL_CURRENT_SCREEN, packet);
             return;

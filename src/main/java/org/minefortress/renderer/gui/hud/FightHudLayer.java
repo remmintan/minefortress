@@ -4,8 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRotation;
-import org.minefortress.fight.ClientFightSelectionManager;
-import org.minefortress.fortress.resources.ItemInfo;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightSelectionManager;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.utils.ModUtils;
 
 import static org.minefortress.renderer.gui.blueprints.BlueprintsScreen.convertItemIconInTheGUI;
@@ -21,7 +21,7 @@ class FightHudLayer extends AbstractHudLayer {
 
     @Override
     protected void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {
-        final var influenceManager = ModUtils.getInfluenceManager();
+        final var influenceManager = CoreModUtils.getMineFortressManagersProvider().get_InfluenceManager();
         if(influenceManager.isSelecting() && ModUtils.getFortressClientManager().isSurvival()) {
             final var stacks = influenceManager.getBlockDataProvider()
                     .getBlockData("influence_flag", BlockRotation.NONE)
@@ -30,7 +30,7 @@ class FightHudLayer extends AbstractHudLayer {
             final var resourceManager = ModUtils.getFortressClientManager().getResourceManager();
 
             for (int i1 = 0; i1 < stacks.size(); i1++) {
-                final ItemInfo stack = stacks.get(i1);
+                final var stack = stacks.get(i1);
                 final var hasItem = resourceManager.hasItem(stack, stacks);
                 final var itemX = screenWidth/2 - 55 + i1%10 * 30;
                 final var itemY = i1/10 * 20 + screenHeight - 40;
@@ -61,7 +61,7 @@ class FightHudLayer extends AbstractHudLayer {
         }
     }
 
-    private ClientFightSelectionManager getFightSelectionManager() {
+    private IClientFightSelectionManager getFightSelectionManager() {
         return ModUtils.getFortressClientManager().getFightManager().getSelectionManager();
     }
 

@@ -8,8 +8,8 @@ import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.data.ClientStructureBlockDataProvider;
-import org.minefortress.blueprints.data.StrctureBlockData;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +17,10 @@ import java.nio.file.Files;
 
 public class InfluenceFlagBlockDataProvider implements IBlockDataProvider {
 
-    private StrctureBlockData influenceFlagData = null;
+    private IStructureBlockData influenceFlagData = null;
 
     @Override
-    public StrctureBlockData getBlockData(String fileName, BlockRotation rotation) {
+    public IStructureBlockData getBlockData(String fileName, BlockRotation rotation) {
         if(!fileName.equals("influence_flag"))
             throw new IllegalArgumentException("Invalid file name for influence flag: " + fileName);
 

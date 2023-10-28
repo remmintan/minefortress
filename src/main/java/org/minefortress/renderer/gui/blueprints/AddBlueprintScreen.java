@@ -5,10 +5,11 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import org.apache.logging.log4j.util.Strings;
-import org.minefortress.network.c2s.ServerboundEditBlueprintPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundEditBlueprintPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 
 public class AddBlueprintScreen extends Screen {
 

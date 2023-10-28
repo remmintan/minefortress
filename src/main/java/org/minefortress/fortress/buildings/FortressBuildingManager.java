@@ -9,13 +9,15 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
+import net.remmintan.mods.minefortress.networking.s2c.S2COpenBuildingRepairScreen;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.fortress.automation.IAutomationArea;
-import org.minefortress.fortress.automation.IAutomationAreaProvider;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundSyncBuildingsPacket;
-import org.minefortress.network.s2c.S2COpenBuildingRepairScreen;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -23,10 +25,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FortressBuildingManager implements IAutomationAreaProvider {
+public class FortressBuildingManager implements IAutomationAreaProvider, IServerBuildingsManager {
 
     private int buildingPointer = 0;
-    private final List<FortressBuilding> buildings = new ArrayList<>();
+    private final List<IFortressBuilding> buildings = new ArrayList<>();
     private final Supplier<ServerWorld> overworldSupplier;
     private final Cache<BlockPos, Object> bedsCache =
             CacheBuilder.newBuilder()
@@ -38,11 +40,12 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
         this.overworldSupplier = overworldSupplier;
     }
 
-    public void addBuilding(FortressBuilding building) {
+    public void addBuilding(IFortressBuilding building) {
         buildings.add(building);
         this.scheduleSync();
     }
 
+    @Override
     public void destroyBuilding(UUID id) {
         getBuildingById(id)
                 .ifPresent(it -> {
@@ -120,7 +123,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
     public NbtCompound toNbt() {
         int i = 0;
         final NbtCompound buildingsTag = new NbtCompound();
-        for (FortressBuilding building : this.buildings) {
+        for (IFortressBuilding building : this.buildings) {
             final NbtCompound buildingTag = new NbtCompound();
             building.writeToNbt(buildingTag);
             buildingsTag.put("building" + i++, buildingTag);
@@ -154,7 +157,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
         return buildings.stream().anyMatch(it -> it.isPartOfTheBuilding(pos));
     }
 
-    public Optional<FortressBuilding> findNearest(BlockPos pos) {
+    public Optional<IFortressBuilding> findNearest(BlockPos pos) {
         return buildings
                 .stream()
                 .sorted(Comparator.comparing(it -> it.getCenter().getSquaredDistance(pos)))
@@ -162,9 +165,10 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
                 .findFirst();
     }
 
+    @Override
     public void doRepairConfirmation(UUID id, ServerPlayerEntity player) {
         final var statesThatNeedsToBeRepaired = getBuildingById(id)
-                .map(FortressBuilding::getAllBlockStatesToRepairTheBuilding)
+                .map(IFortressBuilding::getAllBlockStatesToRepairTheBuilding)
                 .orElse(Collections.emptyMap());
 
         final var packet = new S2COpenBuildingRepairScreen(id, statesThatNeedsToBeRepaired);
@@ -172,7 +176,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
     }
 
     @NotNull
-    public Optional<FortressBuilding> getBuildingById(UUID id) {
+    public Optional<IFortressBuilding> getBuildingById(UUID id) {
         return buildings.stream()
                 .filter(it -> it.getId().equals(id))
                 .findFirst();
@@ -181,7 +185,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider {
     public Optional<HostileEntity> getRandomBuildingAttacker() {
         final var attackersList = this.buildings
                 .stream()
-                .map(FortressBuilding::getAttackers)
+                .map(IFortressBuilding::getAttackers)
                 .flatMap(Collection::stream)
                 .toList();
         if(attackersList.isEmpty())

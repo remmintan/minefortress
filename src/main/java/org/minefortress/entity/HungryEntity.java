@@ -13,12 +13,13 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import org.minefortress.entity.ai.controls.EatControl;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import org.minefortress.entity.ai.goal.EatGoal;
 import org.minefortress.entity.colonist.FakeHungerManager;
 import org.minefortress.entity.colonist.FortressHungerManager;
 import org.minefortress.entity.colonist.IFortressHungerManager;
-import org.minefortress.entity.interfaces.IFortressAwareEntity;
-import org.minefortress.entity.interfaces.IHungerAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwareEntity;
 
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
     private static final String HUNGER_MANAGER_NBT_KEY = "hunger";
 
     private final IFortressHungerManager hungerManager;
-    private final EatControl eatControl;
+    private final IEatControl eatControl;
 
     protected HungryEntity(EntityType<? extends PathAwareEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world);
@@ -119,7 +120,7 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
     }
 
     @Override
-    public Optional<EatControl> getEatControl() {
+    public Optional<IEatControl> getEatControl() {
         return Optional.ofNullable(eatControl);
     }
 

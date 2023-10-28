@@ -4,12 +4,12 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
-import org.minefortress.blueprints.manager.BlueprintMetadata;
-import org.minefortress.fortress.buildings.EssentialBuildingInfo;
-import org.minefortress.network.c2s.C2SDestroyBuilding;
-import org.minefortress.network.c2s.C2SOpenRepairBuildingScreen;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.professions.Profession;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import net.remmintan.mods.minefortress.networking.c2s.C2SDestroyBuilding;
+import net.remmintan.mods.minefortress.networking.c2s.C2SOpenRepairBuildingScreen;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.utils.ModUtils;
 
@@ -17,11 +17,11 @@ import java.util.Optional;
 
 public class ManageBuildingScreen extends WindowScreen {
 
-    private final EssentialBuildingInfo buildingInfo;
-    private final Profession profession;
+    private final IEssentialBuildingInfo buildingInfo;
+    private final IProfession profession;
     private final Text screenName;
 
-    public ManageBuildingScreen(EssentialBuildingInfo essentialBuildingInfo) {
+    public ManageBuildingScreen(IEssentialBuildingInfo essentialBuildingInfo) {
         super(Text.of("Manage Building"));
         this.buildingInfo = essentialBuildingInfo;
         final var blueprintMetadataManager = ModUtils.getBlueprintManager().getBlueprintMetadataManager();
@@ -31,7 +31,7 @@ public class ManageBuildingScreen extends WindowScreen {
                 essentialBuildingInfo
                     .getBlueprintId()
                     .flatMap(blueprintMetadataManager::getByBlueprintId)
-                    .map(BlueprintMetadata::getName)
+                    .map(IBlueprintMetadata::getName)
                     .orElse("Unknown")
         );
         profession = ModUtils.getProfessionManager()

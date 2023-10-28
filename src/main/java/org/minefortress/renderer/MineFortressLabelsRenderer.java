@@ -8,11 +8,11 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import org.apache.commons.lang3.StringUtils;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.minefortress.fortress.buildings.BuildingHealthRenderInfo;
-import org.minefortress.selections.SelectionManager;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,13 +25,13 @@ public class MineFortressLabelsRenderer {
     public static final int RED = 0xffb81d13;
     public static final int BLACK = 0xff000000;
     private final TextRenderer font;
-    private final Supplier<SelectionManager> selectionManagerSupplier;
+    private final Supplier<ISelectionManager> selectionManagerSupplier;
     private final Supplier<List<BuildingHealthRenderInfo>> buildingsHealthSupplier;
     private Camera camera;
     private Quaternionf cameraOrientation;
 
     public MineFortressLabelsRenderer(TextRenderer font,
-                                      Supplier<SelectionManager> selectionManagerSupplier,
+                                      Supplier<ISelectionManager> selectionManagerSupplier,
                                       Supplier<List<BuildingHealthRenderInfo>> buildingsHealthSupplier) {
         this.font = font;
         this.selectionManagerSupplier = selectionManagerSupplier;
@@ -149,7 +149,7 @@ public class MineFortressLabelsRenderer {
         matrixStack.pop();
     }
 
-    public SelectionManager getSelectionManager() {
+    public ISelectionManager getSelectionManager() {
         return selectionManagerSupplier.get();
     }
 

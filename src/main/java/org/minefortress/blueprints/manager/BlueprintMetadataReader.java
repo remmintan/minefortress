@@ -3,8 +3,9 @@ package org.minefortress.blueprints.manager;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 import org.minefortress.MineFortressMod;
-import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,7 +14,7 @@ import java.util.*;
 public class BlueprintMetadataReader {
 
     private static final Identifier PREDEFINED_BLUEPRINTS_ID = new Identifier(MineFortressMod.MOD_ID, "predefined_blueprints.json");
-    private final Map<BlueprintGroup, List<BlueprintMetadata>> predefinedBlueprints = new HashMap<>();
+    private final Map<BlueprintGroup, List<IBlueprintMetadata>> predefinedBlueprints = new HashMap<>();
     private final MinecraftServer server;
 
     public BlueprintMetadataReader(MinecraftServer server) {
@@ -33,7 +34,7 @@ public class BlueprintMetadataReader {
                 final var blueprintGroup = BlueprintGroup.valueOf(jsonReader.nextName());
                 jsonReader.beginArray();
                 while (jsonReader.hasNext()) {
-                    final BlueprintMetadata blueprintMetadata = readBlueprintMetadata(jsonReader);
+                    final IBlueprintMetadata blueprintMetadata = readBlueprintMetadata(jsonReader);
                     predefinedBlueprints.computeIfAbsent(blueprintGroup, k -> new ArrayList<>()).add(blueprintMetadata);
                 }
                 jsonReader.endArray();
@@ -44,11 +45,11 @@ public class BlueprintMetadataReader {
         }
     }
 
-    Map<BlueprintGroup, List<BlueprintMetadata>> getPredefinedBlueprints() {
+    Map<BlueprintGroup, List<IBlueprintMetadata>> getPredefinedBlueprints() {
         return Map.copyOf(predefinedBlueprints);
     }
 
-    private BlueprintMetadata readBlueprintMetadata(JsonReader jsonReader) throws IOException {
+    private IBlueprintMetadata readBlueprintMetadata(JsonReader jsonReader) throws IOException {
         jsonReader.beginObject();
         String name = null;
         String file = null;
@@ -69,7 +70,7 @@ public class BlueprintMetadataReader {
     }
 
     public Optional<BlueprintGroup> convertFilenameToGroup(String filename) {
-        for (Map.Entry<BlueprintGroup, List<BlueprintMetadata>> entry : predefinedBlueprints.entrySet()) {
+        for (Map.Entry<BlueprintGroup, List<IBlueprintMetadata>> entry : predefinedBlueprints.entrySet()) {
             if(entry.getValue().stream().anyMatch(it -> it.getId().equals(filename)))
                 return Optional.of(entry.getKey());
         }

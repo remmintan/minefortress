@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;

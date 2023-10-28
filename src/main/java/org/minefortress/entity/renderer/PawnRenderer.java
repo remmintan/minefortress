@@ -17,15 +17,16 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.entity.interfaces.ITargetedPawn;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 
 import java.util.Optional;
 
@@ -129,12 +130,16 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
         return MinecraftClient.getInstance();
     }
 
-    private FortressMinecraftClient getFortressClient() {
-        return (FortressMinecraftClient) getClient();
+    private IFortressMinecraftClient getFortressClient() {
+        return (IFortressMinecraftClient) getClient();
     }
 
-    private FortressClientManager getFortressClientManager() {
-        return getFortressClient().get_FortressClientManager();
+    private IClientManagersProvider getManagersProvider() {
+        return (IClientManagersProvider) getClient();
+    }
+
+    private IClientFortressManager getFortressClientManager() {
+        return  getManagersProvider().get_ClientFortressManager();
     }
 
     private void setClothesVilibility(MobEntity colonist) {

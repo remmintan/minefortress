@@ -4,7 +4,7 @@
   "package": "org.minefortress.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "FortressServerMixin",
+    "IFortressServerMixin",
     "block.FarmlandBlockMixin",
     "block.FortressAbstractBlockState",
     "entity.ArrowEntityMixin",
@@ -45,7 +45,7 @@
     "renderer.gui.worldcreator.FortressCyclingButtonMixin",
     "renderer.gui.worldcreator.GameTabMixin",
     "renderer.gui.worldcreator.WorldCreatorMixin",
-    "world.FortressClientWorldMixin",
+    "world.ClientWorldMixin",
     "world.WorldLoadedEventMixin"
   ],
   "server": [],

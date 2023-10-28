@@ -18,15 +18,13 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
+import net.remmintan.mods.minefortress.core.FortressState;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import org.minefortress.MineFortressMod;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.fortress.FortressState;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.fortress.ManageBuildingScreen;
-import org.minefortress.selections.SelectionManager;
 import org.minefortress.utils.BlockUtils;
-import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -57,8 +55,8 @@ public abstract class FortressClientInteractionManagerMixin {
 
     @Inject(method = "setGameModes", at = @At("RETURN"))
     public void setGameModes(GameMode gameMode, GameMode previousGameMode, CallbackInfo ci) {
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        final SelectionManager selectionManager = fortressClient.get_SelectionManager();
+        final var fortressClient = (IClientManagersProvider) this.client;
+        final var selectionManager = fortressClient.get_SelectionManager();
         if(selectionManager.isSelecting()) {
             selectionManager.resetSelection();
         }
@@ -83,18 +81,18 @@ public abstract class FortressClientInteractionManagerMixin {
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if(!ModUtils.isClientInFortressGamemode()) return;
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        final ClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
-        final FortressClientManager fortressManager = fortressClient.get_FortressClientManager();
+        final var fortressClient = (IClientManagersProvider) this.client;
+        final var clientBlueprintManager = fortressClient.get_BlueprintManager();
+        final var manager = fortressClient.get_ClientFortressManager();
 
-        if(fortressManager.getState() == FortressState.COMBAT) {
+        if(manager.getState() == FortressState.COMBAT) {
             final var influenceManager = ModUtils.getInfluenceManager();
             if(influenceManager.isSelecting()) {
                 influenceManager.cancelSelectingInfluencePosition();
                 cir.setReturnValue(false);
                 return;
             }
-            final var selectionManager = fortressManager.getFightManager().getSelectionManager();
+            final var selectionManager = manager.getFightManager().getSelectionManager();
             final var mouse = client.mouse;
 
             if(selectionManager.isSelecting())
@@ -113,20 +111,20 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        if(fortressManager.getState() == FortressState.AREAS_SELECTION) {
+        if(manager.getState() == FortressState.AREAS_SELECTION) {
             final var areasClientManager = ModUtils.getAreasClientManager();
             areasClientManager.select(client.crosshairTarget);
             cir.setReturnValue(false);
             return;
         }
 
-        if(fortressManager.isSelectingColonist()){
-            fortressManager.stopSelectingColonist();
+        if(manager.isSelectingColonist()){
+            manager.stopSelectingColonist();
             cir.setReturnValue(false);
             return;
         }
 
-        if(fortressManager.isCenterNotSet()) {
+        if(manager.isCenterNotSet()) {
             cir.setReturnValue(false);
             return;
         }
@@ -138,8 +136,8 @@ public abstract class FortressClientInteractionManagerMixin {
         }
 
 
-        if(fortressManager.isBuildingHovered()) {
-            openManageBuildingMenu(fortressManager);
+        if(manager.isBuildingHovered()) {
+            openManageBuildingMenu(manager);
             cir.setReturnValue(false);
             return;
         }
@@ -149,7 +147,7 @@ public abstract class FortressClientInteractionManagerMixin {
     }
 
     @Unique
-    private static void openManageBuildingMenu(FortressClientManager fortressManager) {
+    private static void openManageBuildingMenu(IClientFortressManager fortressManager) {
         fortressManager
                 .getHoveredBuilding()
                 .ifPresent(it -> {
@@ -167,10 +165,10 @@ public abstract class FortressClientInteractionManagerMixin {
     @Inject(method = "interactEntity", at = @At("HEAD"), cancellable = true)
     public void interactEntity(PlayerEntity player, Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         if(getCurrentGameMode() == FORTRESS) {
-            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-            final FortressClientManager fcm = fortressClient.get_FortressClientManager();
-            if (fcm.getState() == FortressState.COMBAT) {
-                final var fightManager = fcm.getFightManager();
+            final var provider = (IClientManagersProvider) this.client;
+            final var manager = provider.get_ClientFortressManager();
+            if (manager.getState() == FortressState.COMBAT) {
+                final var fightManager = manager.getFightManager();
                 final var selectionManager = fightManager.getSelectionManager();
                 if(selectionManager.isSelecting())
                     selectionManager.resetSelection();
@@ -196,9 +194,9 @@ public abstract class FortressClientInteractionManagerMixin {
         if(world!= null && !world.getWorldBorder().contains(blockPos)) return;
 
 
-        final FortressMinecraftClient fortressClient = (FortressMinecraftClient) this.client;
-        final ClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
-        final FortressClientManager fortressManager = fortressClient.get_FortressClientManager();
+        final var fortressClient = (IClientManagersProvider) this.client;
+        final var clientBlueprintManager = fortressClient.get_BlueprintManager();
+        final var fortressManager = fortressClient.get_ClientFortressManager();
 
         if(fortressManager.getState() == FortressState.COMBAT) {
             final var influenceManager = ModUtils.getInfluenceManager();
@@ -249,7 +247,7 @@ public abstract class FortressClientInteractionManagerMixin {
             cir.setReturnValue(ActionResult.SUCCESS);
             return;
         }
-        final SelectionManager selectionManager = fortressClient.get_SelectionManager();
+        final var selectionManager = fortressClient.get_SelectionManager();
         if(selectionManager.isSelecting()) {
             selectionManager.selectBlock(blockPos, null);
             cir.setReturnValue(ActionResult.SUCCESS);
@@ -261,7 +259,7 @@ public abstract class FortressClientInteractionManagerMixin {
     }
 
     @Unique
-    private static void updateFightSelection(BlockHitResult hitResult, FortressClientManager fortressManager) {
+    private static void updateFightSelection(BlockHitResult hitResult, IClientFortressManager fortressManager) {
         final var fightManager = fortressManager.getFightManager();
         final var selectionManager = fightManager.getSelectionManager();
         if(selectionManager.isSelecting())
@@ -303,7 +301,7 @@ public abstract class FortressClientInteractionManagerMixin {
             blockPos = blockPos.offset(useOnContext.getSide());
         }
 
-        ((FortressMinecraftClient)client).get_SelectionManager().selectBlock(blockPos, blockState);
+        ((IClientManagersProvider)client).get_SelectionManager().selectBlock(blockPos, blockState);
     }
 
     @Unique

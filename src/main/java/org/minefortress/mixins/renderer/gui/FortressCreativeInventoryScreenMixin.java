@@ -28,7 +28,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.resources.client.ClientResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -242,7 +242,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     }
 
     @Unique
-    private static ClientResourceManager getResourceManager() {
+    private static IClientResourceManager getResourceManager() {
         return ModUtils.getFortressClientManager().getResourceManager();
     }
 

@@ -1,8 +1,8 @@
 package org.minefortress.renderer.gui.hud.hints;
 
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.renderer.gui.hud.HudState;
-import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +33,7 @@ public class BuildBlueprintHintsLayer extends AbstractHintsLayer {
         return super.shouldRender(hudState) && hudState == HudState.BLUEPRINT;
     }
 
-    private ClientBlueprintManager getBlueprintManager() {
-        return ModUtils.getFortressClient().get_BlueprintManager();
+    private IClientBlueprintManager getBlueprintManager() {
+        return CoreModUtils.getMineFortressManagersProvider().get_BlueprintManager();
     }
 }

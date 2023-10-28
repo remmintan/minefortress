@@ -4,9 +4,9 @@ import com.chocohead.mm.api.ClassTinkerers;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.minecraft.client.gui.screen.GameModeSelectionScreen;
+import net.remmintan.mods.minefortress.networking.registries.ClientNetworkReceivers;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreen;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreen;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
 import org.minefortress.registries.FortressClientEvents;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressKeybindings;
@@ -22,11 +22,12 @@ public class MineFortressClient implements ClientModInitializer {
     public void onInitializeClient() {
         FortressKeybindings.init();
         FortressEntities.registerRenderers();
+        NetworkReaders.register();
 
         ScreenRegistry.register(FORTRESS_CRAFTING_SCREEN_HANDLER, FortressCraftingScreen::new);
         ScreenRegistry.register(FORTRESS_FURNACE_SCREEN_HANDLER, FortressFurnaceScreen::new);
 
-        FortressClientNetworkHelper.registerReceivers();
+        ClientNetworkReceivers.registerReceivers();
         FortressClientEvents.register();
     }
 }

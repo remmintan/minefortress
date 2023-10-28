@@ -8,16 +8,19 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IBlockRequirement;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.professions.ProfessionFullInfo.Requirements;
 import org.minefortress.utils.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Profession {
+public class Profession implements IProfession {
 
     private final String id;
     private final String title;
@@ -29,12 +32,12 @@ public class Profession {
     private final List<Text> unlockMessage;
     private final String buildingRequirement;
     private final Block blockRequirement;
-    private final List<ItemInfo> itemsRequirement;
+    private final List<IItemInfo> itemsRequirement;
     private final boolean hireMenu;
     private final boolean blueprint;
 
-    private Profession parent;
-    private final List<Profession> children = new ArrayList<>();
+    private IProfession parent;
+    private final List<IProfession> children = new ArrayList<>();
 
     public Profession(ProfessionFullInfo fullInfo) {
         this.id = fullInfo.key();
@@ -59,7 +62,7 @@ public class Profession {
             this.itemsRequirement = requirements
                     .items()
                     .stream()
-                    .map(it -> new ItemInfo(it.item(), it.count()))
+                    .map(it -> (IItemInfo)new ItemInfo(it.item(), it.count()))
                     .toList();
         } else {
             buildingRequirement = "";
@@ -79,84 +82,103 @@ public class Profession {
         }
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public boolean isHireMenu() {
         return hireMenu;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }
 
+    @Override
     public ItemStack getIcon() {
         return icon;
     }
 
+    @Override
     public int getAmount() {
         return amount;
     }
 
+    @Override
     public void setAmount(int amount) {
         this.amount = amount;
     }
 
+    @Override
     public AdvancementFrame getType() {
         return type;
     }
 
-    public void setParent(Profession profession) {
+    @Override
+    public void setParent(IProfession profession) {
         if(this.parent != null)
             throw new IllegalStateException("Profession already has a parent");
         this.parent = profession;
     }
 
-    public void addChild(Profession profession) {
+    @Override
+    public void addChild(IProfession profession) {
         this.children.add(profession);
     }
 
-    public List<Profession> getChildren() {
+    @Override
+    public List<IProfession> getChildren() {
         return Collections.unmodifiableList(children);
     }
 
+    @Override
     public List<Text> getDescription() {
         return description;
     }
 
+    @Override
     public List<Text> getUnlockMessage() {
         return unlockMessage;
     }
 
+    @Override
     public List<Text> getUnlockMoreMessage() {
         return unlockMoreMessage;
     }
 
-    public Profession getParent() {
+    @Override
+    public IProfession getParent() {
         return parent;
     }
 
-    public List<ItemInfo> getItemsRequirement() {
+    @Override
+    public List<IItemInfo> getItemsRequirement() {
         return itemsRequirement;
     }
 
+    @Override
     @Nullable
     public String getBuildingRequirement() {
         return buildingRequirement;
     }
 
+    @Override
     @Nullable
-    public BlockRequirement getBlockRequirement() {
+    public IBlockRequirement getBlockRequirement() {
         return new BlockRequirement(blockRequirement, blueprint);
     }
 
+    @Override
     public NbtCompound toNbt() {
         final NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putInt("amount", amount);
         return nbtCompound;
     }
 
+    @Override
     public void readNbt(NbtCompound nbtCompound) {
         if(nbtCompound.contains("amount"))
             amount = nbtCompound.getInt("amount");
@@ -164,5 +186,5 @@ public class Profession {
             amount = 0;
     }
 
-    public record BlockRequirement(Block block, boolean blueprint) {}
+    public record BlockRequirement(Block block, boolean blueprint) implements IBlockRequirement {}
 }

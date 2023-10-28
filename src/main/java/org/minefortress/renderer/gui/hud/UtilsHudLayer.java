@@ -2,16 +2,15 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.BookScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Items;
-import org.minefortress.network.c2s.ServerboundSleepPacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundSleepPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.FortressBookContents;
 import org.minefortress.renderer.gui.widget.ItemButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemToggleOtherItemWidget;
 import org.minefortress.renderer.gui.widget.TextButtonWidget;
-import org.minefortress.tasks.ClientVisualTasksHolder;
 import org.minefortress.utils.ModUtils;
 
 import java.util.EnumSet;
@@ -47,10 +46,10 @@ public class UtilsHudLayer extends AbstractHudLayer {
                     0,
                     100,
                     Items.ENDER_EYE,
-                    (btn) -> ModUtils.getClientTasksHolder().ifPresent(ClientVisualTasksHolder::toggleSelectionVisibility),
-                    (button) -> ModUtils.getClientTasksHolder().map(ClientVisualTasksHolder::isSelectionHidden)
+                    (btn) -> ModUtils.getClientTasksHolder().ifPresent(IClientTasksHolder::toggleSelectionVisibility),
+                    (button) -> ModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden)
                             .map(it -> it ? "Show Tasks outline" : "Hide Tasks outline"),
-                    () -> ModUtils.getClientTasksHolder().map(ClientVisualTasksHolder::isSelectionHidden).orElse(false),
+                    () -> ModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden).orElse(false),
                     () -> true,
                     Items.ENDER_PEARL
             ),

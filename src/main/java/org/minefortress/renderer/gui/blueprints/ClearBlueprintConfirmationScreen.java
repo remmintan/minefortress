@@ -6,8 +6,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
-import org.minefortress.network.c2s.C2SClearActiveBlueprint;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.networking.c2s.C2SClearActiveBlueprint;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 
 @Environment(value= EnvType.CLIENT)
 public class ClearBlueprintConfirmationScreen extends Screen {

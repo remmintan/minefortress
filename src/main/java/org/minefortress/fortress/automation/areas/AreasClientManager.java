@@ -8,13 +8,17 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
+import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionModelBuilderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreasClientManager;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ISavedAreasHolder;
+import net.remmintan.mods.minefortress.networking.c2s.C2SAddAreaPacket;
+import net.remmintan.mods.minefortress.networking.c2s.C2SRemoveAutomationAreaPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.joml.Vector4f;
-import org.minefortress.network.c2s.C2SAddAreaPacket;
-import org.minefortress.network.c2s.C2SRemoveAutomationAreaPacket;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
-import org.minefortress.selections.renderer.ISelectionInfoProvider;
-import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
-import org.minefortress.utils.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Collections;
@@ -22,16 +26,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class AreasClientManager implements ISelectionInfoProvider, ISelectionModelBuilderInfoProvider {
+public final class AreasClientManager implements ISelectionInfoProvider, ISelectionModelBuilderInfoProvider, IAreasClientManager {
 
     private final SavedAreasHolder savedAreasHolder = new SavedAreasHolder();
     private boolean needsUpdate;
     private ProfessionsSelectionType selectionType;
     private BlockPos selectionStart;
     private BlockPos selectionEnd;
-    private AutomationAreaInfo hoveredArea;
+    private IAutomationAreaInfo hoveredArea;
     private boolean isCorrectState = true;
 
+    @Override
     public boolean select(HitResult target) {
         if(target == null) return false;
         if(target instanceof BlockHitResult bhr) {
@@ -69,6 +74,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         return true;
     }
 
+    @Override
     public void updateSelection(HitResult crosshairTarget) {
         if(crosshairTarget instanceof BlockHitResult bhr) {
             final var blockPos = bhr.getBlockPos();
@@ -91,6 +97,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         }
     }
 
+    @Override
     public void resetSelection() {
         this.selectionEnd = null;
         this.selectionStart = null;
@@ -99,6 +106,7 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         this.isCorrectState = true;
     }
 
+    @Override
     public void removeHovered() {
         if(hoveredArea != null) {
             final var packet = new C2SRemoveAutomationAreaPacket(hoveredArea.getId());
@@ -132,10 +140,12 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                 .toList();
     }
 
+    @Override
     public ProfessionsSelectionType getSelectionType() {
         return selectionType;
     }
 
+    @Override
     public void setSelectionType(ProfessionsSelectionType selectionType) {
         this.selectionType = selectionType;
     }
@@ -152,13 +162,15 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         return Collections.emptyList();
     }
 
-    public SavedAreasHolder getSavedAreasHolder() {
+    @Override
+    public ISavedAreasHolder getSavedAreasHolder() {
         return savedAreasHolder;
     }
 
+    @Override
     public Optional<String> getHoveredAreaName() {
         return Optional.ofNullable(hoveredArea)
-                .map(AutomationAreaInfo::getAreaType)
+                .map(IAutomationAreaInfo::getAreaType)
                 .map(ProfessionsSelectionType::getTitle);
     }
 

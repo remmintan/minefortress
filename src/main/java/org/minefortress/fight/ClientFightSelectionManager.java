@@ -2,23 +2,23 @@ package org.minefortress.fight;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.dtos.combat.MousePos;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightSelectionManager;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.interfaces.ITargetedPawn;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
-public class ClientFightSelectionManager {
+public class ClientFightSelectionManager implements IClientFightSelectionManager {
 
 
     private MousePos selectionStartPos;
@@ -30,12 +30,14 @@ public class ClientFightSelectionManager {
 
     private Vec3d cachedBlockPos;
 
+    @Override
     public void startSelection(double x, double y, Vec3d startBlock) {
         this.resetSelection();
         this.selectionStartPos = new MousePos(x, y);
         this.selectionStartBlock = startBlock;
     }
 
+    @Override
     public void endSelection() {
         this.selectionStartBlock = null;
         this.selectionStartPos = null;
@@ -51,15 +53,18 @@ public class ClientFightSelectionManager {
         }
     }
 
+    @Override
     public boolean hasSelected() {
         return !this.selectedPawns.isEmpty();
     }
 
+    @Override
     public void updateSelection(Mouse mouse, BlockHitResult target) {
         Vec3d pos = target.getPos();
         this.updateSelection(mouse.getX(), mouse.getY(), pos);
     }
 
+    @Override
     public void updateSelection(double x, double y, @Nullable Vec3d endBlock) {
         if(endBlock == null) return;
         if(!isSelectionStarted()) return;
@@ -90,6 +95,7 @@ public class ClientFightSelectionManager {
         }
     }
 
+    @Override
     public void resetSelection() {
         this.selectionStartPos = null;
         this.selectionStartBlock = null;
@@ -98,38 +104,34 @@ public class ClientFightSelectionManager {
         this.selectedPawns.clear();
     }
 
+    @Override
     public boolean isSelecting() {
         return this.selectionStartPos != null && this.selectionStartBlock != null && this.selectionCurPos != null && this.selectionCurBlock != null;
     }
 
+    @Override
     public boolean isSelectionStarted() {
         return this.selectionStartPos != null && this.selectionStartBlock != null;
     }
 
+    @Override
     public void forEachSelected(Consumer<ITargetedPawn> action) {
         selectedPawns.forEach(action);
     }
 
+    @Override
     public MousePos getSelectionStartPos() {
         return selectionStartPos;
     }
 
+    @Override
     public MousePos getSelectionCurPos() {
         return selectionCurPos;
     }
 
+    @Override
     public boolean isSelected(ITargetedPawn colonist) {
         return this.selectedPawns.contains(colonist);
-    }
-
-    public record MousePos(double x, double y) {
-        public int getX() {
-            return (int) x;
-        }
-
-        public int getY() {
-            return (int) y;
-        }
     }
 
 

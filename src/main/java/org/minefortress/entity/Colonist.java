@@ -30,14 +30,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.*;
 import org.minefortress.entity.ai.goal.*;
-import org.minefortress.entity.interfaces.IWorkerPawn;
-import org.minefortress.fortress.FortressServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import org.minefortress.registries.FortressEntities;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 
 import java.util.Optional;
 
@@ -58,7 +61,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     private final DigControl digControl;
     private final PlaceControl placeControl;
     private final ScaffoldsControl scaffoldsControl;
-    private final TaskControl taskControl;
+    private final ITaskControl taskControl;
     private final MovementHelper movementHelper;
     private final IBaritone baritone;
 
@@ -201,8 +204,8 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     private void tickProfessionCheck() {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId) || RESERVE_PROFESSION_ID.equals(professionId)) {
-            getFortressServerManager()
-                    .map(FortressServerManager::getServerProfessionManager)
+            getManagersProvider()
+                    .map(IServerManagersProvider::getProfessionsManager)
                     .flatMap(it -> it.getProfessionsWithAvailablePlaces(RESERVE_PROFESSION_ID.equals(professionId)))
                     .ifPresent(this::setProfession);
         }
@@ -222,7 +225,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     }
 
     private void tickAllControls() {
-        if(getEatControl().map(EatControl::isEating).orElse(false)) return;
+        if(getEatControl().map(IEatControl::isEating).orElse(false)) return;
         if(getDigControl() != null) getDigControl().tick();
         if(getPlaceControl() != null) getPlaceControl().tick();
         if(getScaffoldsControl() != null) getScaffoldsControl().tick();
@@ -287,7 +290,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
 
     private BlockPos goal;
 
-    public void setGoal(TaskBlockInfo taskBlockInfo) {
+    public void setGoal(ITaskBlockInfo taskBlockInfo) {
         this.goal = taskBlockInfo.getPos();
         Item placingItem = taskBlockInfo.getPlacingItem();
         if(placingItem != null) {
@@ -360,15 +363,15 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         }
     }
     public void setProfession(String professionId) {
-        getFortressServerManager().ifPresent(it -> {
-            final var spm = it.getServerProfessionManager();
+        getManagersProvider().ifPresent(it -> {
+            final var spm = it.getProfessionsManager();
             final var type = spm.getEntityTypeForProfession(professionId);
             if(type == FortressEntities.COLONIST_ENTITY_TYPE) {
                 this.dataTracker.set(PROFESSION_ID, professionId);
             } else if (type == FortressEntities.WARRIOR_PAWN_ENTITY_TYPE || type == FortressEntities.ARCHER_PAWN_ENTITY_TYPE) {
-                it.replaceColonistWithTypedPawn(this, professionId, type);
+                getServerFortressManager().ifPresent(m -> m.replaceColonistWithTypedPawn(this, professionId, type));
             }
-            it.scheduleSync();
+            getServerFortressManager().ifPresent(IServerFortressManager::scheduleSync);
         });
     }
 
@@ -376,7 +379,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         this.setProfession(DEFAULT_PROFESSION_ID);
     }
 
-    public TaskControl getTaskControl() {
+    public ITaskControl getTaskControl() {
         return taskControl;
     }
 

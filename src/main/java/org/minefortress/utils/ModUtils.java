@@ -8,17 +8,18 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.infuence.IClientInfluenceManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreasClientManager;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.fight.influence.ClientInfluenceManager;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.fortress.automation.areas.AreasClientManager;
-import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.ClientProfessionManager;
-import org.minefortress.selections.SelectionManager;
-import org.minefortress.tasks.ClientVisualTasksHolder;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -49,8 +50,12 @@ public class ModUtils {
         return gameMode == MineFortressMod.FORTRESS;
     }
 
-    public static FortressMinecraftClient getFortressClient() {
-        return (FortressMinecraftClient) MinecraftClient.getInstance();
+    public static IFortressMinecraftClient getFortressClient() {
+        return (IFortressMinecraftClient) MinecraftClient.getInstance();
+    }
+
+    private static IClientManagersProvider getClientManagersProvider() {
+        return (IClientManagersProvider) MinecraftClient.getInstance();
     }
 
     public static boolean isClientInFortressGamemode() {
@@ -71,33 +76,33 @@ public class ModUtils {
                 .orElseThrow(() -> new IllegalStateException("Player is null"));
     }
 
-    public static FortressClientManager getFortressClientManager() {
-        return getFortressClient().get_FortressClientManager();
+    public static IClientFortressManager getFortressClientManager() {
+        return getClientManagersProvider().get_ClientFortressManager();
     }
 
-    public static ClientProfessionManager getProfessionManager() {
+    public static IClientProfessionManager getProfessionManager() {
         return getFortressClientManager().getProfessionManager();
     }
 
-    public static ClientBlueprintManager getBlueprintManager() {
-        return getFortressClient().get_BlueprintManager();
+    public static IClientBlueprintManager getBlueprintManager() {
+        return getClientManagersProvider().get_BlueprintManager();
     }
-    public static ClientInfluenceManager getInfluenceManager() {
-        return getFortressClient().get_InfluenceManager();
-    }
-
-    public static SelectionManager getSelectionManager() {
-        return getFortressClient().get_SelectionManager();
+    public static IClientInfluenceManager getInfluenceManager() {
+        return getClientManagersProvider().get_InfluenceManager();
     }
 
-    public static Optional<FortressClientWorld> getFortressClientWorld() {
+    public static ISelectionManager getSelectionManager() {
+        return getClientManagersProvider().get_SelectionManager();
+    }
+
+    public static Optional<ITasksInformationHolder> getFortressClientWorld() {
         return Optional.ofNullable(MinecraftClient.getInstance())
                 .map(it -> it.world)
-                .map(FortressClientWorld.class::cast);
+                .map(ITasksInformationHolder.class::cast);
     }
 
-    public static Optional<ClientVisualTasksHolder> getClientTasksHolder() {
-        return getFortressClientWorld().map(FortressClientWorld::get_ClientTasksHolder);
+    public static Optional<IClientTasksHolder> getClientTasksHolder() {
+        return getFortressClientWorld().map(ITasksInformationHolder::get_ClientTasksHolder);
     }
 
     @NotNull
@@ -105,8 +110,8 @@ public class ModUtils {
         return Objects.requireNonNull(MinecraftClient.getInstance().player);
     }
 
-    public static AreasClientManager getAreasClientManager() {
-        return getFortressClient().get_AreasClientManager();
+    public static IAreasClientManager getAreasClientManager() {
+        return getClientManagersProvider().get_AreasClientManager();
     }
 
 

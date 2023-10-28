@@ -9,14 +9,14 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundFollowColonistPacket;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.interfaces.FortressServer;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
 import org.minefortress.interfaces.FortressWorldCreator;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundFollowColonistPacket;
 import org.minefortress.utils.ModUtils;
 
 public class FortressServerEvents {
@@ -46,12 +46,13 @@ public class FortressServerEvents {
 
         // initialising the fortress server on join
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            final var fortressServer = (FortressServer) server;
+            final var fortressServer = (IFortressServer) server;
             final var player = handler.player;
             final var fortressModServerManager = fortressServer.get_FortressModServerManager();
-            final var fsm = fortressModServerManager.getByPlayer(player);
-            fsm.syncOnJoin(fortressModServerManager.isCampfireEnabled(), fortressModServerManager.isBorderEnabled());
-            final var serverProfessionManager = fsm.getServerProfessionManager();
+            final var manager = fortressModServerManager.getFortressManager(player);
+            final var provider = fortressModServerManager.getManagersProvider(player);
+            manager.syncOnJoin(fortressModServerManager.isCampfireEnabled(), fortressModServerManager.isBorderEnabled());
+            final var serverProfessionManager = provider.getProfessionsManager();
             serverProfessionManager.sendProfessions(player);
             serverProfessionManager.scheduleSync();
 
@@ -71,26 +72,26 @@ public class FortressServerEvents {
         });
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            if(server instanceof FortressServer fortressServer) {
+            if(server instanceof IFortressServer IFortressServer) {
                 final var saveProps = server.getSaveProperties();
                 if(saveProps instanceof FortressWorldCreator wcProps) {
-                    fortressServer.get_FortressModServerManager().load(wcProps.is_ShowCampfire(), wcProps.is_BorderEnabled());
+                    IFortressServer.get_FortressModServerManager().load(wcProps.is_ShowCampfire(), wcProps.is_BorderEnabled());
                 } else {
-                    fortressServer.get_FortressModServerManager().load();
+                    IFortressServer.get_FortressModServerManager().load();
                 }
             }
         });
 
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-            if(server instanceof FortressServer fortressServer) {
-                fortressServer.get_FortressModServerManager().save();
-                fortressServer.get_BlueprintsWorld().closeSession();
+            if(server instanceof IFortressServer aserver) {
+                aserver.get_FortressModServerManager().save();
+                aserver.get_BlueprintsWorld().closeSession();
             }
         });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if(server instanceof FortressServer fortressServer) {
-                fortressServer.get_FortressModServerManager().tick(server.getPlayerManager());
+            if(server instanceof IFortressServer IFortressServer) {
+                IFortressServer.get_FortressModServerManager().tick(server.getPlayerManager());
             }
         });
 

@@ -11,7 +11,7 @@ import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
 
@@ -24,7 +24,7 @@ public class FortressCraftingScreenHandler extends AbstractFortressRecipeScreenH
         this(syncId, inventory, null);
     }
 
-    public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory, ServerResourceManager resourceManager) {
+    public FortressCraftingScreenHandler(int syncId, PlayerInventory inventory, IServerResourceManager resourceManager) {
         super(FORTRESS_CRAFTING_SCREEN_HANDLER, syncId, resourceManager, inventory.player);
 
         this.addSlot(new FortressCraftingResultSlot(player, getInput(), this.result, 0, 124, 35));

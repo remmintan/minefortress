@@ -2,11 +2,12 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
+import net.remmintan.gobi.SelectionType;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.widget.HideableButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemToggleWidget;
-import org.minefortress.selections.SelectionType;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Arrays;
@@ -96,7 +97,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                             20,
                             type.getButtonText(),
                             btn -> ModUtils.getSelectionManager().setSelectionType(type),
-                            type.getName(),
+                            type.name(),
                             () -> selection.checked
                     )
             );
@@ -109,15 +110,15 @@ public class ToolsHudLayer extends AbstractHudLayer {
     }
 
     private boolean treeCutterSelected() {
-        return ModUtils.getFortressClient().get_SelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
+        return CoreModUtils.getMineFortressManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
     }
 
     private boolean roadsSelected() {
-        return ModUtils.getFortressClient().get_SelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
+        return CoreModUtils.getMineFortressManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
     }
 
     private boolean blueprintSelected() {
-        return ModUtils.getFortressClient().get_BlueprintManager().isSelecting();
+        return CoreModUtils.getMineFortressManagersProvider().get_BlueprintManager().isSelecting();
     }
 
 }

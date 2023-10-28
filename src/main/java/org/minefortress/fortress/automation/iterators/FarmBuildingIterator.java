@@ -1,12 +1,11 @@
 package org.minefortress.fortress.automation.iterators;
 
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.minefortress.fortress.automation.AutomationActionType;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 
 public class FarmBuildingIterator extends AbstractFilteredIterator {

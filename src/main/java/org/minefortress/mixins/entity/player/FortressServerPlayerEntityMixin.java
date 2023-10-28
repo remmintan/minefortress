@@ -13,9 +13,10 @@ import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
-import org.minefortress.interfaces.FortressServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import org.minefortress.utils.FortressSpawnLocating;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,7 +37,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     private float persistedYaw;
     private float persistedPitch;
 
-    private ServerBlueprintManager serverBlueprintManager;
+    private IServerBlueprintManager serverBlueprintManager;
 
     private boolean wasInBlueprintWorldWhenLoggedOut = false;
 
@@ -85,7 +86,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     }
 
     @Override
-    public ServerBlueprintManager get_ServerBlueprintManager() {
+    public IServerBlueprintManager get_ServerBlueprintManager() {
         return serverBlueprintManager;
     }
 

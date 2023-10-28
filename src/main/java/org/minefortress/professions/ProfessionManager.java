@@ -3,17 +3,19 @@ package org.minefortress.professions;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.remmintan.mods.minefortress.core.interfaces.professions.*;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import org.minefortress.fortress.AbstractFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 import java.util.function.Supplier;
 
-public abstract class ProfessionManager {
+public abstract class ProfessionManager implements IProfessionsManager {
 
     public static final List<Item> FORESTER_ITEMS = Arrays.asList(
             Items.BEETROOT_SEEDS,
@@ -34,25 +36,27 @@ public abstract class ProfessionManager {
             Items.GLOW_INK_SAC
     );
 
-    private Profession root;
-    private Map<String, Profession> professions = Collections.emptyMap();
-    protected final Supplier<AbstractFortressManager> fortressManagerSupplier;
+    private IProfession root;
+    private Map<String, IProfession> professions = Collections.emptyMap();
+    protected final Supplier<IFortressManager> fortressManagerSupplier;
 
-    public ProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
+    public ProfessionManager(Supplier<IFortressManager> fortressManagerSupplier) {
         this.fortressManagerSupplier = fortressManagerSupplier;
     }
 
-    public Profession getRootProfession() {
+    @Override
+    public IProfession getRootProfession() {
         return this.root;
     }
 
-    public final ProfessionResearchState isRequirementsFulfilled(Profession profession, CountProfessionals countProfessionals, boolean countItems) {
+    @Override
+    public final ProfessionResearchState isRequirementsFulfilled(IProfession profession, CountProfessionals countProfessionals, boolean countItems) {
         final String buildingRequirement = profession.getBuildingRequirement();
         if(Objects.isNull(buildingRequirement) || Strings.isBlank(buildingRequirement)) {
             return ProfessionResearchState.UNLOCKED;
         }
 
-        final Profession parent = profession.getParent();
+        final IProfession parent = profession.getParent();
         if(Objects.nonNull(parent)) {
             final var parentState = this.isRequirementsFulfilled(parent, CountProfessionals.DONT_COUNT, false);
             if(parentState != ProfessionResearchState.UNLOCKED) {
@@ -66,22 +70,22 @@ public abstract class ProfessionManager {
             return ProfessionResearchState.UNLOCKED;
         }
 
-        final AbstractFortressManager fortressManager = fortressManagerSupplier.get();
+        final var fortressManager = fortressManagerSupplier.get();
         var minRequirementCount = 0;
         if(countProfessionals == CountProfessionals.INCREASE) {
             minRequirementCount = profession.getAmount();
         }
 
         boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement, minRequirementCount);
-        final Profession.BlockRequirement blockRequirement = profession.getBlockRequirement();
+        final IBlockRequirement blockRequirement = profession.getBlockRequirement();
         if(Objects.nonNull(blockRequirement)) {
             satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement.block(), blockRequirement.blueprint(), minRequirementCount);
         }
 
         if(countItems) {
             final var itemsRequirement = profession.getItemsRequirement();
-            if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement)) {
-                final var hasItems = fortressManager.getResourceManager().hasItems(itemsRequirement);
+            if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement) && !itemsRequirement.isEmpty()) {
+                final var hasItems = fortressManager instanceof IServerFortressManager sfm && sfm.getResourceManager().hasItems(itemsRequirement);
                 satisfied = satisfied && hasItems;
             }
         }
@@ -89,11 +93,13 @@ public abstract class ProfessionManager {
         return satisfied ? ProfessionResearchState.UNLOCKED : ProfessionResearchState.LOCKED_SELF;
     }
 
-    public Profession getProfession(String id) {
+    @Override
+    public IProfession getProfession(String id) {
         return getProfessions().get(id);
     }
 
-    public Optional<Profession> getByBuildingRequirement(String requirement) {
+    @Override
+    public Optional<IProfession> getByBuildingRequirement(String requirement) {
         return getProfessions().values()
                 .stream()
                 .filter(
@@ -107,14 +113,15 @@ public abstract class ProfessionManager {
 
     @Unmodifiable
     @NotNull
-    protected Map<String, Profession> getProfessions(){
+    protected Map<String, IProfession> getProfessions(){
         return this.professions;
     }
 
-    protected void setProfessions(Map<String, Profession> professions) {
+    protected void setProfessions(Map<String, IProfession> professions) {
         this.professions = Collections.unmodifiableMap(professions);
     }
 
+    @Override
     public boolean hasProfession(String name) {
         return getProfessions().containsKey(name) && getProfessions().get(name).getAmount() > 0;
     }
@@ -140,8 +147,8 @@ public abstract class ProfessionManager {
         }
     }
 
-    private void readChildren(JsonReader reader, Profession parent) throws IOException {
-        final var childrenProfession = new ArrayList<Profession>();
+    private void readChildren(JsonReader reader, IProfession parent) throws IOException {
+        final var childrenProfession = new ArrayList<IProfession>();
         reader.beginObject();
         while (reader.hasNext()) {
             final var childName = reader.nextName();
@@ -155,30 +162,24 @@ public abstract class ProfessionManager {
         }
     }
 
-    private void addChildren(Profession parent, List<Profession> children) {
-        for (Profession child : children) {
+    private void addChildren(IProfession parent, List<IProfession> children) {
+        for (IProfession child : children) {
             parent.addChild(child);
             child.setParent(parent);
         }
     }
 
+    @Override
     public int getFreeColonists() {
         final var abstractFortressManager = fortressManagerSupplier.get();
         final int totalColonists = abstractFortressManager.getTotalColonistsCount();
         final int reservedColonists = abstractFortressManager.getReservedPawnsCount();
-        final int totalWorkers = getProfessions().values().stream().mapToInt(Profession::getAmount).sum();
+        final int totalWorkers = getProfessions().values().stream().mapToInt(IProfession::getAmount).sum();
         return totalColonists - totalWorkers - reservedColonists;
     }
 
-    public Optional<String> findIdFromProfession(Profession profession) {
+    @Override
+    public Optional<String> findIdFromProfession(IProfession profession) {
         return getProfessions().entrySet().stream().filter(entry -> entry.getValue() == profession).map(Map.Entry::getKey).findFirst();
-    }
-
-    public abstract void increaseAmount(String professionId, boolean alreadyCharged);
-    public abstract void decreaseAmount(String professionId);
-
-    public enum CountProfessionals {
-        INCREASE,
-        DONT_COUNT
     }
 }

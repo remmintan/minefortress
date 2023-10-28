@@ -5,10 +5,10 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.entity.ai.controls.TaskControl;
-import org.minefortress.tasks.TaskType;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
+import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +112,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         LOGGER.debug("{} moving to next block", getColonistName());
         getMovementHelper().reset();
         workGoal = null;
-        TaskBlockInfo taskBlockInfo = null;
+        ITaskBlockInfo taskBlockInfo = null;
         while (getTaskControl().partHasMoreBlocks()) {
             LOGGER.debug("{} task is not finished yet", getColonistName());
             taskBlockInfo = getTaskControl().getNextBlock();
@@ -147,7 +147,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     private boolean blockInCorrectState(BlockPos pos) {
         if(pos == null) return false;
         if(getTaskControl().is(TaskType.REMOVE)) {
-            if(pos.equals(colonist.getFortressServerManager().orElseThrow().getFortressCenter())) return false;
+            if(pos.equals(colonist.getServerFortressManager().orElseThrow().getFortressCenter())) return false;
             return BuildingHelper.canRemoveBlock(world, pos);
         } else if(getTaskControl().is(TaskType.BUILD)) {
             return BuildingHelper.canPlaceBlock(world, pos);
@@ -156,7 +156,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         }
     }
 
-    private TaskControl getTaskControl() {
+    private ITaskControl getTaskControl() {
         return this.colonist.getTaskControl();
     }
 

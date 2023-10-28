@@ -15,9 +15,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import org.minefortress.blueprints.manager.BlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.panama.renderer.BlueprintRenderer;
-import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 import org.minefortress.utils.ModUtils;
@@ -211,7 +212,7 @@ public final class BlueprintsScreen extends Screen {
                 if(fortressClientManager.isSurvival()) {
                     final var stacks = blueprintSlot.getBlockData().getStacks();
                     for (int i1 = 0; i1 < stacks.size(); i1++) {
-                        final ItemInfo stack = stacks.get(i1);
+                        final var stack = stacks.get(i1);
                         final var hasItem = resourceManager.hasItem(stack, stacks);
                         final var itemX = x + 25 + i1%10 * 30;
                         final var itemY = i1/10 * 20 + this.backgroundHeight;
@@ -254,7 +255,7 @@ public final class BlueprintsScreen extends Screen {
         this.drawMouseoverTooltip(drawContext, mouseX, mouseY);
     }
 
-    public static Item convertItemIconInTheGUI(ItemInfo stack) {
+    public static Item convertItemIconInTheGUI(IItemInfo stack) {
         final var originalItem = stack.item();
         if(Items.FARMLAND.equals(originalItem)) {
             return Items.DIRT;
@@ -341,7 +342,7 @@ public final class BlueprintsScreen extends Screen {
             drawContext.drawItem(new ItemStack(Items.BRICK), (int)(slotX/scaleFactor), (int)(slotY/scaleFactor));
             matrices.pop();
         } else {
-            final BlueprintMetadata metadata = slot.getMetadata();
+            final IBlueprintMetadata metadata = slot.getMetadata();
             final var enoughResources = !ModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
             if(this.client != null){
                 this.blueprintRenderer.renderBlueprintInGui(drawContext.getMatrices(), metadata.getId(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);

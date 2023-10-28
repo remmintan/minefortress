@@ -1,7 +1,6 @@
 package org.minefortress.mixins.entity;
 
 
-import com.chocohead.mm.api.ClassTinkerers;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -12,9 +11,7 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameMode;
-import org.minefortress.MineFortressMod;
-import org.minefortress.interfaces.FortressServer;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.Collections;
@@ -30,7 +27,7 @@ public abstract class FurnaceBlockEntityMixin extends AbstractFurnaceBlockEntity
     @Override
     public List<Recipe<?>> getRecipesUsedAndDropExperience(ServerWorld world, Vec3d pos) {
         if(world == null) throw new IllegalStateException("World is null");
-        final var isFortress = world.getServer() instanceof FortressServer;
+        final var isFortress = world.getServer() instanceof IFortressServer;
         if(isFortress)
             return Collections.emptyList();
         else

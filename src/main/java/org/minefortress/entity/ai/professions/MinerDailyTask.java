@@ -1,25 +1,22 @@
 package org.minefortress.entity.ai.professions;
 
+import net.minecraft.registry.tag.FluidTags;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.fortress.automation.IAutomationArea;
-import org.minefortress.fortress.automation.AutomationBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.util.math.BlockPos;
 
 public class MinerDailyTask implements ProfessionDailyTask{
 
     private long stopTime = 0L;
 
     private IAutomationArea currentMine;
-    private Iterator<AutomationBlockInfo> mineIterator;
-    private AutomationBlockInfo goal;
+    private Iterator<IAutomationBlockInfo> mineIterator;
+    private IAutomationBlockInfo goal;
 
     @Override
     public boolean canStart(Colonist colonist) {
@@ -92,7 +89,7 @@ public class MinerDailyTask implements ProfessionDailyTask{
     }
 
     private Optional<IAutomationArea> getMine(Colonist colonist) {
-        return colonist.getFortressServerManager()
+        return colonist.getServerFortressManager()
                 .flatMap(it -> it.getAutomationAreaByRequirementId("miner"));
     }
 

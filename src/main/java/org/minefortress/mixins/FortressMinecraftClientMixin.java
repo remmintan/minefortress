@@ -18,32 +18,28 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
+import net.remmintan.gobi.SelectionManager;
+import net.remmintan.mods.minefortress.core.FortressState;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
+import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionModelBuilderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.panama.renderer.*;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import net.remmintan.panama.renderer.BlueprintRenderer;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fight.influence.ClientInfluenceManager;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.fortress.FortressState;
+import org.minefortress.fortress.ClientFortressManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
-import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.hire.ClientHireHandler;
-import org.minefortress.professions.hire.HireInfo;
-import org.minefortress.renderer.FortressRenderLayer;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
-import org.minefortress.renderer.gui.hire.HirePawnScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
-import org.minefortress.selections.SelectionManager;
-import org.minefortress.selections.renderer.ISelectionInfoProvider;
-import org.minefortress.selections.renderer.ISelectionModelBuilderInfoProvider;
-import net.remmintan.panama.renderer.CampfireRenderer;
-import net.remmintan.panama.renderer.SelectionRenderer;
-import org.minefortress.selections.renderer.tasks.ITasksModelBuilderInfoProvider;
-import org.minefortress.selections.renderer.tasks.ITasksRenderInfoProvider;
-import net.remmintan.panama.renderer.TasksRenderer;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -59,14 +55,14 @@ import java.util.function.Supplier;
 import static java.util.Map.entry;
 
 @Mixin(MinecraftClient.class)
-public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecutor<Runnable> implements FortressMinecraftClient {
+public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecutor<Runnable> implements IFortressMinecraftClient, IClientManagersProvider {
 
     @Unique
-    private SelectionManager selectionManager;
+    private ISelectionManager selectionManager;
     @Unique
     private FortressHud fortressHud;
     @Unique
-    private FortressClientManager fortressClientManager;
+    private ClientFortressManager clientFortressManager;
     @Unique
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
     @Unique
@@ -120,7 +116,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
         this.selectionManager = new SelectionManager(client);
         this.fortressHud = new FortressHud(client);
-        this.fortressClientManager = new FortressClientManager();
+        this.clientFortressManager = new ClientFortressManager();
         this.areasClientManager = new AreasClientManager();
 
         clientBlueprintManager = new ClientBlueprintManager(client);
@@ -134,12 +130,15 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
                 entry(FortressRenderLayer.getLinesNoDepth(), new BufferBuilder(256))
         );
 
+        final var provider = CoreModUtils.getMineFortressManagersProvider();
+        final var manager = provider.get_ClientFortressManager();
+
         final Supplier<ISelectionInfoProvider> selectInfProvSup = () ->
-                ModUtils.getFortressClientManager().getState() == FortressState.BUILD ?
+                manager.getState() == FortressState.BUILD ?
                         ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
 
         final Supplier<ISelectionModelBuilderInfoProvider> selModBuildInfProv = () ->
-                ModUtils.getFortressClientManager().getState() == FortressState.BUILD ?
+                manager.getState() == FortressState.BUILD ?
                         ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
 
         selectionRenderer = new SelectionRenderer(
@@ -151,19 +150,19 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         );
 
         final Supplier<ITasksRenderInfoProvider> clientTasksHolderSupplier = () -> {
-            if(fortressClientManager.getState() == FortressState.AREAS_SELECTION)
+            if(clientFortressManager.getState() == FortressState.AREAS_SELECTION)
                 return areasClientManager.getSavedAreasHolder();
 
-            final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
+            final ITasksInformationHolder fortressWorld = (ITasksInformationHolder) this.world;
             if(fortressWorld == null) return null;
             return fortressWorld.get_ClientTasksHolder();
         };
 
         final Supplier<ITasksModelBuilderInfoProvider> clientBlueprintManagerSupplier = () -> {
-            if(fortressClientManager.getState() == FortressState.AREAS_SELECTION)
+            if(clientFortressManager.getState() == FortressState.AREAS_SELECTION)
                 return areasClientManager.getSavedAreasHolder();
 
-            final FortressClientWorld fortressWorld = (FortressClientWorld) this.world;
+            final ITasksInformationHolder fortressWorld = (ITasksInformationHolder) this.world;
             if(fortressWorld == null) return null;
             return fortressWorld.get_ClientTasksHolder();
         };
@@ -175,7 +174,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public SelectionManager get_SelectionManager() {
+    public ISelectionManager get_SelectionManager() {
         return selectionManager;
     }
 
@@ -219,8 +218,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public FortressClientManager get_FortressClientManager() {
-        return fortressClientManager;
+    public ClientFortressManager get_ClientFortressManager() {
+        return clientFortressManager;
     }
 
     @Override
@@ -282,14 +281,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return this.influenceManager;
     }
 
-
-    @Override
-    public void open_HireScreen(MinecraftClient client, String screenName, Map<String, HireInfo> professions) {
-        final var handler = new ClientHireHandler(screenName, professions);
-        final var screen = new HirePawnScreen(handler);
-        client.setScreen(screen);
-    }
-
     @Inject(method = "close", at = @At("HEAD"))
     public void close(CallbackInfo ci) {
         this.blueprintRenderer.close();
@@ -299,7 +290,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Unique
     private IBlockDataProvider getProperBlockDataProviderBasedOnState() {
-        if(fortressClientManager.getState() == FortressState.COMBAT) {
+        if(clientFortressManager.getState() == FortressState.COMBAT) {
             return this.get_InfluenceManager().getBlockDataProvider();
         }
 

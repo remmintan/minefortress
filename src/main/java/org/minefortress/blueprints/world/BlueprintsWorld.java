@@ -37,18 +37,20 @@ import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintsWorld;
+import net.remmintan.mods.minefortress.core.interfaces.server.IBlueprintEditingWorld;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.data.FortressModDataLoader;
-import org.minefortress.interfaces.FortressServer;
-import org.minefortress.renderer.gui.blueprints.BlueprintGroup;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 
-public class BlueprintsWorld {
+public class BlueprintsWorld implements IBlueprintsWorld {
 
 
     private static final GameRules EDIT_BLUEPRINT_RULES = Util.make(new GameRules(), gameRules -> {
@@ -93,7 +95,7 @@ public class BlueprintsWorld {
         this.server = server;
     }
 
-    public FortressServerWorld getWorld() {
+    public IBlueprintEditingWorld getWorld() {
         if(world == null) {
             create();
         }
@@ -117,7 +119,7 @@ public class BlueprintsWorld {
         final Executor executor = Util.getMainWorkerExecutor();
         final DynamicRegistryManager dynamicRegistryManager = server.getRegistryManager();
 
-        this.fortressSession = FortressModDataLoader.getInstance().getBlueprintsWorldSession();
+        this.fortressSession = ModPathUtils.getInstance().getBlueprintsWorldSession();
 
         final Registry<Biome> biomeRegistry = dynamicRegistryManager.get(RegistryKeys.BIOME);
         final Registry<DimensionType> dimensionTypeRegistry = dynamicRegistryManager.get(RegistryKeys.DIMENSION_TYPE);
@@ -135,7 +137,7 @@ public class BlueprintsWorld {
                 levelProperties,
                 BLUEPRINTS_WORLD_REGISTRY_KEY,
                 new DimensionOptions(dimensionTypeRegistry.getEntry(DimensionTypes.OVERWORLD).orElseThrow(), chunkGenerator),
-                ((FortressServer)server).get_WorldGenerationProgressListener()
+                ((IFortressServer)server).get_WorldGenerationProgressListener()
         );
     }
 
@@ -154,12 +156,13 @@ public class BlueprintsWorld {
 
     public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel, BlueprintGroup group) {
         this.preparedBlueprintData = blueprintData;
-        final FortressServerWorld world = getWorld();
+        final var world = getWorld();
         world.setFileName(blueprintFileName);
         world.setFloorLevel(floorLevel);
         world.setBlueprintGroup(group);
     }
 
+    @Override
     public void clearBlueprint(ServerPlayerEntity player) {
         preparedBlueprintData = new HashMap<>();
         putBlueprintInAWorld(player, new Vec3i(1, 1, 1));

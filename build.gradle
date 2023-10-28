@@ -4,9 +4,6 @@ plugins {
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
 if(System.getenv("BUILD_NUMBER") != null) {
 	archivesBaseName = "${project.archives_base_name}-nightly"
 	version = "${project.mod_version}+${System.getenv("BUILD_NUMBER")}"
@@ -19,7 +16,32 @@ if(System.getenv("BUILD_NUMBER") != null) {
 	}
 }
 
+sourceSets {
+	core {
+		compileClasspath += main.compileClasspath
+	}
+	building {
+		compileClasspath += main.compileClasspath
+	}
+	networking {
+		compileClasspath += main.compileClasspath + core.output + building.output
+	}
+	selections {
+		compileClasspath += main.compileClasspath + core.output + building.output + networking.output
+	}
+	panama {
+		compileClasspath += main.compileClasspath + core.output + selections.output + building.output
+	}
+	main {
+		compileClasspath += core.output + networking.output + building.output + panama.output + selections.output
+		runtimeClasspath += core.output + networking.output + building.output + panama.output + selections.output
+	}
+}
+
 group = project.maven_group
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -55,13 +77,16 @@ repositories {
 	}
 }
 
+tasks.withType(JavaCompile).configureEach {
+	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+	it.options.release.set(17)
+}
+
 dependencies {
-	// To change the versions see the gradle.properties file
+	// Fabric API. This is technically optional, but you probably want it anyway.
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
@@ -78,11 +103,6 @@ processResources {
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
 	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
 }
 
 loom {

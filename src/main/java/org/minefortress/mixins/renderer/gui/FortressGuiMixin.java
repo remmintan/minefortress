@@ -3,8 +3,8 @@ package org.minefortress.mixins.renderer.gui;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import org.minefortress.fortress.FortressState;
-import org.minefortress.interfaces.FortressMinecraftClient;
+import net.remmintan.mods.minefortress.core.FortressState;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +20,7 @@ public abstract class FortressGuiMixin {
 
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
     private void renderCrosshair(DrawContext context, CallbackInfo ci) {
-        if (((FortressMinecraftClient)client).is_FortressGamemode()) {
+        if (((IFortressMinecraftClient)client).is_FortressGamemode()) {
             ci.cancel();
         }
     }

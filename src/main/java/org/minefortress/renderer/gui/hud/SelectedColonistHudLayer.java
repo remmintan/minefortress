@@ -5,9 +5,10 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwareEntity;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.interfaces.IProfessional;
-import org.minefortress.professions.Profession;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;
@@ -40,14 +41,17 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
             renderIcon(drawContext, heartIconX, heartIconY, 0);
             drawContext.drawTextWithShadow(textRenderer, healthString, heartIconX + 10, heartIconY + 2, 0xFFFFFF);
 
-            final String hungerString = String.format("%d/%d", pawn.getCurrentFoodLevel(), HungerConstants.FULL_FOOD_LEVEL);
-            int hungerIconX = colonistWinX + width/2 + 5;
-            renderIcon(drawContext, hungerIconX, heartIconY, 28);
-            drawContext.drawTextWithShadow(textRenderer, hungerString, hungerIconX + 10, heartIconY + 2, 0xFFFFFF);
+
+            if(pawn instanceof IHungerAwareEntity hungerAwareEntity) {
+                final String hungerString = String.format("%d/%d", hungerAwareEntity.getCurrentFoodLevel(), HungerConstants.FULL_FOOD_LEVEL);
+                int hungerIconX = colonistWinX + width/2 + 5;
+                renderIcon(drawContext, hungerIconX, heartIconY, 28);
+                drawContext.drawTextWithShadow(textRenderer, hungerString, hungerIconX + 10, heartIconY + 2, 0xFFFFFF);
+            }
 
             if(pawn instanceof IProfessional professional) {
                 final String professionId = professional.getProfessionId();
-                final String professionName = Optional.ofNullable(fortressManager.getProfessionManager().getProfession(professionId)).map(Profession::getTitle).orElse("");
+                final String professionName = Optional.ofNullable(fortressManager.getProfessionManager().getProfession(professionId)).map(IProfession::getTitle).orElse("");
                 drawContext.drawTextWithShadow(textRenderer, "Profession:", colonistWinX + 5, heartIconY + textRenderer.fontHeight + 5, 0xFFFFFF);
                 drawContext.drawTextWithShadow(textRenderer, professionName, colonistWinX + 5, heartIconY + 2 * textRenderer.fontHeight + 5 , 0xFFFFFF);
             }

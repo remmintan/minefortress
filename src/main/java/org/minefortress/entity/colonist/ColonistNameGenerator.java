@@ -1,11 +1,12 @@
 package org.minefortress.entity.colonist;
 
 import net.minecraft.nbt.NbtCompound;
+import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.*;
 
-public class ColonistNameGenerator {
+public class ColonistNameGenerator implements IPawnNameGenerator {
 
     private static final List<String> SUPPORTER_NAMES = Arrays.asList(
             "Jèff",
@@ -127,6 +128,7 @@ public class ColonistNameGenerator {
         mandatoryNames = new ArrayList<>();
     }
 
+    @Override
     public String generateRandomName() {
         if(!mandatoryNames.isEmpty()) {
             final var name = mandatoryNames.get((int) (Math.random() * mandatoryNames.size()));
@@ -137,6 +139,7 @@ public class ColonistNameGenerator {
         }
     }
 
+    @Override
     public void write(NbtCompound compound) {
         if(!mandatoryNames.isEmpty()) {
             compound.putString("mandatoryNames", String.join(",", mandatoryNames));

@@ -2,8 +2,8 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
 
 import java.util.EnumSet;
 
@@ -23,8 +23,8 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
         if(colonist.getTaskControl().hasTask()) return false;
         if(!isFarFromCenter()) return false;
 
-        colonist.getFortressServerManager()
-                .flatMap(FortressServerManager::getRandomPositionAroundCampfire)
+        colonist.getServerFortressManager()
+                .flatMap(IServerFortressManager::getRandomPositionAroundCampfire)
                 .ifPresent(pos -> positionAroundCampfire = pos);
 
         return  positionAroundCampfire != null;
@@ -53,7 +53,7 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     }
 
     private boolean isFarFromCenter() {
-        final var serverManager = colonist.getFortressServerManager().orElseThrow();
+        final var serverManager = colonist.getServerFortressManager().orElseThrow();
         final BlockPos fortressCenter = serverManager.getFortressCenter();
         if (fortressCenter == null) return false;
         final var distanseToCenter = Math.sqrt(colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()));

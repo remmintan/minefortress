@@ -5,17 +5,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.utils.BuildingHelper;
 
 import static org.minefortress.entity.colonist.FortressHungerManager.PASSIVE_EXHAUSTION;
 import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
-
-
-import java.util.Random;
 
 public class ForesterDailyTask implements ProfessionDailyTask{
 
@@ -76,8 +72,8 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     private void gatherItemAndAddToInventory(Colonist colonist) {
         if(isSuccess(colonist)){
             final var item = getRandomForesterItem(colonist);
-            colonist.getFortressServerManager().ifPresent(
-                    it -> it.getServerResourceManager().increaseItemAmount(item, 1)
+            colonist.getManagersProvider().ifPresent(
+                    it -> it.getResourceManager().increaseItemAmount(item, 1)
             );
         }
     }
@@ -95,8 +91,8 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     private void setGoal(Colonist colonist) {
         final var world = colonist.getWorld();
 
-        final var fortressCenter = colonist.getFortressServerManager()
-                .map(FortressServerManager::getFortressCenter)
+        final var fortressCenter = colonist.getServerFortressManager()
+                .map(IServerFortressManager::getFortressCenter)
                 .orElseThrow(() -> new IllegalStateException("No fortress center found"));
 
 

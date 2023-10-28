@@ -6,16 +6,17 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorderStage;
+import net.remmintan.mods.minefortress.core.interfaces.infuence.ICaptureTask;
+import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluenceManager;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.data.StrctureBlockData;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.network.s2c.ClientboundTaskExecutedPacket;
-import org.minefortress.network.s2c.S2CSyncInfluence;
-import org.minefortress.network.s2c.S2CUpdateInfluenceBorderStage;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
+import org.minefortress.fortress.ServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
+import net.remmintan.mods.minefortress.networking.s2c.S2CSyncInfluence;
+import net.remmintan.mods.minefortress.networking.s2c.S2CUpdateInfluenceBorderStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,28 +26,29 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class ServerInfluenceManager  {
+public class ServerInfluenceManager implements IServerInfluenceManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfluenceManager.class);
-    private final Deque<CaptureTask> captureTasksQueue = new ConcurrentLinkedDeque<>();
+    private final Deque<ICaptureTask> captureTasksQueue = new ConcurrentLinkedDeque<>();
     private final List<BlockPos> allInfluencePositions = new ArrayList<>();
     private final Synchronizer synchronizer = new Synchronizer();
     private final InfluenceFlagBlockDataProvider influenceFlagBlockDataProvider = new InfluenceFlagBlockDataProvider();
     private final ServerFortressBorderHolder fortressBorderHolder = new ServerFortressBorderHolder();
 
-    private final FortressServerManager fortressServerManager;
+    private final ServerFortressManager serverFortressManager;
 
-    public ServerInfluenceManager(FortressServerManager fortressServerManager) {
-        this.fortressServerManager = fortressServerManager;
+    public ServerInfluenceManager(ServerFortressManager serverFortressManager) {
+        this.serverFortressManager = serverFortressManager;
     }
 
+    @Override
     public void addCapturePosition(UUID taskId, BlockPos pos, ServerPlayerEntity player) {
         final var stage = this.fortressBorderHolder.getStage(pos);
-        final var resourceManager = (ServerResourceManager)this.fortressServerManager.getResourceManager();
+        final var resourceManager = (IServerResourceManager)this.serverFortressManager.getResourceManager();
         final var influenceFlag = influenceFlagBlockDataProvider.getBlockData("influence_flag", BlockRotation.NONE);
         final var stacks = influenceFlag.getStacks();
-        if(stage == WorldBorderStage.GROWING && (resourceManager.hasItems(stacks) || fortressServerManager.isCreative())) {
-            if(fortressServerManager.isSurvival()) {
+        if(stage == WorldBorderStage.GROWING && (resourceManager.hasItems(stacks) || serverFortressManager.isCreative())) {
+            if(serverFortressManager.isSurvival()) {
                 resourceManager.reserveItems(taskId, stacks);
             }
             captureTasksQueue.add(new CaptureTask(taskId, pos));
@@ -57,11 +59,11 @@ public class ServerInfluenceManager  {
             LOGGER.warn("Player tried to capture influence flag without having the required items!");
         }
     }
-    public CaptureTask getCaptureTask() {
+    public ICaptureTask getCaptureTask() {
         return captureTasksQueue.poll();
     }
 
-    public void failCaptureTask(CaptureTask task) {
+    public void failCaptureTask(ICaptureTask task) {
         captureTasksQueue.add(task);
     }
 
@@ -98,6 +100,7 @@ public class ServerInfluenceManager  {
         tag.put("influenceManager", nbt);
     }
 
+    @Override
     public void checkNewPositionAndUpdateClientState(BlockPos pos, ServerPlayerEntity player) {
         final var packet = new S2CUpdateInfluenceBorderStage(fortressBorderHolder.getStage(pos));
         FortressServerNetworkHelper.send(player, S2CUpdateInfluenceBorderStage.CHANNEL, packet);
@@ -126,7 +129,7 @@ public class ServerInfluenceManager  {
     }
 
     public void addCenterAsInfluencePosition() {
-        final var fortressCenter = fortressServerManager.getFortressCenter();
+        final var fortressCenter = serverFortressManager.getFortressCenter();
         if(fortressCenter != null) {
             addInfluencePosition(fortressCenter);
             fortressBorderHolder.add(fortressCenter);
@@ -154,6 +157,6 @@ public class ServerInfluenceManager  {
         }
     }
 
-    public record CaptureTask(UUID taskId, BlockPos pos) { }
+    public record CaptureTask(UUID taskId, BlockPos pos) implements ICaptureTask { }
 
 }

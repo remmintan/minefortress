@@ -7,11 +7,11 @@ import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.networking.registries.ServerNetworkReceivers;
 import org.minefortress.commands.CommandsManager;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
-import org.minefortress.registries.FortressBlocks;
+import net.remmintan.mods.minefortress.building.FortressBlocks;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressItems;
 import org.minefortress.registries.FortressServerEvents;
@@ -34,9 +34,10 @@ public class MineFortressMod implements ModInitializer {
         FortressEntities.register();
         FortressItems.register();
         FortressServerEvents.register();
+        NetworkReaders.register();
 
         CommandsManager.registerCommands();
-        FortressServerNetworkHelper.registerReceivers();
+        ServerNetworkReceivers.registerReceivers();
     }
 
 }

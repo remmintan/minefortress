@@ -2,12 +2,12 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.ItemStack;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.HungryEntity;
-import org.minefortress.entity.ai.controls.EatControl;
-import org.minefortress.entity.interfaces.IFortressAwareEntity;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.resources.server.ServerResourceManager;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -39,16 +39,16 @@ public class EatGoal extends Goal {
         return super.shouldContinue() && getEatControl().isEating();
     }
 
-    private Optional<ServerResourceManager> getResourceManager() {
+    private Optional<IServerResourceManager> getResourceManager() {
         return entity instanceof IFortressAwareEntity f ?
-                f.getFortressServerManager()
-                .map(FortressServerManager::getResourceManager)
-                .map(ServerResourceManager.class::cast) :
+                f.getServerFortressManager()
+                .map(IServerFortressManager::getResourceManager)
+                .map(IServerResourceManager.class::cast) :
                 Optional.empty();
     }
 
     @NotNull
-    private EatControl getEatControl() {
+    private IEatControl getEatControl() {
         return entity.getEatControl().orElseThrow();
     }
 

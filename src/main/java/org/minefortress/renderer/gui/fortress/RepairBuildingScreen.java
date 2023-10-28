@@ -7,9 +7,9 @@ import net.minecraft.item.Item;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.fortress.resources.client.ClientResourceManager;
-import org.minefortress.network.c2s.C2SRepairBuilding;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
+import net.remmintan.mods.minefortress.networking.c2s.C2SRepairBuilding;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.utils.ModUtils;
 
@@ -27,12 +27,12 @@ public class RepairBuildingScreen extends WindowScreen {
     private final Map<Item, Long> requiredItems;
     private Map<Item, Boolean> hasEnoughResources;
 
-    private final ClientResourceManager clientResourceManager;
+    private final IClientResourceManager clientResourceManager;
     private final Set<BlockPos> blocksToRepair;
 
     private ButtonWidget confirmationButton;
 
-    public RepairBuildingScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair, ClientResourceManager clientResourceManager) {
+    public RepairBuildingScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair, IClientResourceManager clientResourceManager) {
         super(Text.of("Repair Building"));
         this.buildingId = buildingId;
         this.clientResourceManager = clientResourceManager;

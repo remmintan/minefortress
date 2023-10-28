@@ -6,13 +6,15 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemGroups;
-import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.network.c2s.C2SRequestResourcesRefresh;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.networking.c2s.C2SRequestResourcesRefresh;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.ChooseModeScreen;
-import org.minefortress.tasks.ClientVisualTasksHolder;
 import org.minefortress.utils.ModUtils;
 
 public class FortressClientEvents {
@@ -30,7 +32,7 @@ public class FortressClientEvents {
 
     private static void startClientTick(MinecraftClient client) {
         final var clientInFortressGamemode = ModUtils.isClientInFortressGamemode();
-        final var fortressClient = ModUtils.getFortressClient();
+        final var provider = CoreModUtils.getMineFortressManagersProvider();
         if(clientInFortressGamemode) {
             final var mouse = client.mouse;
             if(ModUtils.shouldReleaseCamera()) {
@@ -42,18 +44,24 @@ public class FortressClientEvents {
             }
         }
 
+        final var fortressClient = (IFortressMinecraftClient) client;
+
         fortressClient.get_FortressHud().tick();
-        final var fortressClientManager = fortressClient.get_FortressClientManager();
-        fortressClientManager.tick(fortressClient);
+        final var fortressClientManager = provider.get_ClientFortressManager();
+        fortressClientManager.tick(hoveredBlockProvider());
         if(fortressClientManager.gamemodeNeedsInitialization() && !(client.currentScreen instanceof ChooseModeScreen)) {
             client.setScreen(new ChooseModeScreen());
         }
     }
 
+    private static IHoveredBlockProvider hoveredBlockProvider() {
+        return (IHoveredBlockProvider) MinecraftClient.getInstance();
+    }
+
     private static void endClientTick(MinecraftClient client) {
         while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
-            final FortressMinecraftClient fortressClient = (FortressMinecraftClient) client;
-            final ClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
+            final var fortressClient = (IClientManagersProvider) client;
+            final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
             if(clientBlueprintManager.isSelecting()) {
                 fortressClient.get_BlueprintManager().selectNext();
             } else {
@@ -64,7 +72,7 @@ public class FortressClientEvents {
         while (FortressKeybindings.cancelTaskKeybinding.wasPressed()) {
             final ClientWorld world = client.world;
             if(world != null) {
-                final ClientVisualTasksHolder clientVisualTasksHolder = ((FortressClientWorld) world).get_ClientTasksHolder();
+                final var clientVisualTasksHolder = ((ITasksInformationHolder) world).get_ClientTasksHolder();
 
                 if(client.options.sprintKey.isPressed()) {
                     clientVisualTasksHolder.cancelAllTasks();

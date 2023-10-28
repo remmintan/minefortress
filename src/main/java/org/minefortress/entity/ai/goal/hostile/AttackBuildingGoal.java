@@ -6,9 +6,9 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.fortress.FortressServerManager;
-import org.minefortress.fortress.buildings.FortressBuilding;
-import org.minefortress.fortress.server.FortressModServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 
 import java.util.EnumSet;
 
@@ -17,16 +17,16 @@ public final class AttackBuildingGoal extends Goal {
 
     private static final int ATTACK_DISTANCE = 6;
 
-    private final FortressModServerManager modServerManager;
+    private final IFortressModServerManager modServerManager;
     private final HostileEntity mob;
-    private FortressBuilding targetBuilding;
+    private IFortressBuilding targetBuilding;
     private BlockPos targetPosition;
     private Path path;
     private long lastUpdateTime = 0;
 
     private int cooldown = 0;
 
-    public AttackBuildingGoal(HostileEntity mob, FortressModServerManager modServerManager) {
+    public AttackBuildingGoal(HostileEntity mob, IFortressModServerManager modServerManager) {
         this.mob = mob;
         this.modServerManager = modServerManager;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
@@ -40,7 +40,7 @@ public final class AttackBuildingGoal extends Goal {
         final var mobBlockPos = this.mob.getBlockPos();
         this.modServerManager
                 .findReachableFortress(mobBlockPos, getFollowRange())
-                .map(FortressServerManager::getFortressBuildingManager)
+                .map(IServerManagersProvider::getBuildingsManager)
                 .flatMap(it -> it.findNearest(mobBlockPos))
                 .ifPresent(building -> this.targetBuilding = building);
 

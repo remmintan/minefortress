@@ -2,12 +2,15 @@ package org.minefortress.entity.ai.controls;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.*;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
-import org.minefortress.tasks.interfaces.Task;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -16,17 +19,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class TaskControl {
+public class TaskControl implements ITaskControl {
 
     private final Colonist colonist;
 
     private final Cache<UUID, Boolean> returnedIds = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS).build();
 
     private boolean doingEverydayTasks = false;
-    private Task task;
-    private TaskPart taskPart;
-    private Iterator<TaskBlockInfo> blocks;
-    private Consumer<TaskPart> onTaskFailed;
+    private ITask task;
+    private ITaskPart taskPart;
+    private Iterator<ITaskBlockInfo> blocks;
+    private Consumer<ITaskPart> onTaskFailed;
     private Supplier<Boolean> cancelled;
 
 
@@ -34,11 +37,13 @@ public class TaskControl {
         this.colonist = colonist;
     }
 
-    public boolean canStartTask(Task task) {
+    @Override
+    public boolean canStartTask(ITask task) {
         return !hasTask() && !this.returnedIds.asMap().containsKey(task.getId()) && colonist.getCurrentFoodLevel() > 0;
     }
 
-    public void setTask(@NotNull Task task, TaskPart taskPart, Consumer<TaskPart> onTaskFailed, Supplier<Boolean> cancelled) {
+    @Override
+    public void setTask(@NotNull ITask task, ITaskPart taskPart, Consumer<ITaskPart> onTaskFailed, Supplier<Boolean> cancelled) {
         this.task = task;
         this.taskPart = taskPart;
         this.blocks = taskPart.getBlocks().iterator();
@@ -63,6 +68,7 @@ public class TaskControl {
         }
     }
 
+    @Override
     public void resetTask() {
         this.task = null;
         this.taskPart = null;
@@ -71,6 +77,7 @@ public class TaskControl {
         this.cancelled = null;
     }
 
+    @Override
     public void fail() {
         if(!hasTask()) return;
         this.onTaskFailed.accept(taskPart);
@@ -78,12 +85,14 @@ public class TaskControl {
         this.resetTask();
     }
 
+    @Override
     public void success() {
         if(!hasTask()) return;
         this.task.finishPart(taskPart, colonist);
         this.resetTask();
     }
 
+    @Override
     public boolean hasTask() {
         if(cancelled != null && cancelled.get()) {
             this.resetTask();
@@ -92,33 +101,40 @@ public class TaskControl {
         return task != null;
     }
 
+    @Override
     public void setDoingEverydayTasks(boolean doingEverydayTasks) {
         this.doingEverydayTasks = doingEverydayTasks;
     }
 
+    @Override
     public boolean isDoingEverydayTasks() {
         return doingEverydayTasks;
     }
 
+    @Override
     public boolean is(TaskType type) {
         if(!hasTask()) return false;
         return task.getTaskType() == type;
     }
 
+    @Override
     public boolean partHasMoreBlocks() {
         if(!hasTask()) return false;
         return blocks.hasNext();
     }
 
+    @Override
     public Optional<UUID> getTaskId() {
-        return Optional.ofNullable(task).map(Task::getId);
+        return Optional.ofNullable(task).map(ITask::getId);
     }
 
+    @Override
     @Nullable
-    public TaskBlockInfo getNextBlock() {
+    public ITaskBlockInfo getNextBlock() {
         return blocks.next();
     }
 
+    @Override
     public boolean isBlueprintTask() {
         return task instanceof BlueprintTask;
     }

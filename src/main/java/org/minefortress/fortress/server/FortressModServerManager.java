@@ -6,19 +6,22 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.data.FortressModDataLoader;
-import org.minefortress.fortress.FortressServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
+import org.minefortress.fortress.ServerFortressManager;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FortressModServerManager {
+public class FortressModServerManager implements IFortressModServerManager {
 
     private static final String MANAGERS_FILE_NAME = "server-managers.nbt";
     private final MinecraftServer server;
-    private final Map<UUID, FortressServerManager> serverManagers = new HashMap<>();
+    private final Map<UUID, ServerFortressManager> serverManagers = new HashMap<>();
 
     private boolean campfireEnabled;
     private boolean borderEnabled;
@@ -27,12 +30,29 @@ public class FortressModServerManager {
         this.server = server;
     }
 
-    public FortressServerManager getByPlayer(ServerPlayerEntity player) {
-        final var playerId = Uuids.getUuidFromProfile(player.getGameProfile());
-        return serverManagers.computeIfAbsent(playerId, (it) -> new FortressServerManager(server));
+    public IServerManagersProvider getManagersProvider(ServerPlayerEntity player) {
+        return getByPlayer(player);
     }
 
-    public FortressServerManager getByPlayerId(UUID uuid) {
+    private ServerFortressManager getByPlayer(ServerPlayerEntity player) {
+        final var playerId = Uuids.getUuidFromProfile(player.getGameProfile());
+        return serverManagers.computeIfAbsent(playerId, (it) -> new ServerFortressManager(server));
+    }
+
+    public IServerManagersProvider getManagersProvider(UUID uuid) {
+        return getByPlayer(uuid);
+    }
+
+    public IServerFortressManager getFortressManager(ServerPlayerEntity player) {
+        return getByPlayer(player);
+    }
+
+    @Override
+    public IServerFortressManager getFortressManager(UUID id) {
+        return getByPlayer(id);
+    }
+
+    private ServerFortressManager getByPlayer(UUID uuid) {
         if(serverManagers.containsKey(uuid)) {
             return serverManagers.get(uuid);
         } else {
@@ -42,7 +62,7 @@ public class FortressModServerManager {
     }
 
     public void tick(PlayerManager playerManager) {
-        for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
+        for (Map.Entry<UUID, ServerFortressManager> entry : serverManagers.entrySet()) {
             final var playerId = entry.getKey();
             final var manager = entry.getValue();
             final var player = playerManager.getPlayer(playerId);
@@ -52,7 +72,7 @@ public class FortressModServerManager {
 
     public void save() {
         final var nbt = new NbtCompound();
-        for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
+        for (Map.Entry<UUID, ServerFortressManager> entry : serverManagers.entrySet()) {
             final var fortressNbt = new NbtCompound();
             final var id = entry.getKey();
             final var manager = entry.getValue();
@@ -63,7 +83,7 @@ public class FortressModServerManager {
         nbt.putBoolean("campfireEnabled", campfireEnabled);
         nbt.putBoolean("borderEnabled", borderEnabled);
 
-        FortressModDataLoader.saveNbt(nbt, MANAGERS_FILE_NAME, server.session);
+        ModPathUtils.saveNbt(nbt, MANAGERS_FILE_NAME, server.session);
     }
 
     public void load() {
@@ -71,7 +91,7 @@ public class FortressModServerManager {
     }
 
     public void load(boolean campfireEnabled, boolean borderEnabled) {
-        final var nbtCompound = FortressModDataLoader.readNbt(MANAGERS_FILE_NAME, server.session);
+        final var nbtCompound = ModPathUtils.readNbt(MANAGERS_FILE_NAME, server.session);
 
         boolean campfireEnabledSet = false;
         boolean borderEnabledSet = false;
@@ -91,7 +111,7 @@ public class FortressModServerManager {
 
             final var managerNbt = nbtCompound.getCompound(key);
             final var masterPlayerId = UUID.fromString(key);
-            final var manager = new FortressServerManager(server);
+            final var manager = new ServerFortressManager(server);
             manager.readFromNbt(managerNbt);
 
             serverManagers.put(masterPlayerId, manager);
@@ -105,8 +125,8 @@ public class FortressModServerManager {
         }
     }
 
-    public Optional<FortressServerManager> findReachableFortress(BlockPos pos, double reachRange) {
-        for (FortressServerManager manager : serverManagers.values()) {
+    public Optional<IServerManagersProvider> findReachableFortress(BlockPos pos, double reachRange) {
+        for (ServerFortressManager manager : serverManagers.values()) {
             final var fortressCenter = manager.getFortressCenter();
             if(fortressCenter == null) continue;
             final var villageRadius = manager.getVillageRadius();

@@ -3,16 +3,18 @@ package org.minefortress.fortress.automation.areas;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.minefortress.fortress.automation.IAutomationArea;
-import org.minefortress.network.c2s.S2CSyncAreasPacket;
-import org.minefortress.network.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
+import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.networking.s2c.S2CSyncAreasPacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public final class AreasServerManager {
+public final class AreasServerManager implements IServerAutomationAreaManager {
 
     private boolean needSync = false;
     private final List<ServerAutomationAreaInfo> areas = new ArrayList<>();
@@ -20,7 +22,7 @@ public final class AreasServerManager {
     private int tickCounter = 0;
     private int refreshPointer = 0;
 
-    public void addArea(AutomationAreaInfo area) {
+    public void addArea(IAutomationAreaInfo area) {
         areas.add(new ServerAutomationAreaInfo(area));
         sync();
     }
@@ -43,7 +45,7 @@ public final class AreasServerManager {
         }
 
         if(needSync) {
-            final var automationAreaInfos = areas.stream().map(AutomationAreaInfo.class::cast).toList();
+            final var automationAreaInfos = areas.stream().map(IAutomationAreaInfo.class::cast).toList();
             FortressServerNetworkHelper.send(serverPlayer, S2CSyncAreasPacket.CHANNEL, new S2CSyncAreasPacket(automationAreaInfos));
             needSync = false;
         }

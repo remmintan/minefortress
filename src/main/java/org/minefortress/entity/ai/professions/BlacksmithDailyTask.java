@@ -1,19 +1,13 @@
 package org.minefortress.entity.ai.professions;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
-import java.util.List;
-import java.util.Optional;
 
 public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
 
@@ -36,7 +30,8 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     @Override
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
-        return colonist.getFortressServerManager()
+        return colonist
+                .getServerFortressManager()
                 .flatMap(it -> it
                         .getSpecialBlocksByType(Blocks.FURNACE, true)
                         .stream()
@@ -55,7 +50,7 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     }
 
     private boolean atLeastOneFurnaceIsBurning(Colonist colonist){
-        return colonist.getFortressServerManager()
+        return colonist.getServerFortressManager()
                 .map(it -> {
                     final var furnaces = it.getSpecialBlocksByType(Blocks.FURNACE, true);
                     for(BlockPos pos : furnaces){

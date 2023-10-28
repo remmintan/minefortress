@@ -10,10 +10,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import org.minefortress.entity.ArcherPawn;
-import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.entity.Colonist;
-import org.minefortress.entity.WarriorPawn;
+import org.minefortress.entity.*;
 import org.minefortress.entity.renderer.PawnRenderer;
 
 import java.util.List;

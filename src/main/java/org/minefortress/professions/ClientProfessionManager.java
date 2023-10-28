@@ -2,24 +2,30 @@ package org.minefortress.professions;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
-import org.minefortress.fortress.AbstractFortressManager;
-import org.minefortress.network.c2s.ServerboundChangeProfessionStatePacket;
-import org.minefortress.network.helpers.FortressChannelNames;
-import org.minefortress.network.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.core.dtos.professions.IProfessionEssentialInfo;
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
+import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.*;
+import net.remmintan.mods.minefortress.networking.c2s.ServerboundChangeProfessionStatePacket;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import org.minefortress.renderer.gui.hire.HirePawnScreen;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class ClientProfessionManager extends ProfessionManager {
+public final class ClientProfessionManager extends ProfessionManager implements IClientProfessionManager {
 
-    public ClientProfessionManager(Supplier<AbstractFortressManager> fortressManagerSupplier) {
+    public ClientProfessionManager(Supplier<IFortressManager> fortressManagerSupplier) {
         super(fortressManagerSupplier);
     }
 
+    @Override
     public void initProfessions(List<ProfessionFullInfo> fullInfos, String treeJson) {
-        final var professionsMap = fullInfos.stream().collect(Collectors.toMap(ProfessionFullInfo::key, Profession::new));
+        final var professionsMap = fullInfos.stream().collect(Collectors.toMap(ProfessionFullInfo::key, it -> (IProfession) new Profession(it)));
         super.setProfessions(professionsMap);
         super.createProfessionTree(treeJson);
     }
@@ -69,11 +75,23 @@ public class ClientProfessionManager extends ProfessionManager {
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
     }
 
-    public void updateProfessions(List<ProfessionEssentialInfo> info) {
-        for(ProfessionEssentialInfo professionEssentialInfo : info) {
-            final Profession profession = getProfession(professionEssentialInfo.getId());
+    @Override
+    public void updateProfessions(List<IProfessionEssentialInfo> info) {
+        for(var professionEssentialInfo : info) {
+            final IProfession profession = getProfession(professionEssentialInfo.id());
             if(profession != null) {
-                profession.setAmount(professionEssentialInfo.getAmount());
+                profession.setAmount(professionEssentialInfo.amount());
+            }
+        }
+    }
+
+    @Override
+    public void syncCurrentScreenHandler(Map<String, IHireInfo> hireInfos) {
+        final var currentScreen = MinecraftClient.getInstance().currentScreen;
+        if (currentScreen instanceof HirePawnScreen screen) {
+            final var handler = screen.getHandler();
+            if(handler != null) {
+                handler.sync(hireInfos);
             }
         }
     }

@@ -1,9 +1,10 @@
 package org.minefortress.professions.hire;
 
+import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireCost;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.professions.Profession;
-import org.minefortress.professions.ProfessionManager;
-import org.minefortress.professions.ProfessionResearchState;
 import org.minefortress.professions.ServerProfessionManager;
 
 import java.util.*;
@@ -21,7 +22,7 @@ public class ServerHireHandler {
         this.professionManager = professionManager;
     }
 
-    public Map<String, HireInfo> getProfessions() {
+    public Map<String, IHireInfo> getProfessions() {
         return getUnlockedProfessions()
                 .stream()
                 .map(it ->
@@ -37,7 +38,7 @@ public class ServerHireHandler {
                             );
                         }
                 )
-                .collect(Collectors.toMap(HireInfo::professionId, it -> it));
+                .collect(Collectors.toMap(IHireInfo::professionId, it -> it));
     }
 
     public void hire(String professionId) {
@@ -50,7 +51,7 @@ public class ServerHireHandler {
         return hireRequests.computeIfAbsent(professionId, k -> new ArrayDeque<>());
     }
 
-    private List<HireCost> getCost(String it) {
+    private List<IHireCost> getCost(String it) {
         return professionManager.getProfession(it)
                 .getItemsRequirement()
                 .stream()
@@ -84,7 +85,7 @@ public class ServerHireHandler {
 
     private boolean professionUnlocked(String it) {
         final var profession = professionManager.getProfession(it);
-        return professionManager.isRequirementsFulfilled(profession, ProfessionManager.CountProfessionals.DONT_COUNT, false) == ProfessionResearchState.UNLOCKED;
+        return professionManager.isRequirementsFulfilled(profession, CountProfessionals.DONT_COUNT, false) == ProfessionResearchState.UNLOCKED;
     }
 
     private static class HireRequest {

@@ -1,14 +1,10 @@
 package org.minefortress.entity.ai.professions;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
-
-import java.util.Optional;
 
 public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
 
@@ -50,7 +46,7 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
          return colonist
-                    .getFortressServerManager()
+                    .getServerFortressManager()
                     .map(it -> it
                             .getSpecialBlocksByType(Blocks.CRAFTING_TABLE, true)
                             .stream()

@@ -17,8 +17,8 @@ import org.minefortress.entity.ai.goal.SelectTargetToAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 import org.minefortress.entity.ai.goal.warrior.RangedAttackGoal;
-import org.minefortress.entity.interfaces.IProfessional;
-import org.minefortress.entity.interfaces.IWarrior;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 
 public class ArcherPawn extends TargetedPawn implements IWarrior, RangedAttackMob, IProfessional {
 

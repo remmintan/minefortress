@@ -1,13 +1,12 @@
 package org.minefortress.fortress.resources.gui;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.interfaces.FortressMinecraftClient;
 import org.minefortress.renderer.gui.professions.ProfessionsScreen;
 
 public abstract class AbstractMissingProfessionScreen extends Screen {
@@ -45,7 +44,7 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
                     .builder(Text.literal("To professions menu"),
                     button -> {
                         if (this.client != null)
-                            this.client.setScreen(new ProfessionsScreen(getClient()));
+                            this.client.setScreen(new ProfessionsScreen(CoreModUtils.getMineFortressManagersProvider()));
                     })
                     .dimensions(this.width / 2 - 102,
                             this.height / 2 + 48 - 16,
@@ -76,8 +75,5 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
         throw new NotImplementedException("This method should be implemented in child class");
     }
 
-    private FortressMinecraftClient getClient() {
-        return (FortressMinecraftClient) MinecraftClient.getInstance();
-    }
 
 }

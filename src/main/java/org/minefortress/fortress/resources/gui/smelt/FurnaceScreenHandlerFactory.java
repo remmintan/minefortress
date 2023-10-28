@@ -10,8 +10,8 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.interfaces.FortressServer;
 
 import java.util.Objects;
 
@@ -32,10 +32,13 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         if(player instanceof ServerPlayerEntity fortressServerPlayer) {
-            final var manager = ((FortressServer)fortressServerPlayer.server).get_FortressModServerManager().getByPlayer(fortressServerPlayer);
-            final var professionManager = manager.getServerProfessionManager();
+            final var modServerManager = ((IFortressServer) fortressServerPlayer.server).get_FortressModServerManager();
+            final var provider = modServerManager.getManagersProvider(fortressServerPlayer);
+            final var professionManager = provider.getProfessionsManager();
             final var blacksmithsCount = professionManager.getProfession("blacksmith").getAmount();
-            final var otherFurnaceBlocks = manager.getSpecialBlocksByType(Blocks.FURNACE, true)
+            final var otherFurnaceBlocks = modServerManager
+                    .getFortressManager(fortressServerPlayer)
+                    .getSpecialBlocksByType(Blocks.FURNACE, true)
                     .stream()
                     .limit(blacksmithsCount)
                     .filter(Objects::nonNull)
@@ -56,7 +59,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
 
             final var selectedBlockEnt = player.getWorld().getBlockEntity(selectedFurnacePos);
             if(selectedBlockEnt instanceof FurnaceBlockEntity furnaceBlockEntity) {
-                final var resourceManager = manager.getServerResourceManager();
+                final var resourceManager = provider.getResourceManager();
                 return new FortressFurnaceScreenHandler(syncId, inv, resourceManager, furnaceBlockEntity, furnaceBlockEntity.propertyDelegate, otherFurnacesDelegates);
             }
         }

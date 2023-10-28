@@ -4,7 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import org.minefortress.entity.BasePawnEntity;
-import org.minefortress.entity.interfaces.IProfessional;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 
 public class MeleeAttackGoal extends AttackGoal {
 

@@ -5,14 +5,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.data.BlueprintDataLayer;
-import org.minefortress.blueprints.data.StrctureBlockData;
-import org.minefortress.blueprints.interfaces.IBlockDataProvider;
-import org.minefortress.blueprints.interfaces.IStructureRenderInfoProvider;
-import org.minefortress.interfaces.FortressClientWorld;
-import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.utils.BuildingHelper;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.minefortress.utils.ModUtils;
 
 import java.util.*;
@@ -31,7 +28,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     }
 
     protected abstract IBlockDataProvider getBlockDataProvider();
-    public abstract BlueprintMetadata getSelectedStructure();
+    public abstract IBlueprintMetadata getSelectedStructure();
     public void tick() {
         if(!isSelecting()) return;
         structureBuildPos = getSelectedPos();
@@ -43,7 +40,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         return structureBuildPos;
     }
     private void checkNotEnoughResources() {
-        final var fortressClientManager = ((FortressMinecraftClient)client).get_FortressClientManager();
+        final var fortressClientManager = ((IClientManagersProvider)client).get_ClientFortressManager();
         if(fortressClientManager.isSurvival()) {
             final var resourceManager = fortressClientManager.getResourceManager();
             final var stacks = getBlockData().getStacks();
@@ -62,7 +59,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
             cantBuild = true;
             return;
         }
-        final StrctureBlockData blockData = getBlockData();
+        final IStructureBlockData blockData = getBlockData();
         final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL)
                 .entrySet()
                 .stream()
@@ -91,7 +88,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
     }
 
-    private StrctureBlockData getBlockData() {
+    private IStructureBlockData getBlockData() {
         final var blockDataProvider = getBlockDataProvider();
         final var selectedStructure = getSelectedStructure();
         return blockDataProvider
@@ -112,7 +109,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         if(getSelectedStructure() == null) return pos;
 
         final boolean posSolid = !BuildingHelper.doesNotHaveCollisions(client.world, pos);
-        final StrctureBlockData blockData = getBlockData();
+        final IStructureBlockData blockData = getBlockData();
         final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
         BlockPos movedPos = pos.subtract(halfSize);
@@ -122,7 +119,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
 
     @Override
     public final Optional<BlockPos> getStructureRenderPos() {
-        final var floorLevel = Optional.ofNullable(getSelectedStructure()).map(BlueprintMetadata::getFloorLevel).orElse(0);
+        final var floorLevel = Optional.ofNullable(getSelectedStructure()).map(IBlueprintMetadata::getFloorLevel).orElse(0);
         return Optional.ofNullable(structureBuildPos).map(it -> it.down(floorLevel));
     }
 
@@ -132,9 +129,9 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     }
 
     protected void addTaskToTasksHolder(UUID taskId) {
-        final FortressClientWorld world = (FortressClientWorld) client.world;
+        final ITasksInformationHolder world = (ITasksInformationHolder) client.world;
         if(world != null) {
-            final StrctureBlockData blockData = getBlockData();
+            final IStructureBlockData blockData = getBlockData();
             final Map<BlockPos, BlockState> structureData = blockData
                     .getLayer(BlueprintDataLayer.GENERAL);
             final int floorLevel = getSelectedStructure().getFloorLevel();

@@ -2,38 +2,43 @@ package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.tasks.block.info.TaskBlockInfo;
-import org.minefortress.tasks.interfaces.Task;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 
 import java.util.Iterator;
 import java.util.List;
 
-public class TaskPart {
+public class TaskPart implements ITaskPart {
 
     private final Pair<BlockPos, BlockPos> startAndEnd;
-    private final List<TaskBlockInfo> blocks;
-    private final Task task;
+    private final List<ITaskBlockInfo> blocks;
+    private final ITask task;
 
 
-    public TaskPart(final Pair<BlockPos, BlockPos> startAndEnd, List<TaskBlockInfo> blocks, Task task) {
+    public TaskPart(final Pair<BlockPos, BlockPos> startAndEnd, List<ITaskBlockInfo> blocks, ITask task) {
         this.startAndEnd = startAndEnd;
         this.blocks = blocks;
         this.task = task;
     }
 
+    @Override
     public Pair<BlockPos, BlockPos> getStartAndEnd() {
         return startAndEnd;
     }
 
-    public Iterator<TaskBlockInfo> getIterator() {
+    @Override
+    public Iterator<ITaskBlockInfo> getIterator() {
         return blocks.iterator();
     }
 
-    public List<TaskBlockInfo> getBlocks() {
+    @Override
+    public List<ITaskBlockInfo> getBlocks() {
         return blocks;
     }
 
-    public Task getTask() {
+    @Override
+    public ITask getTask() {
         return task;
     }
 }

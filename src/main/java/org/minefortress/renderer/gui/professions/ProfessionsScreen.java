@@ -5,25 +5,25 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
 import org.lwjgl.opengl.GL11;
-import org.minefortress.fortress.FortressClientManager;
-import org.minefortress.interfaces.FortressMinecraftClient;
-import org.minefortress.professions.ProfessionManager;
 
 public class ProfessionsScreen extends Screen {
 
     private final ProfessionsLayer professionsLayer;
-    private final FortressClientManager fortressManager;
-    private final ProfessionManager professionManager;
+    private final IClientFortressManager fortressManager;
+    private final IProfessionsManager professionManager;
 
     private boolean movingLayer = false;
     private boolean startClick = false;
 
-    public ProfessionsScreen(FortressMinecraftClient client) {
+    public ProfessionsScreen(IClientManagersProvider client) {
         super(Text.literal("Professions"));
         this.professionsLayer = new ProfessionsLayer(client);
-        this.fortressManager = client.get_FortressClientManager();
-        this.professionManager = client.get_FortressClientManager().getProfessionManager();
+        this.fortressManager = client.get_ClientFortressManager();
+        this.professionManager = fortressManager.getProfessionManager();
     }
 
     @Override
