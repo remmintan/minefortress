@@ -70,7 +70,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class FortressServerManager  implements IFortressManager, IServerManagersProvider, IServerFortressManager {
+public final class ServerFortressManager implements IFortressManager, IServerManagersProvider, IServerFortressManager {
 
     private static final BlockState DEFAULT_STATE_ABOVE_CAMPFIRE = Blocks.BARRIER.getDefaultState();
     private static final int DEFAULT_COLONIST_COUNT = 5;
@@ -108,7 +108,7 @@ public final class FortressServerManager  implements IFortressManager, IServerMa
     private boolean campfireEnabled;
     private boolean borderEnabled;
 
-    public FortressServerManager(MinecraftServer server) {
+    public ServerFortressManager(MinecraftServer server) {
         this.server = server;
         this.professionManager = new ServerProfessionManager(() -> this, server);
         this.resourceManager = new ServerResourceManager(server);

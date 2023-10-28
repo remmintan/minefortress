@@ -22,7 +22,7 @@ import net.remmintan.mods.minefortress.networking.s2c.SyncHireProgress;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.ServerFortressManager;
 import org.minefortress.professions.hire.ServerHireHandler;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +69,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
             }
             final var canHire = isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
             final var abstractFortressManager = (IServerFortressManager)fortressManagerSupplier.get();
-            if(canHire == ProfessionResearchState.UNLOCKED && getFreeColonists() > 0 && abstractFortressManager instanceof FortressServerManager fsm) {
+            if(canHire == ProfessionResearchState.UNLOCKED && getFreeColonists() > 0 && abstractFortressManager instanceof ServerFortressManager fsm) {
                 final var resourceManager = (IServerResourceManager) abstractFortressManager
                         .getResourceManager();
                 resourceManager.removeItems(profession.getItemsRequirement());
@@ -87,7 +87,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         final IProfession profession = super.getProfession(professionId);
         if(profession == null) return;
         if (profession.isHireMenu()) {
-            if(this.fortressManagerSupplier.get() instanceof FortressServerManager fsm && fsm.getReservedPawnsCount() <= 0) {
+            if(this.fortressManagerSupplier.get() instanceof ServerFortressManager fsm && fsm.getReservedPawnsCount() <= 0) {
                 LoggerFactory.getLogger(ServerProfessionManager.class).error("No reserved pawns but trying to hire a profession");
                 return;
             }
@@ -221,7 +221,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     }
 
     private long countPawnsWithProfession(String professionId) {
-        final var fortressServerManager = (FortressServerManager) super.fortressManagerSupplier.get();
+        final var fortressServerManager = (ServerFortressManager) super.fortressManagerSupplier.get();
         return fortressServerManager
                 .getProfessionals()
                 .stream()
@@ -230,8 +230,8 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     }
 
     private List<IProfessional> getPawnsWithProfession(String professionId) {
-        final FortressServerManager fortressServerManager = (FortressServerManager) super.fortressManagerSupplier.get();
-        return fortressServerManager
+        final ServerFortressManager serverFortressManager = (ServerFortressManager) super.fortressManagerSupplier.get();
+        return serverFortressManager
                 .getProfessionals()
                 .stream()
                 .filter(colonist -> colonist.getProfessionId().equals(professionId))

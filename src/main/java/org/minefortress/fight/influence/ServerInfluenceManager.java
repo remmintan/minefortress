@@ -10,7 +10,7 @@ import net.remmintan.mods.minefortress.core.interfaces.infuence.ICaptureTask;
 import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluenceManager;
 import org.jetbrains.annotations.Nullable;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
-import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.ServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -35,20 +35,20 @@ public class ServerInfluenceManager implements IServerInfluenceManager {
     private final InfluenceFlagBlockDataProvider influenceFlagBlockDataProvider = new InfluenceFlagBlockDataProvider();
     private final ServerFortressBorderHolder fortressBorderHolder = new ServerFortressBorderHolder();
 
-    private final FortressServerManager fortressServerManager;
+    private final ServerFortressManager serverFortressManager;
 
-    public ServerInfluenceManager(FortressServerManager fortressServerManager) {
-        this.fortressServerManager = fortressServerManager;
+    public ServerInfluenceManager(ServerFortressManager serverFortressManager) {
+        this.serverFortressManager = serverFortressManager;
     }
 
     @Override
     public void addCapturePosition(UUID taskId, BlockPos pos, ServerPlayerEntity player) {
         final var stage = this.fortressBorderHolder.getStage(pos);
-        final var resourceManager = (IServerResourceManager)this.fortressServerManager.getResourceManager();
+        final var resourceManager = (IServerResourceManager)this.serverFortressManager.getResourceManager();
         final var influenceFlag = influenceFlagBlockDataProvider.getBlockData("influence_flag", BlockRotation.NONE);
         final var stacks = influenceFlag.getStacks();
-        if(stage == WorldBorderStage.GROWING && (resourceManager.hasItems(stacks) || fortressServerManager.isCreative())) {
-            if(fortressServerManager.isSurvival()) {
+        if(stage == WorldBorderStage.GROWING && (resourceManager.hasItems(stacks) || serverFortressManager.isCreative())) {
+            if(serverFortressManager.isSurvival()) {
                 resourceManager.reserveItems(taskId, stacks);
             }
             captureTasksQueue.add(new CaptureTask(taskId, pos));
@@ -129,7 +129,7 @@ public class ServerInfluenceManager implements IServerInfluenceManager {
     }
 
     public void addCenterAsInfluencePosition() {
-        final var fortressCenter = fortressServerManager.getFortressCenter();
+        final var fortressCenter = serverFortressManager.getFortressCenter();
         if(fortressCenter != null) {
             addInfluencePosition(fortressCenter);
             fortressBorderHolder.add(fortressCenter);

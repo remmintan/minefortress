@@ -10,7 +10,7 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressMan
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
-import org.minefortress.fortress.FortressServerManager;
+import org.minefortress.fortress.ServerFortressManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class FortressModServerManager implements IFortressModServerManager {
 
     private static final String MANAGERS_FILE_NAME = "server-managers.nbt";
     private final MinecraftServer server;
-    private final Map<UUID, FortressServerManager> serverManagers = new HashMap<>();
+    private final Map<UUID, ServerFortressManager> serverManagers = new HashMap<>();
 
     private boolean campfireEnabled;
     private boolean borderEnabled;
@@ -34,9 +34,9 @@ public class FortressModServerManager implements IFortressModServerManager {
         return getByPlayer(player);
     }
 
-    private FortressServerManager getByPlayer(ServerPlayerEntity player) {
+    private ServerFortressManager getByPlayer(ServerPlayerEntity player) {
         final var playerId = Uuids.getUuidFromProfile(player.getGameProfile());
-        return serverManagers.computeIfAbsent(playerId, (it) -> new FortressServerManager(server));
+        return serverManagers.computeIfAbsent(playerId, (it) -> new ServerFortressManager(server));
     }
 
     public IServerManagersProvider getManagersProvider(UUID uuid) {
@@ -52,7 +52,7 @@ public class FortressModServerManager implements IFortressModServerManager {
         return getByPlayer(id);
     }
 
-    private FortressServerManager getByPlayer(UUID uuid) {
+    private ServerFortressManager getByPlayer(UUID uuid) {
         if(serverManagers.containsKey(uuid)) {
             return serverManagers.get(uuid);
         } else {
@@ -62,7 +62,7 @@ public class FortressModServerManager implements IFortressModServerManager {
     }
 
     public void tick(PlayerManager playerManager) {
-        for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
+        for (Map.Entry<UUID, ServerFortressManager> entry : serverManagers.entrySet()) {
             final var playerId = entry.getKey();
             final var manager = entry.getValue();
             final var player = playerManager.getPlayer(playerId);
@@ -72,7 +72,7 @@ public class FortressModServerManager implements IFortressModServerManager {
 
     public void save() {
         final var nbt = new NbtCompound();
-        for (Map.Entry<UUID, FortressServerManager> entry : serverManagers.entrySet()) {
+        for (Map.Entry<UUID, ServerFortressManager> entry : serverManagers.entrySet()) {
             final var fortressNbt = new NbtCompound();
             final var id = entry.getKey();
             final var manager = entry.getValue();
@@ -111,7 +111,7 @@ public class FortressModServerManager implements IFortressModServerManager {
 
             final var managerNbt = nbtCompound.getCompound(key);
             final var masterPlayerId = UUID.fromString(key);
-            final var manager = new FortressServerManager(server);
+            final var manager = new ServerFortressManager(server);
             manager.readFromNbt(managerNbt);
 
             serverManagers.put(masterPlayerId, manager);
@@ -126,7 +126,7 @@ public class FortressModServerManager implements IFortressModServerManager {
     }
 
     public Optional<IServerManagersProvider> findReachableFortress(BlockPos pos, double reachRange) {
-        for (FortressServerManager manager : serverManagers.values()) {
+        for (ServerFortressManager manager : serverManagers.values()) {
             final var fortressCenter = manager.getFortressCenter();
             if(fortressCenter == null) continue;
             final var villageRadius = manager.getVillageRadius();

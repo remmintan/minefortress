@@ -2,9 +2,7 @@ package org.minefortress.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import java.util.UUID;
 import net.minecraft.server.command.ServerCommandSource;
-import org.minefortress.fortress.FortressServerManager;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
