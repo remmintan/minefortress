@@ -3,11 +3,11 @@ package net.remmintan.mods.minefortress.networking.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
-import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaManager;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 import net.remmintan.mods.minefortress.core.interfaces.networking.INetworkingReader;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreasClientManager;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.registries.NetworkingReadersRegistry;
-import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,8 +48,8 @@ public class S2CSyncAreasPacket implements FortressS2CPacket {
         });
     }
 
-    private static IAutomationAreaManager getAutomationAreaManager() {
+    private static IAreasClientManager getAutomationAreaManager() {
         final var provider = CoreModUtils.getMineFortressManagersProvider();
-        return provider.get_AutomationAreaManager();
+        return provider.get_AreasClientManager();
     }
 }
