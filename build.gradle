@@ -110,8 +110,6 @@ loom {
 }
 
 jar {
-//	from sourceSets.core.output, sourceSets.networking.output, sourceSets.building.output, sourceSets.selections.output, sourceSets.panama.output
-
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
 	}
