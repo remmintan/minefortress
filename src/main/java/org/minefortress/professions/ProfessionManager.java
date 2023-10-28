@@ -84,7 +84,7 @@ public abstract class ProfessionManager implements IProfessionsManager {
 
         if(countItems) {
             final var itemsRequirement = profession.getItemsRequirement();
-            if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement)) {
+            if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement) && !itemsRequirement.isEmpty()) {
                 final var hasItems = fortressManager instanceof IServerFortressManager sfm && sfm.getResourceManager().hasItems(itemsRequirement);
                 satisfied = satisfied && hasItems;
             }
