@@ -1,8 +1,5 @@
 package net.remmintan.mods.minefortress.core.interfaces.blueprints;
 
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
-
 import java.util.List;
 import java.util.Optional;
 

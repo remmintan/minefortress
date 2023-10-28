@@ -10,7 +10,7 @@ public class ServerboundSleepPacket implements FortressC2SPacket {
     public ServerboundSleepPacket() {
     }
 
-    public ServerboundSleepPacket(PacketByteBuf buf) {
+    public ServerboundSleepPacket(PacketByteBuf ignoredBuf) {
     }
 
     @Override

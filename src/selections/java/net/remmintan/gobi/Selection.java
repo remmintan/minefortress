@@ -39,10 +39,6 @@ public abstract class Selection implements ISelection {
         return Math.min(block1.getComponentAlongAxis(axis), block2.getComponentAlongAxis(axis));
     }
 
-    private static int getMax(BlockPos block1, BlockPos block2, Direction.Axis axis) {
-        return Math.max(block1.getComponentAlongAxis(axis), block2.getComponentAlongAxis(axis));
-    }
-
     @Override
     public List<Pair<Vec3d, String>> getSelectionLabelsPosition() {
         return Collections.emptyList();
@@ -68,15 +64,15 @@ public abstract class Selection implements ISelection {
 
             final ArrayList<Pair<Vec3d, String>> labels = new ArrayList<>();
             if(Math.abs(difference.getX()) > 1) {
-                labels.add(new Pair<>(xVec, Math.abs(difference.getX()) + ""));
+                labels.add(new Pair<>(xVec, String.valueOf(Math.abs(difference.getX()))));
             }
 
             if(showYDelta && Math.abs(difference.getY()) > 1) {
-                labels.add(new Pair<>(yVec, Math.abs(difference.getY()) + ""));
+                labels.add(new Pair<>(yVec, String.valueOf(Math.abs(difference.getY()))));
             }
 
             if(Math.abs(difference.getZ()) > 1) {
-                labels.add(new Pair<>(zVec, Math.abs(difference.getZ()) + ""));
+                labels.add(new Pair<>(zVec, String.valueOf(Math.abs(difference.getZ()))));
             }
 
             return labels;

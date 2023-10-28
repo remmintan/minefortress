@@ -95,23 +95,6 @@ public class TreeHelper {
         }
     }
 
-    static class TreeInfo {
-        private final int logsCount;
-        private final BlockPos highestLeaf;
-
-        public TreeInfo(int logsCount, BlockPos highestLeaf) {
-            this.logsCount = logsCount;
-            this.highestLeaf = highestLeaf;
-        }
-
-
-        public int getLogsCount() {
-            return logsCount;
-        }
-
-        public BlockPos getHighestLeaf() {
-            return highestLeaf;
-        }
-    }
+    record TreeInfo(int logsCount, BlockPos highestLeaf) {}
 
 }

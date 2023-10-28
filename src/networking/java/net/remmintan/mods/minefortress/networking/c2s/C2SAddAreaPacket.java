@@ -10,7 +10,7 @@ import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPac
 public class C2SAddAreaPacket implements FortressC2SPacket {
 
     public static final String CHANNEL = "add_area";
-    private IAutomationAreaInfo automationAreaInfo;
+    private final IAutomationAreaInfo automationAreaInfo;
 
     public C2SAddAreaPacket(IAutomationAreaInfo automationAreaInfo) {
         this.automationAreaInfo = automationAreaInfo;

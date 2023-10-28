@@ -12,7 +12,7 @@ public class C2SCloseHireMenuPacket implements FortressC2SPacket {
     public C2SCloseHireMenuPacket() {
     }
 
-    public C2SCloseHireMenuPacket(PacketByteBuf buffer) {
+    public C2SCloseHireMenuPacket(PacketByteBuf ignoredBuffer) {
     }
 
     public void write(PacketByteBuf buf) {

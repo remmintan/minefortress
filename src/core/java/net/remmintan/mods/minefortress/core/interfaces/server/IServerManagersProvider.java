@@ -20,6 +20,5 @@ public interface IServerManagersProvider {
     IServerBuildingsManager getBuildingsManager();
     IServerResourceManager getResourceManager();
     IServerTaskManager getTaskManager();
-    void syncOnJoin(boolean b, boolean a);
 
 }

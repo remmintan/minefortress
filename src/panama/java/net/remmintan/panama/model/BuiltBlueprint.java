@@ -18,11 +18,9 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataL
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
 import net.remmintan.panama.RenderHelper;
 import net.remmintan.panama.view.BlueprintBlockRenderView;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -123,9 +121,11 @@ public class BuiltBlueprint implements BuiltModel {
             matrixStack.push();
             matrixStack.translate(pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF);
 
-            blockRenderManager.renderBlock(blockState, pos, blueprintData, matrixStack, bufferBuilder,  true, getClient().world.random);
+            final var clientWorld = getClient().world;
+            if(clientWorld != null) {
+                blockRenderManager.renderBlock(blockState, pos, blueprintData, matrixStack, bufferBuilder,  true, clientWorld.random);
+            }
             nonEmptyLayers.add(blockLayer);
-
             matrixStack.pop();
         }
 
@@ -142,6 +142,7 @@ public class BuiltBlueprint implements BuiltModel {
     }
 
 
+    @NotNull
     private MinecraftClient getClient() {
         return MinecraftClient.getInstance();
     }

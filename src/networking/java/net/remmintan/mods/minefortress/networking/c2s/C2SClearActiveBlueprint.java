@@ -12,7 +12,7 @@ public class C2SClearActiveBlueprint implements FortressC2SPacket {
 
     public C2SClearActiveBlueprint() {
     }
-    public C2SClearActiveBlueprint(PacketByteBuf buf) {
+    public C2SClearActiveBlueprint(PacketByteBuf ignoredBuf) {
     }
 
     @Override

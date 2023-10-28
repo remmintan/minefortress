@@ -11,7 +11,7 @@ public class C2SJumpToCampfire implements FortressC2SPacket {
 
     public C2SJumpToCampfire() {}
 
-    public C2SJumpToCampfire(PacketByteBuf buf) {}
+    public C2SJumpToCampfire(PacketByteBuf ignoredBuf) {}
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {

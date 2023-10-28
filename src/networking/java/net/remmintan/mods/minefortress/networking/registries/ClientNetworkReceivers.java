@@ -37,7 +37,7 @@ public class ClientNetworkReceivers {
         ClientPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName),
                 (client, handler, buf, sender) -> {
                     final var packet = packetConstructor.apply(buf);
-                    client.execute(() -> packet.handle(client, handler.getEnabledFeatures()));
+                    client.execute(() -> packet.handle(client));
                 });
     }
 

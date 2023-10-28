@@ -7,5 +7,5 @@ public enum ServerSelectionType {
     LADDER,
     LADDER_Z_DIRECTION,
     TREE,
-    ROADS;
+    ROADS
 }

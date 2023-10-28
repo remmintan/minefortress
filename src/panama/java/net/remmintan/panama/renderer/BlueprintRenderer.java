@@ -106,7 +106,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         return blueprintsModelBuilder;
     }
 
-    private void renderBlueprintInGui(MatrixStack matrices2, BuiltBlueprint builtBlueprint, float scale, float x, float y, float z, boolean isEnoughResources) {
+    private void renderBlueprintInGui(MatrixStack ignoredMatrices, BuiltBlueprint builtBlueprint, float scale, float x, float y, float z, boolean isEnoughResources) {
         super.client.getProfiler().push("blueprint_render_model");
         DiffuseLighting.enableGuiDepthLighting();
 

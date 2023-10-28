@@ -11,7 +11,6 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
-import net.remmintan.mods.minefortress.building.FortressBlocks;
 
 public class BuildingHelper {
 

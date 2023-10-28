@@ -1,7 +1,6 @@
 package net.remmintan.panama.model.builder;
 
 import net.minecraft.client.render.BufferBuilder;
-import net.remmintan.gobi.ClientSelection;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.panama.model.BuiltTasks;

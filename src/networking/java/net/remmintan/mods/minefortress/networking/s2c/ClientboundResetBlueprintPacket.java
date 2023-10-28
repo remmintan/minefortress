@@ -7,7 +7,7 @@ import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPac
 public class ClientboundResetBlueprintPacket implements FortressS2CPacket {
 
     public ClientboundResetBlueprintPacket() {}
-    public ClientboundResetBlueprintPacket(PacketByteBuf buf) {}
+    public ClientboundResetBlueprintPacket(PacketByteBuf ignoredBuf) {}
 
     @Override
     public void handle(MinecraftClient client) {
