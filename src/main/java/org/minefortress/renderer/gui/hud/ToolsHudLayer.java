@@ -97,7 +97,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                             20,
                             type.getButtonText(),
                             btn -> ModUtils.getSelectionManager().setSelectionType(type),
-                            type.getName(),
+                            type.name(),
                             () -> selection.checked
                     )
             );

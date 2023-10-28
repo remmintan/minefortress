@@ -3,6 +3,7 @@ package org.minefortress.professions.hire;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireCost;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 
+import java.io.Serializable;
 import java.util.List;
 
 public record HireInfo(
@@ -10,4 +11,4 @@ public record HireInfo(
         int hireProgress,
         int hireQueue,
         List<IHireCost> cost
-) implements IHireInfo {}
+) implements IHireInfo, Serializable {}

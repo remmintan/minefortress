@@ -53,7 +53,7 @@ public class BuildHintsLayer extends AbstractHintsLayer{
 
     @Override
     protected Optional<String> getInfoText() {
-        final var name = getSelectionManager().getCurrentSelectionType().getName();
+        final var name = getSelectionManager().getCurrentSelectionType().getDisplayName();
         return Optional.of("Selection type: " + name);
     }
 

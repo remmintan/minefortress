@@ -67,7 +67,7 @@ public class TwoDotsSelection extends Selection {
                         this.selectionStart,
                         this.selectionEnd,
                         hitResult,
-                        getSelectionType().getName()
+                        getSelectionType().name()
                 );
 
 

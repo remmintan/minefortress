@@ -188,7 +188,7 @@ public class WallsSelection extends Selection {
                                     p.getFirst(),
                                     p.getSecond().up(upDelta),
                                     hitResult,
-                                    getSelectionType().getName()
+                                    getSelectionType().name()
                             );
 
                             FortressClientNetworkHelper.send(FortressChannelNames.NEW_SELECTION_TASK, packet);

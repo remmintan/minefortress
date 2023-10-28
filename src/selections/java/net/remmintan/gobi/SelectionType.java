@@ -31,7 +31,7 @@ public enum SelectionType implements ISelectionType {
     }
 
     @Override
-    public String getName() {
+    public String getDisplayName() {
         return name;
     }
 

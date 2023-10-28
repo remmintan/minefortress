@@ -156,8 +156,7 @@ public class ServerTaskManager implements IServerTaskManager {
                 throw new IllegalStateException();
             }
         }
-
-        return null;
+        return simpleSelectionTask;
     }
 
     private ITask getTask() {
