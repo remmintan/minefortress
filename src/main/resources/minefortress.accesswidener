@@ -28,7 +28,6 @@ accessible method net/minecraft/screen/ScreenHandler internalOnSlotClick (IILnet
 accessible field net/minecraft/item/BucketItem fluid Lnet/minecraft/fluid/Fluid;
 accessible method net/minecraft/entity/projectile/ProjectileEntity <init> (Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/World;)V
 accessible method net/minecraft/entity/projectile/PersistentProjectileEntity getEntityCollision (Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/hit/EntityHitResult;
-accessible field net/minecraft/client/gui/hud/InGameHud ICONS Lnet/minecraft/util/Identifier;
 accessible field net/minecraft/structure/StructureTemplate$StructureBlockInfo pos Lnet/minecraft/util/math/BlockPos;
 accessible field net/minecraft/structure/StructureTemplate$StructureBlockInfo state Lnet/minecraft/block/BlockState;
 accessible field net/minecraft/structure/StructureTemplate$StructureBlockInfo nbt Lnet/minecraft/nbt/NbtCompound;
