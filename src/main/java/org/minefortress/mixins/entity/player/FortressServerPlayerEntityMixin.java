@@ -3,6 +3,7 @@ package org.minefortress.mixins.entity.player;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -46,7 +47,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     }
 
     @Inject(method="<init>", at=@At("RETURN"))
-    public void init(MinecraftServer server, ServerWorld world, GameProfile profile, CallbackInfo ci) {
+    public void init(MinecraftServer server, ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, CallbackInfo ci) {
         serverBlueprintManager = new ServerBlueprintManager(server, this::getUuid);
     }
 
