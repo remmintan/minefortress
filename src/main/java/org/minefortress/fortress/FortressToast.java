@@ -8,8 +8,10 @@ import net.minecraft.client.toast.ToastManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public class FortressToast implements Toast {
+    private static final Identifier TEXTURE = new Identifier("toast/advancement");
 
     private Toast.Visibility visibility = Visibility.SHOW;
 

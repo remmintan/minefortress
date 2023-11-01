@@ -7,10 +7,10 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import org.minefortress.MineFortressMod;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundBlueprintsImportExportPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import org.minefortress.MineFortressMod;
 import org.minefortress.renderer.gui.blueprints.list.BlueprintListEntry;
 import org.minefortress.renderer.gui.blueprints.list.BlueprintsListWidget;
 import org.minefortress.utils.ModUtils;
@@ -245,7 +245,7 @@ public class ImportExportBlueprintsScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        super.renderBackground(drawContext);
+        super.renderBackground(drawContext, mouseX, mouseY, delta);
         super.render(drawContext, mouseX, mouseY, delta);
 
         drawContext.drawCenteredTextWithShadow(this.textRenderer, this.label, this.width / 2, 40, 0xFFFFFF);

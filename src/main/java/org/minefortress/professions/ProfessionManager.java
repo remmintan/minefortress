@@ -3,12 +3,12 @@ package org.minefortress.professions;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.*;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 
 import java.io.IOException;
 import java.io.StringReader;

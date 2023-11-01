@@ -14,8 +14,8 @@ import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
-import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreenHandler;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
 package org.minefortress.mixins.world;
 
-import net.minecraft.client.util.telemetry.TelemetryEventProperty;
-import net.minecraft.client.util.telemetry.WorldLoadedEvent;
+import net.minecraft.client.session.telemetry.TelemetryEventProperty;
+import net.minecraft.client.session.telemetry.WorldLoadedEvent;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;

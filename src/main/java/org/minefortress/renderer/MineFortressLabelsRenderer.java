@@ -8,11 +8,11 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import org.apache.commons.lang3.StringUtils;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 
 import java.util.List;
 import java.util.function.Consumer;

@@ -232,12 +232,12 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         }
     }
 
-    @Inject(method = "openPauseMenu", at = @At("HEAD"), cancellable = true)
-    public void openPauseMenu(boolean pause, CallbackInfo ci) {
+    @Inject(method = "openGameMenu", at = @At("HEAD"), cancellable = true)
+    public void openGameMenu(boolean pauseOnly, CallbackInfo ci) {
         if(this.world != null && this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
             final boolean localServer = this.isIntegratedServerRunning() && (this.server == null || !this.server.isRemote());
             if (localServer) {
-                this.setScreen(new BlueprintsPauseScreen(!pause));
+                this.setScreen(new BlueprintsPauseScreen(!pauseOnly));
                 this.soundManager.pauseAll();
             } else {
                 this.setScreen(new BlueprintsPauseScreen(true));

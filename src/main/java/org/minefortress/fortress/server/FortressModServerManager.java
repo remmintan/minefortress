@@ -4,10 +4,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
 import org.minefortress.fortress.ServerFortressManager;
@@ -35,7 +34,7 @@ public class FortressModServerManager implements IFortressModServerManager {
     }
 
     private ServerFortressManager getByPlayer(ServerPlayerEntity player) {
-        final var playerId = Uuids.getUuidFromProfile(player.getGameProfile());
+        final var playerId = player.getGameProfile().getId();
         return serverManagers.computeIfAbsent(playerId, (it) -> new ServerFortressManager(server));
     }
 

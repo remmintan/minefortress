@@ -81,7 +81,7 @@ public class BlueprintsPauseScreen extends Screen {
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         if (this.showMenu) {
-            this.renderBackground(drawContext);
+            this.renderBackground(drawContext, mouseX, mouseY, delta);
             drawContext.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
         } else {
             drawContext.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);

@@ -7,9 +7,9 @@ import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 
 import java.util.List;
 

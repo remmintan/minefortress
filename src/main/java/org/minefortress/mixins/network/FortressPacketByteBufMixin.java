@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.resources.client.FortressItemStack;
@@ -18,7 +19,7 @@ public abstract class FortressPacketByteBufMixin extends ByteBuf {
 
     @Shadow public abstract PacketByteBuf writeVarInt(int value);
 
-    @Shadow public abstract PacketByteBuf writeNbt(@Nullable NbtCompound compound);
+    @Shadow public abstract PacketByteBuf writeNbt(NbtElement compound);
 
     @Shadow public abstract ByteBuf writeInt(int value);
 

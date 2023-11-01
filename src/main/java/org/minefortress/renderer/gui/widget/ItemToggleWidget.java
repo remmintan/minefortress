@@ -1,6 +1,7 @@
 package org.minefortress.renderer.gui.widget;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 

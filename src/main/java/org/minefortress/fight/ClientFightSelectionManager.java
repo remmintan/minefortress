@@ -2,6 +2,7 @@ package org.minefortress.fight;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
@@ -16,6 +17,7 @@ import org.minefortress.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class ClientFightSelectionManager implements IClientFightSelectionManager {

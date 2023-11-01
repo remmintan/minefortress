@@ -2,6 +2,7 @@ package org.minefortress.renderer.gui.widget;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.item.Item;
@@ -34,14 +35,9 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         super(
                 0,
                 0,
-                20,
-                20,
-                0,
-                0,
-                20,
-                FORTRESS_BUTTON_TEXTURE,
                 FORTRESS_BUTTON_WIDTH,
                 FORTRESS_BUTTON_HEIGHT,
+                new ButtonTextures(FORTRESS_BUTTON_TEXTURE, FORTRESS_BUTTON_TEXTURE),
                 clickAction
         );
         this.setTooltip(Tooltip.of(Text.literal(tooltipText)));
@@ -55,14 +51,9 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         super(
                 0,
                 0,
-                20,
-                20,
-                0,
-                0,
-                20,
-                FORTRESS_BUTTON_TEXTURE,
                 FORTRESS_BUTTON_WIDTH,
                 FORTRESS_BUTTON_HEIGHT,
+                new ButtonTextures(FORTRESS_BUTTON_TEXTURE, FORTRESS_BUTTON_TEXTURE),
                 clickAction
         );
         this.itemStack = new ItemStack(item);
@@ -78,7 +69,7 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         renderItem(drawContext);
 
         if(this.checked){
-            this.drawTexture(drawContext, ARROWS_TEXTURE, this.getX()-15, this.getY()+2, 12, 208, 0, 14, 18, 512, 512);
+            drawContext.drawTexture(ARROWS_TEXTURE, this.getX()-15, this.getY()+2, 12, 208, 0, 14, 18, 512, 512);
         }
 
         if(this.hovered) {

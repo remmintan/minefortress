@@ -9,7 +9,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPaw
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
-
+import com.mojang.datafixers.util.Pair;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;

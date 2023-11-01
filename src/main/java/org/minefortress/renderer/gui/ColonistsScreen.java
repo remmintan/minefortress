@@ -52,7 +52,7 @@ public class ColonistsScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, MANAGE_COLONISTS_COUNT_TEXT, this.width / 2, 40, 0xFFFFFF);
         final var countLabel = "Villagers count: " + getColonistsCount();
         final var maxCountLabel = "Max villagers count: " + (getMaxColonistsCount()==-1?"Unlimited":getMaxColonistsCount());

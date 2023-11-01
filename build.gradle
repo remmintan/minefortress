@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'fabric-loom' version '1.2.7'
+	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -56,6 +56,7 @@ repositories {
 		name = "Ladysnake Mods"
 		url = "https://maven.ladysnake.org/releases"
 		content {
+			includeGroup("org.ladysnake")
 			includeGroup("io.github.ladysnake")
 			includeGroupByRegex("dev\\.emi.*")
 			includeGroupByRegex("dev\\.onyxstudios.*")
@@ -91,10 +92,10 @@ dependencies {
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
 
-	modImplementation include("io.github.ladysnake:automatone:1.0.3+minefortress")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.6+minefortress")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.6+minefortress")
-	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.2.6+minefortress")
+	modImplementation include("io.github.ladysnake:automatone:1.0.5+minefortress")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.7+minefortress")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.7+minefortress")
+	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.2.7+minefortress")
 }
 
 processResources {

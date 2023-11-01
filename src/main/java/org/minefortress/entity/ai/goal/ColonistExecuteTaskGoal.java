@@ -3,12 +3,12 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
+import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
-import net.remmintan.mods.minefortress.core.TaskType;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

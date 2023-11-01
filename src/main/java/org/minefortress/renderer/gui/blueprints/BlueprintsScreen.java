@@ -156,17 +156,17 @@ public final class BlueprintsScreen extends Screen {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        if (!this.handler.isNeedScrollbar()) {
-            return false;
-        }
-        int i = (this.handler.getSelectedGroupSize() + 9 - 1) / 9 - 5;
-        this.scrollPosition = (float)((double)this.scrollPosition - amount / (double)i);
-        this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
-        this.handler.scroll(scrollPosition);
-        return true;
-    }
+//    @Override
+//    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+//        if (!this.handler.isNeedScrollbar()) {
+//            return false;
+//        }
+//        int i = (this.handler.getSelectedGroupSize() + 9 - 1) / 9 - 5;
+//        this.scrollPosition = (float)((double)this.scrollPosition - amount / (double)i);
+//        this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
+//        this.handler.scroll(scrollPosition);
+//        return true;
+//    }
 
     public void updateSlots() {
         this.handler.scroll(scrollPosition);
@@ -174,7 +174,7 @@ public final class BlueprintsScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
         this.drawBackground(drawContext, mouseX, mouseY);
         RenderSystem.disableDepthTest();
         super.render(drawContext, mouseX, mouseY, delta);

@@ -57,7 +57,7 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
         final var missingText = String.format("You need at least one %s in your village", getMissingObjectName());
         drawContext.drawCenteredTextWithShadow(this.textRenderer, missingText, this.width / 2, this.height / 2 - 40, 0xFFFFFF);
         if(irregularReson) {

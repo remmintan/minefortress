@@ -46,7 +46,7 @@ public class ClearBlueprintConfirmationScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        super.renderBackground(drawContext);
+        super.renderBackground(drawContext, mouseX, mouseY, delta);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, CONFIRMATION_TEXT, this.width / 2, 40, 0xFFFFFF);
 
         super.render(drawContext, mouseX, mouseY, delta);

@@ -47,7 +47,7 @@ public class RangedAttackGoal extends AttackGoal {
                     int i = pawn.getItemUseTime();
                     if (i >= 20) {
                         pawn.clearActiveItem();
-                        ((RangedAttackMob)pawn).attack(target, BowItem.getPullProgress(i));
+                        ((RangedAttackMob)pawn).shootAt(target, BowItem.getPullProgress(i));
                         this.cooldown = INTERVAL;
                     }
                 }
