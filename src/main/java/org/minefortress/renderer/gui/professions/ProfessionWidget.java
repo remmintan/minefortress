@@ -22,8 +22,8 @@ public class ProfessionWidget {
 
     public static final float PROFESSION_WIDGET_WIDTH = 64f;
     public static final float PROFESSION_WIDGET_HEIGHT = 35f;
-    private static final AdvancementFrame PROFESSIONS_FRAME = AdvancementFrame.CHALLENGE;
-    private static final Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/advancements/widgets.png");
+    private static final AdvancementFrame PROFESSIONS_FRAME = AdvancementFrame.TASK;
+    private static final Identifier TITLE_BOX_TEXTURE = new Identifier("advancements/title_box");
 
     private ProfessionWidget parent;
     private final List<ProfessionWidget> children = new ArrayList<>();
@@ -166,9 +166,9 @@ public class ProfessionWidget {
         boolean bl2 = 113 - originY - this.y - 26 <= 6 + description.size() * client.textRenderer.fontHeight;
         if (!description.isEmpty()) {
             if (bl2) {
-                this.method_2324(drawContext, WIDGETS_TEXTURE, m, l + 26 - n, this.width, n);
+                drawContext.drawGuiTexture(TITLE_BOX_TEXTURE, m, l + 26 - n, this.width, n);
             } else {
-                this.method_2324(drawContext, WIDGETS_TEXTURE, m, l, this.width, n);
+                drawContext.drawGuiTexture(TITLE_BOX_TEXTURE, m, l, this.width, n);
             }
         }
         drawContext.drawGuiTexture(status.getBoxTexture(), 200, 26, 0, 0, m, l, j, 26);
