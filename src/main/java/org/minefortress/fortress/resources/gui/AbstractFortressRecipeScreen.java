@@ -52,7 +52,7 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
         if (getRecipeBookWidget().isOpen() && this.narrow) {
             this.drawBackground(drawContext, delta, mouseX, mouseY);
             getRecipeBookWidget().render(drawContext, mouseX, mouseY, delta);
@@ -101,12 +101,12 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
 
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (!this.hasScrollbar()) {
             return false;
         }
         int i = this.handler.getRowsCount() - 4;
-        this.scrollPosition = (float)((double)this.scrollPosition - amount / (double)i);
+        this.scrollPosition = (float)((double)this.scrollPosition - verticalAmount / (double)i);
         this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
         this.handler.scrollItems(this.scrollPosition);
         return true;

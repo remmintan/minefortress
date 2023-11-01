@@ -119,7 +119,7 @@ public class FortressHud {
     }
 
     private boolean isHudHidden() {
-        return client.options.hudHidden || client.options.debugEnabled;
+        return client.options.hudHidden;
     }
 
 }

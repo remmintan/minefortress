@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.recipebook.ClientRecipeBook;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
@@ -29,8 +30,8 @@ public class FortressRecipeBookWidget extends RecipeBookWidget {
         final var craftingRecipes = client.world.getRecipeManager().listAllOfType(recipeType);
         craftingRecipes
                 .forEach(res -> {
-                    this.recipeBook.add((Recipe<?>) res);
-                    this.recipeBook.display((Recipe<?>) res);
+                    this.recipeBook.add((RecipeEntry<?>)  res);
+                    this.recipeBook.display((RecipeEntry<?>) res);
                 });
 
         this.recipeBook = new ClientRecipeBook();

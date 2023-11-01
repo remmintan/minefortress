@@ -1,6 +1,7 @@
 package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;

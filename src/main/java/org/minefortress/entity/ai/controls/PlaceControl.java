@@ -14,6 +14,7 @@ import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 import static org.minefortress.entity.colonist.FortressHungerManager.ACTIVE_EXHAUSTION;
 import static org.minefortress.fortress.resources.SimilarItemsHelper.isIgnorable;
 
+
 public class PlaceControl extends PositionedActionControl {
 
     private final Colonist colonist;

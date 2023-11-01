@@ -47,7 +47,7 @@ import java.util.Set;
 @Mixin(CreativeInventoryScreen.class)
 public abstract class FortressCreativeInventoryScreenMixin extends AbstractInventoryScreen<CreativeInventoryScreen.CreativeScreenHandler> {
 
-    @Shadow @Final private static Identifier TEXTURE;
+    @Shadow @Final private static Identifier SCROLLER_TEXTURE;
     @Shadow @Final private static String TAB_TEXTURE_PREFIX;
     @Shadow private static ItemGroup selectedTab = ItemGroups.getDefaultTab();
     @Shadow private TextFieldWidget searchBox;
@@ -130,7 +130,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if(isFortressSurvival()) {
-            this.renderBackground(context);
+            this.renderBackground(context, mouseX, mouseY, delta);
             super.render(context, mouseX, mouseY, delta);
             for (ItemGroup itemGroup : getResourceManager().getGroups()) {
                 if (this.renderTabTooltipIfHovered(context, itemGroup, mouseX, mouseY)) break;
@@ -152,7 +152,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             ItemGroup itemGroup = selectedTab;
             for (ItemGroup itemGroup2 : getResourceManager().getGroups()) {
                 RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-                RenderSystem.setShaderTexture(0, TEXTURE);
+                RenderSystem.setShaderTexture(0, SCROLLER_TEXTURE);
                 if (itemGroup2 == selectedTab) continue;
                 this.renderTabIcon(context, itemGroup2);
             }
@@ -163,11 +163,22 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             int j = this.y + 18;
             int k = j + 112;
             if (itemGroup.hasScrollbar()) {
-                context.drawTexture(TEXTURE, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
+                context.drawTexture(SCROLLER_TEXTURE, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
             }
             this.renderTabIcon(context, itemGroup);
             if (itemGroup == Registries.ITEM_GROUP.get(ItemGroups.INVENTORY)) {
-                InventoryScreen.drawEntity(context, this.x + 88, this.y + 45, 20, this.x + 88 - mouseX, this.y + 45 - 30 - mouseY, ModUtils.getClientPlayer());
+                InventoryScreen.drawEntity(
+                        context,
+                        this.x + 88,
+                        this.y + 45,
+                        this.x + 98,
+                        this.y + 55,
+                        20,
+                        0f,
+                        this.x + 88 - mouseX,
+                        this.y + 45 - 30 - mouseY,
+                        ModUtils.getClientPlayer()
+                );
             }
 
             ci.cancel();

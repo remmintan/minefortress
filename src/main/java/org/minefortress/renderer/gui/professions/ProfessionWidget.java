@@ -1,6 +1,7 @@
 package org.minefortress.renderer.gui.professions;
 
 
+import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -21,6 +22,7 @@ public class ProfessionWidget {
 
     public static final float PROFESSION_WIDGET_WIDTH = 64f;
     public static final float PROFESSION_WIDGET_HEIGHT = 35f;
+    private static final AdvancementFrame PROFESSIONS_FRAME = AdvancementFrame.CHALLENGE;
     private static final Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/advancements/widgets.png");
 
     private ProfessionWidget parent;
@@ -78,9 +80,7 @@ public class ProfessionWidget {
         final boolean unlocked = isUnlocked(false) == ProfessionResearchState.UNLOCKED;
 
         AdvancementObtainedStatus status = unlockedWithCount ? AdvancementObtainedStatus.OBTAINED : AdvancementObtainedStatus.UNOBTAINED;
-        final int v = 128 + status.getSpriteIndex() * 26;
-        final int u = profession.getType().getTextureV();
-        drawContext.drawTexture(WIDGETS_TEXTURE, x + this.x + 3, y + this.y, u, v, 26, 26);
+        drawContext.drawGuiTexture(status.getFrameTexture(PROFESSIONS_FRAME), x + this.x + 3, y + this.y, 26, 26);
 
         drawContext.drawItem(profession.getIcon(), x + this.x + 8, y + this.y + 5);
         final var matrices = drawContext.getMatrices();
@@ -171,9 +171,9 @@ public class ProfessionWidget {
                 this.method_2324(drawContext, WIDGETS_TEXTURE, m, l, this.width, n);
             }
         }
-        drawContext.drawTexture(WIDGETS_TEXTURE, m, l, 0, status.getSpriteIndex() * 26, j, 26);
-        drawContext.drawTexture(WIDGETS_TEXTURE, m + j, l, 200 - k, status.getSpriteIndex() * 26, k, 26);
-        drawContext.drawTexture(WIDGETS_TEXTURE, originX + this.x + 3, originY + this.y, this.profession.getType().getTextureV(), 128 + status.getSpriteIndex() * 26, 26, 26);
+        drawContext.drawGuiTexture(status.getBoxTexture(), 200, 26, 0, 0, m, l, j, 26);
+        drawContext.drawGuiTexture(status.getBoxTexture(), 200, 26, 200 - k, 0, m + j, l, k, 26);
+        drawContext.drawGuiTexture(status.getFrameTexture(PROFESSIONS_FRAME), originX + this.x + 3, originY + this.y, 26, 26);
         final var matrices = drawContext.getMatrices();
         matrices.push();
         matrices.translate(0.0, 0.0, 200.0);

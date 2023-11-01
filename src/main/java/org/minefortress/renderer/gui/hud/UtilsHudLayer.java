@@ -2,6 +2,7 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.BookScreen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSleepPacket;

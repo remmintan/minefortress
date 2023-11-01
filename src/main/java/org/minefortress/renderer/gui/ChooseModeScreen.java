@@ -43,7 +43,7 @@ public class ChooseModeScreen extends Screen {
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         if(!ModUtils.getFortressClientManager().gamemodeNeedsInitialization()) Objects.requireNonNull(this.client).setScreen(null);
-        super.renderBackground(drawContext);
+        super.renderBackground(drawContext, mouseX, mouseY, delta);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, loading?loadingText:questionText, this.width / 2, 40, 0xFFFFFF);
         if(loading) return;
         super.render(drawContext, mouseX, mouseY, delta);

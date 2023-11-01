@@ -24,7 +24,6 @@ import org.minefortress.blueprints.world.FortressServerWorld;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
-
 import java.util.*;
 import java.util.function.Supplier;
 

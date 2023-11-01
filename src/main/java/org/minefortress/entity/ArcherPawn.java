@@ -7,7 +7,9 @@ import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -59,7 +61,7 @@ public class ArcherPawn extends TargetedPawn implements IWarrior, RangedAttackMo
     }
 
     @Override
-    public void attack(LivingEntity target, float pullProgress) {
+    public void shootAt(LivingEntity target, float pullProgress) {
         final var itemStack = new ItemStack(Items.ARROW);
         final var persistentProjectileEntity = ProjectileUtil.createArrowProjectile(this, itemStack, pullProgress);
         double d = target.getX() - this.getX();

@@ -23,7 +23,6 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressA
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressSlimeEntity;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;

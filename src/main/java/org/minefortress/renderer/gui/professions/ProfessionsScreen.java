@@ -30,7 +30,7 @@ public class ProfessionsScreen extends Screen {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         int screenX = 0;
         int screenY = 0;
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
 
         this.drawProfessionsTree(drawContext, screenX, screenY);
         drawContext.drawTextWithShadow(textRenderer, this.title, screenX + 8, screenY + 6, 0xFFFFFF);

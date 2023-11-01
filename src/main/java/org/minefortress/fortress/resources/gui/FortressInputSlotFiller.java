@@ -3,11 +3,10 @@ package org.minefortress.fortress.resources.gui;
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.CraftFailedResponseS2CPacket;
-import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeGridAligner;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.screen.slot.Slot;
@@ -27,7 +26,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
         this.handler = handler;
     }
 
-    public void fillInputSlots(ServerPlayerEntity entity, @Nullable Recipe<CraftingInventory> recipe, boolean craftAll) {
+    public void fillInputSlots(ServerPlayerEntity entity, @Nullable RecipeEntry<?> recipe, boolean craftAll) {
         if (recipe == null) {
             return;
         }
@@ -40,7 +39,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
         this.matcher.clear();
         ((FortressSimpleInventory)handler.getScreenInventory()).populate_RecipeFinder(this.matcher);
         this.handler.populateRecipeFinder(this.matcher);
-        if (this.matcher.match(recipe, null)) {
+        if (this.matcher.match(recipe.value(), null)) {
             this.fillInputSlots(recipe, craftAll);
         } else {
             this.returnInputs();
@@ -65,7 +64,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
         this.handler.clearCraftingSlots();
     }
 
-    private void fillInputSlots(Recipe<CraftingInventory> recipe, boolean craftAll) {
+    private void fillInputSlots(RecipeEntry<?> recipe, boolean craftAll) {
         Object itemStack;
         int j;
         boolean bl = this.handler.matches(recipe);
@@ -76,7 +75,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
                 return;
             }
         }
-        if (this.matcher.match(recipe, (IntList)(itemStack = new IntArrayList()), j = this.getAmountToFill(craftAll, i, bl))) {
+        if (this.matcher.match(recipe.value(), (IntList)(itemStack = new IntArrayList()), j = this.getAmountToFill(craftAll, i, bl))) {
             int k = j;
             for (int l : (IntList) itemStack) {
                 int m = RecipeMatcher.getStackFromId(l).getMaxCount();
@@ -84,7 +83,7 @@ public final class FortressInputSlotFiller implements RecipeGridAligner<Integer>
                 k = m;
             }
             j = k;
-            if (this.matcher.match(recipe, (IntList)itemStack, j)) {
+            if (this.matcher.match(recipe.value(), (IntList)itemStack, j)) {
                 this.returnInputs();
                 this.alignRecipeToGrid(this.handler.getCraftingWidth(), this.handler.getCraftingHeight(), this.handler.getCraftingResultSlotIndex(), recipe, ((IntList)itemStack).iterator(), j);
             }

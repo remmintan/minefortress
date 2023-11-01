@@ -6,6 +6,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintsTagsKeeper;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;

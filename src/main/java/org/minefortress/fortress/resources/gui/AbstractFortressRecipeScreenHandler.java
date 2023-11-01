@@ -1,26 +1,26 @@
 package org.minefortress.fortress.resources.gui;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
-import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.fortress.resources.client.FortressItemStack;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IScrollableHandler;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import org.minefortress.interfaces.FortressSimpleInventory;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundScrollCurrentScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IScrollableHandler;
+import org.minefortress.fortress.resources.ItemInfo;
+import org.minefortress.fortress.resources.client.FortressItemStack;
+import org.minefortress.interfaces.FortressSimpleInventory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -167,8 +167,8 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
 
     @SuppressWarnings("unchecked")
     @Override
-    public void fillInputSlots(boolean craftAll, Recipe<?> recipe, ServerPlayerEntity player) {
-        new FortressInputSlotFiller(this).fillInputSlots(player, (Recipe<CraftingInventory>) recipe, craftAll);
+    public void fillInputSlots(boolean craftAll, RecipeEntry<?> recipe, ServerPlayerEntity player) {
+        new FortressInputSlotFiller(this).fillInputSlots(player, (RecipeEntry<?>) recipe, craftAll);
     }
 
     protected abstract T getInput();
@@ -210,8 +210,8 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     }
 
     @Override
-    public boolean matches(Recipe<? super T> recipe) {
-        return recipe.matches(getInput(), world);
+    public boolean matches(RecipeEntry<? extends Recipe<T>> recipe) {
+        return recipe.value().matches(getInput(), world);
     }
 
     protected static class FortressSlot extends Slot {

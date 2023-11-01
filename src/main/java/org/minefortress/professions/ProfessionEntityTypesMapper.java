@@ -3,6 +3,8 @@ package org.minefortress.professions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.entity.EntityType;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
@@ -10,6 +12,7 @@ import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.registries.FortressEntities;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.HashMap;

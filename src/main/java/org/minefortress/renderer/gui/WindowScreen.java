@@ -29,7 +29,7 @@ public class WindowScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        super.renderBackground(drawContext);
+        super.renderBackground(drawContext, mouseX, mouseY, delta);
         this.drawBackground(drawContext);
         super.render(drawContext, mouseX, mouseY, delta);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, getTitle(), this.getScreenCenterX(), this.getScreenTopY() + 10, 0xFFFFFF);

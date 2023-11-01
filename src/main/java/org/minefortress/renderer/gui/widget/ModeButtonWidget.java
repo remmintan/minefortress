@@ -25,8 +25,8 @@ public class ModeButtonWidget extends ItemButtonWidget {
             v += hoveredVOffset;
         }
         RenderSystem.enableDepthTest();
-        this.drawTexture(
-                drawContext,
+
+        drawContext.drawTexture(
                 FORTRESS_BUTTON_TEXTURE,
                 this.getX(),
                 this.getY(),

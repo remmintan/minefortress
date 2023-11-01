@@ -10,7 +10,6 @@ import org.minefortress.entity.Colonist;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import org.minefortress.utils.ModUtils;
-
 import java.util.Optional;
 
 public class SelectedColonistHudLayer extends AbstractHudLayer{
@@ -66,7 +65,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
     }
 
     private void renderIcon(DrawContext drawContext, int iconX, int iconY, int heartIconV) {
-        drawContext.drawTexture(InGameHud.ICONS, iconX, iconY, 110, 52, heartIconV, 8, 8, 256, 256);
+        drawContext.drawTexture(InGameHud.HOTBAR_TEXTURE, iconX, iconY, 110, 52, heartIconV, 8, 8, 256, 256);
     }
 
     @Override
