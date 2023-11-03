@@ -20,9 +20,8 @@ import java.util.function.Function;
 
 public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton, IItemHudElement {
 
-    protected static final Identifier FORTRESS_BUTTON_TEXTURE = new Identifier("minefortress","textures/gui/button.png");
-    protected static final int FORTRESS_BUTTON_HEIGHT = 64;
-    protected static final int FORTRESS_BUTTON_WIDTH = 32;
+    protected static final ButtonTextures ITEM_BUTTON_TEXTURES = new ButtonTextures(new Identifier("widget/button"), new Identifier("widget/button_disabled"), new Identifier("widget/button_highlighted"));
+    protected static final int BUTTON_SIDE = 20;
     private static final Identifier ARROWS_TEXTURE = new Identifier("textures/gui/recipe_book.png");
 
     protected final ItemStack itemStack;
@@ -35,9 +34,9 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         super(
                 0,
                 0,
-                FORTRESS_BUTTON_WIDTH,
-                FORTRESS_BUTTON_HEIGHT,
-                new ButtonTextures(FORTRESS_BUTTON_TEXTURE, FORTRESS_BUTTON_TEXTURE),
+                BUTTON_SIDE,
+                BUTTON_SIDE,
+                ITEM_BUTTON_TEXTURES,
                 clickAction
         );
         this.setTooltip(Tooltip.of(Text.literal(tooltipText)));
@@ -51,9 +50,9 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         super(
                 0,
                 0,
-                FORTRESS_BUTTON_WIDTH,
-                FORTRESS_BUTTON_HEIGHT,
-                new ButtonTextures(FORTRESS_BUTTON_TEXTURE, FORTRESS_BUTTON_TEXTURE),
+                BUTTON_SIDE,
+                BUTTON_SIDE,
+                ITEM_BUTTON_TEXTURES,
                 clickAction
         );
         this.itemStack = new ItemStack(item);
