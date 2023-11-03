@@ -12,7 +12,8 @@ import net.minecraft.util.math.MathHelper;
 
 public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRecipeScreenHandler> extends HandledScreen<T> implements RecipeBookProvider {
 
-    private static final Identifier SCROLLBAR_TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
+    private static final Identifier SCROLLBAR_TEXTURE = new Identifier("container/creative_inventory/scroller");
+    public static final Identifier SCROLLER_DISABLED_TEXTURE = new Identifier("container/creative_inventory/scroller_disabled");
     private boolean narrow;
     private float scrollPosition = 0f;
     private boolean scrolling = false;
@@ -131,7 +132,8 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
 
     private void renderScrollbar(DrawContext drawContext) {
         final var bounds = getScrollbarBounds();
-        drawContext.drawTexture(SCROLLBAR_TEXTURE, bounds.x1(), bounds.y1() + (int)((float)(bounds.y2() - bounds.y1() - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
+        final var texture = hasScrollbar() ? SCROLLBAR_TEXTURE : SCROLLER_DISABLED_TEXTURE;
+        drawContext.drawGuiTexture(texture, bounds.x1(), bounds.y1() + (int)((float)(bounds.y2() - bounds.y1() - 17) * this.scrollPosition), 12, 15);
     }
 
     private AbstractFortressRecipeScreen.ScrollbarBounds getScrollbarBounds() {
@@ -146,6 +148,6 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
         return handler.getRowsCount() > 4;
     }
 
-    private static record ScrollbarBounds(int x1, int y1, int x2, int y2) {}
+    private record ScrollbarBounds(int x1, int y1, int x2, int y2) {}
 
 }

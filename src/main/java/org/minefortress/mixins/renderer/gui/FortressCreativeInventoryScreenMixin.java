@@ -44,6 +44,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Locale;
 import java.util.Set;
 
+import static org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen.SCROLLER_DISABLED_TEXTURE;
+
 @Mixin(CreativeInventoryScreen.class)
 public abstract class FortressCreativeInventoryScreenMixin extends AbstractInventoryScreen<CreativeInventoryScreen.CreativeScreenHandler> {
 
@@ -163,7 +165,8 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             int j = this.y + 18;
             int k = j + 112;
             if (itemGroup.hasScrollbar()) {
-                context.drawTexture(SCROLLER_TEXTURE, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
+                Identifier identifier = this.hasScrollbar() ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
+                context.drawGuiTexture(identifier, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 12, 15);
             }
             this.renderTabIcon(context, itemGroup);
             if (itemGroup == Registries.ITEM_GROUP.get(ItemGroups.INVENTORY)) {
