@@ -27,7 +27,12 @@ import java.util.List;
 
 public final class BlueprintsScreen extends Screen {
 
-    private static final Identifier INVENTORY_TABS_TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
+    private static final Identifier SCROLLER_TEXTURE = new Identifier("container/creative_inventory/scroller");
+    private static final Identifier SCROLLER_DISABLED_TEXTURE = new Identifier("container/creative_inventory/scroller_disabled");
+    private static final Identifier[] TAB_TOP_UNSELECTED_TEXTURES = new Identifier[]{new Identifier("container/creative_inventory/tab_top_unselected_1"), new Identifier("container/creative_inventory/tab_top_unselected_2"), new Identifier("container/creative_inventory/tab_top_unselected_3"), new Identifier("container/creative_inventory/tab_top_unselected_4"), new Identifier("container/creative_inventory/tab_top_unselected_5"), new Identifier("container/creative_inventory/tab_top_unselected_6"), new Identifier("container/creative_inventory/tab_top_unselected_7")};
+    private static final Identifier[] TAB_TOP_SELECTED_TEXTURES = new Identifier[]{new Identifier("container/creative_inventory/tab_top_selected_1"), new Identifier("container/creative_inventory/tab_top_selected_2"), new Identifier("container/creative_inventory/tab_top_selected_3"), new Identifier("container/creative_inventory/tab_top_selected_4"), new Identifier("container/creative_inventory/tab_top_selected_5"), new Identifier("container/creative_inventory/tab_top_selected_6"), new Identifier("container/creative_inventory/tab_top_selected_7")};
+    private static final Identifier[] TAB_BOTTOM_UNSELECTED_TEXTURES = new Identifier[]{new Identifier("container/creative_inventory/tab_bottom_unselected_1"), new Identifier("container/creative_inventory/tab_bottom_unselected_2"), new Identifier("container/creative_inventory/tab_bottom_unselected_3"), new Identifier("container/creative_inventory/tab_bottom_unselected_4"), new Identifier("container/creative_inventory/tab_bottom_unselected_5"), new Identifier("container/creative_inventory/tab_bottom_unselected_6"), new Identifier("container/creative_inventory/tab_bottom_unselected_7")};
+    private static final Identifier[] TAB_BOTTOM_SELECTED_TEXTURES = new Identifier[]{new Identifier("container/creative_inventory/tab_bottom_selected_1"), new Identifier("container/creative_inventory/tab_bottom_selected_2"), new Identifier("container/creative_inventory/tab_bottom_selected_3"), new Identifier("container/creative_inventory/tab_bottom_selected_4"), new Identifier("container/creative_inventory/tab_bottom_selected_5"), new Identifier("container/creative_inventory/tab_bottom_selected_6"), new Identifier("container/creative_inventory/tab_bottom_selected_7")};
     private static final String BACKGROUND_TEXTURE = "textures/gui/container/creative_inventory/tab_items.png";
     private static final Identifier BLUEPRINT_PREVIEW_BACKGROUND_TEXTURE = new Identifier("textures/gui/recipe_book.png");
     private static final Text EDIT_BLUEPRINT_TEXT = Text.literal("right click to edit");
@@ -156,17 +161,17 @@ public final class BlueprintsScreen extends Screen {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-//    @Override
-//    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-//        if (!this.handler.isNeedScrollbar()) {
-//            return false;
-//        }
-//        int i = (this.handler.getSelectedGroupSize() + 9 - 1) / 9 - 5;
-//        this.scrollPosition = (float)((double)this.scrollPosition - amount / (double)i);
-//        this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
-//        this.handler.scroll(scrollPosition);
-//        return true;
-//    }
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (!this.handler.isNeedScrollbar()) {
+            return false;
+        }
+        int i = (this.handler.getSelectedGroupSize() + 9 - 1) / 9 - 5;
+        this.scrollPosition = (float)((double)this.scrollPosition - verticalAmount / (double)i);
+        this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
+        this.handler.scroll(scrollPosition);
+        return true;
+    }
 
     public void updateSlots() {
         this.handler.scroll(scrollPosition);
@@ -177,7 +182,7 @@ public final class BlueprintsScreen extends Screen {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
         this.drawBackground(drawContext, mouseX, mouseY);
         RenderSystem.disableDepthTest();
-        super.render(drawContext, mouseX, mouseY, delta);
+//        super.render(drawContext, mouseX, mouseY, delta);
 
         int screenX = this.x;
         int screenY = this.y;
@@ -362,11 +367,12 @@ public final class BlueprintsScreen extends Screen {
 
         drawContext.drawTexture(new Identifier(BACKGROUND_TEXTURE), this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        int i = this.x + 175;
-        int j = this.y + 18;
-        int k = j + 112;
 
-        drawContext.drawTexture(INVENTORY_TABS_TEXTURE, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 232 + (this.handler.isNeedScrollbar() ? 0 : 12), 0, 12, 15);
+        final var scrollbarX = this.x + 175;
+        final var scrollbarY = this.y + 18 + (int) ((float) (112 - 17) * this.scrollPosition);
+        final var scrollBarTexture = this.handler.isNeedScrollbar() ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
+
+        drawContext.drawGuiTexture(scrollBarTexture, scrollbarX, scrollbarY, 12, 15);
 
         if(selectedGroup != null)
             this.renderTabIcon(drawContext, selectedGroup);
@@ -382,8 +388,7 @@ public final class BlueprintsScreen extends Screen {
 
         int buttonWidth = 26;
 
-        int texX = columnNumber * buttonWidth;
-        int texY = 0;
+
         int x = this.x + buttonWidth * columnNumber;
         int y = this.y;
         if (columnNumber > 0) {
@@ -393,17 +398,27 @@ public final class BlueprintsScreen extends Screen {
         if (topRow) {
             y -= 28;
         } else {
-            texY += 64;
             y += this.backgroundHeight - 4;
         }
-        if (isSelectedGroup) {
-            texY += 32;
-        }
-        drawContext.drawTexture(INVENTORY_TABS_TEXTURE, x, y, texX, texY, buttonWidth, 32);
+
+        final var tabTexture = getTabTexture(topRow, isSelectedGroup, columnNumber);
+
+        drawContext.drawGuiTexture(tabTexture, x, y, buttonWidth, 32);
         int yIconDelta = topRow ? 1 : -1;
         ItemStack icon = group.getIcon();
 
         drawContext.drawItem(icon, x + 5, y + 8 + yIconDelta);
+    }
+
+    private Identifier getTabTexture(boolean topRow, boolean selected, int groupIndex) {
+        final Identifier[] identifiers;
+        if(topRow) {
+            identifiers = selected ? TAB_TOP_SELECTED_TEXTURES : TAB_TOP_UNSELECTED_TEXTURES;
+        } else {
+            identifiers = selected ? TAB_BOTTOM_SELECTED_TEXTURES : TAB_BOTTOM_UNSELECTED_TEXTURES;
+        }
+
+        return identifiers[MathHelper.clamp(groupIndex, 0, identifiers.length)];
     }
 
     private void renderTabTooltipIfHovered(DrawContext drawContext, BlueprintGroup group, int mouseX, int mouseY) {
