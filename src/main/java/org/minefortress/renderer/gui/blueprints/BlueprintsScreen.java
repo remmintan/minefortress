@@ -56,6 +56,8 @@ public final class BlueprintsScreen extends Screen {
 
     private BlueprintScreenHandler handler;
 
+    private ButtonWidget importExportButton;
+
     public BlueprintsScreen() {
         super(Text.literal("Blueprints"));
     }
@@ -72,11 +74,11 @@ public final class BlueprintsScreen extends Screen {
                 this.blueprintRenderer = ModUtils.getFortressClient().get_BlueprintRenderer();
                 final var connectedToTheServer = ModUtils.getFortressClientManager().isConnectedToTheServer();
                 if(!connectedToTheServer) {
-                    final var impExpBtn = ButtonWidget
+                    importExportButton = ButtonWidget
                             .builder(Text.literal("Import / Export"), btn -> client.setScreen(new ImportExportBlueprintsScreen()))
                             .dimensions(this.x + backgroundWidth + previewOffset, this.y - 22, 120, 20)
                             .build();
-                    this.addDrawableChild(impExpBtn);
+                    this.addDrawableChild(importExportButton);
                 }
             } else {
                 this.client.setScreen(null);
@@ -182,6 +184,8 @@ public final class BlueprintsScreen extends Screen {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
         this.drawBackground(drawContext, mouseX, mouseY);
         RenderSystem.disableDepthTest();
+        if(importExportButton!=null)
+            importExportButton.render(drawContext, mouseX, mouseY, delta);
 //        super.render(drawContext, mouseX, mouseY, delta);
 
         int screenX = this.x;
