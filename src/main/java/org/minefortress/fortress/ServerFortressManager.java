@@ -397,6 +397,11 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         influenceManager.sync();
     }
 
+    public void setCampfireVisibilityState(boolean campfireEnabled) {
+        this.campfireEnabled = campfireEnabled;
+        this.scheduleSync();
+    }
+
     public void scheduleSync() {
         needSync = true;
     }

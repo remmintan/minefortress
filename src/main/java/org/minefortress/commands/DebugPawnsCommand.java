@@ -17,7 +17,7 @@ public class DebugPawnsCommand extends MineFortressCommand {
                                 .then(argument("num", IntegerArgumentType.integer())
                                         .executes(context -> {
                                             int num = IntegerArgumentType.getInteger(context, "num");
-                                            final var fortressServerManager = getFortressServerManager(context);
+                                            final var fortressServerManager = getServerManagersProvider(context);
                                             for (int i = 0; i < num; i++) {
                                                 final var playerId = context.getSource().getPlayerOrThrow().getUuid();
                                                 fortressServerManager.spawnPawnNearCampfire(playerId);
@@ -34,7 +34,7 @@ public class DebugPawnsCommand extends MineFortressCommand {
                         .then(literal("pawns")
                                 .then(literal("kill")
                                         .executes(context -> {
-                                            final var fortressServerManager = getFortressServerManager(context);
+                                            final var fortressServerManager = getServerManagersProvider(context);
                                             fortressServerManager.killAllPawns();
                                             return 1;
                                         })

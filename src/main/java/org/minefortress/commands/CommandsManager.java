@@ -9,7 +9,8 @@ public class CommandsManager {
 
     private static final List<MineFortressCommand> commands = Arrays.asList(
             new DebugItemsCommand(),
-            new DebugPawnsCommand()
+            new DebugPawnsCommand(),
+            new CampfireToggleCommand()
     );
 
     private CommandsManager(){}

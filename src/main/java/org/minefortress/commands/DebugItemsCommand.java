@@ -62,7 +62,7 @@ public class DebugItemsCommand extends MineFortressCommand {
                         .executes(
                             context -> {
                                 int num = IntegerArgumentType.getInteger(context, "num");
-                                final var serverManager = getFortressServerManager(context);
+                                final var serverManager = getServerManagersProvider(context);
                                 final var resourceManager = serverManager.getResourceManager();
 
                                 final var random = context.getSource().getWorld().random;
@@ -83,7 +83,7 @@ public class DebugItemsCommand extends MineFortressCommand {
                         .then(literal("clear")
                                 .executes(
                                         context -> {
-                                            final var serverManager = getFortressServerManager(context);
+                                            final var serverManager = getServerManagersProvider(context);
                                             final var resourceManager = serverManager.getResourceManager();
 
                                             resourceManager
