@@ -11,8 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class FortressToast implements Toast {
-    private static final Identifier TEXTURE = new Identifier("toast/advancement");
-
+    private static final Identifier TEXTURE = new Identifier("toast/recipe");
     private Toast.Visibility visibility = Visibility.SHOW;
 
     private final Text title;
@@ -29,9 +28,12 @@ public class FortressToast implements Toast {
     public Visibility draw(DrawContext drawContext, ToastManager manager, long startTime) {
         final TextRenderer textRenderer = manager.getClient().textRenderer;
 
-        drawContext.drawTexture(TEXTURE, 0, 0, 0, 96, this.getWidth(), this.getHeight());
+        drawContext.setShaderColor(1f,1f,1f,1f);
+        drawContext.drawGuiTexture(TEXTURE, 0, 0,  this.getWidth(), this.getHeight());
+
 
         renderItem(drawContext);
+//
 
         drawContext.drawText(textRenderer, this.title, 30, 7, 0xff500050, false);
         drawContext.drawText(textRenderer, this.descriptionFirstLine, 30, 18, 0xff000000, false);
