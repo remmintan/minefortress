@@ -402,6 +402,11 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         this.scheduleSync();
     }
 
+    public void setBorderVisibilityState(boolean borderEnabled) {
+        this.borderEnabled = borderEnabled;
+        this.scheduleSync();
+    }
+
     public void scheduleSync() {
         needSync = true;
     }

@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IServerFortressManager {
+    void setBorderVisibilityState(boolean borderEnabled);
     void setCampfireVisibilityState(boolean campfireEnabled);
     void scheduleSync();
     void syncOnJoin(boolean campfireEnabled, boolean borderEnabled);
