@@ -43,7 +43,9 @@ public class MovementHelper {
         this.baritone.getPathingBehavior().cancelEverything();
         this.baritone.getFollowProcess().cancel();
         this.colonist.setAllowToPlaceBlockFromFarAway(false);
-        this.baritone.settings().allowParkour.set(true);
+        final var settings = this.baritone.settings();
+        settings.allowParkour.set(true);
+        settings.maxFallHeightBucket.set(1000);
     }
 
     private String getColonistName() {
