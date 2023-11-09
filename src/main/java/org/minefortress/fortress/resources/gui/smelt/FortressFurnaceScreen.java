@@ -25,6 +25,9 @@ import java.util.List;
 
 public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<FortressFurnaceScreenHandler> {
 
+
+    private static final Identifier LIT_PROGRESS_TEXTURE = new Identifier("container/furnace/lit_progress");
+    private static final Identifier BURN_PROGRESS_TEXTURE = new Identifier("container/furnace/burn_progress");
     private static final Identifier BACKGROUND_TEXTURE = new Identifier("textures/gui/container/furnace.png");
     private final FurnaceRecipeBookScreen furnaceRecipeBookScreen = new FurnaceRecipeBookScreen();
     private final FortressFurnaceScreenHandler furnaceScreenHandler;
@@ -81,6 +84,17 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
 
             btn.setMessage(Text.literal("Fur."+selectedLabel+": "+burningLabel));
         }
+    }
+
+    @Override
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        super.render(drawContext, mouseX, mouseY, delta);
+
+        int fuelProgress = (this.handler).getFuelProgress()+1;
+        drawContext.drawGuiTexture(LIT_PROGRESS_TEXTURE, 14, 14, 0, 14 - fuelProgress, x + 56, y + 36 + 15 - fuelProgress, 14, fuelProgress);
+
+        int cookProgress = (this.handler).getCookProgress();
+        drawContext.drawGuiTexture(BURN_PROGRESS_TEXTURE, 24, 16, 0, 0, x + 79, y + 34, cookProgress, 16);
     }
 
     @Override
