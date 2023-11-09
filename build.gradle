@@ -53,16 +53,6 @@ repositories {
 		url 'https://jitpack.io'
 	}
 	maven {
-		name = "Ladysnake Mods"
-		url = "https://maven.ladysnake.org/releases"
-		content {
-			includeGroup("org.ladysnake")
-			includeGroup("io.github.ladysnake")
-			includeGroupByRegex("dev\\.emi.*")
-			includeGroupByRegex("dev\\.onyxstudios.*")
-		}
-	}
-	maven {
 		url = "https://maven.pkg.github.com/minefortress-mod/minefortress-cc-api"
 		credentials {
 			username = System.getenv("GITHUB_USERNAME")
@@ -74,6 +64,15 @@ repositories {
 		credentials {
 			username = System.getenv("GITHUB_USERNAME")
 			password = System.getenv("GITHUB_TOKEN")
+		}
+	}
+	maven {
+		name = "Ladysnake Mods"
+		url = "https://maven.ladysnake.org/releases"
+		content {
+			includeGroup("org.ladysnake")
+			includeGroupByRegex("dev\\.emi.*")
+			includeGroupByRegex("dev\\.onyxstudios.*")
 		}
 	}
 }
