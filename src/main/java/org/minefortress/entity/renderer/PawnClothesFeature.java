@@ -11,6 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import org.minefortress.entity.BasePawnEntity;
+import org.minefortress.entity.renderer.models.PawnModel;
 
 public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, PawnModel> {
 

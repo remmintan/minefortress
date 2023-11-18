@@ -1,4 +1,4 @@
-package org.minefortress.entity.renderer;
+package org.minefortress.entity.renderer.models;
 
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.model.EntityModelLayers;

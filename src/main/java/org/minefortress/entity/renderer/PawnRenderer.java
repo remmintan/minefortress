@@ -26,6 +26,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.BasePawnEntity;
+import org.minefortress.entity.renderer.models.PawnModel;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 
 import java.util.Optional;

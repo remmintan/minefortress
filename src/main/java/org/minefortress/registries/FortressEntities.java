@@ -11,6 +11,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import org.minefortress.entity.*;
+import org.minefortress.entity.fight.NavigationTargetEntity;
+import org.minefortress.entity.renderer.NavigationTargetRenderer;
 import org.minefortress.entity.renderer.PawnRenderer;
 
 import java.util.List;
@@ -46,6 +48,15 @@ public class FortressEntities {
                     .build()
     );
 
+    public static final EntityType<NavigationTargetEntity> NAVIGATION_TARGET_ENTITY_TYPE = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier("minefortress", "navigation_target"),
+            FabricEntityTypeBuilder
+                    .create(SpawnGroup.MISC, NavigationTargetEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.1f, 0.1f))
+                    .build()
+    );
+
     private static final List<EntityType<? extends Entity>> fortressAwareEntityTypes = List.of(
             COLONIST_ENTITY_TYPE,
             WARRIOR_PAWN_ENTITY_TYPE,
@@ -62,6 +73,7 @@ public class FortressEntities {
         EntityRendererRegistry.register(FortressEntities.COLONIST_ENTITY_TYPE, PawnRenderer::new);
         EntityRendererRegistry.register(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, PawnRenderer::new);
         EntityRendererRegistry.register(FortressEntities.ARCHER_PAWN_ENTITY_TYPE, PawnRenderer::new);
+        EntityRendererRegistry.register(FortressEntities.NAVIGATION_TARGET_ENTITY_TYPE, NavigationTargetRenderer::new);
     }
 
     public static boolean isFortressAwareEntityType(EntityType<? extends Entity> entityType) {
