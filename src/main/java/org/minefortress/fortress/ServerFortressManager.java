@@ -32,6 +32,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAre
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
@@ -41,6 +42,7 @@ import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -53,6 +55,7 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
+import org.minefortress.fight.ServerFightManager;
 import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
@@ -89,6 +92,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     private final IServerTaskManager taskManager = new ServerTaskManager();
     private final IServerAutomationAreaManager automationAreaManager = new AreasServerManager();
     private final IServerInfluenceManager influenceManager = new ServerInfluenceManager(this);
+    private final IServerFightManager serverFightManager = new ServerFightManager();
     
     private IPawnNameGenerator nameGenerator = new ColonistNameGenerator();
 
@@ -163,6 +167,11 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             needSyncSpecialBlocks = false;
         }
         needSync = false;
+    }
+
+    @Override
+    public IServerFightManager getFightManager() {
+        return serverFightManager;
     }
 
     public void replaceColonistWithTypedPawn(LivingEntity colonist, String warriorId, EntityType<? extends LivingEntity> entityType) {
@@ -482,6 +491,9 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         this.resourceManager.write(tag);
         this.automationAreaManager.write(tag);
         this.influenceManager.write(tag);
+        if(this.serverFightManager instanceof IWritableManager wm) {
+            wm.writeToNbt(tag);
+        }
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -555,6 +567,10 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
         this.automationAreaManager.read(tag);
         this.influenceManager.read(tag);
+
+        if(this.serverFightManager instanceof IWritableManager wm) {
+            wm.readFromNbt(tag);
+        }
 
         this.scheduleSync();
     }

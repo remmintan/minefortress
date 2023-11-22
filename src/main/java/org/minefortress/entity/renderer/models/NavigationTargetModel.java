@@ -1,42 +1,47 @@
 package org.minefortress.entity.renderer.models;
 
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.model.ModelPartBuilder;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.model.*;
+import net.minecraft.client.render.entity.model.EntityModelPartNames;
+import net.minecraft.client.render.entity.model.SinglePartEntityModel;
+import net.minecraft.util.math.MathHelper;
 import org.minefortress.entity.fight.NavigationTargetEntity;
 
-import java.util.Collections;
+public class NavigationTargetModel extends SinglePartEntityModel<NavigationTargetEntity> {
 
-public class NavigationTargetModel extends EntityModel<NavigationTargetEntity> {
+    private static TexturedModelData INSTANCE;
 
-    private final ModelPart arrow;
+    private final ModelPart root;
 
     public NavigationTargetModel() {
-        super();
-        final var cuboids = ModelPartBuilder
-                .create()
-                .cuboid(0, 0, 0, 1, 1, 1)
-                .build()
-                .stream()
-                .map(it -> it.createCuboid(32, 32))
-                .toList();
+        this.root = getTexturedModelData().createModel();
+    }
 
-        this.arrow = new ModelPart(cuboids, Collections.emptyMap());
+    public static TexturedModelData getTexturedModelData() {
+        if(INSTANCE == null) {
+            ModelData modelData = new ModelData();
+            ModelPartData modelPartData = modelData.getRoot();
+            final var cuboid = ModelPartBuilder
+                    .create()
+                    .uv(0, 0)
+                    .cuboid(-5, -5, -5, 10, 10, 10);
+            modelPartData.addChild(EntityModelPartNames.BODY, cuboid, ModelTransform.NONE);
+
+            INSTANCE = TexturedModelData.of(modelData, 32, 32);
+        }
+
+        return INSTANCE;
+    }
+
+
+    @Override
+    public ModelPart getPart() {
+        return root;
     }
 
     @Override
     public void setAngles(NavigationTargetEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
-    }
-
-    @Override
-    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
-        this.arrow.render(matrices, vertices, light, overlay, red, green, blue, alpha);
-    }
-
-    public Identifier getTexture() {
-        return null;
+        this.root.pitch = headPitch * 0.017453292F;
+        this.root.yaw = headYaw * 0.017453292F;
+        this.root.pitch += -0.05F - 0.05F * MathHelper.cos(animationProgress * 0.3F);
     }
 }

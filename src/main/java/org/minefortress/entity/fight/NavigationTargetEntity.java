@@ -9,16 +9,42 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class NavigationTargetEntity extends Entity {
+
+    private static final String TAG_AGE = "age";
+    private static final int MAX_AGE = 5 * 30;
+
+    private int age;
+
     public NavigationTargetEntity(EntityType<?> type, World world) {
         super(type, world);
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        age++;
+        if(age > MAX_AGE) {
+            this.discard();
+        }
+    }
+
+    @Override
+    public float getYaw(float tickDelta) {
+        return age % 45f;
+    }
+
+    @Override
     protected void initDataTracker() {}
     @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {}
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+        if(nbt.contains(TAG_AGE)) {
+            age = nbt.getInt(TAG_AGE);
+        }
+    }
     @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {}
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+        nbt.putInt(TAG_AGE, age);
+    }
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
         return true;
@@ -28,7 +54,7 @@ public class NavigationTargetEntity extends Entity {
 
     @Override
     public boolean canMoveVoluntarily() {
-        return false;
+        return true;
     }
 
     @Override
