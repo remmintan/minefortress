@@ -52,12 +52,10 @@ public interface IServerFortressManager {
 
     void setGamemode(FortressGamemode fortressGamemode);
     void expandTheVillage(BlockPos pos);
-
     void addColonist(LivingEntity pawn);
-
     IServerResourceManager getResourceManager();
-
     BlockPos getFortressCenter();
     Optional<BlockPos> getRandomPositionAroundCampfire();
+    void setSpawnPawns(boolean spawnPawns);
 
 }

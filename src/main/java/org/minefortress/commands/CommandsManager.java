@@ -11,7 +11,8 @@ public class CommandsManager {
             new DebugItemsCommand(),
             new DebugPawnsCommand(),
             new CampfireToggleCommand(),
-            new BorderToggleCommand()
+            new BorderToggleCommand(),
+            new SpawnPawnsCommand()
     );
 
     private CommandsManager(){}

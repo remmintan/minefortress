@@ -111,6 +111,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
     private boolean campfireEnabled;
     private boolean borderEnabled;
+    private boolean spawnPawns = true;
 
     public ServerFortressManager(MinecraftServer server) {
         this.server = server;
@@ -125,6 +126,11 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     public void addColonist(LivingEntity colonist) {
         pawns.add(colonist);
         scheduleSync();
+    }
+
+    @Override
+    public void setSpawnPawns(boolean spawnPawns) {
+        this.spawnPawns = spawnPawns;
     }
 
     @Override
@@ -251,7 +257,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
             final var colonistsCount = this.pawns.size();
             final var spawnFactor = MathHelper.clampedLerp(82, 99, colonistsCount / 50f);
-            if(maxColonistsCount == -1 || colonistsCount < maxColonistsCount) {
+            if(spawnPawns && (maxColonistsCount == -1 || colonistsCount < maxColonistsCount)) {
                 if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) >= spawnFactor) {
                     final long bedsCount = fortressBuildingManager.getTotalBedsCount();
                     if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
@@ -494,6 +500,8 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         if(this.serverFightManager instanceof IWritableManager wm) {
             wm.writeToNbt(tag);
         }
+
+        tag.putBoolean("spawnPawns", spawnPawns);
     }
 
     public void readFromNbt(NbtCompound tag) {
@@ -572,6 +580,9 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             wm.readFromNbt(tag);
         }
 
+        if(tag.contains("spawnPawns")) {
+            this.spawnPawns = tag.getBoolean("spawnPawns");
+        }
         this.scheduleSync();
     }
 
