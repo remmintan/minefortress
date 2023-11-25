@@ -11,8 +11,8 @@ import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.professions.*;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionSyncPacket;
@@ -42,9 +42,13 @@ public final class ServerProfessionManager extends ProfessionManager implements 
 
     private final Map<ProfessionsHireTypes, ServerHireHandler> hireHandlers = new HashMap<>();
     private ServerHireHandler currentHireHandler;
-    public ServerProfessionManager(Supplier<IFortressManager> fortressManagerSupplier, MinecraftServer server) {
+
+    private final Supplier<IServerManagersProvider> serverManagersProviderSupplier;
+
+    public ServerProfessionManager(Supplier<IFortressManager> fortressManagerSupplier, Supplier<IServerManagersProvider> serverManagersProviderSupplier, MinecraftServer server) {
         super(fortressManagerSupplier);
         this.server = server;
+        this.serverManagersProviderSupplier = serverManagersProviderSupplier;
     }
 
     public void openHireMenu(ProfessionsHireTypes hireType, ServerPlayerEntity player) {
@@ -70,8 +74,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
             final var canHire = isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
             final var abstractFortressManager = (IServerFortressManager)fortressManagerSupplier.get();
             if(canHire == ProfessionResearchState.UNLOCKED && getFreeColonists() > 0 && abstractFortressManager instanceof ServerFortressManager fsm) {
-                final var resourceManager = (IServerResourceManager) abstractFortressManager
-                        .getResourceManager();
+                final var resourceManager = serverManagersProviderSupplier.get().getResourceManager();
                 resourceManager.removeItems(profession.getItemsRequirement());
                 fsm.getPawnWithoutAProfession().ifPresent(Colonist::reserveColonist);
                 fsm.scheduleSync();
@@ -97,9 +100,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         if(super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, !itemsAlreadyCharged) != ProfessionResearchState.UNLOCKED) return;
 
         if(!itemsAlreadyCharged) {
-            final var resourceManager = (IServerResourceManager) ((IServerFortressManager)fortressManagerSupplier
-                    .get())
-                    .getResourceManager();
+            final var resourceManager = serverManagersProviderSupplier.get().getResourceManager();
             resourceManager.removeItems(profession.getItemsRequirement());
         }
 

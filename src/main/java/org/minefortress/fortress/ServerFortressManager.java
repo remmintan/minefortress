@@ -115,7 +115,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
     public ServerFortressManager(MinecraftServer server) {
         this.server = server;
-        this.professionManager = new ServerProfessionManager(() -> this, server);
+        this.professionManager = new ServerProfessionManager(() -> this, () -> this, server);
         this.resourceManager = new ServerResourceManager(server);
         this.fortressBuildingManager = new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD));
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {

@@ -11,7 +11,6 @@ import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +52,6 @@ public interface IServerFortressManager {
     void setGamemode(FortressGamemode fortressGamemode);
     void expandTheVillage(BlockPos pos);
     void addColonist(LivingEntity pawn);
-    IServerResourceManager getResourceManager();
     BlockPos getFortressCenter();
     Optional<BlockPos> getRandomPositionAroundCampfire();
     void setSpawnPawns(boolean spawnPawns);

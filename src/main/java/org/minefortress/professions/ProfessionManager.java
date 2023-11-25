@@ -5,7 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.*;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -85,7 +85,7 @@ public abstract class ProfessionManager implements IProfessionsManager {
         if(countItems) {
             final var itemsRequirement = profession.getItemsRequirement();
             if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement) && !itemsRequirement.isEmpty()) {
-                final var hasItems = fortressManager instanceof IServerFortressManager sfm && sfm.getResourceManager().hasItems(itemsRequirement);
+                final var hasItems = fortressManager instanceof IServerManagersProvider smp && smp.getResourceManager().hasItems(itemsRequirement);
                 satisfied = satisfied && hasItems;
             }
         }
