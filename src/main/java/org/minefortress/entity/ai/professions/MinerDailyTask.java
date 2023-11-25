@@ -1,11 +1,9 @@
 package org.minefortress.entity.ai.professions;
 
 import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 
 import java.util.Collections;
@@ -92,7 +90,7 @@ public class MinerDailyTask implements ProfessionDailyTask{
 
     private Optional<IAutomationArea> getMine(Colonist colonist) {
         return colonist.getServerFortressManager()
-                .flatMap(it -> it.getAutomationAreaByRequirementId("miner"));
+                .flatMap(it -> it.getAutomationAreaByRequirementId("miner", colonist.getMasterPlayer().orElse(null)));
     }
 
     private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {

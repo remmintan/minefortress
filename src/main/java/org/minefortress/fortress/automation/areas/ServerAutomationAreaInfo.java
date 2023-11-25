@@ -1,6 +1,8 @@
 package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
@@ -12,6 +14,7 @@ import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.automation.iterators.MineAreaIterator;
 import org.minefortress.fortress.automation.iterators.ResetableIterator;
 import org.minefortress.utils.AreasUtils;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,6 +58,13 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
         }
 
         return currentIterator;
+    }
+
+    @Override
+    public void sendFinishMessage(ServerPlayerEntity entity) {
+        if(getAreaType() == ProfessionsSelectionType.QUARRY) {
+            entity.sendMessage(Text.literal("Mining area is finished!"));
+        }
     }
 
     public void refresh(World world) {

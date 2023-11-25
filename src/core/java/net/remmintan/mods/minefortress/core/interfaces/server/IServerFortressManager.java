@@ -23,7 +23,7 @@ public interface IServerFortressManager {
     void syncOnJoin(boolean campfireEnabled, boolean borderEnabled);
     IPawnNameGenerator getNameGenerator();
     void replaceColonistWithTypedPawn(LivingEntity colonist, String warriorId, EntityType<? extends LivingEntity> entityType);
-    Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement);
+    Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement, ServerPlayerEntity masterPlayer);
     List<BlockPos> getSpecialBlocksByType(Block block, boolean blueprint);
     double getCampfireWarmRadius();
     boolean isPositionWithinFortress(BlockPos pos);

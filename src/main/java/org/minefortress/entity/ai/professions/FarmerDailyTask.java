@@ -9,14 +9,12 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
@@ -175,7 +173,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     private Optional<IAutomationArea> getFarm(Colonist colonist) {
         return colonist
             .getServerFortressManager()
-            .flatMap(it -> it.getAutomationAreaByRequirementId("farmer"));
+            .flatMap(it -> it.getAutomationAreaByRequirementId("farmer", colonist.getMasterPlayer().orElse(null)));
     }
 
     private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {

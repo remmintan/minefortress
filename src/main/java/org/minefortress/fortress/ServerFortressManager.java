@@ -56,6 +56,7 @@ import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fight.ServerFightManager;
 import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
+import org.minefortress.fortress.automation.areas.ServerAutomationAreaInfo;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandlerFactory;
@@ -576,14 +577,31 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         this.scheduleSync();
     }
 
-    public Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement) {
+    public Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement, ServerPlayerEntity masterPlayer) {
         if(getBuildingsManager() instanceof IAutomationAreaProvider provider) {
             final var buildings = provider.getAutomationAreasByRequirement(requirement);
-            final var areas = getAutomationAreaManager().getByRequirement(requirement);
+            final var automationAreaManager = getAutomationAreaManager();
+            final var areas = automationAreaManager.getByRequirement(requirement);
 
-            return Stream
+            final var areaOpt = Stream
                     .concat(buildings, areas)
                     .min(Comparator.comparing(IAutomationArea::getUpdated));
+
+            if(areaOpt.isPresent()) {
+                final var area = areaOpt.get();
+                if(area instanceof ServerAutomationAreaInfo && area.isEmpty(getWorld())) {
+                    if(masterPlayer != null)
+                        area.sendFinishMessage(masterPlayer);
+                    automationAreaManager.removeArea(area.getId());
+                    return getAutomationAreaByRequirementId(requirement, masterPlayer);
+                } else {
+                    return areaOpt;
+                }
+            } else {
+                return areaOpt;
+            }
+
+
         }
         return Optional.empty();
     }
