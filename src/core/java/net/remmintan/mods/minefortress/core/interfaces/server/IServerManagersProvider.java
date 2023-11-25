@@ -15,12 +15,28 @@ import java.util.UUID;
 public interface IServerManagersProvider {
     void killAllPawns();
     Optional<LivingEntity> spawnPawnNearCampfire(UUID id);
-    IServerAutomationAreaManager getAutomationAreaManager();
-    IServerInfluenceManager getInfluenceManager();
-    IServerProfessionsManager getProfessionsManager();
-    IServerBuildingsManager getBuildingsManager();
-    IServerResourceManager getResourceManager();
-    IServerTaskManager getTaskManager();
-    IServerFightManager getFightManager();
+    default IServerAutomationAreaManager getAutomationAreaManager() {
+        return getManager(IServerAutomationAreaManager.class);
+    }
+    default IServerInfluenceManager getInfluenceManager() {
+        return getManager(IServerInfluenceManager.class);
+    }
+    default IServerProfessionsManager getProfessionsManager() {
+        return getManager(IServerProfessionsManager.class);
+    }
+    default IServerBuildingsManager getBuildingsManager() {
+        return getManager(IServerBuildingsManager.class);
+    }
+    default IServerResourceManager getResourceManager() {
+        return getManager(IServerResourceManager.class);
+    }
+    default IServerTaskManager getTaskManager() {
+        return getManager(IServerTaskManager.class);
+    }
+    default IServerFightManager getFightManager() {
+        return getManager(IServerFightManager.class);
+    }
+
+    <T> T getManager(Class<T> managerClass);
 
 }

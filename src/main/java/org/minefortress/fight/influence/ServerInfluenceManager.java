@@ -10,6 +10,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProv
 import net.remmintan.mods.minefortress.core.interfaces.infuence.ICaptureTask;
 import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluenceManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class ServerInfluenceManager implements IServerInfluenceManager {
+public class ServerInfluenceManager implements IServerInfluenceManager, ITickableManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfluenceManager.class);
     private final Deque<ICaptureTask> captureTasksQueue = new ConcurrentLinkedDeque<>();

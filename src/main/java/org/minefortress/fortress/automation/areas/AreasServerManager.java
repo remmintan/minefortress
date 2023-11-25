@@ -6,6 +6,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.networking.s2c.S2CSyncAreasPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public final class AreasServerManager implements IServerAutomationAreaManager {
+public final class AreasServerManager implements IServerAutomationAreaManager, ITickableManager {
 
     private boolean needSync = false;
     private final List<ServerAutomationAreaInfo> areas = new ArrayList<>();

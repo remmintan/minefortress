@@ -14,6 +14,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPaw
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
@@ -24,15 +25,21 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class ServerTaskManager implements IServerTaskManager {
+public class ServerTaskManager implements IServerTaskManager, ITickableManager {
 
     private final static Set<String> BUILDER_PROFESSIONS = Set.of("miner1", "miner2", "miner3", "colonist");
 
     private final Deque<ITask> tasks = new ArrayDeque<>();
     private final Set<UUID> cancelledTasks = new HashSet<>();
 
+    private final IServerFortressManager manager;
+
+    public ServerTaskManager(IServerFortressManager manager) {
+        this.manager = manager;
+    }
+
     @Override
-    public void tick(IServerFortressManager manager, ServerWorld world) {
+    public void tick(ServerPlayerEntity player) {
         if(!hasTask()) return;
         final ITask task = this.getTask();
         final List<IWorkerPawn> freeColonists = manager.getFreeColonists();
@@ -41,7 +48,7 @@ public class ServerTaskManager implements IServerTaskManager {
         if(taskType == TaskType.BUILD) {
             final List<IWorkerPawn> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
 
-            boolean fullyCompleted = setPawnsToTask(world, task, completelyFreePawns);
+            boolean fullyCompleted = setPawnsToTask(player.getServerWorld(), task, completelyFreePawns);
             if(fullyCompleted) return;
 
             final List<IWorkerPawn> otherPawns = freeColonists
@@ -51,7 +58,7 @@ public class ServerTaskManager implements IServerTaskManager {
                     .filter(c -> c.getTaskControl().isDoingEverydayTasks())
 
                     .collect(Collectors.toList());
-            setPawnsToTask(world, task, otherPawns);
+            setPawnsToTask(player.getServerWorld(), task, otherPawns);
         } else {
             final List<String> professions = getProfessionIdFromTask(task);
             final List<IWorkerPawn> professionals = freeColonists
@@ -60,11 +67,11 @@ public class ServerTaskManager implements IServerTaskManager {
                     .filter(c -> c.getTaskControl().canStartTask(task))
                     .collect(Collectors.toList());
 
-            boolean fullyCompleted = setPawnsToTask(world, task, professionals);
+            boolean fullyCompleted = setPawnsToTask(player.getServerWorld(), task, professionals);
             if(fullyCompleted) return;
 
             final List<IWorkerPawn> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
-            setPawnsToTask(world, task, completelyFreePawns);
+            setPawnsToTask(player.getServerWorld(), task, completelyFreePawns);
         }
     }
 

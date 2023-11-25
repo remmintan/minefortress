@@ -13,6 +13,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessio
 import net.remmintan.mods.minefortress.core.interfaces.professions.*;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionSyncPacket;
@@ -31,7 +32,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
-public final class ServerProfessionManager extends ProfessionManager implements IServerProfessionsManager {
+public final class ServerProfessionManager extends ProfessionManager implements IServerProfessionsManager, ITickableManager {
     public static final String PROFESSION_NBT_TAG = "professionId";
 
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
@@ -123,6 +124,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         scheduleSync();
     }
 
+    @Override
     public void tick(@Nullable ServerPlayerEntity player) {
         if(player == null) return;
 
@@ -189,7 +191,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         needsUpdate = true;
     }
 
-    public void writeToNbt(NbtCompound tag){
+    public void write(NbtCompound tag){
         getProfessions().forEach((key, value) -> tag.put(key, value.toNbt()));
     }
 

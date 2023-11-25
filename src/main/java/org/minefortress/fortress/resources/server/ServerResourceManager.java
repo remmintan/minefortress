@@ -10,6 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncItemsPacket;
@@ -20,7 +21,7 @@ import org.minefortress.fortress.resources.client.FortressItemStack;
 
 import java.util.*;
 
-public class ServerResourceManager implements IServerResourceManager {
+public class ServerResourceManager implements IServerResourceManager, ITickableManager {
 
     private final Synchronizer synchronizer = new Synchronizer();
 

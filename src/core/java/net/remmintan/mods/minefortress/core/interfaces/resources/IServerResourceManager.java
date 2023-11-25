@@ -3,12 +3,12 @@ package net.remmintan.mods.minefortress.core.interfaces.resources;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface IServerResourceManager extends IResourceManager {
+public interface IServerResourceManager extends IResourceManager, IServerManager {
     void syncAll();
 
     IItemInfo createItemInfo(Item item, int amount);
@@ -22,7 +22,6 @@ public interface IServerResourceManager extends IResourceManager {
 
     void write(NbtCompound tag);
     void read(NbtCompound tag);
-    void tick(ServerPlayerEntity player);
 
     List<ItemStack> getAllItems();
 

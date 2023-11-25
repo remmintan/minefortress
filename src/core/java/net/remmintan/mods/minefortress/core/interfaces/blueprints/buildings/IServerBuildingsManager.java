@@ -5,13 +5,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface IServerBuildingsManager {
+public interface IServerBuildingsManager extends IServerManager {
     long getTotalBedsCount();
-    void tick(ServerPlayerEntity player);
     void destroyBuilding(UUID id);
     void doRepairConfirmation(UUID id, ServerPlayerEntity player);
     Optional<IFortressBuilding> findNearest(BlockPos pos);

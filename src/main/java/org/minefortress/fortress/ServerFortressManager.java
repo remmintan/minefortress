@@ -40,9 +40,7 @@ import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluence
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
-import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.*;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -80,19 +78,10 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     public static final BlockState CAMPFIRE_DEFAULT_STATE = Blocks.CAMPFIRE.getDefaultState();
 
     private final MinecraftServer server;
-    
     private final Set<LivingEntity> pawns = new HashSet<>();
-
     private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
     private final Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
-    
-    private final IServerProfessionsManager professionManager;
-    private final IServerResourceManager resourceManager;
-    private final IServerBuildingsManager fortressBuildingManager;
-    private final IServerTaskManager taskManager = new ServerTaskManager();
-    private final IServerAutomationAreaManager automationAreaManager = new AreasServerManager();
-    private final IServerInfluenceManager influenceManager = new ServerInfluenceManager(this);
-    private final IServerFightManager serverFightManager = new ServerFightManager();
+    private final Map<Class<? extends IServerManager>, IServerManager> managers = new HashMap<>();
     
     private IPawnNameGenerator nameGenerator = new ColonistNameGenerator();
 
@@ -115,12 +104,22 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
     public ServerFortressManager(MinecraftServer server) {
         this.server = server;
-        this.professionManager = new ServerProfessionManager(() -> this, () -> this, server);
-        this.resourceManager = new ServerResourceManager(server);
-        this.fortressBuildingManager = new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD));
+
+        registerManager(IServerTaskManager.class, new ServerTaskManager(this));
+        registerManager(IServerProfessionsManager.class, new ServerProfessionManager(() -> this, () -> this, server));
+        registerManager(IServerResourceManager.class, new ServerResourceManager(server));
+        registerManager(IServerBuildingsManager.class, new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD)));
+        registerManager(IServerAutomationAreaManager.class, new AreasServerManager());
+        registerManager(IServerInfluenceManager.class, new ServerInfluenceManager(this));
+        registerManager(IServerFightManager.class, new ServerFightManager());
+
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             this.gamemode = FortressGamemode.SURVIVAL;
         }
+    }
+
+    private void registerManager(Class<? extends IServerManager> managerInterface, IServerManager manager) {
+        managers.put(managerInterface, manager);
     }
 
     public void addColonist(LivingEntity colonist) {
@@ -133,29 +132,14 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         this.spawnPawns = spawnPawns;
     }
 
-    @Override
-    public IServerTaskManager getTaskManager() {
-        return taskManager;
-    }
-
-    @Override
-    public IServerInfluenceManager getInfluenceManager() {
-        return influenceManager;
-    }
-
-    @Override
-    public IServerBuildingsManager getBuildingsManager() {
-        return fortressBuildingManager;
-    }
-
-    public void tick(@Nullable ServerPlayerEntity player) {
-        taskManager.tick(this, getWorld());
+    public void tick(@Nullable final ServerPlayerEntity player) {
         tickFortress(player);
-        professionManager.tick(player);
-        resourceManager.tick(player);
-        automationAreaManager.tick(player);
-        influenceManager.tick(player);
-        fortressBuildingManager.tick(player);
+
+        for (IServerManager it : managers.values()) {
+            if(it instanceof ITickableManager tickableManager)
+                tickableManager.tick(player);
+        }
+
         if(!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
         final var syncFortressPacket = new ClientboundSyncFortressManagerPacket(pawns.size(),
@@ -173,11 +157,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             needSyncSpecialBlocks = false;
         }
         needSync = false;
-    }
-
-    @Override
-    public IServerFightManager getFightManager() {
-        return serverFightManager;
     }
 
     public void replaceColonistWithTypedPawn(LivingEntity colonist, String warriorId, EntityType<? extends LivingEntity> entityType) {
@@ -212,7 +191,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             for(LivingEntity pawn : deadPawns) {
                 if(pawn instanceof IProfessional professional) {
                     final String professionId = professional.getProfessionId();
-                    professionManager.decreaseAmount(professionId, true);
+                    getProfessionsManager().decreaseAmount(professionId, true);
                 }
                 pawns.remove(pawn);
             }
@@ -221,6 +200,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
         if(allPawnsAreFree() && (!specialBlocks.containsKey(Blocks.CRAFTING_TABLE) || specialBlocks.get(Blocks.CRAFTING_TABLE).isEmpty())) {
             final var ii = new ItemInfo(Items.CRAFTING_TABLE, 1);
+            final var resourceManager = getResourceManager();
             if(!resourceManager.hasItems(Collections.singletonList(ii))) {
                 resourceManager.increaseItemAmount(Items.CRAFTING_TABLE, 1);
             }
@@ -259,7 +239,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             final var spawnFactor = MathHelper.clampedLerp(82, 99, colonistsCount / 50f);
             if(spawnPawns && (maxColonistsCount == -1 || colonistsCount < maxColonistsCount)) {
                 if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) >= spawnFactor) {
-                    final long bedsCount = fortressBuildingManager.getTotalBedsCount();
+                    final long bedsCount = getBuildingsManager().getTotalBedsCount();
                     if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
                         if(player != null) {
                             spawnPawnNearCampfire(player.getUuid())
@@ -343,6 +323,16 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         return Optional.ofNullable(spawnedPawn);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getManager(Class<T> managerClass) {
+        final var serverManager = managers.get(managerClass);
+        if(managerClass.isAssignableFrom(serverManager.getClass()))
+            return (T) serverManager;
+        else
+            throw new IllegalStateException("Manager " + managerClass.getSimpleName() + " is not assignable from " + serverManager.getClass().getSimpleName());
+    }
+
     @Override
     public void setupCenter(@NotNull BlockPos fortressCenter, World world, ServerPlayerEntity player) {
         this.fortressCenter = fortressCenter;
@@ -363,7 +353,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             spawnPawnNearCampfire(player.getUuid());
         }
 
-        influenceManager.addCenterAsInfluencePosition();
+        getInfluenceManager().addCenterAsInfluencePosition();
         player.setSpawnPoint(getWorld().getRegistryKey(), player.getBlockPos(), 0, true, false);
 
         this.scheduleSync();
@@ -408,8 +398,8 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         this.borderEnabled = borderEnabled;
         this.needSync = true;
         this.needSyncSpecialBlocks = true;
-        automationAreaManager.sync();
-        influenceManager.sync();
+        getAutomationAreaManager().sync();
+        getInfluenceManager().sync();
     }
 
     public void setCampfireVisibilityState(boolean campfireEnabled) {
@@ -451,7 +441,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         tag.putInt("maxX", maxX);
         tag.putInt("maxZ", maxZ);
 
-        final var buildingsNbt = fortressBuildingManager.toNbt();
+        final var buildingsNbt = getBuildingsManager().toNbt();
         tag.put("buildings", buildingsNbt);
 
         final NbtCompound nameGeneratorTag = new NbtCompound();
@@ -485,7 +475,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         }
 
         NbtCompound professionTag = new NbtCompound();
-        professionManager.writeToNbt(professionTag);
+        getProfessionsManager().write(professionTag);
         tag.put("profession", professionTag);
 
         tag.putString("gamemode", this.gamemode.name());
@@ -494,10 +484,10 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             tag.putInt("maxColonistsCount", maxColonistsCount);
         }
 
-        this.resourceManager.write(tag);
-        this.automationAreaManager.write(tag);
-        this.influenceManager.write(tag);
-        if(this.serverFightManager instanceof IWritableManager wm) {
+        getResourceManager().write(tag);
+        getAutomationAreaManager().write(tag);
+        getInfluenceManager().write(tag);
+        if(getFightManager() instanceof IWritableManager wm) {
             wm.writeToNbt(tag);
         }
 
@@ -517,10 +507,10 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         if(tag.contains("maxX")) maxX = tag.getInt("maxX");
         if(tag.contains("maxZ")) maxZ = tag.getInt("maxZ");
 
-        fortressBuildingManager.reset();
+        getBuildingsManager().reset();
         if(tag.contains("buildings")) {
             final NbtCompound buildingsTag = tag.getCompound("buildings");
-            fortressBuildingManager.readFromNbt(buildingsTag);
+            getBuildingsManager().readFromNbt(buildingsTag);
         }
 
         if(tag.contains("nameGenerator")) {
@@ -558,7 +548,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
         if (tag.contains("profession")) {
             NbtCompound professionTag = tag.getCompound("profession");
-            professionManager.readFromNbt(professionTag);
+            getProfessionsManager().readFromNbt(professionTag);
         }
 
         if(tag.contains("gamemode")) {
@@ -567,16 +557,16 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             this.setGamemode(fortressGamemode);
         }
 
-        this.resourceManager.read(tag);
+        getResourceManager().read(tag);
 
         if(tag.contains("maxColonistsCount")) {
             this.maxColonistsCount = tag.getInt("maxColonistsCount");
         }
 
-        this.automationAreaManager.read(tag);
-        this.influenceManager.read(tag);
+        getAutomationAreaManager().read(tag);
+        getInfluenceManager().read(tag);
 
-        if(this.serverFightManager instanceof IWritableManager wm) {
+        if(getFightManager() instanceof IWritableManager wm) {
             wm.readFromNbt(tag);
         }
 
@@ -587,9 +577,9 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     }
 
     public Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement) {
-        if(fortressBuildingManager instanceof IAutomationAreaProvider provider) {
+        if(getBuildingsManager() instanceof IAutomationAreaProvider provider) {
             final var buildings = provider.getAutomationAreasByRequirement(requirement);
-            final var areas = automationAreaManager.getByRequirement(requirement);
+            final var areas = getAutomationAreaManager().getByRequirement(requirement);
 
             return Stream
                     .concat(buildings, areas)
@@ -614,7 +604,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         final int y = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
 
         final BlockPos fortressPos = new BlockPos(x, y, z);
-        if(fortressBuildingManager.isPartOfAnyBuilding(fortressPos)) return Optional.empty();
+        if(getBuildingsManager().isPartOfAnyBuilding(fortressPos)) return Optional.empty();
         boolean isFluid = getWorld().getBlockState(fortressPos).isOf(Blocks.WATER);
         if(isFluid) return Optional.empty();
         boolean isFluidAbove = getWorld().getBlockState(fortressPos.down()).isOf(Blocks.WATER);
@@ -655,7 +645,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
     @Override
     public boolean hasRequiredBuilding(String requirementId, int minCount) {
-        return fortressBuildingManager.hasRequiredBuilding(requirementId, minCount);
+        return getBuildingsManager().hasRequiredBuilding(requirementId, minCount);
     }
 
     @Override
@@ -664,10 +654,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
         else
             return this.specialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
-    }
-
-    public IServerAutomationAreaManager getAutomationAreaManager() {
-        return automationAreaManager;
     }
 
     public boolean isBlockSpecial(Block block) {
@@ -698,11 +684,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     }
 
     @Override
-    public IServerProfessionsManager getProfessionsManager() {
-        return professionManager;
-    }
-
-    @Override
     public List<IWorkerPawn> getFreeColonists() {
         return getWorkersStream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
     }
@@ -728,10 +709,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     @Override
     public boolean isSurvival() {
         return gamemode != null && gamemode == FortressGamemode.SURVIVAL;
-    }
-
-    public IServerResourceManager getResourceManager() {
-        return resourceManager;
     }
 
     private ServerWorld getWorld() {
@@ -795,7 +772,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             }
 
             final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);
-            taskManager.addTask(task, this, this);
+            getTaskManager().addTask(task, this, this);
         } catch (RuntimeException exp) {
             LogManager.getLogger().error("Error while repairing building", exp);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
