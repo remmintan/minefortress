@@ -103,10 +103,10 @@ public class MovementHelper {
             if(stuckTicks > 20) {
                 LOGGER.debug("{} on the same place for too long. Setting stuck to true. Goal: {}", getColonistName(), workGoal);
                 colonist.setAllowToPlaceBlockFromFarAway(true);
+                stuck = true;
                 stuckTicks = 0;
             }
         } else {
-            stuck = false;
             stuckTicks = 0;
         }
         lastPos = currentPos;
