@@ -2,7 +2,6 @@ package net.remmintan.mods.minefortress.core.interfaces.professions;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 
@@ -15,8 +14,6 @@ public interface IServerProfessionsManager extends IProfessionsManager, IServerM
     void openHireMenu(ProfessionsHireTypes hireType, ServerPlayerEntity player);
     EntityType<? extends LivingEntity> getEntityTypeForProfession(String professionId);
     void decreaseAmount(String professionId, boolean b);
-    void write(NbtCompound tag);
-    void readFromNbt(NbtCompound tag);
     void scheduleSync();
     void sendProfessions(ServerPlayerEntity player);
 

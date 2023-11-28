@@ -37,13 +37,13 @@ public class ServerFightManager implements IServerFightManager, IWritableManager
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag) {
+    public void write(NbtCompound tag) {
         if (oldTarget != null)
             tag.putUuid("oldTarget", oldTarget.getUuid());
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag) {
+    public void read(NbtCompound tag) {
         if (tag.contains("oldTarget")) {
             oldTargetUuid = tag.getUuid("oldTarget");
         }

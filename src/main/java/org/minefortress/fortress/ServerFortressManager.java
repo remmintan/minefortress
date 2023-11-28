@@ -168,23 +168,14 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         final var infoTag = getColonistInfoTag(masterId);
         infoTag.putString(ServerProfessionManager.PROFESSION_NBT_TAG, warriorId);
 
-        final var newWarrior = entityType.spawn(world, infoTag, (it) -> {}, pos, SpawnReason.EVENT, true, false);
         colonist.damage(getOutOfWorldDamageSource(), Float.MAX_VALUE);
         pawns.remove(colonist);
-        pawns.add(newWarrior);
+        final var typedReplacement = entityType.spawn(world, infoTag, (it) -> {}, pos, SpawnReason.EVENT, true, false);
+        pawns.add(typedReplacement);
     }
 
     public void tickFortress(@Nullable ServerPlayerEntity player) {
-        if(maxColonistsCount != -1 && getTotalColonistsCount() > maxColonistsCount) {
-            final var deltaColonists = Math.max( pawns.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
-
-
-
-            pawns.stream()
-                    .filter(LivingEntity::isAlive)
-                    .limit(deltaColonists)
-                    .forEach(it -> it.damage(getOutOfWorldDamageSource(), 40f));
-        }
+        keepColonistsBelowMax();
 
         final var deadPawns = pawns.stream()
                 .filter(is -> !is.isAlive()).toList();
@@ -199,13 +190,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             scheduleSync();
         }
 
-        if(allPawnsAreFree() && (!specialBlocks.containsKey(Blocks.CRAFTING_TABLE) || specialBlocks.get(Blocks.CRAFTING_TABLE).isEmpty())) {
-            final var ii = new ItemInfo(Items.CRAFTING_TABLE, 1);
-            final var resourceManager = getResourceManager();
-            if(!resourceManager.hasItems(Collections.singletonList(ii))) {
-                resourceManager.increaseItemAmount(Items.CRAFTING_TABLE, 1);
-            }
-        }
+        giveThePlayerCraftingTableInCaseItWasLost();
 
         if(!(specialBlocks.isEmpty() || blueprintsSpecialBlocks.isEmpty())  && getWorld() != null && getWorld().getRegistryKey() == World.OVERWORLD) {
             boolean needSync = false;
@@ -249,6 +234,27 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                     }
                 }
             }
+        }
+    }
+
+    private void giveThePlayerCraftingTableInCaseItWasLost() {
+        if(allPawnsAreFree() && (!specialBlocks.containsKey(Blocks.CRAFTING_TABLE) || specialBlocks.get(Blocks.CRAFTING_TABLE).isEmpty())) {
+            final var ii = new ItemInfo(Items.CRAFTING_TABLE, 1);
+            final var resourceManager = getResourceManager();
+            if(!resourceManager.hasItems(Collections.singletonList(ii))) {
+                resourceManager.increaseItemAmount(Items.CRAFTING_TABLE, 1);
+            }
+        }
+    }
+
+    private void keepColonistsBelowMax() {
+        if(maxColonistsCount != -1 && getTotalColonistsCount() > maxColonistsCount) {
+            final var deltaColonists = Math.max( pawns.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
+
+            pawns.stream()
+                    .filter(LivingEntity::isAlive)
+                    .limit(deltaColonists)
+                    .forEach(it -> it.damage(getOutOfWorldDamageSource(), Integer.MAX_VALUE));
         }
     }
 
@@ -442,9 +448,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         tag.putInt("maxX", maxX);
         tag.putInt("maxZ", maxZ);
 
-        final var buildingsNbt = getBuildingsManager().toNbt();
-        tag.put("buildings", buildingsNbt);
-
         final NbtCompound nameGeneratorTag = new NbtCompound();
         this.nameGenerator.write(nameGeneratorTag);
         tag.put("nameGenerator", nameGeneratorTag);
@@ -474,22 +477,16 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             }
             tag.put("blueprintsSpecialBlocks", blueprintsSpecialBlocksTag);
         }
-
-        NbtCompound professionTag = new NbtCompound();
-        getProfessionsManager().write(professionTag);
-        tag.put("profession", professionTag);
-
         tag.putString("gamemode", this.gamemode.name());
 
         if(maxColonistsCount != -1) {
             tag.putInt("maxColonistsCount", maxColonistsCount);
         }
 
-        getResourceManager().write(tag);
-        getAutomationAreaManager().write(tag);
-        getInfluenceManager().write(tag);
-        if(getFightManager() instanceof IWritableManager wm) {
-            wm.writeToNbt(tag);
+        for (IServerManager value : managers.values()) {
+            if(value instanceof IWritableManager wm) {
+                wm.write(tag);
+            }
         }
 
         tag.putBoolean("spawnPawns", spawnPawns);
@@ -507,12 +504,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         if(tag.contains("minZ")) minZ = tag.getInt("minZ");
         if(tag.contains("maxX")) maxX = tag.getInt("maxX");
         if(tag.contains("maxZ")) maxZ = tag.getInt("maxZ");
-
-        getBuildingsManager().reset();
-        if(tag.contains("buildings")) {
-            final NbtCompound buildingsTag = tag.getCompound("buildings");
-            getBuildingsManager().readFromNbt(buildingsTag);
-        }
 
         if(tag.contains("nameGenerator")) {
             final NbtCompound nameGeneratorTag = tag.getCompound("nameGenerator");
@@ -547,28 +538,21 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             this.scheduleSyncSpecialBlocks();
         }
 
-        if (tag.contains("profession")) {
-            NbtCompound professionTag = tag.getCompound("profession");
-            getProfessionsManager().readFromNbt(professionTag);
-        }
-
         if(tag.contains("gamemode")) {
             final String gamemodeName = tag.getString("gamemode");
             final FortressGamemode fortressGamemode = FortressGamemode.valueOf(gamemodeName);
             this.setGamemode(fortressGamemode);
         }
 
-        getResourceManager().read(tag);
 
         if(tag.contains("maxColonistsCount")) {
             this.maxColonistsCount = tag.getInt("maxColonistsCount");
         }
 
-        getAutomationAreaManager().read(tag);
-        getInfluenceManager().read(tag);
-
-        if(getFightManager() instanceof IWritableManager wm) {
-            wm.readFromNbt(tag);
+        for (IServerManager value : managers.values()) {
+            if(value instanceof IWritableManager rm) {
+                rm.read(tag);
+            }
         }
 
         if(tag.contains("spawnPawns")) {

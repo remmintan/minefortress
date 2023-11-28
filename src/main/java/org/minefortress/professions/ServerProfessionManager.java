@@ -14,6 +14,7 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.*;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionSyncPacket;
@@ -32,7 +33,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
-public final class ServerProfessionManager extends ProfessionManager implements IServerProfessionsManager, ITickableManager {
+public final class ServerProfessionManager extends ProfessionManager implements IServerProfessionsManager, ITickableManager, IWritableManager {
     public static final String PROFESSION_NBT_TAG = "professionId";
 
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
@@ -191,18 +192,26 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         needsUpdate = true;
     }
 
+    @Override
     public void write(NbtCompound tag){
-        getProfessions().forEach((key, value) -> tag.put(key, value.toNbt()));
+        NbtCompound professionTag = new NbtCompound();
+        getProfessions().forEach((key, value) -> professionTag.put(key, value.toNbt()));
+        tag.put("profession", professionTag);
     }
 
-    public void readFromNbt(NbtCompound tag) {
-        initProfessionsIfNeeded();
-        for(String key : tag.getKeys()){
-            final IProfession profession = super.getProfession(key);
-            if(profession == null) continue;
-            profession.readNbt(tag.getCompound(key));
-            scheduleSync();
+    @Override
+    public void read(NbtCompound tag) {
+        if (tag.contains("profession")) {
+            NbtCompound professionTag = tag.getCompound("profession");
+            initProfessionsIfNeeded();
+            for(String key : professionTag.getKeys()){
+                final IProfession profession = super.getProfession(key);
+                if(profession == null) continue;
+                profession.readNbt(professionTag.getCompound(key));
+                scheduleSync();
+            }
         }
+
     }
 
     public Optional<String> getProfessionsWithAvailablePlaces(boolean professionRequiresReservation) {

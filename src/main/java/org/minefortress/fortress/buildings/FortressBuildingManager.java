@@ -14,6 +14,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomati
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
@@ -26,7 +27,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FortressBuildingManager implements IAutomationAreaProvider, IServerBuildingsManager, ITickableManager {
+public class FortressBuildingManager implements IAutomationAreaProvider, IServerBuildingsManager, ITickableManager, IWritableManager {
 
     private int buildingPointer = 0;
     private final List<IFortressBuilding> buildings = new ArrayList<>();
@@ -121,30 +122,18 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         return count > minCount;
     }
 
-    public NbtCompound toNbt() {
-        int i = 0;
-        final NbtCompound buildingsTag = new NbtCompound();
-        for (IFortressBuilding building : this.buildings) {
-            final NbtCompound buildingTag = new NbtCompound();
-            building.writeToNbt(buildingTag);
-            buildingsTag.put("building" + i++, buildingTag);
-        }
-
-        buildingsTag.putInt("buildingPointer", buildingPointer);
-
-        return buildingsTag;
+    @Override
+    public void write(NbtCompound tag) {
+        final var buildingsNbt = this.toNbt();
+        tag.put("buildings", buildingsNbt);
     }
 
-    public void readFromNbt(NbtCompound buildingsTag) {
-        int i = 0;
-        while(buildingsTag.contains("building" + i)) {
-            final NbtCompound buildingTag = buildingsTag.getCompound("building" + i++);
-            FortressBuilding building = new FortressBuilding(buildingTag);
-            buildings.add(building);
-            this.scheduleSync();
-        }
-
-        buildingPointer = buildingsTag.getInt("buildingPointer");
+    @Override
+    public void read(NbtCompound tag) {
+        this.reset();
+        if(!tag.contains("buildings")) return;
+        final var buildingsTag = tag.getCompound("buildings");
+        this.readFromNbt(buildingsTag);
     }
 
     @Override
@@ -196,7 +185,33 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         return Optional.of(attackersList.get(random.nextInt(attackersList.size())));
     }
 
-    public void reset() {
+    private NbtCompound toNbt() {
+        int i = 0;
+        final NbtCompound buildingsTag = new NbtCompound();
+        for (IFortressBuilding building : this.buildings) {
+            final NbtCompound buildingTag = new NbtCompound();
+            building.writeToNbt(buildingTag);
+            buildingsTag.put("building" + i++, buildingTag);
+        }
+
+        buildingsTag.putInt("buildingPointer", buildingPointer);
+
+        return buildingsTag;
+    }
+
+    private void readFromNbt(NbtCompound buildingsTag) {
+        int i = 0;
+        while(buildingsTag.contains("building" + i)) {
+            final NbtCompound buildingTag = buildingsTag.getCompound("building" + i++);
+            FortressBuilding building = new FortressBuilding(buildingTag);
+            buildings.add(building);
+            this.scheduleSync();
+        }
+
+        buildingPointer = buildingsTag.getInt("buildingPointer");
+    }
+
+    private void reset() {
         buildings.clear();
         bedsCache.invalidateAll();
         buildingPointer = 0;

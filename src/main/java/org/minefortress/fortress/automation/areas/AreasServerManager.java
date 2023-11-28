@@ -7,6 +7,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAre
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.networking.s2c.S2CSyncAreasPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public final class AreasServerManager implements IServerAutomationAreaManager, ITickableManager {
+public final class AreasServerManager implements IServerAutomationAreaManager, ITickableManager, IWritableManager {
 
     private boolean needSync = false;
     private final List<ServerAutomationAreaInfo> areas = new ArrayList<>();
@@ -62,6 +63,7 @@ public final class AreasServerManager implements IServerAutomationAreaManager, I
         needSync = true;
     }
 
+    @Override
     public void write(NbtCompound tag) {
         var areas = new NbtCompound();
         final var nbtElements = new NbtList();
@@ -72,6 +74,7 @@ public final class AreasServerManager implements IServerAutomationAreaManager, I
         tag.put("areaManager", areas);
     }
 
+    @Override
     public void read(NbtCompound tag) {
         this.areas.clear();
         if(!tag.contains("areaManager")) return;

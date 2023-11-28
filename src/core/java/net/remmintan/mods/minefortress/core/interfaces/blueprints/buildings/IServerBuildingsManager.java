@@ -1,7 +1,6 @@
 package net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings;
 
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
@@ -18,9 +17,6 @@ public interface IServerBuildingsManager extends IServerManager {
     void addBuilding(IFortressBuilding building);
     Optional<HostileEntity> getRandomBuildingAttacker();
     Optional<BlockPos> getFreeBed();
-    NbtCompound toNbt();
-    void readFromNbt(NbtCompound buildingsTag);
-    void reset();
     boolean isPartOfAnyBuilding(BlockPos pos);
     boolean hasRequiredBuilding(String requirementId, int minCount);
     Optional<IFortressBuilding> getBuildingById(UUID id);
