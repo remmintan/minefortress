@@ -30,17 +30,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
-import org.minefortress.entity.ai.controls.*;
+import org.minefortress.entity.ai.controls.DigControl;
+import org.minefortress.entity.ai.controls.PlaceControl;
+import org.minefortress.entity.ai.controls.ScaffoldsControl;
+import org.minefortress.entity.ai.controls.TaskControl;
 import org.minefortress.entity.ai.goal.*;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import org.minefortress.registries.FortressEntities;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 
 import java.util.Optional;
 

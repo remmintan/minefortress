@@ -2,6 +2,7 @@ package org.minefortress.blueprints.manager;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
+import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundBlueprintTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
@@ -11,7 +12,6 @@ import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.blueprints.ImportExportBlueprintsScreen;
 import org.minefortress.utils.ModUtils;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -102,11 +102,11 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     @Override
     public void buildCurrentStructure() {
         if(selectedStructure == null) {
-            LoggerFactory.getLogger(ClientBlueprintManager.class).error("No structure selected");
+            ModLogger.LOGGER.error("No structure selected in client blueprint manager");
             return;
         }
         if(super.getStructureRenderPos().isEmpty()) {
-            LoggerFactory.getLogger(ClientBlueprintManager.class).error("No position selected");
+            ModLogger.LOGGER.error("No position selected in client blueprint manager");
             return;
         }
 

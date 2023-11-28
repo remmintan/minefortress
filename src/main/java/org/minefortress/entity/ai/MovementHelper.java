@@ -10,13 +10,10 @@ import baritone.api.utils.BetterBlockPos;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static net.remmintan.mods.minefortress.core.ModLogger.LOGGER;
 
 public class MovementHelper {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MovementHelper.class);
-
     private final Colonist colonist;
     private final IBaritone baritone;
     private BlockPos workGoal;
@@ -153,7 +150,7 @@ public class MovementHelper {
             }
 
             if(pathEvent == PathEvent.CALC_FAILED) {
-                MovementHelper.LOGGER.debug("{} can't find path to {}", getColonistName(), workGoal);
+                LOGGER.debug("{} can't find path to {}", getColonistName(), workGoal);
                 MovementHelper.this.colonist.setAllowToPlaceBlockFromFarAway(true);
             }
         }

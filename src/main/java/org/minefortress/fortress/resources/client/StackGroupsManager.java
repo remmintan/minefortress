@@ -1,15 +1,12 @@
 package org.minefortress.fortress.resources.client;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.remmintan.mods.minefortress.core.ModLogger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,9 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 class StackGroupsManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(StackGroupsManager.class);
-
     private final Map<ItemGroup, ClientItemStacksManager> groups = new HashMap<>();
 
     ClientItemStacksManager getStacksManager(ItemGroup group) {
@@ -63,7 +57,7 @@ class StackGroupsManager {
             if(handler != null && world != null) {
                 ItemGroups.updateDisplayContext(handler.getEnabledFeatures(), false, world.getRegistryManager());
             } else {
-                LOGGER.warn("Item groups are not initialized");
+                ModLogger.LOGGER.warn("Item groups are not initialized");
             }
         }
     }

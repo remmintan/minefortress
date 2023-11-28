@@ -6,6 +6,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorderStage;
+import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.infuence.ICaptureTask;
 import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluenceManager;
@@ -19,8 +20,6 @@ import net.remmintan.mods.minefortress.networking.s2c.S2CSyncInfluence;
 import net.remmintan.mods.minefortress.networking.s2c.S2CUpdateInfluenceBorderStage;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.ServerFortressManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -29,8 +28,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ServerInfluenceManager implements IServerInfluenceManager, ITickableManager, IWritableManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfluenceManager.class);
     private final Deque<ICaptureTask> captureTasksQueue = new ConcurrentLinkedDeque<>();
     private final List<BlockPos> allInfluencePositions = new ArrayList<>();
     private final Synchronizer synchronizer = new Synchronizer();
@@ -58,7 +55,7 @@ public class ServerInfluenceManager implements IServerInfluenceManager, ITickabl
         } else {
             final var packet = new ClientboundTaskExecutedPacket(taskId);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, packet);
-            LOGGER.warn("Player tried to capture influence flag without having the required items!");
+            ModLogger.LOGGER.warn("Player tried to capture influence flag without having the required items!");
         }
     }
     public ICaptureTask getCaptureTask() {

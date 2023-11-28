@@ -9,15 +9,10 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.I
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static net.remmintan.mods.minefortress.core.ModLogger.LOGGER;
 
 public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ColonistExecuteTaskGoal.class);
-
     private final ServerWorld world;
-
     private BlockPos workGoal =  null;
 
     public ColonistExecuteTaskGoal(Colonist colonist) {

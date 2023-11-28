@@ -5,12 +5,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.UUID;
 
@@ -62,7 +62,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
                 try {
                     serverResourceManager.reserveItems(taskId, stacks);
                 }catch (IllegalStateException e) {
-                    LogManager.getLogger().error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
+                    ModLogger.LOGGER.error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
                     FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
                     return;
                 }

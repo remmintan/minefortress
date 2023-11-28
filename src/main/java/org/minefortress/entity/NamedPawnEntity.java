@@ -3,6 +3,7 @@ package org.minefortress.entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.world.LocalDifficulty;
@@ -31,4 +32,8 @@ abstract class NamedPawnEntity extends BasePawnEntity {
         });
     }
 
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        return super.damage(source, amount);
+    }
 }
