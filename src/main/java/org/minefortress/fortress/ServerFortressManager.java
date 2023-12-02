@@ -139,13 +139,14 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     public void spawnDebugEntitiesAroundCampfire(EntityType<? extends IFortressAwareEntity> entityType, int num, ServerPlayerEntity requester) {
         final var infoTag = getColonistInfoTag(requester.getUuid());
 
-        final var fortressCenter = getFortressCenter();
+
         for (int i = 0; i < num; i++) {
+            final var spawnPosition = getRandomSpawnPosition();
             final var pawn = entityType.spawn(
                     getWorld(),
                     infoTag,
                     (it) -> {},
-                    fortressCenter,
+                    spawnPosition,
                     SpawnReason.EVENT,
                     true,
                     false

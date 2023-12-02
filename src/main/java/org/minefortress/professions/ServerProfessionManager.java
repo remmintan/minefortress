@@ -176,6 +176,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     private void tickRemoveFromProfession() {
         for(Map.Entry<String, IProfession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
+            if(professionId.startsWith("warrior")) continue; // TODO
             final IProfession profession = entry.getValue();
             final List<IProfessional> pawnsWithProf = this.getPawnsWithProfession(professionId);
             final int redundantProfCount = pawnsWithProf.size() - profession.getAmount();
