@@ -34,6 +34,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServer
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
@@ -132,6 +133,27 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     @Override
     public void setSpawnPawns(boolean spawnPawns) {
         this.spawnPawns = spawnPawns;
+    }
+
+    @Override
+    public void spawnDebugEntitiesAroundCampfire(EntityType<? extends IFortressAwareEntity> entityType, int num, ServerPlayerEntity requester) {
+        final var infoTag = getColonistInfoTag(requester.getUuid());
+
+        final var fortressCenter = getFortressCenter();
+        for (int i = 0; i < num; i++) {
+            final var pawn = entityType.spawn(
+                    getWorld(),
+                    infoTag,
+                    (it) -> {},
+                    fortressCenter,
+                    SpawnReason.EVENT,
+                    true,
+                    false
+            );
+            if(pawn instanceof LivingEntity le)
+                pawns.add(le);
+        }
+        getFightManager().sync();
     }
 
     public void tick(@Nullable final ServerPlayerEntity player) {

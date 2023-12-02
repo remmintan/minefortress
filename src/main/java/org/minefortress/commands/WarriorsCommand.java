@@ -2,7 +2,6 @@ package org.minefortress.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static net.minecraft.server.command.CommandManager.argument;
@@ -20,17 +19,13 @@ public class WarriorsCommand extends MineFortressCommand {
                 .then(literal("warriors")
                     .then(literal("spawn")
                         .then(argument("num", IntegerArgumentType.integer())
-                            .then(argument("blockPos", BlockPosArgumentType.blockPos())
-                                .executes(context -> {
-                                    final var fortressServerManager = getServerFortressManager(context);
-                                    final var num = IntegerArgumentType.getInteger(context, "num");
-                                    final var blockPos = BlockPosArgumentType.getBlockPos(context, "blockPos");
+                            .executes(context -> {
+                                final var num = IntegerArgumentType.getInteger(context, "num");
+                                final var fightManager = getServerManagersProvider(context).getFightManager();
+                                fightManager.spawnDebugWarriors(num, context.getSource().getPlayer());
 
-
-
-                                    return 1;
-                                })
-                            )
+                                return 1;
+                            })
                         )
                     )
                 )

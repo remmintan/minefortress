@@ -41,7 +41,7 @@ public final class WarriorPawn extends TargetedPawn implements IProfessional, IW
 
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-        if(entityNbt != null) {
+        if(entityNbt != null && entityNbt.contains(ServerProfessionManager.PROFESSION_NBT_TAG)) {
             final var warriorProf = entityNbt.getString(ServerProfessionManager.PROFESSION_NBT_TAG);
             this.dataTracker.set(WARRIOR_PROFESSION_KEY, warriorProf);
         }

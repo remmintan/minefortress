@@ -10,6 +10,7 @@ import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 
@@ -57,5 +58,6 @@ public interface IServerFortressManager {
     BlockPos getFortressCenter();
     Optional<BlockPos> getRandomPositionAroundCampfire();
     void setSpawnPawns(boolean spawnPawns);
+    void spawnDebugEntitiesAroundCampfire(EntityType<? extends IFortressAwareEntity> entityType, int num, ServerPlayerEntity player);
 
 }

@@ -29,6 +29,11 @@ public class ServerFightManager implements IServerFightManager, IWritableManager
     }
 
     @Override
+    public void spawnDebugWarriors(int num, ServerPlayerEntity player) {
+        serverFortressManager.spawnDebugEntitiesAroundCampfire(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, num, player);
+    }
+
+    @Override
     public void setCurrentTarget(BlockPos pos, ServerWorld world) {
         keepTrackOfOldTarget(world);
         oldTarget = FortressEntities.NAVIGATION_TARGET_ENTITY_TYPE.spawn(world, pos.up(), SpawnReason.EVENT);
@@ -81,6 +86,8 @@ public class ServerFightManager implements IServerFightManager, IWritableManager
             this.syncNeeded = false;
         }
     }
+
+
 
     private int countAllWarriors() {
         return serverFortressManager.getAllTargetedPawns().size();
