@@ -61,7 +61,7 @@ public class ClientFightManager implements IClientFightManager {
 
     @Override
     public int getWarriorCount() {
-        return 0;
+        return warriorCount;
     }
 
     @Override
