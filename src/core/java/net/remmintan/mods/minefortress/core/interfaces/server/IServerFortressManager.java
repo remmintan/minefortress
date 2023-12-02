@@ -10,6 +10,7 @@ import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public interface IServerFortressManager {
     Optional<BlockPos> getRandomPosWithinFortress();
 
     List<IWorkerPawn> getFreeColonists();
+    List<ITargetedPawn> getAllTargetedPawns();
 
     void increaseMaxColonistsCount();
 

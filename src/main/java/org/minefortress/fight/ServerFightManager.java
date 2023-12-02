@@ -2,24 +2,47 @@ package org.minefortress.fight;
 
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.S2CSyncFightManager;
 import org.minefortress.entity.fight.NavigationTargetEntity;
 import org.minefortress.registries.FortressEntities;
 
 import java.util.UUID;
 
-public class ServerFightManager implements IServerFightManager, IWritableManager {
+public class ServerFightManager implements IServerFightManager, IWritableManager, ITickableManager {
 
+    private final IServerFortressManager serverFortressManager;
     private NavigationTargetEntity oldTarget;
     private UUID oldTargetUuid;
+
+    private boolean syncNeeded = false;
+
+    public ServerFightManager(IServerFortressManager serverFortressManager) {
+        this.serverFortressManager = serverFortressManager;
+    }
 
     @Override
     public void setCurrentTarget(BlockPos pos, ServerWorld world) {
         keepTrackOfOldTarget(world);
         oldTarget = FortressEntities.NAVIGATION_TARGET_ENTITY_TYPE.spawn(world, pos.up(), SpawnReason.EVENT);
+    }
+
+    @Override
+    public void attractWarriorsToCampfire() {
+        final var fortressCenter = serverFortressManager.getFortressCenter();
+        serverFortressManager.getAllTargetedPawns().forEach(it -> it.setMoveTarget(fortressCenter));
+    }
+
+    @Override
+    public void sync() {
+        syncNeeded = true;
     }
 
     private void keepTrackOfOldTarget(ServerWorld world) {
@@ -47,5 +70,19 @@ public class ServerFightManager implements IServerFightManager, IWritableManager
         if (tag.contains("oldTarget")) {
             oldTargetUuid = tag.getUuid("oldTarget");
         }
+    }
+
+    @Override
+    public void tick(ServerPlayerEntity player) {
+        if(player==null) return;
+        if(syncNeeded) {
+            final var packet = new S2CSyncFightManager(countAllWarriors());
+            FortressServerNetworkHelper.send(player, S2CSyncFightManager.CHANNEL, packet);
+            this.syncNeeded = false;
+        }
+    }
+
+    private int countAllWarriors() {
+        return serverFortressManager.getAllTargetedPawns().size();
     }
 }

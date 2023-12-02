@@ -7,6 +7,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightSelectionManager;
+import net.remmintan.mods.minefortress.networking.c2s.C2SAttractWarriorsToCampfire;
 import net.remmintan.mods.minefortress.networking.c2s.C2SSetNavigationTargetEntity;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.entity.Colonist;
@@ -15,6 +16,7 @@ import org.minefortress.utils.ModUtils;
 public class ClientFightManager implements IClientFightManager {
 
     private final IClientFightSelectionManager selectionManager = new ClientFightSelectionManager();
+    private int warriorCount;
 
     @Override
     public IClientFightSelectionManager getSelectionManager() {
@@ -50,5 +52,21 @@ public class ClientFightManager implements IClientFightManager {
                 return;
         }
         selectionManager.forEachSelected(it -> it.setAttackTarget(livingEntity));
+    }
+
+    @Override
+    public void sync(int count) {
+        this.warriorCount = count;
+    }
+
+    @Override
+    public int getWarriorCount() {
+        return 0;
+    }
+
+    @Override
+    public void attractWarriorsToCampfire() {
+        final var packet = new C2SAttractWarriorsToCampfire();
+        FortressClientNetworkHelper.send(C2SAttractWarriorsToCampfire.CHANNEL, packet);
     }
 }

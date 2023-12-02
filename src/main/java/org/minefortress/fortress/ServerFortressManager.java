@@ -35,6 +35,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.ISer
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluenceManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
@@ -112,7 +113,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         registerManager(IServerBuildingsManager.class, new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD)));
         registerManager(IServerAutomationAreaManager.class, new AreasServerManager());
         registerManager(IServerInfluenceManager.class, new ServerInfluenceManager(this));
-        registerManager(IServerFightManager.class, new ServerFightManager());
+        registerManager(IServerFightManager.class, new ServerFightManager(this));
 
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             this.gamemode = FortressGamemode.SURVIVAL;
@@ -172,6 +173,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         pawns.remove(colonist);
         final var typedReplacement = entityType.spawn(world, infoTag, (it) -> {}, pos, SpawnReason.EVENT, true, false);
         pawns.add(typedReplacement);
+        getFightManager().sync();
     }
 
     public void tickFortress(@Nullable ServerPlayerEntity player) {
@@ -407,6 +409,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         this.needSyncSpecialBlocks = true;
         getAutomationAreaManager().sync();
         getInfluenceManager().sync();
+        getFightManager().sync();
     }
 
     public void setCampfireVisibilityState(boolean campfireEnabled) {
@@ -558,6 +561,10 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         if(tag.contains("spawnPawns")) {
             this.spawnPawns = tag.getBoolean("spawnPawns");
         }
+        getInfluenceManager().sync();
+        getFightManager().sync();
+        getProfessionsManager().scheduleSync();
+        getResourceManager().syncAll();
         this.scheduleSync();
     }
 
@@ -688,6 +695,15 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     @Override
     public List<IWorkerPawn> getFreeColonists() {
         return getWorkersStream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ITargetedPawn> getAllTargetedPawns() {
+        return pawns
+                .stream()
+                .filter(ITargetedPawn.class::isInstance)
+                .map(ITargetedPawn.class::cast)
+                .toList();
     }
 
     public List<BlockPos> getSpecialBlocksByType(Block block, boolean blueprint) {

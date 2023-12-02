@@ -41,7 +41,7 @@ public class FortressHud {
         hudLayers.add(new TimeHudLayer(client));
         hudLayers.add(new FightHudLayer(client));
         hudLayers.add(new AreasHudLayer(client));
-        hudLayers.add(new InluenceHudLayer(client));
+        hudLayers.add(new InfluenceHudLayer(client));
         hudLayers.add(new UtilsHudLayer(client));
     }
 

@@ -1,5 +1,7 @@
 package org.minefortress.renderer.gui.widget;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import org.minefortress.renderer.gui.hud.interfaces.IHudElement;
 
 abstract class BasicHudElement implements IHudElement {
@@ -29,6 +31,10 @@ abstract class BasicHudElement implements IHudElement {
     @Override
     public int getAnchorY() {
         return anchorY;
+    }
+
+    protected TextRenderer textRenderer() {
+        return MinecraftClient.getInstance().textRenderer;
     }
 
 }

@@ -7,5 +7,7 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 public interface IServerFightManager extends IServerManager {
 
     void setCurrentTarget(BlockPos pos, ServerWorld world);
+    void attractWarriorsToCampfire();
+    void sync();
 
 }

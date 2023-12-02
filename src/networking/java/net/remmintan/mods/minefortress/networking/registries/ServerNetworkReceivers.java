@@ -42,6 +42,7 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SRepairBuilding.CHANNEL, C2SRepairBuilding::new);
         registerReceiver(C2SRequestResourcesRefresh.CHANNEL, C2SRequestResourcesRefresh::new);
         registerReceiver(C2SSetNavigationTargetEntity.CHANNEL, C2SSetNavigationTargetEntity::new);
+        registerReceiver(C2SAttractWarriorsToCampfire.CHANNEL, C2SAttractWarriorsToCampfire::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {
