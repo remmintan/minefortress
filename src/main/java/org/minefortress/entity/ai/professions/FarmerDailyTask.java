@@ -29,9 +29,7 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             Items.WHEAT_SEEDS,
             Items.BEETROOT_SEEDS,
             Items.CARROT,
-            Items.POTATO,
-            Items.PUMPKIN_SEEDS,
-            Items.MELON_SEEDS
+            Items.POTATO
     );
 
     private IAutomationArea currentFarm;
