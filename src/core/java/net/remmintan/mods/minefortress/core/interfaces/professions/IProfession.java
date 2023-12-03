@@ -14,6 +14,10 @@ public interface IProfession {
 
     boolean isHireMenu();
 
+    default boolean cantVoluntaryRemoveFromThisProfession() {
+        return isHireMenu();
+    }
+
     String getTitle();
 
     ItemStack getIcon();

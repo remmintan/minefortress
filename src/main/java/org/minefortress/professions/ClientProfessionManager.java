@@ -60,7 +60,7 @@ public final class ClientProfessionManager extends ProfessionManager implements 
     public void decreaseAmount(String professionId) {
         if("colonist".equals(professionId)) return;
         final var profession = this.getProfession(professionId);
-        final var cantRemove = profession.isHireMenu();
+        final var cantRemove = profession.cantVoluntaryRemoveFromThisProfession();
         if(cantRemove){
             final var message = Text.literal("§cCan't remove pawn from profession: " + profession.getTitle());
             MinecraftClient.getInstance().setScreen(null);
