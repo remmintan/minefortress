@@ -114,7 +114,7 @@ public class TreeSelection extends Selection {
             final BlockState blockState = world.getBlockState(pos);
             if(blockState.isAir()) continue;
             if(TreeHelper.isLog(blockState)) {
-                final Optional<BlockPos> rootDownFromLog = findRootDownFromLog(pos, world);
+                final Optional<BlockPos> rootDownFromLog = TreeHelper.findRootDownFromLog(pos, world);
                 if(rootDownFromLog.isPresent()) {
                     treeRoots.add(rootDownFromLog.get());
                     continue;
@@ -122,14 +122,14 @@ public class TreeSelection extends Selection {
             }
 
             if(blockState.isAir() || TreeHelper.isLeaves(blockState)) {
-                final Optional<BlockPos> rootDownFromLeaves = findRootDownFromAirOrLeaves(pos, world);
+                final Optional<BlockPos> rootDownFromLeaves = TreeHelper.findRootDownFromAirOrLeaves(pos, world);
                 if(rootDownFromLeaves.isPresent()) {
                     treeRoots.add(rootDownFromLeaves.get());
                     continue;
                 }
             }
 
-            final Optional<BlockPos> rootUpFromGround = findRootUpFromGround(pos, world);
+            final Optional<BlockPos> rootUpFromGround = TreeHelper.findRootUpFromGround(pos, world);
             rootUpFromGround.ifPresent(treeRoots::add);
         }
     }
@@ -145,45 +145,6 @@ public class TreeSelection extends Selection {
                 this.selectedTreeBlocks.addAll(tree.getLeavesBlocks());
             }
         }
-    }
-
-    private Optional<BlockPos> findRootDownFromLog(BlockPos start, World world) {
-        BlockPos cursor = start;
-        BlockState cursorState;
-
-        do {
-            cursor = cursor.down();
-            cursorState = world.getBlockState(cursor);
-        } while(TreeHelper.isLog(cursorState));
-
-        if(cursorState.isAir()) return Optional.empty();
-        return Optional.of(cursor.up());
-    }
-
-    private Optional<BlockPos> findRootDownFromAirOrLeaves(BlockPos start, World world) {
-        BlockPos cursor = start;
-        BlockState cursorState;
-
-        do {
-            cursor = cursor.down();
-            cursorState = world.getBlockState(cursor);
-        } while(cursorState.isAir() || TreeHelper.isLeaves(cursorState));
-
-        if(TreeHelper.isLog(cursorState)) return findRootDownFromLog(cursor, world);
-        return Optional.empty();
-    }
-
-    private Optional<BlockPos> findRootUpFromGround(BlockPos start, World world) {
-        BlockPos cursor = start;
-        BlockState cursorState;
-
-        do {
-            cursor = cursor.up();
-            cursorState = world.getBlockState(cursor);
-        } while(!TreeHelper.isLog(cursorState) && !cursorState.isAir());
-
-        if(TreeHelper.isLog(cursorState)) return Optional.of(cursor);
-        return Optional.empty();
     }
 
 

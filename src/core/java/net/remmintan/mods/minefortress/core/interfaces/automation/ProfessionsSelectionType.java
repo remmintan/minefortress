@@ -13,12 +13,12 @@ public enum ProfessionsSelectionType {
             new Vector4f(0.5f, 0.5f, 0.5f, 1.0f),
             (reqString) -> reqString.startsWith("miner")
     ),
-//    LOGGING(
-//            "Logging",
-//            Items.STONE_AXE,
-//            new Vector4f(0.3f, 0.6f, 0.0f, 1.0f),
-//            (reqString) -> reqString.startsWith("lumberjack")
-//    ),
+    LOGGING(
+            "Tree harvesting",
+            Items.STONE_AXE,
+            new Vector4f(0.3f, 0.6f, 0.0f, 1.0f),
+            (reqString) -> reqString.startsWith("lumberjack")
+    ),
     FARMING(
             "Farming",
             Items.WHEAT_SEEDS,

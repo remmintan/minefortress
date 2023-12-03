@@ -69,6 +69,45 @@ public class TreeHelper {
         }
     }
 
+    public static Optional<BlockPos> findRootDownFromLog(BlockPos start, World world) {
+        BlockPos cursor = start;
+        BlockState cursorState;
+
+        do {
+            cursor = cursor.down();
+            cursorState = world.getBlockState(cursor);
+        } while(TreeHelper.isLog(cursorState));
+
+        if(cursorState.isAir()) return Optional.empty();
+        return Optional.of(cursor.up());
+    }
+
+    public static Optional<BlockPos> findRootDownFromAirOrLeaves(BlockPos start, World world) {
+        BlockPos cursor = start;
+        BlockState cursorState;
+
+        do {
+            cursor = cursor.down();
+            cursorState = world.getBlockState(cursor);
+        } while(cursorState.isAir() || TreeHelper.isLeaves(cursorState));
+
+        if(TreeHelper.isLog(cursorState)) return findRootDownFromLog(cursor, world);
+        return Optional.empty();
+    }
+
+    public static Optional<BlockPos> findRootUpFromGround(BlockPos start, World world) {
+        BlockPos cursor = start;
+        BlockState cursorState;
+
+        do {
+            cursor = cursor.up();
+            cursorState = world.getBlockState(cursor);
+        } while(!TreeHelper.isLog(cursorState) && !cursorState.isAir());
+
+        if(TreeHelper.isLog(cursorState)) return Optional.of(cursor);
+        return Optional.empty();
+    }
+
     private static void updateTreeDataForOneTree(World world, List<BlockPos> treeBlocks, List<BlockPos> leavesBlocks, BlockPos cursor, BlockState rootBlockState, BlockPos root) {
         if(!isLog(rootBlockState)) return;
         BlockPos areaStart = new BlockPos(cursor.getX() - 1, cursor.getY(), cursor.getZ() - 1);
