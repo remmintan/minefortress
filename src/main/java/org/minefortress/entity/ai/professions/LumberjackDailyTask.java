@@ -1,16 +1,20 @@
 package org.minefortress.entity.ai.professions;
 
+import net.minecraft.util.math.BlockPos;
 import org.minefortress.entity.Colonist;
 
-public class LumberjackDailyTask implements ProfessionDailyTask {
+public class LumberjackDailyTask extends AbstractAutomationAreaTask {
+
+    private BlockPos goal;
+
     @Override
-    public boolean canStart(Colonist colonist) {
-        return false;
+    protected String getAreaId() {
+        return "tree harvesting";
     }
 
     @Override
-    public void start(Colonist colonist) {
-
+    protected String getTaskDesc() {
+        return "Harvesting trees";
     }
 
     @Override
@@ -19,12 +23,13 @@ public class LumberjackDailyTask implements ProfessionDailyTask {
     }
 
     @Override
-    public void stop(Colonist colonist) {
-
+    public boolean shouldContinue(Colonist colonist) {
+        return colonist.getWorld().isDay() && (iterator.hasNext() || this.goal != null);
     }
 
     @Override
-    public boolean shouldContinue(Colonist colonist) {
-        return false;
+    public void stop(Colonist colonist) {
+        super.stop(colonist);
+        this.goal = null;
     }
 }

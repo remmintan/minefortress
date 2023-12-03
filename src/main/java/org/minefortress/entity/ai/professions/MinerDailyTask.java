@@ -1,44 +1,22 @@
 package org.minefortress.entity.ai.professions;
 
 import net.minecraft.registry.tag.FluidTags;
-import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Optional;
+public class MinerDailyTask extends AbstractAutomationAreaTask{
 
-public class MinerDailyTask implements ProfessionDailyTask{
-
-    private long stopTime = 0L;
-
-    private IAutomationArea currentMine;
-    private Iterator<IAutomationBlockInfo> mineIterator;
     private IAutomationBlockInfo goal;
 
     @Override
-    public boolean canStart(Colonist colonist) {
-        return colonist.getWorld().isDay() && isEnoughTimeSinceLastTimePassed(colonist);
-    }
-
-    @Override
-    public void start(Colonist colonist) {
-        colonist.resetControls();
-        colonist.setCurrentTaskDesc("Mining");
-        getMine(colonist).ifPresent(m -> this.currentMine = m);
-        initIterator(colonist);
-    }
-
-    @Override
     public void tick(Colonist colonist) {
-        if (currentMine == null) return;
+        if (area == null) return;
         final var movementHelper = colonist.getMovementHelper();
 
         if(goal == null) {
-            if(!mineIterator.hasNext()) return;
-            goal = mineIterator.next();
+            if(!iterator.hasNext()) return;
+            goal = iterator.next();
         }
 
         if (goal != null && movementHelper.getWorkGoal() == null) {
@@ -67,33 +45,22 @@ public class MinerDailyTask implements ProfessionDailyTask{
 
     @Override
     public void stop(Colonist colonist) {
-        this.currentMine = null;
-        this.mineIterator = Collections.emptyIterator();
-        this.stopTime = colonist.getWorld().getTime();
+        super.stop(colonist);
         this.goal = null;
-        colonist.resetControls();
+    }
+
+    @Override
+    protected String getAreaId() {
+        return "miner";
+    }
+
+    @Override
+    protected String getTaskDesc() {
+        return "Mining";
     }
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return colonist.getWorld().isDay() && (mineIterator.hasNext() || this.goal != null);
-    }
-
-    private void initIterator(Colonist colonist) {
-        if(this.currentMine == null) {
-            this.mineIterator = Collections.emptyIterator();
-        } else {
-            this.currentMine.update();
-            this.mineIterator = this.currentMine.iterator(colonist.getWorld());
-        }
-    }
-
-    private Optional<IAutomationArea> getMine(Colonist colonist) {
-        return colonist.getServerFortressManager()
-                .flatMap(it -> it.getAutomationAreaByRequirementId("miner", colonist.getMasterPlayer().orElse(null)));
-    }
-
-    private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {
-        return colonist.getWorld().getTime() - 100L >= this.stopTime;
+        return colonist.getWorld().isDay() && (iterator.hasNext() || this.goal != null);
     }
 }

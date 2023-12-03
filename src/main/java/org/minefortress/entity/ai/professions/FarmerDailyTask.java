@@ -11,7 +11,6 @@ import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.world.event.GameEvent;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
-import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import org.minefortress.entity.Colonist;
@@ -21,9 +20,12 @@ import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 import org.spongepowered.include.com.google.common.collect.Sets;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.Set;
 
-public class FarmerDailyTask implements ProfessionDailyTask{
+public class FarmerDailyTask extends AbstractAutomationAreaTask {
 
     private static final Set<Item> FARMER_SEEDS = Sets.newHashSet(
             Items.WHEAT_SEEDS,
@@ -32,34 +34,23 @@ public class FarmerDailyTask implements ProfessionDailyTask{
             Items.POTATO
     );
 
-    private IAutomationArea currentFarm;
-    private Iterator<IAutomationBlockInfo> farmIterator;
     private IAutomationBlockInfo goal;
-    private long stopTime = 0L;
-
-    @Override
-    public boolean canStart(Colonist colonist) {
-        return colonist.getWorld().isDay() && isEnoughTimeSinceLastTimePassed(colonist);
-    }
 
     @Override
     public void start(Colonist colonist) {
-        colonist.resetControls();
-        colonist.setCurrentTaskDesc("Farming");
-        getFarm(colonist).ifPresent(f -> this.currentFarm = f);
-        initIterator(colonist);
+        super.start(colonist);
         colonist.getBaritone().settings().allowParkour.set(false);
     }
 
     @Override
     public void tick(Colonist colonist) {
-        if(this.currentFarm == null) return;
+        if(this.area == null) return;
 
         final var movementHelper = colonist.getMovementHelper();
         if(this.goal == null) {
             do {
-                if(!this.farmIterator.hasNext()) return;
-                this.goal = this.farmIterator.next();
+                if(!this.iterator.hasNext()) return;
+                this.goal = this.iterator.next();
             } while(goalAlreadyInCorrectState(colonist));
             movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
@@ -156,35 +147,18 @@ public class FarmerDailyTask implements ProfessionDailyTask{
     }
 
     @Override
-    public void stop(Colonist colonist) {
-        this.currentFarm = null;
-        this.farmIterator = Collections.emptyIterator();
-        this.stopTime = colonist.getWorld().getTime();
-        colonist.resetControls();
+    public boolean shouldContinue(Colonist colonist) {
+        return colonist.getWorld().isDay() && (iterator.hasNext() || this.goal != null);
     }
 
     @Override
-    public boolean shouldContinue(Colonist colonist) {
-        return colonist.getWorld().isDay() && (farmIterator.hasNext() || this.goal != null);
+    protected String getAreaId() {
+        return "farmer";
     }
 
-    private Optional<IAutomationArea> getFarm(Colonist colonist) {
-        return colonist
-            .getServerFortressManager()
-            .flatMap(it -> it.getAutomationAreaByRequirementId("farmer", colonist.getMasterPlayer().orElse(null)));
-    }
-
-    private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {
-        return colonist.getWorld().getTime() - this.stopTime > 100;
-    }
-
-    private void initIterator(Colonist pawn) {
-        if(this.currentFarm == null) {
-            this.farmIterator = Collections.emptyIterator();
-        } else {
-            this.currentFarm.update();
-            this.farmIterator = this.currentFarm.iterator(pawn.getWorld());
-        }
+    @Override
+    protected String getTaskDesc() {
+        return "Farming";
     }
 
     private Optional<BlockItem> getSeeds(Colonist colonist) {

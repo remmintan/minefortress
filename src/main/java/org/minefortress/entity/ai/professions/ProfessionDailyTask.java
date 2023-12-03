@@ -1,7 +1,6 @@
 package org.minefortress.entity.ai.professions;
 
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
 
 public interface ProfessionDailyTask {
 
