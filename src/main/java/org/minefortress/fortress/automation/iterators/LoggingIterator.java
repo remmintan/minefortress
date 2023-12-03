@@ -8,6 +8,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.area.Automatio
 import org.minefortress.fortress.automation.AutomationBlockInfo;
 
 import java.util.List;
+import java.util.Optional;
 
 public class LoggingIterator extends AbstractFilteredIterator {
 
@@ -20,16 +21,19 @@ public class LoggingIterator extends AbstractFilteredIterator {
 
     @Override
     protected boolean filter(BlockPos pos) {
-        final var topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ());
-        final var newPos = new BlockPos(pos.getX(), topY, pos.getZ());
-
-        final var treeRoot = TreeHelper.findRootDownFromLog(newPos, world);
-
-        return treeRoot.isPresent();
+        return getTreeRoot(pos).isPresent();
     }
 
     @Override
     protected AutomationBlockInfo map(BlockPos pos) {
-        return new AutomationBlockInfo(pos, AutomationActionType.CHOP_TREE);
+        return new AutomationBlockInfo(getTreeRoot(pos).get(), AutomationActionType.CHOP_TREE);
     }
+
+    private Optional<BlockPos> getTreeRoot(BlockPos pos) {
+        final var topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ());
+        final var newPos = new BlockPos(pos.getX(), topY, pos.getZ());
+
+        return TreeHelper.findRootDownFromLog(newPos, world);
+    }
+
 }
