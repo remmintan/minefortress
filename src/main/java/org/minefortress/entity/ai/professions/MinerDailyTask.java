@@ -39,6 +39,7 @@ public class MinerDailyTask extends AbstractAutomationAreaTask{
             colonist.getMovementHelper().reset();
             this.goal = null;
         } else {
+            // TODO: check if this miner level can actually dig this block
             colonist.setGoal(new DigTaskBlockInfo(goal.pos()));
         }
     }

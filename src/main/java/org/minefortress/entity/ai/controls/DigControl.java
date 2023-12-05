@@ -1,10 +1,7 @@
 package org.minefortress.entity.ai.controls;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
@@ -13,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.event.GameEvent;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.utils.ResourceUtils;
 import org.minefortress.entity.Colonist;
 
 import static org.minefortress.entity.colonist.FortressHungerManager.ACTIVE_EXHAUSTION;
@@ -46,7 +44,7 @@ public class DigControl extends PositionedActionControl {
         colonist.addHunger(ACTIVE_EXHAUSTION);
         if(destroyProgress >= 1.0f){
             this.destroyProgress = 0f;
-            addDropToTheResourceManager(level, goal, colonist);
+            ResourceUtils.addDropToTheResourceManager(level, goal, colonist);
             level.breakBlock(this.goal, false, this.colonist);
             level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, goal);
             return true;
@@ -57,23 +55,6 @@ public class DigControl extends PositionedActionControl {
                 this.colonist.swingHand(Hand.MAIN_HAND);
             }
             return false;
-        }
-    }
-
-    public static void addDropToTheResourceManager(ServerWorld w, BlockPos g, Colonist c) {
-        final var blockState = w.getBlockState(g);
-        final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(g, blockState) : null;
-        final var drop = Block.getDroppedStacks(blockState, w, g, blockEntity);
-
-        final var provider = c.getManagersProvider().orElseThrow();
-        final var manager = c.getServerFortressManager().orElseThrow();
-        if(manager.isSurvival()) {
-            final var serverResourceManager = provider.getResourceManager();
-            for (ItemStack itemStack : drop) {
-                final var item = itemStack.getItem();
-                final var count = itemStack.getCount();
-                serverResourceManager.increaseItemAmount(item, count);
-            }
         }
     }
 

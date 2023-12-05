@@ -1,10 +1,16 @@
 package net.remmintan.gobi.helpers;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
+import net.minecraft.entity.Entity;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.utils.ResourceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,6 +138,17 @@ public class TreeHelper {
         for (BlockPos neighbor : neighbors) {
             updateTreeDataForOneTree(world, treeBlocks, leavesBlocks, neighbor, rootBlockState, root);
         }
+    }
+
+    public static void removeTheRestOfATree(IWorkerPawn pawn, TreeBlocks tree, ServerWorld world) {
+        tree.getTreeBlocks().forEach(blockPos -> removeBlockAddDropToTheResources(pawn, world, blockPos));
+        tree.getLeavesBlocks().forEach(blockPos -> removeBlockAddDropToTheResources(pawn, world, blockPos));
+    }
+
+    private static void removeBlockAddDropToTheResources(IWorkerPawn pawn, ServerWorld world, BlockPos blockPos) {
+        ResourceUtils.addDropToTheResourceManager(world, blockPos,  pawn);
+        world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 3);
+        world.emitGameEvent((Entity) pawn, GameEvent.BLOCK_DESTROY, blockPos);
     }
 
     record TreeInfo(int logsCount, BlockPos highestLeaf) {}
