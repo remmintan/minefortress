@@ -2,7 +2,6 @@ package org.minefortress.fortress.automation.iterators;
 
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.remmintan.gobi.helpers.TreeHelper;
@@ -60,7 +59,10 @@ public class LoggingAreaIterator extends AbstractFilteredIterator {
         final var state = world.getBlockState(pos);
         if(!state.isAir() && !state.isIn(BlockTags.REPLACEABLE)) return false;
 
-        for (BlockPos.Mutable blockPos : BlockPos.iterateInSquare(pos, 3, Direction.SOUTH, Direction.WEST)) {
+        final var start = pos.add(-3, -5, -3);
+        final var end = pos.add(3, 5, 3);
+
+        for (BlockPos blockPos : BlockPos.iterate(start, end)) {
             final var blockState = world.getBlockState(blockPos);
             if (
                     blockState.isIn(BlockTags.LOGS) ||
