@@ -44,6 +44,7 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
         colonist.addHunger(IDLE_EXHAUSTION);
         if(colonist.getMovementHelper().isStuck()) {
             if(goal != null) {
+                colonist.resetControls();
                 colonist.teleport(goal.getX(), goal.getY(), goal.getZ());
             }
         }
