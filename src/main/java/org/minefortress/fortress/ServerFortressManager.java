@@ -74,6 +74,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType.QUARRY;
+
 public final class ServerFortressManager implements IFortressManager, IServerManagersProvider, IServerFortressManager {
 
     private static final BlockState DEFAULT_STATE_ABOVE_CAMPFIRE = Blocks.BARRIER.getDefaultState();
@@ -603,7 +605,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
             if(areaOpt.isPresent()) {
                 final var area = areaOpt.get();
-                if(area instanceof ServerAutomationAreaInfo && area.isEmpty(getWorld())) {
+                if(area instanceof ServerAutomationAreaInfo saai && area.isEmpty(getWorld()) && saai.getAreaType() == QUARRY) {
                     if(masterPlayer != null)
                         area.sendFinishMessage(masterPlayer);
                     automationAreaManager.removeArea(area.getId());

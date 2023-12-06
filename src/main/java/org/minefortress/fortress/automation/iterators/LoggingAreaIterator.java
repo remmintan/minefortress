@@ -1,0 +1,77 @@
+package org.minefortress.fortress.automation.iterators;
+
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.Heightmap;
+import net.minecraft.world.World;
+import net.remmintan.gobi.helpers.TreeHelper;
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
+import org.minefortress.fortress.automation.AutomationBlockInfo;
+
+import java.util.*;
+
+public class LoggingAreaIterator extends AbstractFilteredIterator {
+
+    private final World world;
+
+    private final Map<BlockPos, AutomationBlockInfo> cache = new HashMap<>();
+    private final Set<BlockPos> existingSaplings = new HashSet<>();
+
+    public LoggingAreaIterator(List<BlockPos> blocks, World world) {
+        super(blocks.listIterator());
+        this.world=world;
+    }
+
+    @Override
+    protected boolean filter(BlockPos pos) {
+        final var topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ());
+        final var newPos = new BlockPos(pos.getX(), topY, pos.getZ());
+
+        final var root = getTreeRoot(newPos);
+        if(root.isPresent()) {
+            cache.put(pos, new AutomationBlockInfo(root.get(), AutomationActionType.CHOP_TREE));
+            return true;
+        }
+
+        if(noOtherTreesOrSaplingsAround(newPos)) {
+            existingSaplings.add(newPos);
+            cache.put(pos, new AutomationBlockInfo(newPos, AutomationActionType.PLANT_SAPLING));
+            return true;
+        }
+
+        return  false;
+    }
+
+    @Override
+    protected AutomationBlockInfo map(BlockPos pos) {
+        return cache.get(pos);
+    }
+
+    private Optional<BlockPos> getTreeRoot(BlockPos pos) {
+        if(!world.getBlockState(pos.down()).isIn(BlockTags.LOGS)) {
+            return Optional.empty();
+        }
+
+        return TreeHelper.findRootDownFromLog(pos, world);
+    }
+
+    private boolean noOtherTreesOrSaplingsAround(BlockPos pos) {
+        final var state = world.getBlockState(pos);
+        if(!state.isAir() && !state.isIn(BlockTags.REPLACEABLE)) return false;
+
+        for (BlockPos.Mutable blockPos : BlockPos.iterateInSquare(pos, 3, Direction.SOUTH, Direction.WEST)) {
+            final var blockState = world.getBlockState(blockPos);
+            if (
+                    blockState.isIn(BlockTags.LOGS) ||
+                    blockState.isIn(BlockTags.SAPLINGS) ||
+                    blockState.isIn(BlockTags.LEAVES) ||
+                    existingSaplings.contains(blockPos)
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}

@@ -12,7 +12,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.event.GameEvent;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -162,7 +162,7 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
     }
 
     private Optional<BlockItem> getSeeds(Colonist colonist) {
-        if(isCreative(colonist)) {
+        if(CoreModUtils.isPlayerInCreative(colonist)) {
             return Optional.of((BlockItem) Items.WHEAT_SEEDS);
         }
         final var serverResourceManager = colonist
@@ -187,12 +187,5 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
                     .removeItems(Collections.singletonList(new ItemInfo(it, 1)))
         );
         return itemOpt.map(it -> (BlockItem) it);
-    }
-
-    private static boolean isCreative(Colonist colonist) {
-        return colonist
-                .getServerFortressManager()
-                .map(IServerFortressManager::isCreative)
-                .orElse(false);
     }
 }

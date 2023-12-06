@@ -6,5 +6,6 @@ public enum AutomationActionType {
     FARM_WATER,
     MINE,
     CHOP_TREE,
+    PLANT_SAPLING,
 
 }

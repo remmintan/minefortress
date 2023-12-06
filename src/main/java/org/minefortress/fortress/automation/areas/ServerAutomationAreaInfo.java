@@ -11,7 +11,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSel
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
-import org.minefortress.fortress.automation.iterators.LoggingIterator;
+import org.minefortress.fortress.automation.iterators.LoggingAreaIterator;
 import org.minefortress.fortress.automation.iterators.MineAreaIterator;
 import org.minefortress.fortress.automation.iterators.ResetableIterator;
 import org.minefortress.utils.AreasUtils;
@@ -55,7 +55,7 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
             this.currentIterator = switch (getAreaType()) {
                 case FARMING -> new FarmAreaIterator(this.getServerArea(), world);
                 case QUARRY -> new MineAreaIterator(this.getServerArea(), world);
-                case LOGGING -> new LoggingIterator(this.getServerArea(), world);
+                case LOGGING -> new LoggingAreaIterator(this.getServerArea(), world);
             };
         }
 
