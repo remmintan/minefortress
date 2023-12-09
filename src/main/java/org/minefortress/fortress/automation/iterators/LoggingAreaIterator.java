@@ -33,7 +33,7 @@ public class LoggingAreaIterator extends AbstractFilteredIterator {
             return true;
         }
 
-        if(noOtherTreesOrSaplingsAround(newPos)) {
+        if(noOtherTreesOrSaplingsAround(newPos) && world.getBlockState(newPos.down()).isIn(BlockTags.DIRT)) {
             existingSaplings.add(newPos);
             cache.put(pos, new AutomationBlockInfo(newPos, AutomationActionType.PLANT_SAPLING));
             return true;
