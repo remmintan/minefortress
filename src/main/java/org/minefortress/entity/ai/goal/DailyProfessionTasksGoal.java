@@ -14,6 +14,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
             entry("crafter", new CrafterDailyTask()),
             entry("blacksmith", new BlacksmithDailyTask()),
             entry("forester", new ForesterDailyTask()),
+            entry("fisher", new FisherDailyTask()),
             entry("farmer", new FarmerDailyTask()),
             entry("miner", new MinerDailyTask()),
             entry("lumberjack", new LumberjackDailyTask())

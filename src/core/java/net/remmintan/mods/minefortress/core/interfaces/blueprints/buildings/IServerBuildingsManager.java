@@ -14,6 +14,7 @@ public interface IServerBuildingsManager extends IServerManager {
     void destroyBuilding(UUID id);
     void doRepairConfirmation(UUID id, ServerPlayerEntity player);
     Optional<IFortressBuilding> findNearest(BlockPos pos);
+    Optional<IFortressBuilding> findNearest(BlockPos pos, String requirement);
     void addBuilding(IFortressBuilding building);
     Optional<HostileEntity> getRandomBuildingAttacker();
     Optional<BlockPos> getFreeBed();

@@ -19,10 +19,12 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
 import net.remmintan.mods.minefortress.networking.s2c.S2COpenBuildingRepairScreen;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -148,8 +150,17 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     }
 
     public Optional<IFortressBuilding> findNearest(BlockPos pos) {
+        return findNearest(pos, "");
+    }
+
+    public Optional<IFortressBuilding> findNearest(BlockPos pos, String requirement) {
+        final Predicate<IFortressBuilding> buildingsFilter = StringUtils.isBlank(requirement) ?
+                it -> true :
+                it -> it.satisfiesRequirement(requirement);
+
         return buildings
                 .stream()
+                .filter(buildingsFilter)
                 .sorted(Comparator.comparing(it -> it.getCenter().getSquaredDistance(pos)))
                 .filter(it -> it.getHealth() > 0)
                 .findFirst();
