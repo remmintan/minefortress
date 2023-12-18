@@ -2,6 +2,7 @@ package org.minefortress.entity.ai.professions.fishing
 
 import net.minecraft.block.Blocks
 import net.minecraft.util.math.BlockPos
+import net.minecraft.world.Heightmap
 import org.minefortress.entity.Colonist
 import java.util.*
 
@@ -10,14 +11,17 @@ const val SEARCH_RADIUS = 20
 
 fun getFisherGoal(pawn: Colonist, pivotBlock: BlockPos, predicate: (BlockPos) -> Boolean): Optional<FisherGoal> {
     val world = pawn.world
-    val randomBlock = BlockPos.iterateRandomly(world.random, SEARCH_RADIUS*3, pivotBlock, 1).first()
+    val randomBlock = BlockPos.iterateRandomly(world.random, SEARCH_RADIUS, pivotBlock, 1).first()
 
     return BlockPos
-            .findClosest(randomBlock, SEARCH_RADIUS*3, SEARCH_RADIUS*3) {
-                predicate(it)
+            .findClosest(randomBlock, SEARCH_RADIUS, SEARCH_RADIUS) {
+                val topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, it.x, it.z)
+                val newPos = BlockPos(it.x, topY-1, it.z)
+                predicate(newPos)
             }
             .map {
-                it.toImmutable()
+                val topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, it.x, it.z)
+                BlockPos(it.x, topY-1, it.z)
             }
             .flatMap {
                 getFisherGoalFromWaterPos(it, pawn)
