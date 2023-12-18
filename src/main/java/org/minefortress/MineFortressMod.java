@@ -7,14 +7,18 @@ import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.building.FortressBlocks;
 import net.remmintan.mods.minefortress.networking.registries.ServerNetworkReceivers;
 import org.minefortress.commands.CommandsManager;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
-import net.remmintan.mods.minefortress.building.FortressBlocks;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressItems;
 import org.minefortress.registries.FortressServerEvents;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MineFortressMod implements ModInitializer {
 
@@ -28,6 +32,14 @@ public class MineFortressMod implements ModInitializer {
     public static final ScreenHandlerType<FortressCraftingScreenHandler> FORTRESS_CRAFTING_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(FORTRESS_CRAFTING_SCREEN_HANDLER_ID, FortressCraftingScreenHandler::new);
     public static final ScreenHandlerType<FortressFurnaceScreenHandler> FORTRESS_FURNACE_SCREEN_HANDLER =  ScreenHandlerRegistry.registerSimple(FORTRESS_FURNACE_SCREEN_HANDLER_ID, FortressFurnaceScreenHandler::new);
 
+    private static final ExecutorService executor;
+
+    static  {
+        var incrementer = new AtomicInteger(0);
+        executor = Executors.newCachedThreadPool(r ->
+                new Thread(r, "MineFortress Worker " + incrementer.incrementAndGet()));
+    }
+
     @Override
     public void onInitialize() {
         FortressBlocks.register();
@@ -38,6 +50,10 @@ public class MineFortressMod implements ModInitializer {
 
         CommandsManager.registerCommands();
         ServerNetworkReceivers.registerReceivers();
+    }
+
+    public static ExecutorService getExecutor() {
+        return executor;
     }
 
 }

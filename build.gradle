@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.21'
 }
 
 if(System.getenv("BUILD_NUMBER") != null) {
@@ -40,8 +41,6 @@ sourceSets {
 
 group = project.maven_group
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -75,6 +74,7 @@ repositories {
 			includeGroupByRegex("dev\\.onyxstudios.*")
 		}
 	}
+    mavenCentral()
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -95,6 +95,7 @@ dependencies {
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.7+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.7+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.2.7+minefortress")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 processResources {
@@ -137,4 +138,7 @@ publishing {
 			}
 		}
 	}
+}
+kotlin {
+    jvmToolchain(17)
 }
