@@ -2,15 +2,15 @@ package org.minefortress.entity.ai.professions;
 
 import kotlin.jvm.functions.Function1;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.professions.fishing.FakePlayerForFishing;
 import org.minefortress.entity.ai.professions.fishing.FisherBlockFounderKt;
 import org.minefortress.entity.ai.professions.fishing.FisherGoal;
+import org.minefortress.entity.fisher.FortressFishingBobberEntity;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -20,7 +20,7 @@ public class FisherDailyTask implements ProfessionDailyTask {
     private long workingTicks = 0L;
     private volatile FisherGoal goal;
     private Future<FisherGoal> goalFuture;
-    private FishingBobberEntity fishingBobberEntity;
+    private FortressFishingBobberEntity fishingBobberEntity;
 
     @Override
     public boolean canStart(Colonist colonist) {
@@ -55,8 +55,14 @@ public class FisherDailyTask implements ProfessionDailyTask {
             colonist.lookAt(goal.getWaterPos());
             workingTicks++;
             if (this.fishingBobberEntity == null) {
-                final var player = FakePlayerForFishing.Companion.getFakePlayerForFinish(colonist);
-                this.fishingBobberEntity = new FishingBobberEntity(player, colonist.getWorld(), 0, 0);
+                colonist.swingHand(Hand.MAIN_HAND);
+                this.fishingBobberEntity = new FortressFishingBobberEntity(
+                        colonist,
+                        colonist.getWorld(),
+                        0,
+                        0
+                );
+                this.fishingBobberEntity.setPosition(goal.getWaterPos().toCenterPos());
                 colonist.getWorld().spawnEntity(fishingBobberEntity);
             }
 
