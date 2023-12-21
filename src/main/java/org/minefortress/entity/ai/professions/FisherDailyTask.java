@@ -18,13 +18,15 @@ import java.util.concurrent.Future;
 public class FisherDailyTask implements ProfessionDailyTask {
     private long stopTime = 0L;
     private long workingTicks = 0L;
+
+    private int catchCooldown = 0;
     private volatile FisherGoal goal;
     private Future<FisherGoal> goalFuture;
     private FortressFishingBobberEntity fishingBobberEntity;
 
     @Override
     public boolean canStart(Colonist colonist) {
-        return colonist.getWorld().isDay() && colonist.getWorld().getTime() - this.stopTime > 200L;
+        return colonist.getWorld().isDay() && colonist.getWorld().getTime() - this.stopTime > 800L;
     }
 
     @Override
@@ -36,6 +38,8 @@ public class FisherDailyTask implements ProfessionDailyTask {
 
     @Override
     public void tick(Colonist colonist) {
+        if(catchCooldown > 0) catchCooldown--;
+
         if(goalFuture != null) {
             if(goalFuture.isDone()) {
                 setTheGoal();
@@ -54,7 +58,7 @@ public class FisherDailyTask implements ProfessionDailyTask {
             colonist.putItemInHand(Items.FISHING_ROD);
             colonist.lookAt(goal.getWaterPos());
             workingTicks++;
-            if (this.fishingBobberEntity == null) {
+            if (this.fishingBobberEntity == null && catchCooldown <= 0) {
                 colonist.swingHand(Hand.MAIN_HAND);
                 this.fishingBobberEntity = new FortressFishingBobberEntity(
                         colonist,
@@ -71,6 +75,7 @@ public class FisherDailyTask implements ProfessionDailyTask {
                 this.fishingBobberEntity.use(colonist.getStackInHand(Hand.MAIN_HAND));
                 if(!this.fishingBobberEntity.isAlive()) {
                     this.fishingBobberEntity = null;
+                    catchCooldown=10;
                 }
             }
 
