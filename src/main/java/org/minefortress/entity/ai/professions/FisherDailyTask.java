@@ -131,6 +131,15 @@ public class FisherDailyTask implements ProfessionDailyTask {
             if(goalOpt.isPresent()) {
                 return goalOpt.get();
             }
+
+            final var goalOpt2 = FisherBlockFounderKt.getFisherGoal(
+                    pawn,
+                    center,
+                    it -> world.getBlockState(it).isOf(Blocks.WATER)
+            );
+            if(goalOpt2.isPresent()) {
+                return goalOpt2.get();
+            }
         }
 
         // look for water near campfire
