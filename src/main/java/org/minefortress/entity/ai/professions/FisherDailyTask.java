@@ -106,6 +106,7 @@ public class FisherDailyTask implements ProfessionDailyTask {
         this.goalFuture = null;
         this.workingTicks = 0L;
         this.fishingBobberEntity=null;
+        colonist.putItemInHand(null);
         colonist.resetControls();
     }
 
