@@ -66,6 +66,14 @@ public class FisherDailyTask implements ProfessionDailyTask {
                 colonist.getWorld().spawnEntity(fishingBobberEntity);
             }
 
+            if(this.fishingBobberEntity!=null && this.fishingBobberEntity.hasHookedSomething()) {
+                colonist.swingHand(Hand.MAIN_HAND);
+                this.fishingBobberEntity.use(colonist.getStackInHand(Hand.MAIN_HAND));
+                if(!this.fishingBobberEntity.isAlive()) {
+                    this.fishingBobberEntity = null;
+                }
+            }
+
 //            if(colonist.getWorld().getBlockState(goal).isOf(Blocks.WATER)) {
 //                colonist.addHunger(PASSIVE_EXHAUSTION);
 //                colonist.addExperience(FORESTER_ITEMS);
@@ -103,7 +111,7 @@ public class FisherDailyTask implements ProfessionDailyTask {
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return (goal != null || goalFuture != null) && colonist.getWorld().isDay() && workingTicks < 200L;
+        return (goal != null || goalFuture != null) && colonist.getWorld().isDay() && workingTicks < 800L;
     }
 
     private FisherGoal setGoalAsync(Colonist pawn) {

@@ -121,6 +121,10 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
         if(requirementId.startsWith("farm"))
             return count * 5 > minCount;
+
+        if(requirementId.startsWith("fisher"))
+            return count * 3 > minCount;
+
         return count > minCount;
     }
 

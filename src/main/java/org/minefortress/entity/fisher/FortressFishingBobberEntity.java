@@ -11,7 +11,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootTables;
+import net.minecraft.loot.context.LootContextParameterSet;
+import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -398,50 +403,47 @@ public class FortressFishingBobberEntity extends ProjectileEntity {
     public void readCustomDataFromNbt(NbtCompound nbt) {
     }
 
-//    public int use(ItemStack usedItem) {
-//        PlayerEntity playerEntity = this.getPlayerOwner();
-//        if (!this.getWorld().isClient && playerEntity != null && !this.removeIfInvalid(playerEntity)) {
-//            int i = 0;
-//            if (this.hookedEntity != null) {
-//                this.pullHookedEntity(this.hookedEntity);
-//                Criteria.FISHING_ROD_HOOKED.trigger((ServerPlayerEntity)playerEntity, usedItem, this, Collections.emptyList());
-//                this.getWorld().sendEntityStatus(this, EntityStatuses.PULL_HOOKED_ENTITY);
-//                i = this.hookedEntity instanceof ItemEntity ? 3 : 5;
-//            } else if (this.hookCountdown > 0) {
-//                LootContextParameterSet lootContextParameterSet = (new LootContextParameterSet.Builder((ServerWorld)this.getWorld())).add(LootContextParameters.ORIGIN, this.getPos()).add(LootContextParameters.TOOL, usedItem).add(LootContextParameters.THIS_ENTITY, this).luck((float)this.luckOfTheSeaLevel + playerEntity.getLuck()).build(LootContextTypes.FISHING);
-//                LootTable lootTable = this.getWorld().getServer().getLootManager().getLootTable(LootTables.FISHING_GAMEPLAY);
-//                List<ItemStack> list = lootTable.generateLoot(lootContextParameterSet);
-//                Criteria.FISHING_ROD_HOOKED.trigger((ServerPlayerEntity)playerEntity, usedItem, this, list);
-//                Iterator var7 = list.iterator();
-//
-//                while(var7.hasNext()) {
-//                    ItemStack itemStack = (ItemStack)var7.next();
-//                    ItemEntity itemEntity = new ItemEntity(this.getWorld(), this.getX(), this.getY(), this.getZ(), itemStack);
-//                    double d = playerEntity.getX() - this.getX();
-//                    double e = playerEntity.getY() - this.getY();
-//                    double f = playerEntity.getZ() - this.getZ();
-//                    double g = 0.1;
-//                    itemEntity.setVelocity(d * 0.1, e * 0.1 + Math.sqrt(Math.sqrt(d * d + e * e + f * f)) * 0.08, f * 0.1);
-//                    this.getWorld().spawnEntity(itemEntity);
-//                    playerEntity.getWorld().spawnEntity(new ExperienceOrbEntity(playerEntity.getWorld(), playerEntity.getX(), playerEntity.getY() + 0.5, playerEntity.getZ() + 0.5, this.random.nextInt(6) + 1));
-//                    if (itemStack.isIn(ItemTags.FISHES)) {
-//                        playerEntity.increaseStat((Identifier)Stats.FISH_CAUGHT, 1);
-//                    }
-//                }
-//
-//                i = 1;
-//            }
-//
-//            if (this.isOnGround()) {
-//                i = 2;
-//            }
-//
-//            this.discard();
-//            return i;
-//        } else {
-//            return 0;
-//        }
-//    }
+    public boolean hasHookedSomething() {
+        return this.hookCountdown > 0 && this.hookCountdown < 10;
+    }
+
+    public int use(ItemStack usedItem) {
+        var pawnEntity = this.getPawnOwner();
+        if (!this.getWorld().isClient && pawnEntity != null && !this.removeIfInvalid(pawnEntity)) {
+            int i = 0;
+            if (this.hookedEntity != null) {
+                this.pullHookedEntity(this.hookedEntity);
+                this.getWorld().sendEntityStatus(this, EntityStatuses.PULL_HOOKED_ENTITY);
+                i = this.hookedEntity instanceof ItemEntity ? 3 : 5;
+            } else if (this.hookCountdown > 0) {
+                var lootContextParameterSet = (new LootContextParameterSet.Builder((ServerWorld)this.getWorld())).add(LootContextParameters.ORIGIN, this.getPos()).add(LootContextParameters.TOOL, usedItem).add(LootContextParameters.THIS_ENTITY, this).luck((float)this.luckOfTheSeaLevel).build(LootContextTypes.FISHING);
+                var lootTable = this.getWorld().getServer().getLootManager().getLootTable(LootTables.FISHING_GAMEPLAY);
+                var list = lootTable.generateLoot(lootContextParameterSet);
+                var var7 = list.iterator();
+
+                while(var7.hasNext()) {
+                    ItemStack itemStack = var7.next();
+                    ItemEntity itemEntity = new ItemEntity(this.getWorld(), this.getX(), this.getY(), this.getZ(), itemStack);
+                    double d = pawnEntity.getX() - this.getX();
+                    double e = pawnEntity.getY() - this.getY();
+                    double f = pawnEntity.getZ() - this.getZ();
+                    double g = 0.1;
+                    itemEntity.setVelocity(d * 0.1, e * 0.1 + Math.sqrt(Math.sqrt(d * d + e * e + f * f)) * 0.08, f * 0.1);
+                    this.getWorld().spawnEntity(itemEntity);
+                }
+                i = 1;
+            }
+
+            if (this.isOnGround()) {
+                i = 2;
+            }
+
+            this.discard();
+            return i;
+        } else {
+            return 0;
+        }
+    }
 
     public void handleStatus(byte status) {
         if (status == EntityStatuses.PULL_HOOKED_ENTITY && this.getWorld().isClient && this.hookedEntity instanceof PlayerEntity && ((PlayerEntity)this.hookedEntity).isMainPlayer()) {

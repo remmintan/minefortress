@@ -155,7 +155,7 @@
     "icon": "minecraft:fishing_rod",
     "description": "Catches fish in ponds\nCooks fish",
     "unlockMessage": "Build Fisherman's house to unlock",
-    "unlockMoreMessage": "Craft more fishing rods or build more Fisherman's houses to unlock more",
+    "unlockMoreMessage": "Build more Fisherman's houses to unlock more",
     "requirements": {
       "building": "fisher"
     }
