@@ -70,6 +70,8 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // forbidding the mmb
+        if(button == 2) return false;
         if (button == 0) {
             final var bounds = getScrollbarBounds();
             if(mouseX >= bounds.x1() && mouseX <= bounds.x2() && mouseY >= bounds.y1() && mouseY <= bounds.y2()) {
@@ -89,6 +91,8 @@ public abstract class AbstractFortressRecipeScreen<T extends AbstractFortressRec
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        // forbidding the mmb
+        if(button == 2) return false;
         if (this.scrolling) {
             final var bounds = getScrollbarBounds();
             this.scrollPosition = ((float)mouseY - (float)bounds.y1() - 7.5f) / ((float)(bounds.y2() - bounds.y1()) - 15.0f);
