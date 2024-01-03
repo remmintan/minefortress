@@ -1,6 +1,9 @@
 package org.minefortress.entity.ai.goal;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
@@ -58,14 +61,34 @@ public class EatGoal extends Goal {
                 .flatMap(it -> it
                         .getAllItems()
                         .stream()
-                        .filter(stack -> !stack.isEmpty() && stack.getItem().isFood())
+                        .filter(EatGoal::isEatable)
                         .max(
                                 Comparator.comparingDouble(stack ->
-                                        Optional.ofNullable(stack.getItem().getFoodComponent())
-                                                .map(item -> item.getHunger() * item.getSaturationModifier() * 2.0f)
-                                                .orElse(0f)
+                                        {
+                                            final var foodComponent = stack.getItem().getFoodComponent();
+                                            //noinspection DataFlowIssue
+                                            return foodComponent.getHunger() * foodComponent.getSaturationModifier() * 2.0f;
+                                        }
                                 )
                         )
                 );
     }
+
+    private static boolean isEatable(ItemStack stack) {
+        if(stack.isEmpty() || !stack.getItem().isFood())
+            return false;
+
+        final var foodComponent = stack.getItem().getFoodComponent();
+        final var statusEffects = foodComponent.getStatusEffects();
+        if(statusEffects.isEmpty())
+            return true;
+
+        for (Pair<StatusEffectInstance, Float> statusEffect : statusEffects) {
+            if(statusEffect.getFirst().getEffectType().getCategory() == StatusEffectCategory.HARMFUL)
+                return false;
+        }
+
+        return true;
+    }
+
 }
