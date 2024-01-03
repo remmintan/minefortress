@@ -9,8 +9,28 @@ import net.remmintan.mods.minefortress.core.interfaces.selections.ISelection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class Selection implements ISelection {
+
+    // TODO: move to config
+    int MAX_SELECTION_SIZE = 2000;
+    private double previousDistance = 0;
+
+    protected abstract Optional<BlockPos> getSelectionStart();
+
+    public boolean needUpdate(BlockPos pickedBlock, int upDelta) {
+        double currentDistance = getSelectionStart().map(it -> it.getSquaredDistance(pickedBlock)).orElse(0d);
+        if(
+            previousDistance == 0 ||
+            getSelection().size()/previousDistance*currentDistance < MAX_SELECTION_SIZE ||
+            currentDistance < previousDistance
+        ) {
+            previousDistance = currentDistance;
+            return true;
+        }
+        return false;
+    }
 
     protected static Pair<Vec3i, Vec3i> getSelectionDimensions(BlockPos start, BlockPos end) {
         if(end == null || start == null) return null;
