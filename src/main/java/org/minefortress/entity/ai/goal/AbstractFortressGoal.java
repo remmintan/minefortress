@@ -25,7 +25,7 @@ abstract class AbstractFortressGoal extends Goal {
     }
 
     protected boolean isStarving() {
-        return colonist.getCurrentFoodLevel() <= 0;
+        return colonist.getCurrentFoodLevel() <= 0 || colonist.getHealth() <= 10;
     }
 
 
