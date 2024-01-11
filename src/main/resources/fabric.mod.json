@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "MineFortress",
-  "description": "The first Real-Time Strategy mod in minecraft. Manage a group of pawns, to survive and grow your village",
+  "description": "The Real-Time Strategy mod for minecraft. Manage a group of pawns, to survive and grow your village",
   "authors": [
     "remmintan"
   ],
@@ -42,7 +42,8 @@
     "fabric": ">=0.90.4",
     "minecraft": "1.20.2",
     "java": ">=17",
-    "mm": ">=2.3"
+    "mm": ">=2.3",
+    "fabric-language-kotlin": ">=1.10.17+kotlin.1.9.22"
   },
   "suggests": {}
 }

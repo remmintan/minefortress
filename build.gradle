@@ -95,7 +95,7 @@ dependencies {
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.7+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.7+minefortress")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.2.7+minefortress")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+	modImplementation include("net.fabricmc:fabric-language-kotlin:1.10.17+kotlin.1.9.22")
 }
 
 processResources {
