@@ -53,17 +53,9 @@ repositories {
 	}
 	maven {
 		url = "https://maven.pkg.github.com/minefortress-mod/minefortress-cc-api"
-		credentials {
-			username = System.getenv("GITHUB_USERNAME")
-			password = System.getenv("GITHUB_TOKEN")
-		}
 	}
 	maven {
 		url = "https://maven.pkg.github.com/minefortress-mod/automatone"
-		credentials {
-			username = System.getenv("GITHUB_USERNAME")
-			password = System.getenv("GITHUB_TOKEN")
-		}
 	}
 	maven {
 		name = "Ladysnake Mods"
