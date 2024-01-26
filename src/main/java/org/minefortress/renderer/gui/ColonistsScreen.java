@@ -12,16 +12,16 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkH
 
 public class ColonistsScreen extends Screen {
 
-    private static final Text MANAGE_COLONISTS_COUNT_TEXT = Text.literal("Manage Villagers");
+    private static final Text MANAGE_COLONISTS_COUNT_TEXT = Text.translatable("key.minefortress.manage_colonists_count");
 
     public ColonistsScreen() {
-        super(Text.literal("Colonists"));
+        super(Text.translatable("key.minefortress.colonists_screen"));
     }
 
     @Override
     protected void init() {
         final var backToMenuBtn = ButtonWidget
-                .builder(Text.literal("Back to game"), button -> closeMenu())
+                .builder(Text.translatable("key.minefortress.back_to_menu_btn"), button -> closeMenu())
                 .dimensions(this.width / 2 - 102, this.height / 4 + 24 + 40, 204, 20)
                 .build();
         this.addDrawableChild(backToMenuBtn);
@@ -54,8 +54,8 @@ public class ColonistsScreen extends Screen {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, MANAGE_COLONISTS_COUNT_TEXT, this.width / 2, 40, 0xFFFFFF);
-        final var countLabel = "Villagers count: " + getColonistsCount();
-        final var maxCountLabel = "Max villagers count: " + (getMaxColonistsCount()==-1?"Unlimited":getMaxColonistsCount());
+        final var countLabel = Text.translatable("key.minefortress.count_label") + getColonistsCount();
+        final var maxCountLabel = Text.translatable("key.minefortress.max_count_label") + (getMaxColonistsCount()==-1?Text.translatable("key.minefortress.unlimited"):getMaxColonistsCount());
 
         drawContext.drawCenteredTextWithShadow(this.textRenderer, Text.literal(countLabel), this.width / 2, 60, 0xFFFFFF);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, Text.literal(maxCountLabel), this.width / 2, 76, 0xFFFFFF);
