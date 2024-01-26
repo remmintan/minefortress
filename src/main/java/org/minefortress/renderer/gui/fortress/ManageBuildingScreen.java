@@ -53,7 +53,7 @@ public class ManageBuildingScreen extends WindowScreen {
 
         final var destroyBuildingBtn = ButtonWidget
                 .builder(
-                        Text.literal("Destroy Building"),
+                        Text.translatable("key.minefortress.manage_building_screen.destroy"),
                         button -> showDestroyConfirmation()
                 )
                 .dimensions(getScreenCenterX() - 100, getScreenTopY() + 55, 200, 20)
@@ -64,7 +64,7 @@ public class ManageBuildingScreen extends WindowScreen {
             this.addDrawableChild(
                     ButtonWidget
                             .builder(
-                                    Text.literal("Repair Building"),
+                                    Text.translatable("key.minefortress.manage_building_screen.repair"),
                                     button -> openRepairBuildingScreen()
                             )
                             .dimensions(getScreenCenterX() - 100, getScreenTopY() + 80, 200, 20)
@@ -78,7 +78,7 @@ public class ManageBuildingScreen extends WindowScreen {
                 this.addDrawableChild(
                         ButtonWidget
                                 .builder(
-                                        Text.literal("Hire pawns"),
+                                        Text.translatable("key.minefortress.hire_pawns"),
                                         button -> ModUtils
                                                 .getProfessionManager()
                                                 .increaseAmount(it.getId(), false)
