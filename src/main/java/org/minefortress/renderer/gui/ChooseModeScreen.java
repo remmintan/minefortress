@@ -11,18 +11,18 @@ import java.util.Objects;
 
 public class ChooseModeScreen extends Screen {
 
-    private final Text questionText = Text.literal("Choose a gamemode for this world");
-    private final Text loadingText = Text.literal("Loading...");
+    private final Text questionText = Text.translatable("key.minefortress.choose_mode_screen.question_text");
+    private final Text loadingText = Text.translatable("key.minefortress.choose_mode_screen.loading_text");
     private boolean loading = false;
 
     public  ChooseModeScreen() {
-        super(Text.literal("Choose Game Mode"));
+        super(Text.translatable("key.minefortress.choose_mode_screen"));
     }
 
     @Override
     protected void init() {
         final var creativeBtn = ButtonWidget
-                .builder(Text.literal("Creative"), button -> {
+                .builder(Text.translatable("key.minefortress.choose_mode_screen.creative_btn"), button -> {
                     setLoading();
                     ModUtils.getFortressClientManager().setGamemode(FortressGamemode.CREATIVE);
                 })
@@ -31,7 +31,7 @@ public class ChooseModeScreen extends Screen {
         this.addDrawableChild(creativeBtn);
 
         final var survivalBtn = ButtonWidget
-                .builder(Text.literal("Survival"), button -> {
+                .builder(Text.translatable("key.minefortress.choose_mode_screen.survival_btn"), button -> {
                     setLoading();
                     ModUtils.getFortressClientManager().setGamemode(FortressGamemode.SURVIVAL);
                 })
