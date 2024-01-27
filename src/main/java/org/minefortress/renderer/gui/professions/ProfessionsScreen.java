@@ -20,7 +20,7 @@ public class ProfessionsScreen extends Screen {
     private boolean startClick = false;
 
     public ProfessionsScreen(IClientManagersProvider client) {
-        super(Text.literal("Professions"));
+        super(Text.translatable("key.minefortress.professions_screen"));
         this.professionsLayer = new ProfessionsLayer(client);
         this.fortressManager = client.get_ClientFortressManager();
         this.professionManager = fortressManager.getProfessionManager();
