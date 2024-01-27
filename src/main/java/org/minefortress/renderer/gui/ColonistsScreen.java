@@ -54,8 +54,8 @@ public class ColonistsScreen extends Screen {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, MANAGE_COLONISTS_COUNT_TEXT, this.width / 2, 40, 0xFFFFFF);
-        final var countLabel = Text.translatable("key.minefortress.count_label") + getColonistsCount();
-        final var maxCountLabel = Text.translatable("key.minefortress.max_count_label") + (getMaxColonistsCount()==-1?Text.translatable("key.minefortress.unlimited"):getMaxColonistsCount());
+        final var countLabel = Text.translatable("key.minefortress.count_label").getString() + getColonistsCount();
+        final var maxCountLabel = Text.translatable("key.minefortress.max_count_label").getString() + (getMaxColonistsCount()==-1?Text.translatable("key.minefortress.unlimited"):getMaxColonistsCount());
 
         drawContext.drawCenteredTextWithShadow(this.textRenderer, Text.literal(countLabel), this.width / 2, 60, 0xFFFFFF);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, Text.literal(maxCountLabel), this.width / 2, 76, 0xFFFFFF);
