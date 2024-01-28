@@ -145,9 +145,7 @@ public class BlueprintsWorld implements IBlueprintsWorld {
     public static FlatChunkGeneratorConfig getGeneratorConfig(Registry<Biome> biomeRegistry) {
 
         final List<FlatChunkGeneratorLayer> flatChunkGeneratorLayers = Arrays.asList(
-                new FlatChunkGeneratorLayer(1, Blocks.BEDROCK),
-                new FlatChunkGeneratorLayer(14, Blocks.DIRT),
-                new FlatChunkGeneratorLayer(1, Blocks.GRASS_BLOCK)
+                new FlatChunkGeneratorLayer(1, Blocks.AIR)
         );
 
         return new FlatChunkGeneratorConfig(Optional.empty(), biomeRegistry.getEntry(BiomeKeys.PLAINS).orElseThrow(), Collections.emptyList())
@@ -169,14 +167,15 @@ public class BlueprintsWorld implements IBlueprintsWorld {
     }
 
     public void putBlueprintInAWorld(final ServerPlayerEntity player, Vec3i blueprintSize) {
-        final BlockState borderBlockState = Blocks.RED_WOOL.getDefaultState();
+        final BlockState borderLineState = Blocks.RED_CONCRETE.getDefaultState();
+        final BlockState borderWallState = Blocks.RED_STAINED_GLASS_PANE.getDefaultState();
 
         final var xOffset = (16 - blueprintSize.getX()) / 2;
         final var zOffset = (16 - blueprintSize.getZ()) / 2;
 
         final int defaultFloorLevel = 16;
         BlockPos
-                .iterate(new BlockPos(-32, 0, -32), new BlockPos(32, 32, 32))
+                .iterate(new BlockPos(-16, 0, -16), new BlockPos(31, 32, 31))
                 .forEach(pos -> {
                     BlockState blockState;
                     final var offsetPos = pos
@@ -189,7 +188,7 @@ public class BlueprintsWorld implements IBlueprintsWorld {
                         blockState = Blocks.AIR.getDefaultState();
                     } else if(pos.getY() == 0) {
                         blockState = Blocks.BEDROCK.getDefaultState();
-                    } else if(pos.getY() > 0 && pos.getY() < defaultFloorLevel - 2) {
+                    } else if(pos.getY() > 0 && pos.getY() < defaultFloorLevel - 1) {
                         blockState = Blocks.DIRT.getDefaultState();
                     } else {
                         blockState = Blocks.GRASS_BLOCK.getDefaultState();
@@ -199,19 +198,21 @@ public class BlueprintsWorld implements IBlueprintsWorld {
                     world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
                 });
 
-        BlockPos.iterate(new BlockPos(-1, 15, -1), new BlockPos(16, 15, 16)).forEach(pos -> {
+        BlockPos.iterate(new BlockPos(-1, defaultFloorLevel - 1, -1), new BlockPos(16, defaultFloorLevel - 1, 16)).forEach(pos -> {
             if(pos.getZ() == -1 || pos.getZ() == 16 || pos.getX() == -1 || pos.getX() == 16) {
-                world.setBlockState(pos, borderBlockState);
+                world.setBlockState(pos, borderLineState);
                 world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
             }
         });
 
-        BlockPos.iterate(new BlockPos(16, 15, 16), new BlockPos(16, 31, 16)).forEach(pos -> {
-            world.setBlockState(pos, borderBlockState);
+        BlockPos.iterate(new BlockPos(16, defaultFloorLevel, 16), new BlockPos(16, defaultFloorLevel + 14, 16)).forEach(pos -> {
+            world.setBlockState(pos, borderWallState);
             world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
         });
-
-
+        BlockPos.iterate(new BlockPos(-1, defaultFloorLevel, -1), new BlockPos(-1, defaultFloorLevel + 14, -1)).forEach(pos -> {
+            world.setBlockState(pos, borderWallState);
+            world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos);
+        });
     }
 
     public void closeSession() {
