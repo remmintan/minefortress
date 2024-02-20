@@ -13,6 +13,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressA
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import org.minefortress.renderer.CameraTools;
 import org.minefortress.utils.ModUtils;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +66,7 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
 
         if(!this.mouseEndPos.equals(this.cachedMousePos)) {
             selectedPawns.clear();
+            final var eyePos = MinecraftClient.getInstance().player.getEyePos();
 
             // create four square point from mouseStartPos to mouseEndPos and put them in a list
             List<MousePos> squarePoints = new ArrayList<>();
@@ -75,25 +77,30 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
 
             var blockPositions = new ArrayList<Vec3d>();
             for (MousePos squarePoint : squarePoints) {
-                final var viewVector = CameraTools.getMouseBasedViewVector(MinecraftClient.getInstance(), squarePoint.getX(), squarePoint.getY());
-                final var vec3 = new Vec3d(0, 0, 0);
-                final var point = vec3.add(viewVector.x * RAY_LENGTH, viewVector.y * RAY_LENGTH, viewVector.z * RAY_LENGTH);
+                final var viewVector = CameraTools.getMouseBasedViewVector(MinecraftClient.getInstance(), squarePoint.getX(), squarePoint.getY());;
+                final var point = eyePos.add(viewVector.x * RAY_LENGTH, viewVector.y * RAY_LENGTH, viewVector.z * RAY_LENGTH);
                 blockPositions.add(point);
             }
+            blockPositions.add(eyePos);
+
+            LoggerFactory.getLogger(ClientFightSelectionManager.class).info("blockPositions: {}", blockPositions);
+
 
             final var av = new ArbitraryVolume(blockPositions);
             final var world = MinecraftClient.getInstance().world;
-            world.getEntities().forEach(
-                it -> {
-                    if(it instanceof IFortressAwareEntity fae) {
-                        final var eyePos = it.getEyePos();
-                        if(av.isInside(eyePos)) {
-                            selectedPawns.add(fae);
+            world
+                .getEntities()
+                .forEach(
+                    it -> {
+                        if(it instanceof IFortressAwareEntity fae) {
+                            final var pawnEyePos = it.getEyePos();
+                            LoggerFactory.getLogger(ClientFightSelectionManager.class).info("pawnEyePos: {}", pawnEyePos);
+                            if(av.isInside(pawnEyePos)) {
+                                selectedPawns.add(fae);
+                            }
                         }
                     }
-                }
-            );
-
+                );
 
 //            selectPawnsByType(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, blockPositions);
 //            selectPawnsByType(FortressEntities.ARCHER_PAWN_ENTITY_TYPE, blockPositions);
