@@ -9,6 +9,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 import org.minefortress.interfaces.FortressGameRenderer;
+import org.minefortress.utils.ModUtils;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -20,11 +21,12 @@ public class CameraTools {
     private static float oldPlayerXRot;
     private static float oldPlayerYRot;
 
-    public static Vec3d getMouseBasedViewVector(MinecraftClient minecraft, float xRot, float yRot) {
-        double xpos = minecraft.mouse.getX();
-        double ypos = minecraft.mouse.getY();
+    public static Vec3d getMouseBasedViewVector(MinecraftClient minecraft, double xpos, double ypos) {
+        final var xRot = ModUtils.getClientPlayer().getPitch();
+        final var yRot = ModUtils.getClientPlayer().getYaw();
+
         if(Math.abs(xpos - oldMouseX) + Math.abs(ypos - oldMouseY) > 0.01 || xRot != oldPlayerXRot || yRot != oldPlayerYRot) {
-            mouseBasedViewVector = getMouseBasedViewVector(minecraft,  xpos, ypos);
+            mouseBasedViewVector = getMouseBasedViewVector(xpos, ypos, minecraft);
             oldMouseX = xpos;
             oldMouseY = ypos;
             oldPlayerXRot = xRot;
@@ -34,7 +36,7 @@ public class CameraTools {
         return mouseBasedViewVector;
     }
 
-    public static Vec3d getMouseBasedViewVector(MinecraftClient minecraft, double xpos, double ypos) {
+    private static Vec3d getMouseBasedViewVector(double xpos, double ypos, MinecraftClient minecraft) {
         int winWidth = minecraft.getWindow().getWidth();
         int winHeight = minecraft.getWindow().getHeight();
 

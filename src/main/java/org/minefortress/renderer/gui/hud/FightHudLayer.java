@@ -72,8 +72,8 @@ class FightHudLayer extends AbstractHudLayer {
     private void renderCurrentSelection(DrawContext drawContext) {
         final var fightSelectionManager = getFightSelectionManager();
         if(fightSelectionManager.isSelecting()) {
-            final var selectionStartPos = fightSelectionManager.getSelectionStartPos();
-            final var selectionCurPos = fightSelectionManager.getSelectionCurPos();
+            final var selectionStartPos = fightSelectionManager.getMouseStartPos();
+            final var selectionCurPos = fightSelectionManager.getMouseEndPos();
 
             final var widthScaleFactor = (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
             final var heightScaleFactor = (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();

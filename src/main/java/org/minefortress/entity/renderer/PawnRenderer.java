@@ -19,6 +19,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.GameMode;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
@@ -94,7 +95,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     }
 
     private boolean selectedAsTargeted (BasePawnEntity pawn) {
-        return pawn instanceof ITargetedPawn tp && getFortressClientManager().getFightManager().getSelectionManager().isSelected(tp);
+        return getFortressClientManager().getFightManager().getSelectionManager().isSelected(pawn);
     }
 
     private float getHealthFoodLevel(BasePawnEntity colonist) {

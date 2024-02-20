@@ -1,6 +1,7 @@
 package org.minefortress.mixins.renderer;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -106,7 +107,8 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
     @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;"))
     public Vec3d updateTargetedEntityGetRotation(Entity instance, float tickDelta) {
         if(instance instanceof ClientPlayerEntity player && ModUtils.isFortressGamemode(player)) {
-            return CameraTools.getMouseBasedViewVector(MinecraftClient.getInstance(), player.getPitch(), player.getYaw());
+            final var mouse = client.mouse;
+            return CameraTools.getMouseBasedViewVector(client, mouse.getX(), mouse.getY());
         } else {
             return instance.getRotationVec(tickDelta);
         }
