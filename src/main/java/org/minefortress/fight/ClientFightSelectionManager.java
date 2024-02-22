@@ -86,21 +86,26 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
             LoggerFactory.getLogger(ClientFightSelectionManager.class).info("blockPositions: {}", blockPositions);
 
 
-            final var av = new ArbitraryVolume(blockPositions);
+
             final var world = MinecraftClient.getInstance().world;
+
+            List<Vec3d> eyePosList = new ArrayList<>();
+
             world
                 .getEntities()
                 .forEach(
-                    it -> {
-                        if(it instanceof IFortressAwareEntity fae) {
-                            final var pawnEyePos = it.getEyePos();
-                            LoggerFactory.getLogger(ClientFightSelectionManager.class).info("pawnEyePos: {}", pawnEyePos);
-                            if(av.isInside(pawnEyePos)) {
-                                selectedPawns.add(fae);
-                            }
+                    entity -> {
+                        if(entity instanceof IFortressAwareEntity) {
+                            final var pos = entity.getEyePos();
+                            eyePosList.add(pos);
                         }
                     }
                 );
+
+
+
+
+
 
 //            selectPawnsByType(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, blockPositions);
 //            selectPawnsByType(FortressEntities.ARCHER_PAWN_ENTITY_TYPE, blockPositions);

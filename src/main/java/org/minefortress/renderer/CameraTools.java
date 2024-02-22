@@ -3,7 +3,9 @@ package org.minefortress.renderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.dtos.combat.MousePos;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -13,6 +15,8 @@ import org.minefortress.utils.ModUtils;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CameraTools {
 
@@ -34,6 +38,26 @@ public class CameraTools {
         }
 
         return mouseBasedViewVector;
+    }
+
+    // project list of all Vec3d to screen space
+    public static List<Vec2f> projectToScreenSpace(List<Vec3d> positions, MinecraftClient minecraft) {
+        final var winWidth = minecraft.getWindow().getWidth();
+        final var winHeight = minecraft.getWindow().getHeight();
+        final var modelViewBuffer = getModelViewMatrix(minecraft);
+        final var projectionBuffer = getProjectionMatrix(minecraft);
+        final var viewport = getViewport(winWidth, winHeight);
+        final var resultingViewBuffer = MemoryUtil.memAllocFloat(3);
+
+        List<Vec2f> screenPositions = new ArrayList<>();
+
+        for (Vec3d position : positions) {
+            resultingViewBuffer.position(0);
+            GLU.gluProject((float) position.x, (float) position.y, (float) position.z, modelViewBuffer, projectionBuffer, viewport, resultingViewBuffer);
+            screenPositions.add(new Vec2f(resultingViewBuffer.get(0), resultingViewBuffer.get(1)));
+        }
+
+        return screenPositions;
     }
 
     private static Vec3d getMouseBasedViewVector(double xpos, double ypos, MinecraftClient minecraft) {
