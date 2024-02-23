@@ -64,6 +64,44 @@ class GLU {
         return true;
     }
 
+    public static boolean gluProject(
+            float objx,
+            float objy,
+            float objz,
+            FloatBuffer modelMatrix,
+            FloatBuffer projMatrix,
+            IntBuffer viewport,
+            FloatBuffer win_pos) {
+
+        float[] in = GLU.in;
+        float[] out = GLU.out;
+
+        in[0] = objx;
+        in[1] = objy;
+        in[2] = objz;
+        in[3] = 1.0f;
+
+        __gluMultMatrixVecf(modelMatrix, in, out);
+        __gluMultMatrixVecf(projMatrix, out, in);
+
+        if (in[3] == 0.0)
+            return false;
+
+        in[3] = (1.0f / in[3]) * 0.5f;
+
+        // Map x, y and z to range 0-1
+        in[0] = in[0] * in[3] + 0.5f;
+        in[1] = in[1] * in[3] + 0.5f;
+        in[2] = in[2] * in[3] + 0.5f;
+
+        // Map x,y to viewport
+        win_pos.put(0, in[0] * viewport.get(viewport.position() + 2) + viewport.get(viewport.position() + 0));
+        win_pos.put(1, in[1] * viewport.get(viewport.position() + 3) + viewport.get(viewport.position() + 1));
+        win_pos.put(2, in[2]);
+
+        return true;
+    }
+
     private static void __gluMultMatricesf(FloatBuffer a, FloatBuffer b, FloatBuffer r) {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {

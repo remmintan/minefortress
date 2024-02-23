@@ -4,13 +4,14 @@ import net.minecraft.client.Mouse;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.core.dtos.combat.MousePos;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 public interface IClientFightSelectionManager {
-    void startSelection(double x, double y, Vec3d startBlock);
+    void startSelection(double x, double y);
 
     void endSelection();
 
@@ -18,7 +19,7 @@ public interface IClientFightSelectionManager {
 
     void updateSelection(Mouse mouse, BlockHitResult target);
 
-    void updateSelection(double x, double y, @Nullable Vec3d endBlock);
+    void updateSelection(double x, double y);
 
     void resetSelection();
 
@@ -28,9 +29,9 @@ public interface IClientFightSelectionManager {
 
     void forEachSelected(Consumer<ITargetedPawn> action);
 
-    MousePos getSelectionStartPos();
+    MousePos getMouseStartPos();
 
-    MousePos getSelectionCurPos();
+    MousePos getMouseEndPos();
 
-    boolean isSelected(ITargetedPawn colonist);
+    boolean isSelected(IFortressAwareEntity colonist);
 }

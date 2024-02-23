@@ -103,7 +103,7 @@ public abstract class FortressClientInteractionManagerMixin {
                 } else {
                     final var crosshairTarget = client.crosshairTarget;
                     if (crosshairTarget!=null)
-                        selectionManager.startSelection(mouse.getX(), mouse.getY(), crosshairTarget.getPos());
+                        selectionManager.startSelection(mouse.getX(), mouse.getY());
                 }
             }
 

@@ -3,15 +3,19 @@ package org.minefortress.renderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.dtos.combat.MousePos;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 import org.minefortress.interfaces.FortressGameRenderer;
+import org.minefortress.utils.ModUtils;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.*;
 
 public class CameraTools {
 
@@ -20,11 +24,12 @@ public class CameraTools {
     private static float oldPlayerXRot;
     private static float oldPlayerYRot;
 
-    public static Vec3d getMouseBasedViewVector(MinecraftClient minecraft, float xRot, float yRot) {
-        double xpos = minecraft.mouse.getX();
-        double ypos = minecraft.mouse.getY();
+    public static Vec3d getMouseBasedViewVector(MinecraftClient minecraft, double xpos, double ypos) {
+        final var xRot = ModUtils.getClientPlayer().getPitch();
+        final var yRot = ModUtils.getClientPlayer().getYaw();
+
         if(Math.abs(xpos - oldMouseX) + Math.abs(ypos - oldMouseY) > 0.01 || xRot != oldPlayerXRot || yRot != oldPlayerYRot) {
-            mouseBasedViewVector = getMouseBasedViewVector(minecraft,  xpos, ypos);
+            mouseBasedViewVector = getMouseBasedViewVector(xpos, ypos, minecraft);
             oldMouseX = xpos;
             oldMouseY = ypos;
             oldPlayerXRot = xRot;
@@ -34,13 +39,32 @@ public class CameraTools {
         return mouseBasedViewVector;
     }
 
-    public static Vec3d getMouseBasedViewVector(MinecraftClient minecraft, double xpos, double ypos) {
+    public static Map<Vec2f, Vec3d> projectToScreenSpace(Set<Vec3d> positions, MinecraftClient minecraft) {
+        final var winWidth = minecraft.getWindow().getWidth();
+        final var winHeight = minecraft.getWindow().getHeight();
+        final var modelViewBuffer = getModelViewMatrix(minecraft, true);
+        final var projectionBuffer = getProjectionMatrix(minecraft);
+        final var viewport = getViewport(winWidth, winHeight);
+        final var resultingViewBuffer = MemoryUtil.memAllocFloat(3);
+
+        Map<Vec2f, Vec3d> screenPositions = new HashMap<>();
+
+        for (Vec3d position : positions) {
+            resultingViewBuffer.position(0);
+            GLU.gluProject((float) position.x, (float) position.y, (float) position.z, modelViewBuffer, projectionBuffer, viewport, resultingViewBuffer);
+            screenPositions.put(new Vec2f(resultingViewBuffer.get(0) / resultingViewBuffer.get(2), winHeight - resultingViewBuffer.get(1) / resultingViewBuffer.get(2)), position);
+        }
+
+        return screenPositions;
+    }
+
+    private static Vec3d getMouseBasedViewVector(double xpos, double ypos, MinecraftClient minecraft) {
         int winWidth = minecraft.getWindow().getWidth();
         int winHeight = minecraft.getWindow().getHeight();
 
         FloatBuffer resultingViewBuffer = MemoryUtil.memAllocFloat(3);
         resultingViewBuffer.position(0);
-        FloatBuffer modelViewBuffer = getModelViewMatrix(minecraft);
+        FloatBuffer modelViewBuffer = getModelViewMatrix(minecraft, false);
         FloatBuffer projectionBuffer = getProjectionMatrix(minecraft);
         IntBuffer viewport = getViewport(winWidth, winHeight);
 
@@ -66,10 +90,19 @@ public class CameraTools {
         return new Vec3d(resultingViewVector);
     }
 
-    private static FloatBuffer getModelViewMatrix(MinecraftClient minecraft) {
+    private static FloatBuffer getModelViewMatrix(MinecraftClient minecraft, boolean translateToPlayer) {
         final var modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
         final var player = minecraft.player;
         if(player != null) {
+            if(translateToPlayer) {
+                final var offset = new Vector3f(
+                        (float) -player.getX(),
+                        (float) -player.getY(),
+                        (float) -player.getZ()
+                );
+                modelViewMatrix.translate(offset);
+            }
+
             final var xRads = (float) Math.toRadians(player.getRotationClient().x);
             modelViewMatrix.rotate(xRads, new Vector3f(1, 0,0));
             final var yRads = (float) Math.toRadians(player.getRotationClient().y + 180f);

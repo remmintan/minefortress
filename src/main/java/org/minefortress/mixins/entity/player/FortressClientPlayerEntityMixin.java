@@ -2,6 +2,7 @@ package org.minefortress.mixins.entity.player;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -48,7 +49,10 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
         }
 
         Vec3d vec3 = this.getCameraPosVec(tickDelta);
-        Vec3d vec31 = CameraTools.getMouseBasedViewVector(this.client, this.getPitch(), this.getYaw());
+        final var mouse = this.client.mouse;
+        // need to send the same mouse credentials that I can obtain from the client because
+        // we need to send different mouse coordinates inside FightSelectionManager
+        Vec3d vec31 = CameraTools.getMouseBasedViewVector(this.client, mouse.getX(), mouse.getY());
         Vec3d vec32 = vec3.add(vec31.x * maxDistance, vec31.y * maxDistance, vec31.z * maxDistance);
         return this.getWorld().raycast(new RaycastContext(vec3, vec32, RaycastContext.ShapeType.OUTLINE, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, this));
     }

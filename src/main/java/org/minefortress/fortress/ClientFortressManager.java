@@ -88,8 +88,8 @@ public final class ClientFortressManager implements IClientFortressManager {
         if(state == FortressState.COMBAT) {
             final var mouse = MinecraftClient.getInstance().mouse;
             final var selectionManager = fightManager.getSelectionManager();
-            selectionManager.startSelection(mouse.getX(), mouse.getY(), colonist.getPos());
-            selectionManager.updateSelection(mouse.getX(), mouse.getY(), colonist.getPos());
+            selectionManager.startSelection(mouse.getX(), mouse.getY());
+            selectionManager.updateSelection(mouse.getX(), mouse.getY());
             selectionManager.endSelection();
 
             selectedPawn = null;
