@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.core.dtos.combat.MousePos;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightSelectionManager;
@@ -16,7 +17,9 @@ import org.minefortress.utils.ModUtils;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class ClientFightSelectionManager implements IClientFightSelectionManager {
@@ -66,46 +69,43 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
 
         if(!this.mouseEndPos.equals(this.cachedMousePos)) {
             selectedPawns.clear();
-            final var eyePos = MinecraftClient.getInstance().player.getEyePos();
-
-            // create four square point from mouseStartPos to mouseEndPos and put them in a list
-            List<MousePos> squarePoints = new ArrayList<>();
-            squarePoints.add(mouseStartPos);
-            squarePoints.add(new MousePos(mouseStartPos.getX(), mouseEndPos.getY()));
-            squarePoints.add(mouseEndPos);
-            squarePoints.add(new MousePos(mouseEndPos.getX(), mouseStartPos.getY()));
-
-            var blockPositions = new ArrayList<Vec3d>();
-            for (MousePos squarePoint : squarePoints) {
-                final var viewVector = CameraTools.getMouseBasedViewVector(MinecraftClient.getInstance(), squarePoint.getX(), squarePoint.getY());;
-                final var point = eyePos.add(viewVector.x * RAY_LENGTH, viewVector.y * RAY_LENGTH, viewVector.z * RAY_LENGTH);
-                blockPositions.add(point);
-            }
-            blockPositions.add(eyePos);
-
-            LoggerFactory.getLogger(ClientFightSelectionManager.class).info("blockPositions: {}", blockPositions);
-
 
 
             final var world = MinecraftClient.getInstance().world;
 
-            List<Vec3d> eyePosList = new ArrayList<>();
-
+            final Map<Vec3d, IFortressAwareEntity> entitesMap = new HashMap<>();
             world
                 .getEntities()
                 .forEach(
                     entity -> {
-                        if(entity instanceof IFortressAwareEntity) {
+                        if(entity instanceof IFortressAwareEntity fae) {
                             final var pos = entity.getEyePos();
-                            eyePosList.add(pos);
+                            entitesMap.put(pos, fae);
                         }
                     }
                 );
 
+            //  found min and max x and y
+            int minX = Math.min(mouseStartPos.getX(), mouseEndPos.getX());
+            int maxX = Math.max(mouseStartPos.getX(), mouseEndPos.getX());
+            int minY = Math.min(mouseStartPos.getY(), mouseEndPos.getY());
+            int maxY = Math.max(mouseStartPos.getY(), mouseEndPos.getY());
 
 
+            // log max and min x and y in one line
+            LoggerFactory.getLogger(ClientFightSelectionManager.class).info("minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
 
-
+            final var screenPositions = CameraTools.projectToScreenSpace(entitesMap.keySet(), MinecraftClient.getInstance());
+            for (Map.Entry<Vec2f, Vec3d> entry : screenPositions.entrySet()) {
+                final var screenPos = entry.getKey();
+                final var entityPos = entry.getValue();
+                // log screen pos
+                LoggerFactory.getLogger(ClientFightSelectionManager.class).info("screenPos: " + screenPos.x + ", " + screenPos.y);
+                if (screenPos.x >= minX && screenPos.x <= maxX && screenPos.y >= minY && screenPos.y <= maxY) {
+                    final var entity = entitesMap.get(entityPos);
+                    selectedPawns.add(entity);
+                }
+            }
 
 //            selectPawnsByType(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, blockPositions);
 //            selectPawnsByType(FortressEntities.ARCHER_PAWN_ENTITY_TYPE, blockPositions);

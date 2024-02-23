@@ -15,8 +15,7 @@ import org.minefortress.utils.ModUtils;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CameraTools {
 
@@ -40,21 +39,20 @@ public class CameraTools {
         return mouseBasedViewVector;
     }
 
-    // project list of all Vec3d to screen space
-    public static List<Vec2f> projectToScreenSpace(List<Vec3d> positions, MinecraftClient minecraft) {
+    public static Map<Vec2f, Vec3d> projectToScreenSpace(Set<Vec3d> positions, MinecraftClient minecraft) {
         final var winWidth = minecraft.getWindow().getWidth();
         final var winHeight = minecraft.getWindow().getHeight();
-        final var modelViewBuffer = getModelViewMatrix(minecraft);
+        final var modelViewBuffer = getModelViewMatrix(minecraft, true);
         final var projectionBuffer = getProjectionMatrix(minecraft);
         final var viewport = getViewport(winWidth, winHeight);
         final var resultingViewBuffer = MemoryUtil.memAllocFloat(3);
 
-        List<Vec2f> screenPositions = new ArrayList<>();
+        Map<Vec2f, Vec3d> screenPositions = new HashMap<>();
 
         for (Vec3d position : positions) {
             resultingViewBuffer.position(0);
             GLU.gluProject((float) position.x, (float) position.y, (float) position.z, modelViewBuffer, projectionBuffer, viewport, resultingViewBuffer);
-            screenPositions.add(new Vec2f(resultingViewBuffer.get(0), resultingViewBuffer.get(1)));
+            screenPositions.put(new Vec2f(resultingViewBuffer.get(0) / resultingViewBuffer.get(2), winHeight - resultingViewBuffer.get(1) / resultingViewBuffer.get(2)), position);
         }
 
         return screenPositions;
@@ -66,7 +64,7 @@ public class CameraTools {
 
         FloatBuffer resultingViewBuffer = MemoryUtil.memAllocFloat(3);
         resultingViewBuffer.position(0);
-        FloatBuffer modelViewBuffer = getModelViewMatrix(minecraft);
+        FloatBuffer modelViewBuffer = getModelViewMatrix(minecraft, false);
         FloatBuffer projectionBuffer = getProjectionMatrix(minecraft);
         IntBuffer viewport = getViewport(winWidth, winHeight);
 
@@ -92,10 +90,19 @@ public class CameraTools {
         return new Vec3d(resultingViewVector);
     }
 
-    private static FloatBuffer getModelViewMatrix(MinecraftClient minecraft) {
+    private static FloatBuffer getModelViewMatrix(MinecraftClient minecraft, boolean translateToPlayer) {
         final var modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
         final var player = minecraft.player;
         if(player != null) {
+            if(translateToPlayer) {
+                final var offset = new Vector3f(
+                        (float) -player.getX(),
+                        (float) -player.getY(),
+                        (float) -player.getZ()
+                );
+                modelViewMatrix.translate(offset);
+            }
+
             final var xRads = (float) Math.toRadians(player.getRotationClient().x);
             modelViewMatrix.rotate(xRads, new Vector3f(1, 0,0));
             final var yRads = (float) Math.toRadians(player.getRotationClient().y + 180f);
