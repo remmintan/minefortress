@@ -87,6 +87,14 @@ class FightHudLayer extends AbstractHudLayer {
             drawContext.drawVerticalLine(selectionCurX, selectionStartY, selectionCurY, SELECTION_COLOR);
             drawContext.drawHorizontalLine(selectionStartX, selectionCurX, selectionCurY, SELECTION_COLOR);
             drawContext.drawVerticalLine(selectionStartX, selectionStartY, selectionCurY, SELECTION_COLOR);
+
+            fightSelectionManager.getScreenPositions().forEach(screenPos -> {
+                final var x = (int) (screenPos.x * widthScaleFactor);
+                final var y = (int) (screenPos.y * heightScaleFactor);
+                drawContext.drawHorizontalLine(x - 2, x + 2, y, SELECTION_COLOR);
+                drawContext.drawVerticalLine(x, y - 2, y + 2, SELECTION_COLOR);
+            });
+
         }
     }
 

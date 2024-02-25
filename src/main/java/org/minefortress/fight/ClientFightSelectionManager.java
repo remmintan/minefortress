@@ -14,12 +14,8 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressA
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import org.minefortress.renderer.CameraTools;
 import org.minefortress.utils.ModUtils;
-import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ClientFightSelectionManager implements IClientFightSelectionManager {
@@ -30,6 +26,8 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
     private MousePos cachedMousePos;
 
     private final List<IFortressAwareEntity> selectedPawns = new ArrayList<>();
+
+    private Set<Vec2f> screenPositions = new HashSet<>();
 
 
     @Override
@@ -79,7 +77,7 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
                 .forEach(
                     entity -> {
                         if(entity instanceof IFortressAwareEntity fae) {
-                            final var pos = entity.getEyePos();
+                            final var pos = entity.getPos();
                             entitesMap.put(pos, fae);
                         }
                     }
@@ -93,14 +91,15 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
 
 
             // log max and min x and y in one line
-            LoggerFactory.getLogger(ClientFightSelectionManager.class).info("minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
+//            LoggerFactory.getLogger(ClientFightSelectionManager.class).info("minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
 
             final var screenPositions = CameraTools.projectToScreenSpace(entitesMap.keySet(), MinecraftClient.getInstance());
+            this.screenPositions = screenPositions.keySet();
             for (Map.Entry<Vec2f, Vec3d> entry : screenPositions.entrySet()) {
                 final var screenPos = entry.getKey();
                 final var entityPos = entry.getValue();
                 // log screen pos
-                LoggerFactory.getLogger(ClientFightSelectionManager.class).info("screenPos: " + screenPos.x + ", " + screenPos.y);
+//                LoggerFactory.getLogger(ClientFightSelectionManager.class).info("screenPos: " + screenPos.x + ", " + screenPos.y);
                 if (screenPos.x >= minX && screenPos.x <= maxX && screenPos.y >= minY && screenPos.y <= maxY) {
                     final var entity = entitesMap.get(entityPos);
                     selectedPawns.add(entity);
@@ -168,5 +167,9 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
         return this.selectedPawns.contains(colonist);
     }
 
+    @Override
+    public Set<Vec2f> getScreenPositions() {
+        return screenPositions;
+    }
 
 }

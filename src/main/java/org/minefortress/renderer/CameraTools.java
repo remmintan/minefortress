@@ -52,7 +52,7 @@ public class CameraTools {
         for (Vec3d position : positions) {
             resultingViewBuffer.position(0);
             GLU.gluProject((float) position.x, (float) position.y, (float) position.z, modelViewBuffer, projectionBuffer, viewport, resultingViewBuffer);
-            screenPositions.put(new Vec2f(resultingViewBuffer.get(0) / resultingViewBuffer.get(2), winHeight - resultingViewBuffer.get(1) / resultingViewBuffer.get(2)), position);
+            screenPositions.put(new Vec2f(resultingViewBuffer.get(0) , winHeight-resultingViewBuffer.get(1)), position);
         }
 
         return screenPositions;
@@ -94,6 +94,13 @@ public class CameraTools {
         final var modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
         final var player = minecraft.player;
         if(player != null) {
+
+
+            final var xRads = (float) Math.toRadians(player.getRotationClient().x);
+            modelViewMatrix.rotate(xRads, new Vector3f(1, 0,0));
+            final float yRads = (float) Math.toRadians(player.getRotationClient().y + 180f);
+            modelViewMatrix.rotate(yRads, new Vector3f(0, 1,0));
+
             if(translateToPlayer) {
                 final var offset = new Vector3f(
                         (float) -player.getX(),
@@ -102,11 +109,6 @@ public class CameraTools {
                 );
                 modelViewMatrix.translate(offset);
             }
-
-            final var xRads = (float) Math.toRadians(player.getRotationClient().x);
-            modelViewMatrix.rotate(xRads, new Vector3f(1, 0,0));
-            final var yRads = (float) Math.toRadians(player.getRotationClient().y + 180f);
-            modelViewMatrix.rotate(yRads, new Vector3f(0, 1,0));
         }
         FloatBuffer modelViewBuffer = MemoryUtil.memAllocFloat(16);
         modelViewBuffer.position(0);
