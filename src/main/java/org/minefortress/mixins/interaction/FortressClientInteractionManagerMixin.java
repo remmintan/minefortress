@@ -22,6 +22,7 @@ import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.MineFortressMod;
 import org.minefortress.renderer.gui.fortress.ManageBuildingScreen;
 import org.minefortress.utils.BlockUtils;
@@ -86,40 +87,34 @@ public abstract class FortressClientInteractionManagerMixin {
         final var manager = fortressClient.get_ClientFortressManager();
 
         if(manager.getState() == FortressState.COMBAT) {
-            final var influenceManager = ModUtils.getInfluenceManager();
-            if(influenceManager.isSelecting()) {
-                influenceManager.cancelSelectingInfluencePosition();
-                cir.setReturnValue(false);
-                return;
-            }
-            final var selectionManager = manager.getFightManager().getSelectionManager();
-            final var mouse = client.mouse;
-
-            if(selectionManager.isSelecting())
-                selectionManager.endSelection();
-            else {
-                if(selectionManager.hasSelected()) {
-                    selectionManager.resetSelection();
-                } else {
-                    final var crosshairTarget = client.crosshairTarget;
-                    if (crosshairTarget!=null)
-                        selectionManager.startSelection(mouse.getX(), mouse.getY());
-                }
-            }
-
-            cir.setReturnValue(false);
-            return;
+//            final var influenceManager = ModUtils.getInfluenceManager();
+//            if(influenceManager.isSelecting()) {
+//                influenceManager.cancelSelectingInfluencePosition();
+//                cir.setReturnValue(false);
+//                return;
+//            }
+//            final var selectionManager = manager.getFightManager().getSelectionManager();
+//            final var mouse = client.mouse;
+//
+//            if(selectionManager.isSelecting())
+//                selectionManager.endSelection();
+//            else {
+//                if(selectionManager.hasSelected()) {
+//                    selectionManager.resetSelection();
+//                } else {
+//                    final var crosshairTarget = client.crosshairTarget;
+//                    if (crosshairTarget!=null)
+//                        selectionManager.startSelection(mouse.getX(), mouse.getY());
+//                }
+//            }
+//
+//            cir.setReturnValue(false);
+//            return;
         }
 
         if(manager.getState() == FortressState.AREAS_SELECTION) {
             final var areasClientManager = ModUtils.getAreasClientManager();
             areasClientManager.select(client.crosshairTarget);
-            cir.setReturnValue(false);
-            return;
-        }
-
-        if(manager.isSelectingColonist()){
-            manager.stopSelectingColonist();
             cir.setReturnValue(false);
             return;
         }
@@ -169,13 +164,9 @@ public abstract class FortressClientInteractionManagerMixin {
             final var manager = provider.get_ClientFortressManager();
             if (manager.getState() == FortressState.COMBAT) {
                 final var fightManager = manager.getFightManager();
-                final var selectionManager = fightManager.getSelectionManager();
-                if(selectionManager.isSelecting())
-                    selectionManager.resetSelection();
+                final var targetedSelectionManager = provider.getTargetedSelectionManager();
 
-                if(selectionManager.hasSelected()) {
-                    fightManager.setTarget(entity);
-                }
+                fightManager.setTarget(entity, targetedSelectionManager);
                 cir.setReturnValue(ActionResult.FAIL);
                 return;
             }
@@ -261,13 +252,7 @@ public abstract class FortressClientInteractionManagerMixin {
     @Unique
     private static void updateFightSelection(BlockHitResult hitResult, IClientFortressManager fortressManager) {
         final var fightManager = fortressManager.getFightManager();
-        final var selectionManager = fightManager.getSelectionManager();
-        if(selectionManager.isSelecting())
-            selectionManager.resetSelection();
-
-        if(selectionManager.hasSelected()) {
-            fightManager.setTarget(hitResult);
-        }
+        fightManager.setTarget(hitResult, CoreModUtils.getMineFortressManagersProvider().getTargetedSelectionManager());
     }
 
     @Inject(method = "getReachDistance", at = @At("HEAD"), cancellable = true)

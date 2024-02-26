@@ -4,11 +4,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.HitResult;
 
 public interface IClientFightManager {
-    IClientFightSelectionManager getSelectionManager();
 
-    void setTarget(HitResult hitResult);
+    void setTarget(HitResult hitResult, ITargetedSelectionManager targetedSelectionManager);
 
-    void setTarget(Entity entity);
+    void setTarget(Entity entity, ITargetedSelectionManager targetedSelectionManager);
     void sync(int warriorsCount);
     int getWarriorCount();
     void attractWarriorsToCampfire();

@@ -83,7 +83,7 @@ public abstract class FortressWorldRendererMixin  {
         final var immediate = this.bufferBuilders.getEntityVertexConsumers();
         final var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
         final var fcm = provider.get_ClientFortressManager();
-        if (!selectionManager.isSelecting() && fcm.getState() == FortressState.BUILD) {
+        if (!selectionManager.isSelecting() && (fcm.getState() == FortressState.BUILD_EDITING)) {
             if(ModUtils.isClientInFortressGamemode()) {
                 final HitResult crosshairTarget = client.crosshairTarget;
                 if(crosshairTarget instanceof BlockHitResult bhr) {

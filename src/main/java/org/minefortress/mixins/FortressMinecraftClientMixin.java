@@ -22,6 +22,7 @@ import net.remmintan.gobi.SelectionManager;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionModelBuilderInfoProvider;
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
+import org.minefortress.fight.ClientPawnsSelectionManager;
 import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.ClientFortressManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
@@ -79,6 +81,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private TasksRenderer tasksRenderer;
     @Unique
     private AreasClientManager areasClientManager;
+
+    private IClientPawnsSelectionManager pawnsSelectionManager = new ClientPawnsSelectionManager();
 
     @Shadow
     @Final
@@ -133,13 +137,12 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         final var provider = CoreModUtils.getMineFortressManagersProvider();
         final var manager = provider.get_ClientFortressManager();
 
+        final var isInBuildState = manager.getState() == FortressState.BUILD_SELECTION || manager.getState() == FortressState.BUILD_EDITING;
         final Supplier<ISelectionInfoProvider> selectInfProvSup = () ->
-                manager.getState() == FortressState.BUILD ?
-                        ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+                isInBuildState ? ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
 
         final Supplier<ISelectionModelBuilderInfoProvider> selModBuildInfProv = () ->
-                manager.getState() == FortressState.BUILD ?
-                        ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+                isInBuildState ? ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
 
         selectionRenderer = new SelectionRenderer(
                 client,
@@ -279,6 +282,10 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public ClientInfluenceManager get_InfluenceManager() {
         return this.influenceManager;
+    }
+
+    public IClientPawnsSelectionManager get_PawnsSelectionManager() {
+        return pawnsSelectionManager;
     }
 
     @Inject(method = "close", at = @At("HEAD"))

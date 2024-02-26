@@ -2,28 +2,30 @@ package org.minefortress.fight;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
-import net.minecraft.entity.EntityType;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.dtos.combat.MousePos;
-import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightSelectionManager;
+import net.remmintan.mods.minefortress.core.interfaces.client.ISelectedColonistProvider;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
+import net.remmintan.mods.minefortress.core.interfaces.combat.ITargetedSelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.utils.GlobalProjectionCache;
 import org.minefortress.renderer.CameraTools;
 import org.minefortress.utils.ModUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-public class ClientFightSelectionManager implements IClientFightSelectionManager {
+public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager, ITargetedSelectionManager, ISelectedColonistProvider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientPawnsSelectionManager.class);
 
-    public static final int RAY_LENGTH = 200;
     private MousePos mouseStartPos;
     private MousePos mouseEndPos;
-    private MousePos cachedMousePos;
 
     private final List<IFortressAwareEntity> selectedPawns = new ArrayList<>();
 
@@ -37,17 +39,9 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
     }
 
     @Override
-    public void endSelection() {
+    public void endSelection(double x, double y) {
         this.mouseStartPos = null;
         this.mouseEndPos = null;
-        if(!hasSelected()) {
-            final var message = Text.of("Only warriors and archers can be selected and controlled directly.");
-            MinecraftClient
-                    .getInstance()
-                    .inGameHud
-                    .getChatHud()
-                    .addMessage(message);
-        }
     }
 
     @Override
@@ -56,18 +50,22 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
     }
 
     @Override
-    public void updateSelection(Mouse mouse, BlockHitResult target) {
+    public void updateSelection(Mouse mouse) {
         this.updateSelection(mouse.getX(), mouse.getY());
     }
 
-    @Override
-    public void updateSelection(double x, double y) {
+    private void updateSelection(double x, double y) {
         if(!isSelectionStarted()) return;
+
+
         this.mouseEndPos = new MousePos(x, y);
+        LOGGER.info("Updating selection");
+        LOGGER.info("Mouse start pos: " + mouseStartPos.getX() + " " + mouseStartPos.getY());
+        LOGGER.info("Mouse end pos: " + x + " " + y);
 
-        if(!this.mouseEndPos.equals(this.cachedMousePos)) {
+        if(GlobalProjectionCache.shouldUpdateValues("pawnsSelectionManager")) {
+            LOGGER.info("Trying to update selection");
             selectedPawns.clear();
-
 
             final var world = MinecraftClient.getInstance().world;
 
@@ -89,43 +87,17 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
             int minY = Math.min(mouseStartPos.getY(), mouseEndPos.getY());
             int maxY = Math.max(mouseStartPos.getY(), mouseEndPos.getY());
 
-
-            // log max and min x and y in one line
-//            LoggerFactory.getLogger(ClientFightSelectionManager.class).info("minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
-
             final var screenPositions = CameraTools.projectToScreenSpace(entitesMap.keySet(), MinecraftClient.getInstance());
             this.screenPositions = screenPositions.keySet();
             for (Map.Entry<Vec2f, Vec3d> entry : screenPositions.entrySet()) {
                 final var screenPos = entry.getKey();
                 final var entityPos = entry.getValue();
                 // log screen pos
-//                LoggerFactory.getLogger(ClientFightSelectionManager.class).info("screenPos: " + screenPos.x + ", " + screenPos.y);
                 if (screenPos.x >= minX && screenPos.x <= maxX && screenPos.y >= minY && screenPos.y <= maxY) {
                     final var entity = entitesMap.get(entityPos);
                     selectedPawns.add(entity);
                 }
             }
-
-//            selectPawnsByType(FortressEntities.WARRIOR_PAWN_ENTITY_TYPE, blockPositions);
-//            selectPawnsByType(FortressEntities.ARCHER_PAWN_ENTITY_TYPE, blockPositions);
-
-            this.cachedMousePos = this.mouseEndPos;
-        }
-    }
-
-    private void selectPawnsByType(EntityType<? extends ITargetedPawn> type, List<BlockPos> blockPositions) {
-        final List<ITargetedPawn> selectedPawns1;
-
-//        final var selectionBox = new Box(selectionStartBlock.getX(), -64, selectionStartBlock.getZ(), selectionCurBlock.getX(), 256, selectionCurBlock.getZ());
-        final var world = MinecraftClient.getInstance().world;
-        if(world != null) {
-            final var playerId = ModUtils.getCurrentPlayerUUID();
-            selectedPawns1 = world
-                    .getEntitiesByType(type, null, it -> it.getMasterId().map(playerId::equals).orElse(false))
-                    .stream()
-                    .map(ITargetedPawn.class::cast)
-                    .toList();
-            selectedPawns.addAll(selectedPawns1);
         }
     }
 
@@ -133,7 +105,6 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
     public void resetSelection() {
         this.mouseStartPos = null;
         this.mouseEndPos = null;
-        this.cachedMousePos = null;
         this.selectedPawns.clear();
     }
 
@@ -148,8 +119,8 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
     }
 
     @Override
-    public void forEachSelected(Consumer<ITargetedPawn> action) {
-//        selectedPawns.forEach(action);
+    public void forEachSelected(Consumer<IFortressAwareEntity> action) {
+        selectedPawns.forEach(action);
     }
 
     @Override
@@ -172,4 +143,25 @@ public class ClientFightSelectionManager implements IClientFightSelectionManager
         return screenPositions;
     }
 
+    @Override
+    public void forEachTargetedPawn(Consumer<ITargetedPawn> action) {
+        this.forEachSelected(it -> {if(it instanceof ITargetedPawn tp) action.accept(tp);});
+    }
+
+    @Override
+    public boolean isSelectingColonist() {
+        final var state = ModUtils.getFortressClientManager().getState();
+        return (state == FortressState.COMBAT || state == FortressState.BUILD_SELECTION || state==FortressState.BUILD_EDITING) && this.getSelectedPawn() != null;
+    }
+
+    @Override
+    public LivingEntity getSelectedPawn() {
+        if(selectedPawns.size() == 1) {
+            final var pawn = selectedPawns.get(0);
+            if(pawn instanceof LivingEntity le) {
+                return le;
+            }
+        }
+        return null;
+    }
 }

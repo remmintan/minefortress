@@ -1,7 +1,6 @@
 package org.minefortress.mixins.renderer;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -11,8 +10,8 @@ import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.interfaces.FortressGameRenderer;
-import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -55,11 +54,15 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         final var provider = (IClientManagersProvider) this.client;
         final var selectionManager = provider.get_SelectionManager();
         final var clientFortressManager = provider.get_ClientFortressManager();
-        final var fightSelectionManager = clientFortressManager
-                .getFightManager()
-                .getSelectionManager();
+        final var pawnsSelectionManager = provider.get_PawnsSelectionManager();
         final var areasClientManager = ModUtils.getAreasClientManager();
-        if (((IFortressMinecraftClient)getClient()).is_FortressGamemode()) {
+
+        if (ModUtils.isClientInFortressGamemode()) {
+            final var clientState = clientFortressManager.getState();
+            if(clientState == FortressState.COMBAT || clientState == FortressState.BUILD_SELECTION) {
+                pawnsSelectionManager.updateSelection(client.mouse);
+            }
+
             if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
                 if(clientFortressManager.isCenterNotSet()) {
                     resetAllSelectionManagers();
@@ -73,20 +76,13 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
                     return;
                 }
 
-                final var clientState = clientFortressManager.getState();
                 if(clientState == FortressState.AREAS_SELECTION) {
                     areasClientManager.updateSelection(blockHitResult);
                 } else {
                     areasClientManager.resetSelection();
                 }
 
-                if(clientState == FortressState.COMBAT) {
-                    fightSelectionManager.updateSelection(client.mouse, blockHitResult);
-                } else {
-                    fightSelectionManager.resetSelection();
-                }
-
-                if(clientState == FortressState.BUILD) {
+                if(clientState == FortressState.BUILD_EDITING) {
                     selectionManager.tickSelectionUpdate(blockHitResult.getBlockPos(), blockHitResult.getSide());
                 } else {
                     selectionManager.resetSelection();
@@ -99,8 +95,10 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Unique
     private static void resetAllSelectionManagers() {
+        final var provider = CoreModUtils.getMineFortressManagersProvider();
+
         ModUtils.getSelectionManager().resetSelection();
-        ModUtils.getFortressClientManager().getFightManager().getSelectionManager().resetSelection();
+        provider.get_PawnsSelectionManager().resetSelection();
         ModUtils.getAreasClientManager().resetSelection();
     }
 
