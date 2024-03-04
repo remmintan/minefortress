@@ -3,11 +3,13 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
 import net.remmintan.gobi.SelectionType;
+import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import org.minefortress.renderer.gui.widget.HideableButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemButtonWidget;
 import org.minefortress.renderer.gui.widget.ItemToggleWidget;
+import org.minefortress.renderer.gui.widget.ModeButtonWidget;
 import org.minefortress.utils.ModUtils;
 
 import java.util.Arrays;
@@ -47,7 +49,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         },
                         (button) -> Optional.of(blueprintSelected() ? "Cancel" : "Blueprints"),
                         this::blueprintSelected,
-                        () -> !treeCutterSelected() && !roadsSelected()
+                        () -> !treeCutterSelected() && !roadsSelected() && hudHasCorrectState(FortressState.BUILD_EDITING)
                 ),
                 new ItemToggleWidget(
                         0,
@@ -62,7 +64,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         },
                         (button) -> Optional.of(treeCutterSelected() ? "Cancel" : "Chop trees"),
                         this::treeCutterSelected,
-                        () -> !blueprintSelected() && !roadsSelected()
+                        () -> !blueprintSelected() && !roadsSelected() && hudHasCorrectState(FortressState.BUILD_EDITING)
                 ),
                 new ItemToggleWidget(
                         0,
@@ -77,7 +79,27 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         },
                         (button) -> Optional.of(roadsSelected() ? "Cancel" : "Build roads"),
                         this::roadsSelected,
-                        () -> !blueprintSelected() && !treeCutterSelected()
+                        () -> !blueprintSelected() && !treeCutterSelected() && hudHasCorrectState(FortressState.BUILD_EDITING)
+                )
+        );
+
+        // add buttons to switch between build edit mode and build selection mode
+        this.addElement(
+                new ModeButtonWidget(
+                        0,
+                        125,
+                        Items.STONE_SHOVEL,
+                        btn -> setCorrectHudState(FortressState.BUILD_EDITING),
+                        "Edit Mode",
+                        () -> hudHasCorrectState(FortressState.BUILD_EDITING)
+                ),
+                new ModeButtonWidget(
+                        0,
+                        150,
+                        Items.STONE_PICKAXE,
+                        btn -> setCorrectHudState(FortressState.BUILD_SELECTION),
+                        "Selection Mode",
+                        () -> hudHasCorrectState(FortressState.BUILD_SELECTION)
                 )
         );
 
@@ -98,10 +120,24 @@ public class ToolsHudLayer extends AbstractHudLayer {
                             type.getButtonText(),
                             btn -> ModUtils.getSelectionManager().setSelectionType(type),
                             type.name(),
-                            () -> selection.checked
+                            () -> selection.checked && hudHasCorrectState(FortressState.BUILD_EDITING)
                     )
             );
         }
+    }
+
+    private boolean hudHasCorrectState(FortressState expectedState) {
+        return ModUtils.getFortressClientManager().getState() == expectedState;
+    }
+
+    private void setCorrectHudState(FortressState expectedState) {
+        ModUtils.getFortressClientManager().setState(expectedState);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        selection.visible = hudHasCorrectState(FortressState.BUILD_EDITING);
     }
 
     @Override

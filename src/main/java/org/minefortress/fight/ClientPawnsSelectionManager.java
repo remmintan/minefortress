@@ -56,15 +56,8 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
 
     private void updateSelection(double x, double y) {
         if(!isSelectionStarted()) return;
-
-
         this.mouseEndPos = new MousePos(x, y);
-        LOGGER.info("Updating selection");
-        LOGGER.info("Mouse start pos: " + mouseStartPos.getX() + " " + mouseStartPos.getY());
-        LOGGER.info("Mouse end pos: " + x + " " + y);
-
         if(GlobalProjectionCache.shouldUpdateValues("pawnsSelectionManager")) {
-            LOGGER.info("Trying to update selection");
             selectedPawns.clear();
 
             final var world = MinecraftClient.getInstance().world;
