@@ -6,7 +6,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
-import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightSelectionManager;
+import net.remmintan.mods.minefortress.core.interfaces.combat.ITargetedSelectionManager;
 import net.remmintan.mods.minefortress.networking.c2s.C2SAttractWarriorsToCampfire;
 import net.remmintan.mods.minefortress.networking.c2s.C2SSetNavigationTargetEntity;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -14,20 +14,13 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.utils.ModUtils;
 
 public class ClientFightManager implements IClientFightManager {
-
-    private final IClientFightSelectionManager selectionManager = new ClientFightSelectionManager();
     private int warriorCount;
 
     @Override
-    public IClientFightSelectionManager getSelectionManager() {
-        return selectionManager;
-    }
-
-    @Override
-    public void setTarget(HitResult hitResult) {
+    public void setTarget(HitResult hitResult, ITargetedSelectionManager targetedSelectionManager) {
         if(hitResult instanceof BlockHitResult blockHitResult) {
             final var blockPos = blockHitResult.getBlockPos();
-            selectionManager.forEachSelected(it -> it.setMoveTarget(blockPos));
+            targetedSelectionManager.forEachTargetedPawn(it -> it.setMoveTarget(blockPos));
             final var packet = new C2SSetNavigationTargetEntity(blockPos);
             FortressClientNetworkHelper.send(C2SSetNavigationTargetEntity.CHANNEL, packet);
         } else if (hitResult instanceof EntityHitResult entityHitResult) {
@@ -38,12 +31,12 @@ public class ClientFightManager implements IClientFightManager {
                 if(masterPlayerId.map(it -> it.equals(ModUtils.getCurrentPlayerUUID())).orElse(false))
                     return;
             }
-            selectionManager.forEachSelected(it -> it.setAttackTarget(livingEntity));
+            targetedSelectionManager.forEachTargetedPawn(it -> it.setAttackTarget(livingEntity));
         }
     }
 
     @Override
-    public void setTarget(Entity entity) {
+    public void setTarget(Entity entity, ITargetedSelectionManager targetedSelectionManager) {
         if(!(entity instanceof LivingEntity livingEntity)) return;
         if(entity instanceof Colonist col) {
             final var masterPlayerId = col.getMasterId();
@@ -51,7 +44,7 @@ public class ClientFightManager implements IClientFightManager {
             if(masterPlayerId.map(it -> it.equals(playerId)).orElse(false))
                 return;
         }
-        selectionManager.forEachSelected(it -> it.setAttackTarget(livingEntity));
+        targetedSelectionManager.forEachTargetedPawn(it -> it.setAttackTarget(livingEntity));
     }
 
     @Override

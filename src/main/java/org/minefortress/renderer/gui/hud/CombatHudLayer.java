@@ -7,18 +7,14 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
-import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightSelectionManager;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.renderer.gui.widget.ItemHudElement;
 import org.minefortress.utils.ModUtils;
 
 import static org.minefortress.renderer.gui.blueprints.BlueprintsScreen.convertItemIconInTheGUI;
 
-class FightHudLayer extends AbstractHudLayer {
-
-    private static final int SELECTION_COLOR = 0xFF00FF00;
-
-    FightHudLayer(MinecraftClient client) {
+class CombatHudLayer extends AbstractHudLayer{
+    CombatHudLayer(MinecraftClient client) {
         super(client);
         this.setBasepoint(0, 0, PositionX.CENTER, PositionY.BOTTOM);
         this.addElement(
@@ -35,7 +31,11 @@ class FightHudLayer extends AbstractHudLayer {
     protected void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {
         drawTotalWarriorsAmount(drawContext, screenWidth, screenHeight);
         renderInfluenceFlagCosts(drawContext, screenWidth, screenHeight);
-        renderCurrentSelection(drawContext);
+    }
+
+    @Override
+    public boolean shouldRender(HudState hudState) {
+        return hudState == HudState.COMBAT;
     }
 
     private void drawTotalWarriorsAmount(DrawContext drawContext, int screenWidth, int screenHeight) {
@@ -69,45 +69,8 @@ class FightHudLayer extends AbstractHudLayer {
         }
     }
 
-    private void renderCurrentSelection(DrawContext drawContext) {
-        final var fightSelectionManager = getFightSelectionManager();
-        if(fightSelectionManager.isSelecting()) {
-            final var selectionStartPos = fightSelectionManager.getMouseStartPos();
-            final var selectionCurPos = fightSelectionManager.getMouseEndPos();
-
-            final var widthScaleFactor = (double) client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-            final var heightScaleFactor = (double) client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-
-            final var selectionStartX = (int) (selectionStartPos.x() * widthScaleFactor);
-            final var selectionStartY = (int) (selectionStartPos.y() * heightScaleFactor);
-            final var selectionCurX = (int) (selectionCurPos.x() * widthScaleFactor);
-            final var selectionCurY = (int) (selectionCurPos.y() * heightScaleFactor);
-
-            drawContext.drawHorizontalLine(selectionStartX, selectionCurX, selectionStartY, SELECTION_COLOR);
-            drawContext.drawVerticalLine(selectionCurX, selectionStartY, selectionCurY, SELECTION_COLOR);
-            drawContext.drawHorizontalLine(selectionStartX, selectionCurX, selectionCurY, SELECTION_COLOR);
-            drawContext.drawVerticalLine(selectionStartX, selectionStartY, selectionCurY, SELECTION_COLOR);
-
-            fightSelectionManager.getScreenPositions().forEach(screenPos -> {
-                final var x = (int) (screenPos.x * widthScaleFactor);
-                final var y = (int) (screenPos.y * heightScaleFactor);
-                drawContext.drawHorizontalLine(x - 2, x + 2, y, SELECTION_COLOR);
-                drawContext.drawVerticalLine(x, y - 2, y + 2, SELECTION_COLOR);
-            });
-
-        }
-    }
-
-    private IClientFightSelectionManager getFightSelectionManager() {
-        return getFightManager().getSelectionManager();
-    }
-
     private static IClientFightManager getFightManager() {
         return ModUtils.getFortressClientManager().getFightManager();
     }
 
-    @Override
-    public boolean shouldRender(HudState hudState) {
-        return hudState == HudState.COMBAT;
-    }
 }

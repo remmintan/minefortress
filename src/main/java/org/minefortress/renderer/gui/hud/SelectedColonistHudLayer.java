@@ -6,10 +6,12 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwareEntity;
-import org.minefortress.entity.Colonist;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import org.minefortress.entity.Colonist;
 import org.minefortress.utils.ModUtils;
+
 import java.util.Optional;
 
 public class SelectedColonistHudLayer extends AbstractHudLayer{
@@ -21,9 +23,9 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
 
     @Override
     protected void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {
-        final var fortressManager = ModUtils.getFortressClientManager();
-        if(fortressManager.isSelectingColonist()){
-            final var pawn = fortressManager.getSelectedPawn();
+        final var selectedPawnsProvider = CoreModUtils.getMineFortressManagersProvider().getSelectedColonistProvider();
+        if(selectedPawnsProvider.isSelectingColonist()) {
+            final var pawn = selectedPawnsProvider.getSelectedPawn();
 
             final int colonistWinX = 0;
             final int colonistWinY = screenHeight - 85;
@@ -40,7 +42,6 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
             renderIcon(drawContext, heartIconX, heartIconY, 0);
             drawContext.drawTextWithShadow(textRenderer, healthString, heartIconX + 10, heartIconY + 2, 0xFFFFFF);
 
-
             if(pawn instanceof IHungerAwareEntity hungerAwareEntity) {
                 final String hungerString = String.format("%d/%d", hungerAwareEntity.getCurrentFoodLevel(), HungerConstants.FULL_FOOD_LEVEL);
                 int hungerIconX = colonistWinX + width/2 + 5;
@@ -49,16 +50,16 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
             }
 
             if(pawn instanceof IProfessional professional) {
-                final String professionId = professional.getProfessionId();
-                final String professionName = Optional.ofNullable(fortressManager.getProfessionManager().getProfession(professionId)).map(IProfession::getTitle).orElse("");
+                final var professionId = professional.getProfessionId();
+                final var professionManager = ModUtils.getProfessionManager();
+                final var professionName = Optional.ofNullable(professionManager.getProfession(professionId)).map(IProfession::getTitle).orElse("");
                 drawContext.drawTextWithShadow(textRenderer, "Profession:", colonistWinX + 5, heartIconY + textRenderer.fontHeight + 5, 0xFFFFFF);
                 drawContext.drawTextWithShadow(textRenderer, professionName, colonistWinX + 5, heartIconY + 2 * textRenderer.fontHeight + 5 , 0xFFFFFF);
             }
 
-
             if(pawn instanceof Colonist colonist) {
                 drawContext.drawTextWithShadow(textRenderer, "Task:", colonistWinX + 5, heartIconY + 3 * textRenderer.fontHeight + 10, 0xFFFFFF);
-                final String task = colonist.getCurrentTaskDesc();
+                final var task = colonist.getCurrentTaskDesc();
                 drawContext.drawTextWithShadow(textRenderer, task, colonistWinX + 5, heartIconY + 4 * textRenderer.fontHeight + 10, 0xFFFFFF);
             }
         }

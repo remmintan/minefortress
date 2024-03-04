@@ -17,10 +17,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.GameMode;
-import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
@@ -28,7 +25,6 @@ import org.joml.Vector3f;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.renderer.models.PawnModel;
-import org.minefortress.interfaces.IFortressMinecraftClient;
 
 import java.util.Optional;
 
@@ -73,29 +69,23 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
 
         if(currentGamemode == MineFortressMod.FORTRESS) {
             final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == pawn;
-            final var fightSelecting = selectedAsTargeted(pawn);
-            final boolean selecting = getFortressClientManager().getSelectedPawn() == pawn;
+            final var fightSelecting = isThisPawnSelected(pawn);
             var color = getHealthFoodLevelColor(pawn);
-            if(hovering || selecting || color != null || fightSelecting) {
+            if(hovering || color != null || fightSelecting) {
                 final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-                if(color != null && !(hovering || fightSelecting)) {
-                    color.mul(0.7f);
-                }
+                if(color == null)
+                    color = new Vector3f(0.0f, 1.0f, 0.0f);
 
-                if(color == null) {
-                    color = new Vector3f(selecting ? 0.7f : 0.0f, selecting ? 0.7f : 1.0f, selecting ? 0.7f : 0.0f);
-                    if(fightSelecting) {
-                        color = new Vector3f(0.0f, 1.0f, 0.0f);
-                    }
-                }
+                if(!hovering)
+                    color.mul(0.7f);
 
                 PawnRenderer.renderRhombus(matrixStack, buffer, pawn, color);
             }
         }
     }
 
-    private boolean selectedAsTargeted (BasePawnEntity pawn) {
-        return getFortressClientManager().getFightManager().getSelectionManager().isSelected(pawn);
+    private boolean isThisPawnSelected(BasePawnEntity pawn) {
+        return CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().isSelected(pawn);
     }
 
     private float getHealthFoodLevel(BasePawnEntity colonist) {
@@ -130,18 +120,6 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
 
     private MinecraftClient getClient() {
         return MinecraftClient.getInstance();
-    }
-
-    private IFortressMinecraftClient getFortressClient() {
-        return (IFortressMinecraftClient) getClient();
-    }
-
-    private IClientManagersProvider getManagersProvider() {
-        return (IClientManagersProvider) getClient();
-    }
-
-    private IClientFortressManager getFortressClientManager() {
-        return  getManagersProvider().get_ClientFortressManager();
     }
 
     private void setClothesVilibility(MobEntity colonist) {

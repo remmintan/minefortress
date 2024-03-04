@@ -5,35 +5,26 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.remmintan.mods.minefortress.core.dtos.combat.MousePos;
+import net.remmintan.mods.minefortress.core.utils.GlobalProjectionCache;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 import org.minefortress.interfaces.FortressGameRenderer;
-import org.minefortress.utils.ModUtils;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class CameraTools {
 
     private static Vec3d mouseBasedViewVector;
-    private static double oldMouseX, oldMouseY;
-    private static float oldPlayerXRot;
-    private static float oldPlayerYRot;
 
     public static Vec3d getMouseBasedViewVector(MinecraftClient minecraft, double xpos, double ypos) {
-        final var xRot = ModUtils.getClientPlayer().getPitch();
-        final var yRot = ModUtils.getClientPlayer().getYaw();
-
-        if(Math.abs(xpos - oldMouseX) + Math.abs(ypos - oldMouseY) > 0.01 || xRot != oldPlayerXRot || yRot != oldPlayerYRot) {
+        if(GlobalProjectionCache.shouldUpdateValues("mouseBasedViewVector")) {
             mouseBasedViewVector = getMouseBasedViewVector(xpos, ypos, minecraft);
-            oldMouseX = xpos;
-            oldMouseY = ypos;
-            oldPlayerXRot = xRot;
-            oldPlayerYRot = yRot;
         }
 
         return mouseBasedViewVector;
@@ -94,11 +85,9 @@ public class CameraTools {
         final var modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
         final var player = minecraft.player;
         if(player != null) {
-
-
-            final var xRads = (float) Math.toRadians(player.getRotationClient().x);
+            final var xRads = (float) Math.toRadians(player.getPitch());
             modelViewMatrix.rotate(xRads, new Vector3f(1, 0,0));
-            final float yRads = (float) Math.toRadians(player.getRotationClient().y + 180f);
+            final float yRads = (float) Math.toRadians(player.getYaw() + 180f);
             modelViewMatrix.rotate(yRads, new Vector3f(0, 1,0));
 
             if(translateToPlayer) {

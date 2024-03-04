@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
@@ -22,19 +21,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IClientFortressManager extends IFortressManager {
-    void select(LivingEntity colonist);
 
     void jumpToCampfire();
 
     void updateBuildings(List<IEssentialBuildingInfo> buildings);
 
     void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks);
-
-    boolean isSelectingColonist();
-
-    LivingEntity getSelectedPawn();
-
-    void stopSelectingColonist();
 
     void open_HireScreen(MinecraftClient client, String screenName, Map<String, IHireInfo> professions);
 

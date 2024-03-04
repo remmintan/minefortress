@@ -5,17 +5,13 @@ import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
-import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
-import net.remmintan.mods.minefortress.networking.s2c.ClientboundFollowColonistPacket;
 import org.minefortress.blueprints.world.BlueprintsWorld;
-import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.interfaces.FortressWorldCreator;
 import org.minefortress.utils.ModUtils;
 
@@ -40,6 +36,20 @@ public class FortressServerEvents {
         EntitySleepEvents.ALLOW_NEARBY_MONSTERS.register((player, pos, vanilla) -> {
             if(ModUtils.isFortressGamemode(player)) {
                 return ActionResult.SUCCESS;
+            }
+            return ActionResult.PASS;
+        });
+
+        AttackEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
+            if(ModUtils.isFortressGamemode(player)) {
+                return ActionResult.FAIL;
+            }
+            return ActionResult.PASS;
+        });
+
+        UseEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
+            if(ModUtils.isFortressGamemode(player)) {
+                return ActionResult.FAIL;
             }
             return ActionResult.PASS;
         });
@@ -93,19 +103,6 @@ public class FortressServerEvents {
             if(server instanceof IFortressServer IFortressServer) {
                 IFortressServer.get_FortressModServerManager().tick(server.getPlayerManager());
             }
-        });
-
-        AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-            if(ModUtils.isFortressGamemode(player)) {
-                if (player instanceof ServerPlayerEntity serverPlayer && entity instanceof BasePawnEntity pawn) {
-                    final var id = pawn.getId();
-                    final var packet = new ClientboundFollowColonistPacket(id);
-                    FortressServerNetworkHelper.send(serverPlayer, FortressChannelNames.FORTRESS_SELECT_COLONIST, packet);
-                }
-
-                return ActionResult.SUCCESS;
-            }
-            return ActionResult.PASS;
         });
     }
 

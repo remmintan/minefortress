@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -46,7 +45,6 @@ public final class ClientFortressManager implements IClientFortressManager {
     private final IClientProfessionManager professionManager;
     private final IClientResourceManager resourceManager = new ClientResourceManagerImpl();
     private final IClientFightManager fightManager = new ClientFightManager();
-
     private boolean connectedToTheServer = false;
     private boolean initialized = false;
 
@@ -60,9 +58,6 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     private BlockPos posAppropriateForCenter;
     private BlockPos oldPosAppropriateForCenter;
-
-    private LivingEntity selectedPawn;
-
     private List<IEssentialBuildingInfo> buildings = new ArrayList<>();
     private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
     private Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
@@ -71,9 +66,8 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     private int maxColonistsCount;
 
-    private FortressState state = FortressState.BUILD;
+    private FortressState state = FortressState.BUILD_SELECTION;
 
-    private boolean campfireEnabled = true;
     private boolean borderEnabled = true;
 
     public ClientFortressManager() {
@@ -81,21 +75,6 @@ public final class ClientFortressManager implements IClientFortressManager {
                 () -> ((IClientManagersProvider) MinecraftClient.getInstance())
                         .get_ClientFortressManager()
         );
-    }
-
-    @Override
-    public void select(LivingEntity colonist) {
-        if(state == FortressState.COMBAT) {
-            final var mouse = MinecraftClient.getInstance().mouse;
-            final var selectionManager = fightManager.getSelectionManager();
-            selectionManager.startSelection(mouse.getX(), mouse.getY());
-            selectionManager.updateSelection(mouse.getX(), mouse.getY());
-            selectionManager.endSelection();
-
-            selectedPawn = null;
-            return;
-        }
-        this.selectedPawn = colonist;
     }
 
     @Override
@@ -113,21 +92,6 @@ public final class ClientFortressManager implements IClientFortressManager {
     public void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks) {
         this.specialBlocks = specialBlocks;
         this.blueprintsSpecialBlocks = blueprintSpecialBlocks;
-    }
-
-    @Override
-    public boolean isSelectingColonist() {
-        return selectedPawn != null && state == FortressState.BUILD;
-    }
-
-    @Override
-    public LivingEntity getSelectedPawn() {
-        return selectedPawn;
-    }
-
-    @Override
-    public void stopSelectingColonist() {
-        this.selectedPawn = null;
     }
 
     @Override
@@ -152,15 +116,12 @@ public final class ClientFortressManager implements IClientFortressManager {
         this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
         this.reservedColonistCount = reservedColonistCount;
-        this.campfireEnabled = campfireEnabled;
         this.borderEnabled = borderEnabled;
         this.initialized = true;
     }
 
     @Override
     public void tick(IHoveredBlockProvider fortressClient) {
-        if(isSelectingColonist() && selectedPawn.isDead()) stopSelectingColonist();
-
         final MinecraftClient client = (MinecraftClient) fortressClient;
         if(
                 client.world == null ||
@@ -384,8 +345,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     @Override
     public void reset() {
         this.initialized = false;
-        this.selectedPawn = null;
-        this.state= FortressState.BUILD;
+        this.state = FortressState.BUILD_SELECTION;
     }
 
     // getter and setter for state
@@ -395,7 +355,7 @@ public final class ClientFortressManager implements IClientFortressManager {
         if(state == FortressState.AREAS_SELECTION) {
             ModUtils.getAreasClientManager().getSavedAreasHolder().setNeedRebuild(true);
         }
-        if(state == FortressState.BUILD) {
+        if(state == FortressState.BUILD_SELECTION || state == FortressState.BUILD_EDITING) {
             ModUtils.getClientTasksHolder().ifPresent(it -> it.setNeedRebuild(true));
         }
     }
@@ -413,7 +373,7 @@ public final class ClientFortressManager implements IClientFortressManager {
                     .filter(it -> it.getHealth() < 100)
                     .map(this::buildingToHealthRenderInfo)
                     .toList();
-            case BUILD -> buildings
+            case BUILD_SELECTION, BUILD_EDITING -> buildings
                     .stream()
                     .filter(it -> it.getHealth() < 33)
                     .map(this::buildingToHealthRenderInfo)

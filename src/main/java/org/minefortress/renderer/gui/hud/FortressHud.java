@@ -39,7 +39,8 @@ public class FortressHud {
         hudLayers.add(new HoveredEntityHudLayer(client));
         hudLayers.add(new ToolsHudLayer(client));
         hudLayers.add(new TimeHudLayer(client));
-        hudLayers.add(new FightHudLayer(client));
+        hudLayers.add(new PawnsSelectionHudLayer(client));
+        hudLayers.add(new CombatHudLayer(client));
         hudLayers.add(new AreasHudLayer(client));
         hudLayers.add(new InfluenceHudLayer(client));
         hudLayers.add(new UtilsHudLayer(client));
@@ -112,7 +113,7 @@ public class FortressHud {
         if(BlueprintsWorld.isBlueprintsWorld(client.world)) return HudState.BLUEPRINT_EDITING;
 
         return switch (ModUtils.getFortressClientManager().getState()) {
-            case BUILD -> HudState.BUILD;
+            case BUILD_EDITING, BUILD_SELECTION -> HudState.BUILD;
             case COMBAT -> HudState.COMBAT;
             case AREAS_SELECTION -> HudState.AREAS_SELECTION;
         };

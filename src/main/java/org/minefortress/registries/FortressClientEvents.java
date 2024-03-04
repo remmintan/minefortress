@@ -13,6 +13,7 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHo
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SRequestResourcesRefresh;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import org.minefortress.controls.MouseEvents;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.utils.ModUtils;
@@ -20,7 +21,8 @@ import org.minefortress.utils.ModUtils;
 public class FortressClientEvents {
 
     public static void register() {
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ModUtils.getFortressClientManager().reset());
+        final var fortressManager = ModUtils.getFortressClientManager();
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> fortressManager.reset());
         ClientTickEvents.START_CLIENT_TICK.register(FortressClientEvents::startClientTick);
         ClientTickEvents.END_CLIENT_TICK.register(FortressClientEvents::endClientTick);
         ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> {
@@ -31,22 +33,21 @@ public class FortressClientEvents {
     }
 
     private static void startClientTick(MinecraftClient client) {
-        final var clientInFortressGamemode = ModUtils.isClientInFortressGamemode();
-        final var provider = CoreModUtils.getMineFortressManagersProvider();
-        if(clientInFortressGamemode) {
-            final var mouse = client.mouse;
-            if(ModUtils.shouldReleaseCamera()) {
-                if(!mouse.isCursorLocked())
-                    mouse.lockCursor();
-            } else {
-                if(mouse.isCursorLocked())
-                    mouse.unlockCursor();
-            }
+        MouseEvents.checkMouseStateAndFireEvents();
+
+        if(!ModUtils.isClientInFortressGamemode()) return;
+        final var mouse = client.mouse;
+        if(ModUtils.shouldReleaseCamera()) {
+            if(!mouse.isCursorLocked())
+                mouse.lockCursor();
+        } else {
+            if(mouse.isCursorLocked())
+                mouse.unlockCursor();
         }
 
         final var fortressClient = (IFortressMinecraftClient) client;
-
         fortressClient.get_FortressHud().tick();
+        final var provider = CoreModUtils.getMineFortressManagersProvider();
         final var fortressClientManager = provider.get_ClientFortressManager();
         fortressClientManager.tick(hoveredBlockProvider());
         if(fortressClientManager.gamemodeNeedsInitialization() && !(client.currentScreen instanceof ChooseModeScreen)) {

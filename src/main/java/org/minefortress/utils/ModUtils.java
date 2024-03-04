@@ -3,8 +3,6 @@ package org.minefortress.utils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.option.GameOptions;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -120,7 +118,6 @@ public class ModUtils {
     public static boolean shouldReleaseCamera() {
         final var client = MinecraftClient.getInstance();
         final var options = client.options;
-
 
         final var blueprintManager = getBlueprintManager();
         final var selectionManager = getSelectionManager();
