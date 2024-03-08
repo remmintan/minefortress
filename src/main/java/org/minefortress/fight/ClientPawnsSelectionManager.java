@@ -67,7 +67,7 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
                 .getEntities()
                 .forEach(
                     entity -> {
-                        if(entity instanceof IFortressAwareEntity fae) {
+                        if(entity instanceof IFortressAwareEntity fae && fae.getMasterId().map(it -> it.equals(MinecraftClient.getInstance().player.getUuid())).orElse(false)) {
                             final var pos = entity.getPos();
                             entitesMap.put(pos, fae);
                         }
