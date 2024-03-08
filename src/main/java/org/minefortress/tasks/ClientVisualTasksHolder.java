@@ -2,16 +2,17 @@ package org.minefortress.tasks;
 
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.gobi.ClientSelection;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundCancelTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.joml.Vector4f;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 
 import java.util.*;
 
@@ -38,6 +39,9 @@ public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, 
         });
         removeTask(lastTaskId);
         FortressClientNetworkHelper.send(FortressChannelNames.CANCEL_TASK, new ServerboundCancelTaskPacket(lastTaskId));
+        if(tasksStack.empty()) {
+            CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().resetSelection();
+        }
     }
 
     public void cancelAllTasks() {

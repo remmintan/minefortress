@@ -18,6 +18,7 @@ import java.util.Optional;
 public class ToolsHudLayer extends AbstractHudLayer {
 
     private final ItemButtonWidget selection;
+    private final ModeButtonWidget buildEditMode;
 
     protected ToolsHudLayer(MinecraftClient client) {
         super(client);
@@ -33,7 +34,6 @@ public class ToolsHudLayer extends AbstractHudLayer {
                 (button) -> button.checked ? Optional.empty() : Optional.of("Selection Type")
         );
         this.addElement(selection);
-
 
         this.addElement(
                 new ItemToggleWidget(
@@ -83,20 +83,20 @@ public class ToolsHudLayer extends AbstractHudLayer {
                 )
         );
 
-        // add buttons to switch between build edit mode and build selection mode
+        buildEditMode = new ModeButtonWidget(
+                0,
+                125,
+                Items.BRICKS,
+                btn -> setCorrectHudState(FortressState.BUILD_EDITING),
+                () -> isAnyPawnSelected()? "Building Mode" : "Select any pawn to build",
+                () -> hudHasCorrectState(FortressState.BUILD_EDITING)
+        );
         this.addElement(
-                new ModeButtonWidget(
-                        0,
-                        125,
-                        Items.STONE_SHOVEL,
-                        btn -> setCorrectHudState(FortressState.BUILD_EDITING),
-                        "Edit Mode",
-                        () -> hudHasCorrectState(FortressState.BUILD_EDITING)
-                ),
+                buildEditMode,
                 new ModeButtonWidget(
                         0,
                         150,
-                        Items.STONE_PICKAXE,
+                        Items.COMPASS,
                         btn -> setCorrectHudState(FortressState.BUILD_SELECTION),
                         "Selection Mode",
                         () -> hudHasCorrectState(FortressState.BUILD_SELECTION)
@@ -138,6 +138,11 @@ public class ToolsHudLayer extends AbstractHudLayer {
     public void tick() {
         super.tick();
         selection.visible = hudHasCorrectState(FortressState.BUILD_EDITING);
+        buildEditMode.active = isAnyPawnSelected();
+    }
+
+    private static boolean isAnyPawnSelected() {
+        return CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().hasSelected();
     }
 
     @Override

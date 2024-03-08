@@ -20,6 +20,7 @@ import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManage
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SJumpToCampfire;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundFortressCenterSetPacket;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSetGamemodePacket;
@@ -139,6 +140,9 @@ public final class ClientFortressManager implements IClientFortressManager {
             return;
         }
         if(!initialized) return;
+
+        resetBuildEditState();
+
         if(isCenterNotSet()) {
             synchronized (KEY) {
                 if(setCenterToast == null) {
@@ -160,6 +164,12 @@ public final class ClientFortressManager implements IClientFortressManager {
 
                 posAppropriateForCenter = cursor.toImmutable();
             }
+        }
+    }
+
+    private void resetBuildEditState() {
+        if(this.state == FortressState.BUILD_EDITING && !CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().hasSelected()) {
+            this.state = FortressState.BUILD_SELECTION;
         }
     }
 

@@ -2,6 +2,7 @@ package org.minefortress.renderer.gui.widget;
 
 import net.minecraft.item.Item;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class ModeButtonWidget extends ItemButtonWidget {
@@ -14,8 +15,21 @@ public class ModeButtonWidget extends ItemButtonWidget {
         this.isActiveSupplier = isActiveSupplier;
     }
 
+    public ModeButtonWidget(
+            int anchorX, int anchorY, Item item, PressAction clickAction, Supplier<String> tooltipTextSupplier, Supplier<Boolean> isActiveSupplier
+    ) {
+        super(anchorX, anchorY, item, clickAction, itemButtonWidget -> Optional.of(tooltipTextSupplier.get()));
+        this.isActiveSupplier = isActiveSupplier;
+    }
+
     @Override
     public boolean isFocused() {
         return this.isActiveSupplier.get();
+    }
+
+    @Override
+    public void onClick(double mouseX, double mouseY) {
+        if(!active) return;
+        super.onClick(mouseX, mouseY);
     }
 }
