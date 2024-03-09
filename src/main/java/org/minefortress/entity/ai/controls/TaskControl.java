@@ -43,7 +43,7 @@ public class TaskControl implements ITaskControl {
     }
 
     @Override
-    public void setTask(@NotNull ITask task, ITaskPart taskPart, Supplier<Boolean> cancelled) {
+    public void setTask(@NotNull ITask task, ITaskPart taskPart, @NotNull Supplier<Boolean> cancelled) {
         this.task = task;
         this.taskPart = taskPart;
         this.blocks = taskPart.getBlocks().iterator();
@@ -87,7 +87,12 @@ public class TaskControl implements ITaskControl {
     public void success() {
         if(!hasTask()) return;
         this.task.finishPart(taskPart, colonist);
-        this.resetTask();
+        if(task.hasAvailableParts()) {
+            // taking next part into work
+            this.setTask(task, task.getNextPart(colonist.getServerWorld(), colonist), cancelled);
+        } else {
+            this.resetTask();
+        }
     }
 
     @Override

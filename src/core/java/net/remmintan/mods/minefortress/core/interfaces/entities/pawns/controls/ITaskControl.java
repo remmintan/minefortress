@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 public interface ITaskControl {
     boolean canStartTask(ITask task);
 
-    void setTask(@NotNull ITask task, ITaskPart taskPart, Supplier<Boolean> cancelled);
+    void setTask(@NotNull ITask task, ITaskPart taskPart, @NotNull Supplier<Boolean> cancelled);
 
     void resetTask();
 
