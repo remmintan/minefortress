@@ -54,18 +54,19 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final var provider = getManagersProvider(server, player);
         final var taskManager = provider.getTaskManager();
+        final var tasksCreator = provider.getTasksCreator();
         final var resourceManager = provider.getResourceManager();
 
         final var stackInHand = player.getStackInHand(Hand.MAIN_HAND);
         final var item = stackInHand.getItem();
-        final var buildTask = taskManager.createRoadsTask(digUuid, TaskType.BUILD, placeUuid, blocks, item);
+        final var buildTask = tasksCreator.createRoadsTask(digUuid, TaskType.BUILD, placeUuid, blocks, item);
         final var manager = getFortressManager(server, player);
         final Runnable onDigComplete = () -> taskManager.addTask(buildTask, provider, manager, selectedPawns, player);
 
         if(manager.isSurvival())
             resourceManager.reserveItems(placeUuid, Collections.singletonList(resourceManager.createItemInfo(item, blocks.size())));
 
-        final var digTask = taskManager.createRoadsTask(digUuid, TaskType.REMOVE, placeUuid, blocks, item, onDigComplete);
+        final var digTask = tasksCreator.createRoadsTask(digUuid, TaskType.REMOVE, placeUuid, blocks, item, onDigComplete);
         taskManager.addTask(digTask, provider, manager, selectedPawns, player);
     }
 }

@@ -44,6 +44,7 @@ import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.*;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksCreator;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncFortressManagerPacket;
@@ -68,6 +69,7 @@ import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.RepairBuildingTask;
 import org.minefortress.tasks.ServerTaskManager;
+import org.minefortress.tasks.TasksCreator;
 import org.minefortress.utils.BlockInfoUtils;
 
 import java.util.*;
@@ -117,6 +119,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         registerManager(IServerAutomationAreaManager.class, new AreasServerManager());
         registerManager(IServerInfluenceManager.class, new ServerInfluenceManager(this));
         registerManager(IServerFightManager.class, new ServerFightManager(this));
+        registerManager(ITasksCreator.class, new TasksCreator());
 
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             this.gamemode = FortressGamemode.SURVIVAL;

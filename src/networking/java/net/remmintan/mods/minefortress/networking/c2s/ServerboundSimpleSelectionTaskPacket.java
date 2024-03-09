@@ -97,11 +97,12 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
         final var id = this.getId();
         final var taskType = this.getTaskType();
         final var taskManager = provider.getTaskManager();
+        final var tasksCreator = provider.getTasksCreator();
         final var startingBlock = this.getStart();
         final var endingBlock = this.getEnd();
         final var hitResult = this.getHitResult();
         final var selectionType = this.getSelectionType();
-        final var task = taskManager.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, player);
+        final var task = tasksCreator.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, player);
         final var manager = getFortressManager(server, player);
 
         taskManager.addTask(task, provider, manager, selectedPawns,player);

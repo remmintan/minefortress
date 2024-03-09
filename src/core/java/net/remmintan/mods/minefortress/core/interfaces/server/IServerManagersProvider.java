@@ -8,6 +8,7 @@ import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluence
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksCreator;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +33,9 @@ public interface IServerManagersProvider {
     }
     default IServerTaskManager getTaskManager() {
         return getManager(IServerTaskManager.class);
+    }
+    default ITasksCreator getTasksCreator() {
+        return getManager(ITasksCreator.class);
     }
     default IServerFightManager getFightManager() {
         return getManager(IServerFightManager.class);

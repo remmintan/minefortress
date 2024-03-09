@@ -2,16 +2,10 @@ package org.minefortress.tasks;
 
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
-import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
@@ -100,30 +94,6 @@ public class ServerTaskManager implements IServerTaskManager {
             if(!task.hasAvailableParts()) break;
             c.getTaskControl().setTask(task, task.getNextPart(world, c), this::returnTaskPart, () -> this.isCancelled(task.getId()));
         }
-    }
-
-    @Override
-    public ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots) {
-        return new CutTreesTask(uuid, treeRoots);
-    }
-
-    @Override
-    public ITask createRoadsTask(UUID digUuid, TaskType type, UUID placeUuid, List<BlockPos> blocks, Item itemInHand, Runnable onComplete) {
-        return new RoadsTask(placeUuid, type, blocks, itemInHand, onComplete);
-    }
-
-    @Override
-    public ITask createSelectionTask(UUID id, TaskType taskType, BlockPos start, BlockPos end, ServerSelectionType selectionType, HitResult hitResult, ServerPlayerEntity player) {
-        SimpleSelectionTask simpleSelectionTask = new SimpleSelectionTask(id, taskType, start, end, hitResult, selectionType);
-        if(simpleSelectionTask.getTaskType() == TaskType.BUILD) {
-            final ItemStack itemInHand = player.getStackInHand(Hand.MAIN_HAND);
-            if(itemInHand != ItemStack.EMPTY) {
-                simpleSelectionTask.setPlacingItem(itemInHand.getItem());
-            } else {
-                throw new IllegalStateException();
-            }
-        }
-        return simpleSelectionTask;
     }
 
     private void returnTaskPart(ITaskPart taskPart) {
