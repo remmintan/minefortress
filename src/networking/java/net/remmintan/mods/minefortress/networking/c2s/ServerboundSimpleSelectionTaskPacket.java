@@ -10,6 +10,7 @@ import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,7 +47,11 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
             this.hitResult = null;
         }
         this.selectionType = buffer.readString();
-        selectedPawns = buffer.readList(PacketByteBuf::readInt);
+        this.selectedPawns = new ArrayList<>();
+        int size = buffer.readInt();
+        for (int i = 0; i < size; i++) {
+            this.selectedPawns.add(buffer.readInt());
+        }
     }
 
     @Override

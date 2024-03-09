@@ -14,4 +14,8 @@ public interface ITaskPart {
     List<ITaskBlockInfo> getBlocks();
 
     ITask getTask();
+
+    default void returnTaskPart() {
+        getTask().returnPart(this.getStartAndEnd());
+    }
 }

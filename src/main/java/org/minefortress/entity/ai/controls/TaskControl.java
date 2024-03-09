@@ -4,32 +4,32 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.tasks.*;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
+import org.minefortress.tasks.BlueprintTask;
+import org.minefortress.tasks.CutTreesTask;
+import org.minefortress.tasks.RoadsTask;
+import org.minefortress.tasks.SimpleSelectionTask;
 
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class TaskControl implements ITaskControl {
 
     private final Colonist colonist;
-
     private final Cache<UUID, Boolean> returnedIds = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS).build();
 
     private boolean doingEverydayTasks = false;
     private ITask task;
     private ITaskPart taskPart;
     private Iterator<ITaskBlockInfo> blocks;
-    private Consumer<ITaskPart> onTaskFailed;
     private Supplier<Boolean> cancelled;
 
 
@@ -43,11 +43,10 @@ public class TaskControl implements ITaskControl {
     }
 
     @Override
-    public void setTask(@NotNull ITask task, ITaskPart taskPart, Consumer<ITaskPart> onTaskFailed, Supplier<Boolean> cancelled) {
+    public void setTask(@NotNull ITask task, ITaskPart taskPart, Supplier<Boolean> cancelled) {
         this.task = task;
         this.taskPart = taskPart;
         this.blocks = taskPart.getBlocks().iterator();
-        this.onTaskFailed = onTaskFailed;
         this.cancelled = cancelled;
         this.updateCurrentTaskDesription();
     }
@@ -73,14 +72,13 @@ public class TaskControl implements ITaskControl {
         this.task = null;
         this.taskPart = null;
         this.blocks = null;
-        this.onTaskFailed = null;
         this.cancelled = null;
     }
 
     @Override
     public void fail() {
         if(!hasTask()) return;
-        this.onTaskFailed.accept(taskPart);
+        taskPart.returnTaskPart();
         this.returnedIds.put(task.getId(), true);
         this.resetTask();
     }

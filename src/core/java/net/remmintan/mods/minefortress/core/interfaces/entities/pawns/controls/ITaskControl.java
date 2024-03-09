@@ -9,13 +9,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public interface ITaskControl {
     boolean canStartTask(ITask task);
 
-    void setTask(@NotNull ITask task, ITaskPart taskPart, Consumer<ITaskPart> onTaskFailed, Supplier<Boolean> cancelled);
+    void setTask(@NotNull ITask task, ITaskPart taskPart, Supplier<Boolean> cancelled);
 
     void resetTask();
 
