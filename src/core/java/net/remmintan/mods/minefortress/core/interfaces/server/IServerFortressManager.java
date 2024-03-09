@@ -12,7 +12,6 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomati
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,14 +33,12 @@ public interface IServerFortressManager {
 
     void jumpToCampfire(ServerPlayerEntity player);
 
-    void repairBuilding(ServerPlayerEntity player, UUID taskId, UUID buildingId);
+    void repairBuilding(ServerPlayerEntity player, UUID taskId, UUID buildingId, List<Integer> selectedPawns);
 
     boolean isSurvival();
 
     boolean isCreative();
     Optional<BlockPos> getRandomPosWithinFortress();
-
-    List<IWorkerPawn> getFreeColonists();
     List<ITargetedPawn> getAllTargetedPawns();
 
     void increaseMaxColonistsCount();

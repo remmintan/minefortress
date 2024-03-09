@@ -12,6 +12,8 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
@@ -22,12 +24,15 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
     private final BlockRotation rotation;
     private final int floorLevel;
 
-    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel) {
+    private final List<Integer> selectedPawns;
+
+    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel, List<Integer> selectedPawns) {
         this.taskId = taskId;
         this.blueprintId = blueprintId;
         this.startPos = startPos;
         this.rotation = rotation;
         this.floorLevel = floorLevel;
+        this.selectedPawns = selectedPawns;
     }
 
     public ServerboundBlueprintTaskPacket(PacketByteBuf buf) {
@@ -36,6 +41,12 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
         this.startPos = buf.readBlockPos();
         this.rotation = buf.readEnumConstant(BlockRotation.class);
         this.floorLevel = buf.readInt();
+        this.selectedPawns = new ArrayList<>();
+        final int size = buf.readInt();
+        for (int i = 0; i < size; i++) {
+            selectedPawns.add(buf.readInt());
+        }
+
     }
 
     @Override
@@ -45,6 +56,10 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
         buf.writeBlockPos(startPos);
         buf.writeEnumConstant(rotation);
         buf.writeInt(floorLevel);
+        buf.writeInt(selectedPawns.size());
+        for (Integer selectedPawn : selectedPawns) {
+            buf.writeInt(selectedPawn);
+        }
     }
 
     @Override
@@ -67,12 +82,11 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
                     return;
                 }
             }
-            Runnable executeBuildTask = () -> provider.getTaskManager().addTask(task, provider, manager);
+            Runnable executeBuildTask = () -> provider.getTaskManager().addTask(task, provider, manager, selectedPawns, player);
             if (floorLevel > 0) {
                 final var digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintId, rotation);
                 digTask.addFinishListener(executeBuildTask);
-
-                provider.getTaskManager().addTask(digTask, provider, manager);
+                provider.getTaskManager().addTask(digTask, provider, manager, selectedPawns, player);
             } else {
                 executeBuildTask.run();
             }

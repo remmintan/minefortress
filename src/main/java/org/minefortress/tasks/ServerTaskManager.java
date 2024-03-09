@@ -14,69 +14,41 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPaw
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
-import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
-import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.resources.ItemInfo;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class ServerTaskManager implements IServerTaskManager, ITickableManager {
+public class ServerTaskManager implements IServerTaskManager {
 
     private final static Set<String> BUILDER_PROFESSIONS = Set.of("miner1", "miner2", "miner3", "colonist");
 
-    private final Deque<ITask> tasks = new ArrayDeque<>();
     private final Set<UUID> cancelledTasks = new HashSet<>();
 
-    private final IServerFortressManager manager;
-
-    public ServerTaskManager(IServerFortressManager manager) {
-        this.manager = manager;
-    }
-
-    @Override
-    public void tick(ServerPlayerEntity player) {
-        if(!hasTask()) return;
-        final ITask task = this.getTask();
-        final List<IWorkerPawn> freeColonists = manager.getFreeColonists();
-        if(freeColonists.isEmpty()) return;
+    private void assignPawnsToTask(ServerPlayerEntity player, ITask task, List<IWorkerPawn> workers) {
+        if(workers.isEmpty()) return;
         final TaskType taskType = task.getTaskType();
         if(taskType == TaskType.BUILD) {
-            final List<IWorkerPawn> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
 
-            boolean fullyCompleted = setPawnsToTask(player.getServerWorld(), task, completelyFreePawns);
-            if(fullyCompleted) return;
-
-            final List<IWorkerPawn> otherPawns = freeColonists
-                    .stream()
-                    .filter(c -> isBuilderProfession(c.getProfessionId()))
-                    .filter(c -> c.getTaskControl().canStartTask(task))
-                    .filter(c -> c.getTaskControl().isDoingEverydayTasks())
-
-                    .collect(Collectors.toList());
-            setPawnsToTask(player.getServerWorld(), task, otherPawns);
+            setPawnsToTask(player.getServerWorld(), task, workers);
         } else {
             final List<String> professions = getProfessionIdFromTask(task);
-            final List<IWorkerPawn> professionals = freeColonists
+            final List<IWorkerPawn> professionals = workers
                     .stream()
                     .filter(c -> professions.contains(c.getProfessionId()))
                     .filter(c -> c.getTaskControl().canStartTask(task))
                     .collect(Collectors.toList());
 
-            boolean fullyCompleted = setPawnsToTask(player.getServerWorld(), task, professionals);
-            if(fullyCompleted) return;
-
-            final List<IWorkerPawn> completelyFreePawns = getCompletelyFreePawns(task, freeColonists);
-            setPawnsToTask(player.getServerWorld(), task, completelyFreePawns);
+            setPawnsToTask(player.getServerWorld(), task, professionals);
         }
     }
 
     @Override
-    public void addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager) {
+    public void addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager, List<Integer> selectedPawns, ServerPlayerEntity player) {
         task.prepareTask();
         if(task.hasAvailableParts()) {
             if(task instanceof SimpleSelectionTask simpleSelectionTask) {
@@ -93,25 +65,23 @@ public class ServerTaskManager implements IServerTaskManager, ITickableManager {
                     provider.getResourceManager().reserveItems(task.getId(), Collections.singletonList(info));
                 }
             }
-            tasks.add(task);
         }
+
+        final var serverWorld = player.getWorld();
+        final var selectedWorkers = selectedPawns
+                .stream()
+                .map(serverWorld::getEntityById)
+                .filter(IWorkerPawn.class::isInstance)
+                .map(IWorkerPawn.class::cast)
+                .toList();
+
+        assignPawnsToTask(player, task, selectedWorkers);
     }
 
     @Override
     public void cancelTask(UUID id, IServerManagersProvider provider, IServerFortressManager manager) {
         cancelledTasks.add(id);
         provider.getResourceManager().returnReservedItems(id);
-        tasks.removeIf(task -> task.getId().equals(id));
-    }
-
-    @NotNull
-    private List<IWorkerPawn> getCompletelyFreePawns(ITask task, List<IWorkerPawn> freeColonists) {
-        return freeColonists
-                .stream()
-                .filter(c -> isBuilderProfession(c.getProfessionId()))
-                .filter(c -> c.getTaskControl().canStartTask(task))
-                .filter(c -> !c.getTaskControl().isDoingEverydayTasks())
-                .collect(Collectors.toList());
     }
 
     private List<String> getProfessionIdFromTask(ITask task) {
@@ -125,21 +95,11 @@ public class ServerTaskManager implements IServerTaskManager, ITickableManager {
         return BUILDER_PROFESSIONS.contains(professionId);
     }
 
-    private boolean setPawnsToTask(ServerWorld world, ITask task, List<IWorkerPawn> completelyFreePawns) {
+    private void setPawnsToTask(ServerWorld world, ITask task, List<IWorkerPawn> completelyFreePawns) {
         for(IWorkerPawn c : completelyFreePawns) {
             if(!task.hasAvailableParts()) break;
             c.getTaskControl().setTask(task, task.getNextPart(world, c), this::returnTaskPart, () -> this.isCancelled(task.getId()));
         }
-        if(!task.hasAvailableParts()) {
-            tasks.remove();
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean hasTask() {
-        return !tasks.isEmpty();
     }
 
     @Override
@@ -166,17 +126,9 @@ public class ServerTaskManager implements IServerTaskManager, ITickableManager {
         return simpleSelectionTask;
     }
 
-    private ITask getTask() {
-        return tasks.element();
-    }
-
     private void returnTaskPart(ITaskPart taskPart) {
         ITask task = taskPart.getTask();
         task.returnPart(taskPart.getStartAndEnd());
-
-        if(!tasks.contains(task)) {
-            tasks.addFirst(task);
-        }
     }
 
     private boolean isCancelled(UUID id) {

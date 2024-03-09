@@ -14,9 +14,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IServerTaskManager extends IServerManager {
-    void addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager);
+    void addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager, List<Integer> selectedPawns, ServerPlayerEntity player);
     void cancelTask(UUID id, IServerManagersProvider provider, IServerFortressManager manager);
-    boolean hasTask();
     ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots);
     default ITask createRoadsTask(UUID digUuid, TaskType type, UUID placeUuid, List<BlockPos> blocks, Item itemInHand) {
         return createRoadsTask(digUuid, type, placeUuid, blocks, itemInHand, () -> {});

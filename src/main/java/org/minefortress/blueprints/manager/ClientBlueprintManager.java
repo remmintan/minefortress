@@ -4,9 +4,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundBlueprintTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.blueprints.data.ClientStructureBlockDataProvider;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
@@ -114,17 +116,24 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
 
         UUID taskId = UUID.randomUUID();
         addTaskToTasksHolder(taskId);
-        final ServerboundBlueprintTaskPacket serverboundBlueprintTaskPacket =
-                new ServerboundBlueprintTaskPacket(taskId,
-                        selectedStructure.getId(),
-                        getStructureBuildPos(),
-                        selectedStructure.getRotation(),
-                        getSelectedStructure().getFloorLevel());
+        final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket(taskId);
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
 
         if(!client.options.sprintKey.isPressed()) {
             clearStructure();
         }
+    }
+
+    @NotNull
+    private ServerboundBlueprintTaskPacket getServerboundBlueprintTaskPacket(UUID taskId) {
+        final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
+        return new ServerboundBlueprintTaskPacket(taskId,
+                        selectedStructure.getId(),
+                        getStructureBuildPos(),
+                        selectedStructure.getRotation(),
+                        getSelectedStructure().getFloorLevel(),
+                        selectedPawnsIds
+                );
     }
 
     @Override

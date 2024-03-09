@@ -110,7 +110,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     public ServerFortressManager(MinecraftServer server) {
         this.server = server;
 
-        registerManager(IServerTaskManager.class, new ServerTaskManager(this));
+        registerManager(IServerTaskManager.class, new ServerTaskManager());
         registerManager(IServerProfessionsManager.class, new ServerProfessionManager(() -> this, () -> this, server));
         registerManager(IServerResourceManager.class, new ServerResourceManager(server));
         registerManager(IServerBuildingsManager.class, new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD)));
@@ -718,11 +718,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     }
 
     @Override
-    public List<IWorkerPawn> getFreeColonists() {
-        return getWorkersStream().filter(c -> !c.getTaskControl().hasTask()).collect(Collectors.toList());
-    }
-
-    @Override
     public List<ITargetedPawn> getAllTargetedPawns() {
         return pawns
                 .stream()
@@ -794,7 +789,8 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         return Math.max(Math.max(radius1, radius2), Math.max(radius3, radius4));
     }
 
-    public void repairBuilding(ServerPlayerEntity player, UUID taskId, UUID buildingId) {
+    @Override
+    public void repairBuilding(ServerPlayerEntity player, UUID taskId, UUID buildingId, List<Integer> selectedPawns) {
         final var buildingManager = getBuildingsManager();
         final var resourceManager = getResourceManager();
 
@@ -815,7 +811,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             }
 
             final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);
-            getTaskManager().addTask(task, this, this);
+            getTaskManager().addTask(task, this, this, selectedPawns, player);
         } catch (RuntimeException exp) {
             LogManager.getLogger().error("Error while repairing building", exp);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));

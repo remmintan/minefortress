@@ -14,21 +14,32 @@ public class ServerboundCutTreesTaskPacket implements FortressC2SPacket {
 
     private final UUID uuid;
     private final List<BlockPos> treeRoots;
+    private final List<Integer> selectedPawns;
 
-    public ServerboundCutTreesTaskPacket(UUID uuid, List<BlockPos> treeRoots) {
+    public ServerboundCutTreesTaskPacket(UUID uuid, List<BlockPos> treeRoots, List<Integer> selectedPawns) {
         this.uuid = uuid;
         this.treeRoots = treeRoots;
+        this.selectedPawns = selectedPawns;
     }
 
     public ServerboundCutTreesTaskPacket(PacketByteBuf buf) {
         this.uuid = buf.readUuid();
         this.treeRoots = buf.readCollection(ArrayList::new, PacketByteBuf::readBlockPos);
+        selectedPawns = new ArrayList<>();
+        final int size = buf.readInt();
+        for (int i = 0; i < size; i++) {
+            selectedPawns.add(buf.readInt());
+        }
     }
 
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeUuid(uuid);
         buf.writeCollection(treeRoots, PacketByteBuf::writeBlockPos);
+        buf.writeInt(selectedPawns.size());
+        for (Integer selectedPawn : selectedPawns) {
+            buf.writeInt(selectedPawn);
+        }
     }
 
     @Override
@@ -37,6 +48,6 @@ public class ServerboundCutTreesTaskPacket implements FortressC2SPacket {
         final var taskManager = provider.getTaskManager();
         final var cutTreesTask = taskManager.createCutTreesTask(uuid, treeRoots);
         final var manager = getFortressManager(server, player);
-        taskManager.addTask(cutTreesTask, provider, manager);
+        taskManager.addTask(cutTreesTask, provider, manager, selectedPawns, player);
     }
 }

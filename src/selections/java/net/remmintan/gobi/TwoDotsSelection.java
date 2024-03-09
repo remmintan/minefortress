@@ -13,6 +13,7 @@ import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSimpleSelectionTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -67,13 +68,15 @@ public class TwoDotsSelection extends Selection {
                 if(level instanceof ITasksInformationHolder holder) {
                     holder.get_ClientTasksHolder().addTask(newTaskId, getSelection(), taskType);
                 }
+                final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
                 final var packet = new ServerboundSimpleSelectionTaskPacket(
                         newTaskId,
                         taskType,
                         this.selectionStart,
                         this.selectionEnd,
                         hitResult,
-                        getSelectionType().name()
+                        getSelectionType().name(),
+                        selectedPawnsIds
                 );
 
 

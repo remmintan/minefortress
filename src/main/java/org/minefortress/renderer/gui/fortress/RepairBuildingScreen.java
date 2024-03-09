@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SRepairBuilding;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -69,7 +70,9 @@ public class RepairBuildingScreen extends WindowScreen {
 
                     ModUtils.getClientTasksHolder().ifPresent(it -> it.addTask(taskId, blocksToRepair));
 
-                    final var packet = new C2SRepairBuilding(taskId, buildingId);
+                    final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider()
+                            .get_PawnsSelectionManager().getSelectedPawnsIds();
+                    final var packet = new C2SRepairBuilding(taskId, buildingId, selectedPawnsIds);
                     FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet);
                     Optional.ofNullable(this.client).ifPresent(it -> it.setScreen(null));
                 }

@@ -1,11 +1,10 @@
 package net.remmintan.mods.minefortress.core.interfaces.combat;
 
 import net.minecraft.client.Mouse;
-import net.minecraft.util.math.Vec2f;
 import net.remmintan.mods.minefortress.core.dtos.combat.MousePos;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 
-import java.util.Set;
+import java.util.List;
 import java.util.function.Consumer;
 
 public interface IClientPawnsSelectionManager {
@@ -31,5 +30,5 @@ public interface IClientPawnsSelectionManager {
 
     boolean isSelected(IFortressAwareEntity colonist);
 
-    Set<Vec2f> getScreenPositions();
+    List<Integer> getSelectedPawnsIds();
 }

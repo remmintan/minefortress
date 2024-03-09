@@ -10,6 +10,7 @@ import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,14 +22,16 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
     private final BlockPos end;
     private final HitResult hitResult;
     private final String selectionType;
+    private final List<Integer> selectedPawns;
 
-    public ServerboundSimpleSelectionTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, String selectionType) {
+    public ServerboundSimpleSelectionTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, String selectionType, List<Integer> selectedPawns) {
         this.id = id;
         this.taskType = taskType;
         this.start = start;
         this.end = end;
         this.hitResult = hitResult;
         this.selectionType = selectionType;
+        this.selectedPawns = selectedPawns;
     }
 
     public ServerboundSimpleSelectionTaskPacket(PacketByteBuf buffer) {
@@ -43,6 +46,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
             this.hitResult = null;
         }
         this.selectionType = buffer.readString();
+        selectedPawns = buffer.readList(PacketByteBuf::readInt);
     }
 
     @Override
@@ -57,6 +61,10 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
             buffer.writeBlockHitResult((BlockHitResult) this.hitResult);
         }
         buffer.writeString(selectionType);
+        buffer.writeInt(selectedPawns.size());
+        for (Integer selectedPawn : selectedPawns) {
+            buffer.writeInt(selectedPawn);
+        }
     }
 
     public TaskType getTaskType() {
@@ -96,6 +104,6 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
         final var task = taskManager.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, player);
         final var manager = getFortressManager(server, player);
 
-        taskManager.addTask(task, provider, manager);
+        taskManager.addTask(task, provider, manager, selectedPawns,player);
     }
 }

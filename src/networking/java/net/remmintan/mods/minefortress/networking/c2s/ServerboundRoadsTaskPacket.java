@@ -19,17 +19,24 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
     private final UUID placeUuid;
 
     private final List<BlockPos> blocks;
+    private final List<Integer> selectedPawns;
 
-    public ServerboundRoadsTaskPacket(UUID digUuid, UUID placeUuid, List<BlockPos> blocks) {
+    public ServerboundRoadsTaskPacket(UUID digUuid, UUID placeUuid, List<BlockPos> blocks, List<Integer> selectedPawns) {
         this.digUuid = digUuid;
         this.placeUuid = placeUuid;
         this.blocks = Collections.unmodifiableList(blocks);
+        this.selectedPawns =  selectedPawns;
     }
 
     public ServerboundRoadsTaskPacket(PacketByteBuf buf) {
         digUuid = buf.readUuid();
         placeUuid = buf.readUuid();
         blocks = buf.readCollection(ArrayList::new, PacketByteBuf::readBlockPos);
+        selectedPawns = new ArrayList<>();
+        final int size = buf.readInt();
+        for (int i = 0; i < size; i++) {
+            selectedPawns.add(buf.readInt());
+        }
     }
 
     @Override
@@ -37,6 +44,10 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
         buf.writeUuid(digUuid);
         buf.writeUuid(placeUuid);
         buf.writeCollection(blocks, PacketByteBuf::writeBlockPos);
+        buf.writeInt(selectedPawns.size());
+        for (Integer selectedPawn : selectedPawns) {
+            buf.writeInt(selectedPawn);
+        }
     }
 
     @Override
@@ -49,12 +60,12 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
         final var item = stackInHand.getItem();
         final var buildTask = taskManager.createRoadsTask(digUuid, TaskType.BUILD, placeUuid, blocks, item);
         final var manager = getFortressManager(server, player);
-        final Runnable onDigComplete = () -> taskManager.addTask(buildTask, provider, manager);
+        final Runnable onDigComplete = () -> taskManager.addTask(buildTask, provider, manager, selectedPawns, player);
 
         if(manager.isSurvival())
             resourceManager.reserveItems(placeUuid, Collections.singletonList(resourceManager.createItemInfo(item, blocks.size())));
 
         final var digTask = taskManager.createRoadsTask(digUuid, TaskType.REMOVE, placeUuid, blocks, item, onDigComplete);
-        taskManager.addTask(digTask, provider, manager);
+        taskManager.addTask(digTask, provider, manager, selectedPawns, player);
     }
 }

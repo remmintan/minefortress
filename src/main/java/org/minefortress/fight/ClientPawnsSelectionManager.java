@@ -2,6 +2,7 @@ package org.minefortress.fight;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
@@ -132,11 +133,6 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
     }
 
     @Override
-    public Set<Vec2f> getScreenPositions() {
-        return screenPositions;
-    }
-
-    @Override
     public void forEachTargetedPawn(Consumer<ITargetedPawn> action) {
         this.forEachSelected(it -> {if(it instanceof ITargetedPawn tp) action.accept(tp);});
     }
@@ -157,4 +153,10 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
         }
         return null;
     }
+
+    @Override
+    public List<Integer> getSelectedPawnsIds() {
+        return selectedPawns.stream().map(Entity.class::cast).map(Entity::getId).toList();
+    }
+
 }
