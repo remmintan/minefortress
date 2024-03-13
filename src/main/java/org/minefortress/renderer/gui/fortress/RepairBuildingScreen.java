@@ -70,8 +70,7 @@ public class RepairBuildingScreen extends WindowScreen {
 
                     ModUtils.getClientTasksHolder().ifPresent(it -> it.addTask(taskId, blocksToRepair));
 
-                    final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider()
-                            .get_PawnsSelectionManager().getSelectedPawnsIds();
+                    final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
                     final var packet = new C2SRepairBuilding(taskId, buildingId, selectedPawnsIds);
                     FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet);
                     Optional.ofNullable(this.client).ifPresent(it -> it.setScreen(null));

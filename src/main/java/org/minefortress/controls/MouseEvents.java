@@ -21,6 +21,8 @@ public class MouseEvents {
         final var mouseY = mouse.getY();
         if(isMousePressed) {
             if(!mousePressedInpreviousTick) {
+                if(ModUtils.getFortressClient().get_FortressHud().isHovered() || MinecraftClient.getInstance().currentScreen != null)
+                    return;
                 firePressEvent(mouseX, mouseY);
             }
         } else {

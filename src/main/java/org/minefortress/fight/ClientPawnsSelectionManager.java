@@ -16,21 +16,16 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedP
 import net.remmintan.mods.minefortress.core.utils.GlobalProjectionCache;
 import org.minefortress.renderer.CameraTools;
 import org.minefortress.utils.ModUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Consumer;
 
 public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager, ITargetedSelectionManager, ISelectedColonistProvider {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientPawnsSelectionManager.class);
 
     private MousePos mouseStartPos;
     private MousePos mouseEndPos;
 
     private final List<IFortressAwareEntity> selectedPawns = new ArrayList<>();
-
-    private Set<Vec2f> screenPositions = new HashSet<>();
 
 
     @Override
@@ -43,6 +38,11 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
     public void endSelection(double x, double y) {
         this.mouseStartPos = null;
         this.mouseEndPos = null;
+
+        if(!this.selectedPawns.isEmpty()) {
+            ModUtils.getFortressClientManager().setState(FortressState.BUILD_EDITING);
+        }
+
     }
 
     @Override
@@ -64,11 +64,12 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
             final var world = MinecraftClient.getInstance().world;
 
             final Map<Vec3d, IFortressAwareEntity> entitesMap = new HashMap<>();
+            final UUID playerUUID = MinecraftClient.getInstance().player.getUuid();
             world
                 .getEntities()
                 .forEach(
                     entity -> {
-                        if(entity instanceof IFortressAwareEntity fae && fae.getMasterId().map(it -> it.equals(MinecraftClient.getInstance().player.getUuid())).orElse(false)) {
+                        if(entity instanceof IFortressAwareEntity fae && fae.getMasterId().map(it -> it.equals(playerUUID)).orElse(false)) {
                             final var pos = entity.getPos();
                             entitesMap.put(pos, fae);
                         }
@@ -82,7 +83,6 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
             int maxY = Math.max(mouseStartPos.getY(), mouseEndPos.getY());
 
             final var screenPositions = CameraTools.projectToScreenSpace(entitesMap.keySet(), MinecraftClient.getInstance());
-            this.screenPositions = screenPositions.keySet();
             for (Map.Entry<Vec2f, Vec3d> entry : screenPositions.entrySet()) {
                 final var screenPos = entry.getKey();
                 final var entityPos = entry.getValue();
