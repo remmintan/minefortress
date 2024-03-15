@@ -39,7 +39,7 @@ public class TaskControl implements ITaskControl {
 
     @Override
     public boolean canStartTask(ITask task) {
-        return !hasTask() && !this.returnedIds.asMap().containsKey(task.getId()) && colonist.getCurrentFoodLevel() > 0;
+        return !this.returnedIds.asMap().containsKey(task.getId()) && colonist.getCurrentFoodLevel() > 0;
     }
 
     @Override
