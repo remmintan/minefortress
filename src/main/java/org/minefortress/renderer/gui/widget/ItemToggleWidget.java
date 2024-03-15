@@ -1,7 +1,6 @@
 package org.minefortress.renderer.gui.widget;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 
@@ -33,7 +32,18 @@ public class ItemToggleWidget extends ItemButtonWidget {
     }
 
     @Override
+    public void onClick(double mouseX, double mouseY) {
+        if(!shouldRenderSupplier.get()) return;
+        super.onClick(mouseX, mouseY);
+    }
+
+    @Override
     public boolean shouldRender(boolean isCreative) {
         return super.shouldRender(isCreative) && this.shouldRenderSupplier.get();
+    }
+
+    @Override
+    public boolean isHovered() {
+        return super.isHovered() && shouldRenderSupplier.get();
     }
 }

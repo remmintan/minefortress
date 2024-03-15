@@ -98,7 +98,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         final var provider = CoreModUtils.getMineFortressManagersProvider();
 
         ModUtils.getSelectionManager().resetSelection();
-        provider.get_PawnsSelectionManager().resetSelection();
+//        provider.get_PawnsSelectionManager().resetSelection();
         ModUtils.getAreasClientManager().resetSelection();
     }
 
