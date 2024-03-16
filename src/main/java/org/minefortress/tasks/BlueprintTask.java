@@ -11,6 +11,7 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
@@ -145,4 +146,12 @@ public class BlueprintTask extends AbstractTask {
         }
     }
 
+    @Override
+    public List<TaskInformationDto> toTaskInformationDto() {
+        Set<BlockPos> allBlocks = new HashSet<>(blueprintData.keySet());
+        if(blueprintEntityData != null) allBlocks.addAll(blueprintEntityData.keySet());
+        if(blueprintAutomaticData != null) allBlocks.addAll(blueprintAutomaticData.keySet());
+        final var positions = allBlocks.stream().map(it -> it.add(startingBlock)).toList();
+        return List.of(new TaskInformationDto(id, positions, taskType));
+    }
 }

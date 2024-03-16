@@ -13,7 +13,7 @@ import java.util.List;
 
 public class S2CAddClientTasksPacket implements FortressS2CPacket {
 
-    public static final String CHANNEL = "minefortress:client_task_state";
+    public static final String CHANNEL = "minefortress_client_task_state";
 
     private final List<TaskInformationDto> tasks;
 
