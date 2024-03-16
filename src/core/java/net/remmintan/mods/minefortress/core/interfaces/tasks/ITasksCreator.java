@@ -13,12 +13,12 @@ import java.util.UUID;
 
 public interface ITasksCreator extends IServerManager {
 
-    ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots);
+    ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots, List<BlockPos> positions);
     default ITask createRoadsTask(UUID digUuid, TaskType type, UUID placeUuid, List<BlockPos> blocks, Item itemInHand) {
         return createRoadsTask(digUuid, type, placeUuid, blocks, itemInHand, () -> {});
     }
     ITask createRoadsTask(UUID digUuid, TaskType type, UUID placeUuid, List<BlockPos> blocks, Item itemInHand, Runnable onComplete);
 
-    ITask createSelectionTask(UUID id, TaskType taskType, BlockPos start, BlockPos end, ServerSelectionType selectionType, HitResult hitResult, ServerPlayerEntity player);
+    ITask createSelectionTask(UUID id, TaskType taskType, BlockPos start, BlockPos end, ServerSelectionType selectionType, HitResult hitResult, List<BlockPos> positions, ServerPlayerEntity player);
 
 }

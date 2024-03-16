@@ -2,9 +2,9 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.BookScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSleepPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -47,10 +47,10 @@ public class UtilsHudLayer extends AbstractHudLayer {
                     0,
                     100,
                     Items.ENDER_EYE,
-                    (btn) -> ModUtils.getClientTasksHolder().ifPresent(IClientTasksHolder::toggleSelectionVisibility),
-                    (button) -> ModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden)
+                    (btn) -> CoreModUtils.getClientTasksHolder().ifPresent(IClientTasksHolder::toggleSelectionVisibility),
+                    (button) -> CoreModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden)
                             .map(it -> it ? "Show Tasks outline" : "Hide Tasks outline"),
-                    () -> ModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden).orElse(false),
+                    () -> CoreModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden).orElse(false),
                     () -> true,
                     Items.ENDER_PEARL
             ),

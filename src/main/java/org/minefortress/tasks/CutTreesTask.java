@@ -6,6 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.remmintan.gobi.helpers.TreeBlocks;
 import net.remmintan.gobi.helpers.TreeHelper;
 import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
@@ -25,10 +26,13 @@ public class CutTreesTask implements ITask {
 
     private int removedRoots = 0;
 
-    public CutTreesTask(UUID uuid, List<BlockPos> treeRoots) {
+    private final List<BlockPos> positions;
+
+    public CutTreesTask(UUID uuid, List<BlockPos> treeRoots, List<BlockPos> positions) {
         this.uuid = uuid;
         this.treeRoots = new ArrayDeque<>(treeRoots);
         this.totalRootCount = treeRoots.size();
+        this.positions = positions;
     }
 
     @Override
@@ -81,5 +85,11 @@ public class CutTreesTask implements ITask {
                 FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
             });
         }
+    }
+
+    @Override
+    public List<TaskInformationDto> toTaskInformationDto() {
+        final var taskInformationDto = new TaskInformationDto(getId(), positions, TaskType.REMOVE);
+        return List.of(taskInformationDto);
     }
 }

@@ -5,16 +5,17 @@ import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
-import org.jetbrains.annotations.NotNull;
+import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
-import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import org.minefortress.utils.BlockUtils;
 
 import java.util.*;
@@ -124,6 +125,17 @@ public class RoadsTask implements ITask {
                 FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
             });
             onComplete.run();
+        }
+    }
+
+    @Override
+    public List<TaskInformationDto> toTaskInformationDto() {
+        if(taskType == TaskType.BUILD){
+            final var digTask = new TaskInformationDto(id, blocks, TaskType.REMOVE);
+            final var placeTask = new TaskInformationDto(id, blocks, TaskType.BUILD);
+            return List.of(digTask, placeTask);
+        } else {
+            return List.of();
         }
     }
 }

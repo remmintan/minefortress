@@ -69,7 +69,7 @@ public class BuiltTasks implements BuiltModel {
 
     private void renderBlock(BufferBuilder bufferBuilder, MatrixStack matrices, BiFunction<World, BlockPos, Boolean> shouldRender, IClientTask selection, Vector4f color) {
         init(bufferBuilder);
-        final Set<BlockPos> positions = selection.getBlockPositions();
+        final var positions = selection.getBlockPositions();
         for(BlockPos pos: positions) {
             if(!shouldRender.apply(getWorld(), pos)) continue;
             matrices.push();

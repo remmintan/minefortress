@@ -5,20 +5,19 @@ import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import org.joml.Vector4f;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 
-public final class ClientSelection implements IClientTask {
-
-    private final Set<BlockPos> blockPositions;
+public final class ClientTask implements IClientTask {
+    private final List<BlockPos> blockPositions;
     private final Vector4f color;
     private final BiFunction<World, BlockPos, Boolean> shouldRenderBlock;
 
-    public ClientSelection(Iterable<BlockPos> blockPositions,
-                           Vector4f color,
-                           BiFunction<World, BlockPos, Boolean> shouldRenderBlock) {
-        HashSet<BlockPos> positions = new HashSet<>();
+    public ClientTask(Iterable<BlockPos> blockPositions,
+            Vector4f color,
+            BiFunction<World, BlockPos, Boolean> shouldRenderBlock) {
+        List<BlockPos> positions = new ArrayList<>();
         for(BlockPos pos: blockPositions) {
             positions.add(pos.toImmutable());
         }
@@ -28,10 +27,9 @@ public final class ClientSelection implements IClientTask {
     }
 
     @Override
-    public Set<BlockPos> getBlockPositions() {
+    public List<BlockPos> getBlockPositions() {
         return blockPositions;
     }
-
 
     @Override
     public Vector4f getColor() {

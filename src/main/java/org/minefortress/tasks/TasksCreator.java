@@ -17,8 +17,8 @@ import java.util.UUID;
 public class TasksCreator implements ITasksCreator {
 
     @Override
-    public ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots) {
-        return new CutTreesTask(uuid, treeRoots);
+    public ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots, List<BlockPos> positions) {
+        return new CutTreesTask(uuid, treeRoots, positions);
     }
 
     @Override
@@ -27,8 +27,8 @@ public class TasksCreator implements ITasksCreator {
     }
 
     @Override
-    public ITask createSelectionTask(UUID id, TaskType taskType, BlockPos start, BlockPos end, ServerSelectionType selectionType, HitResult hitResult, ServerPlayerEntity player) {
-        SimpleSelectionTask simpleSelectionTask = new SimpleSelectionTask(id, taskType, start, end, hitResult, selectionType);
+    public ITask createSelectionTask(UUID id, TaskType taskType, BlockPos start, BlockPos end, ServerSelectionType selectionType, HitResult hitResult, List<BlockPos> positions, ServerPlayerEntity player) {
+        SimpleSelectionTask simpleSelectionTask = new SimpleSelectionTask(id, taskType, start, end, hitResult, selectionType, positions);
         if(simpleSelectionTask.getTaskType() == TaskType.BUILD) {
             final ItemStack itemInHand = player.getStackInHand(Hand.MAIN_HAND);
             if(itemInHand != ItemStack.EMPTY) {

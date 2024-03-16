@@ -1,9 +1,10 @@
 package org.minefortress.tasks;
 
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.gobi.ClientSelection;
+import net.remmintan.gobi.ClientTask;
 import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
@@ -16,7 +17,7 @@ import org.joml.Vector4f;
 
 import java.util.*;
 
-public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider, IClientTasksHolder {
+public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider, IClientTasksHolder {
     private static final Vector4f DESTROY_COLOR = new Vector4f(170f/255f, 0, 0, 1f);
     private static final Vector4f BUILD_COLOR = new Vector4f(0, 170f/255f, 0, 1f);
 
@@ -30,7 +31,8 @@ public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, 
     private boolean selectionHidden = false;
     private boolean needRebuild = false;
 
-    public void cancelTask() {
+    @Override
+    public void cancelLatestTask() {
         if(tasksStack.empty()) return;
         final UUID lastTaskId = tasksStack.pop();
         subtasksMap.entrySet().stream().filter(it -> it.getValue().equals(lastTaskId)).map(Map.Entry::getKey).forEach(it -> {
@@ -44,28 +46,23 @@ public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, 
         }
     }
 
+    @Override
     public void cancelAllTasks() {
         while(!tasksStack.empty()) {
-            cancelTask();
+            cancelLatestTask();
         }
     }
 
     @Override
-    public void addRoadsSelectionTask(UUID digTaskId, UUID placeTaskId, List<BlockPos> positions) {
-        addTask(digTaskId, positions, TaskType.REMOVE);
-        addTask(placeTaskId, positions, TaskType.BUILD);
+    public void addTasks(List<TaskInformationDto> tasks) {
+        for(TaskInformationDto task: tasks) {
+            addTask(task.id(), task.positions(), task.type(), null);
+        }
     }
 
-    public void addTask(UUID uuid, Iterable<BlockPos> blocks) {
-        addTask(uuid, blocks, TaskType.BUILD);
-    }
-
-    public void addTask(UUID uuid, Iterable<BlockPos> blocks, TaskType type) {
-        addTask(uuid, blocks, type, null);
-    }
-
+    @Override
     public void addTask(UUID uuid, Iterable<BlockPos> blocks, TaskType type, UUID superTaskId) {
-        IClientTask newTask = new ClientSelection(
+        IClientTask newTask = new ClientTask(
                 blocks,
                 type == TaskType.REMOVE ? DESTROY_COLOR: BUILD_COLOR,
                 (w, p) -> type == TaskType.REMOVE ? BuildingHelper.canRemoveBlock(w, p) : BuildingHelper.canPlaceBlock(w, p)
@@ -86,11 +83,12 @@ public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, 
 
     @Override
     public Set<IClientTask> getAllSelections() {
-        final var clientSelections = new HashSet<IClientTask>(buildTasks.values());
+        final var clientSelections = new HashSet<>(buildTasks.values());
         clientSelections.addAll(removeTasks.values());
         return clientSelections;
     }
 
+    @Override
     public void removeTask(UUID uuid) {
         if(buildTasks.containsKey(uuid)) {
             buildTasks.remove(uuid);
@@ -104,28 +102,28 @@ public class ClientVisualTasksHolder implements ITasksModelBuilderInfoProvider, 
         this.setNeedRebuild(true);
     }
 
+    @Override
     public boolean isNeedRebuild() {
         return needRebuild;
     }
 
+    @Override
     public void setNeedRebuild(boolean needRebuild) {
         this.needRebuild = needRebuild;
     }
 
     @Override
     public boolean shouldRender() {
-        return !selectionHidden && (removeTasks.size() > 0 || buildTasks.size() > 0);
+        return !selectionHidden && (!removeTasks.isEmpty() || !buildTasks.isEmpty());
     }
 
+    @Override
     public void toggleSelectionVisibility() {
         this.selectionHidden = !this.selectionHidden;
     }
 
+    @Override
     public boolean isSelectionHidden() {
         return selectionHidden;
-    }
-
-    public boolean isEmpty() {
-        return buildTasks.isEmpty() && removeTasks.isEmpty();
     }
 }

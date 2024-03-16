@@ -194,6 +194,7 @@ public class WallsSelection extends Selection {
                                     p.getSecond().up(upDelta),
                                     hitResult,
                                     getSelectionType().name(),
+                                    getSelection(),
                                     selectedPawnsIds
                             );
 

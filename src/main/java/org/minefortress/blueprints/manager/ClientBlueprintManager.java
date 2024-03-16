@@ -114,9 +114,8 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
 
         if(!super.canBuild()) return;
 
-        UUID taskId = UUID.randomUUID();
-        addTaskToTasksHolder(taskId);
-        final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket(taskId);
+//        addTaskToTasksHolder(taskId);
+        final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket();
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
 
         if(!client.options.sprintKey.isPressed()) {
@@ -125,9 +124,10 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     }
 
     @NotNull
-    private ServerboundBlueprintTaskPacket getServerboundBlueprintTaskPacket(UUID taskId) {
+    private ServerboundBlueprintTaskPacket getServerboundBlueprintTaskPacket() {
         final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
-        return new ServerboundBlueprintTaskPacket(taskId,
+        return new ServerboundBlueprintTaskPacket(
+                        UUID.randomUUID(),
                         selectedStructure.getId(),
                         getStructureBuildPos(),
                         selectedStructure.getRotation(),

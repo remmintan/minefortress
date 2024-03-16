@@ -4,8 +4,10 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ITask {
@@ -18,5 +20,6 @@ public interface ITask {
     void finishPart(ITaskPart part, IWorkerPawn colonist);
 
     default void addFinishListener(Runnable listener) {}
+    List<TaskInformationDto> toTaskInformationDto();
 
 }

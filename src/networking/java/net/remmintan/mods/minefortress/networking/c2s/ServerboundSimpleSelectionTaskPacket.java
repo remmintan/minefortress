@@ -24,14 +24,15 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
     private final HitResult hitResult;
     private final String selectionType;
     private final List<Integer> selectedPawns;
-
-    public ServerboundSimpleSelectionTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, String selectionType, List<Integer> selectedPawns) {
+    private final List<BlockPos> positions;
+    public ServerboundSimpleSelectionTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, String selectionType, List<BlockPos> positions, List<Integer> selectedPawns) {
         this.id = id;
         this.taskType = taskType;
         this.start = start;
         this.end = end;
         this.hitResult = hitResult;
         this.selectionType = selectionType;
+        this.positions = positions;
         this.selectedPawns = selectedPawns;
     }
 
@@ -47,9 +48,16 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
             this.hitResult = null;
         }
         this.selectionType = buffer.readString();
+
+        this.positions = new ArrayList<>();
+        int selectionSize = buffer.readInt();
+        for (int i = 0; i < selectionSize; i++) {
+            this.positions.add(buffer.readBlockPos());
+        }
+
         this.selectedPawns = new ArrayList<>();
-        int size = buffer.readInt();
-        for (int i = 0; i < size; i++) {
+        int pawnsSize = buffer.readInt();
+        for (int i = 0; i < pawnsSize; i++) {
             this.selectedPawns.add(buffer.readInt());
         }
     }
@@ -66,6 +74,12 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
             buffer.writeBlockHitResult((BlockHitResult) this.hitResult);
         }
         buffer.writeString(selectionType);
+
+        buffer.writeInt(positions.size());
+        for (BlockPos blockPos : positions) {
+            buffer.writeBlockPos(blockPos);
+        }
+
         buffer.writeInt(selectedPawns.size());
         for (Integer selectedPawn : selectedPawns) {
             buffer.writeInt(selectedPawn);
@@ -107,9 +121,9 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
         final var endingBlock = this.getEnd();
         final var hitResult = this.getHitResult();
         final var selectionType = this.getSelectionType();
-        final var task = tasksCreator.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, player);
+        final var task = tasksCreator.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, positions, player);
         final var manager = getFortressManager(server, player);
 
-        taskManager.addTask(task, provider, manager, selectedPawns,player);
+        taskManager.addTask(task, provider, manager, selectedPawns, player);
     }
 }

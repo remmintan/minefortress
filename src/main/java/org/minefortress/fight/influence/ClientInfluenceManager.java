@@ -7,6 +7,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderStage;
+import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
@@ -15,6 +16,7 @@ import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressMan
 import net.remmintan.mods.minefortress.core.interfaces.infuence.IClientInfluenceManager;
 import net.remmintan.mods.minefortress.core.interfaces.infuence.IInfluencePosStateHolder;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionsHireTypes;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SCaptureInfluencePositionPacket;
 import net.remmintan.mods.minefortress.networking.c2s.C2SUpdateNewInfluencePosition;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -132,7 +134,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager implement
     @Override
     public void sendCaptureTaskPacket(BlockPos pos, IStructureBlockData blockData) {
         final var taskId = UUID.randomUUID();
-        ModUtils.getClientTasksHolder()
+        CoreModUtils.getClientTasksHolder()
                 .ifPresent(it -> {
                     final var blocks = blockData.getLayer(BlueprintDataLayer.GENERAL)
                             .entrySet()
@@ -143,7 +145,7 @@ public class ClientInfluenceManager extends BaseClientStructureManager implement
                             .map(BlockPos::toImmutable)
                             .map(p -> p.add(pos))
                             .toList();
-                    it.addTask(taskId, blocks);
+                    it.addTask(taskId, blocks, TaskType.BUILD, null);
                 });
 
         final var packet = new C2SCaptureInfluencePositionPacket(taskId, pos);

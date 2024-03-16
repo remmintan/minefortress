@@ -10,6 +10,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
@@ -32,8 +33,9 @@ public class SimpleSelectionTask extends AbstractTask {
     private final ServerSelectionType selectionType;
 
     private Item placingItem;
+    private List<BlockPos> positions;
 
-    public SimpleSelectionTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, HitResult hitResult, ServerSelectionType selectionType) {
+    public SimpleSelectionTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, HitResult hitResult, ServerSelectionType selectionType, List<BlockPos> positions) {
         super(id, taskType, startingBlock, endingBlock);
         this.selectionType = selectionType;
 
@@ -56,6 +58,8 @@ public class SimpleSelectionTask extends AbstractTask {
             this.hitResult = hitResult;
             this.horizontalDirection = null;
         }
+
+        this.positions = positions;
     }
 
     private boolean isShouldSwapEnds(TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, ServerSelectionType selectionType) {
@@ -122,4 +126,8 @@ public class SimpleSelectionTask extends AbstractTask {
         }
     }
 
+    @Override
+    public List<TaskInformationDto> toTaskInformationDto() {
+        return List.of(new TaskInformationDto(id, positions, taskType));
+    }
 }

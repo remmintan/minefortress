@@ -71,7 +71,6 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
             final var provider = getManagersProvider(server, player);
             if(manager.isSurvival()) {
-
                 final var serverResourceManager = provider.getResourceManager();
                 final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
                 try {

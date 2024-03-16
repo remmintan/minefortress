@@ -9,10 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionType;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSimpleSelectionTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
@@ -63,19 +61,16 @@ public class TwoDotsSelection extends Selection {
             return false;
         } else {
             if(pickedBlock != null && hitResult instanceof BlockHitResult && click == this.clickType && connection != null && selectionEnd != null) {
-                UUID newTaskId = UUID.randomUUID();
-                TaskType taskType = mapClickTypeToTaskType(clickType);
-                if(level instanceof ITasksInformationHolder holder) {
-                    holder.get_ClientTasksHolder().addTask(newTaskId, getSelection(), taskType);
-                }
+                final var taskType = mapClickTypeToTaskType(clickType);
                 final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
                 final var packet = new ServerboundSimpleSelectionTaskPacket(
-                        newTaskId,
+                        UUID.randomUUID(),
                         taskType,
                         this.selectionStart,
                         this.selectionEnd,
                         hitResult,
                         getSelectionType().name(),
+                        getSelection(),
                         selectedPawnsIds
                 );
 

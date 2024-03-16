@@ -1,13 +1,13 @@
 package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.gobi.ClientSelection;
+import net.remmintan.gobi.ClientTask;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ISavedAreasHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +54,7 @@ public final class SavedAreasHolder implements ITasksModelBuilderInfoProvider, I
     }
 
     private IClientTask toClientSelection(IAutomationAreaInfo info) {
-        return new ClientSelection(
+        return new ClientTask(
                 info.getClientArea(),
                 info.getAreaType().getColor(),
                 BuildingHelper::canRemoveBlock

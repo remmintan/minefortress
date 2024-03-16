@@ -8,13 +8,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import net.remmintan.mods.minefortress.core.utils.PathUtils;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 
 import java.util.*;
 
@@ -23,8 +24,8 @@ public abstract class AbstractTask implements ITask {
     protected static final int PART_SIZE = 3;
 
     // CAUTION: not actually unique
-    private final UUID id;
-    private final TaskType taskType;
+    protected final UUID id;
+    protected final TaskType taskType;
     protected BlockPos startingBlock;
     protected BlockPos endingBlock;
 
@@ -102,6 +103,13 @@ public abstract class AbstractTask implements ITask {
             colonsit.getMasterPlayer().ifPresent(this::sendFinishTaskNotificationToPlayer);
             taskFinishListeners.forEach(Runnable::run);
         }
+    }
+
+    @Override
+    public List<TaskInformationDto> toTaskInformationDto() {
+        final var blocks = new ArrayList<BlockPos>();
+        BlockPos.iterate(startingBlock, endingBlock).forEach(it -> blocks.add(it.toImmutable()));
+        return Collections.singletonList(new TaskInformationDto(id, blocks, taskType));
     }
 
     protected void sendFinishTaskNotificationToPlayer(ServerPlayerEntity randomPlayer) {

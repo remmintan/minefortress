@@ -4,11 +4,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.joml.Vector4f;
 
-import java.util.Set;
+import java.util.List;
 
 public interface IClientTask {
 
-    Set<BlockPos> getBlockPositions();
+    List<BlockPos> getBlockPositions();
 
     Vector4f getColor();
 

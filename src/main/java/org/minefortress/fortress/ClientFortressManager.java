@@ -366,7 +366,7 @@ public final class ClientFortressManager implements IClientFortressManager {
             ModUtils.getAreasClientManager().getSavedAreasHolder().setNeedRebuild(true);
         }
         if(state == FortressState.BUILD_SELECTION || state == FortressState.BUILD_EDITING) {
-            ModUtils.getClientTasksHolder().ifPresent(it -> it.setNeedRebuild(true));
+            CoreModUtils.getClientTasksHolder().ifPresent(it -> it.setNeedRebuild(true));
         }
     }
 

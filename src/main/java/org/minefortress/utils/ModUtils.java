@@ -15,8 +15,6 @@ import net.remmintan.mods.minefortress.core.interfaces.infuence.IClientInfluence
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreasClientManager;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.MineFortressMod;
 import org.minefortress.interfaces.IFortressMinecraftClient;
@@ -93,16 +91,6 @@ public class ModUtils {
 
     public static ISelectionManager getSelectionManager() {
         return getClientManagersProvider().get_SelectionManager();
-    }
-
-    public static Optional<ITasksInformationHolder> getFortressClientWorld() {
-        return Optional.ofNullable(MinecraftClient.getInstance())
-                .map(it -> it.world)
-                .map(ITasksInformationHolder.class::cast);
-    }
-
-    public static Optional<IClientTasksHolder> getClientTasksHolder() {
-        return getFortressClientWorld().map(ITasksInformationHolder::get_ClientTasksHolder);
     }
 
     @NotNull

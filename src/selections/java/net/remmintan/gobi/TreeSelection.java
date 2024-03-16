@@ -11,9 +11,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.remmintan.gobi.helpers.TreeBlocks;
 import net.remmintan.gobi.helpers.TreeHelper;
-import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundCutTreesTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
@@ -58,11 +56,8 @@ public class TreeSelection extends Selection {
             if(!treeRoots.isEmpty()) {
                 this.selectedTreeBlocks.remove(start);
                 final UUID newTaskId = UUID.randomUUID();
-                if(level instanceof ITasksInformationHolder holder) {
-                    holder.get_ClientTasksHolder().addTask(newTaskId, getSelection(), TaskType.REMOVE);
-                }
                 final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
-                final var packet = new ServerboundCutTreesTaskPacket(newTaskId, Collections.unmodifiableList(treeRoots), selectedPawnsIds);
+                final var packet = new ServerboundCutTreesTaskPacket(newTaskId, Collections.unmodifiableList(treeRoots), getSelection(), selectedPawnsIds);
                 FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_CUT_TREES_TASK, packet);
             }
 

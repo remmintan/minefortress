@@ -1,6 +1,5 @@
 package org.minefortress.blueprints.manager;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -8,11 +7,12 @@ import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.utils.ModUtils;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class BaseClientStructureManager implements IStructureRenderInfoProvider {
@@ -126,24 +126,6 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     @Override
     public boolean canBuild() {
         return !cantBuild;
-    }
-
-    protected void addTaskToTasksHolder(UUID taskId) {
-        final ITasksInformationHolder world = (ITasksInformationHolder) client.world;
-        if(world != null) {
-            final IStructureBlockData blockData = getBlockData();
-            final Map<BlockPos, BlockState> structureData = blockData
-                    .getLayer(BlueprintDataLayer.GENERAL);
-            final int floorLevel = getSelectedStructure().getFloorLevel();
-            final List<BlockPos> blocks = structureData
-                    .entrySet()
-                    .stream()
-                    .filter(entry -> !entry.getValue().isAir())
-                    .map(Map.Entry::getKey)
-                    .map(it -> it.add(structureBuildPos.down(floorLevel)))
-                    .collect(Collectors.toList());
-            world.get_ClientTasksHolder().addTask(taskId, blocks);
-        }
     }
 
     protected void reset() {

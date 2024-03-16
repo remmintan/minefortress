@@ -78,7 +78,7 @@ public class FortressClientEvents {
                 if(client.options.sprintKey.isPressed()) {
                     clientVisualTasksHolder.cancelAllTasks();
                 } else {
-                    clientVisualTasksHolder.cancelTask();
+                    clientVisualTasksHolder.cancelLatestTask();
                 }
             }
         }

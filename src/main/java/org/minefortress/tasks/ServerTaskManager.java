@@ -11,6 +11,8 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressMan
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.S2CAddClientTasksPacket;
 import org.minefortress.fortress.resources.ItemInfo;
 
 import java.util.*;
@@ -19,6 +21,7 @@ import java.util.stream.StreamSupport;
 
 public class ServerTaskManager implements IServerTaskManager {
     private final Set<UUID> cancelledTasks = new HashSet<>();
+    private final Map<UUID, ITask> nonFinishedTasks = new HashMap<>();
 
     @Override
     public void addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager, List<Integer> selectedPawns, ServerPlayerEntity player) {
@@ -49,11 +52,16 @@ public class ServerTaskManager implements IServerTaskManager {
                 .toList();
 
         assignPawnsToTask(player, task, selectedWorkers);
+
+        final var packet = new S2CAddClientTasksPacket(task.toTaskInformationDto());
+        FortressServerNetworkHelper.send(player, S2CAddClientTasksPacket.CHANNEL, packet);
+        nonFinishedTasks.put(task.getId(), task);
     }
 
     @Override
     public void cancelTask(UUID id, IServerManagersProvider provider, IServerFortressManager manager) {
         cancelledTasks.add(id);
+        nonFinishedTasks.remove(id);
         provider.getResourceManager().returnReservedItems(id);
     }
 
