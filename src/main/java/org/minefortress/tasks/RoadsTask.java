@@ -32,12 +32,11 @@ public class RoadsTask implements ITask {
     private final int totalParts;
     private int finishedParts = 0;
 
-    private final Runnable onComplete;
+    private final List<Runnable> taskFinishListeners = new ArrayList<>();
 
-    public RoadsTask(UUID id, TaskType taskType, List<BlockPos> blocks, Item item, Runnable onComplete) {
+    public RoadsTask(UUID id, TaskType taskType, List<BlockPos> blocks, Item item) {
         this.id = id;
         this.taskType = taskType;
-        this.onComplete = onComplete;
         this.blocks = blocks;
         this.item = item;
         this.totalParts = prepareParts();
@@ -120,12 +119,17 @@ public class RoadsTask implements ITask {
     public void finishPart(ITaskPart part, IWorkerPawn colonist) {
         final ServerWorld world = colonist.getServerWorld();
         finishedParts++;
-        if(taskParts.isEmpty() && finishedParts == totalParts){
+        if(taskParts.isEmpty() && totalParts <= finishedParts){
             world.getPlayers().stream().findAny().ifPresent(player -> {
                 FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
             });
-            onComplete.run();
+            taskFinishListeners.forEach(Runnable::run);
         }
+    }
+
+    @Override
+    public void addFinishListener(Runnable listener) {
+        taskFinishListeners.add(listener);
     }
 
     @Override

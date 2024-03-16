@@ -22,8 +22,8 @@ public class TasksCreator implements ITasksCreator {
     }
 
     @Override
-    public ITask createRoadsTask(UUID digUuid, TaskType type, UUID placeUuid, List<BlockPos> blocks, Item itemInHand, Runnable onComplete) {
-        return new RoadsTask(placeUuid, type, blocks, itemInHand, onComplete);
+    public ITask createRoadsTask(UUID digUuid, TaskType type, UUID placeUuid, List<BlockPos> blocks, Item itemInHand) {
+        return new RoadsTask(placeUuid, type, blocks, itemInHand);
     }
 
     @Override
