@@ -132,12 +132,6 @@ public class RoadsTask implements ITask {
 
     @Override
     public List<TaskInformationDto> toTaskInformationDto() {
-        if(item == null) {
-            final var digTask = new TaskInformationDto(id, blocks, TaskType.REMOVE);
-            final var placeTask = new TaskInformationDto(id, blocks, TaskType.BUILD);
-            return List.of(digTask, placeTask);
-        } else {
-            return List.of();
-        }
+        return List.of(new TaskInformationDto(id, blocks, getTaskType()));
     }
 }
