@@ -2,6 +2,7 @@ package org.minefortress.tasks;
 
 
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -9,6 +10,7 @@ import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -19,7 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class ServerTaskManager implements IServerTaskManager {
+public class ServerTaskManager implements IServerTaskManager, IWritableManager {
     private final Set<UUID> cancelledTasks = new HashSet<>();
     private final Map<UUID, ITask> nonFinishedTasks = new HashMap<>();
 
@@ -103,4 +105,13 @@ public class ServerTaskManager implements IServerTaskManager {
     }
 
 
+    @Override
+    public void write(NbtCompound tag) {
+
+    }
+
+    @Override
+    public void read(NbtCompound tag) {
+
+    }
 }

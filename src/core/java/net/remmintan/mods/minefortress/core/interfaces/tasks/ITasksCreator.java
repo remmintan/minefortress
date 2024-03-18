@@ -15,7 +15,7 @@ public interface ITasksCreator extends IServerManager {
 
     ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots, List<BlockPos> positions);
 
-    ITask createRoadsTask(UUID digUuid, TaskType type, UUID placeUuid, List<BlockPos> blocks, Item itemInHand);
+    ITask createRoadsTask(UUID uuid, List<BlockPos> blocks, Item itemInHand);
 
     ITask createSelectionTask(UUID id, TaskType taskType, BlockPos start, BlockPos end, ServerSelectionType selectionType, HitResult hitResult, List<BlockPos> positions, ServerPlayerEntity player);
 

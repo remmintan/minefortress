@@ -5,7 +5,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 import java.util.ArrayList;
@@ -59,15 +58,16 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
 
         final var stackInHand = player.getStackInHand(Hand.MAIN_HAND);
         final var item = stackInHand.getItem();
-        final var buildTask = tasksCreator.createRoadsTask(digUuid, TaskType.BUILD, placeUuid, blocks, item);
-        final var manager = getFortressManager(server, player);
-        final Runnable onDigComplete = () -> taskManager.addTask(buildTask, provider, manager, selectedPawns, player);
 
+        final var manager = getFortressManager(server, player);
         if(manager.isSurvival())
             resourceManager.reserveItems(placeUuid, Collections.singletonList(resourceManager.createItemInfo(item, blocks.size())));
 
-        final var digTask = tasksCreator.createRoadsTask(digUuid, TaskType.REMOVE, placeUuid, blocks, item);
-        digTask.addFinishListener(onDigComplete);
+        final var digTask = tasksCreator.createRoadsTask(digUuid, blocks, null);
+        digTask.addFinishListener(() -> {
+            final var buildTask = tasksCreator.createRoadsTask(placeUuid, blocks, item);
+            taskManager.addTask(buildTask, provider, manager, selectedPawns, player);
+        });
         taskManager.addTask(digTask, provider, manager, selectedPawns, player);
     }
 }

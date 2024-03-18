@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class RoadsTask implements ITask {
 
     private final UUID id;
-    private final TaskType taskType;
     private final Item item;
 
     private final List<BlockPos> blocks;
@@ -34,9 +33,8 @@ public class RoadsTask implements ITask {
 
     private final List<Runnable> taskFinishListeners = new ArrayList<>();
 
-    public RoadsTask(UUID id, TaskType taskType, List<BlockPos> blocks, Item item) {
+    public RoadsTask(UUID id, List<BlockPos> blocks, Item item) {
         this.id = id;
-        this.taskType = taskType;
         this.blocks = blocks;
         this.item = item;
         this.totalParts = prepareParts();
@@ -87,7 +85,7 @@ public class RoadsTask implements ITask {
 
     @Override
     public TaskType getTaskType() {
-        return taskType;
+        return item == null ? TaskType.REMOVE : TaskType.BUILD;
     }
 
     @Override
@@ -134,7 +132,7 @@ public class RoadsTask implements ITask {
 
     @Override
     public List<TaskInformationDto> toTaskInformationDto() {
-        if(taskType == TaskType.BUILD){
+        if(item == null) {
             final var digTask = new TaskInformationDto(id, blocks, TaskType.REMOVE);
             final var placeTask = new TaskInformationDto(id, blocks, TaskType.BUILD);
             return List.of(digTask, placeTask);
