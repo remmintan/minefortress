@@ -117,10 +117,11 @@ public class RoadsTask implements ITask {
     public void finishPart(ITaskPart part, IWorkerPawn colonist) {
         final ServerWorld world = colonist.getServerWorld();
         finishedParts++;
-        if(taskParts.isEmpty() && totalParts <= finishedParts){
-            world.getPlayers().stream().findAny().ifPresent(player -> {
-                FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
-            });
+        if(finishedParts > totalParts)
+            throw new IllegalStateException("Finished more parts than total parts");
+
+        if(taskParts.isEmpty() && totalParts == finishedParts){
+            world.getPlayers().stream().findAny().ifPresent(player -> FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId())));
             taskFinishListeners.forEach(Runnable::run);
         }
     }
@@ -133,5 +134,10 @@ public class RoadsTask implements ITask {
     @Override
     public List<TaskInformationDto> toTaskInformationDto() {
         return List.of(new TaskInformationDto(id, blocks, getTaskType()));
+    }
+
+    @Override
+    public boolean taskFullyFinished() {
+        return finishedParts == totalParts;
     }
 }

@@ -22,4 +22,6 @@ public interface ITask {
     default void addFinishListener(Runnable listener) {}
     List<TaskInformationDto> toTaskInformationDto();
 
+    boolean taskFullyFinished();
+
 }

@@ -99,10 +99,19 @@ public abstract class AbstractTask implements ITask {
     @Override
     public void finishPart(ITaskPart part, IWorkerPawn colonsit) {
         completedParts++;
+        if(completedParts > totalParts) {
+            throw new IllegalStateException("Completed parts cannot be greater than total parts");
+        }
+
         if(parts.isEmpty() && totalParts <= completedParts) {
             colonsit.getMasterPlayer().ifPresent(this::sendFinishTaskNotificationToPlayer);
             taskFinishListeners.forEach(Runnable::run);
         }
+    }
+
+    @Override
+    public boolean taskFullyFinished() {
+        return totalParts <= completedParts;
     }
 
     @Override

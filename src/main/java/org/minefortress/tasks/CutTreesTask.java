@@ -70,21 +70,26 @@ public class CutTreesTask implements ITask {
     @Override
     public void finishPart(ITaskPart part, IWorkerPawn colonist) {
         final ServerWorld world = colonist.getServerWorld();
-        if(part != null && part.getStartAndEnd() != null && part.getStartAndEnd().getFirst() != null) {
-            final BlockPos root = part.getStartAndEnd().getFirst();
-            final Optional<TreeBlocks> treeOpt = TreeHelper.getTreeBlocks(root.up(), world);
-            if(treeOpt.isPresent()) {
-                final TreeBlocks tree = treeOpt.get();
-                TreeHelper.removeTheRestOfATree(colonist, tree, world);
-            }
+        final BlockPos root = part.getStartAndEnd().getFirst();
+        final Optional<TreeBlocks> treeOpt = TreeHelper.getTreeBlocks(root.up(), world);
+        if(treeOpt.isPresent()) {
+            final TreeBlocks tree = treeOpt.get();
+            TreeHelper.removeTheRestOfATree(colonist, tree, world);
         }
 
         removedRoots++;
-        if(treeRoots.isEmpty() && removedRoots <= totalRootCount) {
-            world.getPlayers().stream().findAny().ifPresent(player -> {
-                FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
-            });
+        if(removedRoots > totalRootCount) {
+            throw new IllegalStateException("Removed more roots than total roots");
         }
+
+        if(treeRoots.isEmpty() && removedRoots == totalRootCount) {
+            world.getPlayers().stream().findAny().ifPresent(player -> FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId())));
+        }
+    }
+
+    @Override
+    public boolean taskFullyFinished() {
+        return removedRoots == totalRootCount;
     }
 
     @Override
