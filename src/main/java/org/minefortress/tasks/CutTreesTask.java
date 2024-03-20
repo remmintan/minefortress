@@ -25,7 +25,7 @@ public class CutTreesTask implements ITask {
     private final int totalRootCount;
 
     private int removedRoots = 0;
-
+    private boolean canceled = false;
     private final List<BlockPos> positions;
 
     public CutTreesTask(UUID uuid, List<BlockPos> treeRoots, List<BlockPos> positions) {
@@ -51,7 +51,7 @@ public class CutTreesTask implements ITask {
     }
 
     @Override
-    public ITaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
+    public ITaskPart getNextPart(IWorkerPawn colonist) {
         if(!treeRoots.isEmpty()) {
             final BlockPos root = treeRoots.remove();
             final ITaskBlockInfo rootBlockInfo = new DigTaskBlockInfo( root);
@@ -65,6 +65,11 @@ public class CutTreesTask implements ITask {
     public void returnPart(Pair<BlockPos, BlockPos> partStartAndEnd) {
         final BlockPos root = partStartAndEnd.getFirst();
         treeRoots.add(root);
+    }
+
+    @Override
+    public void cancel() {
+        canceled = true;
     }
 
     @Override

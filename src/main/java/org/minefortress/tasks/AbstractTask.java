@@ -36,6 +36,8 @@ public abstract class AbstractTask implements ITask {
 
     private final List<Runnable> taskFinishListeners = new ArrayList<>();
 
+    protected boolean canceled = false;
+
     protected AbstractTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock) {
         this.id = id;
         this.taskType = taskType;
@@ -112,6 +114,11 @@ public abstract class AbstractTask implements ITask {
     @Override
     public boolean taskFullyFinished() {
         return totalParts <= completedParts;
+    }
+
+    @Override
+    public void cancel() {
+        canceled = true;
     }
 
     @Override

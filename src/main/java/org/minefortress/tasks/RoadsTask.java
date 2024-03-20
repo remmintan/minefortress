@@ -31,6 +31,7 @@ public class RoadsTask implements ITask {
     private final int totalParts;
     private int finishedParts = 0;
 
+    private boolean canceled = false;
     private final List<Runnable> taskFinishListeners = new ArrayList<>();
 
     public RoadsTask(UUID id, List<BlockPos> blocks, Item item) {
@@ -94,7 +95,7 @@ public class RoadsTask implements ITask {
     }
 
     @Override
-    public ITaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
+    public ITaskPart getNextPart(IWorkerPawn colonist) {
         return taskParts.poll();
     }
 
@@ -124,6 +125,11 @@ public class RoadsTask implements ITask {
             world.getPlayers().stream().findAny().ifPresent(player -> FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId())));
             taskFinishListeners.forEach(Runnable::run);
         }
+    }
+
+    @Override
+    public void cancel() {
+        canceled = true;
     }
 
     @Override

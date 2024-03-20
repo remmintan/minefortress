@@ -2,7 +2,6 @@ package org.minefortress.tasks;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
@@ -26,7 +25,7 @@ public class RepairBuildingTask extends AbstractTask {
     }
 
     @Override
-    public ITaskPart getNextPart(ServerWorld level, IWorkerPawn colonist) {
+    public ITaskPart getNextPart(IWorkerPawn colonist) {
         final var part = parts.remove();
         final var taskBlocks = BlockPos.stream(part.getFirst(), part.getSecond())
                 .map(BlockPos::toImmutable)

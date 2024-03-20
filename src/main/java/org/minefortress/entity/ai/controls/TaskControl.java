@@ -1,7 +1,5 @@
 package org.minefortress.entity.ai.controls;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
@@ -18,78 +16,70 @@ import org.minefortress.tasks.SimpleSelectionTask;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 public class TaskControl implements ITaskControl {
 
-    private final Colonist colonist;
-    private final Cache<UUID, Boolean> returnedIds = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS).build();
-
+    private final Colonist worker;
     private boolean doingEverydayTasks = false;
     private ITask task;
     private ITaskPart taskPart;
     private Iterator<ITaskBlockInfo> blocks;
-    private Supplier<Boolean> cancelled;
 
-
-    public TaskControl(Colonist colonist) {
-        this.colonist = colonist;
+    public TaskControl(Colonist worker) {
+        this.worker = worker;
     }
 
     @Override
     public boolean canStartTask(ITask task) {
-        return !this.returnedIds.asMap().containsKey(task.getId()) && colonist.getCurrentFoodLevel() > 0;
+        return worker.getCurrentFoodLevel() > 0;
     }
 
     @Override
-    public void setTask(@NotNull ITask task, ITaskPart taskPart, @NotNull Supplier<Boolean> cancelled) {
+    public void setTask(@NotNull ITask task) {
         this.task = task;
-        this.taskPart = taskPart;
+        this.taskPart = task.getNextPart(worker);
         this.blocks = taskPart.getBlocks().iterator();
-        this.cancelled = cancelled;
         this.updateCurrentTaskDesription();
     }
 
     private void updateCurrentTaskDesription() {
         if(task instanceof SimpleSelectionTask) {
             if(task.getTaskType() == TaskType.REMOVE) {
-                colonist.setCurrentTaskDesc("Digging");
+                worker.setCurrentTaskDesc("Digging");
             } else {
-                colonist.setCurrentTaskDesc("Building");
+                worker.setCurrentTaskDesc("Building");
             }
         } else if(task instanceof BlueprintTask) {
-            colonist.setCurrentTaskDesc("Building blueprint");
+            worker.setCurrentTaskDesc("Building blueprint");
         } else if(task instanceof CutTreesTask) {
-            colonist.setCurrentTaskDesc("Falling trees");
+            worker.setCurrentTaskDesc("Falling trees");
         } else if(task instanceof RoadsTask) {
-            colonist.setCurrentTaskDesc("Building roads");
+            worker.setCurrentTaskDesc("Building roads");
         }
     }
 
     @Override
     public void resetTask() {
-        this.task = null;
+        if(task!=null && task.taskFullyFinished())
+            this.task = null;
         this.taskPart = null;
         this.blocks = null;
-        this.cancelled = null;
     }
 
     @Override
     public void fail() {
         if(!hasTask()) return;
         taskPart.returnTaskPart();
-        this.returnedIds.put(task.getId(), true);
         this.resetTask();
     }
 
     @Override
     public void success() {
         if(!hasTask()) return;
-        this.task.finishPart(taskPart, colonist);
+        this.task.finishPart(taskPart, worker);
         if(task.hasAvailableParts()) {
             // taking next part into work
-            this.setTask(task, task.getNextPart(colonist.getServerWorld(), colonist), cancelled);
+            this.setTask(task);
         } else {
             this.resetTask();
         }
@@ -97,10 +87,6 @@ public class TaskControl implements ITaskControl {
 
     @Override
     public boolean hasTask() {
-        if(cancelled != null && cancelled.get()) {
-            this.resetTask();
-            colonist.resetControls();
-        }
         return task != null;
     }
 

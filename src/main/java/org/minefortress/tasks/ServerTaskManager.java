@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class ServerTaskManager implements IServerTaskManager, IWritableManager {
-    private final Set<UUID> cancelledTasks = new HashSet<>();
     private final Map<UUID, ITask> nonFinishedTasks = new HashMap<>();
 
     @Override
@@ -62,7 +61,6 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
 
     @Override
     public void cancelTask(UUID id, IServerManagersProvider provider, IServerFortressManager manager) {
-        cancelledTasks.add(id);
         nonFinishedTasks.remove(id);
         provider.getResourceManager().returnReservedItems(id);
     }
@@ -100,7 +98,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
     private void setPawnsToTask(ServerWorld world, ITask task, List<IWorkerPawn> workers) {
         for(IWorkerPawn worker : workers) {
             if(!task.hasAvailableParts()) break;
-            worker.getTaskControl().setTask(task, task.getNextPart(world, worker), () -> cancelledTasks.contains(task.getId()));
+            worker.getTaskControl().setTask(task);
         }
     }
 
