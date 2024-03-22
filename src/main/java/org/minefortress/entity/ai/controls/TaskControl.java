@@ -69,7 +69,8 @@ public class TaskControl implements ITaskControl {
         if(taskPart!=null)
             this.task.finishPart(taskPart, worker);
 
-        this.findNextPart();
+        if(this.taskPart != null && !this.taskPart.hasNext())
+            this.findNextPart();
     }
 
     @Override
@@ -105,7 +106,6 @@ public class TaskControl implements ITaskControl {
     @Override
     public void findNextPart() {
         if(task.hasAvailableParts()) {
-            // taking next part into work
             this.setTask(task);
         } else {
             this.resetTask();

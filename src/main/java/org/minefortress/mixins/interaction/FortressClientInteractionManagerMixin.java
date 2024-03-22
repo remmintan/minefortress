@@ -68,8 +68,6 @@ public abstract class FortressClientInteractionManagerMixin {
         }
     }
 
-
-
     @Inject(method = "setGameMode", at = @At("RETURN"))
     public void setGameMode(GameMode gameMode, CallbackInfo ci) {
         if(gameMode == FORTRESS) {
@@ -86,30 +84,23 @@ public abstract class FortressClientInteractionManagerMixin {
         final var clientBlueprintManager = fortressClient.get_BlueprintManager();
         final var manager = fortressClient.get_ClientFortressManager();
 
+        if(manager.isCenterNotSet()) {
+            cir.setReturnValue(false);
+            return;
+        }
+
+        if(manager.getState() == FortressState.BUILD_SELECTION) {
+            cir.setReturnValue(false);
+            return;
+        }
+
         if(manager.getState() == FortressState.COMBAT) {
-//            final var influenceManager = ModUtils.getInfluenceManager();
-//            if(influenceManager.isSelecting()) {
-//                influenceManager.cancelSelectingInfluencePosition();
-//                cir.setReturnValue(false);
-//                return;
-//            }
-//            final var selectionManager = manager.getFightManager().getSelectionManager();
-//            final var mouse = client.mouse;
-//
-//            if(selectionManager.isSelecting())
-//                selectionManager.endSelection();
-//            else {
-//                if(selectionManager.hasSelected()) {
-//                    selectionManager.resetSelection();
-//                } else {
-//                    final var crosshairTarget = client.crosshairTarget;
-//                    if (crosshairTarget!=null)
-//                        selectionManager.startSelection(mouse.getX(), mouse.getY());
-//                }
-//            }
-//
-//            cir.setReturnValue(false);
-//            return;
+            final var influenceManager = ModUtils.getInfluenceManager();
+            if(influenceManager.isSelecting()) {
+                influenceManager.cancelSelectingInfluencePosition();
+                cir.setReturnValue(false);
+                return;
+            }
         }
 
         if(manager.getState() == FortressState.AREAS_SELECTION) {
@@ -119,17 +110,11 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        if(manager.isCenterNotSet()) {
-            cir.setReturnValue(false);
-            return;
-        }
-
         if(clientBlueprintManager.isSelecting()) {
            clientBlueprintManager.clearStructure();
             cir.setReturnValue(false);
             return;
         }
-
 
         if(manager.isBuildingHovered()) {
             openManageBuildingMenu(manager);
