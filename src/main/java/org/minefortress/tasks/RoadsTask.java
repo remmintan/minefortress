@@ -133,6 +133,11 @@ public class RoadsTask implements ITask {
     }
 
     @Override
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    @Override
     public void addFinishListener(Runnable listener) {
         taskFinishListeners.add(listener);
     }

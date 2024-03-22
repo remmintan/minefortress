@@ -76,16 +76,16 @@ public class BlueprintTask extends AbstractTask {
     }
 
     @Override
-    public void finishPart(ITaskPart part, IWorkerPawn colonist) {
-        final ServerWorld world = colonist.getServerWorld();
+    public void finishPart(ITaskPart part, IWorkerPawn worker) {
+        final ServerWorld world = worker.getServerWorld();
         if(parts.isEmpty() && getCompletedParts()+1 >= totalParts) {
             if(blueprintEntityData != null) {
                 blueprintEntityData.forEach((pos, state) -> {
                     final var realPos = pos.add(startingBlock);
                     world.setBlockState(realPos, state, 3);
                     final var item = state.getBlock().asItem();
-                    removeReservedItem(colonist, item);
-                    addSpecialBlueprintBlock(colonist, state.getBlock(), realPos);
+                    removeReservedItem(worker, item);
+                    addSpecialBlueprintBlock(worker, state.getBlock(), realPos);
                 });
             }
 
@@ -95,9 +95,9 @@ public class BlueprintTask extends AbstractTask {
                         final var realpos = pos.add(startingBlock);
                         world.setBlockState(realpos, state, 3);
 
-                        addSpecialBlueprintBlock(colonist, state.getBlock(), realpos);
+                        addSpecialBlueprintBlock(worker, state.getBlock(), realpos);
                         if(!state.isIn(BlockTags.BEDS) || state.get(BedBlock.PART) != BedPart.FOOT) {
-                            removeReservedItem(colonist, state.getBlock().asItem());
+                            removeReservedItem(worker, state.getBlock().asItem());
                         }
                     });
             }
@@ -115,15 +115,15 @@ public class BlueprintTask extends AbstractTask {
                     floorLevel,
                     mergeBlockData
             );
-            final var manager = colonist.getServerFortressManager().orElseThrow();
+            final var manager = worker.getServerFortressManager().orElseThrow();
             manager.expandTheVillage(fortressBuilding.getStart());
             manager.expandTheVillage(fortressBuilding.getEnd());
 
-            final var provider = colonist.getManagersProvider().orElseThrow();
+            final var provider = worker.getManagersProvider().orElseThrow();
             final var buildingManager = provider.getBuildingsManager();
             buildingManager.addBuilding(fortressBuilding);
         }
-        super.finishPart(part, colonist);
+        super.finishPart(part, worker);
     }
 
     private void addSpecialBlueprintBlock(IWorkerPawn colonist, Block block, BlockPos pos) {

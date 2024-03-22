@@ -73,6 +73,11 @@ public class CutTreesTask implements ITask {
     }
 
     @Override
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    @Override
     public void finishPart(ITaskPart part, IWorkerPawn colonist) {
         final ServerWorld world = colonist.getServerWorld();
         final BlockPos root = part.getStartAndEnd().getFirst();

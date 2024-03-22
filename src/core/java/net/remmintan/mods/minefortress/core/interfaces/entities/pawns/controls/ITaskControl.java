@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ITaskControl {
-    boolean canStartTask(ITask task);
 
     void setTask(@NotNull ITask task);
 
@@ -22,6 +21,8 @@ public interface ITaskControl {
 
     boolean hasTask();
 
+    boolean hasTaskPart();
+
     void setDoingEverydayTasks(boolean doingEverydayTasks);
 
     boolean isDoingEverydayTasks();
@@ -29,6 +30,8 @@ public interface ITaskControl {
     boolean is(TaskType type);
 
     boolean partHasMoreBlocks();
+
+    void findNextPart();
 
     Optional<UUID> getTaskId();
 

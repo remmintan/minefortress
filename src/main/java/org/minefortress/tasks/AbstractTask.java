@@ -99,14 +99,14 @@ public abstract class AbstractTask implements ITask {
     }
 
     @Override
-    public void finishPart(ITaskPart part, IWorkerPawn colonsit) {
+    public void finishPart(ITaskPart part, IWorkerPawn worker) {
         completedParts++;
         if(completedParts > totalParts) {
             throw new IllegalStateException("Completed parts cannot be greater than total parts");
         }
 
         if(parts.isEmpty() && totalParts <= completedParts) {
-            colonsit.getMasterPlayer().ifPresent(this::sendFinishTaskNotificationToPlayer);
+            worker.getMasterPlayer().ifPresent(this::sendFinishTaskNotificationToPlayer);
             taskFinishListeners.forEach(Runnable::run);
         }
     }
@@ -119,6 +119,11 @@ public abstract class AbstractTask implements ITask {
     @Override
     public void cancel() {
         canceled = true;
+    }
+
+    @Override
+    public boolean isCanceled() {
+        return canceled;
     }
 
     @Override

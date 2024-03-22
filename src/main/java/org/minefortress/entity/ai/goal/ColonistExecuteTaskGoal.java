@@ -9,6 +9,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.I
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
+
 import static net.remmintan.mods.minefortress.core.ModLogger.LOGGER;
 
 public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
@@ -44,9 +45,23 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public void tick() {
-        final var hasTask = getTaskControl().hasTask();
-        if(this.workGoal == null || !hasTask){
-            LOGGER.debug("{} don't have any work, but keep ticking [work goal {}, has task {}]", getColonistName(), workGoal, hasTask);
+        if(this.workGoal == null) {
+            // quite tricky part
+            // first of all we need to understand that if we have landed in this block we were not able to find
+            // any block to work on in the last moveToNextBlock() call
+            if(getTaskControl().hasTaskPart()) {
+                // if we end up here that means that we still have some task part to work on
+                // if we have more blocks in the current task part we should try to find the next one
+                // otherwise we should finish the task part successfully
+                if(getTaskControl().partHasMoreBlocks()) {
+                    moveToNextBlock();
+                } else  {
+                    getTaskControl().success();
+                }
+            } else {
+                getTaskControl().findNextPart();
+            }
+
             return;
         }
 
@@ -75,22 +90,14 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        final var notStarving = !super.isStarving();
-        final var hasTask = getTaskControl().hasTask();
-        final var hasGoalTryingToReachOrWorking = getMovementHelper().stillTryingToReachGoal() ||
-                workGoal != null ||
-                getTaskControl().partHasMoreBlocks() ||
-                colonist.diggingOrPlacing();
-        final var shouldContinue = notStarving && hasTask && hasGoalTryingToReachOrWorking;
-        LOGGER.debug("{} should continue task execution {} [not starving {}, has task {}, has goal and working {}, digging or placing {}]", getColonistName(), shouldContinue, notStarving, hasTask, hasGoalTryingToReachOrWorking, colonist.diggingOrPlacing());
-        return shouldContinue;
+        return getTaskControl().hasTask() && !super.isStarving();
     }
 
     @Override
     public void stop() {
         LOGGER.debug("{} stopping the task execution", getColonistName());
         final var taskControl = getTaskControl();
-        if(taskControl.hasTask()) {
+        if(taskControl.hasTaskPart()) {
             if(taskControl.partHasMoreBlocks()) {
                 LOGGER.debug("{} failing task part", getColonistName());
                taskControl.fail();

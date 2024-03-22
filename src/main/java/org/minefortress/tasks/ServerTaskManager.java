@@ -78,7 +78,6 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
             final List<IWorkerPawn> professionals = workers
                     .stream()
                     .filter(c -> professions.contains(c.getProfessionId()))
-                    .filter(c -> c.getTaskControl().canStartTask(task))
                     .collect(Collectors.toList());
             if(professionals.isEmpty()) {
                 player.sendMessage(Text.of("No appropriate professionals selected"), false);

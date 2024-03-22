@@ -23,5 +23,6 @@ public interface ITask {
 
     boolean taskFullyFinished();
     void cancel();
+    boolean isCanceled();
 
 }
