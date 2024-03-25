@@ -89,6 +89,12 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
+        if(manager.isBuildingHovered()) {
+            openManageBuildingMenu(manager);
+            cir.setReturnValue(false);
+            return;
+        }
+
         if(manager.getState() == FortressState.BUILD_SELECTION) {
             cir.setReturnValue(false);
             return;
@@ -112,12 +118,6 @@ public abstract class FortressClientInteractionManagerMixin {
 
         if(clientBlueprintManager.isSelecting()) {
            clientBlueprintManager.clearStructure();
-            cir.setReturnValue(false);
-            return;
-        }
-
-        if(manager.isBuildingHovered()) {
-            openManageBuildingMenu(manager);
             cir.setReturnValue(false);
             return;
         }

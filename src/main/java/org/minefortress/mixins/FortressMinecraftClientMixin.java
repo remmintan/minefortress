@@ -247,6 +247,12 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             }
             ci.cancel();
         }
+
+        final var pawnsSelection = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+        if(!pawnsSelection.getSelectedPawnsIds().isEmpty()) {
+            pawnsSelection.resetSelection();
+            ci.cancel();
+        }
     }
 
     @Override

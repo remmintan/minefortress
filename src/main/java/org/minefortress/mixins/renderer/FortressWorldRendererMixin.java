@@ -15,9 +15,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.border.WorldBorder;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
@@ -42,11 +42,13 @@ import java.util.function.BiFunction;
 @Mixin(WorldRenderer.class)
 public abstract class FortressWorldRendererMixin  {
 
-    private static final Identifier FORCEFIELD = new Identifier("textures/misc/forcefield.png");
+    @Unique
+    private static final Identifier FORCE_FIELD = new Identifier("textures/misc/forcefield.png");
     @Shadow @Final private MinecraftClient client;
     @Shadow private ClientWorld world;
     @Shadow @Final private BufferBuilderStorage bufferBuilders;
 
+    @Unique
     private MineFortressLabelsRenderer entityRenderer;
 
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -78,28 +80,31 @@ public abstract class FortressWorldRendererMixin  {
         fortressClient.get_SelectionRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
         fortressClient.get_TasksRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
 
+        if(!ModUtils.isClientInFortressGamemode()) return;
+        
         final var provider = CoreModUtils.getMineFortressManagersProvider();
         final var selectionManager = provider.get_SelectionManager();
         final var immediate = this.bufferBuilders.getEntityVertexConsumers();
         final var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
         final var fcm = provider.get_ClientFortressManager();
-        if (!selectionManager.isSelecting() && (fcm.getState() == FortressState.BUILD_EDITING)) {
-            if(ModUtils.isClientInFortressGamemode()) {
-                final HitResult crosshairTarget = client.crosshairTarget;
-                if(crosshairTarget instanceof BlockHitResult bhr) {
-                    BlockPos pos = bhr.getBlockPos();
-                    if(pos != null && !world.getBlockState(pos).isAir()) {
-                        final List<BlockPos> buildingSelection = fcm.getBuildingSelection(pos);
-                        for(BlockPos sel: buildingSelection) {
-                            if(this.world.getWorldBorder().contains(sel)) {
-                                final BlockState blockState = this.world.getBlockState(sel);
-                                if(!blockState.isAir()) {
-                                    this.drawBlockOutline(matrices, vertexConsumer, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, sel, blockState);
-                                }
-                            }
-                        }
-                    }
+        if (!selectionManager.isSelecting() && (fcm.getState() == FortressState.BUILD_EDITING || fcm.getState() == FortressState.BUILD_SELECTION)){
+            final var target = client.crosshairTarget;
+            if(target instanceof BlockHitResult bhr) {
+                final var pos = bhr.getBlockPos();
+                if(pos != null && !world.getBlockState(pos).isAir()) {
+                    final var buildingSelection = fcm.getBuildingSelection(pos);
+                    renderBuildingSelection(matrices, camera, buildingSelection, vertexConsumer, cameraPos);
                 }
+            }
+        }
+    }
+
+    @Unique
+    private void renderBuildingSelection(MatrixStack matrices, Camera camera, List<BlockPos> buildingSelection, VertexConsumer vertexConsumer, Vec3d cameraPos) {
+        for(BlockPos sel: buildingSelection) {
+            final BlockState blockState = this.world.getBlockState(sel);
+            if(!blockState.isAir()) {
+                this.drawBlockOutline(matrices, vertexConsumer, camera.getFocusedEntity(), cameraPos.x, cameraPos.y, cameraPos.z, sel, blockState);
             }
         }
     }
@@ -154,7 +159,7 @@ public abstract class FortressWorldRendererMixin  {
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
             RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
-            RenderSystem.setShaderTexture(0, FORCEFIELD);
+            RenderSystem.setShaderTexture(0, FORCE_FIELD);
             RenderSystem.depthMask(MinecraftClient.isFabulousGraphicsOrBetter());
             MatrixStack matrixStack = RenderSystem.getModelViewStack();
             matrixStack.push();
