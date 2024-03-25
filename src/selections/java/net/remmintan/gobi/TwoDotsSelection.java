@@ -62,7 +62,8 @@ public class TwoDotsSelection extends Selection {
         } else {
             if(pickedBlock != null && hitResult instanceof BlockHitResult && click == this.clickType && connection != null && selectionEnd != null) {
                 final var taskType = mapClickTypeToTaskType(clickType);
-                final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
+                final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+                final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
                 final var packet = new ServerboundSimpleSelectionTaskPacket(
                         UUID.randomUUID(),
                         taskType,
@@ -73,9 +74,8 @@ public class TwoDotsSelection extends Selection {
                         getSelection(),
                         selectedPawnsIds
                 );
-
-
                 FortressClientNetworkHelper.send(FortressChannelNames.NEW_SELECTION_TASK, packet);
+                selectionManager.resetSelection();
             }
             return true;
         }

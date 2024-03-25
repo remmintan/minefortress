@@ -56,9 +56,11 @@ public class TreeSelection extends Selection {
             if(!treeRoots.isEmpty()) {
                 this.selectedTreeBlocks.remove(start);
                 final UUID newTaskId = UUID.randomUUID();
-                final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
+                final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+                final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
                 final var packet = new ServerboundCutTreesTaskPacket(newTaskId, Collections.unmodifiableList(treeRoots), getSelection(), selectedPawnsIds);
                 FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_CUT_TREES_TASK, packet);
+                selectionManager.resetSelection();
             }
 
             return true;

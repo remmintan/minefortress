@@ -65,10 +65,12 @@ public class RepairBuildingScreen extends WindowScreen {
             .builder(
                 Text.of("Repair"),
                 button -> {
-                    final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
+                    final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+                    final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
                     final var packet = new C2SRepairBuilding(UUID.randomUUID(), buildingId, selectedPawnsIds);
                     FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet);
                     Optional.ofNullable(this.client).ifPresent(it -> it.setScreen(null));
+                    selectionManager.resetSelection();
                 }
             )
             .dimensions(

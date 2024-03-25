@@ -31,12 +31,12 @@ public class RoadsSelection extends WallsSelection{
             final UUID digTaskId = UUID.randomUUID();
             final UUID placeTaskId = UUID.randomUUID();
 
-//            final IClientTasksHolder tasksHolder = ((ITasksInformationHolder) level).get_ClientTasksHolder();
-//            tasksHolder.addRoadsSelectionTask(digTaskId, placeTaskId, getSelection());
-
-            final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
+            final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+            final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
             final var packet = new ServerboundRoadsTaskPacket(digTaskId, placeTaskId, getSelection(), selectedPawnsIds);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_ROADS_TASK, packet);
+
+            selectionManager.resetSelection();
             return true;
         }
     }

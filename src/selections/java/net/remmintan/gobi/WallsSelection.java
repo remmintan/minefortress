@@ -186,7 +186,8 @@ public class WallsSelection extends Selection {
                             UUID uuid = UUID.randomUUID();
                             if(level instanceof ITasksInformationHolder holder)
                                 holder.get_ClientTasksHolder().addTask(uuid, getSelection(), taskType, supertaskUuid);
-                            final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
+                            final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+                            final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
                             final var packet = new ServerboundSimpleSelectionTaskPacket(
                                     uuid,
                                     taskType,
@@ -197,8 +198,8 @@ public class WallsSelection extends Selection {
                                     getSelection(),
                                     selectedPawnsIds
                             );
-
                             FortressClientNetworkHelper.send(FortressChannelNames.NEW_SELECTION_TASK, packet);
+                            selectionManager.resetSelection();
                         });
             }
             return true;

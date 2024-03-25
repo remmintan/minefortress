@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundBlueprintTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
@@ -113,18 +114,16 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
 
         if(!super.canBuild()) return;
 
-//        addTaskToTasksHolder(taskId);
-        final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket();
+        final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+        final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket(selectionManager);
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
-
-        if(!client.options.sprintKey.isPressed()) {
-            clearStructure();
-        }
+        selectionManager.resetSelection();
+        clearStructure();
     }
 
     @NotNull
-    private ServerboundBlueprintTaskPacket getServerboundBlueprintTaskPacket() {
-        final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
+    private ServerboundBlueprintTaskPacket getServerboundBlueprintTaskPacket(IClientPawnsSelectionManager manager) {
+        final var selectedPawnsIds = manager.getSelectedPawnsIds();
         return new ServerboundBlueprintTaskPacket(
                         selectedStructure.getId(),
                         getStructureBuildPos(),
