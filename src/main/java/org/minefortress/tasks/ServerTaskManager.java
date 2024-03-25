@@ -100,7 +100,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
 
     private List<String> getProfessionIdFromTask(ITask task) {
         if(task instanceof CutTreesTask) {
-            return Arrays.asList("lumberjack1", "lumberjack2", "lumberjack3");
+            return Arrays.asList("lumberjack1", "lumberjack2", "lumberjack3", "colonist");
         }
         return List.of("colonist");
     }
