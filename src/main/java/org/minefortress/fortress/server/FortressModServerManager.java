@@ -86,7 +86,7 @@ public class FortressModServerManager implements IFortressModServerManager {
     }
 
     public void load() {
-        load(true, true);
+        load(true, false);
     }
 
     public void load(boolean campfireEnabled, boolean borderEnabled) {

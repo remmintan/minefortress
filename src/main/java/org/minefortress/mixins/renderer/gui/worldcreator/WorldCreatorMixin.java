@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class WorldCreatorMixin implements FortressWorldCreator {
 
     @Unique
-    private boolean borderEnabled = true;
+    private boolean borderEnabled = false;
     @Unique
     private boolean showCampfire = true;
 
