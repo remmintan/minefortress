@@ -1,6 +1,5 @@
 package org.minefortress.tasks;
 
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
@@ -13,6 +12,4 @@ public class BlueprintDigTask extends SimpleSelectionTask {
         super(id, TaskType.REMOVE, startingBlock, endingBlock, null, ServerSelectionType.SQUARES, StreamSupport.stream(BlockPos.iterate(startingBlock, endingBlock).spliterator(), false).map(BlockPos::toImmutable).toList());
     }
 
-    @Override
-    protected void sendFinishTaskNotificationToPlayer(ServerPlayerEntity randomPlayer) {}
 }

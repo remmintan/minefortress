@@ -18,7 +18,6 @@ import org.minefortress.utils.ModUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.UUID;
 
 public final class ClientBlueprintManager extends BaseClientStructureManager implements IClientBlueprintManager {
 
@@ -127,7 +126,6 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     private ServerboundBlueprintTaskPacket getServerboundBlueprintTaskPacket() {
         final var selectedPawnsIds = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().getSelectedPawnsIds();
         return new ServerboundBlueprintTaskPacket(
-                        UUID.randomUUID(),
                         selectedStructure.getId(),
                         getStructureBuildPos(),
                         selectedStructure.getRotation(),

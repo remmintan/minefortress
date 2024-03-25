@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
-
-    private final UUID taskId;
     private final String blueprintId;
     private final BlockPos startPos;
     private final BlockRotation rotation;
@@ -26,8 +24,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
     private final List<Integer> selectedPawns;
 
-    public ServerboundBlueprintTaskPacket(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel, List<Integer> selectedPawns) {
-        this.taskId = taskId;
+    public ServerboundBlueprintTaskPacket(String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel, List<Integer> selectedPawns) {
         this.blueprintId = blueprintId;
         this.startPos = startPos;
         this.rotation = rotation;
@@ -36,7 +33,6 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
     }
 
     public ServerboundBlueprintTaskPacket(PacketByteBuf buf) {
-        this.taskId = buf.readUuid();
         this.blueprintId = buf.readString();
         this.startPos = buf.readBlockPos();
         this.rotation = buf.readEnumConstant(BlockRotation.class);
@@ -51,7 +47,6 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
     @Override
     public void write(PacketByteBuf buf) {
-        buf.writeUuid(taskId);
         buf.writeString(blueprintId);
         buf.writeBlockPos(startPos);
         buf.writeEnumConstant(rotation);
@@ -67,23 +62,26 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
         if(player instanceof final FortressServerPlayerEntity fortressServerPlayer) {
             final var manager = getFortressManager(server, player);
             final var blueprintManager = fortressServerPlayer.get_ServerBlueprintManager();
-            final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
-
             final var provider = getManagersProvider(server, player);
-            if(manager.isSurvival()) {
-                final var serverResourceManager = provider.getResourceManager();
-                final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
-                try {
-                    serverResourceManager.reserveItems(taskId, stacks);
-                }catch (IllegalStateException e) {
-                    ModLogger.LOGGER.error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
-                    FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
-                    return;
+
+            Runnable executeBuildTask = () -> {
+                final var taskId = UUID.randomUUID();
+                final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
+                if(manager.isSurvival()) {
+                    final var serverResourceManager = provider.getResourceManager();
+                    final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
+                    try {
+                        serverResourceManager.reserveItems(taskId, stacks);
+                    }catch (IllegalStateException e) {
+                        ModLogger.LOGGER.error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
+                        FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
+                        return;
+                    }
                 }
-            }
-            Runnable executeBuildTask = () -> provider.getTaskManager().addTask(task, provider, manager, selectedPawns, player);
+                provider.getTaskManager().addTask(task, provider, manager, selectedPawns, player);
+            };
             if (floorLevel > 0) {
-                final var digTask = blueprintManager.createDigTask(taskId, startPos, floorLevel, blueprintId, rotation);
+                final var digTask = blueprintManager.createDigTask(UUID.randomUUID(), startPos, floorLevel, blueprintId, rotation);
                 digTask.addFinishListener(executeBuildTask);
                 provider.getTaskManager().addTask(digTask, provider, manager, selectedPawns, player);
             } else {

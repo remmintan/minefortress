@@ -4,7 +4,6 @@ package org.minefortress.tasks;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
@@ -72,7 +71,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
         }
         final TaskType taskType = task.getTaskType();
         if(taskType == TaskType.BUILD) {
-            setPawnsToTask(player.getServerWorld(), task, workers);
+            setPawnsToTask(task, workers);
         } else {
             final List<String> professions = getProfessionIdFromTask(task);
             final List<IWorkerPawn> professionals = workers
@@ -83,7 +82,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
                 player.sendMessage(Text.of("No appropriate professionals selected"), false);
                 return;
             }
-            setPawnsToTask(player.getServerWorld(), task, professionals);
+            setPawnsToTask(task, professionals);
         }
     }
 
@@ -94,7 +93,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
         return List.of("colonist");
     }
 
-    private void setPawnsToTask(ServerWorld world, ITask task, List<IWorkerPawn> workers) {
+    private void setPawnsToTask(ITask task, List<IWorkerPawn> workers) {
         for(IWorkerPawn worker : workers) {
             if(!task.hasAvailableParts()) break;
             worker.getTaskControl().setTask(task);
