@@ -79,7 +79,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
             }
         }
 
-        final var movementHelperStuck = getMovementHelper().isStuck();
+        final var movementHelperStuck = !getMovementHelper().hasReachedWorkGoal() && getMovementHelper().isStuck();
         final var cantPlaceUnderMyself = this.colonist.getPlaceControl().isCantPlaceUnderMyself();
         if(movementHelperStuck || cantPlaceUnderMyself) {
             LOGGER.debug("{} stuck with moving or placing failing task [movement helper stuck: {}, cant place under myself: {}]", getColonistName(), movementHelperStuck, cantPlaceUnderMyself);

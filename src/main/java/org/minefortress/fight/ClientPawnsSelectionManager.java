@@ -29,6 +29,12 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
 
 
     @Override
+    public void selectSingle(IFortressAwareEntity fortressAwareEntity) {
+        this.resetSelection();
+        selectedPawns.add(fortressAwareEntity);
+    }
+
+    @Override
     public void startSelection(double x, double y) {
         this.resetSelection();
         this.mouseStartPos = new MousePos(x, y);

@@ -9,8 +9,10 @@ import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.interfaces.FortressWorldCreator;
 import org.minefortress.utils.ModUtils;
@@ -42,6 +44,10 @@ public class FortressServerEvents {
 
         AttackEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
             if(ModUtils.isFortressGamemode(player)) {
+                if(entity instanceof IFortressAwareEntity fortressAwareEntity) {
+                    final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+                    selectionManager.selectSingle(fortressAwareEntity);
+                }
                 return ActionResult.FAIL;
             }
             return ActionResult.PASS;

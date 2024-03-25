@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public interface IClientPawnsSelectionManager {
+
+    void selectSingle(IFortressAwareEntity fortressAwareEntity);
     void startSelection(double x, double y);
 
     void endSelection(double x, double y);
