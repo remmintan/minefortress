@@ -25,6 +25,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
 
     @Override
     public void addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager, List<Integer> selectedPawns, ServerPlayerEntity player) {
+        removeAllFinishedTasks();
         task.prepareTask();
         if(task.hasAvailableParts()) {
             if(task instanceof SimpleSelectionTask simpleSelectionTask) {
@@ -60,8 +61,19 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
 
     @Override
     public void cancelTask(UUID id, IServerManagersProvider provider, IServerFortressManager manager) {
-        nonFinishedTasks.remove(id);
+        removeAllFinishedTasks();
+        final var removedTask = nonFinishedTasks.remove(id);
+        if(removedTask != null)
+            removedTask.cancel();
         provider.getResourceManager().returnReservedItems(id);
+    }
+
+    private void removeAllFinishedTasks() {
+        final var finishedTasks = nonFinishedTasks.entrySet()
+                .stream()
+                .filter(e -> e.getValue().taskFullyFinished())
+                .toList();
+        finishedTasks.forEach(e -> nonFinishedTasks.remove(e.getKey()));
     }
 
     private void assignPawnsToTask(ServerPlayerEntity player, ITask task, List<IWorkerPawn> workers) {

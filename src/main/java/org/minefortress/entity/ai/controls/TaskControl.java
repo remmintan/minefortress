@@ -75,7 +75,7 @@ public class TaskControl implements ITaskControl {
 
     @Override
     public boolean hasTask() {
-        return task != null;
+        return task != null && !task.isCanceled();
     }
 
     @Override
