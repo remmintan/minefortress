@@ -17,7 +17,6 @@ import net.remmintan.mods.minefortress.networking.s2c.S2CAddClientTasksPacket;
 import org.minefortress.fortress.resources.ItemInfo;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class ServerTaskManager implements IServerTaskManager, IWritableManager {
@@ -79,33 +78,13 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
     }
 
     private boolean assignPawnsToTask(ServerPlayerEntity player, ITask task, List<IWorkerPawn> workers) {
+        workers = workers.stream().filter(worker -> !worker.getTaskControl().isDoingEverydayTasks()).toList();
         if(workers.isEmpty()) {
-            player.sendMessage(Text.of("No workers selected"), false);
+            player.sendMessage(Text.of("No appropriate workers selected"), false);
             return false;
         }
-        final TaskType taskType = task.getTaskType();
-        if(taskType == TaskType.BUILD) {
-            setPawnsToTask(task, workers);
-        } else {
-            final List<String> professions = getProfessionIdFromTask(task);
-            final List<IWorkerPawn> professionals = workers
-                    .stream()
-                    .filter(c -> professions.contains(c.getProfessionId()))
-                    .collect(Collectors.toList());
-            if(professionals.isEmpty()) {
-                player.sendMessage(Text.of("No appropriate professionals selected"), false);
-                return false;
-            }
-            setPawnsToTask(task, professionals);
-        }
+        setPawnsToTask(task, workers);
         return true;
-    }
-
-    private List<String> getProfessionIdFromTask(ITask task) {
-        if(task instanceof CutTreesTask) {
-            return Arrays.asList("lumberjack1", "lumberjack2", "lumberjack3", "colonist");
-        }
-        return List.of("colonist");
     }
 
     private void setPawnsToTask(ITask task, List<IWorkerPawn> workers) {
