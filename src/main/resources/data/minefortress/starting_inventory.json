@@ -26,5 +26,9 @@
   {
     "item": "minecraft:torch",
     "amount": 16
+  },
+  {
+    "item": "minecraft:wheat_seeds",
+    "amount": 30
   }
 ]
