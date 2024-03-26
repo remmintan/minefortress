@@ -137,12 +137,12 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         final var provider = CoreModUtils.getMineFortressManagersProvider();
         final var manager = provider.get_ClientFortressManager();
 
-        final var isInBuildState = manager.getState() == FortressState.BUILD_SELECTION || manager.getState() == FortressState.BUILD_EDITING;
+        final Supplier<Boolean> isInBuildState = () -> manager.getState() == FortressState.BUILD_SELECTION || manager.getState() == FortressState.BUILD_EDITING;
         final Supplier<ISelectionInfoProvider> selectInfProvSup = () ->
-                isInBuildState ? ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+                isInBuildState.get() ? ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
 
         final Supplier<ISelectionModelBuilderInfoProvider> selModBuildInfProv = () ->
-                isInBuildState ? ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+                isInBuildState.get() ? ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
 
         selectionRenderer = new SelectionRenderer(
                 client,
