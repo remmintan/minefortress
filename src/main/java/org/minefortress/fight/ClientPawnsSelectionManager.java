@@ -46,7 +46,10 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
         this.mouseEndPos = null;
 
         if(!this.selectedPawns.isEmpty()) {
-            ModUtils.getFortressClientManager().setState(FortressState.BUILD_EDITING);
+            final var fortressManager = ModUtils.getFortressClientManager();
+            if (fortressManager.getState() != FortressState.COMBAT) {
+                fortressManager.setState(FortressState.BUILD_EDITING);
+            }
         }
 
     }
