@@ -40,4 +40,3 @@ accessible class net/minecraft/client/gui/screen/world/CreateWorldScreen$GameTab
 accessible class net/minecraft/client/gui/screen/world/WorldScreenOptionGrid
 accessible  class   net/minecraft/client/render/RenderLayer$MultiPhase
 accessible  method  net/minecraft/client/render/RenderLayer of  (Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;ILnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;
-accessible field net/minecraft/client/gui/hud/InGameHud HOTBAR_TEXTURE Lnet/minecraft/util/Identifier;

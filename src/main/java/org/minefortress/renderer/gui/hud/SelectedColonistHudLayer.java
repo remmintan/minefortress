@@ -2,9 +2,9 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.HungerConstants;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
@@ -15,6 +15,9 @@ import org.minefortress.utils.ModUtils;
 import java.util.Optional;
 
 public class SelectedColonistHudLayer extends AbstractHudLayer{
+
+    private static final Identifier HEART_TEXTURE = new Identifier("hud/heart/full");
+    private static final Identifier FOOD_TEXTURE = new Identifier("hud/food_full");
 
     protected SelectedColonistHudLayer(MinecraftClient client) {
         super(client);
@@ -39,13 +42,13 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
             final String healthString = String.format("%.0f/%.0f", pawn.getHealth(), pawn.getMaxHealth());
             int heartIconX = colonistWinX + 5;
             int heartIconY = colonistWinY + textRenderer.fontHeight + 10;
-            renderIcon(drawContext, heartIconX, heartIconY, 0);
+            drawContext.drawGuiTexture(HEART_TEXTURE, heartIconX, heartIconY, 9, 9);
             drawContext.drawTextWithShadow(textRenderer, healthString, heartIconX + 10, heartIconY + 2, 0xFFFFFF);
 
             if(pawn instanceof IHungerAwareEntity hungerAwareEntity) {
                 final String hungerString = String.format("%d/%d", hungerAwareEntity.getCurrentFoodLevel(), HungerConstants.FULL_FOOD_LEVEL);
                 int hungerIconX = colonistWinX + width/2 + 5;
-                renderIcon(drawContext, hungerIconX, heartIconY, 28);
+                drawContext.drawGuiTexture(FOOD_TEXTURE, hungerIconX, heartIconY, 9, 9);
                 drawContext.drawTextWithShadow(textRenderer, hungerString, hungerIconX + 10, heartIconY + 2, 0xFFFFFF);
             }
 
@@ -63,10 +66,6 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
                 drawContext.drawTextWithShadow(textRenderer, task, colonistWinX + 5, heartIconY + 4 * textRenderer.fontHeight + 10, 0xFFFFFF);
             }
         }
-    }
-
-    private void renderIcon(DrawContext drawContext, int iconX, int iconY, int heartIconV) {
-        drawContext.drawTexture(InGameHud.HOTBAR_TEXTURE, iconX, iconY, 110, 52, heartIconV, 8, 8, 256, 256);
     }
 
     @Override
