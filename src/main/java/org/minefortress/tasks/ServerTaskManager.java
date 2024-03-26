@@ -52,11 +52,13 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
                 .map(IWorkerPawn.class::cast)
                 .toList();
 
-        assignPawnsToTask(player, task, selectedWorkers);
+        final var assignmentResult = assignPawnsToTask(player, task, selectedWorkers);
 
-        final var packet = new S2CAddClientTasksPacket(task.toTaskInformationDto());
-        FortressServerNetworkHelper.send(player, S2CAddClientTasksPacket.CHANNEL, packet);
-        nonFinishedTasks.put(task.getId(), task);
+        if(assignmentResult) {
+            final var packet = new S2CAddClientTasksPacket(task.toTaskInformationDto());
+            FortressServerNetworkHelper.send(player, S2CAddClientTasksPacket.CHANNEL, packet);
+            nonFinishedTasks.put(task.getId(), task);
+        }
     }
 
     @Override
@@ -76,10 +78,10 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
         finishedTasks.forEach(e -> nonFinishedTasks.remove(e.getKey()));
     }
 
-    private void assignPawnsToTask(ServerPlayerEntity player, ITask task, List<IWorkerPawn> workers) {
+    private boolean assignPawnsToTask(ServerPlayerEntity player, ITask task, List<IWorkerPawn> workers) {
         if(workers.isEmpty()) {
             player.sendMessage(Text.of("No workers selected"), false);
-            return;
+            return false;
         }
         final TaskType taskType = task.getTaskType();
         if(taskType == TaskType.BUILD) {
@@ -92,10 +94,11 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
                     .collect(Collectors.toList());
             if(professionals.isEmpty()) {
                 player.sendMessage(Text.of("No appropriate professionals selected"), false);
-                return;
+                return false;
             }
             setPawnsToTask(task, professionals);
         }
+        return true;
     }
 
     private List<String> getProfessionIdFromTask(ITask task) {
