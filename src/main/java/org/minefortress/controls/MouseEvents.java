@@ -4,12 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.utils.ModUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MouseEvents {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MouseEvents.class);
 
     private static boolean mousePressedInpreviousTick = false;
 
@@ -37,8 +33,10 @@ public class MouseEvents {
         final var fortressManager = ModUtils.getFortressClientManager();
         final var state = fortressManager.getState();
         final var correctState = state == FortressState.COMBAT || state == FortressState.BUILD_SELECTION;
+        final var noBuildingHovered = ModUtils.getFortressClientManager().getHoveredBuilding().isEmpty();
+        final var noScreenOpened = MinecraftClient.getInstance().currentScreen == null;
 
-        if(correctState) {
+        if(correctState && noBuildingHovered && noScreenOpened) {
             final var provider = CoreModUtils.getMineFortressManagersProvider();
             final var pawnsSelection = provider.get_PawnsSelectionManager();
             pawnsSelection.startSelection(mouseX, mouseY);

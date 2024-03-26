@@ -33,9 +33,10 @@ public class FortressClientEvents {
     }
 
     private static void startClientTick(MinecraftClient client) {
+        if(!ModUtils.isClientInFortressGamemode()) return;
+
         MouseEvents.checkMouseStateAndFireEvents();
 
-        if(!ModUtils.isClientInFortressGamemode()) return;
         final var mouse = client.mouse;
         if(ModUtils.shouldReleaseCamera()) {
             if(!mouse.isCursorLocked())
