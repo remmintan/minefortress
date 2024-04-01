@@ -4,7 +4,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import org.apache.logging.log4j.util.Strings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ColonistNameGenerator implements IPawnNameGenerator {
 
@@ -25,7 +27,8 @@ public class ColonistNameGenerator implements IPawnNameGenerator {
             "Aki",
             "Grungy",
             "Jukotzu",
-            "Telis"
+            "Telis",
+            "Jeve Stobs"
     );
 
     private static final List<String> RANDOM_NAMES = Arrays.asList(
