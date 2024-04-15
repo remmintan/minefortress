@@ -814,7 +814,10 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             }
 
             final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);
-            getTaskManager().addTask(task, this, this, selectedPawns, player);
+            final var wasAssigned = getTaskManager().addTask(task, this, this, selectedPawns, player);
+            if (!wasAssigned) {
+                resourceManager.returnReservedItems(taskId);
+            }
         } catch (RuntimeException exp) {
             LogManager.getLogger().error("Error while repairing building", exp);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));

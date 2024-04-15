@@ -66,8 +66,12 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
         final var digTask = tasksCreator.createRoadsTask(digUuid, blocks, null);
         digTask.addFinishListener(() -> {
             final var buildTask = tasksCreator.createRoadsTask(placeUuid, blocks, item);
-            taskManager.addTask(buildTask, provider, manager, selectedPawns, player);
+            final var buildWasAssigned = taskManager.addTask(buildTask, provider, manager, selectedPawns, player);
+            if (!buildWasAssigned)
+                resourceManager.returnReservedItems(placeUuid);
         });
-        taskManager.addTask(digTask, provider, manager, selectedPawns, player);
+        final var digWasAssigned = taskManager.addTask(digTask, provider, manager, selectedPawns, player);
+        if (!digWasAssigned)
+            resourceManager.returnReservedItems(placeUuid);
     }
 }
