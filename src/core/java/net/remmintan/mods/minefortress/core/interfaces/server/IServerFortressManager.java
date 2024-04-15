@@ -38,7 +38,6 @@ public interface IServerFortressManager {
     boolean isSurvival();
 
     boolean isCreative();
-    Optional<BlockPos> getRandomPosWithinFortress();
     List<ITargetedPawn> getAllTargetedPawns();
 
     void increaseMaxColonistsCount();

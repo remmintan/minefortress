@@ -20,7 +20,7 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
         if(colonist.getEatControl().map(IEatControl::isEating).orElse(false)) return false;
         if(!isDay() || colonist.getTaskControl().hasTask()) return false;
         final var posOptional = colonist.getServerFortressManager()
-                .flatMap(IServerFortressManager::getRandomPosWithinFortress);
+                .flatMap(IServerFortressManager::getRandomPositionAroundCampfire);
         if(posOptional.isPresent()) {
             goal = posOptional.get();
             return true;

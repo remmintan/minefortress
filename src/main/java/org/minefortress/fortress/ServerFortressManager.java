@@ -633,23 +633,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         return fortressCenter!=null?fortressCenter.toImmutable():null;
     }
 
-    public Optional<BlockPos> getRandomPosWithinFortress(){
-        if(minX == Integer.MAX_VALUE) return Optional.empty();
-
-        final int x = getWorld().random.nextInt(maxX - minX) + minX;
-        final int z = getWorld().random.nextInt(maxZ - minZ) + minZ;
-        final int y = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, x, z);
-
-        final BlockPos fortressPos = new BlockPos(x, y, z);
-        if(getBuildingsManager().isPartOfAnyBuilding(fortressPos)) return Optional.empty();
-        boolean isFluid = getWorld().getBlockState(fortressPos).isOf(Blocks.WATER);
-        if(isFluid) return Optional.empty();
-        boolean isFluidAbove = getWorld().getBlockState(fortressPos.down()).isOf(Blocks.WATER);
-        if(isFluidAbove) return Optional.empty();
-
-        return Optional.of(fortressPos.up());
-    }
-
     public boolean isPositionWithinFortress(BlockPos pos) {
         if(minX == Integer.MAX_VALUE) {
             return false;
