@@ -67,8 +67,9 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
             Runnable executeBuildTask = () -> {
                 final var taskId = UUID.randomUUID();
                 final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
+                final var serverResourceManager = provider.getResourceManager();
+
                 if(manager.isSurvival()) {
-                    final var serverResourceManager = provider.getResourceManager();
                     final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
                     try {
                         serverResourceManager.reserveItems(taskId, stacks);
@@ -78,7 +79,10 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
                         return;
                     }
                 }
-                provider.getTaskManager().addTask(task, provider, manager, selectedPawns, player);
+                final var ableToAssign = provider.getTaskManager().addTask(task, provider, manager, selectedPawns, player);
+                if (!ableToAssign) {
+                    serverResourceManager.returnReservedItems(taskId);
+                }
             };
             if (floorLevel > 0) {
                 final var digTask = blueprintManager.createDigTask(UUID.randomUUID(), startPos, floorLevel, blueprintId, rotation);

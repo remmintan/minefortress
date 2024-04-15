@@ -23,7 +23,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
     private final Map<UUID, ITask> nonFinishedTasks = new HashMap<>();
 
     @Override
-    public void addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager, List<Integer> selectedPawns, ServerPlayerEntity player) {
+    public boolean addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager, List<Integer> selectedPawns, ServerPlayerEntity player) {
         removeAllFinishedTasks();
         task.prepareTask();
         if(task.hasAvailableParts()) {
@@ -58,6 +58,8 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
             FortressServerNetworkHelper.send(player, S2CAddClientTasksPacket.CHANNEL, packet);
             nonFinishedTasks.put(task.getId(), task);
         }
+
+        return assignmentResult;
     }
 
     @Override
