@@ -230,6 +230,7 @@ public class SelectionManager implements ISelectionManager {
     public void resetSelection() {
         if(!this.isSelecting()) return;
         selection.reset();
+        this.setSelectionType(SelectionType.SQUARES);
         this.clickType = null;
         this.upSelectionDelta = 0;
         this.inCorrectState = true;
