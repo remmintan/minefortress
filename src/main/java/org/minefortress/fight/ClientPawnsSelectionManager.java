@@ -13,6 +13,7 @@ import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelect
 import net.remmintan.mods.minefortress.core.interfaces.combat.ITargetedSelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 import net.remmintan.mods.minefortress.core.utils.GlobalProjectionCache;
 import org.minefortress.renderer.CameraTools;
 import org.minefortress.utils.ModUtils;
@@ -47,6 +48,12 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
 
         if(!this.selectedPawns.isEmpty()) {
             final var fortressManager = ModUtils.getFortressClientManager();
+            if (this.selectedPawns.stream().allMatch(it -> it instanceof IWarrior)) {
+                fortressManager.setState(FortressState.COMBAT);
+            } else if (this.selectedPawns.stream().noneMatch(it -> it instanceof IWarrior)) {
+                fortressManager.setState(FortressState.BUILD_EDITING);
+            }
+
             if (fortressManager.getState() != FortressState.COMBAT) {
                 fortressManager.setState(FortressState.BUILD_EDITING);
             }
