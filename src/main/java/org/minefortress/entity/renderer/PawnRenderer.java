@@ -17,7 +17,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.core.FortressState;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
@@ -29,6 +32,9 @@ import org.minefortress.entity.renderer.models.PawnModel;
 import java.util.Optional;
 
 public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel> {
+
+    private static final Vector3f GREEN_COLOR = new Vector3f(0f, 1f, 0f);
+    private static final Vector3f YELLOW_COLOR = new Vector3f(1f, 1f, 0f);
 
     private static final Identifier GUY = new Identifier("minefortress", "textures/skins/guy.png");
     private static final Identifier GUY2 = new Identifier("minefortress", "textures/skins/guy2.png");
@@ -56,6 +62,17 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
         return colonist.hasCustomName();
     }
 
+    @NotNull
+    private static Vector3f getColorBaseOnMode(BasePawnEntity pawn) {
+        final var state = CoreModUtils.getMineFortressManagersProvider().get_ClientFortressManager().getState();
+        final boolean warrior = pawn instanceof IWarrior;
+        final var combatState = state == FortressState.COMBAT;
+        if (combatState && warrior || !combatState && !warrior)
+            return new Vector3f(GREEN_COLOR);
+        else
+            return new Vector3f(YELLOW_COLOR);
+    }
+
     @Override
     public void render(BasePawnEntity pawn, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         setClothesVilibility(pawn);
@@ -74,7 +91,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
             if(hovering || color != null || fightSelecting) {
                 final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
                 if(color == null)
-                    color = new Vector3f(0.0f, 1.0f, 0.0f);
+                    color = getColorBaseOnMode(pawn);
 
                 if(!hovering)
                     color.mul(0.7f);
