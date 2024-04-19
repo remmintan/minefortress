@@ -7,9 +7,9 @@ import net.minecraft.client.gui.screen.GameModeSelectionScreen;
 import net.remmintan.mods.minefortress.networking.registries.ClientNetworkReceivers;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreen;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreen;
-import org.minefortress.registries.FortressClientEvents;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressKeybindings;
+import org.minefortress.registries.events.FortressClientEvents;
 
 import static org.minefortress.MineFortressMod.FORTRESS_CRAFTING_SCREEN_HANDLER;
 import static org.minefortress.MineFortressMod.FORTRESS_FURNACE_SCREEN_HANDLER;

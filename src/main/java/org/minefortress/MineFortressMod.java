@@ -14,7 +14,7 @@ import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandl
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.registries.FortressItems;
-import org.minefortress.registries.FortressServerEvents;
+import org.minefortress.registries.events.FortressServerEvents;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
