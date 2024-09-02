@@ -137,10 +137,14 @@ public final class ClientFortressManager implements IClientFortressManager {
             }
 
             posAppropriateForCenter = null;
+            hoveredBuilding = null;
             return;
         }
         if(!initialized) return;
 
+        if (state != FortressState.BUILD_EDITING && state != FortressState.BUILD_SELECTION) {
+            hoveredBuilding = null;
+        }
         resetBuildEditState();
 
         if(isCenterNotSet()) {
