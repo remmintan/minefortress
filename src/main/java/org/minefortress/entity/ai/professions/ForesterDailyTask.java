@@ -125,7 +125,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
                                 )
                                 .map(BlockPos::up)
                 )
-                .orElseThrow(() -> new IllegalStateException("No block found for forester"));
+                .orElseGet(colonist::getBlockPos);
     }
 
 }
