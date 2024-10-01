@@ -25,9 +25,7 @@ public class EatGoal extends Goal {
 
     @Override
     public boolean canStart() {
-        boolean hasTask = entity instanceof IWorkerPawn workerPawn &&
-                (workerPawn.getTaskControl().isDoingEverydayTasks() || workerPawn.getTaskControl().hasTask());
-        return !hasTask && getEatControl().isHungry() && getEatableItem().isPresent();
+        return getEatControl().isHungry() && getEatableItem().isPresent();
     }
 
     @Override

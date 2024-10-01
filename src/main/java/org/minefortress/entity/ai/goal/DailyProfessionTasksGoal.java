@@ -28,7 +28,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStart() {
-        if(this.isStarving()) return false;
+        if(this.isHungry()) return false;
         final ITaskControl taskControl = getTaskControl();
         if(taskControl.hasTask()) return false;
         final String professionId = colonist.getProfessionId();
@@ -60,7 +60,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return  !isStarving()
+        return  !isHungry()
                 && this.currentTask != null
                 && this.currentTask.shouldContinue(colonist)
                 && !getTaskControl().hasTask();
@@ -74,7 +74,7 @@ public class DailyProfessionTasksGoal extends AbstractFortressGoal {
 
     @Override
     public boolean canStop() {
-        return this.isStarving();
+        return this.isHungry();
     }
 
     private ITaskControl getTaskControl() {

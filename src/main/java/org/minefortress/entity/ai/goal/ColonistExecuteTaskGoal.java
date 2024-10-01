@@ -28,7 +28,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     @Override
     public boolean canStart() {
         final var hasTask = getTaskControl().hasTask();
-        final var notStarving = !super.isStarving();
+        final var notStarving = !super.isHungry();
         LOGGER.debug("{} can executeTask [ has task: {}, not starving: {}]", getColonistName(), hasTask, notStarving);
         return  hasTask && notStarving;
     }
@@ -90,7 +90,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return getTaskControl().hasTask() && !super.isStarving();
+        return getTaskControl().hasTask() && !super.isHungry();
     }
 
     @Override

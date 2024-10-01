@@ -3,6 +3,7 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import org.minefortress.entity.Colonist;
 
 import java.util.EnumSet;
@@ -24,8 +25,8 @@ abstract class AbstractFortressGoal extends Goal {
         return colonist.getName().getString();
     }
 
-    protected boolean isStarving() {
-        return colonist.getCurrentFoodLevel() <= 0 || colonist.getHealth() <= 10;
+    protected boolean isHungry() {
+        return colonist.getEatControl().map(IEatControl::isHungry).orElse(false);
     }
 
 
