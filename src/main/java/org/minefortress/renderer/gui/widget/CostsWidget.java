@@ -48,7 +48,7 @@ public class CostsWidget implements Drawable, Element {
             drawContext.drawText(getTextRenderer(), countLabel, (int)(textX / scaleFactor), (int)(textY / scaleFactor), color, false);
             matrices.pop();
             drawContext.drawItem(stack, x + i, y);
-            i+=(9 + countLabelWidth) * scaleFactor;
+            i += (25 + countLabelWidth) * scaleFactor;
         }
     }
 
