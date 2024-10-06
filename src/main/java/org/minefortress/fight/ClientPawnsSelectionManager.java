@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.core.FortressState;
@@ -32,7 +33,11 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
     @Override
     public void selectSingle(IFortressAwareEntity fortressAwareEntity) {
         this.resetSelection();
-        selectedPawns.add(fortressAwareEntity);
+        final var uuid = Optional.ofNullable(MinecraftClient.getInstance().player).map(PlayerEntity::getUuid);
+        final var masterId = fortressAwareEntity.getMasterId();
+        if (masterId.isPresent() && uuid.isPresent() && uuid.get().equals(masterId.get())) {
+            selectedPawns.add(fortressAwareEntity);
+        }
     }
 
     @Override
