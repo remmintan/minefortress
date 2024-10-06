@@ -11,13 +11,12 @@ import org.minefortress.utils.ModUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public interface IHireScreenHandler {
 
     String getScreenName();
 
-    Set<String> getProfessions();
+    List<String> getProfessions();
     int getHireProgress(String professionId);
     int getHireQueue(String professionId);
     List<IItemInfo> getCost(String professionId);
@@ -40,7 +39,7 @@ public interface IHireScreenHandler {
         return Optional.ofNullable(profession);
     }
 
-    void sync(Map<String, IHireInfo> professions);
+    void sync(Map<String, IHireInfo> professions, List<String> additionalProfessionsInfo);
 
 
 }

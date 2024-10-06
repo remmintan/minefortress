@@ -86,12 +86,12 @@ public final class ClientProfessionManager extends ProfessionManager implements 
     }
 
     @Override
-    public void syncCurrentScreenHandler(Map<String, IHireInfo> hireInfos) {
+    public void syncCurrentScreenHandler(Map<String, IHireInfo> hireInfos, List<String> additionalProfessionsInfo) {
         final var currentScreen = MinecraftClient.getInstance().currentScreen;
         if (currentScreen instanceof HirePawnScreen screen) {
             final var handler = screen.getHandler();
             if(handler != null) {
-                handler.sync(hireInfos);
+                handler.sync(hireInfos, additionalProfessionsInfo);
             }
         }
     }

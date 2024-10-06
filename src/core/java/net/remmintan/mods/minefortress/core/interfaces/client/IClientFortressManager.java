@@ -28,7 +28,7 @@ public interface IClientFortressManager extends IFortressManager {
 
     void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks);
 
-    void open_HireScreen(MinecraftClient client, String screenName, Map<String, IHireInfo> professions);
+    void open_HireScreen(MinecraftClient client, String screenName, Map<String, IHireInfo> professions, List<String> additionalInfo);
 
     void sync(
             int colonistsCount,

@@ -9,16 +9,17 @@ import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public final class ClientHireHandler implements IHireScreenHandler {
 
     private final String screenName;
     private Map<String, IHireInfo> professions;
+    private List<String> additionalInfo;
 
-    public ClientHireHandler(String screenName, Map<String, IHireInfo> professions) {
+    public ClientHireHandler(String screenName, Map<String, IHireInfo> professions, List<String> additionalInfo) {
         this.screenName = screenName;
         this.professions = professions;
+        this.additionalInfo = additionalInfo;
     }
 
     @Override
@@ -27,8 +28,8 @@ public final class ClientHireHandler implements IHireScreenHandler {
     }
 
     @Override
-    public Set<String> getProfessions() {
-        return professions.keySet();
+    public List<String> getProfessions() {
+        return additionalInfo;
     }
 
     @Override
@@ -71,11 +72,12 @@ public final class ClientHireHandler implements IHireScreenHandler {
     }
 
     @Override
-    public void sync(Map<String, IHireInfo> professions) {
+    public void sync(Map<String, IHireInfo> professions, List<String> additionalInfo) {
         if(professions == null) {
             throw new IllegalArgumentException("Professions cannot be null");
         }
         this.professions = professions;
+        this.additionalInfo = additionalInfo;
     }
 
 }

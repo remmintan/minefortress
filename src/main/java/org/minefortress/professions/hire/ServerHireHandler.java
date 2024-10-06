@@ -79,7 +79,7 @@ public class ServerHireHandler {
         }
     }
 
-    private List<String> getUnlockedProfessions() {
+    public List<String> getUnlockedProfessions() {
         return professions.stream().filter(this::professionUnlocked).toList();
     }
 

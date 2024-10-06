@@ -27,7 +27,6 @@ public class CostsWidget implements Drawable, Element {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        final var itemRenderer = getItemRenderer();
         int i = 0;
         for(var ent : costs) {
             final var stack = ent.item().getDefaultStack();

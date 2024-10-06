@@ -10,6 +10,7 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.util.Map;
 
 public class S2COpenHireMenuPacket implements FortressS2CPacket {
@@ -17,10 +18,12 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
     public static final String CHANNEL = "open_hire_menu";
     private final String screenName;
     private final Map<String, IHireInfo> professions;
+    private final List<String> additionalProfessionsInfo;
 
-    public S2COpenHireMenuPacket(String screenName, Map<String, IHireInfo> professions) {
+    public S2COpenHireMenuPacket(String screenName, Map<String, IHireInfo> professions, List<String> additionalProfessionsInfo) {
         this.screenName = screenName;
         this.professions = professions;
+        this.additionalProfessionsInfo = additionalProfessionsInfo;
     }
 
     @SuppressWarnings("unchecked")
@@ -28,6 +31,7 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
         this.screenName = buf.readString();
         try(var stream = new ObjectInputStream(new ByteBufInputStream(buf))) {
             this.professions = (Map<String, IHireInfo>) stream.readObject();
+            this.additionalProfessionsInfo = (List<String>) stream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -38,6 +42,7 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
         buf.writeString(screenName);
         try(var stream = new ObjectOutputStream(new ByteBufOutputStream(buf))) {
             stream.writeObject(professions);
+            stream.writeObject(additionalProfessionsInfo);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -46,6 +51,6 @@ public class S2COpenHireMenuPacket implements FortressS2CPacket {
     @Override
     public void handle(MinecraftClient client) {
         final var manager = getManagersProvider().get_ClientFortressManager();
-        manager.open_HireScreen(client, screenName, professions);
+        manager.open_HireScreen(client, screenName, professions, additionalProfessionsInfo);
     }
 }

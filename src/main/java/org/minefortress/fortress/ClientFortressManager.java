@@ -178,8 +178,8 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     @Override
-    public void open_HireScreen(MinecraftClient client, String screenName, Map<String, IHireInfo> professions) {
-        final var handler = new ClientHireHandler(screenName, professions);
+    public void open_HireScreen(MinecraftClient client, String screenName, Map<String, IHireInfo> professions, List<String> additionalInfo) {
+        final var handler = new ClientHireHandler(screenName, professions, additionalInfo);
         final var screen = new HirePawnScreen(handler);
         client.setScreen(screen);
     }

@@ -11,5 +11,5 @@ public interface IClientProfessionManager extends IProfessionsManager {
 
     void updateProfessions(List<IProfessionEssentialInfo> info);
 
-    void syncCurrentScreenHandler(Map<String, IHireInfo> hireInfos);
+    void syncCurrentScreenHandler(Map<String, IHireInfo> hireInfos, List<String> additionalInfo);
 }
