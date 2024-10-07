@@ -89,7 +89,7 @@ public final class BlueprintsScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if(button == 0) {
-            for(BlueprintGroup group : BlueprintGroup.values()) {
+            for (BlueprintGroup group : BlueprintGroup.nonLegacyValues()) {
                 if(isClickInTab(group, mouseX, mouseY)) return true;
             }
 
@@ -138,7 +138,7 @@ public final class BlueprintsScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (button == 0) {
             this.isScrolling = false;
-            for (BlueprintGroup blueprintGroup: BlueprintGroup.values()) {
+            for (BlueprintGroup blueprintGroup : BlueprintGroup.nonLegacyValues()) {
                 if (this.isClickInTab(blueprintGroup, mouseX, mouseY)) {
                     this.handler.selectGroup(blueprintGroup);
                     this.scrollPosition = 0;
@@ -363,7 +363,7 @@ public final class BlueprintsScreen extends Screen {
     private void drawBackground(DrawContext drawContext, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         final BlueprintGroup selectedGroup = this.handler.getSelectedGroup();
-        for (BlueprintGroup bg : BlueprintGroup.values()) {
+        for (BlueprintGroup bg : BlueprintGroup.nonLegacyValues()) {
             if (selectedGroup == bg) continue;
             this.renderTabIcon(drawContext, bg);
             this.renderTabTooltipIfHovered(drawContext, bg, mouseX, mouseY);

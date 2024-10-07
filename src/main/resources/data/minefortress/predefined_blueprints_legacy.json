@@ -65,30 +65,6 @@
       "file": "big_house_1",
       "floorLevel": 1,
       "requirementId": "house"
-    },
-    {
-      "name": "Library 1",
-      "file": "library_1",
-      "requirementId": "social",
-      "floorLevel": 0
-    },
-    {
-      "name": "Library 2",
-      "file": "library_2",
-      "requirementId": "social",
-      "floorLevel": 1
-    },
-    {
-      "name": "Temple 3",
-      "file": "temple_3",
-      "requirementId": "social",
-      "floorLevel": 0
-    },
-    {
-      "name": "Temple 4",
-      "file": "temple_4",
-      "requirementId": "social",
-      "floorLevel": 0
     }
   ],
   "WORKSHOPS": [
@@ -223,6 +199,52 @@
       "file": "weaponsmith_1",
       "requirementId": "blacksmith",
       "floorLevel": 0
+    }
+  ],
+  "SOCIAL_BUILDINGS": [
+    {
+      "name": "Library 1",
+      "file": "library_1",
+      "requirementId": "social",
+      "floorLevel": 0
+    },
+    {
+      "name": "Library 2",
+      "file": "library_2",
+      "requirementId": "social",
+      "floorLevel": 1
+    },
+    {
+      "name": "Temple 3",
+      "file": "temple_3",
+      "requirementId": "social",
+      "floorLevel": 0
+    },
+    {
+      "name": "Temple 4",
+      "file": "temple_4",
+      "requirementId": "social",
+      "floorLevel": 0
+    }
+  ],
+  "FARMS": [
+    {
+      "name": "Animal Pen 1",
+      "file": "animal_pen_1",
+      "requirementId": "shepherd",
+      "floorLevel": 1
+    },
+    {
+      "name": "Animal Pen 2",
+      "file": "animal_pen_2",
+      "requirementId": "shepherd",
+      "floorLevel": 1
+    },
+    {
+      "name": "Animal Pen 3",
+      "file": "animal_pen_3",
+      "requirementId": "shepherd",
+      "floorLevel": 1
     },
     {
       "name": "Small Farm 1",
@@ -235,6 +257,18 @@
       "file": "large_farm_1",
       "requirementId": "farmer",
       "floorLevel": 0
+    },
+    {
+      "name": "Stable 1",
+      "file": "stable_1",
+      "requirementId": "stableman",
+      "floorLevel": 1
+    },
+    {
+      "name": "Stable 2",
+      "file": "stable_2",
+      "requirementId": "stableman",
+      "floorLevel": 1
     }
   ],
   "DECORATION": [

@@ -1,16 +1,15 @@
 package org.minefortress.renderer.gui.blueprints.handler;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import org.minefortress.interfaces.IFortressMinecraftClient;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundEditBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
+import org.minefortress.interfaces.IFortressMinecraftClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ public final class BlueprintScreenHandler {
 
     private final IClientManagersProvider managersProvider;
 
-    private BlueprintGroup selectedGroup = BlueprintGroup.LIVING_HOUSES;
+    private BlueprintGroup selectedGroup = BlueprintGroup.WORKSHOPS;
 
     private List<BlueprintSlot> currentSlots;
     private boolean needScrollbar = false;

@@ -85,10 +85,19 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
                     if(group.isPresent()) {
                         return ClientboundUpdateBlueprintPacket.edit(it.filename, it.floorLevel, it.tag);
                     } else {
-                        return new ClientboundAddBlueprintPacket(it.group, it.filename, it.filename, it.floorLevel, "custom", it.tag);
+                        final var newGroup = mapLegacyGroups(it.group);
+                        return new ClientboundAddBlueprintPacket(newGroup, it.filename, it.filename, it.floorLevel, "custom", it.tag);
                     }
                 })
                 .toList();
+    }
+
+    private BlueprintGroup mapLegacyGroups(BlueprintGroup legacyGroup) {
+        return switch (legacyGroup) {
+            case FARMS -> BlueprintGroup.WORKSHOPS;
+            case SOCIAL_BUILDINGS -> BlueprintGroup.LIVING_HOUSES;
+            default -> legacyGroup;
+        };
     }
 
     @Override
