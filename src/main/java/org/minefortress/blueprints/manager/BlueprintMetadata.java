@@ -2,6 +2,7 @@ package org.minefortress.blueprints.manager;
 
 import net.minecraft.util.BlockRotation;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement;
 
 import java.util.Optional;
 
@@ -9,7 +10,7 @@ public class BlueprintMetadata implements IBlueprintMetadata {
 
     private final String id;
     private final String name;
-    private final String requirementId;
+    private final BlueprintRequirement requirement;
     private int floorLevel;
 
     private BlockRotation rotation = BlockRotation.NONE;
@@ -18,7 +19,7 @@ public class BlueprintMetadata implements IBlueprintMetadata {
         this.name = name;
         this.id = id;
         this.floorLevel = floorLevel;
-        this.requirementId = requirementId;
+        this.requirement = new BlueprintRequirement(Optional.ofNullable(requirementId).orElse("none"));
     }
 
     @Override
@@ -32,8 +33,8 @@ public class BlueprintMetadata implements IBlueprintMetadata {
     }
 
     @Override
-    public String getRequirementId() {
-        return Optional.ofNullable(requirementId).orElse("none");
+    public IBlueprintRequirement getRequirement() {
+        return requirement;
     }
 
     @Override

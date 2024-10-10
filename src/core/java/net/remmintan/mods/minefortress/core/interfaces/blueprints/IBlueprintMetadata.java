@@ -7,7 +7,7 @@ public interface IBlueprintMetadata {
 
     String getId();
 
-    String getRequirementId();
+    IBlueprintRequirement getRequirement();
 
     int getFloorLevel();
 

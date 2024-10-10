@@ -339,22 +339,31 @@ public final class BlueprintsScreen extends Screen {
         }
     }
 
+    private static void drawItemInSlot(DrawContext drawContext, MatrixStack matrices, float scaleFactor, Item item, int slotX, int slotY) {
+        matrices.push();
+        matrices.scale(scaleFactor, scaleFactor, scaleFactor);
+        drawContext.drawItem(new ItemStack(item), (int) (slotX / scaleFactor), (int) (slotY / scaleFactor));
+        matrices.pop();
+    }
+
     private void drawSlot(DrawContext drawContext, BlueprintSlot slot, int slotColumn, int slotRow) {
         RenderSystem.enableDepthTest();
         int slotX = slotColumn * 18 + 9 + 5;
         int slotY = slotRow * 18 + 18 + 5;
         if(slot == BlueprintSlot.EMPTY){
-            final var scaleFactor = 0.5f;
             final var matrices = drawContext.getMatrices();
-            matrices.push();
-            matrices.scale(scaleFactor, scaleFactor, scaleFactor);
-            drawContext.drawItem(new ItemStack(Items.BRICK), (int)(slotX/scaleFactor), (int)(slotY/scaleFactor));
-            matrices.pop();
+            final var item = Items.BRICK;
+            drawItemInSlot(drawContext, matrices, 0.5f, item, slotX, slotY);
         } else {
             final IBlueprintMetadata metadata = slot.getMetadata();
             final var enoughResources = !ModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
-            if(this.client != null){
-                this.blueprintRenderer.renderBlueprintInGui(drawContext.getMatrices(), metadata.getId(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
+            final var matrices = drawContext.getMatrices();
+            this.blueprintRenderer.renderBlueprintInGui(matrices, metadata.getId(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
+
+            final var requirement = metadata.getRequirement();
+            final var icon = requirement.getIcon();
+            if (icon != null) {
+                drawItemInSlot(drawContext, matrices, 0.7f, icon, slotX, slotY);
             }
         }
 

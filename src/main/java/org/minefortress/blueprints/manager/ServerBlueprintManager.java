@@ -24,6 +24,7 @@ import org.minefortress.blueprints.world.FortressServerWorld;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
+
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -59,7 +60,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                                         blueprintMetadata.getName(),
                                         file,
                                         floorLevel,
-                                        blueprintMetadata.getRequirementId(),
+                                        blueprintMetadata.getRequirement().getId(),
                                         it
                                 );
                                 FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
@@ -107,7 +108,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
 
     @Override
     public BlueprintTask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel) {
-        final String requirementId = this.findRequirementById(blueprintId)
+        final String requirementId = this.findRequirementById(blueprintId).map(IBlueprintRequirement::getId)
                 .orElse("custom");
         final IStructureBlockData serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation, floorLevel);
         final Vec3i size = serverStructureInfo.getSize();
@@ -218,13 +219,13 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
         return !blockState.isOf(Blocks.DIRT);
     }
 
-    private Optional<String> findRequirementById(String blueprintId){
+    private Optional<IBlueprintRequirement> findRequirementById(String blueprintId) {
         return blueprintMetadataReader.getPredefinedBlueprints()
                 .values()
                 .stream()
                 .flatMap(Collection::stream)
                 .filter(blueprintMetadata -> blueprintMetadata.getId().equals(blueprintId))
                 .findFirst()
-                .map(IBlueprintMetadata::getRequirementId);
+                .map(IBlueprintMetadata::getRequirement);
     }
 }
