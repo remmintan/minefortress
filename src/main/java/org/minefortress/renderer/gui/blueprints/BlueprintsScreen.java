@@ -237,7 +237,9 @@ public final class BlueprintsScreen extends Screen {
 
         this.drawForeground(drawContext);
         if(this.handler.hasFocusedSlot()){
-            if(this.sneakButtonDown && handler.getFocusedSlot() != BlueprintSlot.EMPTY) {
+            final var focusedSlot = handler.getFocusedSlot();
+            final var focusedSlotIsNotEmpty = focusedSlot != BlueprintSlot.EMPTY;
+            if (this.sneakButtonDown && focusedSlotIsNotEmpty) {
                 drawContext.drawText(this.textRenderer,
                         DELETE_BLUEPRINT_TEXT,
                         this.backgroundWidth + this.previewOffset + 3,
@@ -245,13 +247,26 @@ public final class BlueprintsScreen extends Screen {
                         0xFF0000,
                         false);
             } else {
-                final var editText = handler.getFocusedSlot() != BlueprintSlot.EMPTY ? EDIT_BLUEPRINT_TEXT : ADD_BLUEPRINT_TEXT;
+                final var editText = focusedSlotIsNotEmpty ? EDIT_BLUEPRINT_TEXT : ADD_BLUEPRINT_TEXT;
                 drawContext.drawText(this.textRenderer,
                         editText,
                         this.backgroundWidth + this.previewOffset + 3,
                         this.backgroundHeight - this.textRenderer.fontHeight - 3,
                         0xFFFFFF,
                         false);
+            }
+
+            if (focusedSlotIsNotEmpty) {
+                final var professionName = focusedSlot.getMetadata().getRequirement().getProfessionName();
+                if (professionName != null) {
+                    final var unlocksText = Text.of("Unlocks: " + professionName);
+                    drawContext.drawText(this.textRenderer,
+                            unlocksText,
+                            this.backgroundWidth + this.previewOffset + 3,
+                            3,
+                            0xFFFFFF,
+                            false);
+                }
             }
 
         }

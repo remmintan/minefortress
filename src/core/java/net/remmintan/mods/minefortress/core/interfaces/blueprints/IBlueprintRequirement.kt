@@ -9,5 +9,6 @@ interface IBlueprintRequirement {
     val level: Int
 
     fun getIcon(): Item? = type?.icon
+    fun getProfessionName(): String? = type?.displayName
 
 }
