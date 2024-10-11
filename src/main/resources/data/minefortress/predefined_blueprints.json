@@ -135,6 +135,12 @@
       "floorLevel": 0
     },
     {
+      "name": "Weaponsmith 1",
+      "file": "weaponsmith_1",
+      "requirementId": "blacksmith2",
+      "floorLevel": 0
+    },
+    {
       "name": "Forester's house",
       "file": "forester_house",
       "requirementId": "forester",
@@ -159,69 +165,15 @@
       "floorLevel": 0
     },
     {
-      "name": "Armorer House 1",
-      "file": "armorer_house_1",
-      "requirementId": "armorer",
-      "floorLevel": 0
-    },
-    {
-      "name": "Butcher Shop 1",
-      "file": "butcher_shop_1",
-      "requirementId": "butcher",
-      "floorLevel": 0
-    },
-    {
-      "name": "Butcher Shop 2",
-      "file": "butcher_shop_2",
-      "requirementId": "butcher",
-      "floorLevel": 1
-    },
-    {
-      "name": "Cartographer 1",
-      "file": "cartographer_1",
-      "requirementId": "cartographer",
-      "floorLevel": 1
-    },
-    {
       "name": "Fisher Cottage 1",
       "file": "fisher_cottage_1",
       "requirementId": "fisher",
       "floorLevel": 2
     },
     {
-      "name": "Fletcher House 1",
-      "file": "fletcher_house_1",
-      "requirementId": "fletcher",
-      "floorLevel": 1
-    },
-    {
-      "name": "Masons House 1",
-      "file": "masons_house_1",
-      "requirementId": "masons",
-      "floorLevel": 0
-    },
-    {
-      "name": "Shepherds House 1",
-      "file": "shepherds_house_1",
-      "requirementId": "shepherd",
-      "floorLevel": 1
-    },
-    {
-      "name": "Tannery 1",
-      "file": "tannery_1",
-      "requirementId": "tanner",
-      "floorLevel": 0
-    },
-    {
       "name": "Tool Smith 1",
       "file": "tool_smith_1",
       "requirementId": "crafter",
-      "floorLevel": 0
-    },
-    {
-      "name": "Weaponsmith 1",
-      "file": "weaponsmith_1",
-      "requirementId": "blacksmith",
       "floorLevel": 0
     },
     {
@@ -233,7 +185,7 @@
     {
       "name": "Large Farm 1",
       "file": "large_farm_1",
-      "requirementId": "farmer",
+      "requirementId": "farmer2",
       "floorLevel": 0
     }
   ],
