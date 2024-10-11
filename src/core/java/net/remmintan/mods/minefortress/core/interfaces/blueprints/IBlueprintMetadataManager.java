@@ -8,7 +8,11 @@ public interface IBlueprintMetadataManager {
 
     IBlueprintMetadata selectNext();
 
-    List<IBlueprintMetadata> getAllForGroup(BlueprintGroup group);
+    default List<IBlueprintMetadata> getAllForGroup(BlueprintGroup group) {
+        return getAllForGroup(group, 0);
+    }
+
+    List<IBlueprintMetadata> getAllForGroup(BlueprintGroup group, Integer level);
 
     IBlueprintMetadata add(BlueprintGroup group, String name, String file, int floorLevel, String requirementId);
 

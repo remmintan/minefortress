@@ -1,65 +1,27 @@
-package org.minefortress.blueprints.manager;
+package org.minefortress.blueprints.manager
 
-import net.minecraft.util.BlockRotation;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement;
+import net.minecraft.util.BlockRotation
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement
+import java.util.*
 
-import java.util.Optional;
+class BlueprintMetadata(
+    override val name: String,
+    override val id: String,
+    override var floorLevel: Int,
+    requirementId: String?
+) : IBlueprintMetadata {
+    override val requirement: IBlueprintRequirement =
+        BlueprintRequirement(Optional.ofNullable(requirementId).orElse("none"))
 
-public class BlueprintMetadata implements IBlueprintMetadata {
+    override var rotation: BlockRotation = BlockRotation.NONE
+        private set
 
-    private final String id;
-    private final String name;
-    private final BlueprintRequirement requirement;
-    private int floorLevel;
-
-    private BlockRotation rotation = BlockRotation.NONE;
-
-    public BlueprintMetadata(String name, String id, int floorLevel, String requirementId) {
-        this.name = name;
-        this.id = id;
-        this.floorLevel = floorLevel;
-        this.requirement = new BlueprintRequirement(Optional.ofNullable(requirementId).orElse("none"));
+    override fun rotateRight() {
+        rotation = rotation.rotate(BlockRotation.CLOCKWISE_90)
     }
 
-    @Override
-    public String getName() {
-        return name;
+    override fun rotateLeft() {
+        rotation = rotation.rotate(BlockRotation.COUNTERCLOCKWISE_90)
     }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public IBlueprintRequirement getRequirement() {
-        return requirement;
-    }
-
-    @Override
-    public int getFloorLevel() {
-        return floorLevel;
-    }
-
-    @Override
-    public void setFloorLevel(int floorLevel) {
-        this.floorLevel = floorLevel;
-    }
-
-    @Override
-    public void rotateRight() {
-        rotation = rotation.rotate(BlockRotation.CLOCKWISE_90);
-    }
-
-    @Override
-    public void rotateLeft() {
-        rotation = rotation.rotate(BlockRotation.COUNTERCLOCKWISE_90);
-    }
-
-    @Override
-    public BlockRotation getRotation() {
-        return rotation;
-    }
-
 }

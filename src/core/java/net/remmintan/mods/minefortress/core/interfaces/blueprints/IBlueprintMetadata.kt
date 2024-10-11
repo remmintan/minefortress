@@ -1,21 +1,20 @@
-package net.remmintan.mods.minefortress.core.interfaces.blueprints;
+package net.remmintan.mods.minefortress.core.interfaces.blueprints
 
-import net.minecraft.util.BlockRotation;
+import net.minecraft.util.BlockRotation
 
-public interface IBlueprintMetadata {
-    String getName();
+interface IBlueprintMetadata {
 
-    String getId();
+    val name: String?
+    val id: String?
+    val requirement: IBlueprintRequirement?
+    var floorLevel: Int
+    val rotation: BlockRotation?
 
-    IBlueprintRequirement getRequirement();
+    fun rotateRight()
 
-    int getFloorLevel();
+    fun rotateLeft()
 
-    void setFloorLevel(int floorLevel);
+    fun getLevel() = requirement?.level ?: 0
 
-    void rotateRight();
 
-    void rotateLeft();
-
-    BlockRotation getRotation();
 }

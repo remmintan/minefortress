@@ -19,15 +19,20 @@ public final class BlueprintMetadataManager implements IBlueprintMetadataManager
     @Override
     public IBlueprintMetadata selectNext() {
         index++;
-        if (index >= flatBlueprints().size()) {
+        if (index >= flatBlueprints(0).size()) {
             index = 0;
         }
-        return flatBlueprints().get(index);
+        return flatBlueprints(0).get(index);
     }
 
+
     @Override
-    public List<IBlueprintMetadata> getAllForGroup(BlueprintGroup group) {
-        return blueprintsMap.getOrDefault(group, Collections.emptyList());
+    public List<IBlueprintMetadata> getAllForGroup(BlueprintGroup group, Integer level) {
+        return blueprintsMap
+                .getOrDefault(group, Collections.emptyList())
+                .stream()
+                .filter(it -> it.getLevel() == level)
+                .toList();
     }
 
     @Override
@@ -66,6 +71,15 @@ public final class BlueprintMetadataManager implements IBlueprintMetadataManager
 
     private List<IBlueprintMetadata> flatBlueprints() {
         return blueprintsMap.values().stream().flatMap(Collection::stream).toList();
+    }
+
+    private List<IBlueprintMetadata> flatBlueprints(int level) {
+        return blueprintsMap
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .filter(it -> it.getLevel() == level)
+                .toList();
     }
 
     @Override
