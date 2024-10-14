@@ -93,6 +93,18 @@
   ],
   "WORKSHOPS": [
     {
+      "name": "Tool Smith 1",
+      "file": "tool_smith_1",
+      "requirementId": "crafter",
+      "floorLevel": 0
+    },
+    {
+      "name": "Forester's house",
+      "file": "forester_house",
+      "requirementId": "forester",
+      "floorLevel": 0
+    },
+    {
       "name": "Wooden Miner's House",
       "file": "miner_house_wooden",
       "requirementId": "miner_wooden",
@@ -141,12 +153,6 @@
       "floorLevel": 0
     },
     {
-      "name": "Forester's house",
-      "file": "forester_house",
-      "requirementId": "forester",
-      "floorLevel": 0
-    },
-    {
       "name": "Small Warrior's house",
       "file": "warrior_1",
       "requirementId": "warrior1",
@@ -169,12 +175,6 @@
       "file": "fisher_cottage_1",
       "requirementId": "fisher",
       "floorLevel": 2
-    },
-    {
-      "name": "Tool Smith 1",
-      "file": "tool_smith_1",
-      "requirementId": "crafter",
-      "floorLevel": 0
     },
     {
       "name": "Small Farm 1",
