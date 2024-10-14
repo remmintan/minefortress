@@ -13,6 +13,6 @@ enum class BlueprintRequirementType(val icon: Item, val displayName: String, val
     WARRIOR(Items.STONE_SWORD, "Warrior", listOf("warrior1", "warrior2")),
     ARCHER(Items.BOW, "Archer", listOf("shooting_gallery")),
     FISHERMAN(Items.FISHING_ROD, "Fisher", listOf("fisher")),
-    CRAFTSMAN(Items.CRAFTING_TABLE, "Craftsman", listOf("crafter"))
+    CRAFTSMAN(Items.CRAFTING_TABLE, "Craftsman", listOf("crafter", "crafter_2"))
 
 }

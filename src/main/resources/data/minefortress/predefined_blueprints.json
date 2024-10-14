@@ -93,9 +93,15 @@
   ],
   "WORKSHOPS": [
     {
+      "name": "Crafting table",
+      "file": "crafting_table",
+      "requirementId": "crafter",
+      "floorLevel": 0
+    },
+    {
       "name": "Tool Smith 1",
       "file": "tool_smith_1",
-      "requirementId": "crafter",
+      "requirementId": "crafter_2",
       "floorLevel": 0
     },
     {
