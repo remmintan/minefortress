@@ -2,7 +2,6 @@ package org.minefortress.entity;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
-import baritone.api.minefortress.IFortressColonist;
 import baritone.api.minefortress.IMinefortressEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -40,14 +39,13 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
 import org.minefortress.entity.ai.controls.DigControl;
 import org.minefortress.entity.ai.controls.PlaceControl;
-import org.minefortress.entity.ai.controls.ScaffoldsControl;
 import org.minefortress.entity.ai.controls.TaskControl;
 import org.minefortress.entity.ai.goal.*;
 import org.minefortress.registries.FortressEntities;
 
 import java.util.Optional;
 
-public final class Colonist extends NamedPawnEntity implements IMinefortressEntity, IFortressColonist, IWorkerPawn {
+public final class Colonist extends NamedPawnEntity implements IMinefortressEntity, IWorkerPawn {
 
     public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;
@@ -63,7 +61,6 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
 
     private final DigControl digControl;
     private final PlaceControl placeControl;
-    private final ScaffoldsControl scaffoldsControl;
     private final ITaskControl taskControl;
     private final MovementHelper movementHelper;
     private final IBaritone baritone;
@@ -76,14 +73,12 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         if(world instanceof ServerWorld) {
             digControl = new DigControl(this, (ServerWorld) world);
             placeControl = new PlaceControl(this);
-            scaffoldsControl = new ScaffoldsControl(this);
             taskControl = new TaskControl(this);
             baritone = BaritoneAPI.getProvider().getBaritone(this);
             movementHelper = new MovementHelper(this);
         } else {
             digControl = null;
             placeControl = null;
-            scaffoldsControl = null;
             taskControl = null;
             baritone = null;
             movementHelper = null;
@@ -231,7 +226,6 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         if(getEatControl().map(IEatControl::isEating).orElse(false)) return;
         if(getDigControl() != null) getDigControl().tick();
         if(getPlaceControl() != null) getPlaceControl().tick();
-        if(getScaffoldsControl() != null) getScaffoldsControl().tick();
         if(getMovementHelper() != null) getMovementHelper().tick();
     }
 
@@ -275,20 +269,10 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         return placeControl;
     }
 
-    @Override
-    public ScaffoldsControl getScaffoldsControl() {
-        return scaffoldsControl;
-    }
-
     public void resetControls() {
         digControl.reset();
         placeControl.reset();
-        scaffoldsControl.clearResults();
         movementHelper.reset();
-    }
-
-    public boolean diggingOrPlacing() {
-        return (placeControl != null && placeControl.isWorking()) || (digControl != null &&  digControl.isWorking());
     }
 
     private BlockPos goal;

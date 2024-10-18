@@ -22,7 +22,7 @@ sourceSets {
 		compileClasspath += main.compileClasspath
 	}
 	building {
-		compileClasspath += main.compileClasspath
+		compileClasspath += main.compileClasspath + core.output
 	}
 	networking {
 		compileClasspath += main.compileClasspath + core.output + building.output
@@ -77,7 +77,7 @@ dependencies {
 
 	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
 
-	modImplementation include("com.github.minefortress-mod:automatone:1.0.7-minefortress")
+	modImplementation include("com.github.minefortress-mod:automatone:1.0.8-minefortress")
 	modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-base:5.2.9-minefortress")
 	modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-entity:5.2.9-minefortress")
 	modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-world:5.2.9-minefortress")
