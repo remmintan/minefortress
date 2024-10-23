@@ -15,10 +15,7 @@
     "unlockMessage": "Build 'Wooden Miner's house' to unlock",
     "unlockMoreMessage": "Build more 'Wooden Miner's houses' to unlock more",
     "requirements": {
-      "building": {
-        "type": "MINER",
-        "level": 0
-      },
+      "building": "miner_wooden",
       "items": [
         {
           "id": "minecraft:stone_pickaxe",
@@ -40,10 +37,7 @@
     "unlockMessage": "Build 'Stone Miner's house' to unlock",
     "unlockMoreMessage": "Build more 'Stone Miner's houses' to unlock more",
     "requirements": {
-      "building": {
-        "type": "MINER",
-        "level": 1
-      },
+      "building": "miner_stone",
       "items": [
         {
           "id": "minecraft:iron_pickaxe",
@@ -65,10 +59,7 @@
     "unlockMessage": "Build 'Miners' guild house' to unlock",
     "unlockMoreMessage": "Build more 'Miners' guild houses' to unlock more",
     "requirements": {
-      "building": {
-        "type": "MINER",
-        "level": 2
-      },
+      "building": "miners_guild",
       "items": [
         {
           "id": "minecraft:diamond_pickaxe",
@@ -90,15 +81,12 @@
     "unlockMessage": "Build 'Wooden Lumberjack's house' to unlock",
     "unlockMoreMessage": "Build more 'Wooden Lumberjack's houses' to unlock more",
     "requirements": {
-      "building": {
-        "type": "LUMBERJACK",
-        "level": 0
-      },
+      "building": "lumberjack_wooden",
       "items": [
-          {
+        {
           "id": "minecraft:stone_axe",
           "count": 1
-          }
+        }
       ]
     },
     "hireMenu": true
@@ -111,15 +99,12 @@
     "unlockMessage": "Build 'Stone Lumberjack's house' to unlock",
     "unlockMoreMessage": "Build more 'Stone Lumberjack's houses' to unlock more",
     "requirements": {
-      "building": {
-        "type": "LUMBERJACK",
-        "level": 1
-      },
+      "building": "lumberjack_stone",
       "items": [
-          {
+        {
           "id": "minecraft:iron_axe",
           "count": 1
-          }
+        }
       ]
     },
     "hireMenu": true
@@ -132,15 +117,12 @@
     "unlockMessage": "Build 'Lumberjack's guild house' to unlock",
     "unlockMoreMessage": "Build more 'Lumberjack's guild houses' to unlock more",
     "requirements": {
-      "building": {
-        "type": "LUMBERJACK",
-        "level": 2
-      },
+      "building": "lumberjack_guild",
       "items": [
-          {
+        {
           "id": "minecraft:diamond_axe",
           "count": 1
-          }
+        }
       ]
     },
     "hireMenu": true
@@ -153,10 +135,18 @@
     "unlockMessage": "Brings food. Build 'Forester's house' to unlock",
     "unlockMoreMessage": "Build more 'Forester's houses' to unlock more",
     "requirements": {
-      "building": {
-        "type": "FORESTER",
-        "level": 0
-      }
+      "building": "forester"
+    }
+  },
+  {
+    "key": "hunter",
+    "title": "Hunter",
+    "icon": "minecraft:bow",
+    "description": "Can use bow.\nDefends village from monsters.\nHunts monsters.\nCan work at night",
+    "unlockMessage": "Will be available in future updates",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
     }
   },
   {
@@ -167,10 +157,7 @@
     "unlockMessage": "Build Fisherman's house to unlock",
     "unlockMoreMessage": "Build more Fisherman's houses to unlock more",
     "requirements": {
-      "building": {
-        "type": "FISHERMAN",
-        "level": 0
-      }
+      "building": "fisher"
     }
   },
   {
@@ -181,10 +168,62 @@
     "unlockMessage": "Build any farm to unlock",
     "unlockMoreMessage": "Build more farms to hire more",
     "requirements": {
-      "building": {
-        "type": "FARMER",
-        "level": 0
-      }
+      "building": "farmer"
+    }
+  },
+  {
+    "key": "baker",
+    "title": "Baker",
+    "icon": "minecraft:bread",
+    "description": "Bakes bread, cakes and other food",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
+  },
+  {
+    "key": "shepherd",
+    "title": "Shepherd",
+    "icon": "minecraft:carrot_on_a_stick",
+    "description": "Brings pigs, sheeps and cows to the village.\nProvides milks, wool and meat",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
+  },
+  {
+    "key": "stableman",
+    "title": "Stableman",
+    "icon": "minecraft:lead",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
+  },
+  {
+    "key": "butcher",
+    "title": "Butcher",
+    "icon": "minecraft:beef",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
+  },
+  {
+    "key": "cook",
+    "title": "Cook",
+    "icon": "minecraft:cooked_beef",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
     }
   },
   {
@@ -202,6 +241,28 @@
     }
   },
   {
+    "key": "leather_worker1",
+    "title": "Leather Worker - LVL1",
+    "icon": "minecraft:leather",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
+  },
+  {
+    "key": "leather_worker2",
+    "title": "Leather Worker - LVL2",
+    "icon": "minecraft:leather_horse_armor",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
+  },
+  {
     "key": "blacksmith",
     "title": "Blacksmith",
     "icon": "minecraft:iron_ingot",
@@ -213,6 +274,39 @@
         "type": "BLACKSMITH",
         "level": 0
       }
+    }
+  },
+  {
+    "key": "armorer",
+    "title": "Armorer",
+    "icon": "minecraft:iron_chestplate",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
+  },
+  {
+    "key": "weaver",
+    "title": "Weaver",
+    "icon": "minecraft:string",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    }
+  },
+  {
+    "key": "tailor",
+    "title": "Tailor",
+    "icon": "minecraft:white_banner",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
     }
   },
   {
@@ -286,6 +380,42 @@
           "count": 32
         }
       ]
+    },
+    "hireMenu": true
+  },
+  {
+    "key": "archer2",
+    "title": "Archer - LVL2",
+    "icon": "minecraft:crossbow",
+    "description": "",
+    "unlockMessage": "Will be available in future releases",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    },
+    "hireMenu": true
+  },
+  {
+    "key": "knight1",
+    "title": "Knight - LVL1",
+    "icon": "minecraft:iron_horse_armor",
+    "description": "Will be available in future releases",
+    "unlockMessage": "",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
+    },
+    "hireMenu": true
+  },
+  {
+    "key": "knight2",
+    "title": "Knight - LVL2",
+    "icon": "minecraft:diamond_horse_armor",
+    "description": "Will be available in future releases",
+    "unlockMessage": "",
+    "unlockMoreMessage": "",
+    "requirements": {
+      "building": "_"
     },
     "hireMenu": true
   }

@@ -11,37 +11,15 @@
       }
     },
     "forester": {
-      "hunter": {},
       "fisherman": {},
-      "farmer": {
-        "baker": {},
-        "shepherd": {
-          "stableman": {},
-          "butcher": {
-            "cook": {}
-          }
-        }
-      },
+      "farmer": {},
       "warrior1": {
         "warrior2": {},
-        "archer1": {
-          "archer2": {}
-        },
-        "knight1": {
-          "knight2": {}
-        }
+        "archer1": {}
       }
     },
     "crafter": {
-      "blacksmith": {
-        "leather_worker1": {
-          "leather_worker2": {}
-        },
-        "weaver": {
-          "tailor": {}
-        },
-        "armorer": {}
-      }
+      "blacksmith": {}
     }
   }
 }
