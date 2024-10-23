@@ -6,6 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.professions.fishing.FisherBlockFounderKt;
@@ -125,7 +126,7 @@ public class FisherDailyTask implements ProfessionDailyTask {
         if(managersProviderOpt.isEmpty()) return null;
         final var managersProvider = managersProviderOpt.get();
         final var buildingsManager = managersProvider.getBuildingsManager();
-        final var buildingOpt = buildingsManager.findNearest(pawn.getBlockPos(), "fisher");
+        final var buildingOpt = buildingsManager.findNearest(pawn.getBlockPos(), ProfessionType.FISHERMAN);
         final var world = pawn.getWorld();
         if(buildingOpt.isPresent()) {
             final var building = buildingOpt.get();

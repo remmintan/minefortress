@@ -31,6 +31,7 @@ import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
@@ -596,11 +597,12 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         this.scheduleSync();
     }
 
-    public Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement, ServerPlayerEntity masterPlayer) {
+    @Override
+    public Optional<IAutomationArea> getAutomationAreaByProfessionType(ProfessionType professionType, ServerPlayerEntity masterPlayer) {
         if(getBuildingsManager() instanceof IAutomationAreaProvider provider) {
-            final var buildings = provider.getAutomationAreasByRequirement(requirement);
+            final var buildings = provider.getAutomationAreaByProfessionType(professionType);
             final var automationAreaManager = getAutomationAreaManager();
-            final var areas = automationAreaManager.getByRequirement(requirement);
+            final var areas = automationAreaManager.getByProfessionType(professionType);
 
             final var areaOpt = Stream
                     .concat(buildings, areas)
@@ -612,7 +614,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                     if(masterPlayer != null)
                         area.sendFinishMessage(masterPlayer);
                     automationAreaManager.removeArea(area.getId());
-                    return getAutomationAreaByRequirementId(requirement, masterPlayer);
+                    return getAutomationAreaByProfessionType(professionType, masterPlayer);
                 } else {
                     return areaOpt;
                 }
@@ -664,8 +666,8 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     }
 
     @Override
-    public boolean hasRequiredBuilding(String requirementId, int minCount) {
-        return getBuildingsManager().hasRequiredBuilding(requirementId, minCount);
+    public boolean hasRequiredBuilding(ProfessionType type, int level, int minCount) {
+        return getBuildingsManager().hasRequiredBuilding(type, level, minCount);
     }
 
     @Override

@@ -28,7 +28,7 @@ public interface IClientBlueprintManager extends IStructureRenderInfoProvider {
 
     IBlockDataProvider getBlockDataProvider();
 
-    void add(BlueprintGroup group, String name, String file, int floorLevel, String requirementId, NbtCompound tag);
+    void add(BlueprintGroup group, String name, String blueprintId, int floorLevel, NbtCompound tag);
 
     void update(String fileName, NbtCompound tag, int newFloorLevel);
 

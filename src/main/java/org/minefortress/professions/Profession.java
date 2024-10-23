@@ -3,16 +3,13 @@ package org.minefortress.professions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancement.AdvancementFrame;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IBlockRequirement;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
-import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.utils.GuiUtils;
 
@@ -30,11 +27,10 @@ public class Profession implements IProfession {
     private final List<Text> description;
     private final List<Text> unlockMoreMessage;
     private final List<Text> unlockMessage;
-    private final String buildingRequirement;
-    private final Block blockRequirement;
     private final List<IItemInfo> itemsRequirement;
+    private final ProfessionType requirementType;
+    private final int requirementLevel;
     private final boolean hireMenu;
-    private final boolean blueprint;
 
     private IProfession parent;
     private final List<IProfession> children = new ArrayList<>();
@@ -48,16 +44,8 @@ public class Profession implements IProfession {
         final var requirements = fullInfo.requirements();
 
         if(requirements != null) {
-            buildingRequirement = requirements.building();
-
-            final var blockRequirement = requirements.block();
-            if(blockRequirement != null && !Blocks.AIR.equals(blockRequirement.block())) {
-                this.blockRequirement = blockRequirement.block();
-                blueprint = blockRequirement.inBlueprint();
-            } else {
-                this.blockRequirement = null;
-                blueprint = false;
-            }
+            requirementType = requirements.building().type();
+            requirementLevel = requirements.building().level();
 
             this.itemsRequirement = requirements
                     .items()
@@ -65,9 +53,8 @@ public class Profession implements IProfession {
                     .map(it -> (IItemInfo)new ItemInfo(it.item(), it.count()))
                     .toList();
         } else {
-            buildingRequirement = "";
-            blockRequirement = null;
-            blueprint = false;
+            requirementType = null;
+            requirementLevel = 0;
             itemsRequirement = Collections.emptyList();
         }
 
@@ -160,15 +147,13 @@ public class Profession implements IProfession {
     }
 
     @Override
-    @Nullable
-    public String getBuildingRequirement() {
-        return buildingRequirement;
+    public ProfessionType getRequirementType() {
+        return requirementType;
     }
 
     @Override
-    @Nullable
-    public IBlockRequirement getBlockRequirement() {
-        return new BlockRequirement(blockRequirement, blueprint);
+    public int getRequirementLevel() {
+        return requirementLevel;
     }
 
     @Override
@@ -186,5 +171,4 @@ public class Profession implements IProfession {
             amount = 0;
     }
 
-    public record BlockRequirement(Block block, boolean blueprint) implements IBlockRequirement {}
 }

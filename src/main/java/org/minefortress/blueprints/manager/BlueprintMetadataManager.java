@@ -36,12 +36,12 @@ public final class BlueprintMetadataManager implements IBlueprintMetadataManager
     }
 
     @Override
-    public IBlueprintMetadata add(BlueprintGroup group, String name, String file, int floorLevel, String requirementId) {
-        if (isContainsBlueprint(name, file)) {
-            throw new IllegalArgumentException("Blueprint with areaType " + name + " and file " + file + " already exists");
+    public IBlueprintMetadata add(BlueprintGroup group, String name, String blueprintId, int floorLevel) {
+        if (isContainsBlueprint(name, blueprintId)) {
+            throw new IllegalArgumentException("Blueprint with areaType " + name + " and blueprintId " + blueprintId + " already exists");
         }
 
-        final IBlueprintMetadata metadata = new BlueprintMetadata(name, file, floorLevel, requirementId);
+        final IBlueprintMetadata metadata = new BlueprintMetadata(name, blueprintId, floorLevel);
         blueprintsMap.computeIfAbsent(group, k -> new ArrayList<>()).add(metadata);
         return metadata;
     }

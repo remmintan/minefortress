@@ -29,7 +29,6 @@ public class BlueprintTask extends AbstractTask {
     private final Map<BlockPos, BlockState> blueprintEntityData;
     private final Map<BlockPos, BlockState> blueprintAutomaticData;
     private final int floorLevel;
-    private final String requirementId;
     private final String blueprintId;
 
     public BlueprintTask(
@@ -40,7 +39,6 @@ public class BlueprintTask extends AbstractTask {
             Map<BlockPos, BlockState> blueprintEntityData,
             Map<BlockPos, BlockState> blueprintAutomaticData,
             int floorLevel,
-            String requirementId,
             @NotNull String blueprintId
     ) {
         super(id, TaskType.BUILD, startingPos, endingPos);
@@ -48,7 +46,6 @@ public class BlueprintTask extends AbstractTask {
         this.blueprintEntityData = blueprintEntityData;
         this.blueprintAutomaticData = blueprintAutomaticData;
         this.floorLevel = floorLevel;
-        this.requirementId = requirementId;
         this.blueprintId = blueprintId;
     }
 
@@ -110,7 +107,6 @@ public class BlueprintTask extends AbstractTask {
                     UUID.randomUUID(),
                     startingBlock,
                     endingBlock,
-                    requirementId,
                     blueprintId,
                     floorLevel,
                     mergeBlockData

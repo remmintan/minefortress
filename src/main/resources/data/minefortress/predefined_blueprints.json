@@ -3,91 +3,76 @@
     {
       "name": "Small House 1",
       "file": "small_house_1",
-      "floorLevel": 0,
-      "requirementId": "house"
+      "floorLevel": 0
     },
     {
       "name": "Small House 2",
       "file": "small_house_2",
-      "floorLevel": 0,
-      "requirementId": "house"
+      "floorLevel": 0
     },
     {
       "name": "Small House 3",
       "file": "small_house_3",
-      "floorLevel": 0,
-      "requirementId": "house"
+      "floorLevel": 0
     },
     {
       "name": "Small House 4",
       "file": "small_house_4",
-      "floorLevel": 0,
-      "requirementId": "house"
+      "floorLevel": 0
     },
     {
       "name": "Small House 5",
       "file": "small_house_5",
-      "floorLevel": 1,
-      "requirementId": "house"
+      "floorLevel": 1
     },
     {
       "name": "Small House 6",
       "file": "small_house_6",
-      "floorLevel": 0,
-      "requirementId": "house"
+      "floorLevel": 0
     },
     {
       "name": "Small House 7",
       "file": "small_house_7",
-      "floorLevel": 0,
-      "requirementId": "house"
+      "floorLevel": 0
     },
     {
       "name": "Small House 8",
       "file": "small_house_8",
-      "floorLevel": 2,
-      "requirementId": "house"
+      "floorLevel": 2
     },
     {
       "name": "Medium House 1",
       "file": "medium_house_1",
-      "floorLevel": 1,
-      "requirementId": "house"
+      "floorLevel": 1
     },
     {
       "name": "Medium House 2",
       "file": "medium_house_2",
-      "floorLevel": 0,
-      "requirementId": "house"
+      "floorLevel": 0
     },
     {
       "name": "Big House 1",
       "file": "big_house_1",
-      "floorLevel": 1,
-      "requirementId": "house"
+      "floorLevel": 1
     },
     {
       "name": "Library 1",
       "file": "library_1",
-      "requirementId": "social",
       "floorLevel": 0
     },
     {
       "name": "Library 2",
       "file": "library_2",
-      "requirementId": "social",
       "floorLevel": 1
     },
     {
       "name": "Temple 3",
       "file": "temple_3",
-      "requirementId": "social",
       "floorLevel": 0
     },
     {
       "name": "Temple 4",
       "file": "temple_4",
-      "requirementId": "social",
       "floorLevel": 0
     }
   ],
@@ -95,25 +80,21 @@
     {
       "name": "Crafting table",
       "file": "crafting_table",
-      "requirementId": "crafter",
       "floorLevel": 0
     },
     {
       "name": "Tool Smith 1",
       "file": "tool_smith_1",
-      "requirementId": "crafter_2",
       "floorLevel": 0
     },
     {
       "name": "Forester's house",
       "file": "forester_house",
-      "requirementId": "forester",
       "floorLevel": 0
     },
     {
       "name": "Wooden Miner's House",
       "file": "miner_house_wooden",
-      "requirementId": "miner_wooden",
       "floorLevel": 0
     },
     {
@@ -125,73 +106,61 @@
     {
       "name": "Miners' guild house",
       "file": "miner_house_guild",
-      "requirementId": "miners_guild",
       "floorLevel": 0
     },
     {
       "name": "Wooden Lumberjack's house",
       "file": "lumberjack_house_wooden",
-      "requirementId": "lumberjack_wooden",
       "floorLevel": 0
     },
     {
       "name": "Stone Lumberjack's house",
       "file": "lumberjack_house_stone",
-      "requirementId": "lumberjack_stone",
       "floorLevel": 0
     },
     {
       "name": "Lumberjack's guild house",
       "file": "lumberjack_house_guild",
-      "requirementId": "lumberjack_guild",
       "floorLevel": 0
     },
     {
       "name": "Blacksmith's house",
       "file": "small_house_3_with_furnace",
-      "requirementId": "blacksmith",
       "floorLevel": 0
     },
     {
       "name": "Weaponsmith 1",
       "file": "weaponsmith_1",
-      "requirementId": "blacksmith2",
       "floorLevel": 0
     },
     {
       "name": "Small Warrior's house",
       "file": "warrior_1",
-      "requirementId": "warrior1",
       "floorLevel": 0
     },
     {
       "name": "Medium Warrior's house",
       "file": "warrior_2",
-      "requirementId": "warrior2",
       "floorLevel": 1
     },
     {
       "name": "Shooting gallery",
       "file": "shooting_gallery",
-      "requirementId": "shooting_gallery",
       "floorLevel": 0
     },
     {
       "name": "Fisher Cottage 1",
       "file": "fisher_cottage_1",
-      "requirementId": "fisher",
       "floorLevel": 2
     },
     {
       "name": "Small Farm 1",
       "file": "small_farm_1",
-      "requirementId": "farmer",
       "floorLevel": 0
     },
     {
       "name": "Large Farm 1",
       "file": "large_farm_1",
-      "requirementId": "farmer2",
       "floorLevel": 0
     }
   ],

@@ -60,7 +60,6 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                                         blueprintMetadata.getName(),
                                         file,
                                         floorLevel,
-                                        blueprintMetadata.getRequirement().getId(),
                                         it
                                 );
                                 FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
@@ -90,7 +89,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
         final var existed = blockDataManager.update(fileName, updatedStructure, newFloorLevel, group);
         final FortressS2CPacket packet =
                 existed? ClientboundUpdateBlueprintPacket.edit(fileName, newFloorLevel, updatedStructure) :
-                        new ClientboundAddBlueprintPacket(group, fileName, fileName,  newFloorLevel, "custom", updatedStructure);
+                        new ClientboundAddBlueprintPacket(group, fileName, fileName, newFloorLevel, updatedStructure);
         scheduledEdits.add(packet);
     }
 
@@ -108,8 +107,6 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
 
     @Override
     public BlueprintTask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel) {
-        final String requirementId = this.findRequirementById(blueprintId).map(IBlueprintRequirement::getId)
-                .orElse("custom");
         final IStructureBlockData serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation, floorLevel);
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(floorLevel);
@@ -125,7 +122,6 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                 automatic,
                 entityLayer,
                 floorLevel,
-                requirementId,
                 blueprintId
         );
     }

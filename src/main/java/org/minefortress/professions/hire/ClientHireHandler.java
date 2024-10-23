@@ -61,8 +61,9 @@ public final class ClientHireHandler implements IHireScreenHandler {
                 .getFortressClientManager()
                 .getProfessionManager()
                 .getProfession(professionId);
-        final var buildingRequirement = profession.getBuildingRequirement();
-        return ModUtils.getFortressClientManager().countBuildings(buildingRequirement) * 10;
+        final var requirementType = profession.getRequirementType();
+        final var requirementLevel = profession.getRequirementLevel();
+        return ModUtils.getFortressClientManager().countBuildings(requirementType, requirementLevel) * 10;
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.minefortress.entity.ai.professions;
 
 import net.minecraft.registry.tag.FluidTags;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
 
@@ -51,8 +52,8 @@ public class MinerDailyTask extends AbstractAutomationAreaTask{
     }
 
     @Override
-    protected String getAreaId() {
-        return "miner";
+    protected ProfessionType getProfessionType() {
+        return ProfessionType.MINER;
     }
 
     @Override

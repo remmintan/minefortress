@@ -166,8 +166,8 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     }
 
     @Override
-    public void add(BlueprintGroup group, String name, String file, int floorLevel, String requirementId, NbtCompound tag) {
-        final IBlueprintMetadata metadata = this.blueprintMetadataManager.add(group, name, file, floorLevel, requirementId);
+    public void add(BlueprintGroup group, String name, String blueprintId, int floorLevel, NbtCompound tag) {
+        final IBlueprintMetadata metadata = this.blueprintMetadataManager.add(group, name, blueprintId, floorLevel);
         blockDataManager.setBlueprint(metadata.getId(), tag);
         blockDataManager.invalidateBlueprint(metadata.getId());
     }

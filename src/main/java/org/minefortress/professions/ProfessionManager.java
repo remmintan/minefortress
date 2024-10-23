@@ -4,9 +4,12 @@ import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.professions.*;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement;
+import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
-import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -51,8 +54,8 @@ public abstract class ProfessionManager implements IProfessionsManager {
 
     @Override
     public final ProfessionResearchState isRequirementsFulfilled(IProfession profession, CountProfessionals countProfessionals, boolean countItems) {
-        final String buildingRequirement = profession.getBuildingRequirement();
-        if(Objects.isNull(buildingRequirement) || Strings.isBlank(buildingRequirement)) {
+        final var requirementType = profession.getRequirementType();
+        if (requirementType == null) {
             return ProfessionResearchState.UNLOCKED;
         }
 
@@ -64,24 +67,17 @@ public abstract class ProfessionManager implements IProfessionsManager {
             }
         }
 
-        final var disabled = "_".equals(buildingRequirement) &&
-                Optional.ofNullable(profession.getBlockRequirement()).map(it -> it.block() == null).orElse(true);
-        if(fortressManagerSupplier.get().isCreative() && !disabled) {
+        final var fortressManager = fortressManagerSupplier.get();
+        if (fortressManager.isCreative()) {
             return ProfessionResearchState.UNLOCKED;
         }
 
-        final var fortressManager = fortressManagerSupplier.get();
         var minRequirementCount = 0;
         if(countProfessionals == CountProfessionals.INCREASE) {
             minRequirementCount = profession.getAmount();
         }
 
-        boolean satisfied = fortressManager.hasRequiredBuilding(buildingRequirement, minRequirementCount);
-        final IBlockRequirement blockRequirement = profession.getBlockRequirement();
-        if(Objects.nonNull(blockRequirement)) {
-            satisfied = satisfied || fortressManager.hasRequiredBlock(blockRequirement.block(), blockRequirement.blueprint(), minRequirementCount);
-        }
-
+        boolean satisfied = fortressManager.hasRequiredBuilding(requirementType, profession.getRequirementLevel(), minRequirementCount);
         if(countItems) {
             final var itemsRequirement = profession.getItemsRequirement();
             if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement) && !itemsRequirement.isEmpty()) {
@@ -99,15 +95,11 @@ public abstract class ProfessionManager implements IProfessionsManager {
     }
 
     @Override
-    public Optional<IProfession> getByBuildingRequirement(String requirement) {
-        return getProfessions().values()
+    public Optional<IProfession> getByBuildingRequirement(IBlueprintRequirement requirement) {
+        return getProfessions()
+                .values()
                 .stream()
-                .filter(
-                    profession -> Optional
-                        .ofNullable(profession.getBuildingRequirement())
-                        .orElse("!!!!some-invalid-requirement!!!!")
-                        .equals(requirement)
-                )
+                .filter(p -> requirement.satisfies(p.getRequirementType(), p.getRequirementLevel()))
                 .findFirst();
     }
 

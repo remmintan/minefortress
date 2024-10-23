@@ -9,6 +9,7 @@ import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
@@ -65,7 +66,7 @@ public interface IClientFortressManager extends IFortressManager {
 
     IClientProfessionManager getProfessionManager();
 
-    int countBuildings(String requirementId);
+    int countBuildings(ProfessionType type, int level);
 
     boolean gamemodeNeedsInitialization();
 

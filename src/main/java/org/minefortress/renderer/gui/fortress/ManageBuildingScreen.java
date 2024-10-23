@@ -5,11 +5,11 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.networking.c2s.C2SDestroyBuilding;
 import net.remmintan.mods.minefortress.networking.c2s.C2SOpenRepairBuildingScreen;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
-import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import org.minefortress.renderer.gui.WindowScreen;
 import org.minefortress.utils.ModUtils;
 
@@ -34,8 +34,8 @@ public class ManageBuildingScreen extends WindowScreen {
                     .map(IBlueprintMetadata::getName)
                     .orElse("Unknown")
         );
-        profession = ModUtils.getProfessionManager()
-                .getByBuildingRequirement(buildingInfo.getRequirementId())
+        profession = buildingInfo.getRequirement()
+                .flatMap(it -> ModUtils.getProfessionManager().getByBuildingRequirement(it))
                 .orElse(null);
     }
 

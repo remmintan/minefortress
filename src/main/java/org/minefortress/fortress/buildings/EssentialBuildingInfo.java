@@ -2,9 +2,11 @@ package org.minefortress.fortress.buildings;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.manager.BlueprintRequirement;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +18,6 @@ public class EssentialBuildingInfo implements IEssentialBuildingInfo {
     private final UUID id;
     private final BlockPos start;
     private final BlockPos end;
-    private final String requirementId;
     private final long bedsCount;
     @NotNull
     private final String blueprintId;
@@ -25,14 +26,12 @@ public class EssentialBuildingInfo implements IEssentialBuildingInfo {
     public EssentialBuildingInfo(UUID id,
                                  BlockPos start,
                                  BlockPos end,
-                                 String requirementId,
                                  long bedsCount,
                                  @Nullable String blueprintId,
                                  int health) {
         this.id = id;
         this.start = start.toImmutable();
         this.end = end.toImmutable();
-        this.requirementId = requirementId;
         this.bedsCount = bedsCount;
         this.blueprintId = Optional.ofNullable(blueprintId).orElse(DEFAULT_BLUEPRINT_ID);
         this.health = health;
@@ -42,7 +41,6 @@ public class EssentialBuildingInfo implements IEssentialBuildingInfo {
         this.id = buf.readUuid();
         this.start = buf.readBlockPos();
         this.end = buf.readBlockPos();
-        this.requirementId = buf.readString();
         this.bedsCount = buf.readLong();
         this.blueprintId = buf.readString();
         this.health = buf.readInt();
@@ -56,11 +54,6 @@ public class EssentialBuildingInfo implements IEssentialBuildingInfo {
     @Override
     public BlockPos getEnd() {
         return end;
-    }
-
-    @Override
-    public String getRequirementId() {
-        return requirementId;
     }
 
     @Override
@@ -90,9 +83,13 @@ public class EssentialBuildingInfo implements IEssentialBuildingInfo {
         buffer.writeUuid(id);
         buffer.writeBlockPos(start);
         buffer.writeBlockPos(end);
-        buffer.writeString(requirementId);
         buffer.writeLong(bedsCount);
         buffer.writeString(blueprintId);
         buffer.writeInt(health);
+    }
+
+    @Override
+    public Optional<IBlueprintRequirement> getRequirement() {
+        return getBlueprintId().map(BlueprintRequirement::new);
     }
 }

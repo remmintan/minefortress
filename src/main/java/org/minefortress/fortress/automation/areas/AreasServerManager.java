@@ -4,12 +4,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
-import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
-import net.remmintan.mods.minefortress.networking.s2c.S2CSyncAreasPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.S2CSyncAreasPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,8 @@ public final class AreasServerManager implements IServerAutomationAreaManager, I
         }
     }
 
-    public Stream<IAutomationArea> getByRequirement(String requirement) {
+    @Override
+    public Stream<IAutomationArea> getByProfessionType(ProfessionType requirement) {
         return areas.stream()
                 .filter(it -> it.getAreaType().satisfies(requirement))
                 .map(ServerAutomationAreaInfo.class::cast);

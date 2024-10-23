@@ -2,17 +2,18 @@ package net.remmintan.mods.minefortress.core.interfaces.buildings;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public interface IEssentialBuildingInfo {
+    Optional<IBlueprintRequirement> getRequirement();
     BlockPos getStart();
 
     BlockPos getEnd();
-
-    String getRequirementId();
 
     long getBedsCount();
 
@@ -23,4 +24,14 @@ public interface IEssentialBuildingInfo {
     int getHealth();
 
     void write(PacketByteBuf buffer);
+
+    default boolean satisfiesRequirement(ProfessionType type, int level) {
+        return getRequirement()
+                .map(it -> Optional
+                        .ofNullable(it.getType())
+                        .map(t -> t.equals(type))
+                        .orElse(false)
+                        && it.getLevel() >= level)
+                .orElse(false);
+    }
 }

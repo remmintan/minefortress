@@ -12,6 +12,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.event.GameEvent;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
@@ -152,8 +153,8 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
     }
 
     @Override
-    protected String getAreaId() {
-        return "farmer";
+    protected ProfessionType getProfessionType() {
+        return ProfessionType.FARMER;
     }
 
     @Override

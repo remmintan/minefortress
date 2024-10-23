@@ -11,6 +11,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
@@ -19,7 +20,6 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
 import net.remmintan.mods.minefortress.networking.s2c.S2COpenBuildingRepairScreen;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -107,22 +107,27 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         needSync = true;
     }
 
-    public boolean hasRequiredBuilding(String requirementId, int minCount) {
+    @Override
+    public boolean hasRequiredBuilding(ProfessionType type, int level, int minCount) {
         final var requiredBuildings = buildings.stream()
-                .filter(b -> b.satisfiesRequirement(requirementId));
-        if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
+                .filter(b -> b.satisfiesRequirement(type, level));
+        if (
+                type == ProfessionType.MINER ||
+                        type == ProfessionType.LUMBERJACK ||
+                        type == ProfessionType.WARRIOR
+        ) {
             return requiredBuildings
                     .mapToLong(it -> it.getBedsCount(getWorld()) * 10)
                     .sum() > minCount;
         }
         final var count = requiredBuildings.count();
-        if(requirementId.equals("shooting_gallery"))
+        if (type == ProfessionType.ARCHER)
             return count * 10 > minCount;
 
-        if(requirementId.startsWith("farm"))
+        if (type == ProfessionType.FARMER)
             return count * 5 > minCount;
 
-        if(requirementId.startsWith("fisher"))
+        if (type == ProfessionType.FISHERMAN)
             return count * 3 > minCount;
 
         return count > minCount;
@@ -143,9 +148,9 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     }
 
     @Override
-    public Stream<IAutomationArea> getAutomationAreasByRequirement(String requirementId) {
+    public Stream<IAutomationArea> getAutomationAreaByProfessionType(ProfessionType type) {
         return this.buildings.stream()
-                .filter(building -> building.satisfiesRequirement(requirementId))
+                .filter(building -> building.satisfiesRequirement(type, 0))
                 .map(IAutomationArea.class::cast);
     }
 
@@ -154,13 +159,13 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     }
 
     public Optional<IFortressBuilding> findNearest(BlockPos pos) {
-        return findNearest(pos, "");
+        return findNearest(pos, null);
     }
 
-    public Optional<IFortressBuilding> findNearest(BlockPos pos, String requirement) {
-        final Predicate<IFortressBuilding> buildingsFilter = StringUtils.isBlank(requirement) ?
+    public Optional<IFortressBuilding> findNearest(BlockPos pos, ProfessionType type) {
+        final Predicate<IFortressBuilding> buildingsFilter = type == null ?
                 it -> true :
-                it -> it.satisfiesRequirement(requirement);
+                it -> it.satisfiesRequirement(type, 0);
 
         return buildings
                 .stream()

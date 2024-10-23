@@ -7,6 +7,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public interface IFortressBuilding extends IAutomationArea {
 
     void writeToNbt(NbtCompound tag);
 
-    boolean satisfiesRequirement(String requirementId);
+    boolean satisfiesRequirement(ProfessionType type, int level);
 
     UUID getId();
 

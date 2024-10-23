@@ -87,6 +87,8 @@ public final class BlueprintScreenHandler {
 
     public void sendEditPacket() {
         final IBlueprintMetadata metadata = this.focusedSlot.getMetadata();
+        final var requirement = metadata.getRequirement();
+
         final String file = metadata.getId();
         final int floorLevel = metadata.getFloorLevel();
         final ServerboundEditBlueprintPacket packet = ServerboundEditBlueprintPacket.edit(file, floorLevel, selectedGroup);

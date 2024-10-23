@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,6 @@ public class FortressBuilding implements IFortressBuilding {
     private final UUID id;
     private final BlockPos start;
     private final BlockPos end;
-    private final String requirementId;
     @Nullable
     private final String blueprintId;
     private final int floorLevel;
@@ -40,12 +40,11 @@ public class FortressBuilding implements IFortressBuilding {
     private LocalDateTime lastUpdated;
     private Iterator<IAutomationBlockInfo> currentIterator;
 
-    private Set<HostileEntity> attackers = new HashSet<>();
+    private final Set<HostileEntity> attackers = new HashSet<>();
 
     public FortressBuilding(UUID id,
                             BlockPos start,
                             BlockPos end,
-                            String requirementId,
                             @NotNull String blueprintId,
                             int floorLevel,
                             Map<BlockPos, BlockState> buildingBlockData
@@ -53,7 +52,6 @@ public class FortressBuilding implements IFortressBuilding {
         this.id = id;
         this.start = start.toImmutable();
         this.end = end.toImmutable();
-        this.requirementId = requirementId;
         final var blockData = buildingBlockData.entrySet().stream()
                 .collect(Collectors.toMap(it -> it.getKey().add(start).toImmutable(), Map.Entry::getValue));
         this.floorLevel = floorLevel;
@@ -78,11 +76,6 @@ public class FortressBuilding implements IFortressBuilding {
             this.end = BlockPos.fromLong(tag.getLong("end"));
         else
             throw new IllegalArgumentException("Tag does not contain end");
-
-        if (tag.contains("requirementId"))
-            this.requirementId = tag.getString("requirementId");
-        else
-            this.requirementId = "<old>";
 
         if (tag.contains("lastUpdated"))
             this.lastUpdated = LocalDateTime.parse(tag.getString("lastUpdated"));
@@ -187,7 +180,6 @@ public class FortressBuilding implements IFortressBuilding {
         tag.putUuid("id", id);
         tag.putLong("start", start.asLong());
         tag.putLong("end", end.asLong());
-        tag.putString("requirementId", requirementId);
         tag.putString("lastUpdated", lastUpdated.toString());
         if(blueprintId != null) {
             tag.putString("blueprintId", blueprintId);
@@ -201,7 +193,7 @@ public class FortressBuilding implements IFortressBuilding {
     @Override
     public Iterator<IAutomationBlockInfo> iterator(World world) {
         if (currentIterator == null || !currentIterator.hasNext()) {
-            if (requirementId.startsWith("farm")) {
+            if (satisfiesRequirement(ProfessionType.FARMER, 0)) {
                 this.currentIterator = new FarmBuildingIterator(start, end, world);
             }
         }
@@ -213,8 +205,8 @@ public class FortressBuilding implements IFortressBuilding {
     }
 
     @Override
-    public boolean satisfiesRequirement(String requirementId) {
-        return this.requirementId != null && this.requirementId.equals(requirementId);
+    public boolean satisfiesRequirement(ProfessionType type, int minLevel) {
+        return type.getBlueprintIds().indexOf(blueprintId) >= minLevel;
     }
 
     @Override
@@ -248,7 +240,7 @@ public class FortressBuilding implements IFortressBuilding {
 
     @Override
     public IEssentialBuildingInfo toEssentialInfo(World world) {
-        return new EssentialBuildingInfo(id, start, end, requirementId, getBedsCount(world), blueprintId, getHealth());
+        return new EssentialBuildingInfo(id, start, end, getBedsCount(world), blueprintId, getHealth());
     }
 
     @Override

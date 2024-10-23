@@ -21,19 +21,19 @@ import java.util.Map;
 public class ServerboundEditBlueprintPacket implements FortressC2SPacket {
 
     private final Type type;
-    private final String blueprintFileName;
+    private final String blueprintId;
     private final int floorLevel;
     private final BlueprintGroup blueprintGroup;
 
-    private ServerboundEditBlueprintPacket(String blueprintFileName, int floorLevel,  Type type, BlueprintGroup blueprintGroup) {
-        this.blueprintFileName = blueprintFileName;
+    private ServerboundEditBlueprintPacket(String blueprintId, int floorLevel, Type type, BlueprintGroup blueprintGroup) {
+        this.blueprintId = blueprintId;
         this.floorLevel = floorLevel;
         this.type = type;
         this.blueprintGroup = blueprintGroup;
     }
 
     public ServerboundEditBlueprintPacket(PacketByteBuf buf) {
-        this.blueprintFileName = buf.readString();
+        this.blueprintId = buf.readString();
         this.floorLevel = buf.readInt();
         this.type = buf.readEnumConstant(Type.class);
         this.blueprintGroup = buf.readEnumConstant(BlueprintGroup.class);
@@ -41,7 +41,7 @@ public class ServerboundEditBlueprintPacket implements FortressC2SPacket {
 
     @Override
     public void write(PacketByteBuf buf) {
-        buf.writeString(this.blueprintFileName);
+        buf.writeString(this.blueprintId);
         buf.writeInt(this.floorLevel);
         buf.writeEnumConstant(type);
         buf.writeEnumConstant(blueprintGroup);
@@ -52,21 +52,21 @@ public class ServerboundEditBlueprintPacket implements FortressC2SPacket {
         if(server instanceof IFortressServer fortressServer) {
             if(player instanceof FortressServerPlayerEntity fortressPlayer) {
                 if(type == Type.REMOVE) {
-                    fortressPlayer.get_ServerBlueprintManager().remove(blueprintFileName);
+                    fortressPlayer.get_ServerBlueprintManager().remove(blueprintId);
                 } else {
                     final IBlueprintsWorld blueprintsWorld = fortressServer.get_BlueprintsWorld();
                     if(type == Type.EDIT) {
                         final var blockData = fortressPlayer
                                 .get_ServerBlueprintManager()
                                 .getBlockDataManager()
-                                .getBlockData(blueprintFileName, BlockRotation.NONE);
+                                .getBlockData(blueprintId, BlockRotation.NONE);
                         final Map<BlockPos, BlockState> blueprintData = blockData
                                 .getLayer(BlueprintDataLayer.GENERAL);
 
-                        blueprintsWorld.prepareBlueprint(blueprintData, blueprintFileName, floorLevel, blueprintGroup);
+                        blueprintsWorld.prepareBlueprint(blueprintData, blueprintId, floorLevel, blueprintGroup);
                         blueprintsWorld.putBlueprintInAWorld(player, blockData.getSize());
                     } else if(type == Type.CREATE) {
-                        blueprintsWorld.prepareBlueprint(new HashMap<>(), blueprintFileName, floorLevel, blueprintGroup);
+                        blueprintsWorld.prepareBlueprint(new HashMap<>(), blueprintId, floorLevel, blueprintGroup);
                         blueprintsWorld.putBlueprintInAWorld(player, new Vec3i(1, 1, 1));
                     }
                     player.moveToWorld((ServerWorld) blueprintsWorld.getWorld());

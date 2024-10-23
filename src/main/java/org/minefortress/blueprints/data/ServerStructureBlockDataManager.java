@@ -86,7 +86,7 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
                         return ClientboundUpdateBlueprintPacket.edit(it.filename, it.floorLevel, it.tag);
                     } else {
                         final var newGroup = mapLegacyGroups(it.group);
-                        return new ClientboundAddBlueprintPacket(newGroup, it.filename, it.filename, it.floorLevel, "custom", it.tag);
+                        return new ClientboundAddBlueprintPacket(newGroup, it.filename, it.filename, it.floorLevel, it.tag);
                     }
                 })
                 .toList();

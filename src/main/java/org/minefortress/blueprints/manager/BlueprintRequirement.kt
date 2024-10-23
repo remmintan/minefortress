@@ -1,19 +1,19 @@
 package org.minefortress.blueprints.manager
 
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintRequirementType
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 
-class BlueprintRequirement(override val id: String) : IBlueprintRequirement {
-    override val type: BlueprintRequirementType?
+class BlueprintRequirement(blueprintId: String) : IBlueprintRequirement {
+    override val type: ProfessionType?
     override val level: Int
 
     init {
-        var type: BlueprintRequirementType? = null
-        var level = 0
+        var type: ProfessionType? = null
+        var level = -1
 
-        for (entry in BlueprintRequirementType.entries) {
-            val requirementsIds = entry.requirementsIds
-            val index = requirementsIds.indexOf(id)
+        for (entry in ProfessionType.entries) {
+            val requiredBlueprints = entry.blueprintIds
+            val index = requiredBlueprints.indexOf(blueprintId)
             if (index >= 0) {
                 type = entry
                 level = index

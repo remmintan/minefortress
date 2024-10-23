@@ -4,8 +4,8 @@ import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -44,9 +44,9 @@ public interface IProfession {
 
     List<IItemInfo> getItemsRequirement();
 
-    @Nullable String getBuildingRequirement();
+    ProfessionType getRequirementType();
 
-    @Nullable IBlockRequirement getBlockRequirement();
+    int getRequirementLevel();
 
     NbtCompound toNbt();
 

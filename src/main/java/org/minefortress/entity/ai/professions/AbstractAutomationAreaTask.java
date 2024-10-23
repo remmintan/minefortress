@@ -3,6 +3,7 @@ package org.minefortress.entity.ai.professions;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import org.minefortress.entity.Colonist;
 
 import java.util.Collections;
@@ -36,7 +37,7 @@ abstract class AbstractAutomationAreaTask implements ProfessionDailyTask{
         colonist.resetControls();
     }
 
-    protected abstract String getAreaId();
+    protected abstract ProfessionType getProfessionType();
 
     protected abstract String getTaskDesc();
 
@@ -56,7 +57,7 @@ abstract class AbstractAutomationAreaTask implements ProfessionDailyTask{
     private Optional<IAutomationArea> getArea(Colonist colonist) {
         return colonist
                 .getServerFortressManager()
-                .flatMap(it -> it.getAutomationAreaByRequirementId(getAreaId(),
+                .flatMap(it -> it.getAutomationAreaByProfessionType(getProfessionType(),
                                     colonist.getMasterPlayer().orElse(null)));
     }
 

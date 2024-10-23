@@ -1,5 +1,7 @@
 package net.remmintan.mods.minefortress.core.interfaces.professions;
 
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement;
+
 import java.util.Optional;
 
 public interface IProfessionsManager {
@@ -9,7 +11,7 @@ public interface IProfessionsManager {
 
     IProfession getProfession(String id);
 
-    Optional<IProfession> getByBuildingRequirement(String requirement);
+    Optional<IProfession> getByBuildingRequirement(IBlueprintRequirement requirement);
 
     boolean hasProfession(String name);
 

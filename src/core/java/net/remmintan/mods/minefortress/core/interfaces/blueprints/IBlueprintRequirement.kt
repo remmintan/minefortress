@@ -4,11 +4,15 @@ import net.minecraft.item.Item
 
 interface IBlueprintRequirement {
 
-    val id: String
-    val type: BlueprintRequirementType?
+    val type: ProfessionType?
     val level: Int
 
     fun getIcon(): Item? = type?.icon
     fun getProfessionName(): String? = type?.displayName
+
+    fun satisfies(type: ProfessionType?, level: Int): Boolean {
+        if (type == null) return false
+        return type == this.type && this.level >= level
+    }
 
 }

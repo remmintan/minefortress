@@ -12,6 +12,7 @@ import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
@@ -278,32 +279,33 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     @Override
-    public boolean hasRequiredBuilding(String requirementId, int minCount) {
+    public boolean hasRequiredBuilding(ProfessionType type, int level, int minCount) {
         final var requiredBuilding = buildings.stream()
-                .filter(b -> b.getRequirementId().equals(requirementId));
-        if(requirementId.startsWith("miner") || requirementId.startsWith("lumberjack") || requirementId.startsWith("warrior")) {
+                .filter(b -> b.satisfiesRequirement(type, level));
+        if (type == ProfessionType.MINER ||
+                type == ProfessionType.LUMBERJACK ||
+                type == ProfessionType.WARRIOR) {
             return requiredBuilding
                     .mapToLong(it -> it.getBedsCount() * 10)
                     .sum() > minCount;
         }
         final var count = requiredBuilding.count();
-        if(requirementId.equals("shooting_gallery"))
+        if (type == ProfessionType.ARCHER)
             return count * 10 > minCount;
 
-        if(requirementId.startsWith("farm"))
+        if (type == ProfessionType.FARMER)
             return count * 5 > minCount;
 
-        if(requirementId.startsWith("fisher"))
+        if (type == ProfessionType.FISHERMAN)
             return count * 3 > minCount;
-
 
         return count > minCount;
     }
 
     @Override
-    public int countBuildings(String requirementId) {
+    public int countBuildings(ProfessionType type, int level) {
         return (int) buildings.stream()
-                .filter(b -> b.getRequirementId().equals(requirementId))
+                .filter(b -> b.satisfiesRequirement(type, level))
                 .count();
     }
 

@@ -9,6 +9,7 @@ import net.remmintan.gobi.helpers.TreeBlocks;
 import net.remmintan.gobi.helpers.TreeHelper;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.resources.ItemInfo;
@@ -24,8 +25,8 @@ public class LumberjackDailyTask extends AbstractAutomationAreaTask {
     private TreeBlocks blocks;
 
     @Override
-    protected String getAreaId() {
-        return "lumberjack";
+    protected ProfessionType getProfessionType() {
+        return ProfessionType.LUMBERJACK;
     }
 
     @Override

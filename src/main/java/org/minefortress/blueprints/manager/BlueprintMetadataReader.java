@@ -1,13 +1,11 @@
 package org.minefortress.blueprints.manager;
 
 import com.google.gson.stream.JsonReader;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 import org.minefortress.MineFortressMod;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -55,7 +53,6 @@ public class BlueprintMetadataReader {
         jsonReader.beginObject();
         String name = null;
         String file = null;
-        String requirementId = null;
         int floorLevel = 0;
         while (jsonReader.hasNext()) {
             final var propertyName = jsonReader.nextName();
@@ -63,12 +60,11 @@ public class BlueprintMetadataReader {
                 case "name" -> name = jsonReader.nextString();
                 case "file" -> file = jsonReader.nextString();
                 case "floorLevel" -> floorLevel = jsonReader.nextInt();
-                case "requirementId" -> requirementId = jsonReader.nextString();
                 default -> throw new RuntimeException("Unknown property " + propertyName);
             }
         }
         jsonReader.endObject();
-        return new BlueprintMetadata(name, file, floorLevel, requirementId);
+        return new BlueprintMetadata(name, file, floorLevel);
     }
 
     public Optional<BlueprintGroup> convertFilenameToGroup(String filename) {

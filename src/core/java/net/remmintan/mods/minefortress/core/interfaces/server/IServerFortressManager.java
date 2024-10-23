@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
@@ -24,7 +25,8 @@ public interface IServerFortressManager {
     void syncOnJoin(boolean campfireEnabled, boolean borderEnabled);
     IPawnNameGenerator getNameGenerator();
     void replaceColonistWithTypedPawn(LivingEntity colonist, String warriorId, EntityType<? extends LivingEntity> entityType);
-    Optional<IAutomationArea> getAutomationAreaByRequirementId(String requirement, ServerPlayerEntity masterPlayer);
+
+    Optional<IAutomationArea> getAutomationAreaByProfessionType(ProfessionType professionType, ServerPlayerEntity masterPlayer);
     List<BlockPos> getSpecialBlocksByType(Block block, boolean blueprint);
     double getCampfireWarmRadius();
     boolean isPositionWithinFortress(BlockPos pos);

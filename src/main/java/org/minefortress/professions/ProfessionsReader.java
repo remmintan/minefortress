@@ -3,21 +3,23 @@ package org.minefortress.professions;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public final class ProfessionsReader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProfessionsReader.class);
 
     private final Identifier professionsResourceId = new Identifier("minefortress", "professions/list.json");
     private final Identifier professionTreeId = new Identifier("minefortress", "professions/tree.json");
@@ -100,7 +102,7 @@ public final class ProfessionsReader {
     }
 
     private ProfessionFullInfo.Requirements readRequirements(JsonReader reader) throws IOException {
-        String buildingRequirement = null;
+        ProfessionFullInfo.BuildingRequirement buildingRequirement = null;
         ProfessionFullInfo.BlockRequirement blockRequirement = null;
         List<ProfessionFullInfo.ItemRequirement> items = null;
 
@@ -108,7 +110,7 @@ public final class ProfessionsReader {
         while (reader.hasNext()) {
             final var propertyName = reader.nextName();
             switch (propertyName) {
-                case "building" -> buildingRequirement = reader.nextString();
+                case "building" -> buildingRequirement = readBuildingRequirement(reader);
                 case "block" -> blockRequirement = readBlockRequirement(reader);
                 case "items" -> items = readItemRequirements(reader);
             }
@@ -134,6 +136,31 @@ public final class ProfessionsReader {
             throw new IllegalStateException("Block requirement must have a block");
         }
         return new ProfessionFullInfo.BlockRequirement(Registries.BLOCK.get(new Identifier(blockName)), inBlueprint);
+    }
+
+    private ProfessionFullInfo.BuildingRequirement readBuildingRequirement(JsonReader reader) throws IOException {
+        String typeString = null;
+        int level = -1;
+
+        reader.beginObject();
+        while (reader.hasNext()) {
+            final var propertuName = reader.nextName();
+            switch (propertuName) {
+                case "type" -> typeString = reader.nextString();
+                case "level" -> level = reader.nextInt();
+            }
+        }
+
+        if (typeString == null) return null;
+        ProfessionType type;
+        try {
+            type = ProfessionType.valueOf(typeString);
+        } catch (IllegalArgumentException exp) {
+            LOG.warn("Can't profession requirement. Unknown  blueprint requirement type: {}", typeString);
+            return null;
+        }
+
+        return new ProfessionFullInfo.BuildingRequirement(type, level);
     }
 
     private List<ProfessionFullInfo.ItemRequirement> readItemRequirements(JsonReader reader) throws IOException {
