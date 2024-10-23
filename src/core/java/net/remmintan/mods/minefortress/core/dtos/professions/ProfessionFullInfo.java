@@ -5,7 +5,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 
 import java.util.Collections;
@@ -32,19 +31,16 @@ public record ProfessionFullInfo(
         final var unlockMessage = packet.readString();
         final var unlockMoreMessage = packet.readString();
         final var cantRemove = packet.readBoolean();
-        final var blueprintRequirementType = packet.readEnumConstant(ProfessionType.class);
         final var buildingRequirementLevel = packet.readInt();
-        final var block = Registries.BLOCK.get(packet.readIdentifier());
-        final var inBlueprint = packet.readBoolean();
+        final var blueprintRequirementType = buildingRequirementLevel >= 0 ? packet.readEnumConstant(ProfessionType.class) : null;
+
         var items = packet
                 .readList(PacketByteBuf::readItemStack)
                 .stream()
                 .map(ItemRequirement::fromStack)
                 .toList();
 
-        final var requirements = new Requirements(
-                new BuildingRequirement(blueprintRequirementType, buildingRequirementLevel),
-                new BlockRequirement(block, inBlueprint), items);
+        final var requirements = new Requirements(new BuildingRequirement(blueprintRequirementType, buildingRequirementLevel), items);
         return new ProfessionFullInfo(key, title, icon, description, unlockMessage, unlockMoreMessage, cantRemove, requirements);
     }
 
@@ -58,24 +54,14 @@ public record ProfessionFullInfo(
         packet.writeBoolean(hireMenu);
         if(requirements != null) {
             final var buildingRequirement = requirements.building();
-            packet.writeEnumConstant(buildingRequirement.type);
             packet.writeInt(buildingRequirement.level);
-            final var blockRequirement = requirements.block();
-            if(blockRequirement != null) {
-                packet.writeIdentifier(Registries.BLOCK.getId(blockRequirement.block()));
-                packet.writeBoolean(blockRequirement.inBlueprint());
-            } else {
-                packet.writeIdentifier(Registries.BLOCK.getId(Blocks.AIR));
-                packet.writeBoolean(false);
-            }
+            packet.writeEnumConstant(buildingRequirement.type);
             packet.writeVarInt(requirements.items().size());
             for (var itemReq : requirements.items()) {
                 packet.writeItemStack(itemReq.toStack());
             }
         } else {
-            packet.writeString("");
-            packet.writeIdentifier(Registries.BLOCK.getId(Blocks.AIR));
-            packet.writeBoolean(false);
+            packet.writeInt(-1);
             packet.writeVarInt(0);
         }
     }
@@ -99,7 +85,7 @@ public record ProfessionFullInfo(
 
     }
 
-    public record Requirements(BuildingRequirement building, BlockRequirement block, List<ItemRequirement> items) {
+    public record Requirements(BuildingRequirement building, List<ItemRequirement> items) {
         @Override
         public List<ItemRequirement> items() {
             return Optional.ofNullable(items).orElse(Collections.emptyList());

@@ -223,7 +223,10 @@
     "unlockMessage": "Build Small Warrior's house to unlock",
     "unlockMoreMessage": "You need more stone swords or build another Small Warrior's house to hire more!",
     "requirements": {
-      "building": "warrior1",
+      "building": {
+        "type": "WARRIOR",
+        "level": 0
+      },
       "items": [
         {
           "id": "minecraft:stone_sword",
@@ -241,7 +244,10 @@
     "unlockMessage": "Build Medium Warrior's house to unlock",
     "unlockMoreMessage": "You need more iron swords/armors or build another Medium Warrior's house to hire more!",
     "requirements": {
-      "building": "warrior2",
+      "building": {
+        "type": "WARRIOR",
+        "level": 1
+      },
       "items": [
         {
           "id": "minecraft:iron_sword",
@@ -275,7 +281,10 @@
     "unlockMessage": "Build Shooting gallery to unlock",
     "unlockMoreMessage": "You need more bows/arrows to hire more!",
     "requirements": {
-      "building": "shooting_gallery",
+      "building": {
+        "type": "ARCHER",
+        "level": 0
+      },
       "items": [
         {
           "id": "minecraft:bow",

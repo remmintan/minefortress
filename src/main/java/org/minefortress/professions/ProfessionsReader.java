@@ -103,7 +103,6 @@ public final class ProfessionsReader {
 
     private ProfessionFullInfo.Requirements readRequirements(JsonReader reader) throws IOException {
         ProfessionFullInfo.BuildingRequirement buildingRequirement = null;
-        ProfessionFullInfo.BlockRequirement blockRequirement = null;
         List<ProfessionFullInfo.ItemRequirement> items = null;
 
         reader.beginObject();
@@ -111,31 +110,11 @@ public final class ProfessionsReader {
             final var propertyName = reader.nextName();
             switch (propertyName) {
                 case "building" -> buildingRequirement = readBuildingRequirement(reader);
-                case "block" -> blockRequirement = readBlockRequirement(reader);
                 case "items" -> items = readItemRequirements(reader);
             }
         }
         reader.endObject();
-        return new ProfessionFullInfo.Requirements(buildingRequirement, blockRequirement, items);
-    }
-
-    private ProfessionFullInfo.BlockRequirement readBlockRequirement(JsonReader reader) throws IOException {
-        String blockName = null;
-        boolean inBlueprint = false;
-
-        reader.beginObject();
-        while (reader.hasNext()) {
-            final var propertyName = reader.nextName();
-            switch (propertyName) {
-                case "id" -> blockName = reader.nextString();
-                case "inBlueprint" -> inBlueprint = reader.nextBoolean();
-            }
-        }
-        reader.endObject();
-        if(blockName == null) {
-            throw new IllegalStateException("Block requirement must have a block");
-        }
-        return new ProfessionFullInfo.BlockRequirement(Registries.BLOCK.get(new Identifier(blockName)), inBlueprint);
+        return new ProfessionFullInfo.Requirements(buildingRequirement, items);
     }
 
     private ProfessionFullInfo.BuildingRequirement readBuildingRequirement(JsonReader reader) throws IOException {
@@ -150,6 +129,7 @@ public final class ProfessionsReader {
                 case "level" -> level = reader.nextInt();
             }
         }
+        reader.endObject();
 
         if (typeString == null) return null;
         ProfessionType type;

@@ -100,7 +100,6 @@
     {
       "name": "Stone Miner's house",
       "file": "miner_house_stone",
-      "requirementId": "miner_stone",
       "floorLevel": 0
     },
     {
@@ -168,43 +167,36 @@
     {
       "name": "Accessory 1",
       "file": "accessory_1",
-      "requirementId": "decor",
       "floorLevel": 0
     },
     {
       "name": "Fountain 01",
       "file": "fountain_01",
-      "requirementId": "decor",
       "floorLevel": 1
     },
     {
       "name": "Meeting Point 1",
       "file": "meeting_point_1",
-      "requirementId": "decor",
       "floorLevel": 1
     },
     {
       "name": "Meeting Point 2",
       "file": "meeting_point_2",
-      "requirementId": "decor",
       "floorLevel": 1
     },
     {
       "name": "Meeting Point 3",
       "file": "meeting_point_3",
-      "requirementId": "decor",
       "floorLevel": 1
     },
     {
       "name": "Meeting Point 4",
       "file": "meeting_point_4",
-      "requirementId": "decor",
       "floorLevel": 1
     },
     {
       "name": "Meeting Point 5",
       "file": "meeting_point_5",
-      "requirementId": "decor",
       "floorLevel": 1
     }
   ]
