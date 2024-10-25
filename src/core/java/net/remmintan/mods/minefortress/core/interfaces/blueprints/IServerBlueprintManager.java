@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface IServerBlueprintManager {
     void tick(ServerPlayerEntity player);
 
-    void update(String fileName, NbtCompound updatedStructure, int newFloorLevel, BlueprintGroup group);
+    void update(String fileName, NbtCompound updatedStructure, int newFloorLevel, int capacity, BlueprintGroup group);
 
     void remove(String name);
 

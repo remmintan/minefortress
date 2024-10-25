@@ -64,7 +64,7 @@ public class BlueprintMetadataReader {
             }
         }
         jsonReader.endObject();
-        return new BlueprintMetadata(name, file, floorLevel);
+        return new BlueprintMetadata(name, file, floorLevel, 10);
     }
 
     public Optional<BlueprintGroup> convertFilenameToGroup(String filename) {

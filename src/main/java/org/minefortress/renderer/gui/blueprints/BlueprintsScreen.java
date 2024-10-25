@@ -255,20 +255,6 @@ public final class BlueprintsScreen extends Screen {
                         0xFFFFFF,
                         false);
             }
-
-            if (focusedSlotIsNotEmpty) {
-                final var professionName = focusedSlot.getMetadata().getRequirement().getProfessionName();
-                if (professionName != null) {
-                    final var unlocksText = Text.of("Unlocks: " + professionName);
-                    drawContext.drawText(this.textRenderer,
-                            unlocksText,
-                            this.backgroundWidth + this.previewOffset + 3,
-                            3,
-                            0xFFFFFF,
-                            false);
-                }
-            }
-
         }
 
         matrixStack.pop();
@@ -471,8 +457,9 @@ public final class BlueprintsScreen extends Screen {
     }
 
     private void drawMouseoverTooltip(DrawContext drawContext, int x, int y) {
-        if (this.handler.hasFocusedSlot() && this.handler.getFocusedSlot() != BlueprintSlot.EMPTY) {
-            drawContext.drawTooltip(this.textRenderer, this.handler.getFocusedSlotName(), x, y);
+        final var focusedSlot = this.handler.getFocusedSlot();
+        if (focusedSlot != null && focusedSlot != BlueprintSlot.EMPTY) {
+            drawContext.drawTooltip(this.textRenderer, focusedSlot.getTooltipText(), x, y);
         }
     }
 

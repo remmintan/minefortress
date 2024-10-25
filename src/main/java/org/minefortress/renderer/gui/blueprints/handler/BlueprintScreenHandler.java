@@ -127,8 +127,4 @@ public final class BlueprintScreenHandler {
         return totalSize;
     }
 
-    public Text getFocusedSlotName() {
-        return this.focusedSlot.getTooltipText();
-    }
-
 }

@@ -13,7 +13,7 @@ public interface IServerStructureBlockDataManager extends IBlockDataProvider {
 
     Optional<NbtCompound> getStructureNbt(String fileName);
 
-    boolean update(String fileName, NbtCompound tag, int newFloorLevel, BlueprintGroup group);
+    boolean update(String fileName, NbtCompound tag, int newFloorLevel, int capacity, BlueprintGroup group);
 
     List<FortressS2CPacket> getInitPackets();
 

@@ -1,11 +1,9 @@
 package org.minefortress.blueprints.data;
 
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.MinecraftServer;
@@ -63,12 +61,12 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
     }
 
     @Override
-    public boolean update(String fileName, NbtCompound tag, int newFloorLevel, BlueprintGroup group) {
+    public boolean update(String fileName, NbtCompound tag, int newFloorLevel, int capacity, BlueprintGroup group) {
         if(group == null) {
             throw new IllegalArgumentException("Group can't be null");
         }
         final var alreadyIn = updatedStructures.containsKey(fileName);
-        updatedStructures.put(fileName, new Blueprint(fileName, newFloorLevel, tag, group));
+        updatedStructures.put(fileName, new Blueprint(fileName, newFloorLevel, capacity, tag, group));
         removedDefaultStructures.remove(fileName);
         invalidateBlueprint(fileName);
 
@@ -86,7 +84,7 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
                         return ClientboundUpdateBlueprintPacket.edit(it.filename, it.floorLevel, it.tag);
                     } else {
                         final var newGroup = mapLegacyGroups(it.group);
-                        return new ClientboundAddBlueprintPacket(newGroup, it.filename, it.filename, it.floorLevel, it.tag);
+                        return new ClientboundAddBlueprintPacket(newGroup, it.filename, it.filename, it.floorLevel, it.capacity, it.tag);
                     }
                 })
                 .toList();
@@ -243,9 +241,6 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
                     .forEach(it -> updatedStructures.put(it.filename, it));
 
             readRemovedBlueprints();
-        } else {
-            if(tag == null) throw new IllegalStateException("Blueprints folder does not exist and no default data is provided");
-            readLegacy(tag);
         }
     }
 
@@ -257,59 +252,32 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
         }
     }
 
-    private void readLegacy(NbtCompound tag) {
-        if(!tag.contains("updatedStructures")) return;
-        updatedStructures.clear();
-
-        Map<String, NbtCompound> structuresMap = new HashMap<>();
-        final NbtList nbtElements = tag.getList("updatedStructures", NbtType.COMPOUND);
-        for (int i = 0; i < nbtElements.size(); i++) {
-            final NbtCompound mapEntry = nbtElements.getCompound(i);
-            final String fileName = mapEntry.getString("fileName");
-            final NbtCompound structure = mapEntry.getCompound("structure");
-            structuresMap.put(fileName, structure);
-        }
-
-        Map<String, Integer> floorLevelsMap = new HashMap<>();
-        if(tag.contains("floorLevel")) {
-            final NbtCompound floorLevel = tag.getCompound("floorLevel");
-            for(String key : floorLevel.getKeys()) {
-                floorLevelsMap.put(key, floorLevel.getInt(key));
-            }
-        }
-
-        structuresMap
-                .forEach((key, value) -> {
-                    final var groupOpt = filenameToGroupConverter.apply(key);
-                    final var group = groupOpt.orElseThrow(() -> new IllegalStateException("Can't find group for blueprint " + key));
-                    final var bp = new Blueprint(key, floorLevelsMap.getOrDefault(key, 0), value, group);
-                    updatedStructures.put(key, bp);
-                });
-    }
-
     private record Blueprint(
             String filename,
             int floorLevel,
+            int capacity,
             NbtCompound tag,
             BlueprintGroup group
     ){
+        static Blueprint fromNbt(NbtCompound nbt) {
+            final var filename = nbt.getString("filename");
+            final var tag = nbt.getCompound("tag");
+            final var floorLevel = nbt.getInt("floorLevel");
+            final var capacity = nbt.contains("capacity") ? nbt.getInt("capacity") : 10;
+            final var groupStr = nbt.getString("group");
+            final var group = BlueprintGroup.valueOf(groupStr);
+
+            return new Blueprint(filename, floorLevel, capacity, tag, group);
+        }
+
         NbtCompound toNbt() {
             final var nbt = new NbtCompound();
             nbt.putString("filename", filename);
             nbt.put("tag", tag);
             nbt.putInt("floorLevel", floorLevel);
             nbt.putString("group", group.toString());
+            nbt.putInt("capacity", capacity);
             return nbt;
-        }
-
-        static Blueprint fromNbt(NbtCompound nbt) {
-            final var filename = nbt.getString("filename");
-            final var tag = nbt.getCompound("tag");
-            final var floorLevel = nbt.getInt("floorLevel");
-            final var groupStr = nbt.getString("group");
-            final var group = BlueprintGroup.valueOf(groupStr);
-
-            return new Blueprint(filename, floorLevel, tag, group);
         }
     }
 

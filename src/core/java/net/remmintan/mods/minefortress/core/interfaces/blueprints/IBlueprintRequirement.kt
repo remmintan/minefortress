@@ -6,9 +6,9 @@ interface IBlueprintRequirement {
 
     val type: ProfessionType?
     val level: Int
+    val totalLevels: Int
 
     fun getIcon(): Item? = type?.icon
-    fun getProfessionName(): String? = type?.displayName
 
     fun satisfies(type: ProfessionType?, level: Int): Boolean {
         if (type == null) return false

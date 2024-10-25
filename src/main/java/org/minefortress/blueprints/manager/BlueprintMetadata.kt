@@ -8,6 +8,7 @@ class BlueprintMetadata(
     override val name: String,
     override val id: String,
     override var floorLevel: Int,
+    override val capacity: Int
 ) : IBlueprintMetadata {
 
     override val requirement: IBlueprintRequirement = BlueprintRequirement(id)

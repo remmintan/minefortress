@@ -12,14 +12,17 @@ public class ClientboundAddBlueprintPacket implements FortressS2CPacket {
     private final String name;
     private final String fileName;
     private final int floorLevel;
+    private final int capacity;
     private final NbtCompound tag;
 
-    public ClientboundAddBlueprintPacket(BlueprintGroup group, String name, String fileName, int floorLevel, NbtCompound tag) {
+    public ClientboundAddBlueprintPacket(BlueprintGroup group, String name, String fileName, int floorLevel, int capacity, NbtCompound tag) {
         this.group = group;
         this.name = name;
         this.fileName = fileName;
         this.tag = tag;
+
         this.floorLevel = floorLevel;
+        this.capacity = capacity;
     }
 
     public ClientboundAddBlueprintPacket(PacketByteBuf buf) {
@@ -28,13 +31,14 @@ public class ClientboundAddBlueprintPacket implements FortressS2CPacket {
         this.fileName = buf.readString();
         this.tag = buf.readNbt();
         this.floorLevel = buf.readInt();
+        this.capacity = buf.readInt();
     }
 
     @Override
     public void handle(MinecraftClient client) {
         final var provider = getManagersProvider();
         final var blueprintManager = provider.get_BlueprintManager();
-        blueprintManager.add(group, name, fileName, floorLevel, tag);
+        blueprintManager.add(group, name, fileName, floorLevel, capacity, tag);
 
     }
 
@@ -45,5 +49,6 @@ public class ClientboundAddBlueprintPacket implements FortressS2CPacket {
         buf.writeString(fileName);
         buf.writeNbt(tag);
         buf.writeInt(floorLevel);
+        buf.writeInt(capacity);
     }
 }

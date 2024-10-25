@@ -60,6 +60,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                                         blueprintMetadata.getName(),
                                         file,
                                         floorLevel,
+                                        blueprintMetadata.getCapacity(),
                                         it
                                 );
                                 FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
@@ -85,11 +86,11 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
     }
 
     @Override
-    public void update(String fileName, NbtCompound updatedStructure, int newFloorLevel, BlueprintGroup group) {
-        final var existed = blockDataManager.update(fileName, updatedStructure, newFloorLevel, group);
+    public void update(String fileName, NbtCompound updatedStructure, int newFloorLevel, int capacity, BlueprintGroup group) {
+        final var existed = blockDataManager.update(fileName, updatedStructure, newFloorLevel, capacity, group);
         final FortressS2CPacket packet =
                 existed? ClientboundUpdateBlueprintPacket.edit(fileName, newFloorLevel, updatedStructure) :
-                        new ClientboundAddBlueprintPacket(group, fileName, fileName, newFloorLevel, updatedStructure);
+                        new ClientboundAddBlueprintPacket(group, fileName, fileName, newFloorLevel, capacity, updatedStructure);
         scheduledEdits.add(packet);
     }
 
@@ -204,7 +205,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
 
         final NbtCompound updatedStructure = new NbtCompound();
         structureToUpdate.writeNbt(updatedStructure);
-        this.update(fileName, updatedStructure, newFloorLevel, fortressServerWorld.getBlueprintGroup());
+        this.update(fileName, updatedStructure, newFloorLevel, 10, fortressServerWorld.getBlueprintGroup());
 
     }
 

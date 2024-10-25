@@ -28,7 +28,7 @@ import java.util.*;
 
 public class ClientInfluenceManager extends BaseClientStructureManager implements IClientInfluenceManager {
 
-    private static final IBlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0);
+    private static final IBlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0, 0);
 
     private final InfluenceFlagBlockDataProvider blockDataProvider = new InfluenceFlagBlockDataProvider();
     private final ClientFortressBorderHolder clientFortressBorderHolder = new ClientFortressBorderHolder(this);

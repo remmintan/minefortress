@@ -7,6 +7,7 @@ interface IBlueprintMetadata {
     val name: String?
     val id: String?
     val requirement: IBlueprintRequirement?
+    val capacity: Int
     var floorLevel: Int
     val rotation: BlockRotation?
 

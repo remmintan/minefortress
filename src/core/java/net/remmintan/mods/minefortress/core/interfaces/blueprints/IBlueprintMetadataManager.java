@@ -14,7 +14,7 @@ public interface IBlueprintMetadataManager {
 
     List<IBlueprintMetadata> getAllForGroup(BlueprintGroup group, Integer level);
 
-    IBlueprintMetadata add(BlueprintGroup group, String name, String blueprintId, int floorLevel);
+    IBlueprintMetadata add(BlueprintGroup group, String name, String blueprintId, int floorLevel, int capacity);
 
     void reset();
 
