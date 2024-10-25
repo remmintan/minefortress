@@ -84,8 +84,6 @@ public class FortressBuilding implements IFortressBuilding {
 
         if (tag.contains("blueprintId"))
             this.blueprintId = tag.getString("blueprintId");
-        else if (tag.contains("file")) // support old format
-            this.blueprintId = tag.getString("file");
         else
             this.blueprintId = null;
 

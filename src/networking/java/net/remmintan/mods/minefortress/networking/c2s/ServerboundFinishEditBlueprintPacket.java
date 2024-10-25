@@ -5,8 +5,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.utils.BlueprintWorldSupportKt;
 
 public class ServerboundFinishEditBlueprintPacket implements FortressC2SPacket {
 
@@ -28,16 +28,11 @@ public class ServerboundFinishEditBlueprintPacket implements FortressC2SPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         if(shouldSave) {
-            updateBlueprint(server, player);
+            BlueprintWorldSupportKt.saveBlueprintFromWorld(server, player);
         }
 
         final ServerWorld world = server.getWorld(World.OVERWORLD);
         player.getInventory().clear();
         player.moveToWorld(world);
-    }
-
-    private void updateBlueprint(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressPlayer = (FortressServerPlayerEntity) player;
-        fortressPlayer.get_ServerBlueprintManager().finishBlueprintEdit(shouldSave, server, player);
     }
 }

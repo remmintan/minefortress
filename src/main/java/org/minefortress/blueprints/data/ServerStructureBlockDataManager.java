@@ -21,7 +21,6 @@ import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundAddBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundUpdateBlueprintPacket;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 
 import java.util.*;
@@ -47,13 +46,13 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
     }
 
     @Override
-    public Optional<Integer> getFloorLevel(String filename) {
-        return Optional.ofNullable(updatedStructures.get(filename)).map(Blueprint::floorLevel);
+    public Optional<Integer> getFloorLevel(String blueprintId) {
+        return Optional.ofNullable(updatedStructures.get(blueprintId)).map(Blueprint::floorLevel);
     }
 
     @Override
-    public Optional<NbtCompound> getStructureNbt(String fileName) {
-        return getStructure(fileName).map(it -> {
+    public Optional<NbtCompound> getStructureNbt(String blueprintId) {
+        return getStructure(blueprintId).map(it -> {
             NbtCompound compound = new NbtCompound();
             it.writeNbt(compound);
             return compound;
@@ -61,16 +60,16 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
     }
 
     @Override
-    public boolean update(String fileName, NbtCompound tag, int newFloorLevel, int capacity, BlueprintGroup group) {
+    public boolean update(String blueprintId, NbtCompound tag, int newFloorLevel, int capacity, BlueprintGroup group) {
         if(group == null) {
             throw new IllegalArgumentException("Group can't be null");
         }
-        final var alreadyIn = updatedStructures.containsKey(fileName);
-        updatedStructures.put(fileName, new Blueprint(fileName, newFloorLevel, capacity, tag, group));
-        removedDefaultStructures.remove(fileName);
-        invalidateBlueprint(fileName);
+        final var alreadyIn = updatedStructures.containsKey(blueprintId);
+        updatedStructures.put(blueprintId, new Blueprint(blueprintId, newFloorLevel, capacity, tag, group));
+        removedDefaultStructures.remove(blueprintId);
+        invalidateBlueprint(blueprintId);
 
-        final var defaultStructure = filenameToGroupConverter.apply(fileName).isPresent();
+        final var defaultStructure = filenameToGroupConverter.apply(blueprintId).isPresent();
         return alreadyIn || defaultStructure;
     }
 
@@ -99,25 +98,25 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
     }
 
     @Override
-    public void remove(String fileName) {
-        updatedStructures.remove(fileName);
-        if(filenameToGroupConverter.apply(fileName).isPresent()) {
-            removedDefaultStructures.add(fileName);
+    public void remove(String blueprintId) {
+        updatedStructures.remove(blueprintId);
+        if (filenameToGroupConverter.apply(blueprintId).isPresent()) {
+            removedDefaultStructures.add(blueprintId);
         }
     }
 
     @Override
-    protected Optional<StructureTemplate> getStructure(String blueprintFileName) {
-        if(removedDefaultStructures.contains(blueprintFileName)) {
+    protected Optional<StructureTemplate> getStructure(String blueprintId) {
+        if (removedDefaultStructures.contains(blueprintId)) {
             return Optional.empty();
         }
-        if(updatedStructures.containsKey(blueprintFileName)) {
-            final NbtCompound structureTag = updatedStructures.get(blueprintFileName).tag();
+        if (updatedStructures.containsKey(blueprintId)) {
+            final NbtCompound structureTag = updatedStructures.get(blueprintId).tag();
             final StructureTemplate structure = new StructureTemplate();
             structure.readNbt(Registries.BLOCK.getReadOnlyWrapper(), structureTag);
             return Optional.of(structure);
         } else {
-            return getDefaultStructure(blueprintFileName);
+            return getDefaultStructure(blueprintId);
         }
     }
 
@@ -230,7 +229,7 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
     }
 
     @Override
-    public void readBlockDataManager(@Nullable NbtCompound tag) {
+    public void readBlockDataManager() {
         if(ModPathUtils.exists(getBlueprintsFolder(), server.session)) {
             updatedStructures.clear();
             removedDefaultStructures.clear();

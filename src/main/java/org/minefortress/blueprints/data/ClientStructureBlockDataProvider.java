@@ -6,7 +6,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintsTagsKeeper;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
@@ -20,9 +19,9 @@ public final class ClientStructureBlockDataProvider extends AbstractStructureBlo
     private final Map<String, NbtCompound> blueprintTags = new HashMap<>();
 
     @Override
-    protected Optional<StructureTemplate> getStructure(String blueprintFileName) {
-        if(!blueprintTags.containsKey(blueprintFileName)) return Optional.empty();
-        final NbtCompound blueprintTag = blueprintTags.get(blueprintFileName);
+    protected Optional<StructureTemplate> getStructure(String blueprintId) {
+        if (!blueprintTags.containsKey(blueprintId)) return Optional.empty();
+        final NbtCompound blueprintTag = blueprintTags.get(blueprintId);
         final StructureTemplate structure = new StructureTemplate();
         structure.readNbt(Registries.BLOCK.getReadOnlyWrapper(), blueprintTag);
         return Optional.of(structure);

@@ -9,13 +9,12 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registries;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.StructureTemplate;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
 import org.jetbrains.annotations.NotNull;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,7 +43,7 @@ abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
         new HashSet<>(blueprints.keySet()).stream().filter(key -> key.startsWith(fileName)).forEach(blueprints::remove);
     }
 
-    protected abstract Optional<StructureTemplate> getStructure(String blueprintFileName);
+    protected abstract Optional<StructureTemplate> getStructure(String blueprintId);
     protected abstract IStructureBlockData buildStructure(StructureTemplate structure, BlockRotation rotation, int floorLevel);
 
     @NotNull

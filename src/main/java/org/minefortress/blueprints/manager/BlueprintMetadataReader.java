@@ -67,9 +67,9 @@ public class BlueprintMetadataReader {
         return new BlueprintMetadata(name, file, floorLevel, 10);
     }
 
-    public Optional<BlueprintGroup> convertFilenameToGroup(String filename) {
+    public Optional<BlueprintGroup> convertIdToGroup(String blueprintId) {
         for (Map.Entry<BlueprintGroup, List<IBlueprintMetadata>> entry : predefinedBlueprints.entrySet()) {
-            if(entry.getValue().stream().anyMatch(it -> it.getId().equals(filename)))
+            if (entry.getValue().stream().anyMatch(it -> it.getId().equals(blueprintId)))
                 return Optional.of(entry.getKey());
         }
         return Optional.empty();

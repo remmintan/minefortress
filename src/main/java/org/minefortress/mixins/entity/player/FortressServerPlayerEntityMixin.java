@@ -12,12 +12,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.blueprints.world.BlueprintsWorld;
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import org.minefortress.utils.FortressSpawnLocating;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -71,7 +71,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        serverBlueprintManager.read(nbt);
+        serverBlueprintManager.read();
         if(nbt.contains("playerState")) {
             NbtCompound playerState = nbt.getCompound("playerState");
             wasInBlueprintWorldWhenLoggedOut = playerState.getBoolean("wasInBlueprintWorldWhenLoggedOut");
