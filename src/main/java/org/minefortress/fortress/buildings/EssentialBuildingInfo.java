@@ -2,11 +2,10 @@ package org.minefortress.fortress.buildings;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintRequirement;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.blueprints.manager.BlueprintRequirement;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -89,7 +88,7 @@ public class EssentialBuildingInfo implements IEssentialBuildingInfo {
     }
 
     @Override
-    public Optional<IBlueprintRequirement> getRequirement() {
+    public Optional<BlueprintRequirement> getRequirement() {
         return getBlueprintId().map(BlueprintRequirement::new);
     }
 }

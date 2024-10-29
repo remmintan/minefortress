@@ -3,8 +3,8 @@ package org.minefortress.renderer.gui.blueprints.handler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundEditBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
@@ -51,7 +51,7 @@ public final class BlueprintScreenHandler {
         final var blueprintManager = managersProvider.get_BlueprintManager();
         final var fortressClientManager = managersProvider.get_ClientFortressManager();
         final var resourceManager = fortressClientManager.getResourceManager();
-        final List<IBlueprintMetadata> allBlueprint = blueprintManager.getAllBlueprints(selectedGroup);
+        final List<BlueprintMetadata> allBlueprint = blueprintManager.getAllBlueprints(selectedGroup);
         this.totalSize = allBlueprint.size();
         this.currentSlots = new ArrayList<>();
 
@@ -64,7 +64,7 @@ public final class BlueprintScreenHandler {
             for (int column = 0; column < 9; ++column) {
                 int m = column + (row + skippedRows) * 9;
                 if (m >= 0 && m < this.totalSize) {
-                    final IBlueprintMetadata blueprintMetadata = allBlueprint.get(m);
+                    final BlueprintMetadata blueprintMetadata = allBlueprint.get(m);
                     final var blockData = blueprintManager.getBlockDataProvider().getBlockData(blueprintMetadata.getId(), BlockRotation.NONE);
                     if(fortressClientManager.isSurvival()) {
                         final var stacks = blockData.getStacks();
@@ -86,9 +86,7 @@ public final class BlueprintScreenHandler {
     }
 
     public void sendEditPacket() {
-        final IBlueprintMetadata metadata = this.focusedSlot.getMetadata();
-        final var requirement = metadata.getRequirement();
-
+        final BlueprintMetadata metadata = this.focusedSlot.getMetadata();
         final String file = metadata.getId();
         final int floorLevel = metadata.getFloorLevel();
         final ServerboundEditBlueprintPacket packet = ServerboundEditBlueprintPacket.edit(file, floorLevel, selectedGroup);

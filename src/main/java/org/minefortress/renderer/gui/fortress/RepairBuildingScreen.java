@@ -13,7 +13,10 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkH
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.renderer.gui.WindowScreen;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.minefortress.utils.BlockInfoUtils.convertBlockStatesMapItemsMap;
@@ -28,7 +31,6 @@ public class RepairBuildingScreen extends WindowScreen {
     private Map<Item, Boolean> hasEnoughResources;
 
     private final IClientResourceManager clientResourceManager;
-    private final Set<BlockPos> blocksToRepair;
 
     private ButtonWidget confirmationButton;
 
@@ -36,8 +38,6 @@ public class RepairBuildingScreen extends WindowScreen {
         super(Text.of("Repair Building"));
         this.buildingId = buildingId;
         this.clientResourceManager = clientResourceManager;
-        this.blocksToRepair = blocksToRepair.keySet();
-
         requiredItems = convertBlockStatesMapItemsMap(blocksToRepair);
 
         recalculateResources();

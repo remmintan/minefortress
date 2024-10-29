@@ -10,8 +10,8 @@ import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
@@ -270,7 +270,7 @@ public final class ClientFortressManager implements IClientFortressManager {
         return getHoveredBuilding()
                 .flatMap(IEssentialBuildingInfo::getBlueprintId)
                 .flatMap(it -> ModUtils.getBlueprintManager().getBlueprintMetadataManager().getByBlueprintId(it))
-                .map(IBlueprintMetadata::getName);
+                .map(BlueprintMetadata::getName);
     }
 
     @Override

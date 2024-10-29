@@ -7,20 +7,23 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerStructureBlockDataManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
-import net.remmintan.mods.minefortress.networking.s2c.ClientboundAddBlueprintPacket;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundRemoveBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundResetBlueprintPacket;
-import net.remmintan.mods.minefortress.networking.s2c.ClientboundUpdateBlueprintPacket;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBlueprintPacket;
 import org.minefortress.blueprints.data.ServerStructureBlockDataManager;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.SimpleSelectionTask;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 public class ServerBlueprintManager implements IServerBlueprintManager {
 
@@ -28,71 +31,77 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
 
     private final ServerStructureBlockDataManager blockDataManager;
     private final BlueprintMetadataReader blueprintMetadataReader;
-    private final Queue<FortressS2CPacket> scheduledEdits = new ArrayDeque<>();
+    private final Queue<FortressS2CPacket> scheduledSyncs = new ArrayDeque<>();
 
-    public ServerBlueprintManager(MinecraftServer server, Supplier<UUID> userIdProvider) {
+    private final Map<String, BlueprintMetadata> blueprints = new HashMap<>();
+
+    public ServerBlueprintManager(MinecraftServer server) {
         this.blueprintMetadataReader = new BlueprintMetadataReader(server);
-        this.blockDataManager = new ServerStructureBlockDataManager(server, blueprintMetadataReader::convertIdToGroup, userIdProvider);
+        this.blockDataManager = new ServerStructureBlockDataManager(server);
     }
 
     @Override
     public void tick(ServerPlayerEntity player) {
         if(!initialized) {
-            blueprintMetadataReader.read();
-            scheduledEdits.clear();
+            if (blueprints.isEmpty()) readDefaultBlueprints();
+
             final ClientboundResetBlueprintPacket resetpacket = new ClientboundResetBlueprintPacket();
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESET_BLUEPRINT, resetpacket);
 
-            for(Map.Entry<BlueprintGroup, List<IBlueprintMetadata>> entry : blueprintMetadataReader.getPredefinedBlueprints().entrySet()) {
-                for(IBlueprintMetadata blueprintMetadata : entry.getValue()) {
-                    final String file = blueprintMetadata.getId();
-                    blockDataManager.getStructureNbt(file)
-                            .ifPresent(it -> {
-                                final int floorLevel = blockDataManager.getFloorLevel(file).orElse(blueprintMetadata.getFloorLevel());
-                                final ClientboundAddBlueprintPacket packet = new ClientboundAddBlueprintPacket(
-                                        entry.getKey(),
-                                        blueprintMetadata.getName(),
-                                        file,
-                                        floorLevel,
-                                        blueprintMetadata.getCapacity(),
-                                        it
-                                );
-                                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
-                            });
-                }
-            }
-
-            final var initPackets = blockDataManager.getInitPackets();
-            scheduledEdits.addAll(initPackets);
+            blueprints.forEach((blueprintId, metadata) -> {
+                blockDataManager.getStructureNbt(blueprintId)
+                        .ifPresent(it -> {
+                            final var packet = new ClientboundSyncBlueprintPacket(metadata, it);
+                            scheduledSyncs.add(packet);
+                        });
+            });
 
             initialized = true;
         }
 
-        if(!scheduledEdits.isEmpty()) {
-            final FortressS2CPacket packet = scheduledEdits.remove();
-            if(packet instanceof ClientboundUpdateBlueprintPacket)
-                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, packet);
-            else if(packet instanceof ClientboundAddBlueprintPacket)
-                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_ADD_BLUEPRINT, packet);
+        if (!scheduledSyncs.isEmpty()) {
+            final FortressS2CPacket packet = scheduledSyncs.remove();
+            if (packet instanceof ClientboundSyncBlueprintPacket)
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SYNC_BLUEPRINT, packet);
+            else if (packet instanceof ClientboundRemoveBlueprintPacket)
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_REMOVE_BLUEPRINT, packet);
             else
                 throw new IllegalStateException("Wrong blueprint update packet type: " + packet.getClass());
         }
     }
 
+    private void readDefaultBlueprints() {
+        blueprintMetadataReader.read();
+        for (BlueprintMetadata metadata : blueprintMetadataReader.getPredefinedBlueprints()) {
+            final String blueprintId = metadata.getId();
+            blueprints.put(blueprintId, metadata);
+        }
+    }
+
     @Override
-    public void update(String blueprintId, NbtCompound updatedStructure, int newFloorLevel, int capacity, BlueprintGroup group) {
-        final var existed = blockDataManager.update(blueprintId, updatedStructure, newFloorLevel, capacity, group);
-        final FortressS2CPacket packet =
-                existed ? ClientboundUpdateBlueprintPacket.edit(blueprintId, newFloorLevel, updatedStructure) :
-                        new ClientboundAddBlueprintPacket(group, blueprintId, blueprintId, newFloorLevel, capacity, updatedStructure);
-        scheduledEdits.add(packet);
+    public void update(String blueprintId, NbtCompound tag, int newFloorLevel) {
+        final var oldBlueprintMetadata = blueprints.get(blueprintId);
+        final var newBlueprintMetadata = new BlueprintMetadata(
+                oldBlueprintMetadata.getName(),
+                blueprintId,
+                newFloorLevel,
+                oldBlueprintMetadata.getCapacity(),
+                oldBlueprintMetadata.getGroup()
+        );
+
+        blueprints.put(blueprintId, newBlueprintMetadata);
+        blockDataManager.addOrUpdate(blueprintId, tag);
+
+        final FortressS2CPacket packet = new ClientboundSyncBlueprintPacket(newBlueprintMetadata, tag);
+        scheduledSyncs.add(packet);
     }
 
     @Override
     public void remove(String blueprintId) {
+        blueprints.remove(blueprintId);
         blockDataManager.remove(blueprintId);
-        final var remove = ClientboundUpdateBlueprintPacket.remove(blueprintId);
-        scheduledEdits.add(remove);
+        final var remove = new ClientboundRemoveBlueprintPacket(blueprintId);
+        scheduledSyncs.add(remove);
     }
 
     @Override
@@ -136,13 +145,33 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
     }
 
     @Override
-    public void write() {
-        blockDataManager.writeBlockDataManager();
+    public NbtCompound write() {
+        final var wholeManager = new NbtCompound();
+
+        final var serializedBlueprints = new NbtCompound();
+        for (Map.Entry<String, BlueprintMetadata> entry : blueprints.entrySet()) {
+            final var blueprintId = entry.getKey();
+            final var metadata = entry.getValue();
+            serializedBlueprints.put(blueprintId, metadata.toNbt());
+        }
+
+        wholeManager.put("blueprints", serializedBlueprints);
+
+        return wholeManager;
     }
 
     @Override
-    public void read() {
-        blockDataManager.readBlockDataManager();
+    public void read(NbtCompound wholeManager) {
+        scheduledSyncs.clear();
+        blueprints.clear();
         initialized = false;
+
+        if (wholeManager.contains("blueprints")) {
+            final var serializedBlueprints = wholeManager.getCompound("blueprints");
+            for (String blueprintId : serializedBlueprints.getKeys()) {
+                final var metadata = new BlueprintMetadata(serializedBlueprints.getCompound(blueprintId));
+                blueprints.put(blueprintId, metadata);
+            }
+        }
     }
 }

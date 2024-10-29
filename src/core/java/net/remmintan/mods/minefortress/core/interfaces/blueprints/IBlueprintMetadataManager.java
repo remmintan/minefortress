@@ -1,26 +1,19 @@
 package net.remmintan.mods.minefortress.core.interfaces.blueprints;
 
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface IBlueprintMetadataManager {
-    void select(IBlueprintMetadata metadata);
 
-    IBlueprintMetadata selectNext();
+    List<BlueprintMetadata> getAllForGroup(BlueprintGroup group);
 
-    default List<IBlueprintMetadata> getAllForGroup(BlueprintGroup group) {
-        return getAllForGroup(group, 0);
-    }
-
-    List<IBlueprintMetadata> getAllForGroup(BlueprintGroup group, Integer level);
-
-    IBlueprintMetadata add(BlueprintGroup group, String name, String blueprintId, int floorLevel, int capacity);
+    void sync(BlueprintMetadata metadata);
 
     void reset();
 
-    void remove(String filename);
+    void remove(String blueprintId);
 
-    void update(String fileName, int newFloorLevel);
-
-    Optional<IBlueprintMetadata> getByBlueprintId(String blueprintId);
+    Optional<BlueprintMetadata> getByBlueprintId(String blueprintId);
 }

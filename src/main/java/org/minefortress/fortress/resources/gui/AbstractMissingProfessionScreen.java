@@ -5,7 +5,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.renderer.gui.professions.ProfessionsScreen;
 
@@ -71,9 +70,7 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
     @NotNull
     protected abstract String getMissingObjectName();
 
-    protected String getActionText() {
-        throw new NotImplementedException("This method should be implemented in child class");
-    }
+    protected abstract String getActionText();
 
 
 }

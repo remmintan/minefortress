@@ -14,8 +14,8 @@ public class FortressChannelNames {
     public static final String FORTRESS_SELECT_COLONIST = "fortress_select_colonist";
     public static final String FORTRESS_EDIT_BLUEPRINT = "fortress_edit_blueprint";
     public static final String FORTRESS_SAVE_EDIT_BLUEPRINT = "fortress_save_edit_blueprint";
-    public static final String FORTRESS_ADD_BLUEPRINT = "fortress_add_blueprint";
-    public static final String FORTRESS_UPDATE_BLUEPRINT = "fortress_update_blueprint";
+    public static final String FORTRESS_SYNC_BLUEPRINT = "fortress_add_blueprint";
+    public static final String FORTRESS_REMOVE_BLUEPRINT = "fortress_update_blueprint";
     public static final String FORTRESS_RESET_BLUEPRINT = "fortress_reset_blueprint";
     public static final String FORTRESS_CUT_TREES_TASK = "fortress_cut_trees_task";
     public static final String FORTRESS_ROADS_TASK = "fortress_roads_task";

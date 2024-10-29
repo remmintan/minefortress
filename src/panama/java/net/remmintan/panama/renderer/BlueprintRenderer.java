@@ -13,8 +13,8 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.FortressState;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureRenderInfoProvider;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.panama.model.BuiltBlueprint;
@@ -45,8 +45,8 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     public void prepareForRender() {
         final IStructureRenderInfoProvider clientBlueprintManager = getStructureRenderInfoProvider();
         if(clientBlueprintManager.isSelecting()) {
-            final IBlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
-            final BlockRotation blockRotation = selectedStructure.getRotation();
+            final BlueprintMetadata selectedStructure = clientBlueprintManager.getSelectedStructure();
+            final BlockRotation blockRotation = clientBlueprintManager.getSelectedRotation().getRotation();
             final String fileName = selectedStructure.getId();
             blueprintsModelBuilder.getOrBuildBlueprint(fileName, blockRotation);
         }
@@ -131,8 +131,9 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
     @Override
     protected Optional<BuiltModel> getBuiltModel() {
-        final IBlueprintMetadata selectedStructure = getStructureRenderInfoProvider().getSelectedStructure();
-        final BuiltBlueprint nullableBlueprint = this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getId(), selectedStructure.getRotation());
+        final BlueprintMetadata selectedStructure = getStructureRenderInfoProvider().getSelectedStructure();
+        final var selectedRotation = getStructureRenderInfoProvider().getSelectedRotation();
+        final BuiltBlueprint nullableBlueprint = this.blueprintsModelBuilder.getOrBuildBlueprint(selectedStructure.getId(), selectedRotation.getRotation());
         return Optional.ofNullable(nullableBlueprint);
     }
 

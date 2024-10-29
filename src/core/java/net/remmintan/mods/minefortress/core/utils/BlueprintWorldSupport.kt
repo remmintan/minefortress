@@ -62,9 +62,7 @@ fun saveBlueprintFromWorld(server: MinecraftServer, player: ServerPlayerEntity) 
         player._ServerBlueprintManager.update(
             blueprintId,
             updatedStructure,
-            newFloorLevel,
-            10,
-            fortressServerWorld.blueprintGroup
+            newFloorLevel
         )
     }
 

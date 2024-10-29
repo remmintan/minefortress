@@ -1,12 +1,11 @@
-package org.minefortress.blueprints.manager
+package net.remmintan.mods.minefortress.core.dtos.buildings
 
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 
-class BlueprintRequirement(blueprintId: String) : IBlueprintRequirement {
-    override val type: ProfessionType?
-    override val level: Int
-    override val totalLevels: Int
+class BlueprintRequirement(blueprintId: String) {
+    val type: ProfessionType?
+    val level: Int
+    val totalLevels: Int
 
     init {
         var type: ProfessionType? = null
@@ -27,6 +26,13 @@ class BlueprintRequirement(blueprintId: String) : IBlueprintRequirement {
         this.type = type
         this.level = level
         this.totalLevels = totalLevels
+    }
+
+    val icon = type?.icon
+
+    fun satisfies(type: ProfessionType?, level: Int): Boolean {
+        if (type == null) return false
+        return type == this.type && this.level >= level
     }
 
 

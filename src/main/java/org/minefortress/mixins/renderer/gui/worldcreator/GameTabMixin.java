@@ -1,7 +1,6 @@
 package org.minefortress.mixins.renderer.gui.worldcreator;
 
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
-import net.minecraft.client.gui.screen.world.WorldCreator;
 import net.minecraft.client.gui.screen.world.WorldScreenOptionGrid;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.text.Text;

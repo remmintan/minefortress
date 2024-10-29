@@ -1,7 +1,6 @@
 package org.minefortress.renderer.gui.professions;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;

@@ -8,10 +8,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderStage;
 import net.remmintan.mods.minefortress.core.TaskType;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.infuence.IClientInfluenceManager;
 import net.remmintan.mods.minefortress.core.interfaces.infuence.IInfluencePosStateHolder;
@@ -21,18 +19,20 @@ import net.remmintan.mods.minefortress.networking.c2s.C2SCaptureInfluencePositio
 import net.remmintan.mods.minefortress.networking.c2s.C2SUpdateNewInfluencePosition;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.blueprints.manager.BaseClientStructureManager;
-import org.minefortress.blueprints.manager.BlueprintMetadata;
+import org.minefortress.blueprints.manager.BlueprintRotation;
 import org.minefortress.utils.ModUtils;
 
 import java.util.*;
 
 public class ClientInfluenceManager extends BaseClientStructureManager implements IClientInfluenceManager {
 
-    private static final IBlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0, 0);
+    private static final BlueprintMetadata INFLUENCE_FLAG_METADATA = new BlueprintMetadata("Influence Flag", "influence_flag", 0, 0, BlueprintGroup.DECORATION);
 
     private final InfluenceFlagBlockDataProvider blockDataProvider = new InfluenceFlagBlockDataProvider();
     private final ClientFortressBorderHolder clientFortressBorderHolder = new ClientFortressBorderHolder(this);
     private final IInfluencePosStateHolder influencePosStateHolder = new InfluencePosStateHolder();
+
+    private final IBlueprintRotation selectedRotation = new BlueprintRotation();
 
     private boolean isSelectingInfluencePosition = false;
 
@@ -164,8 +164,13 @@ public class ClientInfluenceManager extends BaseClientStructureManager implement
     }
 
     @Override
-    public IBlueprintMetadata getSelectedStructure() {
+    public BlueprintMetadata getSelectedStructure() {
         return INFLUENCE_FLAG_METADATA;
+    }
+
+    @Override
+    public IBlueprintRotation getSelectedRotation() {
+        return selectedRotation;
     }
 
     @Override

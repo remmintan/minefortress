@@ -48,7 +48,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method="<init>", at=@At("RETURN"))
     public void init(MinecraftServer server, ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, CallbackInfo ci) {
-        serverBlueprintManager = new ServerBlueprintManager(server, this::getUuid);
+        serverBlueprintManager = new ServerBlueprintManager(server);
     }
 
     @Inject(method="tick", at=@At("TAIL"))
@@ -58,7 +58,9 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
-        serverBlueprintManager.write();
+        final var blueprintManager = serverBlueprintManager.write();
+        nbt.put("blueprintManager", blueprintManager);
+
         NbtCompound playerState = new NbtCompound();
         playerState.putBoolean("wasInBlueprintWorldWhenLoggedOut", wasInBlueprintWorldWhenLoggedOut);
         if(persistedPos != null) {
@@ -71,7 +73,8 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        serverBlueprintManager.read();
+        final var blueprintManager = nbt.contains("blueprintManager") ? nbt.getCompound("blueprintManager") : new NbtCompound();
+        serverBlueprintManager.read(blueprintManager);
         if(nbt.contains("playerState")) {
             NbtCompound playerState = nbt.getCompound("playerState");
             wasInBlueprintWorldWhenLoggedOut = playerState.getBoolean("wasInBlueprintWorldWhenLoggedOut");

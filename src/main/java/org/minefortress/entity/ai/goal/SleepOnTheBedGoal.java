@@ -1,8 +1,6 @@
 package org.minefortress.entity.ai.goal;
 
 import net.minecraft.block.BedBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
@@ -10,7 +8,7 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressMan
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
-import org.minefortress.entity.ai.MovementHelper;
+
 import java.util.Optional;
 
 public class SleepOnTheBedGoal extends AbstractFortressGoal {

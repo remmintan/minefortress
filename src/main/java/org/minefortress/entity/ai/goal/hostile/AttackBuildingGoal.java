@@ -1,7 +1,6 @@
 package org.minefortress.entity.ai.goal.hostile;
 
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;

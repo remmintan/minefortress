@@ -1,89 +1,51 @@
 package org.minefortress.blueprints.manager;
 
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadataManager;
 
 import java.util.*;
 
 public final class BlueprintMetadataManager implements IBlueprintMetadataManager {
 
-    private final Map<BlueprintGroup, List<IBlueprintMetadata>> blueprintsMap = new HashMap<>();
-    private int index = 0;
+    private final Map<BlueprintGroup, List<BlueprintMetadata>> blueprintsGroups = new HashMap<>();
 
     @Override
-    public void select(IBlueprintMetadata metadata) {
-        index = flatBlueprints().indexOf(metadata);
-    }
-
-    @Override
-    public IBlueprintMetadata selectNext() {
-        index++;
-        if (index >= flatBlueprints(0).size()) {
-            index = 0;
-        }
-        return flatBlueprints(0).get(index);
-    }
-
-
-    @Override
-    public List<IBlueprintMetadata> getAllForGroup(BlueprintGroup group, Integer level) {
-        return blueprintsMap
+    public List<BlueprintMetadata> getAllForGroup(BlueprintGroup group) {
+        return blueprintsGroups
                 .getOrDefault(group, Collections.emptyList())
                 .stream()
-                .filter(it -> it.getLevel() == level)
+                .filter(it -> it.getRequirement().getLevel() == 0)
                 .toList();
     }
 
     @Override
-    public IBlueprintMetadata add(BlueprintGroup group, String name, String blueprintId, int floorLevel, int capacity) {
-        if (isContainsBlueprint(name, blueprintId)) {
-            throw new IllegalArgumentException("Blueprint with areaType " + name + " and blueprintId " + blueprintId + " already exists");
-        }
+    public void sync(BlueprintMetadata metadata) {
+        final var groupId = metadata.getGroup();
+        final var group = blueprintsGroups.computeIfAbsent(groupId, k -> new ArrayList<>());
 
-        final IBlueprintMetadata metadata = new BlueprintMetadata(name, blueprintId, floorLevel, capacity);
-        blueprintsMap.computeIfAbsent(group, k -> new ArrayList<>()).add(metadata);
-        return metadata;
+        final var blueprintId = metadata.getId();
+        group.removeIf(it -> it.getId().equals(blueprintId));
+
+        group.add(metadata);
     }
 
     @Override
     public void reset() {
-        this.blueprintsMap.clear();
-        this.index = 0;
+        this.blueprintsGroups.clear();
     }
 
     @Override
-    public void remove(String filename) {
-        blueprintsMap.forEach((k, v) -> v.removeIf(it -> it.getId().equals(filename)));
+    public void remove(String blueprintId) {
+        blueprintsGroups.forEach((k, v) -> v.removeIf(it -> it.getId().equals(blueprintId)));
+    }
+
+    private List<BlueprintMetadata> flatBlueprints() {
+        return blueprintsGroups.values().stream().flatMap(Collection::stream).toList();
     }
 
     @Override
-    public void update(String fileName, int newFloorLevel) {
-        flatBlueprints()
-                .stream()
-                .filter(b -> b.getId().equals(fileName))
-                .forEach(b -> b.setFloorLevel(newFloorLevel));
-    }
-
-    private boolean isContainsBlueprint(String name, String file) {
-        return flatBlueprints().stream().anyMatch(b -> b.getName().equals(name) && b.getId().equals(file));
-    }
-
-    private List<IBlueprintMetadata> flatBlueprints() {
-        return blueprintsMap.values().stream().flatMap(Collection::stream).toList();
-    }
-
-    private List<IBlueprintMetadata> flatBlueprints(int level) {
-        return blueprintsMap
-                .values()
-                .stream()
-                .flatMap(Collection::stream)
-                .filter(it -> it.getLevel() == level)
-                .toList();
-    }
-
-    @Override
-    public Optional<IBlueprintMetadata> getByBlueprintId(String blueprintId) {
+    public Optional<BlueprintMetadata> getByBlueprintId(String blueprintId) {
         if(blueprintId == null) return Optional.empty();
         return flatBlueprints().stream().filter(b -> b.getId().equals(blueprintId)).findFirst();
     }

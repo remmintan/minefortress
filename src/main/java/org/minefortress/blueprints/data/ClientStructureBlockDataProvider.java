@@ -44,8 +44,8 @@ public final class ClientStructureBlockDataProvider extends AbstractStructureBlo
     }
 
     @Override
-    public void setBlueprint(String blueprintFileName, NbtCompound tag) {
-        blueprintTags.put(blueprintFileName, tag);
+    public void setBlueprint(String blueprintId, NbtCompound tag) {
+        blueprintTags.put(blueprintId, tag);
     }
 
     @Override

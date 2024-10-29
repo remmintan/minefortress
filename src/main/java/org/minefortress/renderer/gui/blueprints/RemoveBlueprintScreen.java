@@ -25,7 +25,7 @@ public class RemoveBlueprintScreen extends Screen {
                         Text.literal("Yes"),
                         button -> {
                             final var removePacket = ServerboundEditBlueprintPacket.remove(name);
-                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, removePacket);
+                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_REMOVE_BLUEPRINT, removePacket);
                         }
                 )
                 .dimensions(this.width / 2 - 102, this.height / 4 + 48 - 16, 102, 20)

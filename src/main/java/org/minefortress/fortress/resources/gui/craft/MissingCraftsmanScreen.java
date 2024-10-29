@@ -10,4 +10,8 @@ public class MissingCraftsmanScreen extends AbstractMissingProfessionScreen {
         return "Craftsman";
     }
 
+    @Override
+    protected String getActionText() {
+        return "Go to professions manager to hire one";
+    }
 }

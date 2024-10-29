@@ -3,8 +3,8 @@ package org.minefortress.professions;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintRequirement;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement;
 import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
@@ -95,7 +95,7 @@ public abstract class ProfessionManager implements IProfessionsManager {
     }
 
     @Override
-    public Optional<IProfession> getByBuildingRequirement(IBlueprintRequirement requirement) {
+    public Optional<IProfession> getByBuildingRequirement(BlueprintRequirement requirement) {
         return getProfessions()
                 .values()
                 .stream()

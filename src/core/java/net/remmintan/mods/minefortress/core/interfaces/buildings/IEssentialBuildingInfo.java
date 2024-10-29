@@ -2,7 +2,7 @@ package net.remmintan.mods.minefortress.core.interfaces.buildings;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintRequirement;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IEssentialBuildingInfo {
-    Optional<IBlueprintRequirement> getRequirement();
+    Optional<BlueprintRequirement> getRequirement();
     BlockPos getStart();
 
     BlockPos getEnd();

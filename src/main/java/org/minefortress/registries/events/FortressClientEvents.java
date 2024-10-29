@@ -10,7 +10,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.util.ActionResult;
 import net.remmintan.mods.minefortress.core.FortressState;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
@@ -93,12 +92,7 @@ public class FortressClientEvents {
     private static void endClientTick(MinecraftClient client) {
         while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
             final var fortressClient = (IClientManagersProvider) client;
-            final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
-            if(clientBlueprintManager.isSelecting()) {
-                fortressClient.get_BlueprintManager().selectNext();
-            } else {
-                fortressClient.get_SelectionManager().toggleSelectionType();
-            }
+            fortressClient.get_SelectionManager().toggleSelectionType();
         }
 
         while (FortressKeybindings.cancelTaskKeybinding.wasPressed()) {

@@ -5,6 +5,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.building.BuildingHelper;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +29,10 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     }
 
     protected abstract IBlockDataProvider getBlockDataProvider();
-    public abstract IBlueprintMetadata getSelectedStructure();
+
+    public abstract BlueprintMetadata getSelectedStructure();
+
+    public abstract IBlueprintRotation getSelectedRotation();
     public void tick() {
         if(!isSelecting()) return;
         structureBuildPos = getSelectedPos();
@@ -90,9 +94,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
 
     private IStructureBlockData getBlockData() {
         final var blockDataProvider = getBlockDataProvider();
-        final var selectedStructure = getSelectedStructure();
-        return blockDataProvider
-                .getBlockData(selectedStructure.getId(), selectedStructure.getRotation());
+        return blockDataProvider.getBlockData(getSelectedStructure().getId(), getSelectedRotation().getRotation());
     }
 
     @Nullable
@@ -119,7 +121,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
 
     @Override
     public final Optional<BlockPos> getStructureRenderPos() {
-        final var floorLevel = Optional.ofNullable(getSelectedStructure()).map(IBlueprintMetadata::getFloorLevel).orElse(0);
+        final var floorLevel = Optional.ofNullable(getSelectedStructure()).map(BlueprintMetadata::getFloorLevel).orElse(0);
         return Optional.ofNullable(structureBuildPos).map(it -> it.down(floorLevel));
     }
 

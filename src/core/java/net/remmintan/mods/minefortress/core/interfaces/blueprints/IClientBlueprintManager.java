@@ -1,6 +1,7 @@
 package net.remmintan.mods.minefortress.core.interfaces.blueprints;
 
 import net.minecraft.nbt.NbtCompound;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 
 import java.util.List;
 
@@ -10,11 +11,9 @@ public interface IClientBlueprintManager extends IStructureRenderInfoProvider {
     void handleBlueprintsExport(String name, byte[] bytes);
     void handleImportExportFailure();
 
-    void select(IBlueprintMetadata blueprintMetadata);
+    void select(BlueprintMetadata blueprintMetadata);
 
-    void selectNext();
-
-    List<IBlueprintMetadata> getAllBlueprints(BlueprintGroup group);
+    List<BlueprintMetadata> getAllBlueprints(BlueprintGroup group);
 
     void buildCurrentStructure();
 
@@ -28,11 +27,9 @@ public interface IClientBlueprintManager extends IStructureRenderInfoProvider {
 
     IBlockDataProvider getBlockDataProvider();
 
-    void add(BlueprintGroup group, String name, String blueprintId, int floorLevel, int capacity, NbtCompound tag);
+    void sync(BlueprintMetadata metadata, NbtCompound tag);
 
-    void update(String fileName, NbtCompound tag, int newFloorLevel);
-
-    void remove(String filename);
+    void remove(String blueprintId);
 
     void reset();
 

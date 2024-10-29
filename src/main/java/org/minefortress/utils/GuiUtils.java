@@ -2,11 +2,9 @@ package org.minefortress.utils;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 public class GuiUtils {
 

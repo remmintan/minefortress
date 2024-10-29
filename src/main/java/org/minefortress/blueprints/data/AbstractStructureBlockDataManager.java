@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
 
-    private final Map<String, IStructureBlockData> blueprints = new HashMap<>();
+    private final Map<String, IStructureBlockData> blockDataCache = new HashMap<>();
 
     public IStructureBlockData getBlockData(String blueprintId, BlockRotation rotation) {
         return getBlockData(blueprintId, rotation, 0);
@@ -29,18 +29,18 @@ abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
 
     public IStructureBlockData getBlockData(String blueprintId, BlockRotation rotation, int floorLevel) {
         final String key = getKey(blueprintId, rotation);
-        if(!blueprints.containsKey(key)) {
+        if (!blockDataCache.containsKey(key)) {
             final StructureTemplate structure = getStructure(blueprintId)
                     .orElseThrow(() -> new IllegalStateException("Blueprint not found " + blueprintId));
             final IStructureBlockData blueprintBlockData = buildStructure(structure, rotation, floorLevel);
-            blueprints.put(key, blueprintBlockData);
+            blockDataCache.put(key, blueprintBlockData);
         }
 
-        return blueprints.get(key);
+        return blockDataCache.get(key);
     }
 
-    public void invalidateBlueprint(String fileName) {
-        new HashSet<>(blueprints.keySet()).stream().filter(key -> key.startsWith(fileName)).forEach(blueprints::remove);
+    public void invalidateBlueprint(String blueprintId) {
+        new HashSet<>(blockDataCache.keySet()).stream().filter(key -> key.startsWith(blueprintId)).forEach(blockDataCache::remove);
     }
 
     protected abstract Optional<StructureTemplate> getStructure(String blueprintId);
@@ -110,7 +110,7 @@ abstract class AbstractStructureBlockDataManager implements IBlockDataProvider {
     }
 
     public void reset() {
-        this.blueprints.clear();
+        this.blockDataCache.clear();
     }
 
     protected static SizeAndPivot getSizeAndPivot(StructureTemplate structure, BlockRotation rotation) {

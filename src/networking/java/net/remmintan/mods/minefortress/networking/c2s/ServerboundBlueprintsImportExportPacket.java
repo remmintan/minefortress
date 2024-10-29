@@ -2,28 +2,22 @@ package net.remmintan.mods.minefortress.networking.c2s;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerStructureBlockDataManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
-import net.remmintan.mods.minefortress.core.utils.ModPathUtils;
 import net.remmintan.mods.minefortress.networking.NetworkActionType;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.helpers.NetworkUtils;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundBlueprintsProcessImportExportPacket;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -59,26 +53,52 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
         buf.writeByteArray(NetworkUtils.getCompressedBytes(bytes));
     }
 
+    private static byte[] zipBlueprintsFolderToByteArray(NbtCompound serializedBlueprints, IServerStructureBlockDataManager structureManager) throws IOException {
+        final byte[] bytes;
+        try(
+                final var byteArrayOutputStream = new ByteArrayOutputStream();
+                final var zipOS = new ZipOutputStream(byteArrayOutputStream);
+                final var dos = new DataOutputStream(zipOS)
+        ) {
+
+            for (String blueprintId : serializedBlueprints.getKeys()) {
+                final var structureNbtOpt = structureManager.getStructureNbt(blueprintId);
+                if (structureNbtOpt.isEmpty()) continue;
+                final var structureNbt = structureNbtOpt.get();
+                structureNbt.put("minefortressMetadata", serializedBlueprints.getCompound(blueprintId));
+
+                final var zipEntry = new ZipEntry(blueprintId + ".nbt");
+                zipOS.putNextEntry(zipEntry);
+                NbtIo.writeCompound(structureNbt, dos);
+                zipOS.closeEntry();
+            }
+
+            byteArrayOutputStream.flush();
+            bytes = byteArrayOutputStream.toByteArray();
+        }
+        return bytes;
+    }
+
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
 
         if(player instanceof FortressServerPlayerEntity serverPlayer) {
             switch (type) {
-                case EXPORT -> handleExport(server, player, serverPlayer);
-                case IMPORT -> handleImport(server, player, serverPlayer);
+                case EXPORT -> handleExport(player, serverPlayer);
+                case IMPORT -> handleImport(player, serverPlayer);
             }
         }
     }
 
-    private void handleExport(MinecraftServer server, ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
+    private void handleExport(ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
         byte[] bytes;
         try {
             final var sbm = serverPlayer.get_ServerBlueprintManager();
-            sbm.write();
-            final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
-            final var blueprintsPath = ModPathUtils.getFolderAbsolutePath(blueprintsFolderPath, server.session);
-            bytes = zipBlueprintsFolderToByteArray(blueprintsPath);
+            final var serializedSbm = sbm.write();
+            final var serializedBlueprints = serializedSbm.getCompound("blueprints");
+
+            bytes = zipBlueprintsFolderToByteArray(serializedBlueprints, sbm.getBlockDataManager());
         }catch (RuntimeException | IOException exp) {
             exp.printStackTrace();
             final var packet = new ClientboundBlueprintsProcessImportExportPacket(ClientboundBlueprintsProcessImportExportPacket.CurrentScreenAction.FAILURE);
@@ -90,36 +110,33 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, packet);
     }
 
-    private void handleImport(MinecraftServer server, ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
+    private void handleImport(ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
         try {
             final var sbm = serverPlayer.get_ServerBlueprintManager();
-            final var blueprintsFolderPath = sbm.getBlockDataManager().getBlueprintsFolder();
-            final var pathString = ModPathUtils.getFolderAbsolutePath(blueprintsFolderPath, server.session);
-            final var path = Paths.get(pathString);
-            final var target = path.toFile();
-            FileUtils.deleteDirectory(target);
-            target.mkdirs();
+            final var blueprintsMap = new NbtCompound();
             try (
                 final var bais = new ByteArrayInputStream(bytes);
-                final var zis = new ZipInputStream(bais)
+                final var zis = new ZipInputStream(bais);
+                final var dis = new DataInputStream(zis)
             ){
-                ZipEntry nextEntry;
-                while ((nextEntry = zis.getNextEntry()) != null) {
-                    final var file = new File(target, nextEntry.getName());
-                    if (!file.toPath().normalize().startsWith(target.toPath())) {
-                        continue;
-                    }
+                ZipEntry entry;
+                while ((entry = zis.getNextEntry()) != null) {
+                    final var blueprintFileName = entry.getName();
+                    final var blueprintId = StringUtils.substringBeforeLast(blueprintFileName, ".");
 
-                    if (nextEntry.isDirectory()) {
-                        file.mkdirs();
-                    } else {
-                        try (final var fos = Files.newOutputStream(file.toPath())) {
-                            IOUtils.copy(zis, fos);
-                        }
+                    final NbtCompound structureCompound = NbtIo.readCompound(dis);
+
+                    if (structureCompound.contains("minefortressMetadata")) {
+                        final var minefortressMetadata = structureCompound.getCompound("minefortressMetadata");
+                        blueprintsMap.put(blueprintId, minefortressMetadata);
+                        structureCompound.remove("minefortressMetadata");
+                        sbm.getBlockDataManager().addOrUpdate(blueprintId, structureCompound);
                     }
                 }
             }
-            sbm.read();
+            final var importedBlueprintManager = new NbtCompound();
+            importedBlueprintManager.put("blueprints", blueprintsMap);
+            sbm.read(importedBlueprintManager);
             final var packet = new ClientboundBlueprintsProcessImportExportPacket(ClientboundBlueprintsProcessImportExportPacket.CurrentScreenAction.SUCCESS);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, packet);
         }catch (IOException | RuntimeException e) {
@@ -129,30 +146,5 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
         }
     }
 
-    private byte[] zipBlueprintsFolderToByteArray(String pathStr) throws IOException {
-        final var path = Path.of(pathStr);
-        if(!Files.isDirectory(path)) {
-            throw new RuntimeException("Path is not directory: " + pathStr);
-        }
-
-        try(
-                final var byteArrayOutputStream = new ByteArrayOutputStream();
-                final var zipOS = new ZipOutputStream(byteArrayOutputStream);
-                final var walk = Files.walk(path)
-        ) {
-            for (Path it : walk.toList()) {
-                final var relative = path.relativize(it);
-                final var relativePathStr = relative.toString();
-                if (Strings.isEmpty(relativePathStr)) continue;
-                final var zipEntry = new ZipEntry(relativePathStr);
-                zipOS.putNextEntry(zipEntry);
-                final var bytes = Files.readAllBytes(it);
-                zipOS.write(bytes, 0, bytes.length);
-                zipOS.closeEntry();
-            }
-
-            return byteArrayOutputStream.toByteArray();
-        }
-    }
 
 }

@@ -2,7 +2,6 @@ package org.minefortress.mixins.entity.player;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;

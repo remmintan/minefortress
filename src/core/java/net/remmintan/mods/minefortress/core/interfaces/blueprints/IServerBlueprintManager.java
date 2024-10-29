@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface IServerBlueprintManager {
     void tick(ServerPlayerEntity player);
 
-    void update(String blueprintId, NbtCompound updatedStructure, int newFloorLevel, int capacity, BlueprintGroup group);
+    void update(String blueprintId, NbtCompound updatedStructure, int newFloorLevel);
 
     void remove(String blueprintId);
 
@@ -21,7 +21,7 @@ public interface IServerBlueprintManager {
 
     ITask createDigTask(UUID taskId, BlockPos startPos, int floorLevel, String blueprintId, BlockRotation rotation);
 
-    void write();
+    NbtCompound write();
 
-    void read();
+    void read(NbtCompound nbt);
 }

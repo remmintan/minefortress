@@ -7,20 +7,18 @@ import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 import org.minefortress.entity.ai.goal.SelectTargetToAttackGoal;
 import org.minefortress.entity.ai.goal.warrior.FollowLivingEntityGoal;
 import org.minefortress.entity.ai.goal.warrior.MoveToBlockGoal;
 import org.minefortress.entity.ai.goal.warrior.RangedAttackGoal;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 
 public class ArcherPawn extends TargetedPawn implements IWarrior, RangedAttackMob, IProfessional {
 

@@ -3,6 +3,7 @@ package org.minefortress.blueprints.manager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.remmintan.mods.minefortress.core.ModLogger;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
@@ -26,15 +27,13 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     private final ClientStructureBlockDataProvider blockDataManager = new ClientStructureBlockDataProvider();
     private final IBlueprintMetadataManager blueprintMetadataManager = new BlueprintMetadataManager();
 
-    private IBlueprintMetadata selectedStructure;
-
+    private BlueprintMetadata selectedStructure;
+    private IBlueprintRotation selectedRotation;
 
     public ClientBlueprintManager(MinecraftClient client) {
         super(client);
         this.client = client;
     }
-
-
 
     @Override
     public boolean isSelecting() {
@@ -85,19 +84,13 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     }
 
     @Override
-    public void select(IBlueprintMetadata blueprintMetadata) {
+    public void select(BlueprintMetadata blueprintMetadata) {
         this.selectedStructure = blueprintMetadata;
-        this.blueprintMetadataManager.select(blueprintMetadata);
+        this.selectedRotation = new BlueprintRotation();
     }
 
     @Override
-    public void selectNext() {
-        if(!this.isSelecting()) return;
-        this.selectedStructure = blueprintMetadataManager.selectNext();
-    }
-
-    @Override
-    public List<IBlueprintMetadata> getAllBlueprints(BlueprintGroup group) {
+    public List<BlueprintMetadata> getAllBlueprints(BlueprintGroup group) {
         return this.blueprintMetadataManager.getAllForGroup(group);
     }
 
@@ -127,7 +120,7 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
         return new ServerboundBlueprintTaskPacket(
                         selectedStructure.getId(),
                         getStructureBuildPos(),
-                        selectedStructure.getRotation(),
+                selectedRotation.getRotation(),
                         getSelectedStructure().getFloorLevel(),
                         selectedPawnsIds
                 );
@@ -139,8 +132,13 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     }
 
     @Override
-    public IBlueprintMetadata getSelectedStructure() {
+    public BlueprintMetadata getSelectedStructure() {
         return selectedStructure;
+    }
+
+    @Override
+    public IBlueprintRotation getSelectedRotation() {
+        return selectedRotation;
     }
 
     @Override
@@ -150,14 +148,14 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
 
     @Override
     public void rotateSelectedStructureClockwise() {
-        if(selectedStructure == null) throw new IllegalStateException("No blueprint selected");
-        this.selectedStructure.rotateRight();
+        if (selectedRotation == null) throw new IllegalStateException("No blueprint selected");
+        this.selectedRotation.rotateRight();
     }
 
     @Override
     public void rotateSelectedStructureCounterClockwise() {
-        if(selectedStructure == null) throw new IllegalStateException("No blueprint selected");
-        this.selectedStructure.rotateLeft();
+        if (selectedRotation == null) throw new IllegalStateException("No blueprint selected");
+        this.selectedRotation.rotateLeft();
     }
 
     @Override
@@ -166,28 +164,17 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     }
 
     @Override
-    public void add(BlueprintGroup group, String name, String blueprintId, int floorLevel, int capacity, NbtCompound tag) {
-        final IBlueprintMetadata metadata = this.blueprintMetadataManager.add(group, name, blueprintId, floorLevel, capacity);
+    public void sync(BlueprintMetadata metadata, NbtCompound tag) {
+        this.blueprintMetadataManager.sync(metadata);
         blockDataManager.setBlueprint(metadata.getId(), tag);
         blockDataManager.invalidateBlueprint(metadata.getId());
     }
 
     @Override
-    public void update(String fileName, NbtCompound tag, int newFloorLevel) {
-        blueprintMetadataManager.update(fileName,newFloorLevel);
-
-        blockDataManager.setBlueprint(fileName, tag);
-        blockDataManager.invalidateBlueprint(fileName);
-        if(client instanceof IFortressMinecraftClient fortressClient) {
-            fortressClient.get_BlueprintRenderer().getBlueprintsModelBuilder().invalidateBlueprint(fileName);
-        }
-    }
-
-    @Override
-    public void remove(String filename) {
-        blueprintMetadataManager.remove(filename);
-        blockDataManager.removeBlueprint(filename);
-        blockDataManager.invalidateBlueprint(filename);
+    public void remove(String blueprintId) {
+        blueprintMetadataManager.remove(blueprintId);
+        blockDataManager.removeBlueprint(blueprintId);
+        blockDataManager.invalidateBlueprint(blueprintId);
     }
 
     @Override

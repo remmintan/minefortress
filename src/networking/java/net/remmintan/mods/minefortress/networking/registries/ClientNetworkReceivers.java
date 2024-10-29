@@ -14,8 +14,8 @@ public class ClientNetworkReceivers {
     public static void registerReceivers() {
         registerReceiver(FortressChannelNames.FINISH_TASK, ClientboundTaskExecutedPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_MANAGER_SYNC, ClientboundSyncFortressManagerPacket::new);
-        registerReceiver(FortressChannelNames.FORTRESS_ADD_BLUEPRINT, ClientboundAddBlueprintPacket::new);
-        registerReceiver(FortressChannelNames.FORTRESS_UPDATE_BLUEPRINT, ClientboundUpdateBlueprintPacket::new);
+        registerReceiver(FortressChannelNames.FORTRESS_SYNC_BLUEPRINT, ClientboundSyncBlueprintPacket::new);
+        registerReceiver(FortressChannelNames.FORTRESS_REMOVE_BLUEPRINT, ClientboundRemoveBlueprintPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_RESET_BLUEPRINT, ClientboundResetBlueprintPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_BUILDINGS_SYNC, ClientboundSyncBuildingsPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, ClientboundSyncSpecialBlocksPacket::new);

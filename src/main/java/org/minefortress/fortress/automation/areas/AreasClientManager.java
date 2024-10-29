@@ -3,7 +3,6 @@ package org.minefortress.fortress.automation.areas;
 import com.google.common.collect.Streams;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;

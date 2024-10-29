@@ -4,7 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintMetadata;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.networking.c2s.C2SDestroyBuilding;
@@ -31,7 +31,7 @@ public class ManageBuildingScreen extends WindowScreen {
                 essentialBuildingInfo
                     .getBlueprintId()
                     .flatMap(blueprintMetadataManager::getByBlueprintId)
-                    .map(IBlueprintMetadata::getName)
+                        .map(BlueprintMetadata::getName)
                     .orElse("Unknown")
         );
         profession = buildingInfo.getRequirement()
