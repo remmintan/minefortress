@@ -15,7 +15,7 @@ public final class BlueprintMetadataManager implements IBlueprintMetadataManager
         return blueprintsGroups
                 .getOrDefault(group, Collections.emptyList())
                 .stream()
-                .filter(it -> it.getRequirement().getLevel() == 0)
+                .filter(it -> it.getRequirement().getLevel() == 0 || it.getRequirement().getLevel() == -1)
                 .toList();
     }
 
@@ -25,9 +25,18 @@ public final class BlueprintMetadataManager implements IBlueprintMetadataManager
         final var group = blueprintsGroups.computeIfAbsent(groupId, k -> new ArrayList<>());
 
         final var blueprintId = metadata.getId();
-        group.removeIf(it -> it.getId().equals(blueprintId));
+        final int indexOfBlueprint = group
+                .stream()
+                .filter(it -> it.getId().equals(blueprintId))
+                .findFirst()
+                .map(group::indexOf)
+                .orElse(-1);
 
-        group.add(metadata);
+        if (indexOfBlueprint != -1) {
+            group.set(indexOfBlueprint, metadata);
+        } else {
+            group.add(metadata);
+        }
     }
 
     @Override

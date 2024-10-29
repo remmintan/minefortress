@@ -168,6 +168,12 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
         this.blueprintMetadataManager.sync(metadata);
         blockDataManager.setBlueprint(metadata.getId(), tag);
         blockDataManager.invalidateBlueprint(metadata.getId());
+        if (client instanceof IFortressMinecraftClient fortressClient) {
+            fortressClient
+                    .get_BlueprintRenderer()
+                    .getBlueprintsModelBuilder()
+                    .invalidateBlueprint(metadata.getId());
+        }
     }
 
     @Override

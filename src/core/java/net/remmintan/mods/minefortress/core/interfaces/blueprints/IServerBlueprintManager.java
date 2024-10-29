@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface IServerBlueprintManager {
     void tick(ServerPlayerEntity player);
 
-    void update(String blueprintId, NbtCompound updatedStructure, int newFloorLevel);
+    void update(String blueprintId, String blueprintName, BlueprintGroup group, NbtCompound updatedStructure, int newFloorLevel);
 
     void remove(String blueprintId);
 

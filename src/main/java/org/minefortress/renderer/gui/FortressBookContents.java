@@ -19,7 +19,7 @@ public class FortressBookContents implements BookScreen.Contents {
             """,
             """
             middle mouse button press - rotate the camera with the mouse
-            ctrl + R - change the build type (Squares, Walls, Ladder)
+                    ctrl + R - change the build actionType (Squares, Walls, Ladder)
             ctrl + E - move current selection Up
             ctrl + Q - move current selection Down
             """,

@@ -15,6 +15,7 @@ import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import net.remmintan.mods.minefortress.core.interfaces.server.IBlueprintEditingWorld;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.concurrent.Executor;
@@ -26,7 +27,8 @@ public class FortressServerWorld extends ServerWorld implements IBlueprintEditin
 
     private boolean saveModeEnabled = false;
 
-    private String fileName;
+    private String blueprintId = "";
+    private String blueprintName;
     private int floorLevel;
     private BlueprintGroup blueprintGroup;
 
@@ -71,16 +73,6 @@ public class FortressServerWorld extends ServerWorld implements IBlueprintEditin
     }
 
     @Override
-    public String getFileName() {
-        return fileName;
-    }
-
-    @Override
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    @Override
     public int getFloorLevel() {
         return floorLevel;
     }
@@ -90,14 +82,26 @@ public class FortressServerWorld extends ServerWorld implements IBlueprintEditin
         this.floorLevel = floorLevel;
     }
 
+    @Nullable
     @Override
-    public BlueprintGroup getBlueprintGroup() {
-        return blueprintGroup;
+    public String getBlueprintId() {
+        return this.blueprintId;
     }
 
     @Override
-    public void setBlueprintGroup(BlueprintGroup blueprintGroup) {
-        this.blueprintGroup = blueprintGroup;
+    public void setBlueprintId(@Nullable String s) {
+        this.blueprintId = s;
+    }
+
+    @Nullable
+    @Override
+    public String getBlueprintName() {
+        return this.blueprintName;
+    }
+
+    @Override
+    public void setBlueprintName(@Nullable String s) {
+        this.blueprintName = s;
     }
 
     @Override
@@ -108,5 +112,16 @@ public class FortressServerWorld extends ServerWorld implements IBlueprintEditin
     @Override
     public void disableSaveStructureMode() {
         saveModeEnabled = false;
+    }
+
+    @Nullable
+    @Override
+    public BlueprintGroup getBlueprintGroup() {
+        return blueprintGroup;
+    }
+
+    @Override
+    public void setBlueprintGroup(@Nullable BlueprintGroup group) {
+        this.blueprintGroup = group;
     }
 }

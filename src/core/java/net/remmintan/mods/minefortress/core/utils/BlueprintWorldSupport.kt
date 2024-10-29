@@ -15,8 +15,14 @@ import kotlin.math.min
 
 fun saveBlueprintFromWorld(server: MinecraftServer, player: ServerPlayerEntity) {
     val fortressServerWorld = player.world as IBlueprintEditingWorld
-    val blueprintId = fortressServerWorld.fileName
-    val updatedStructureIdentifier = Identifier.of("minefortress", blueprintId)
+
+    val blueprintId = fortressServerWorld.blueprintId
+    val blueprintName = fortressServerWorld.blueprintName
+
+    val idStr = blueprintId ?: blueprintName?.replace(Regex("[^a-zA-Z0-9]"), "_")?.lowercase()
+    ?: throw IllegalStateException("Both name and id are null")
+
+    val updatedStructureIdentifier = Identifier.of("minefortress", idStr)
     val structureManager = server.structureTemplateManager
     val structureToUpdate = structureManager.getTemplateOrBlank(updatedStructureIdentifier)
     fortressServerWorld.enableSaveStructureMode()
@@ -60,7 +66,9 @@ fun saveBlueprintFromWorld(server: MinecraftServer, player: ServerPlayerEntity) 
     structureToUpdate.writeNbt(updatedStructure)
     if (player is FortressServerPlayerEntity) {
         player._ServerBlueprintManager.update(
-            blueprintId,
+            idStr,
+            blueprintName,
+            fortressServerWorld.blueprintGroup,
             updatedStructure,
             newFloorLevel
         )

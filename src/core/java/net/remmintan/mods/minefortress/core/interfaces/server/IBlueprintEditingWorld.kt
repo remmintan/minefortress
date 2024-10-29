@@ -1,21 +1,14 @@
-package net.remmintan.mods.minefortress.core.interfaces.server;
+package net.remmintan.mods.minefortress.core.interfaces.server
 
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 
-public interface IBlueprintEditingWorld {
-    String getFileName();
+interface IBlueprintEditingWorld {
+    var blueprintId: String?
+    var blueprintName: String?
+    var floorLevel: Int
+    var blueprintGroup: BlueprintGroup?
 
-    void setFileName(String fileName);
+    fun enableSaveStructureMode()
 
-    int getFloorLevel();
-
-    void setFloorLevel(int floorLevel);
-
-    BlueprintGroup getBlueprintGroup();
-
-    void setBlueprintGroup(BlueprintGroup blueprintGroup);
-
-    void enableSaveStructureMode();
-
-    void disableSaveStructureMode();
+    fun disableSaveStructureMode()
 }

@@ -8,10 +8,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerStructureBlockDataManager;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -40,9 +37,13 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
         this.blockDataManager = new ServerStructureBlockDataManager(server);
     }
 
+    private static BlockPos getEndPos(BlockPos startPos, Vec3i size) {
+        return startPos.add(new Vec3i(size.getX() - 1, size.getY() - 1, size.getZ() - 1));
+    }
+
     @Override
     public void tick(ServerPlayerEntity player) {
-        if(!initialized) {
+        if (!initialized) {
             if (blueprints.isEmpty()) readDefaultBlueprints();
 
             final ClientboundResetBlueprintPacket resetpacket = new ClientboundResetBlueprintPacket();
@@ -72,28 +73,11 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
 
     private void readDefaultBlueprints() {
         blueprintMetadataReader.read();
+        var i = 0;
         for (BlueprintMetadata metadata : blueprintMetadataReader.getPredefinedBlueprints()) {
             final String blueprintId = metadata.getId();
             blueprints.put(blueprintId, metadata);
         }
-    }
-
-    @Override
-    public void update(String blueprintId, NbtCompound tag, int newFloorLevel) {
-        final var oldBlueprintMetadata = blueprints.get(blueprintId);
-        final var newBlueprintMetadata = new BlueprintMetadata(
-                oldBlueprintMetadata.getName(),
-                blueprintId,
-                newFloorLevel,
-                oldBlueprintMetadata.getCapacity(),
-                oldBlueprintMetadata.getGroup()
-        );
-
-        blueprints.put(blueprintId, newBlueprintMetadata);
-        blockDataManager.addOrUpdate(blueprintId, tag);
-
-        final FortressS2CPacket packet = new ClientboundSyncBlueprintPacket(newBlueprintMetadata, tag);
-        scheduledSyncs.add(packet);
     }
 
     @Override
@@ -140,8 +124,31 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
         return new BlueprintDigTask(taskId, startPos, endPos);
     }
 
-    private static BlockPos getEndPos(BlockPos startPos, Vec3i size) {
-        return startPos.add(new Vec3i(size.getX()-1, size.getY()-1, size.getZ()-1));
+    @Override
+    public void update(String blueprintId, String blueprintName, BlueprintGroup group, NbtCompound tag, int newFloorLevel) {
+        final var obm = blueprints.computeIfAbsent(
+                blueprintId,
+                id -> new BlueprintMetadata(
+                        blueprintName,
+                        id,
+                        0,
+                        10,
+                        group
+                )
+        );
+        final var newBlueprintMetadata = new BlueprintMetadata(
+                obm.getName(),
+                blueprintId,
+                newFloorLevel,
+                obm.getCapacity(),
+                obm.getGroup()
+        );
+
+        blueprints.put(blueprintId, newBlueprintMetadata);
+        blockDataManager.addOrUpdate(blueprintId, tag);
+
+        final FortressS2CPacket packet = new ClientboundSyncBlueprintPacket(newBlueprintMetadata, tag);
+        scheduledSyncs.add(packet);
     }
 
     @Override

@@ -154,10 +154,12 @@ public class BlueprintsWorld implements IBlueprintsWorld {
                 .with(flatChunkGeneratorLayers, Optional.empty(), biomeRegistry.getEntry(BiomeKeys.PLAINS).orElseThrow());
     }
 
-    public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel, BlueprintGroup group) {
+    @Override
+    public void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintId, String blueprintName, int floorLevel, BlueprintGroup group) {
         this.preparedBlueprintData = blueprintData;
         final var world = getWorld();
-        world.setFileName(blueprintFileName);
+        world.setBlueprintId(blueprintId);
+        world.setBlueprintName(blueprintName);
         world.setFloorLevel(floorLevel);
         world.setBlueprintGroup(group);
     }

@@ -12,7 +12,8 @@ import java.util.Map;
 public interface IBlueprintsWorld {
 
     void clearBlueprint(ServerPlayerEntity player);
-    void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintFileName, int floorLevel, BlueprintGroup group);
+
+    void prepareBlueprint(Map<BlockPos, BlockState> blueprintData, String blueprintId, String blueprintName, int floorLevel, BlueprintGroup group);
     IBlueprintEditingWorld getWorld();
     void putBlueprintInAWorld(final ServerPlayerEntity player, Vec3i blueprintSize);
     void closeSession();
