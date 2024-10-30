@@ -10,10 +10,12 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkH
 
 public class RemoveBlueprintScreen extends Screen {
 
+    private final String id;
     private final String name;
 
-    public RemoveBlueprintScreen(String name) {
+    public RemoveBlueprintScreen(String blueprintId, String name) {
         super(Text.literal("Remove Blueprint"));
+        this.id = blueprintId;
         this.name = name;
     }
 
@@ -24,8 +26,9 @@ public class RemoveBlueprintScreen extends Screen {
                 .builder(
                         Text.literal("Yes"),
                         button -> {
-                            final var removePacket = ServerboundEditBlueprintPacket.remove(name);
-                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_REMOVE_BLUEPRINT, removePacket);
+                            final var removePacket = ServerboundEditBlueprintPacket.remove(id);
+                            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, removePacket);
+                            this.client.setScreen(new BlueprintsScreen());
                         }
                 )
                 .dimensions(this.width / 2 - 102, this.height / 4 + 48 - 16, 102, 20)
@@ -34,9 +37,7 @@ public class RemoveBlueprintScreen extends Screen {
         final var noBtn = ButtonWidget
                 .builder(
                         Text.literal("No"),
-                        button -> {
-                            this.client.setScreen(new BlueprintsScreen());
-                        }
+                        button -> this.client.setScreen(new BlueprintsScreen())
                 )
                 .dimensions(this.width / 2, this.height / 4 + 48 - 16, 102, 20)
                 .build();
@@ -47,7 +48,7 @@ public class RemoveBlueprintScreen extends Screen {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width/2, 40, 0xFFFFFF);
-        drawContext.drawCenteredTextWithShadow(this.textRenderer, Text.literal(String.format("Do you want to delete blueprint: %s", name)), 60, 30, 0xFFFFFF);
+        drawContext.drawCenteredTextWithShadow(this.textRenderer, Text.literal(String.format("Do you want to delete blueprint: %s", name)), this.width / 2, 60, 0xFFFFFF);
         super.render(drawContext, mouseX, mouseY, delta);
     }
 

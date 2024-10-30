@@ -24,6 +24,7 @@ import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
 import org.minefortress.utils.ModUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 public final class BlueprintsScreen extends Screen {
 
@@ -150,7 +151,12 @@ public final class BlueprintsScreen extends Screen {
         if(button == 1) {
             if(this.handler.hasFocusedSlot()) {
                 if(sneakButtonDown) {
-                    this.handler.sendRemovePacket();
+                    Optional.ofNullable(this.client)
+                            .ifPresent(it -> {
+                                final var metadata = handler.getFocusedSlot().getMetadata();
+                                it.setScreen(new RemoveBlueprintScreen(metadata.getId(), metadata.getName()));
+                            });
+
                 } else {
                     this.handler.sendEditPacket();
                     if(client != null) {
