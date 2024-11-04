@@ -4,13 +4,12 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintRequirement;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public interface IEssentialBuildingInfo {
-    Optional<BlueprintRequirement> getRequirement();
+    BlueprintRequirement getRequirement();
     BlockPos getStart();
 
     BlockPos getEnd();
@@ -19,19 +18,18 @@ public interface IEssentialBuildingInfo {
 
     UUID getId();
 
-    @NotNull Optional<String> getBlueprintId();
+    String getBlueprintId();
 
     int getHealth();
 
     void write(PacketByteBuf buffer);
 
     default boolean satisfiesRequirement(ProfessionType type, int level) {
-        return getRequirement()
-                .map(it -> Optional
-                        .ofNullable(it.getType())
-                        .map(t -> t.equals(type))
-                        .orElse(false)
-                        && it.getLevel() >= level)
-                .orElse(false);
+        final var requirement = getRequirement();
+        return Optional
+                .ofNullable(requirement.getType())
+                .map(t -> t.equals(type))
+                .orElse(false)
+                && requirement.getLevel() >= level;
     }
 }

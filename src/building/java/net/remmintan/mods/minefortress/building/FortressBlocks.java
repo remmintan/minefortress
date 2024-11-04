@@ -11,19 +11,29 @@ import net.minecraft.util.Identifier;
 
 public class FortressBlocks {
 
-    public static final Block SCAFFOLD_OAK_PLANKS = new FortressScaffoldBlock();
+    public static Block SCAFFOLD_OAK_PLANKS;
+    public static Block FORTRESS_BUILDING;
 
     public static BlockEntityType<FortressScaffoldBlockEntity> SCAFFOLD_ENT_TYPE;
+    public static BlockEntityType<BuildingBlockEntity> BUILDING_ENT_TYPE;
 
     public static void register() {
-        final var id = Identifier.of("minefortress", "scaffold_oak_planks");
-        Registry.register(Registries.BLOCK, id, FortressBlocks.SCAFFOLD_OAK_PLANKS);
+        final var scaffoldId = Identifier.of("minefortress", "scaffold_oak_planks");
+        SCAFFOLD_OAK_PLANKS = Registry.register(Registries.BLOCK, scaffoldId, new FortressScaffoldBlock());
         FlammableBlockRegistry.getInstance(Blocks.FIRE).add(FortressBlocks.SCAFFOLD_OAK_PLANKS, 5, 20);
-
         SCAFFOLD_ENT_TYPE = Registry.register(
                 Registries.BLOCK_ENTITY_TYPE,
-                id,
+                scaffoldId,
                 FabricBlockEntityTypeBuilder.create(FortressScaffoldBlockEntity::new, SCAFFOLD_OAK_PLANKS).build()
+        );
+
+
+        final var buildingId = Identifier.of("minefortress", "building");
+        FORTRESS_BUILDING = Registry.register(Registries.BLOCK, buildingId, new BuildingBlock());
+        BUILDING_ENT_TYPE = Registry.register(
+                Registries.BLOCK_ENTITY_TYPE,
+                buildingId,
+                FabricBlockEntityTypeBuilder.create(BuildingBlockEntity::new).build()
         );
     }
 }

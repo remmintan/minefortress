@@ -9,7 +9,6 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.resource.DataConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -18,7 +17,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -67,23 +65,6 @@ public class BlueprintsWorld implements IBlueprintsWorld {
             DataConfiguration.SAFE_MODE);
     private static final Identifier BLUEPRINTS_WORLD_ID = new Identifier("blueprints");
     public static final RegistryKey<World> BLUEPRINTS_WORLD_REGISTRY_KEY = RegistryKey.of(RegistryKeys.WORLD, BLUEPRINTS_WORLD_ID);
-    private static final DimensionType BLUEPRINT_DIMENSION_TYPE = new DimensionType(
-            OptionalLong.of(10000),
-            true,
-            false,
-            false,
-            false,
-            1,
-            false,
-            true,
-            0,
-            32,
-            16,
-            BlockTags.INFINIBURN_OVERWORLD,
-            BLUEPRINTS_WORLD_ID,
-            0.0f,
-            new DimensionType.MonsterSettings(false, false, UniformIntProvider.create(0, 7), 0)
-    );
 
     private FortressServerWorld world;
     private final MinecraftServer server;

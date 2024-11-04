@@ -21,8 +21,11 @@ sourceSets {
 	core {
 		compileClasspath += main.compileClasspath
 	}
-	building {
+	gui {
 		compileClasspath += main.compileClasspath + core.output
+	}
+	building {
+		compileClasspath += main.compileClasspath + core.output + gui.output
 	}
 	networking {
 		compileClasspath += main.compileClasspath + core.output + building.output
@@ -34,8 +37,8 @@ sourceSets {
 		compileClasspath += main.compileClasspath + core.output + selections.output + building.output
 	}
 	main {
-		compileClasspath += core.output + networking.output + building.output + panama.output + selections.output
-		runtimeClasspath += core.output + networking.output + building.output + panama.output + selections.output
+		compileClasspath += core.output + networking.output + building.output + panama.output + selections.output + gui.output
+		runtimeClasspath += core.output + networking.output + building.output + panama.output + selections.output + gui.output
 	}
 }
 

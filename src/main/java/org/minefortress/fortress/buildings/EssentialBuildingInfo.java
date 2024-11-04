@@ -12,8 +12,6 @@ import java.util.UUID;
 
 public class EssentialBuildingInfo implements IEssentialBuildingInfo {
 
-    public static final String DEFAULT_BLUEPRINT_ID = "default-file-36d9a49d-4d47-45c8-9201-23d71e156da1";
-
     private final UUID id;
     private final BlockPos start;
     private final BlockPos end;
@@ -32,7 +30,7 @@ public class EssentialBuildingInfo implements IEssentialBuildingInfo {
         this.start = start.toImmutable();
         this.end = end.toImmutable();
         this.bedsCount = bedsCount;
-        this.blueprintId = Optional.ofNullable(blueprintId).orElse(DEFAULT_BLUEPRINT_ID);
+        this.blueprintId = Optional.ofNullable(blueprintId).orElse("unknown");
         this.health = health;
     }
 
@@ -67,9 +65,8 @@ public class EssentialBuildingInfo implements IEssentialBuildingInfo {
 
     @Override
     @NotNull
-    public Optional<String> getBlueprintId() {
-        if(blueprintId.equals(DEFAULT_BLUEPRINT_ID)) return Optional.empty();
-        return Optional.of(blueprintId);
+    public String getBlueprintId() {
+        return blueprintId;
     }
 
     @Override
@@ -88,7 +85,7 @@ public class EssentialBuildingInfo implements IEssentialBuildingInfo {
     }
 
     @Override
-    public Optional<BlueprintRequirement> getRequirement() {
-        return getBlueprintId().map(BlueprintRequirement::new);
+    public BlueprintRequirement getRequirement() {
+        return new BlueprintRequirement(blueprintId);
     }
 }

@@ -268,7 +268,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     @Override
     public Optional<String> getHoveredBuildingName() {
         return getHoveredBuilding()
-                .flatMap(IEssentialBuildingInfo::getBlueprintId)
+                .map(IEssentialBuildingInfo::getBlueprintId)
                 .flatMap(it -> ModUtils.getBlueprintManager().getBlueprintMetadataManager().getByBlueprintId(it))
                 .map(BlueprintMetadata::getName);
     }

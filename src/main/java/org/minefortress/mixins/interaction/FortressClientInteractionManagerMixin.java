@@ -24,7 +24,6 @@ import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressMan
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.MineFortressMod;
-import org.minefortress.renderer.gui.fortress.ManageBuildingScreen;
 import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -131,8 +130,8 @@ public abstract class FortressClientInteractionManagerMixin {
         fortressManager
                 .getHoveredBuilding()
                 .ifPresent(it -> {
-                    final var manageBuildingScreen = new ManageBuildingScreen(it);
-                    MinecraftClient.getInstance().setScreen(manageBuildingScreen);
+//                    final var manageBuildingScreen = new ManageBuildingScreen(it);
+//                    MinecraftClient.getInstance().setScreen(manageBuildingScreen);
                 });
     }
 
