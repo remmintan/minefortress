@@ -56,8 +56,8 @@ public class FortressFishingBobberEntityRenderer extends EntityRenderer<Fortress
             float h = pawnOwner.getHandSwingProgress(g);
             float k = MathHelper.sin(MathHelper.sqrt(h) * 3.1415927F);
             float l = MathHelper.lerp(g, pawnOwner.prevBodyYaw, pawnOwner.bodyYaw) * 0.017453292F;
-            double d = (double)MathHelper.sin(l);
-            double e = (double)MathHelper.cos(l);
+            double d = MathHelper.sin(l);
+            double e = MathHelper.cos(l);
             double m = (double)j * 0.35;
             double n = 0.8;
             double o;
@@ -66,15 +66,15 @@ public class FortressFishingBobberEntityRenderer extends EntityRenderer<Fortress
             float r;
             double s;
 
-            o = MathHelper.lerp((double)g, pawnOwner.prevX, pawnOwner.getX()) - e * m - d * 0.8;
+            o = MathHelper.lerp(g, pawnOwner.prevX, pawnOwner.getX()) - e * m - d * 0.8;
             p = pawnOwner.prevY + (double)pawnOwner.getStandingEyeHeight() + (pawnOwner.getY() - pawnOwner.prevY) * (double)g - 0.45;
-            q = MathHelper.lerp((double)g, pawnOwner.prevZ, pawnOwner.getZ()) - d * m + e * 0.8;
+            q = MathHelper.lerp(g, pawnOwner.prevZ, pawnOwner.getZ()) - d * m + e * 0.8;
             r = pawnOwner.isInSneakingPose() ? -0.1875F : 0.0F;
 
 
-            s = MathHelper.lerp((double)g, fishingBobberEntity.prevX, fishingBobberEntity.getX());
-            double t = MathHelper.lerp((double)g, fishingBobberEntity.prevY, fishingBobberEntity.getY()) + 0.25;
-            double u = MathHelper.lerp((double)g, fishingBobberEntity.prevZ, fishingBobberEntity.getZ());
+            s = MathHelper.lerp(g, fishingBobberEntity.prevX, fishingBobberEntity.getX());
+            double t = MathHelper.lerp(g, fishingBobberEntity.prevY, fishingBobberEntity.getY()) + 0.25;
+            double u = MathHelper.lerp(g, fishingBobberEntity.prevZ, fishingBobberEntity.getZ());
             float v = (float)(o - s);
             float w = (float)(p - t) + r;
             float x = (float)(q - u);

@@ -18,8 +18,6 @@ import org.minefortress.utils.ModUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-;
-
 public class ImportExportBlueprintsScreen extends Screen {
 
     private static final Text DEFAULT_LABEL = Text.literal("Import/Export Blueprints");

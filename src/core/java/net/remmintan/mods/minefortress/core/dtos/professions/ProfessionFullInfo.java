@@ -1,7 +1,5 @@
 package net.remmintan.mods.minefortress.core.dtos.professions;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -63,13 +61,6 @@ public record ProfessionFullInfo(
         } else {
             packet.writeInt(-1);
             packet.writeVarInt(0);
-        }
-    }
-
-    public record BlockRequirement(Block block, boolean inBlueprint) {
-        @Override
-        public Block block() {
-            return Optional.ofNullable(block).orElse(Blocks.AIR);
         }
     }
 

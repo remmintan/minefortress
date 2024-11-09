@@ -73,7 +73,6 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
 
     private void readDefaultBlueprints() {
         blueprintMetadataReader.read();
-        var i = 0;
         for (BlueprintMetadata metadata : blueprintMetadataReader.getPredefinedBlueprints()) {
             final String blueprintId = metadata.getId();
             blueprints.put(blueprintId, metadata);

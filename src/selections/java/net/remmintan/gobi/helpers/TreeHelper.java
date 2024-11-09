@@ -141,8 +141,8 @@ public class TreeHelper {
     }
 
     public static void removeTheRestOfATree(IWorkerPawn pawn, TreeBlocks tree, ServerWorld world) {
-        tree.getTreeBlocks().forEach(blockPos -> removeBlockAddDropToTheResources(pawn, world, blockPos));
-        tree.getLeavesBlocks().forEach(blockPos -> removeBlockAddDropToTheResources(pawn, world, blockPos));
+        tree.treeBlocks().forEach(blockPos -> removeBlockAddDropToTheResources(pawn, world, blockPos));
+        tree.leavesBlocks().forEach(blockPos -> removeBlockAddDropToTheResources(pawn, world, blockPos));
     }
 
     private static void removeBlockAddDropToTheResources(IWorkerPawn pawn, ServerWorld world, BlockPos blockPos) {
@@ -151,6 +151,7 @@ public class TreeHelper {
         world.emitGameEvent((Entity) pawn, GameEvent.BLOCK_DESTROY, blockPos);
     }
 
-    record TreeInfo(int logsCount, BlockPos highestLeaf) {}
+    public record TreeInfo(int logsCount, BlockPos highestLeaf) {
+    }
 
 }

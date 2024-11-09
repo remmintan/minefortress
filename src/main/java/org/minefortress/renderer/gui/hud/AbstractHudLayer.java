@@ -3,7 +3,6 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.item.ItemRenderer;
 import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
 import org.minefortress.renderer.gui.hud.interfaces.IHudElement;
 import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
@@ -18,7 +17,6 @@ public abstract class AbstractHudLayer implements IHudLayer {
     private final List<IHudElement> fortressHudElements = new ArrayList<>();
 
     protected final MinecraftClient client;
-    protected final ItemRenderer itemRenderer;
     protected final TextRenderer textRenderer;
 
     private Integer basepointX;
@@ -30,7 +28,6 @@ public abstract class AbstractHudLayer implements IHudLayer {
 
     protected AbstractHudLayer(MinecraftClient client) {
         this.client = client;
-        this.itemRenderer = client.getItemRenderer();
         this.textRenderer = client.textRenderer;
     }
 

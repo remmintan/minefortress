@@ -28,11 +28,6 @@ public class LadderSelection extends TwoDotsSelection{
     }
 
     @Override
-    public List<BlockPos> getSelection() {
-        return super.getSelection();
-    }
-
-    @Override
     protected ISelectionType getSelectionType() {
         return SelectionType.LADDER;
     }

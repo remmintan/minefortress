@@ -32,7 +32,7 @@ public class SimpleSelectionTask extends AbstractTask {
     private final ServerSelectionType selectionType;
 
     private Item placingItem;
-    private List<BlockPos> positions;
+    private final List<BlockPos> positions;
 
     public SimpleSelectionTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, HitResult hitResult, ServerSelectionType selectionType, List<BlockPos> positions) {
         super(id, taskType, startingBlock, endingBlock);

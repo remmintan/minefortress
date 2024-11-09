@@ -2,8 +2,8 @@ package org.minefortress.entity.ai.controls;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
-import org.minefortress.entity.Colonist;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
+import org.minefortress.entity.Colonist;
 
 abstract class PositionedActionControl  {
 
@@ -18,10 +18,6 @@ abstract class PositionedActionControl  {
     }
 
     public abstract void tick();
-
-    public boolean isWorking() {
-        return goal != null;
-    }
 
     public boolean isDone() {
         return goal == null;

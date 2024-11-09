@@ -120,18 +120,8 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
     }
 
     @Override
-    public boolean isSelected() {
-        return super.isSelected();
-    }
-
-    @Override
     public void setPos(int x, int y) {
         this.setX(x);
         this.setY(y);
-    }
-
-    @Override
-    public boolean isHovered() {
-        return super.isHovered();
     }
 }

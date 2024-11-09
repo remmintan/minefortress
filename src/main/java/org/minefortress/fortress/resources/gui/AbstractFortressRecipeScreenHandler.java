@@ -165,10 +165,9 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public void fillInputSlots(boolean craftAll, RecipeEntry<?> recipe, ServerPlayerEntity player) {
-        new FortressInputSlotFiller(this).fillInputSlots(player, (RecipeEntry<?>) recipe, craftAll);
+        new FortressInputSlotFiller(this).fillInputSlots(player, recipe, craftAll);
     }
 
     protected abstract T getInput();
@@ -243,11 +242,6 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
             if(handler.virtualInventory != null)
                 handler.virtualInventory.set(this.getIndex(), stack);
             super.setStackNoCallbacks(stack);
-        }
-
-        @Override
-        public ItemStack getStack() {
-            return super.getStack();
         }
 
         @Override

@@ -20,7 +20,7 @@ public abstract class FortressPlayerInventoryMixin {
     @Shadow @Final public PlayerEntity player;
 
     @Inject(method = "populateRecipeFinder", at = @At("HEAD"), cancellable = true)
-    void populateFinder(RecipeMatcher finder, CallbackInfo ci) {;
+    void populateFinder(RecipeMatcher finder, CallbackInfo ci) {
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             final var player = (ServerPlayerEntity) this.player;
             final var server = (IFortressServer)player.getServer();

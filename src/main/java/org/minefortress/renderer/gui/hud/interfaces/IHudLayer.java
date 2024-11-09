@@ -9,7 +9,10 @@ public interface IHudLayer {
     void render(DrawContext drawContext, TextRenderer font, int screenWidth, int screenHeight, double mouseX, double mouseY, float delta);
     boolean shouldRender(HudState hudState);
     default void onClick(double mouseX, double mouseY) {}
-    default void tick() {};
+
+    default void tick() {
+    }
+
     boolean isHovered();
 
 }

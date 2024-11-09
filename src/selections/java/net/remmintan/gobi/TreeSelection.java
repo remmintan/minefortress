@@ -145,8 +145,8 @@ public class TreeSelection extends Selection {
                 treeRoots.remove(root);
             } else {
                 final TreeBlocks tree = treeBlocks.get();
-                this.selectedTreeBlocks.addAll(tree.getTreeBlocks());
-                this.selectedTreeBlocks.addAll(tree.getLeavesBlocks());
+                this.selectedTreeBlocks.addAll(tree.treeBlocks());
+                this.selectedTreeBlocks.addAll(tree.leavesBlocks());
             }
         }
     }

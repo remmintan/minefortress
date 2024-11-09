@@ -7,7 +7,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
-import net.minecraft.world.GameMode;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
@@ -42,10 +41,6 @@ public class ModUtils {
             return isFortressGamemode(player);
         }
         return false;
-    }
-
-    public static boolean isFortressGamemode(GameMode gameMode) {
-        return gameMode == MineFortressMod.FORTRESS;
     }
 
     public static IFortressMinecraftClient getFortressClient() {

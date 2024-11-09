@@ -84,7 +84,7 @@ public class FortressFishingBobberEntity extends ProjectileEntity {
         double e = thrower.getEyeY();
         double l = thrower.getZ() - (double)h * 0.3;
         this.refreshPositionAndAngles(d, e, l, g, f);
-        Vec3d vec3d = new Vec3d((double)(-i), (double)MathHelper.clamp(-(k / j), -5.0F, 5.0F), (double)(-h));
+        Vec3d vec3d = new Vec3d(-i, MathHelper.clamp(-(k / j), -5.0F, 5.0F), -h);
         double m = vec3d.length();
         vec3d = vec3d.multiply(0.6 / m + this.random.nextTriangular(0.5, 0.0103365), 0.6 / m + this.random.nextTriangular(0.5, 0.0103365), 0.6 / m + this.random.nextTriangular(0.5, 0.0103365));
         this.setVelocity(vec3d);
@@ -101,14 +101,14 @@ public class FortressFishingBobberEntity extends ProjectileEntity {
 
     public void onTrackedDataSet(TrackedData<?> data) {
         if (HOOK_ENTITY_ID.equals(data)) {
-            int i = (Integer)this.getDataTracker().get(HOOK_ENTITY_ID);
+            int i = this.getDataTracker().get(HOOK_ENTITY_ID);
             this.hookedEntity = i > 0 ? this.getWorld().getEntityById(i - 1) : null;
         }
 
         if (CAUGHT_FISH.equals(data)) {
-            this.caughtFish = (Boolean)this.getDataTracker().get(CAUGHT_FISH);
+            this.caughtFish = this.getDataTracker().get(CAUGHT_FISH);
             if (this.caughtFish) {
-                this.setVelocity(this.getVelocity().x, (double)(-0.4F * MathHelper.nextFloat(this.velocityRandom, 0.6F, 1.0F)), this.getVelocity().z);
+                this.setVelocity(this.getVelocity().x, -0.4F * MathHelper.nextFloat(this.velocityRandom, 0.6F, 1.0F), this.getVelocity().z);
             }
         }
 
@@ -168,7 +168,7 @@ public class FortressFishingBobberEntity extends ProjectileEntity {
                         if (!this.hookedEntity.isRemoved() && this.hookedEntity.getWorld().getRegistryKey() == this.getWorld().getRegistryKey()) {
                             this.setPosition(this.hookedEntity.getX(), this.hookedEntity.getBodyY(0.8), this.hookedEntity.getZ());
                         } else {
-                            this.updateHookedEntityId((Entity)null);
+                            this.updateHookedEntityId(null);
                             this.state = FortressFishingBobberEntity.State.FLYING;
                         }
                     }
@@ -296,24 +296,24 @@ public class FortressFishingBobberEntity extends ProjectileEntity {
                     g = MathHelper.sin(f);
                     h = MathHelper.cos(f);
                     d = this.getX() + (double)(g * (float)this.fishTravelCountdown * 0.1F);
-                    e = (double)((float)MathHelper.floor(this.getY()) + 1.0F);
+                    e = (float) MathHelper.floor(this.getY()) + 1.0F;
                     j = this.getZ() + (double)(h * (float)this.fishTravelCountdown * 0.1F);
                     blockState = serverWorld.getBlockState(BlockPos.ofFloored(d, e - 1.0, j));
                     if (blockState.isOf(Blocks.WATER)) {
                         if (this.random.nextFloat() < 0.15F) {
-                            serverWorld.spawnParticles(ParticleTypes.BUBBLE, d, e - 0.10000000149011612, j, 1, (double)g, 0.1, (double)h, 0.0);
+                            serverWorld.spawnParticles(ParticleTypes.BUBBLE, d, e - 0.10000000149011612, j, 1, g, 0.1, h, 0.0);
                         }
 
                         float k = g * 0.04F;
                         float l = h * 0.04F;
-                        serverWorld.spawnParticles(ParticleTypes.FISHING, d, e, j, 0, (double)l, 0.01, (double)(-k), 1.0);
-                        serverWorld.spawnParticles(ParticleTypes.FISHING, d, e, j, 0, (double)(-l), 0.01, (double)k, 1.0);
+                        serverWorld.spawnParticles(ParticleTypes.FISHING, d, e, j, 0, l, 0.01, -k, 1.0);
+                        serverWorld.spawnParticles(ParticleTypes.FISHING, d, e, j, 0, -l, 0.01, k, 1.0);
                     }
                 } else {
                     this.playSound(SoundEvents.ENTITY_FISHING_BOBBER_SPLASH, 0.25F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
                     double m = this.getY() + 0.5;
-                    serverWorld.spawnParticles(ParticleTypes.BUBBLE, this.getX(), m, this.getZ(), (int)(1.0F + this.getWidth() * 20.0F), (double)this.getWidth(), 0.0, (double)this.getWidth(), 0.20000000298023224);
-                    serverWorld.spawnParticles(ParticleTypes.FISHING, this.getX(), m, this.getZ(), (int)(1.0F + this.getWidth() * 20.0F), (double)this.getWidth(), 0.0, (double)this.getWidth(), 0.20000000298023224);
+                    serverWorld.spawnParticles(ParticleTypes.BUBBLE, this.getX(), m, this.getZ(), (int) (1.0F + this.getWidth() * 20.0F), this.getWidth(), 0.0, this.getWidth(), 0.20000000298023224);
+                    serverWorld.spawnParticles(ParticleTypes.FISHING, this.getX(), m, this.getZ(), (int) (1.0F + this.getWidth() * 20.0F), this.getWidth(), 0.0, this.getWidth(), 0.20000000298023224);
                     this.hookCountdown = MathHelper.nextInt(this.random, 20, 40);
                     this.getDataTracker().set(CAUGHT_FISH, true);
                 }
@@ -332,7 +332,7 @@ public class FortressFishingBobberEntity extends ProjectileEntity {
                     g = MathHelper.nextFloat(this.random, 0.0F, 360.0F) * 0.017453292F;
                     h = MathHelper.nextFloat(this.random, 25.0F, 60.0F);
                     d = this.getX() + (double)(MathHelper.sin(g) * h) * 0.1;
-                    e = (double)((float)MathHelper.floor(this.getY()) + 1.0F);
+                    e = (float) MathHelper.floor(this.getY()) + 1.0F;
                     j = this.getZ() + (double)(MathHelper.cos(g) * h) * 0.1;
                     blockState = serverWorld.getBlockState(BlockPos.ofFloored(d, e - 1.0, j));
                     if (blockState.isOf(Blocks.WATER)) {
@@ -378,9 +378,9 @@ public class FortressFishingBobberEntity extends ProjectileEntity {
     }
 
     private FortressFishingBobberEntity.PositionType getPositionType(BlockPos start, BlockPos end) {
-        return (FortressFishingBobberEntity.PositionType)BlockPos.stream(start, end).map(this::getPositionType).reduce((positionType, positionType2) -> {
-            return positionType == positionType2 ? positionType : FortressFishingBobberEntity.PositionType.INVALID;
-        }).orElse(FortressFishingBobberEntity.PositionType.INVALID);
+        return BlockPos.stream(start, end).map(this::getPositionType).reduce((positionType, positionType2) -> {
+            return positionType == positionType2 ? positionType : PositionType.INVALID;
+        }).orElse(PositionType.INVALID);
     }
 
     private FortressFishingBobberEntity.PositionType getPositionType(BlockPos pos) {
@@ -510,7 +510,7 @@ public class FortressFishingBobberEntity extends ProjectileEntity {
         super.onSpawnPacket(packet);
         if (this.getPawnOwner() == null) {
             int i = packet.getEntityData();
-            LOGGER.error((String)"Failed to recreate fishing hook on client. {} (id: {}) is not a valid owner.", (Object)this.getWorld().getEntityById(i), (Object)i);
+            LOGGER.error("Failed to recreate fishing hook on client. {} (id: {}) is not a valid owner.", this.getWorld().getEntityById(i), i);
             this.kill();
         }
 
@@ -521,15 +521,15 @@ public class FortressFishingBobberEntity extends ProjectileEntity {
         CAUGHT_FISH = DataTracker.registerData(FortressFishingBobberEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 
-    static enum State {
+    enum State {
         FLYING,
         HOOKED_IN_ENTITY,
-        BOBBING;
+        BOBBING
     }
 
-    private static enum PositionType {
+    private enum PositionType {
         ABOVE_WATER,
         INSIDE_WATER,
-        INVALID;
+        INVALID
     }
 }

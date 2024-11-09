@@ -11,7 +11,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRIN
 
 class BuildingConfigurationScreenHandler(
     syncId: Int,
-    inventory: Inventory?,
+    ignoredInv: Inventory?,
     private val propertyDelegate: PropertyDelegate = ArrayPropertyDelegate(2)
 ) : ScreenHandler(BUILDING_CONFIGURATION_SCREEN_HANDLER_TYPE, syncId) {
 

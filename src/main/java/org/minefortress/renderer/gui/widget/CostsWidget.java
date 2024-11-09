@@ -5,7 +5,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import org.minefortress.utils.GuiUtils;
@@ -66,10 +65,6 @@ public class CostsWidget implements Drawable, Element {
     private static int getItemAmount(ItemStack stack) {
         final var fortressClientManager = ModUtils.getFortressClientManager();
         return fortressClientManager.getResourceManager().getItemAmount(stack.getItem());
-    }
-
-    private static ItemRenderer getItemRenderer() {
-        return MinecraftClient.getInstance().getItemRenderer();
     }
 
     private static TextRenderer getTextRenderer() {

@@ -24,7 +24,7 @@ abstract class AbstractHintsLayer  extends AbstractHudLayer implements IHintsLay
 
     protected Optional<String> getInfoText() {
         return Optional.empty();
-    };
+    }
 
     @Override
     protected final void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {

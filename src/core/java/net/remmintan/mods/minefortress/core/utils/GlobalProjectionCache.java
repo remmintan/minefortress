@@ -17,7 +17,7 @@ public class GlobalProjectionCache {
     private static Vec3d cachedPlayerPos = Vec3d.ZERO;
 
     // time
-    private static Map<String, Long> lastUpdateTimes = new ConcurrentHashMap<>();
+    private static final Map<String, Long> lastUpdateTimes = new ConcurrentHashMap<>();
 
     public static boolean shouldUpdateValues(String timeKey) {
         final var minecraft = MinecraftClient.getInstance();

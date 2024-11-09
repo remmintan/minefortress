@@ -55,8 +55,4 @@ public class DynamicTextButtonWidget extends ButtonWidget implements IHudButton 
         return anchorY;
     }
 
-    @Override
-    public boolean isHovered() {
-        return super.isHovered();
-    }
 }

@@ -215,15 +215,5 @@ public class FortressFurnaceScreenHandler extends AbstractFortressRecipeScreenHa
             stack.onCraft(this.player.getWorld(), this.player, this.amount);
             this.amount = 0;
         }
-
-        @Override
-        public int getMaxItemCount(ItemStack stack) {
-            return Integer.MAX_VALUE;
-        }
-
-        @Override
-        public int getMaxItemCount() {
-            return Integer.MAX_VALUE;
-        }
     }
 }
