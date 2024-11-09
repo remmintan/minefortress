@@ -19,7 +19,7 @@ fun MinecraftServer.getBlueprintWorld(): ServerWorld =
     this.getWorld(BLUEPRINT_DIMENSION_KEY) ?: error("Blueprint world not found")
 
 fun ServerWorld.prepareBlueprint(blueprintId: String?, blueprintName: String?, group: BlueprintGroup?) {
-    val poa = BlockPos(-1, 1, 0)
+    val poa = BlockPos(-1, 16, -1)
     this.setBlockState(poa, FortressBlocks.FORTRESS_BUILDING.defaultState)
     (this.getBlockEntity(poa) as BuildingBlockEntity).apply {
         this.blueprintId = blueprintId
@@ -49,6 +49,9 @@ fun ServerWorld.putBlueprintInAWorld(
             val offsetPos = pos
                 .down(defaultFloorLevel - floorLevel)
                 .add(-xOffset, 0, -zOffset)
+
+            if (this.getBlockState(pos).block == FortressBlocks.FORTRESS_BUILDING)
+                return@forEach
 
             blockState = if (blueprintData.containsKey(offsetPos)) {
                 blueprintData[offsetPos]

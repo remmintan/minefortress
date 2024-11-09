@@ -52,14 +52,14 @@ class BuildingBlockEntity(pos: BlockPos?, private val state: BlockState?) :
     override fun writeNbt(nbt: NbtCompound?) {
         super.writeNbt(nbt)
         nbt?.putString("blueprintId", blueprintId)
-        nbt?.putString("blueprintName", blueprintName)
+        if (blueprintName != null) nbt?.putString("blueprintName", blueprintName)
         nbt?.putInt("blueprintGroup", blueprintGroup.ordinal)
     }
 
     override fun readNbt(nbt: NbtCompound?) {
         super.readNbt(nbt)
         blueprintId = nbt?.getString("blueprintId")
-        blueprintName = nbt?.getString("blueprintName")
+        blueprintName = if (nbt?.contains("blueprintName") == true) nbt.getString("blueprintName") else null
         blueprintGroup = BlueprintGroup.entries[nbt?.getInt("blueprintGroup") ?: 0]
     }
 }

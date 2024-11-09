@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:overworld",
+  "type": "minefortress:blueprint_dimension_type",
   "generator": {
     "type": "minecraft:flat",
     "settings": {
