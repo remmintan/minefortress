@@ -47,7 +47,7 @@ public final class ModeHudLayer extends AbstractHudLayer{
 
     @Override
     public boolean shouldRender(HudState hudState) {
-        return hudState != HudState.BLANK && hudState != HudState.INITIALIZING;
+        return hudState != HudState.BLANK && hudState != HudState.INITIALIZING && hudState != HudState.BLUEPRINT_EDITING;
     }
 
 }
