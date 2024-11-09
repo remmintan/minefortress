@@ -1,99 +1,104 @@
-package net.remmintan.mods.minefortress.networking.c2s;
+package net.remmintan.mods.minefortress.networking.c2s
 
-import net.minecraft.block.BlockState;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintsWorld;
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
-import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.minecraft.network.PacketByteBuf
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.util.BlockRotation
+import net.minecraft.util.math.Vec3i
+import net.remmintan.mods.minefortress.blueprints.getBlueprintWorld
+import net.remmintan.mods.minefortress.blueprints.prepareBlueprint
+import net.remmintan.mods.minefortress.blueprints.putBlueprintInAWorld
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
 
-import java.util.HashMap;
-import java.util.Map;
+class ServerboundEditBlueprintPacket : FortressC2SPacket {
+    private val blueprintId: String?
+    private val blueprintName: String?
+    private val actionType: ActionType
+    private val floorLevel: Int
+    private val blueprintGroup: BlueprintGroup
 
-public class ServerboundEditBlueprintPacket implements FortressC2SPacket {
-
-    private final String blueprintId;
-    private final String blueprintName;
-    private final ActionType actionType;
-    private final int floorLevel;
-    private final BlueprintGroup blueprintGroup;
-
-    private ServerboundEditBlueprintPacket(String blueprintId, String blueprintName, int floorLevel, ActionType actionType, BlueprintGroup blueprintGroup) {
-        this.blueprintId = blueprintId;
-        this.blueprintName = blueprintName;
-        this.floorLevel = floorLevel;
-        this.actionType = actionType;
-        this.blueprintGroup = blueprintGroup;
+    private constructor(
+        blueprintId: String?,
+        blueprintName: String?,
+        floorLevel: Int,
+        actionType: ActionType,
+        blueprintGroup: BlueprintGroup
+    ) {
+        this.blueprintId = blueprintId
+        this.blueprintName = blueprintName
+        this.floorLevel = floorLevel
+        this.actionType = actionType
+        this.blueprintGroup = blueprintGroup
     }
 
-    public ServerboundEditBlueprintPacket(PacketByteBuf buf) {
-        this.blueprintId = buf.readNullable(PacketByteBuf::readString);
-        this.blueprintName = buf.readNullable(PacketByteBuf::readString);
-        this.floorLevel = buf.readInt();
-        this.blueprintGroup = buf.readEnumConstant(BlueprintGroup.class);
-        this.actionType = buf.readEnumConstant(ActionType.class);
-
+    constructor(buf: PacketByteBuf) {
+        this.blueprintId = buf.readNullable { obj: PacketByteBuf -> obj.readString() }
+        this.blueprintName = buf.readNullable { obj: PacketByteBuf -> obj.readString() }
+        this.floorLevel = buf.readInt()
+        this.blueprintGroup = buf.readEnumConstant(BlueprintGroup::class.java)
+        this.actionType = buf.readEnumConstant(
+            ActionType::class.java
+        )
     }
 
-    public static ServerboundEditBlueprintPacket edit(String id, int floorLevel, BlueprintGroup group) {
-        return new ServerboundEditBlueprintPacket(id, null, floorLevel, ActionType.EDIT, group);
+    override fun write(buf: PacketByteBuf) {
+        buf.writeNullable(this.blueprintId) { b, id -> b.writeString(id) }
+        buf.writeNullable(this.blueprintName) { b, name -> b.writeString(name) }
+        buf.writeInt(this.floorLevel)
+        buf.writeEnumConstant(blueprintGroup)
+        buf.writeEnumConstant(actionType)
     }
 
-    public static ServerboundEditBlueprintPacket add(String name, BlueprintGroup group) {
-        return new ServerboundEditBlueprintPacket(null, name, 0, ActionType.CREATE, group);
-    }
-
-    public static ServerboundEditBlueprintPacket remove(String id) {
-        return new ServerboundEditBlueprintPacket(id, null, 0, ActionType.REMOVE, BlueprintGroup.LIVING_HOUSES);
-    }
-
-    @Override
-    public void write(PacketByteBuf buf) {
-        buf.writeNullable(this.blueprintId, PacketByteBuf::writeString);
-        buf.writeNullable(this.blueprintName, PacketByteBuf::writeString);
-        buf.writeInt(this.floorLevel);
-        buf.writeEnumConstant(blueprintGroup);
-        buf.writeEnumConstant(actionType);
-    }
-
-    @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        if(server instanceof IFortressServer fortressServer) {
-            if(player instanceof FortressServerPlayerEntity fortressPlayer) {
+    override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
+        if (server is IFortressServer) {
+            if (player is FortressServerPlayerEntity) {
                 if (actionType == ActionType.REMOVE) {
-                    fortressPlayer.get_ServerBlueprintManager().remove(blueprintId);
+                    player._ServerBlueprintManager.remove(blueprintId)
                 } else {
-                    final IBlueprintsWorld blueprintsWorld = fortressServer.get_BlueprintsWorld();
+                    val blueprintsWorld = server.getBlueprintWorld()
                     if (actionType == ActionType.EDIT) {
-                        final var blockData = fortressPlayer
-                                .get_ServerBlueprintManager()
-                                .getBlockDataManager()
-                                .getBlockData(blueprintId, BlockRotation.NONE);
-                        final Map<BlockPos, BlockState> blueprintData = blockData
-                                .getLayer(BlueprintDataLayer.GENERAL);
+                        val blockData: IStructureBlockData = player
+                            ._ServerBlueprintManager
+                            .blockDataManager
+                            .getBlockData(blueprintId, BlockRotation.NONE)
+                        val blueprintData = blockData
+                            .getLayer(BlueprintDataLayer.GENERAL)
 
-                        blueprintsWorld.prepareBlueprint(blueprintData, blueprintId, blueprintName, floorLevel, blueprintGroup);
-                        blueprintsWorld.putBlueprintInAWorld(player, blockData.getSize());
+                        blueprintsWorld.prepareBlueprint(blueprintId, blueprintName, blueprintGroup)
+                        blueprintsWorld.putBlueprintInAWorld(blueprintData, player, blockData.size, floorLevel)
                     } else if (actionType == ActionType.CREATE) {
-                        blueprintsWorld.prepareBlueprint(new HashMap<>(), blueprintId, blueprintName, floorLevel, blueprintGroup);
-                        blueprintsWorld.putBlueprintInAWorld(player, new Vec3i(1, 1, 1));
+                        blueprintsWorld.prepareBlueprint(blueprintId, blueprintName, blueprintGroup)
+                        blueprintsWorld.putBlueprintInAWorld(HashMap(), player, Vec3i(1, 1, 1), floorLevel)
                     }
-                    player.moveToWorld((ServerWorld) blueprintsWorld.getWorld());
+                    player.moveToWorld(blueprintsWorld)
                 }
             }
         }
     }
 
-    private enum ActionType {
+    private enum class ActionType {
         EDIT, CREATE, REMOVE
     }
 
+    companion object {
+        @JvmStatic
+        fun edit(id: String?, floorLevel: Int, group: BlueprintGroup): ServerboundEditBlueprintPacket {
+            return ServerboundEditBlueprintPacket(id, null, floorLevel, ActionType.EDIT, group)
+        }
+
+        @JvmStatic
+        fun add(name: String?, group: BlueprintGroup): ServerboundEditBlueprintPacket {
+            return ServerboundEditBlueprintPacket(null, name, 0, ActionType.CREATE, group)
+        }
+
+        @JvmStatic
+        fun remove(id: String?): ServerboundEditBlueprintPacket {
+            return ServerboundEditBlueprintPacket(id, null, 0, ActionType.REMOVE, BlueprintGroup.LIVING_HOUSES)
+        }
+    }
 }

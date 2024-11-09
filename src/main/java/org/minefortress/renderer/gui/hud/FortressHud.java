@@ -5,7 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
-import org.minefortress.blueprints.world.BlueprintsWorld;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import org.minefortress.renderer.gui.hud.hints.*;
 import org.minefortress.renderer.gui.hud.interfaces.IHintsLayer;
 import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
@@ -110,7 +110,8 @@ public class FortressHud {
         if(fortressClientManager.isCenterNotSet()) return HudState.INITIALIZING;
 
         if(ModUtils.getBlueprintManager().isSelecting()) return HudState.BLUEPRINT;
-        if(BlueprintsWorld.isBlueprintsWorld(client.world)) return HudState.BLUEPRINT_EDITING;
+        if (client.world != null && client.world.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY())
+            return HudState.BLUEPRINT_EDITING;
 
         return switch (ModUtils.getFortressClientManager().getState()) {
             case BUILD_EDITING, BUILD_SELECTION -> HudState.BUILD;

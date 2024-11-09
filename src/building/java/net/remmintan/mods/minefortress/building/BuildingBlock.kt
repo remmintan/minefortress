@@ -17,7 +17,7 @@ import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintsWorld
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
 
 val PROFESSIONS_TYPE_PROP = EnumProperty.of("profession", ProfessionType::class.java)
 val CAPACITY_PROP = IntProperty.of("capacity", 0, 30)
@@ -25,7 +25,7 @@ val CAPACITY_PROP = IntProperty.of("capacity", 0, 30)
 class BuildingBlock : BlockWithEntity(FabricBlockSettings
     .create()
     .dropsNothing()
-    .solidBlock { _, world, _ -> world is IBlueprintsWorld }
+    .solidBlock { _, world, _ -> world is World && world.registryKey == BLUEPRINT_DIMENSION_KEY }
 ) {
 
     init {

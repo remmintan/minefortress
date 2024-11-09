@@ -21,6 +21,7 @@ import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.remmintan.gobi.SelectionManager;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
@@ -34,7 +35,6 @@ import net.remmintan.panama.renderer.*;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
-import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.fight.ClientPawnsSelectionManager;
 import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.ClientFortressManager;
@@ -82,7 +82,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Unique
     private AreasClientManager areasClientManager;
 
-    private IClientPawnsSelectionManager pawnsSelectionManager = new ClientPawnsSelectionManager();
+    private final IClientPawnsSelectionManager pawnsSelectionManager = new ClientPawnsSelectionManager();
 
     @Shadow
     @Final
@@ -237,7 +237,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method = "openGameMenu", at = @At("HEAD"), cancellable = true)
     public void openGameMenu(boolean pauseOnly, CallbackInfo ci) {
-        if(this.world != null && this.world.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
+        if (this.world != null && this.world.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY()) {
             final boolean localServer = this.isIntegratedServerRunning() && (this.server == null || !this.server.isRemote());
             if (localServer) {
                 this.setScreen(new BlueprintsPauseScreen(!pauseOnly));

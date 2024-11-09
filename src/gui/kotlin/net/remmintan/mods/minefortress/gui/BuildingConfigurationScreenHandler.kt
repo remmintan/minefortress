@@ -7,7 +7,7 @@ import net.minecraft.screen.ArrayPropertyDelegate
 import net.minecraft.screen.PropertyDelegate
 import net.minecraft.screen.ScreenHandler
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintsWorld
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
 
 class BuildingConfigurationScreenHandler(
     syncId: Int,
@@ -23,7 +23,7 @@ class BuildingConfigurationScreenHandler(
         TODO("Not yet implemented")
     }
 
-    override fun canUse(player: PlayerEntity?): Boolean = player?.world is IBlueprintsWorld
+    override fun canUse(player: PlayerEntity?): Boolean = player?.world?.registryKey == BLUEPRINT_DIMENSION_KEY
 
     fun getCapacity() = propertyDelegate[0]
     fun setCapacity(value: Int) = propertyDelegate.set(0, value)

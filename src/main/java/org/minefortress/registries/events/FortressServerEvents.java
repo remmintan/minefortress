@@ -7,9 +7,9 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.interfaces.FortressWorldCreator;
 import org.minefortress.utils.ModUtils;
 
@@ -59,7 +59,7 @@ public class FortressServerEvents {
         });
 
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-            final var inBlueprintWorldOnDisconnect = handler.player.getWorld().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY;
+            final var inBlueprintWorldOnDisconnect = handler.player.getWorld().getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY();
             if(handler.player instanceof FortressServerPlayerEntity fortressPlayer) {
                 fortressPlayer.set_WasInBlueprintWorldWhenLoggedOut(inBlueprintWorldOnDisconnect);
             }
@@ -79,7 +79,6 @@ public class FortressServerEvents {
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
             if(server instanceof IFortressServer aserver) {
                 aserver.get_FortressModServerManager().save();
-                aserver.get_BlueprintsWorld().closeSession();
             }
         });
 

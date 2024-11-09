@@ -13,11 +13,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
-import org.minefortress.blueprints.world.BlueprintsWorld;
 import org.minefortress.utils.FortressSpawnLocating;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -104,7 +104,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method="getTeleportTarget", at=@At("HEAD"), cancellable = true)
     public void getTeleportTarget(ServerWorld destination, CallbackInfoReturnable<TeleportTarget> cir) {
-        if(destination.getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY) {
+        if (destination.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY()) {
             this.persistedPos = this.getPos();
             this.persistedVelocity = this.getVelocity();
             this.persistedPitch = this.getPitch();
@@ -116,7 +116,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
             cir.setReturnValue(teleportTarget);
         }
 
-        if(this.getWorld().getRegistryKey() == BlueprintsWorld.BLUEPRINTS_WORLD_REGISTRY_KEY && destination.getRegistryKey() == World.OVERWORLD) {
+        if (this.getWorld().getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY() && destination.getRegistryKey() == World.OVERWORLD) {
             final Vec3d position = this.persistedPos;
             final Vec3d velocity = this.persistedVelocity;
             final TeleportTarget teleportTarget = new TeleportTarget(position, velocity, this.persistedYaw, this.persistedPitch);

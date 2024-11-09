@@ -4,11 +4,13 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.screen.NamedScreenHandlerFactory
 import net.minecraft.screen.PropertyDelegate
 import net.minecraft.screen.ScreenHandler
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.gui.BuildingConfigurationScreenHandler
 
@@ -37,10 +39,27 @@ class BuildingBlockEntity(pos: BlockPos?, private val state: BlockState?) :
         override fun size(): Int = 2
     }
 
+    var blueprintId: String? = null
+    var blueprintName: String? = null
+    var blueprintGroup: BlueprintGroup = BlueprintGroup.LIVING_HOUSES
+
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
         return BuildingConfigurationScreenHandler(syncId, playerInventory, propertyDelegate)
     }
 
-
     override fun getDisplayName(): Text = Text.of("Building configuration")
+
+    override fun writeNbt(nbt: NbtCompound?) {
+        super.writeNbt(nbt)
+        nbt?.putString("blueprintId", blueprintId)
+        nbt?.putString("blueprintName", blueprintName)
+        nbt?.putInt("blueprintGroup", blueprintGroup.ordinal)
+    }
+
+    override fun readNbt(nbt: NbtCompound?) {
+        super.readNbt(nbt)
+        blueprintId = nbt?.getString("blueprintId")
+        blueprintName = nbt?.getString("blueprintName")
+        blueprintGroup = BlueprintGroup.entries[nbt?.getInt("blueprintGroup") ?: 0]
+    }
 }

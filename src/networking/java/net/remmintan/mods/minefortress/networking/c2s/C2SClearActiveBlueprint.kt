@@ -1,28 +1,24 @@
-package net.remmintan.mods.minefortress.networking.c2s;
+package net.remmintan.mods.minefortress.networking.c2s
 
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.minecraft.network.PacketByteBuf
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.network.ServerPlayerEntity
+import net.remmintan.mods.minefortress.blueprints.clearBlueprint
+import net.remmintan.mods.minefortress.blueprints.getBlueprintWorld
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket
 
-public class C2SClearActiveBlueprint implements FortressC2SPacket {
+class C2SClearActiveBlueprint : FortressC2SPacket {
+    constructor()
+    constructor(ignoredBuf: PacketByteBuf?)
 
-    public static final String CHANNEL = "clear_active_blueprint";
-
-    public C2SClearActiveBlueprint() {
-    }
-    public C2SClearActiveBlueprint(PacketByteBuf ignoredBuf) {
-    }
-
-    @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        var fortressServer = (IFortressServer) server;
-        fortressServer.get_BlueprintsWorld().clearBlueprint(player);
+    override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
+        server.getBlueprintWorld().clearBlueprint(player)
     }
 
-    @Override
-    public void write(PacketByteBuf buf) {
+    override fun write(buf: PacketByteBuf) {
+    }
 
+    companion object {
+        const val CHANNEL: String = "clear_active_blueprint"
     }
 }
