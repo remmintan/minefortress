@@ -7,6 +7,7 @@ import net.minecraft.util.StringIdentifiable
 enum class ProfessionType(val icon: Item, val displayName: String, val blueprintIds: List<String>) :
     StringIdentifiable {
 
+    NONE(Items.AIR, "None", emptyList()),
     FARMER(Items.WHEAT, "Farmer", listOf("small_farm_1", "large_farm_1")),
     MINER(Items.STONE_PICKAXE, "Miner", listOf("miner_house_wooden", "miner_house_stone", "miner_house_guild")),
     LUMBERJACK(

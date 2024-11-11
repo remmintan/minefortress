@@ -16,6 +16,7 @@ import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import net.remmintan.mods.minefortress.blueprints.isBlueprintWorld
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
 
@@ -52,7 +53,7 @@ class BuildingBlock : BlockWithEntity(FabricBlockSettings
         hit: BlockHitResult?
     ): ActionResult {
         val ent = world?.getBlockEntity(pos)
-        if (ent is NamedScreenHandlerFactory) {
+        if (world?.isBlueprintWorld() == true && ent is NamedScreenHandlerFactory) {
             player?.openHandledScreen(ent)
             return ActionResult.SUCCESS
         }

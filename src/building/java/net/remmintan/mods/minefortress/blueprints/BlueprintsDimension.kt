@@ -7,6 +7,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
+import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
 import net.remmintan.mods.minefortress.building.BuildingBlockEntity
 import net.remmintan.mods.minefortress.building.FortressBlocks
@@ -14,6 +15,8 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
 
 private val BORDER_STATE = Blocks.RED_WOOL.defaultState
+
+fun World.isBlueprintWorld(): Boolean = this.registryKey == BLUEPRINT_DIMENSION_KEY
 
 fun MinecraftServer.getBlueprintWorld(): ServerWorld =
     this.getWorld(BLUEPRINT_DIMENSION_KEY) ?: error("Blueprint world not found")
