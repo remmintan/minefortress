@@ -2,14 +2,17 @@ package org.minefortress.registries.events;
 
 
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.GameMode;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import org.minefortress.MineFortressMod;
 import org.minefortress.interfaces.FortressWorldCreator;
 import org.minefortress.utils.ModUtils;
 
@@ -85,6 +88,14 @@ public class FortressServerEvents {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             if(server instanceof IFortressServer IFortressServer) {
                 IFortressServer.get_FortressModServerManager().tick(server.getPlayerManager());
+            }
+        });
+
+        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
+            if (destination.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY()) {
+                player.changeGameMode(GameMode.CREATIVE);
+            } else if (origin.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY()) {
+                player.changeGameMode(MineFortressMod.FORTRESS);
             }
         });
     }
