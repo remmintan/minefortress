@@ -5,9 +5,6 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.BlockRotation
 import net.minecraft.util.math.Vec3i
-import net.remmintan.mods.minefortress.blueprints.getBlueprintWorld
-import net.remmintan.mods.minefortress.blueprints.prepareBlueprint
-import net.remmintan.mods.minefortress.blueprints.putBlueprintInAWorld
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData
@@ -60,7 +57,7 @@ class ServerboundEditBlueprintPacket : FortressC2SPacket {
                 if (actionType == ActionType.REMOVE) {
                     player._ServerBlueprintManager.remove(blueprintId)
                 } else {
-                    val blueprintsWorld = server.getBlueprintWorld()
+                    val blueprintsWorld = server._BlueprintWorld
                     if (actionType == ActionType.EDIT) {
                         val blockData: IStructureBlockData = player
                             ._ServerBlueprintManager
@@ -75,7 +72,7 @@ class ServerboundEditBlueprintPacket : FortressC2SPacket {
                         blueprintsWorld.prepareBlueprint(blueprintId, blueprintName, blueprintGroup)
                         blueprintsWorld.putBlueprintInAWorld(HashMap(), player, Vec3i(1, 1, 1), floorLevel)
                     }
-                    player.moveToWorld(blueprintsWorld)
+                    player.moveToWorld(blueprintsWorld.world)
                 }
             }
         }

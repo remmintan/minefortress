@@ -21,14 +21,14 @@ sourceSets {
 	core {
 		compileClasspath += main.compileClasspath
 	}
-	gui {
+	networking {
 		compileClasspath += main.compileClasspath + core.output
+	}
+	gui {
+		compileClasspath += main.compileClasspath + core.output + networking.output
 	}
 	building {
 		compileClasspath += main.compileClasspath + core.output + gui.output
-	}
-	networking {
-		compileClasspath += main.compileClasspath + core.output + building.output
 	}
 	selections {
 		compileClasspath += main.compileClasspath + core.output + building.output + networking.output

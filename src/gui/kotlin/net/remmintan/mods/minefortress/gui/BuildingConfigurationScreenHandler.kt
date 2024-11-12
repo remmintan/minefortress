@@ -25,9 +25,6 @@ class BuildingConfigurationScreenHandler(
 
     override fun canUse(player: PlayerEntity?): Boolean = player?.world?.registryKey == BLUEPRINT_DIMENSION_KEY
 
-    fun getCapacity() = propertyDelegate[0]
-    fun setCapacity(value: Int) = propertyDelegate.set(0, value)
-
+    fun getCapacity() = if (propertyDelegate[0] <= 0) "" else propertyDelegate[0].toString()
     fun getProfession(): ProfessionType = ProfessionType.entries[propertyDelegate[1]]
-    fun setProfession(value: ProfessionType) = propertyDelegate.set(1, value.ordinal)
 }

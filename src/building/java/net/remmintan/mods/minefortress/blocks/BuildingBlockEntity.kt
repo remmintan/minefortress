@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.building
+package net.remmintan.mods.minefortress.blocks
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
@@ -17,31 +17,31 @@ import net.remmintan.mods.minefortress.gui.BuildingConfigurationScreenHandler
 class BuildingBlockEntity(pos: BlockPos?, private val state: BlockState?) :
     BlockEntity(FortressBlocks.BUILDING_ENT_TYPE, pos, state), NamedScreenHandlerFactory {
 
+    var blueprintId: String? = null
+    var blueprintName: String? = null
+    var blueprintGroup: BlueprintGroup = BlueprintGroup.LIVING_HOUSES
+
+    var capacity: Int = 0
+    var professionType: ProfessionType = ProfessionType.NONE
+
     private val propertyDelegate = object : PropertyDelegate {
         override fun get(index: Int): Int {
             return when (index) {
-                0 -> state?.get(CAPACITY_PROP) ?: throw IllegalStateException("Capacity property not found")
-                1 -> state?.get(PROFESSIONS_TYPE_PROP)?.ordinal
-                    ?: throw IllegalStateException("Profession property not found")
-
+                0 -> capacity
+                1 -> professionType.ordinal
                 else -> throw IllegalArgumentException("Invalid property index")
             }
         }
 
         override fun set(index: Int, value: Int) {
             when (index) {
-                0 -> world?.setBlockState(pos, state?.with(CAPACITY_PROP, value))
-                1 -> world?.setBlockState(pos, state?.with(PROFESSIONS_TYPE_PROP, ProfessionType.entries[value]))
-                else -> throw IllegalArgumentException("Invalid property index")
+                0 -> capacity = value
+                1 -> professionType = ProfessionType.entries[value]
             }
         }
 
         override fun size(): Int = 2
     }
-
-    var blueprintId: String? = null
-    var blueprintName: String? = null
-    var blueprintGroup: BlueprintGroup = BlueprintGroup.LIVING_HOUSES
 
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
         return BuildingConfigurationScreenHandler(syncId, playerInventory, propertyDelegate)

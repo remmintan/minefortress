@@ -9,8 +9,8 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
-import net.remmintan.mods.minefortress.building.BuildingBlockEntity
-import net.remmintan.mods.minefortress.building.FortressBlocks
+import net.remmintan.mods.minefortress.blocks.BuildingBlockEntity
+import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
 

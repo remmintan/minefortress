@@ -3,9 +3,9 @@ package net.remmintan.mods.minefortress.networking.registries;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.networking.c2s.*;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
-import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 import java.util.function.Function;
 
@@ -43,6 +43,7 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SRequestResourcesRefresh.CHANNEL, C2SRequestResourcesRefresh::new);
         registerReceiver(C2SSetNavigationTargetEntity.CHANNEL, C2SSetNavigationTargetEntity::new);
         registerReceiver(C2SAttractWarriorsToCampfire.CHANNEL, C2SAttractWarriorsToCampfire::new);
+        registerReceiver(C2SUpdateScreenPropertyKt.getCHANNEL(), C2SUpdateScreenProperty::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {

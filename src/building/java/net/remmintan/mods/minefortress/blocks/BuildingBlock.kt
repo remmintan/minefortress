@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.building
+package net.remmintan.mods.minefortress.blocks
 
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
 import net.minecraft.block.Block

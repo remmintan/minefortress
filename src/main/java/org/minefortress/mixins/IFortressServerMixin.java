@@ -1,12 +1,18 @@
 package org.minefortress.mixins;
 
 import com.mojang.datafixers.DataFixer;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.*;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ApiServices;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
+import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintWorld;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.world.BlueprintWorldWrapper;
 import org.minefortress.fortress.server.FortressModServerManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,6 +28,10 @@ import java.net.Proxy;
 public abstract class IFortressServerMixin extends ReentrantThreadExecutor<ServerTask> implements IFortressServer {
 
     @Shadow @Final private WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory;
+
+    @Shadow
+    @Nullable
+    public abstract ServerWorld getWorld(RegistryKey<World> key);
 
     @Unique
     private FortressModServerManager fortressModServerManager;
@@ -43,5 +53,10 @@ public abstract class IFortressServerMixin extends ReentrantThreadExecutor<Serve
     @Override
     public FortressModServerManager get_FortressModServerManager() {
         return fortressModServerManager;
+    }
+
+    @Override
+    public IBlueprintWorld get_BlueprintWorld() {
+        return new BlueprintWorldWrapper((MinecraftServer) (Object) this);
     }
 }

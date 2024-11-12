@@ -8,7 +8,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
-import net.remmintan.mods.minefortress.building.FortressBlocks;
+import net.remmintan.mods.minefortress.blocks.FortressBlocks;
 
 public class FortressItems {
 

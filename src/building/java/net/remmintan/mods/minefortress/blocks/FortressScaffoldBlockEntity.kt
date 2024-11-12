@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.building
+package net.remmintan.mods.minefortress.blocks
 
 import baritone.api.minefortress.IFortressAwareBlockEntity
 import baritone.api.minefortress.IMinefortressEntity

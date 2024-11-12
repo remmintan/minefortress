@@ -2,10 +2,10 @@ package org.minefortress.fortress.automation.iterators;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.blocks.FortressBlocks;
+import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import org.minefortress.fortress.automation.AutomationBlockInfo;
-import net.remmintan.mods.minefortress.building.FortressBlocks;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 
 import java.util.List;
 

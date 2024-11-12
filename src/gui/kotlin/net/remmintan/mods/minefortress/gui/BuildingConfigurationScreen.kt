@@ -9,6 +9,9 @@ import net.minecraft.client.gui.widget.TextWidget
 import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.text.Text
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
+import net.remmintan.mods.minefortress.networking.c2s.C2SUpdateScreenProperty
+import net.remmintan.mods.minefortress.networking.c2s.CHANNEL
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 
 class BuildingConfigurationScreen(
     handler: BuildingConfigurationScreenHandler,
@@ -16,6 +19,8 @@ class BuildingConfigurationScreen(
     title: Text
 ) : HandledScreen<BuildingConfigurationScreenHandler>(handler, playerInventory, title) {
 
+    private var professionSelector: CyclingButtonWidget<ProfessionType>? = null
+    private var capacityWidget: TextFieldWidget? = null
 
     override fun init() {
         super.init()
@@ -27,26 +32,30 @@ class BuildingConfigurationScreen(
         val adder = grid.createAdder(2)
 
         val professionsLabel = TextWidget(Text.of("Hires:"), this.textRenderer)
-        val professionSelector = CyclingButtonWidget
+        professionSelector = CyclingButtonWidget
             .builder { it: ProfessionType -> Text.of(it.displayName) }
             .values(ProfessionType.entries)
             .initially(handler.getProfession())
             .build(this.x + 2, this.y + 2, 200, 20, Text.of("Profession"))
-            { btn, prof ->
-                handler.setProfession(prof)
+            { _, prof ->
+                val packet = C2SUpdateScreenProperty(1, prof.ordinal)
+                FortressClientNetworkHelper.send(CHANNEL, packet)
             }
         adder.add(professionsLabel, grid.copyPositioner().marginTop(9))
         adder.add(professionSelector)
 
         val capacityLabel = TextWidget(Text.of("Building capacity:"), this.textRenderer)
-        val capacityWidget = TextFieldWidget(this.textRenderer, 200, 20, Text.of(handler.getCapacity().toString()))
-        capacityWidget.setChangedListener { text ->
-            val capacity = text.toIntOrNull()
+        capacityWidget = TextFieldWidget(this.textRenderer, 200, 20, Text.of(handler.getCapacity().toString()))
+        capacityWidget?.setChangedListener { text ->
+            val capacity = if (text.isBlank()) 0 else text.toIntOrNull()
             if (capacity != null && capacity < 101) {
-                handler.setCapacity(capacity)
+                val packet = C2SUpdateScreenProperty(0, capacity)
+                FortressClientNetworkHelper.send(CHANNEL, packet)
             }
         }
-        capacityWidget.setTextPredicate { text -> text.isEmpty() || text.toIntOrNull() != null && text.toInt() < 101 }
+        capacityWidget?.setTextPredicate { text ->
+            text.isEmpty() || text.toIntOrNull() != null && text.toInt() > 0 && text.toInt() < 101
+        }
         adder.add(capacityLabel, grid.copyPositioner().marginTop(9))
         adder.add(capacityWidget)
 
@@ -56,7 +65,13 @@ class BuildingConfigurationScreen(
         grid.forEachChild(this::addDrawableChild)
     }
 
+    override fun handledScreenTick() {
+
+    }
+
     override fun drawForeground(context: DrawContext?, mouseX: Int, mouseY: Int) {
+        capacityWidget?.text = handler.getCapacity()
+        professionSelector?.value = handler.getProfession()
         context?.drawCenteredTextWithShadow(
             this.textRenderer,
             this.title,
