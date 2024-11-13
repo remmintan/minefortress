@@ -22,6 +22,8 @@ class BuildingConfigurationScreen(
     private var professionSelector: CyclingButtonWidget<ProfessionType>? = null
     private var capacityWidget: TextFieldWidget? = null
 
+    private var revision = 0
+
     override fun init() {
         super.init()
         val grid = GridWidget()
@@ -38,17 +40,18 @@ class BuildingConfigurationScreen(
             .initially(handler.getProfession())
             .build(this.x + 2, this.y + 2, 200, 20, Text.of("Profession"))
             { _, prof ->
+                if (revision == 0) return@build
                 val packet = C2SUpdateScreenProperty(1, prof.ordinal)
                 FortressClientNetworkHelper.send(CHANNEL, packet)
             }
         adder.add(professionsLabel, grid.copyPositioner().marginTop(9))
         adder.add(professionSelector)
 
-        val capacityLabel = TextWidget(Text.of("Building capacity:"), this.textRenderer)
+        val capacityLabel = TextWidget(Text.of("Building capacity [0-100]:"), this.textRenderer)
         capacityWidget = TextFieldWidget(this.textRenderer, 200, 20, Text.of(handler.getCapacity().toString()))
         capacityWidget?.setChangedListener { text ->
             val capacity = if (text.isBlank()) 0 else text.toIntOrNull()
-            if (capacity != null && capacity < 101) {
+            if (capacity != null && capacity < 101 && revision > 0) {
                 val packet = C2SUpdateScreenProperty(0, capacity)
                 FortressClientNetworkHelper.send(CHANNEL, packet)
             }
@@ -66,12 +69,15 @@ class BuildingConfigurationScreen(
     }
 
     override fun handledScreenTick() {
+        if (handler.revision > revision) {
+            revision = handler.revision
+            capacityWidget?.text = handler.getCapacity()
+            professionSelector?.value = handler.getProfession()
+        }
 
     }
 
     override fun drawForeground(context: DrawContext?, mouseX: Int, mouseY: Int) {
-        capacityWidget?.text = handler.getCapacity()
-        professionSelector?.value = handler.getProfession()
         context?.drawCenteredTextWithShadow(
             this.textRenderer,
             this.title,

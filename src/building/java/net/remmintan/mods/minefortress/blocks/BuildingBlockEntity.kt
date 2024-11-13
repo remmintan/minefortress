@@ -14,21 +14,23 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.gui.BuildingConfigurationScreenHandler
 
-class BuildingBlockEntity(pos: BlockPos?, private val state: BlockState?) :
+class BuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     BlockEntity(FortressBlocks.BUILDING_ENT_TYPE, pos, state), NamedScreenHandlerFactory {
 
     var blueprintId: String? = null
     var blueprintName: String? = null
     var blueprintGroup: BlueprintGroup = BlueprintGroup.LIVING_HOUSES
-
     var capacity: Int = 0
-    var professionType: ProfessionType = ProfessionType.NONE
+        private set
+    var profession: ProfessionType = ProfessionType.NONE
+        private set
+
 
     private val propertyDelegate = object : PropertyDelegate {
         override fun get(index: Int): Int {
             return when (index) {
                 0 -> capacity
-                1 -> professionType.ordinal
+                1 -> profession.ordinal
                 else -> throw IllegalArgumentException("Invalid property index")
             }
         }
@@ -36,7 +38,7 @@ class BuildingBlockEntity(pos: BlockPos?, private val state: BlockState?) :
         override fun set(index: Int, value: Int) {
             when (index) {
                 0 -> capacity = value
-                1 -> professionType = ProfessionType.entries[value]
+                1 -> profession = ProfessionType.entries[value]
             }
         }
 
