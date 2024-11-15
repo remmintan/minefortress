@@ -1,6 +1,7 @@
 package net.remmintan.mods.minefortress.core.interfaces.blueprints.world
 
 import net.minecraft.block.BlockState
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
@@ -9,7 +10,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 
 interface IBlueprintWorld {
 
-    fun prepareBlueprint(blueprintId: String?, blueprintName: String?, group: BlueprintGroup?)
+    fun setBlueprintMetadata(blueprintId: String?, blueprintName: String?, group: BlueprintGroup?)
     fun clearBlueprint(player: ServerPlayerEntity?)
     fun putBlueprintInAWorld(
         blueprintData: Map<BlockPos, BlockState>,
@@ -17,6 +18,7 @@ interface IBlueprintWorld {
         blueprintSize: Vec3i,
         floorLevel: Int
     )
+    fun saveBlueprintFromWorld(server: MinecraftServer, player: ServerPlayerEntity)
 
     val world: ServerWorld
 

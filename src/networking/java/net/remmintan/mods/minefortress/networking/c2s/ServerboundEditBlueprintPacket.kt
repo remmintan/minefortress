@@ -66,10 +66,10 @@ class ServerboundEditBlueprintPacket : FortressC2SPacket {
                         val blueprintData = blockData
                             .getLayer(BlueprintDataLayer.GENERAL)
 
-                        blueprintsWorld.prepareBlueprint(blueprintId, blueprintName, blueprintGroup)
+                        blueprintsWorld.setBlueprintMetadata(blueprintId, blueprintName, blueprintGroup)
                         blueprintsWorld.putBlueprintInAWorld(blueprintData, player, blockData.size, floorLevel)
                     } else if (actionType == ActionType.CREATE) {
-                        blueprintsWorld.prepareBlueprint(blueprintId, blueprintName, blueprintGroup)
+                        blueprintsWorld.setBlueprintMetadata(blueprintId, blueprintName, blueprintGroup)
                         blueprintsWorld.putBlueprintInAWorld(HashMap(), player, Vec3i(1, 1, 1), floorLevel)
                     }
                     player.moveToWorld(blueprintsWorld.world)

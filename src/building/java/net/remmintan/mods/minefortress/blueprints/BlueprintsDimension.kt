@@ -12,23 +12,49 @@ import net.minecraft.world.event.GameEvent
 import net.remmintan.mods.minefortress.blocks.BuildingBlockEntity
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
 
+val BLUEPRINT_START = BlockPos(0, 1, 0)
+val BLUEPRINT_END = BlockPos(15, 32, 15)
+
 private val BORDER_STATE = Blocks.RED_WOOL.defaultState
+
+private val METADATA_POS = BlockPos(-1, 16, -1)
 
 fun World.isBlueprintWorld(): Boolean = this.registryKey == BLUEPRINT_DIMENSION_KEY
 
 fun MinecraftServer.getBlueprintWorld(): ServerWorld =
     this.getWorld(BLUEPRINT_DIMENSION_KEY) ?: error("Blueprint world not found")
 
-fun ServerWorld.prepareBlueprint(blueprintId: String?, blueprintName: String?, group: BlueprintGroup?) {
-    val poa = BlockPos(-1, 16, -1)
-    this.setBlockState(poa, FortressBlocks.FORTRESS_BUILDING.defaultState)
-    (this.getBlockEntity(poa) as BuildingBlockEntity).apply {
+fun ServerWorld.setBlueprintMetadata(blueprintId: String?, blueprintName: String?, group: BlueprintGroup?) {
+    this.setBlockState(METADATA_POS, FortressBlocks.FORTRESS_BUILDING.defaultState)
+    (this.getBlockEntity(METADATA_POS) as BuildingBlockEntity).apply {
         this.blueprintId = blueprintId
         this.blueprintName = blueprintName
         this.blueprintGroup = group ?: BlueprintGroup.LIVING_HOUSES
     }
+}
+
+data class BlueprintWorldMetadata(
+    val id: String?,
+    val name: String?,
+    val group: BlueprintGroup,
+    val capacity: Int,
+    val profession: ProfessionType
+)
+
+fun ServerWorld.getBlueprintMetadata(): BlueprintWorldMetadata {
+    this.isBlueprintWorld() || error("Not a blueprint world")
+
+    val blockEntity = this.getBlockEntity(METADATA_POS) as BuildingBlockEntity
+    return BlueprintWorldMetadata(
+        blockEntity.blueprintId,
+        blockEntity.blueprintName,
+        blockEntity.blueprintGroup,
+        blockEntity.capacity,
+        blockEntity.profession
+    )
 }
 
 fun ServerWorld.clearBlueprint(player: ServerPlayerEntity?) {
