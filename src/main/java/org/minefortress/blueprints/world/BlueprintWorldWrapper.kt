@@ -9,7 +9,6 @@ import net.minecraft.registry.tag.BlockTags
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
 import net.remmintan.mods.minefortress.blueprints.*
@@ -46,13 +45,12 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
         val id = blueprintId ?: blueprintName?.replace(Regex("[^a-zA-Z0-9]"), "_")?.lowercase()
         ?: throw IllegalStateException("Both name and id are null")
 
-        val updatedStructureIdentifier = Identifier.of("minefortress", id)
         val structureManager = server.structureTemplateManager
-        val structure = structureManager.getTemplateOrBlank(updatedStructureIdentifier)
-
-        val dimensions = BLUEPRINT_START.subtract(BLUEPRINT_END).add(1, 1, 1)
+        val structure = structureManager.createTemplate(NbtCompound())
+        val dimensions = BLUEPRINT_END.subtract(BLUEPRINT_START).add(1, 1, 1)
 
         structure.saveFromWorld(player.world, BLUEPRINT_START, dimensions, true, Blocks.DIRT)
+        val blueprintMinY = world.getBlueprintMinY()
         structure.blockInfoLists.forEach {
             it.all.removeIf {
                 it.state.isIn(BlockTags.DIRT) || it.state.isOf(Blocks.AIR)
@@ -95,7 +93,7 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
                 blueprintName,
                 metadata.group,
                 updatedStructure,
-                16 - minY
+                16 - blueprintMinY
             )
         }
     }

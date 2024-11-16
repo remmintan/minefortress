@@ -98,6 +98,8 @@ public class FortressServerEvents {
                 player.changeGameMode(MineFortressMod.FORTRESS);
             }
         });
+
+        PlayerBlockEventsKt.registerPlayerBlockEvents();
     }
 
 }

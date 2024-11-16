@@ -46,12 +46,14 @@ public final class ServerStructureBlockDataManager extends AbstractStructureBloc
         final var structure = structuresManager.getTemplateOrBlank(id);
         structure.readNbt(Registries.BLOCK.getReadOnlyWrapper(), tag);
         structuresManager.saveTemplate(id);
+        super.invalidateBlueprint(blueprintId);
     }
 
     @Override
     public void remove(String blueprintId) {
         final var id = Identifier.of("minefortress", blueprintId);
         server.getStructureTemplateManager().unloadTemplate(id);
+        super.invalidateBlueprint(blueprintId);
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.remmintan.mods.minefortress.blueprints
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.registry.tag.BlockTags
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
@@ -16,7 +17,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
 
 val BLUEPRINT_START = BlockPos(0, 1, 0)
-val BLUEPRINT_END = BlockPos(15, 32, 15)
+val BLUEPRINT_END = BlockPos(15, 29, 15)
 
 private val BORDER_STATE = Blocks.RED_WOOL.defaultState
 
@@ -59,6 +60,19 @@ fun ServerWorld.getBlueprintMetadata(): BlueprintWorldMetadata {
 
 fun ServerWorld.clearBlueprint(player: ServerPlayerEntity?) {
     putBlueprintInAWorld(HashMap(), player, Vec3i(1, 1, 1), 0)
+}
+
+fun World.getBlueprintMinY(): Int {
+    this.isBlueprintWorld() || error("Not a blueprint world")
+
+    return BlockPos
+        .iterate(BLUEPRINT_START, BLUEPRINT_END)
+        .map { it.toImmutable() }
+        .filter {
+            it.y < 16 && !this.getBlockState(it).isIn(BlockTags.DIRT) ||
+                    it.y >= 16 && !this.getBlockState(it).isOf(Blocks.AIR)
+        }
+        .minOf { it.y }
 }
 
 fun ServerWorld.putBlueprintInAWorld(
