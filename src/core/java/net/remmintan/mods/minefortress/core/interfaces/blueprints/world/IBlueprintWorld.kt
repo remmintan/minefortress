@@ -10,7 +10,12 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 
 interface IBlueprintWorld {
 
-    fun setBlueprintMetadata(blueprintId: String?, blueprintName: String?, group: BlueprintGroup?)
+    fun setBlueprintMetadata(
+        player: ServerPlayerEntity?,
+        blueprintId: String?,
+        blueprintName: String?,
+        group: BlueprintGroup?
+    )
     fun clearBlueprint(player: ServerPlayerEntity?)
     fun putBlueprintInAWorld(
         blueprintData: Map<BlockPos, BlockState>,

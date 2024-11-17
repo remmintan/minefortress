@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.blueprints.BlueprintsDimensionKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
@@ -110,7 +111,10 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
             this.persistedPitch = this.getPitch();
             this.persistedYaw = this.getYaw();
 
-            final Vec3d position = new Vec3d(-1, 17, -1);
+            final var cell = BlueprintsDimensionKt.getPersonalBlueprintCell(this);
+
+            final var configBlockPos = cell.getConfigBlock();
+            final Vec3d position = new Vec3d(configBlockPos.getX(), configBlockPos.getY() + 1, configBlockPos.getZ());
             final Vec3d velocity = new Vec3d(0, 0, 0);
             final TeleportTarget teleportTarget = new TeleportTarget(position, velocity, -45, 0);
             cir.setReturnValue(teleportTarget);

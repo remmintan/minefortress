@@ -19,8 +19,13 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressS
 class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
 
     override val world: ServerWorld = server.getBlueprintWorld()
-    override fun setBlueprintMetadata(blueprintId: String?, blueprintName: String?, group: BlueprintGroup?) {
-        world.setBlueprintMetadata(blueprintId, blueprintName, group)
+    override fun setBlueprintMetadata(
+        player: ServerPlayerEntity?,
+        blueprintId: String?,
+        blueprintName: String?,
+        group: BlueprintGroup?
+    ) {
+        world.setBlueprintMetadata(blueprintId, blueprintName, group, player)
     }
 
     override fun clearBlueprint(player: ServerPlayerEntity?) {
@@ -37,7 +42,7 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
     }
 
     override fun saveBlueprintFromWorld(server: MinecraftServer, player: ServerPlayerEntity) {
-        val metadata = server.getBlueprintWorld().getBlueprintMetadata()
+        val metadata = server.getBlueprintWorld().getBlueprintMetadata(player)
 
         val blueprintId = metadata.id
         val blueprintName = metadata.name
@@ -47,10 +52,12 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
 
         val structureManager = server.structureTemplateManager
         val structure = structureManager.createTemplate(NbtCompound())
-        val dimensions = BLUEPRINT_END.subtract(BLUEPRINT_START).add(1, 1, 1)
 
-        structure.saveFromWorld(player.world, BLUEPRINT_START, dimensions, true, Blocks.DIRT)
-        val blueprintMinY = world.getBlueprintMinY()
+        val cell = player.getPersonalBlueprintCell()
+        val dimensions = cell.end.subtract(cell.start).add(1, 1, 1)
+
+        structure.saveFromWorld(player.world, cell.start, dimensions, true, Blocks.DIRT)
+        val blueprintMinY = world.getBlueprintMinY(player)
         structure.blockInfoLists.forEach {
             it.all.removeIf {
                 it.state.isIn(BlockTags.DIRT) || it.state.isOf(Blocks.AIR)
@@ -93,7 +100,7 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
                 blueprintName,
                 metadata.group,
                 updatedStructure,
-                16 - blueprintMinY
+                DEFAULT_FLOOR_LEVEL - blueprintMinY
             )
         }
     }

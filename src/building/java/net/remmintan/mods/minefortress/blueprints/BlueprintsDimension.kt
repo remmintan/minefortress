@@ -2,10 +2,12 @@ package net.remmintan.mods.minefortress.blueprints
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.BlockBox
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
 import net.minecraft.world.World
@@ -15,26 +17,70 @@ import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
-
-val BLUEPRINT_START = BlockPos(0, 1, 0)
-val BLUEPRINT_END = BlockPos(15, 29, 15)
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 private val BORDER_STATE = Blocks.RED_WOOL.defaultState
 
-private val METADATA_POS = BlockPos(-1, 16, -1)
+private const val GRID_SIZE = 100000
+private const val GRID_SIDE_SIZE = 18
+private const val BLUEPRINT_CELL_SIZE = GRID_SIDE_SIZE - 2
+const val DEFAULT_FLOOR_LEVEL = 16
+
+data class PersonalizedBlueprintCell(
+    val start: BlockPos,
+    val end: BlockPos,
+    val configBlock: BlockPos,
+) {
+    private val allowedBox: BlockBox = BlockBox.create(start, end)
+    fun contains(pos: BlockPos): Boolean = allowedBox.contains(pos)
+}
+
+private val cellsCache = ConcurrentHashMap<UUID, PersonalizedBlueprintCell>()
+
+fun PlayerEntity.getPersonalBlueprintCell(): PersonalizedBlueprintCell {
+    return cellsCache.computeIfAbsent(uuid) {
+        val gridX = Math.floorMod(it.mostSignificantBits, GRID_SIZE)
+        val gridZ = Math.floorMod(it.leastSignificantBits, GRID_SIZE)
+
+        val startX = gridX * GRID_SIDE_SIZE + 1
+        val startZ = gridZ * GRID_SIDE_SIZE + 1
+        val startBlock = BlockPos(startX, 1, startZ)
+
+        val endX = startX + GRID_SIDE_SIZE - 2
+        val endZ = startZ + GRID_SIDE_SIZE - 2
+        val endBlock = BlockPos(endX, 29, endZ)
+
+        val configBlock = BlockPos(startX - 1, 16, startZ - 1)
+
+        return@computeIfAbsent PersonalizedBlueprintCell(
+            startBlock.toImmutable(),
+            endBlock.toImmutable(),
+            configBlock.toImmutable()
+        )
+    }
+}
 
 fun World.isBlueprintWorld(): Boolean = this.registryKey == BLUEPRINT_DIMENSION_KEY
 
 fun MinecraftServer.getBlueprintWorld(): ServerWorld =
     this.getWorld(BLUEPRINT_DIMENSION_KEY) ?: error("Blueprint world not found")
 
-fun ServerWorld.setBlueprintMetadata(blueprintId: String?, blueprintName: String?, group: BlueprintGroup?) {
-    this.setBlockState(METADATA_POS, FortressBlocks.FORTRESS_BUILDING.defaultState)
-    (this.getBlockEntity(METADATA_POS) as BuildingBlockEntity).apply {
-        this.blueprintId = blueprintId
-        this.blueprintName = blueprintName
-        this.blueprintGroup = group ?: BlueprintGroup.LIVING_HOUSES
-    }
+fun ServerWorld.setBlueprintMetadata(
+    blueprintId: String?,
+    blueprintName: String?,
+    group: BlueprintGroup?,
+    player: ServerPlayerEntity?
+) {
+    player?.getPersonalBlueprintCell()?.let {
+        val metadataPos = it.configBlock
+        this.setBlockState(metadataPos, FortressBlocks.FORTRESS_BUILDING.defaultState)
+        (this.getBlockEntity(metadataPos) as BuildingBlockEntity).apply {
+            this.blueprintId = blueprintId
+            this.blueprintName = blueprintName
+            this.blueprintGroup = group ?: BlueprintGroup.LIVING_HOUSES
+        }
+    } ?: error("Player not found")
 }
 
 data class BlueprintWorldMetadata(
@@ -45,34 +91,45 @@ data class BlueprintWorldMetadata(
     val profession: ProfessionType
 )
 
-fun ServerWorld.getBlueprintMetadata(): BlueprintWorldMetadata {
+fun ServerWorld.getBlueprintMetadata(player: ServerPlayerEntity?): BlueprintWorldMetadata {
     this.isBlueprintWorld() || error("Not a blueprint world")
 
-    val blockEntity = this.getBlockEntity(METADATA_POS) as BuildingBlockEntity
-    return BlueprintWorldMetadata(
-        blockEntity.blueprintId,
-        blockEntity.blueprintName,
-        blockEntity.blueprintGroup,
-        blockEntity.capacity,
-        blockEntity.profession
-    )
+    player ?: error("Player not found")
+
+    return player.getPersonalBlueprintCell()
+        .configBlock
+        .let { this.getBlockEntity(it) as BuildingBlockEntity }
+        .run {
+            BlueprintWorldMetadata(
+                blueprintId,
+                blueprintName,
+                blueprintGroup,
+                capacity,
+                profession
+            )
+        }
+
 }
 
 fun ServerWorld.clearBlueprint(player: ServerPlayerEntity?) {
     putBlueprintInAWorld(HashMap(), player, Vec3i(1, 1, 1), 0)
 }
 
-fun World.getBlueprintMinY(): Int {
+fun World.getBlueprintMinY(player: ServerPlayerEntity?): Int {
     this.isBlueprintWorld() || error("Not a blueprint world")
 
-    return BlockPos
-        .iterate(BLUEPRINT_START, BLUEPRINT_END)
-        .map { it.toImmutable() }
-        .filter {
-            it.y < 16 && !this.getBlockState(it).isIn(BlockTags.DIRT) ||
-                    it.y >= 16 && !this.getBlockState(it).isOf(Blocks.AIR)
-        }
-        .minOf { it.y }
+    player ?: error("Player not found")
+
+    return player.getPersonalBlueprintCell().let {
+        BlockPos
+            .iterate(it.start, it.end)
+            .map { it.toImmutable() }
+            .filter {
+                it.y < 16 && !this.getBlockState(it).isIn(BlockTags.DIRT) ||
+                        it.y >= 16 && !this.getBlockState(it).isOf(Blocks.AIR)
+            }
+            .minOf { it.y }
+    }
 }
 
 fun ServerWorld.putBlueprintInAWorld(
@@ -81,28 +138,41 @@ fun ServerWorld.putBlueprintInAWorld(
     blueprintSize: Vec3i,
     floorLevel: Int
 ) {
-    val xOffset = (16 - blueprintSize.x) / 2
-    val zOffset = (16 - blueprintSize.z) / 2
+    player ?: error("Player not found")
 
-    val defaultFloorLevel = 16
+    val xOffset = (BLUEPRINT_CELL_SIZE - blueprintSize.x) / 2
+    val zOffset = (BLUEPRINT_CELL_SIZE - blueprintSize.z) / 2
+
+    val cell = player.getPersonalBlueprintCell()
+
+    val start = cell.start.subtract(Vec3i(1, 1, 1))
+    val end = cell.end.add(Vec3i(1, 1, 1))
+
+
     BlockPos
-        .iterate(BlockPos(-32, 0, -32), BlockPos(32, 32, 32))
+        .iterate(start, end)
         .forEach { pos: BlockPos ->
             val blockState: BlockState?
             val offsetPos = pos
-                .down(defaultFloorLevel - floorLevel)
-                .add(-xOffset, 0, -zOffset)
+                .down(DEFAULT_FLOOR_LEVEL - floorLevel)
+                .add(-xOffset - cell.start.x, 0, -zOffset - cell.start.z)
 
             if (this.getBlockState(pos).block == FortressBlocks.FORTRESS_BUILDING)
                 return@forEach
 
-            blockState = if (blueprintData.containsKey(offsetPos)) {
+            blockState = if (pos.y == DEFAULT_FLOOR_LEVEL - 1 &&
+                (pos.x == start.x || pos.x == end.x || pos.z == start.z || pos.z == end.z)
+            ) {
+                BORDER_STATE
+            } else if (pos.y >= DEFAULT_FLOOR_LEVEL && pos.x == end.x && pos.z == end.z) {
+                BORDER_STATE
+            } else if (blueprintData.containsKey(offsetPos)) {
                 blueprintData[offsetPos]
-            } else if (pos.y >= defaultFloorLevel) {
+            } else if (pos.y >= DEFAULT_FLOOR_LEVEL) {
                 Blocks.AIR.defaultState
             } else if (pos.y == 0) {
                 Blocks.BEDROCK.defaultState
-            } else if (pos.y > 0 && pos.y < defaultFloorLevel - 2) {
+            } else if (pos.y > 0 && pos.y < DEFAULT_FLOOR_LEVEL - 2) {
                 Blocks.DIRT.defaultState
             } else {
                 Blocks.GRASS_BLOCK.defaultState
@@ -111,16 +181,4 @@ fun ServerWorld.putBlueprintInAWorld(
             this.setBlockState(pos, blockState)
             this.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos)
         }
-
-    BlockPos.iterate(BlockPos(-1, 15, -1), BlockPos(16, 15, 16)).forEach { pos: BlockPos ->
-        if (pos.z == -1 || pos.z == 16 || pos.x == -1 || pos.x == 16) {
-            this.setBlockState(pos, BORDER_STATE)
-            this.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos)
-        }
-    }
-
-    BlockPos.iterate(BlockPos(16, 15, 16), BlockPos(16, 31, 16)).forEach { pos: BlockPos? ->
-        this.setBlockState(pos, BORDER_STATE)
-        this.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos)
-    }
 }
