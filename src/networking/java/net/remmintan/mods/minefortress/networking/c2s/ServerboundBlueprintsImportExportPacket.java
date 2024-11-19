@@ -73,7 +73,7 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
                 zipOS.closeEntry();
             }
 
-            byteArrayOutputStream.flush();
+            zipOS.finish();
             bytes = byteArrayOutputStream.toByteArray();
         }
         return bytes;
