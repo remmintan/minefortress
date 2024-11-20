@@ -17,7 +17,9 @@ import net.remmintan.mods.minefortress.networking.helpers.NetworkUtils;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundBlueprintsProcessImportExportPacket;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -57,8 +59,7 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
         final byte[] bytes;
         try(
                 final var byteArrayOutputStream = new ByteArrayOutputStream();
-                final var zipOS = new ZipOutputStream(byteArrayOutputStream);
-                final var dos = new DataOutputStream(zipOS)
+                final var zipOS = new ZipOutputStream(byteArrayOutputStream)
         ) {
 
             for (String blueprintId : serializedBlueprints.getKeys()) {
@@ -69,7 +70,11 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
 
                 final var zipEntry = new ZipEntry(blueprintId + ".nbt");
                 zipOS.putNextEntry(zipEntry);
-                NbtIo.writeCompound(structureNbt, dos);
+                try (final var baos = new ByteArrayOutputStream()) {
+                    NbtIo.writeCompressed(structureNbt, baos);
+                    final var b = baos.toByteArray();
+                    zipOS.write(b);
+                }
                 zipOS.closeEntry();
             }
 
@@ -116,15 +121,18 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
             final var blueprintsMap = new NbtCompound();
             try (
                 final var bais = new ByteArrayInputStream(bytes);
-                final var zis = new ZipInputStream(bais);
-                final var dis = new DataInputStream(zis)
+                final var zis = new ZipInputStream(bais)
             ){
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
                     final var blueprintFileName = entry.getName();
                     final var blueprintId = StringUtils.substringBeforeLast(blueprintFileName, ".");
 
-                    final NbtCompound structureCompound = NbtIo.readCompound(dis);
+                    final var b = zis.readAllBytes();
+                    final NbtCompound structureCompound;
+                    try (final var nbtBais = new ByteArrayInputStream(b)) {
+                        structureCompound = NbtIo.readCompressed(nbtBais);
+                    }
 
                     if (structureCompound.contains("minefortressMetadata")) {
                         final var minefortressMetadata = structureCompound.getCompound("minefortressMetadata");
