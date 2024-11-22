@@ -37,7 +37,6 @@ public interface IClientFortressManager extends IFortressManager {
             boolean connectedToTheServer,
             int maxColonistsCount,
             int reservedColonistCount,
-            boolean campfireEnabled,
             boolean borderEnabled
     );
 

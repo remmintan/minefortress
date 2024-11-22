@@ -22,7 +22,6 @@ public class FortressModServerManager implements IFortressModServerManager {
     private final MinecraftServer server;
     private final Map<UUID, ServerFortressManager> serverManagers = new HashMap<>();
 
-    private boolean campfireEnabled;
     private boolean borderEnabled;
 
     public FortressModServerManager(MinecraftServer server) {
@@ -79,29 +78,22 @@ public class FortressModServerManager implements IFortressModServerManager {
             nbt.put(id.toString(), fortressNbt);
         }
 
-        nbt.putBoolean("campfireEnabled", campfireEnabled);
         nbt.putBoolean("borderEnabled", borderEnabled);
 
         ModPathUtils.saveNbt(nbt, MANAGERS_FILE_NAME, server.session);
     }
 
     public void load() {
-        load(true, false);
+        load(false);
     }
 
-    public void load(boolean campfireEnabled, boolean borderEnabled) {
+    @Override
+    public void load(boolean borderEnabled) {
         final var nbtCompound = ModPathUtils.readNbt(MANAGERS_FILE_NAME, server.session);
 
-        boolean campfireEnabledSet = false;
         boolean borderEnabledSet = false;
 
         for (String key : nbtCompound.getKeys()) {
-            if(key.equals("campfireEnabled")) {
-                this.campfireEnabled = nbtCompound.getBoolean(key);
-                campfireEnabledSet = true;
-                continue;
-            }
-
             if(key.equals("borderEnabled")) {
                 this.borderEnabled = nbtCompound.getBoolean(key);
                 borderEnabledSet = true;
@@ -114,10 +106,6 @@ public class FortressModServerManager implements IFortressModServerManager {
             manager.readFromNbt(managerNbt);
 
             serverManagers.put(masterPlayerId, manager);
-        }
-
-        if(!campfireEnabledSet) {
-            this.campfireEnabled = campfireEnabled;
         }
         if(!borderEnabledSet) {
             this.borderEnabled = borderEnabled;
@@ -137,9 +125,6 @@ public class FortressModServerManager implements IFortressModServerManager {
         return Optional.empty();
     }
 
-    public boolean isCampfireEnabled() {
-        return campfireEnabled;
-    }
 
     public boolean isBorderEnabled() {
         return borderEnabled;

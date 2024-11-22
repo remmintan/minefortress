@@ -48,7 +48,7 @@ public class FortressServerEvents {
             final var fortressModServerManager = fortressServer.get_FortressModServerManager();
             final var manager = fortressModServerManager.getFortressManager(player);
             final var provider = fortressModServerManager.getManagersProvider(player);
-            manager.syncOnJoin(fortressModServerManager.isCampfireEnabled(), fortressModServerManager.isBorderEnabled());
+            manager.syncOnJoin(fortressModServerManager.isBorderEnabled());
             final var serverProfessionManager = provider.getProfessionsManager();
             serverProfessionManager.sendProfessions(player);
             serverProfessionManager.scheduleSync();
@@ -72,7 +72,7 @@ public class FortressServerEvents {
             if(server instanceof IFortressServer IFortressServer) {
                 final var saveProps = server.getSaveProperties();
                 if(saveProps instanceof FortressWorldCreator wcProps) {
-                    IFortressServer.get_FortressModServerManager().load(wcProps.is_ShowCampfire(), wcProps.is_BorderEnabled());
+                    IFortressServer.get_FortressModServerManager().load(wcProps.is_BorderEnabled());
                 } else {
                     IFortressServer.get_FortressModServerManager().load();
                 }

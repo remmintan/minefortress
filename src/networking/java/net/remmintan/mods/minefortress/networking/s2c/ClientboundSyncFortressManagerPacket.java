@@ -14,7 +14,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
     private final boolean connectedToTheServer;
     private final int maxColonistsCount;
     private final int reservedColonistsCount;
-    private final boolean campfireEnabled;
     private final boolean borderEnabled;
 
     public ClientboundSyncFortressManagerPacket(int colonistsCount,
@@ -23,7 +22,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
                                                 boolean connectedToTheServer,
                                                 int maxColonistsCount,
                                                 int reservedColonistsCount,
-                                                boolean campfireEnabled,
                                                 boolean borderEnabled) {
         this.colonistsCount = colonistsCount;
         this.fortressPos = fortressPos;
@@ -31,7 +29,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
         this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
         this.reservedColonistsCount = reservedColonistsCount;
-        this.campfireEnabled = campfireEnabled;
         this.borderEnabled = borderEnabled;
     }
 
@@ -47,7 +44,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
         this.maxColonistsCount = buf.readInt();
         this.connectedToTheServer = buf.readBoolean();
         this.reservedColonistsCount = buf.readInt();
-        this.campfireEnabled = buf.readBoolean();
         this.borderEnabled = buf.readBoolean();
     }
 
@@ -62,7 +58,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
                     this.connectedToTheServer,
                     this.maxColonistsCount,
                     reservedColonistsCount,
-                    campfireEnabled,
                     borderEnabled
                 );
     }
@@ -79,7 +74,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
         buf.writeInt(maxColonistsCount);
         buf.writeBoolean(connectedToTheServer);
         buf.writeInt(reservedColonistsCount);
-        buf.writeBoolean(campfireEnabled);
         buf.writeBoolean(borderEnabled);
     }
 }

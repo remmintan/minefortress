@@ -3,7 +3,6 @@ package org.minefortress.fortress;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -24,7 +23,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
@@ -81,9 +79,7 @@ import static net.remmintan.mods.minefortress.core.interfaces.automation.Profess
 
 public final class ServerFortressManager implements IFortressManager, IServerManagersProvider, IServerFortressManager {
 
-    private static final BlockState DEFAULT_STATE_ABOVE_CAMPFIRE = Blocks.BARRIER.getDefaultState();
     private static final int DEFAULT_COLONIST_COUNT = 5;
-    public static final BlockState CAMPFIRE_DEFAULT_STATE = Blocks.CAMPFIRE.getDefaultState();
 
     private final MinecraftServer server;
     private final Set<LivingEntity> pawns = new HashSet<>();
@@ -106,7 +102,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     private BlockPos fortressCenter = null;
     private int maxColonistsCount = -1;
 
-    private boolean campfireEnabled;
     private boolean borderEnabled;
     private boolean spawnPawns = true;
 
@@ -179,7 +174,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                 isServer,
                 maxColonistsCount,
                 getReservedPawnsCount(),
-                campfireEnabled,
                 borderEnabled);
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, syncFortressPacket);
         if(needSyncSpecialBlocks){
@@ -247,9 +241,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         }
 
         if(this.fortressCenter != null) {
-            if (!this.campfireEnabled)
-                resetCampfireState(player);
-
             final var colonistsCount = this.pawns.size();
             final var spawnFactor = MathHelper.clampedLerp(82, 99, colonistsCount / 50f);
             if(spawnPawns && (maxColonistsCount == -1 || colonistsCount < maxColonistsCount)) {
@@ -284,22 +275,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                     .filter(LivingEntity::isAlive)
                     .limit(deltaColonists)
                     .forEach(it -> it.damage(getOutOfWorldDamageSource(), Integer.MAX_VALUE));
-        }
-    }
-
-    private void resetCampfireState(@Nullable ServerPlayerEntity player) {
-        final BlockState blockState = getWorld().getBlockState(this.fortressCenter);
-        if(blockState == CAMPFIRE_DEFAULT_STATE) {
-            getWorld().setBlockState(fortressCenter, Blocks.AIR.getDefaultState(), 3);
-            if(player != null)
-                getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
-        }
-        final BlockPos aboveTheCenter = this.fortressCenter.up();
-        final BlockState blockStateAbove = getWorld().getBlockState(aboveTheCenter);
-        if(blockStateAbove == DEFAULT_STATE_ABOVE_CAMPFIRE) {
-            getWorld().setBlockState(aboveTheCenter, Blocks.AIR.getDefaultState(), 3);
-            if(player != null)
-                getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
         }
     }
 
@@ -406,19 +381,14 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         return new BlockPos(spawnX, spawnY, spawnZ);
     }
 
-    public void syncOnJoin(boolean campfireEnabled, boolean borderEnabled) {
-        this.campfireEnabled = campfireEnabled;
+    @Override
+    public void syncOnJoin(boolean borderEnabled) {
         this.borderEnabled = borderEnabled;
         this.needSync = true;
         this.needSyncSpecialBlocks = true;
         getAutomationAreaManager().sync();
         getInfluenceManager().sync();
         getFightManager().sync();
-    }
-
-    public void setCampfireVisibilityState(boolean campfireEnabled) {
-        this.campfireEnabled = campfireEnabled;
-        this.scheduleSync();
     }
 
     public void setBorderVisibilityState(boolean borderEnabled) {

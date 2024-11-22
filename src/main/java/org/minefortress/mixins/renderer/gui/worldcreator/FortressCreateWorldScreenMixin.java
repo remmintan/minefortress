@@ -32,7 +32,6 @@ public abstract class FortressCreateWorldScreenMixin extends Screen {
     public SaveProperties updateLevelPropsBeforeStartingAServer(SaveProperties props) {
         final var worldCreator = this.getWorldCreator();
         if(props instanceof FortressWorldCreator wcProps && worldCreator instanceof FortressWorldCreator fortressWorldCreator) {
-            wcProps.set_ShowCampfire(fortressWorldCreator.is_ShowCampfire());
             wcProps.set_BorderEnabled(fortressWorldCreator.is_BorderEnabled());
         }
 

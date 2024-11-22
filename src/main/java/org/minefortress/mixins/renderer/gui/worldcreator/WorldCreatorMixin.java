@@ -15,8 +15,6 @@ public abstract class WorldCreatorMixin implements FortressWorldCreator {
 
     @Unique
     private boolean borderEnabled = false;
-    @Unique
-    private boolean showCampfire = true;
 
     @Shadow public abstract void setDifficulty(Difficulty difficulty);
 
@@ -40,13 +38,4 @@ public abstract class WorldCreatorMixin implements FortressWorldCreator {
         this.borderEnabled = borderEnabled;
     }
 
-    @Override
-    public boolean is_ShowCampfire() {
-        return showCampfire;
-    }
-
-    @Override
-    public void set_ShowCampfire(boolean showCampfire) {
-        this.showCampfire = showCampfire;
-    }
 }

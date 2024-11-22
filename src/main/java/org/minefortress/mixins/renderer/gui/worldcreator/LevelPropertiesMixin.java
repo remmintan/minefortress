@@ -10,19 +10,7 @@ public abstract class LevelPropertiesMixin implements FortressWorldCreator {
 
     // true by default because we need compatibility with existing worlds
     @Unique
-    private boolean showCampfire = true;
-    @Unique
     private boolean borderEnabled = false;
-
-    @Override
-    public void set_ShowCampfire(boolean showCampfire) {
-        this.showCampfire = showCampfire;
-    }
-
-    @Override
-    public boolean is_ShowCampfire() {
-        return this.showCampfire;
-    }
 
     @Override
     public void set_BorderEnabled(boolean borderEnabled) {

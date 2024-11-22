@@ -100,7 +100,6 @@ public final class ClientFortressManager implements IClientFortressManager {
             boolean connectedToTheServer,
             int maxColonistsCount,
             int reservedColonistCount,
-            boolean campfireEnabled,
             boolean borderEnabled
     ) {
         this.colonistsCount = colonistsCount;
