@@ -87,15 +87,6 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        if(manager.getState() == FortressState.COMBAT) {
-            final var influenceManager = ModUtils.getInfluenceManager();
-            if(influenceManager.isSelecting()) {
-                influenceManager.cancelSelectingInfluencePosition();
-                cir.setReturnValue(false);
-                return;
-            }
-        }
-
         if(manager.getState() == FortressState.AREAS_SELECTION) {
             final var areasClientManager = ModUtils.getAreasClientManager();
             areasClientManager.select(client.crosshairTarget);

@@ -37,7 +37,6 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressA
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
-import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluenceManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
@@ -56,7 +55,6 @@ import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fight.ServerFightManager;
-import org.minefortress.fight.influence.ServerInfluenceManager;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.fortress.automation.areas.ServerAutomationAreaInfo;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
@@ -102,7 +100,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     private BlockPos fortressCenter = null;
     private int maxColonistsCount = -1;
 
-    private boolean borderEnabled;
     private boolean spawnPawns = true;
 
     public ServerFortressManager(MinecraftServer server) {
@@ -113,7 +110,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         registerManager(IServerResourceManager.class, new ServerResourceManager(server));
         registerManager(IServerBuildingsManager.class, new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD)));
         registerManager(IServerAutomationAreaManager.class, new AreasServerManager());
-        registerManager(IServerInfluenceManager.class, new ServerInfluenceManager(this));
         registerManager(IServerFightManager.class, new ServerFightManager(this));
         registerManager(ITasksCreator.class, new TasksCreator());
 
@@ -173,8 +169,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                 gamemode,
                 isServer,
                 maxColonistsCount,
-                getReservedPawnsCount(),
-                borderEnabled);
+                getReservedPawnsCount());
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, syncFortressPacket);
         if(needSyncSpecialBlocks){
             final var syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks, blueprintsSpecialBlocks);
@@ -341,7 +336,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             spawnPawnNearCampfire(player.getUuid());
         }
 
-        getInfluenceManager().addCenterAsInfluencePosition();
         player.setSpawnPoint(getWorld().getRegistryKey(), player.getBlockPos(), 0, true, false);
 
         this.scheduleSync();
@@ -382,19 +376,13 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     }
 
     @Override
-    public void syncOnJoin(boolean borderEnabled) {
-        this.borderEnabled = borderEnabled;
+    public void syncOnJoin() {
         this.needSync = true;
         this.needSyncSpecialBlocks = true;
         getAutomationAreaManager().sync();
-        getInfluenceManager().sync();
         getFightManager().sync();
     }
 
-    public void setBorderVisibilityState(boolean borderEnabled) {
-        this.borderEnabled = borderEnabled;
-        this.scheduleSync();
-    }
 
     public void scheduleSync() {
         needSync = true;
@@ -535,7 +523,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         if(tag.contains("spawnPawns")) {
             this.spawnPawns = tag.getBoolean("spawnPawns");
         }
-        getInfluenceManager().sync();
         getFightManager().sync();
         getProfessionsManager().scheduleSync();
         getResourceManager().syncAll();

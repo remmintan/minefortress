@@ -4,7 +4,6 @@ import net.minecraft.entity.LivingEntity;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
-import net.remmintan.mods.minefortress.core.interfaces.infuence.IServerInfluenceManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
@@ -18,9 +17,6 @@ public interface IServerManagersProvider {
     Optional<LivingEntity> spawnPawnNearCampfire(UUID id);
     default IServerAutomationAreaManager getAutomationAreaManager() {
         return getManager(IServerAutomationAreaManager.class);
-    }
-    default IServerInfluenceManager getInfluenceManager() {
-        return getManager(IServerInfluenceManager.class);
     }
     default IServerProfessionsManager getProfessionsManager() {
         return getManager(IServerProfessionsManager.class);

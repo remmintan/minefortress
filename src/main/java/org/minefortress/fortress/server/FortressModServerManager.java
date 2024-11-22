@@ -22,7 +22,6 @@ public class FortressModServerManager implements IFortressModServerManager {
     private final MinecraftServer server;
     private final Map<UUID, ServerFortressManager> serverManagers = new HashMap<>();
 
-    private boolean borderEnabled;
 
     public FortressModServerManager(MinecraftServer server) {
         this.server = server;
@@ -78,37 +77,20 @@ public class FortressModServerManager implements IFortressModServerManager {
             nbt.put(id.toString(), fortressNbt);
         }
 
-        nbt.putBoolean("borderEnabled", borderEnabled);
-
         ModPathUtils.saveNbt(nbt, MANAGERS_FILE_NAME, server.session);
     }
 
-    public void load() {
-        load(false);
-    }
-
     @Override
-    public void load(boolean borderEnabled) {
+    public void load() {
         final var nbtCompound = ModPathUtils.readNbt(MANAGERS_FILE_NAME, server.session);
 
-        boolean borderEnabledSet = false;
-
         for (String key : nbtCompound.getKeys()) {
-            if(key.equals("borderEnabled")) {
-                this.borderEnabled = nbtCompound.getBoolean(key);
-                borderEnabledSet = true;
-                continue;
-            }
-
             final var managerNbt = nbtCompound.getCompound(key);
             final var masterPlayerId = UUID.fromString(key);
             final var manager = new ServerFortressManager(server);
             manager.readFromNbt(managerNbt);
 
             serverManagers.put(masterPlayerId, manager);
-        }
-        if(!borderEnabledSet) {
-            this.borderEnabled = borderEnabled;
         }
     }
 
@@ -123,10 +105,5 @@ public class FortressModServerManager implements IFortressModServerManager {
             }
         }
         return Optional.empty();
-    }
-
-
-    public boolean isBorderEnabled() {
-        return borderEnabled;
     }
 }

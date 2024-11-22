@@ -61,8 +61,6 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     private FortressState state = FortressState.BUILD_SELECTION;
 
-    private boolean borderEnabled = true;
-
     public ClientFortressManager() {
         professionManager = new ClientProfessionManager(
                 () -> ((IClientManagersProvider) MinecraftClient.getInstance())
@@ -99,16 +97,13 @@ public final class ClientFortressManager implements IClientFortressManager {
             FortressGamemode gamemode,
             boolean connectedToTheServer,
             int maxColonistsCount,
-            int reservedColonistCount,
-            boolean borderEnabled
-    ) {
+            int reservedColonistCount) {
         this.colonistsCount = colonistsCount;
         this.fortressCenter = fortressCenter;
         this.gamemode = gamemode;
         this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
         this.reservedColonistCount = reservedColonistCount;
-        this.borderEnabled = borderEnabled;
         this.initialized = true;
     }
 
@@ -349,11 +344,6 @@ public final class ClientFortressManager implements IClientFortressManager {
         final var health = buildingInfo.getHealth();
 
         return new BuildingHealthRenderInfo(center, health);
-    }
-
-    @Override
-    public boolean isBorderEnabled() {
-        return borderEnabled;
     }
 
     @Override

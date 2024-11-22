@@ -42,7 +42,6 @@ public class FortressHud {
         hudLayers.add(new PawnsSelectionHudLayer(client));
         hudLayers.add(new CombatHudLayer(client));
         hudLayers.add(new AreasHudLayer(client));
-        hudLayers.add(new InfluenceHudLayer(client));
         hudLayers.add(new UtilsHudLayer(client));
     }
 

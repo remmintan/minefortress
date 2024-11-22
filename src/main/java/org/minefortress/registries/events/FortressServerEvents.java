@@ -13,7 +13,6 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.Blueprin
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.minefortress.MineFortressMod;
-import org.minefortress.interfaces.FortressWorldCreator;
 import org.minefortress.utils.ModUtils;
 
 public class FortressServerEvents {
@@ -48,7 +47,7 @@ public class FortressServerEvents {
             final var fortressModServerManager = fortressServer.get_FortressModServerManager();
             final var manager = fortressModServerManager.getFortressManager(player);
             final var provider = fortressModServerManager.getManagersProvider(player);
-            manager.syncOnJoin(fortressModServerManager.isBorderEnabled());
+            manager.syncOnJoin();
             final var serverProfessionManager = provider.getProfessionsManager();
             serverProfessionManager.sendProfessions(player);
             serverProfessionManager.scheduleSync();
@@ -69,13 +68,8 @@ public class FortressServerEvents {
         });
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            if(server instanceof IFortressServer IFortressServer) {
-                final var saveProps = server.getSaveProperties();
-                if(saveProps instanceof FortressWorldCreator wcProps) {
-                    IFortressServer.get_FortressModServerManager().load(wcProps.is_BorderEnabled());
-                } else {
-                    IFortressServer.get_FortressModServerManager().load();
-                }
+            if (server instanceof IFortressServer fortressServer) {
+                fortressServer.get_FortressModServerManager().load();
             }
         });
 

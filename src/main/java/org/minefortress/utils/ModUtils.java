@@ -10,7 +10,6 @@ import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import net.remmintan.mods.minefortress.core.interfaces.infuence.IClientInfluenceManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreasClientManager;
@@ -80,9 +79,6 @@ public class ModUtils {
     public static IClientBlueprintManager getBlueprintManager() {
         return getClientManagersProvider().get_BlueprintManager();
     }
-    public static IClientInfluenceManager getInfluenceManager() {
-        return getClientManagersProvider().get_InfluenceManager();
-    }
 
     public static ISelectionManager getSelectionManager() {
         return getClientManagersProvider().get_SelectionManager();
@@ -105,12 +101,10 @@ public class ModUtils {
         final var blueprintManager = getBlueprintManager();
         final var selectionManager = getSelectionManager();
         final var areasClientManager = getAreasClientManager();
-        final var influenceManager = getInfluenceManager();
 
         final var anyManagerSelecting = blueprintManager.isSelecting() ||
                 selectionManager.isSelecting() ||
-                areasClientManager.isSelecting() ||
-                influenceManager.isSelecting();
+                areasClientManager.isSelecting();
 
         return options.pickItemKey.isPressed() || (options.sprintKey.isPressed() && !anyManagerSelecting);
     }

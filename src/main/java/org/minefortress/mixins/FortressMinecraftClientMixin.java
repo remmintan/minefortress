@@ -39,7 +39,6 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fight.ClientPawnsSelectionManager;
-import org.minefortress.fight.influence.ClientInfluenceManager;
 import org.minefortress.fortress.ClientFortressManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.interfaces.IFortressMinecraftClient;
@@ -72,8 +71,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
     @Unique
     private ClientBlueprintManager clientBlueprintManager;
-    @Unique
-    private ClientInfluenceManager influenceManager;
+
     @Unique
     private BlueprintRenderer blueprintRenderer;
     @Unique
@@ -125,7 +123,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.areasClientManager = new AreasClientManager();
 
         clientBlueprintManager = new ClientBlueprintManager(client);
-        influenceManager = new ClientInfluenceManager(client);
 
 
         blueprintRenderer = new BlueprintRenderer(this::getProperBlockDataProviderBasedOnState, client, blockBufferBuilderStorage);
@@ -280,11 +277,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return this.areasClientManager;
     }
 
-    @Override
-    public ClientInfluenceManager get_InfluenceManager() {
-        return this.influenceManager;
-    }
-
     public IClientPawnsSelectionManager get_PawnsSelectionManager() {
         return pawnsSelectionManager;
     }
@@ -297,10 +289,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Unique
     private IBlockDataProvider getProperBlockDataProviderBasedOnState() {
-        if(clientFortressManager.getState() == FortressState.COMBAT) {
-            return this.get_InfluenceManager().getBlockDataProvider();
-        }
-
         return this.get_BlueprintManager().getBlockDataProvider();
     }
 }

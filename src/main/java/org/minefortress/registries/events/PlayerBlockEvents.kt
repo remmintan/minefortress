@@ -47,11 +47,6 @@ fun registerPlayerBlockEvents() {
         val fortressManager = ModUtils.getFortressClientManager()
 
         if (fortressManager.state == FortressState.COMBAT) {
-            val influenceManager = ModUtils.getInfluenceManager()
-            if (influenceManager.isSelecting) {
-                influenceManager.selectInfluencePosition()
-                return@register ActionResult.SUCCESS
-            }
             updateFightSelection(hitResult, fortressManager)
             return@register ActionResult.SUCCESS
         }

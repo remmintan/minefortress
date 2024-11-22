@@ -18,10 +18,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IServerFortressManager {
-    void setBorderVisibilityState(boolean borderEnabled);
     void scheduleSync();
 
-    void syncOnJoin(boolean borderEnabled);
+    void syncOnJoin();
     IPawnNameGenerator getNameGenerator();
     void replaceColonistWithTypedPawn(LivingEntity colonist, String warriorId, EntityType<? extends LivingEntity> entityType);
 

@@ -19,7 +19,6 @@ import net.remmintan.mods.minefortress.networking.c2s.C2SAddAreaPacket;
 import net.remmintan.mods.minefortress.networking.c2s.C2SRemoveAutomationAreaPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.joml.Vector4f;
-import org.minefortress.utils.ModUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +33,6 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
     private BlockPos selectionStart;
     private BlockPos selectionEnd;
     private IAutomationAreaInfo hoveredArea;
-    private boolean isCorrectState = true;
 
     @Override
     public boolean select(HitResult target) {
@@ -53,21 +51,14 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                 selectionStart = blockPos.toImmutable();
                 selectionEnd = blockPos.toImmutable();
             } else {
-                if(isCorrectState) {
-                    final var selectedBlocks = Collections.unmodifiableList(getSelectedBlocks());
-                    final var info = new AutomationAreaInfo(
-                            selectedBlocks,
-                            selectionType,
-                            UUID.randomUUID()
-                    );
-                    final var packet = new C2SAddAreaPacket(info);
-                    FortressClientNetworkHelper.send(C2SAddAreaPacket.CHANNEL, packet);
-                } else {
-                    MinecraftClient.getInstance()
-                            .inGameHud
-                            .getChatHud()
-                            .addMessage(Text.literal("The selected area is not inside the fortress!"));
-                }
+                final var selectedBlocks = Collections.unmodifiableList(getSelectedBlocks());
+                final var info = new AutomationAreaInfo(
+                        selectedBlocks,
+                        selectionType,
+                        UUID.randomUUID()
+                );
+                final var packet = new C2SAddAreaPacket(info);
+                FortressClientNetworkHelper.send(C2SAddAreaPacket.CHANNEL, packet);
                 resetSelection();
             }
         }
@@ -89,11 +80,6 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
                 }
             }
 
-            isCorrectState = ModUtils.getInfluenceManager()
-                    .getFortressBorder()
-                    .map(it -> getSelectedBlocks().stream().allMatch(it::contains))
-                    .orElse(true);
-
         }
     }
 
@@ -103,7 +89,6 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
         this.selectionStart = null;
         this.needsUpdate = true;
         this.hoveredArea = null;
-        this.isCorrectState = true;
     }
 
     @Override
@@ -152,9 +137,6 @@ public final class AreasClientManager implements ISelectionInfoProvider, ISelect
 
     @Override
     public Vector4f getClickColor() {
-        if(!isCorrectState) {
-            return new Vector4f((170f/255f), 0.0f, 0.0f, 0.5f);
-        }
         return selectionType.getColor();
     }
     @Override

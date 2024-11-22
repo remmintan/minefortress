@@ -9,7 +9,6 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.utils.ModUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -54,10 +53,6 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         }
     }
 
-    protected boolean isEnoughResources() {
-        return enoughResources;
-    }
-
     private void checkCantBuild() {
         if(!enoughResources) {
             cantBuild = true;
@@ -72,13 +67,11 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
                 .collect(Collectors.toSet());
         final int floorLevel = getSelectedStructure().getFloorLevel();
 
-        final var fortressBorder = ModUtils.getInfluenceManager().getFortressBorder();
 
         final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
                 .filter(blockPos -> blockPos.getY() >= floorLevel)
                 .map(pos -> pos.add(structureBuildPos.down(floorLevel)))
-                .anyMatch(pos -> !BuildingHelper.canPlaceBlock(client.world, pos) ||
-                        fortressBorder.map(border -> !border.contains(pos)).orElse(false));
+                .anyMatch(pos -> !BuildingHelper.canPlaceBlock(client.world, pos));
 
         final boolean blueprintPartInTheAir = blueprintDataPositions.stream()
                 .filter(blockPos -> {
@@ -86,8 +79,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
                     return y<=floorLevel;
                 })
                 .map(pos -> pos.add(structureBuildPos.down(floorLevel)))
-                .anyMatch(pos -> BuildingHelper.canPlaceBlock(client.world, pos.down()) ||
-                        fortressBorder.map(border -> !border.contains(pos)).orElse(false));
+                .anyMatch(pos -> BuildingHelper.canPlaceBlock(client.world, pos.down()));
 
         cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
     }

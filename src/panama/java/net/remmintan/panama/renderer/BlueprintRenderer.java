@@ -12,7 +12,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureRenderInfoProvider;
@@ -233,11 +232,6 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
     @NotNull
     private static IStructureRenderInfoProvider getStructureRenderInfoProvider() {
         final var provider = CoreModUtils.getMineFortressManagersProvider();
-        final var manager = provider.get_ClientFortressManager();
-        final var state = manager.getState();
-        if(state == FortressState.COMBAT) {
-            return provider.get_InfluenceManager();
-        }
         return provider.get_BlueprintManager();
     }
 

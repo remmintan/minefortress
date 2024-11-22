@@ -18,6 +18,7 @@ import org.minefortress.tasks.ClientTasksHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,6 +30,7 @@ import java.util.function.Supplier;
 public abstract class ClientWorldMixin extends World implements ITasksInformationHolder {
 
     @Shadow @Final private MinecraftClient client;
+    @Unique
     private ClientTasksHolder tasksHolder;
 
     protected ClientWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, DynamicRegistryManager registryManager, RegistryEntry<DimensionType> dimensionEntry, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long biomeAccess, int maxChainedNeighborUpdates) {
@@ -50,7 +52,6 @@ public abstract class ClientWorldMixin extends World implements ITasksInformatio
         if(shouldKeepTicking.getAsBoolean()) {
             if(client instanceof IClientManagersProvider fortressClient){
                 fortressClient.get_BlueprintManager().tick();
-                fortressClient.get_InfluenceManager().tick();
             }
         }
     }

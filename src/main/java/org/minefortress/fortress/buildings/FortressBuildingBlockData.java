@@ -192,7 +192,7 @@ class FortressBuildingBlockData {
     }
 
     int getHealth() {
-        if(actualState.size() == 0) return 0;
+        if (actualState.isEmpty()) return 0;
         final var preserved = actualState.values().stream().filter(state -> state == BuildingBlockState.PRESERVED).count();
         final var delta = (float) preserved / (float) actualState.size();
         return (int)MathHelper.clampedMap(delta, 0.5f, 1, 0, 100);

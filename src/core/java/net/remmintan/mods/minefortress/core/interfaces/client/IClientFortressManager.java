@@ -36,8 +36,7 @@ public interface IClientFortressManager extends IFortressManager {
             FortressGamemode gamemode,
             boolean connectedToTheServer,
             int maxColonistsCount,
-            int reservedColonistCount,
-            boolean borderEnabled
+            int reservedColonistCount
     );
 
     void tick(IHoveredBlockProvider fortressClient);
@@ -78,8 +77,6 @@ public interface IClientFortressManager extends IFortressManager {
     FortressState getState();
 
     List<BuildingHealthRenderInfo> getBuildingHealths();
-
-    boolean isBorderEnabled();
 
     void openRepairBuildingScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair);
 

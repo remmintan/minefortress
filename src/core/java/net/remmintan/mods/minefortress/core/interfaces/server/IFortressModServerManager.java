@@ -12,11 +12,8 @@ public interface IFortressModServerManager {
     IServerManagersProvider getManagersProvider(UUID id);
     IServerFortressManager getFortressManager(ServerPlayerEntity player);
     IServerFortressManager getFortressManager(UUID id);
-    boolean isBorderEnabled();
     void save();
     void load();
-
-    void load(boolean border);
     void tick(PlayerManager manager);
     Optional<IServerManagersProvider> findReachableFortress(BlockPos pos, double reachRange);
 }

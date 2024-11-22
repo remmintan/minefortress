@@ -119,16 +119,6 @@ public class SelectionManager implements ISelectionManager {
             } else {
                 inCorrectState = true;
             }
-
-            provider
-                    .get_InfluenceManager()
-                    .getFortressBorder()
-                    .ifPresent(border ->
-                            inCorrectState = inCorrectState && selection
-                                    .getSelection()
-                                    .stream()
-                                    .allMatch(border::contains)
-                    );
         }
     }
 

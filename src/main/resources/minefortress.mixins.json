@@ -21,8 +21,7 @@
     "network.FortressPacketByteBufMixin",
     "network.FortressServerPlayNetworkHandlerMixin",
     "renderer.gui.FortressScreenHandler",
-    "renderer.gui.FortressSimpleInventoryMixin",
-    "renderer.gui.worldcreator.LevelPropertiesMixin"
+    "renderer.gui.FortressSimpleInventoryMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",
@@ -42,7 +41,6 @@
     "renderer.gui.GameModeSelectionScreenMixin",
     "renderer.gui.worldcreator.FortressCreateWorldScreenMixin",
     "renderer.gui.worldcreator.FortressCyclingButtonMixin",
-    "renderer.gui.worldcreator.GameTabMixin",
     "renderer.gui.worldcreator.WorldCreatorMixin",
     "world.ClientWorldMixin",
     "world.WorldLoadedEventMixin"

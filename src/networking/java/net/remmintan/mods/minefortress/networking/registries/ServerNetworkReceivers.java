@@ -32,8 +32,6 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SHirePawnWithScreenPacket.CHANNEL, C2SHirePawnWithScreenPacket::new);
         registerReceiver(C2SAddAreaPacket.CHANNEL, C2SAddAreaPacket::new);
         registerReceiver(C2SRemoveAutomationAreaPacket.CHANNEL, C2SRemoveAutomationAreaPacket::new);
-        registerReceiver(C2SCaptureInfluencePositionPacket.CHANNEL, C2SCaptureInfluencePositionPacket::new);
-        registerReceiver(C2SUpdateNewInfluencePosition.CHANNEL, C2SUpdateNewInfluencePosition::new);
         registerReceiver(C2SJumpToCampfire.CHANNEL, C2SJumpToCampfire::new);
         registerReceiver(C2SClearActiveBlueprint.CHANNEL, C2SClearActiveBlueprint::new);
         registerReceiver(C2SDestroyBuilding.CHANNEL, C2SDestroyBuilding::new);
