@@ -10,6 +10,7 @@ import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundRemoveBlueprintPacket;
@@ -18,6 +19,7 @@ import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBlueprintPa
 import org.minefortress.blueprints.data.ServerStructureBlockDataManager;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
+import org.minefortress.tasks.InstantPlaceTask;
 import org.minefortress.tasks.SimpleSelectionTask;
 
 import java.util.*;
@@ -49,13 +51,11 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
             final ClientboundResetBlueprintPacket resetpacket = new ClientboundResetBlueprintPacket();
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESET_BLUEPRINT, resetpacket);
 
-            blueprints.forEach((blueprintId, metadata) -> {
-                blockDataManager.getStructureNbt(blueprintId)
-                        .ifPresent(it -> {
-                            final var packet = new ClientboundSyncBlueprintPacket(metadata, it);
-                            scheduledSyncs.add(packet);
-                        });
-            });
+            blueprints.forEach((blueprintId, metadata) -> blockDataManager.getStructureNbt(blueprintId)
+                    .ifPresent(it -> {
+                        final var packet = new ClientboundSyncBlueprintPacket(metadata, it);
+                        scheduledSyncs.add(packet);
+                    }));
 
             initialized = true;
         }
@@ -121,6 +121,15 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
         final BlockPos endPos = getEndPos(startPos, size);
 
         return new BlueprintDigTask(taskId, startPos, endPos);
+    }
+
+    @Override
+    public IInstantTask createInstantPlaceTask(String blueprintId, BlockPos start, BlockRotation rotation) {
+        final IStructureBlockData serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation);
+        final var blocks = serverStructureInfo.getLayer(BlueprintDataLayer.GENERAL);
+
+        final var metadata = blueprints.get(blueprintId);
+        return new InstantPlaceTask(metadata, blocks, start);
     }
 
     @Override

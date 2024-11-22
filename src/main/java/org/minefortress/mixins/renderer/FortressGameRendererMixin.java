@@ -49,6 +49,15 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         return this.getFov(this.getCamera(), f, b);
     }
 
+    @Unique
+    private static void resetAllSelectionManagers() {
+        final var provider = CoreModUtils.getMineFortressManagersProvider();
+
+        ModUtils.getSelectionManager().resetSelection();
+        provider.get_PawnsSelectionManager().resetSelection();
+        ModUtils.getAreasClientManager().resetSelection();
+    }
+
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick(CallbackInfo ci) {
         final var provider = (IClientManagersProvider) this.client;
@@ -64,11 +73,11 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
             }
 
             if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
-                if(clientFortressManager.isCenterNotSet()) {
-                    resetAllSelectionManagers();
-                    clientFortressManager.updateRenderer(client.worldRenderer);
-                    return;
-                }
+//                if(clientFortressManager.isCenterNotSet()) {
+//                    resetAllSelectionManagers();
+//                    clientFortressManager.updateRenderer(client.worldRenderer);
+//                    return;
+//                }
 
                 final IClientBlueprintManager clientBlueprintManager = provider.get_BlueprintManager();
                 if(clientBlueprintManager.isSelecting()) {
@@ -91,15 +100,6 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         } else {
             resetAllSelectionManagers();
         }
-    }
-
-    @Unique
-    private static void resetAllSelectionManagers() {
-        final var provider = CoreModUtils.getMineFortressManagersProvider();
-
-        ModUtils.getSelectionManager().resetSelection();
-//        provider.get_PawnsSelectionManager().resetSelection();
-        ModUtils.getAreasClientManager().resetSelection();
     }
 
     @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;"))

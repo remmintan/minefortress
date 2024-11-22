@@ -13,6 +13,10 @@ public interface IClientBlueprintManager extends IStructureRenderInfoProvider {
 
     void select(BlueprintMetadata blueprintMetadata);
 
+    default void select(String blueprintId) {
+        getBlueprintMetadataManager().getByBlueprintId(blueprintId).ifPresent(this::select);
+    }
+
     List<BlueprintMetadata> getAllBlueprints(BlueprintGroup group);
 
     void buildCurrentStructure();

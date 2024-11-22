@@ -5,7 +5,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
@@ -46,7 +45,7 @@ public interface IServerFortressManager {
 
     void decreaseMaxColonistsCount();
 
-    void setupCenter(BlockPos pos, World world, ServerPlayerEntity player);
+    void setupCenter(BlockPos pos, ServerPlayerEntity player);
 
     void openHandledScreen(ScreenType type, ServerPlayerEntity player, BlockPos pos);
 

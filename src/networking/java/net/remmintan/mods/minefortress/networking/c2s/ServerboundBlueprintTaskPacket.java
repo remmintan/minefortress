@@ -1,9 +1,11 @@
 package net.remmintan.mods.minefortress.networking.c2s;
 
+import kotlin.Unit;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
@@ -64,6 +66,21 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
             final var blueprintManager = fortressServerPlayer.get_ServerBlueprintManager();
             final var provider = getManagersProvider(server, player);
 
+            if ("campfire".equals(blueprintId)) {
+                final var task = blueprintManager.createInstantPlaceTask(blueprintId, startPos, rotation);
+                task.addFinishListener(() -> {
+                    final var start = task.getStart();
+                    final var end = task.getEnd();
+
+                    final var center = BlockBox.create(start, end).getCenter();
+
+                    manager.setupCenter(center, player);
+                    return Unit.INSTANCE;
+                });
+                provider.getTaskManager().executeInstantTask(task, player, provider);
+                return;
+            }
+
             Runnable executeBuildTask = () -> {
                 final var taskId = UUID.randomUUID();
                 final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
@@ -73,7 +90,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
                     final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
                     try {
                         serverResourceManager.reserveItems(taskId, stacks);
-                    }catch (IllegalStateException e) {
+                    } catch (IllegalStateException e) {
                         ModLogger.LOGGER.error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
                         FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
                         return;

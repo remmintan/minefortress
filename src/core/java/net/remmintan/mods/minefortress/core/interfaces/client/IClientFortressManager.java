@@ -3,7 +3,6 @@ package net.remmintan.mods.minefortress.core.interfaces.client;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
@@ -46,15 +45,11 @@ public interface IClientFortressManager extends IFortressManager {
 
     boolean isConnectedToTheServer();
 
-    BlockPos getPosAppropriateForCenter();
-
     boolean notInitialized();
 
     boolean isCenterNotSet();
 
-    void setupFortressCenter();
-
-    void updateRenderer(WorldRenderer worldRenderer);
+    void setupFortressCenter(BlockPos pos);
 
     List<BlockPos> getBuildingSelection(BlockPos pos);
 

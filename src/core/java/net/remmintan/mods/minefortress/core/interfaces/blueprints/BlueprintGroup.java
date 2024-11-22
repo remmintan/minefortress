@@ -14,22 +14,23 @@ public enum BlueprintGroup {
     DECORATION(true, Items.ROSE_BUSH, "Decoration"),
     FARMS(true, Items.WHEAT, "Farms", true),
     SOCIAL_BUILDINGS(true, Items.BOOKSHELF, "Social Buildings", true),
+    HIDDEN(true, Items.AIR, "", true)
     ;
 
     private final boolean topRow;
     private final ItemStack icon;
     private final Text nameText;
-    private final boolean legacy;
+    private final boolean hidden;
 
     BlueprintGroup(boolean topRow, Item item, String name) {
         this(topRow, item, name, false);
     }
 
-    BlueprintGroup(boolean topRow, Item item, String name, boolean legacy) {
+    BlueprintGroup(boolean topRow, Item item, String name, boolean hidden) {
         this.topRow = topRow;
         this.icon = new ItemStack(item);
         this.nameText = Text.literal(name);
-        this.legacy = legacy;
+        this.hidden = hidden;
     }
 
     public boolean isTopRow() {
@@ -44,7 +45,7 @@ public enum BlueprintGroup {
         return nameText;
     }
 
-    public static List<BlueprintGroup> nonLegacyValues() {
-        return Arrays.stream(BlueprintGroup.values()).filter(it -> !it.legacy).toList();
+    public static List<BlueprintGroup> nonHidden() {
+        return Arrays.stream(BlueprintGroup.values()).filter(it -> !it.hidden).toList();
     }
 }

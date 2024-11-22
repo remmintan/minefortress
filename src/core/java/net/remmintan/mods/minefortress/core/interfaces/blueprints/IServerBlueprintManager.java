@@ -4,6 +4,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 
 import java.util.UUID;
@@ -20,6 +21,8 @@ public interface IServerBlueprintManager {
     ITask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel);
 
     ITask createDigTask(UUID taskId, BlockPos startPos, int floorLevel, String blueprintId, BlockRotation rotation);
+
+    IInstantTask createInstantPlaceTask(String blueprintId, BlockPos start, BlockRotation rotation);
 
     NbtCompound write();
 

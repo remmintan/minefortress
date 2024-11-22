@@ -41,7 +41,7 @@ public class FortressToast implements Toast {
         return visibility;
     }
 
-    void hide() {
+    public void hide() {
         this.visibility = Visibility.HIDE;
     }
 

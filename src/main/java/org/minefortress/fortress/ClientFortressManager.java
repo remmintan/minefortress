@@ -3,11 +3,8 @@ package org.minefortress.fortress;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
@@ -23,7 +20,6 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SJumpToCampfire;
-import net.remmintan.mods.minefortress.networking.c2s.ServerboundFortressCenterSetPacket;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSetGamemodePacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -43,7 +39,6 @@ import java.util.stream.StreamSupport;
 
 public final class ClientFortressManager implements IClientFortressManager {
 
-    private static final Object KEY = new Object();
     private final IClientProfessionManager professionManager;
     private final IClientResourceManager resourceManager = new ClientResourceManagerImpl();
     private final IClientFightManager fightManager = new ClientFightManager();
@@ -56,10 +51,6 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     private IEssentialBuildingInfo hoveredBuilding = null;
 
-    private volatile FortressToast setCenterToast;
-
-    private BlockPos posAppropriateForCenter;
-    private BlockPos oldPosAppropriateForCenter;
     private List<IEssentialBuildingInfo> buildings = new ArrayList<>();
     private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
     private Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
@@ -130,14 +121,6 @@ public final class ClientFortressManager implements IClientFortressManager {
                 client.interactionManager == null ||
                 client.interactionManager.getCurrentGameMode() != MineFortressMod.FORTRESS
         ) {
-            synchronized (KEY) {
-                if(setCenterToast != null) {
-                    setCenterToast.hide();
-                    setCenterToast = null;
-                }
-            }
-
-            posAppropriateForCenter = null;
             hoveredBuilding = null;
             return;
         }
@@ -149,25 +132,14 @@ public final class ClientFortressManager implements IClientFortressManager {
         resetBuildEditState();
 
         if(isCenterNotSet()) {
-            synchronized (KEY) {
-                if(setCenterToast == null) {
-                    this.setCenterToast = new FortressToast("Set up your Fortress", "Right-click to place", Items.CAMPFIRE);
-                    client.getToastManager().add(setCenterToast);
+            final var blueprintManager = CoreModUtils.getMineFortressManagersProvider().get_BlueprintManager();
+            if (!blueprintManager.isSelecting()) {
+                blueprintManager.select("campfire");
+            } else {
+                final var id = blueprintManager.getSelectedStructure().getId();
+                if (!id.equals("campfire")) {
+                    blueprintManager.select("campfire");
                 }
-            }
-
-            final BlockPos hoveredBlockPos = fortressClient.get_HoveredBlockPos();
-            if(hoveredBlockPos!=null && !hoveredBlockPos.equals(BlockPos.ORIGIN)) {
-                if(hoveredBlockPos.equals(oldPosAppropriateForCenter)) return;
-
-                BlockPos cursor = hoveredBlockPos;
-                while (!BuildingHelper.canPlaceBlock(client.world, cursor))
-                    cursor = cursor.up();
-
-                while (BuildingHelper.canPlaceBlock(client.world, cursor.down()))
-                    cursor = cursor.down();
-
-                posAppropriateForCenter = cursor.toImmutable();
             }
         }
     }
@@ -191,11 +163,6 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     @Override
-    public BlockPos getPosAppropriateForCenter() {
-        return posAppropriateForCenter;
-    }
-
-    @Override
     public boolean notInitialized() {
         return !initialized;
     }
@@ -206,36 +173,9 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     @Override
-    public void setupFortressCenter() {
+    public void setupFortressCenter(BlockPos pos) {
         if(fortressCenter!=null) throw new IllegalStateException("Fortress center already set");
-        this.setCenterToast.hide();
-        this.setCenterToast = null;
-        fortressCenter = posAppropriateForCenter;
-        posAppropriateForCenter = null;
-        final ServerboundFortressCenterSetPacket serverboundFortressCenterSetPacket = new ServerboundFortressCenterSetPacket(fortressCenter);
-        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_CENTER, serverboundFortressCenterSetPacket);
-
-        final MinecraftClient client = MinecraftClient.getInstance();
-        final WorldRenderer worldRenderer = client.worldRenderer;
-
-
-        if(worldRenderer!=null) {
-            worldRenderer.scheduleBlockRenders(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ());
-            worldRenderer.scheduleTerrainUpdate();
-        }
-    }
-
-    @Override
-    public void updateRenderer(WorldRenderer worldRenderer) {
-        if(oldPosAppropriateForCenter == posAppropriateForCenter) return;
-        final BlockPos posAppropriateForCenter = this.getPosAppropriateForCenter();
-        if(posAppropriateForCenter != null) {
-            oldPosAppropriateForCenter = posAppropriateForCenter;
-            final BlockPos start = posAppropriateForCenter.add(-2, -2, -2);
-            final BlockPos end = posAppropriateForCenter.add(2, 2, 2);
-            worldRenderer.scheduleBlockRenders(start.getX(), start.getY(), start.getZ(), end.getX(), end.getY(), end.getZ());
-            worldRenderer.scheduleTerrainUpdate();
-        }
+        fortressCenter = pos;
     }
 
     @Override

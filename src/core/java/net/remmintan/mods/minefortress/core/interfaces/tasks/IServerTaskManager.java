@@ -10,5 +10,7 @@ import java.util.UUID;
 
 public interface IServerTaskManager extends IServerManager {
     boolean addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager, List<Integer> selectedPawns, ServerPlayerEntity player);
+
+    void executeInstantTask(IInstantTask task, ServerPlayerEntity player, IServerManagersProvider provider);
     void cancelTask(UUID id, IServerManagersProvider provider, IServerFortressManager manager);
 }

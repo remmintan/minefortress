@@ -1,4 +1,11 @@
 {
+  "HIDDEN": [
+    {
+      "name": "Campfire",
+      "file": "campfire",
+      "floorLevel": 0
+    }
+  ],
   "LIVING_HOUSES": [
     {
       "name": "Small House 1",

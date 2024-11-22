@@ -158,7 +158,6 @@ class FortressBuildingBlockData {
         if(stateUpdated)
             recalculatePreservedPositions();
 
-
         return stateUpdated;
     }
 

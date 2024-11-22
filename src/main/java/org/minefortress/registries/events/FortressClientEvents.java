@@ -20,12 +20,15 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkH
 import org.minefortress.controls.MouseEvents;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.registries.FortressKeybindings;
+import org.minefortress.registries.events.client.ToastEvents;
 import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.utils.ModUtils;
 
 public class FortressClientEvents {
 
     public static void register() {
+        new ToastEvents().register();
+
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ModUtils.getFortressClientManager().reset());
         ClientTickEvents.START_CLIENT_TICK.register(FortressClientEvents::startClientTick);
         ClientTickEvents.END_CLIENT_TICK.register(FortressClientEvents::endClientTick);

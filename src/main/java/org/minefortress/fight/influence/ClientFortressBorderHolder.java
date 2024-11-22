@@ -4,7 +4,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.fortress.FortressBorder;
-import org.minefortress.utils.ModUtils;
 
 import java.util.*;
 
@@ -25,14 +24,6 @@ public class ClientFortressBorderHolder extends BaseFortressBorderHolder {
     }
 
     public Optional<WorldBorder> getFortressBorder() {
-        final var fortressClientManager = ModUtils.getFortressClientManager();
-        if(fortressClientManager.isCenterNotSet()) {
-            final var posAppropriateForCenter = fortressClientManager.getPosAppropriateForCenter();
-            if(posAppropriateForCenter == null) {
-                return Optional.empty();
-            }
-            return getWorldBorder(Collections.singletonList(posAppropriateForCenter), true);
-        }
         final var selecting = clientInfluenceManager.isSelecting();
         if(selecting) {
             return clientInfluenceManager

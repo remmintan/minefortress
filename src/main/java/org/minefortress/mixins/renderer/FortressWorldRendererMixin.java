@@ -65,7 +65,6 @@ public abstract class FortressWorldRendererMixin  {
     public void setupTerrain(Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci) {
         final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
         fortressClient.get_BlueprintRenderer().prepareForRender();
-        fortressClient.get_CampfireRenderer().prepareForRender();
         fortressClient.get_SelectionRenderer().prepareForRender();
         fortressClient.get_TasksRenderer().prepareForRender();
     }
@@ -76,7 +75,6 @@ public abstract class FortressWorldRendererMixin  {
 
         final var fortressClient = (IFortressMinecraftClient) this.client;
         fortressClient.get_BlueprintRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z,  projectionMatrix);
-        fortressClient.get_CampfireRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
         fortressClient.get_SelectionRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
         fortressClient.get_TasksRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
 

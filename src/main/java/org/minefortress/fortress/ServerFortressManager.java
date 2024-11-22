@@ -247,9 +247,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         }
 
         if(this.fortressCenter != null) {
-            if(this.campfireEnabled)
-                setTheCampfireState(player);
-            else
+            if (!this.campfireEnabled)
                 resetCampfireState(player);
 
             final var colonistsCount = this.pawns.size();
@@ -286,22 +284,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                     .filter(LivingEntity::isAlive)
                     .limit(deltaColonists)
                     .forEach(it -> it.damage(getOutOfWorldDamageSource(), Integer.MAX_VALUE));
-        }
-    }
-
-    private void setTheCampfireState(@Nullable ServerPlayerEntity player) {
-        final BlockState blockState = getWorld().getBlockState(this.fortressCenter);
-        if(blockState != CAMPFIRE_DEFAULT_STATE) {
-            getWorld().setBlockState(fortressCenter, CAMPFIRE_DEFAULT_STATE, 3);
-            if(player != null)
-                getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, fortressCenter);
-        }
-        final BlockPos aboveTheCenter = this.fortressCenter.up();
-        final BlockState blockStateAbove = getWorld().getBlockState(aboveTheCenter);
-        if(blockStateAbove != DEFAULT_STATE_ABOVE_CAMPFIRE) {
-            getWorld().setBlockState(aboveTheCenter, DEFAULT_STATE_ABOVE_CAMPFIRE, 3);
-            if(player != null)
-                getWorld().emitGameEvent(player, GameEvent.BLOCK_PLACE, aboveTheCenter);
         }
     }
 
@@ -372,15 +354,8 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     }
 
     @Override
-    public void setupCenter(@NotNull BlockPos fortressCenter, World world, ServerPlayerEntity player) {
+    public void setupCenter(@NotNull BlockPos fortressCenter, ServerPlayerEntity player) {
         this.fortressCenter = fortressCenter;
-
-        if(!(world instanceof ServerWorld))
-            throw new IllegalArgumentException("World must be a server world");
-
-        if(this.campfireEnabled) {
-            setTheCampfireState(player);
-        }
 
         if(minX > this.fortressCenter.getX()-10) minX = this.fortressCenter.getX()-10;
         if(minZ > this.fortressCenter.getZ()-10) minZ = this.fortressCenter.getZ()-10;

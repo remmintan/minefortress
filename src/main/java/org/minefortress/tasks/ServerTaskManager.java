@@ -10,6 +10,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPaw
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -60,6 +61,11 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
         }
 
         return assignmentResult;
+    }
+
+    @Override
+    public void executeInstantTask(IInstantTask task, ServerPlayerEntity player, IServerManagersProvider provider) {
+        task.execute(player.getServerWorld(), player, provider::getBuildingsManager);
     }
 
     @Override

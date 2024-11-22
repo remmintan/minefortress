@@ -31,7 +31,10 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHo
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
-import net.remmintan.panama.renderer.*;
+import net.remmintan.panama.renderer.BlueprintRenderer;
+import net.remmintan.panama.renderer.FortressRenderLayer;
+import net.remmintan.panama.renderer.SelectionRenderer;
+import net.remmintan.panama.renderer.TasksRenderer;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
@@ -74,14 +77,12 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Unique
     private BlueprintRenderer blueprintRenderer;
     @Unique
-    private CampfireRenderer campfireRenderer;
-    @Unique
     private SelectionRenderer selectionRenderer;
     @Unique
     private TasksRenderer tasksRenderer;
     @Unique
     private AreasClientManager areasClientManager;
-
+    @Unique
     private final IClientPawnsSelectionManager pawnsSelectionManager = new ClientPawnsSelectionManager();
 
     @Shadow
@@ -128,7 +129,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
 
         blueprintRenderer = new BlueprintRenderer(this::getProperBlockDataProviderBasedOnState, client, blockBufferBuilderStorage);
-        campfireRenderer = new CampfireRenderer(client, blockBufferBuilderStorage);
         Map<RenderLayer, BufferBuilder> selectionBufferBuilderStorage = Map.ofEntries(
                 entry(RenderLayer.getLines(), new BufferBuilder(256)),
                 entry(FortressRenderLayer.getLinesNoDepth(), new BufferBuilder(256))
@@ -261,11 +261,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     }
 
     @Override
-    public CampfireRenderer get_CampfireRenderer() {
-        return campfireRenderer;
-    }
-
-    @Override
     public SelectionRenderer get_SelectionRenderer() {
         return selectionRenderer;
     }
@@ -297,7 +292,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Inject(method = "close", at = @At("HEAD"))
     public void close(CallbackInfo ci) {
         this.blueprintRenderer.close();
-        this.campfireRenderer.close();
         this.selectionRenderer.close();
     }
 
