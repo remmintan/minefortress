@@ -13,16 +13,15 @@ import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blueprints.isBlueprintWorld
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
 
-class BuildingBlock : BlockWithEntity(FabricBlockSettings
+class FortressBuildingConfigurationBlock : BlockWithEntity(
+    FabricBlockSettings
     .create()
     .dropsNothing()
-    .solidBlock { _, world, _ -> world is World && world.registryKey == BLUEPRINT_DIMENSION_KEY }
 ) {
 
     override fun createBlockEntity(pos: BlockPos?, state: BlockState?): BlockEntity {
-        return BuildingBlockEntity(pos, state)
+        return FortressBuildingConfigurationBlockEntity(pos, state)
     }
 
     @Deprecated("Deprecated in Java")

@@ -39,7 +39,7 @@ public class FortressItems {
     );
 
     public static final Item BUILDING_BLOCK = new BlockItem(
-            FortressBlocks.FORTRESS_BUILDING,
+            FortressBlocks.FORTRESS_BUILDING_CONFIGURATION,
             new FabricItemSettings().maxCount(1)
     );
 

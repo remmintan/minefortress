@@ -19,7 +19,9 @@ import org.minefortress.utils.ModUtils
 
 fun registerPlayerBlockEvents() {
     UseBlockCallback.EVENT.register { player, world, hand, hitResult ->
-        if (!world.isBlueprintWorld() || world.getBlockState(hitResult.blockPos).isOf(FortressBlocks.FORTRESS_BUILDING))
+        if (!world.isBlueprintWorld() || world.getBlockState(hitResult.blockPos)
+                .isOf(FortressBlocks.FORTRESS_BUILDING_CONFIGURATION)
+        )
             return@register ActionResult.PASS
 
         val cell = player.getPersonalBlueprintCell()

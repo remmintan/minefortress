@@ -12,10 +12,12 @@ import net.minecraft.util.Identifier;
 public class FortressBlocks {
 
     public static Block SCAFFOLD_OAK_PLANKS;
+    public static Block FORTRESS_BUILDING_CONFIGURATION;
     public static Block FORTRESS_BUILDING;
 
     public static BlockEntityType<FortressScaffoldBlockEntity> SCAFFOLD_ENT_TYPE;
-    public static BlockEntityType<BuildingBlockEntity> BUILDING_ENT_TYPE;
+    public static BlockEntityType<FortressBuildingConfigurationBlockEntity> BUILDING_CONFIGURATION_ENT_TYPE;
+    public static BlockEntityType<FortressBuildingBlockEntity> BUILDING_ENT_TYPE;
 
     public static void register() {
         final var scaffoldId = Identifier.of("minefortress", "scaffold_oak_planks");
@@ -28,12 +30,20 @@ public class FortressBlocks {
         );
 
 
-        final var buildingId = Identifier.of("minefortress", "building");
-        FORTRESS_BUILDING = Registry.register(Registries.BLOCK, buildingId, new BuildingBlock());
+        final var buildingConfigurationBlockId = Identifier.of("minefortress", "building_configuration");
+        FORTRESS_BUILDING_CONFIGURATION = Registry.register(Registries.BLOCK, buildingConfigurationBlockId, new FortressBuildingConfigurationBlock());
+        BUILDING_CONFIGURATION_ENT_TYPE = Registry.register(
+                Registries.BLOCK_ENTITY_TYPE,
+                buildingConfigurationBlockId,
+                FabricBlockEntityTypeBuilder.create(FortressBuildingConfigurationBlockEntity::new).build()
+        );
+
+        final var buildingBlockId = Identifier.of("minefortress", "building");
+        FORTRESS_BUILDING = Registry.register(Registries.BLOCK, buildingBlockId, new FortressBuildingBlock());
         BUILDING_ENT_TYPE = Registry.register(
                 Registries.BLOCK_ENTITY_TYPE,
-                buildingId,
-                FabricBlockEntityTypeBuilder.create(BuildingBlockEntity::new).build()
+                buildingBlockId,
+                FabricBlockEntityTypeBuilder.create(FortressBuildingBlockEntity::new).build()
         );
     }
 }

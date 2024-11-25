@@ -14,8 +14,8 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.gui.BuildingConfigurationScreenHandler
 
-class BuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
-    BlockEntity(FortressBlocks.BUILDING_ENT_TYPE, pos, state), NamedScreenHandlerFactory {
+class FortressBuildingConfigurationBlockEntity(pos: BlockPos?, state: BlockState?) :
+    BlockEntity(FortressBlocks.BUILDING_CONFIGURATION_ENT_TYPE, pos, state), NamedScreenHandlerFactory {
 
     var blueprintId: String? = null
     var blueprintName: String? = null

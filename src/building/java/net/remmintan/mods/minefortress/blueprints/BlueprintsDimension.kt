@@ -12,8 +12,8 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
-import net.remmintan.mods.minefortress.blocks.BuildingBlockEntity
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
+import net.remmintan.mods.minefortress.blocks.FortressBuildingConfigurationBlockEntity
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
@@ -74,8 +74,8 @@ fun ServerWorld.setBlueprintMetadata(
 ) {
     player?.getPersonalBlueprintCell()?.let {
         val metadataPos = it.configBlock
-        this.setBlockState(metadataPos, FortressBlocks.FORTRESS_BUILDING.defaultState)
-        (this.getBlockEntity(metadataPos) as BuildingBlockEntity).apply {
+        this.setBlockState(metadataPos, FortressBlocks.FORTRESS_BUILDING_CONFIGURATION.defaultState)
+        (this.getBlockEntity(metadataPos) as FortressBuildingConfigurationBlockEntity).apply {
             this.blueprintId = blueprintId
             this.blueprintName = blueprintName
             this.blueprintGroup = group ?: BlueprintGroup.LIVING_HOUSES
@@ -98,7 +98,7 @@ fun ServerWorld.getBlueprintMetadata(player: ServerPlayerEntity?): BlueprintWorl
 
     return player.getPersonalBlueprintCell()
         .configBlock
-        .let { this.getBlockEntity(it) as BuildingBlockEntity }
+        .let { this.getBlockEntity(it) as FortressBuildingConfigurationBlockEntity }
         .run {
             BlueprintWorldMetadata(
                 blueprintId,
@@ -157,7 +157,7 @@ fun ServerWorld.putBlueprintInAWorld(
                 .down(DEFAULT_FLOOR_LEVEL - floorLevel)
                 .add(-xOffset - cell.start.x, 0, -zOffset - cell.start.z)
 
-            if (this.getBlockState(pos).block == FortressBlocks.FORTRESS_BUILDING)
+            if (this.getBlockState(pos).block == FortressBlocks.FORTRESS_BUILDING_CONFIGURATION)
                 return@forEach
 
             blockState = if (pos.y == DEFAULT_FLOOR_LEVEL - 1 &&
