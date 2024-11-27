@@ -1,4 +1,4 @@
-package org.minefortress.fortress.automation;
+package net.remmintan.mods.minefortress.core.automation;
 
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;

@@ -9,11 +9,9 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
-import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,11 +95,6 @@ public class FortressBuilding implements IFortressBuilding {
         } else {
             this.buildingBlockData = null;
         }
-
-        if (tag.contains("floorLevel"))
-            this.floorLevel = tag.getInt("floorLevel");
-        else
-            this.floorLevel = 0;
     }
 
     @Override
@@ -125,13 +118,6 @@ public class FortressBuilding implements IFortressBuilding {
     }
 
     @Override
-    public boolean isPartOfTheBuilding(BlockPos pos) {
-        return start.getX() <= pos.getX() && pos.getX() <= end.getX()
-                && start.getY()-1 <= pos.getY() && pos.getY() <= end.getY() + 1
-                && start.getZ() <= pos.getZ() && pos.getZ() <= end.getZ();
-    }
-
-    @Override
     public BlockPos getStart() {
         return start;
     }
@@ -139,18 +125,6 @@ public class FortressBuilding implements IFortressBuilding {
     @Override
     public BlockPos getEnd() {
         return end;
-    }
-
-    @Override
-    public BlockPos getCenter() {
-        return new BlockPos((start.getX() + end.getX()) / 2, (start.getY() + end.getY()) / 2, (start.getZ() + end.getZ()) / 2);
-    }
-
-    @Override
-    public BlockPos getNearestCornerXZ(BlockPos pos, World world) {
-        final var x = pos.getX() < start.getX() ? start.getX() : Math.min(pos.getX(), end.getX());
-        final var z = pos.getZ() < start.getZ() ? start.getZ() : Math.min(pos.getZ(), end.getZ());
-        return world.getTopPosition(Heightmap.Type.WORLD_SURFACE, new BlockPos(x, 0, z));
     }
 
     @Override
@@ -171,21 +145,6 @@ public class FortressBuilding implements IFortressBuilding {
     @Override
     public long getBedsCount(World world) {
         return streamBeds(world).count();
-    }
-
-    @Override
-    public void writeToNbt(NbtCompound tag) {
-        tag.putUuid("id", id);
-        tag.putLong("start", start.asLong());
-        tag.putLong("end", end.asLong());
-        tag.putString("lastUpdated", lastUpdated.toString());
-        if(blueprintId != null) {
-            tag.putString("blueprintId", blueprintId);
-        }
-        if(buildingBlockData != null) {
-            tag.put("buildingBlockData", buildingBlockData.toNbt());
-        }
-        tag.putInt("floorLevel", floorLevel);
     }
 
     @Override
@@ -234,11 +193,6 @@ public class FortressBuilding implements IFortressBuilding {
     public Set<HostileEntity> getAttackers() {
         attackers.removeIf(it -> !it.isAlive());
         return attackers;
-    }
-
-    @Override
-    public IEssentialBuildingInfo toEssentialInfo(World world) {
-        return new EssentialBuildingInfo(id, start, end, getBedsCount(world), blueprintId, getHealth());
     }
 
     @Override

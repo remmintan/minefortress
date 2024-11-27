@@ -1,4 +1,4 @@
-package org.minefortress.fortress.automation.iterators;
+package net.remmintan.mods.minefortress.blocks.building;
 
 
 import net.minecraft.block.Blocks;
@@ -9,7 +9,7 @@ import net.remmintan.mods.minefortress.core.automation.AutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.automation.iterators.AbstractFilteredIterator;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 
-public class FarmBuildingIterator extends AbstractFilteredIterator {
+class FarmBuildingIterator extends AbstractFilteredIterator {
 
     private final World world;
 

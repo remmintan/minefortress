@@ -32,13 +32,17 @@ fun registerPlayerBlockEvents() {
     }
 
     AttackBlockCallback.EVENT.register { player, world, hand, blockPos, direction ->
+        if (!world.isBlueprintWorld())
+            return@register ActionResult.PASS
         val cell = player.getPersonalBlueprintCell()
 
-        return@register if (!world.isBlueprintWorld())
-            ActionResult.PASS
-        else if (!cell.contains(blockPos))
-            ActionResult.FAIL
-        else ActionResult.PASS
+        return@register if (!cell.contains(blockPos)) ActionResult.FAIL else ActionResult.PASS
+    }
+
+    // can't destroy building blocks
+    AttackBlockCallback.EVENT.register { player, world, hand, blockPos, direction ->
+        return@register if (world.getBlockState(blockPos).isOf(FortressBlocks.FORTRESS_BUILDING))
+            ActionResult.FAIL else ActionResult.PASS
     }
 
     UseBlockCallback.EVENT.register { player, world, hand, hitResult ->

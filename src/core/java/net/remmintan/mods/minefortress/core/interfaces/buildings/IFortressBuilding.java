@@ -2,9 +2,9 @@ package net.remmintan.mods.minefortress.core.interfaces.buildings;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
@@ -15,25 +15,37 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface IFortressBuilding extends IAutomationArea {
-    boolean updateTheHealthState(ServerWorld world);
 
     int getHealth();
-
-    boolean isPartOfTheBuilding(BlockPos pos);
 
     BlockPos getStart();
 
     BlockPos getEnd();
 
-    BlockPos getCenter();
+    default BlockPos getCenter() {
+        final var start = getStart();
+        final var end = getEnd();
+        return BlockBox.create(start, end).getCenter();
+    }
 
-    BlockPos getNearestCornerXZ(BlockPos pos, World world);
+    default BlockPos getNearestCornerXZ(BlockPos pos, World world) {
+        final var start = getStart();
+        final var end = getEnd();
+        final var x = pos.getX() < start.getX() ? start.getX() : Math.min(pos.getX(), end.getX());
+        final var z = pos.getZ() < start.getZ() ? start.getZ() : Math.min(pos.getZ(), end.getZ());
+        return world.getTopPosition(Heightmap.Type.WORLD_SURFACE, new BlockPos(x, 0, z));
+    }
+
+    default boolean isPartOfTheBuilding(BlockPos pos) {
+        final var start = getStart().toImmutable().down(1);
+        final var end = getEnd().toImmutable().up(1);
+
+        return BlockBox.create(start, end).contains(pos);
+    }
 
     Optional<BlockPos> getFreeBed(World world);
 
-    long getBedsCount(World world);
-
-    void writeToNbt(NbtCompound tag);
+    int getBedsCount();
 
     boolean satisfiesRequirement(ProfessionType type, int level);
 
@@ -42,8 +54,6 @@ public interface IFortressBuilding extends IAutomationArea {
     void attack(HostileEntity attacker);
 
     Set<HostileEntity> getAttackers();
-
-    IEssentialBuildingInfo toEssentialInfo(World world);
 
     Map<BlockPos, BlockState> getAllBlockStatesToRepairTheBuilding();
 }

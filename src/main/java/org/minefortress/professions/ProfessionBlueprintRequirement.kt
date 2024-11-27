@@ -4,6 +4,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequ
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 
 class ProfessionBlueprintRequirement(
-    override val type: ProfessionType?, override val level: Int,
+    override val type: ProfessionType?,
+    override val level: Int,
     override val totalLevels: Int
 ) : IBlueprintRequirement

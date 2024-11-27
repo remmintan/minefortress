@@ -2,6 +2,7 @@ package net.remmintan.mods.minefortress.core.dtos.buildings
 
 import net.minecraft.nbt.NbtCompound
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintRequirement
 
 class BlueprintMetadata(
     val name: String,
@@ -19,7 +20,7 @@ class BlueprintMetadata(
         BlueprintGroup.valueOf(tag.getString("group"))
     )
 
-    val requirement = BlueprintRequirement(id)
+    val requirement = BlueprintRequirement(id) as IBlueprintRequirement
 
     fun toNbt() = NbtCompound().apply {
         putString("name", name)

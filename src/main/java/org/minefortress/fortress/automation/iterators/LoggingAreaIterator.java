@@ -5,8 +5,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.remmintan.gobi.helpers.TreeHelper;
+import net.remmintan.mods.minefortress.core.automation.AutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.automation.iterators.AbstractFilteredIterator;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
-import org.minefortress.fortress.automation.AutomationBlockInfo;
 
 import java.util.*;
 

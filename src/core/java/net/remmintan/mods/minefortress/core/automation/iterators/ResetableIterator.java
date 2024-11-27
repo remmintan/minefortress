@@ -1,4 +1,4 @@
-package org.minefortress.fortress.automation.iterators;
+package net.remmintan.mods.minefortress.core.automation.iterators;
 
 import java.util.Iterator;
 

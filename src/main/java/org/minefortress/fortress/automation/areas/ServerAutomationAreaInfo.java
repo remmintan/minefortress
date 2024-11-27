@@ -6,6 +6,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.automation.iterators.ResetableIterator;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
@@ -13,7 +14,6 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomati
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.fortress.automation.iterators.LoggingAreaIterator;
 import org.minefortress.fortress.automation.iterators.MineAreaIterator;
-import org.minefortress.fortress.automation.iterators.ResetableIterator;
 import org.minefortress.utils.AreasUtils;
 
 import java.time.LocalDateTime;

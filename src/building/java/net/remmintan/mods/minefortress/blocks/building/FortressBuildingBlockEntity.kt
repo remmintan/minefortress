@@ -1,0 +1,134 @@
+package net.remmintan.mods.minefortress.blocks.building
+
+import net.minecraft.block.BedBlock
+import net.minecraft.block.BlockState
+import net.minecraft.block.entity.BlockEntity
+import net.minecraft.block.enums.BedPart
+import net.minecraft.entity.mob.HostileEntity
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.entity.player.PlayerInventory
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.registry.tag.BlockTags
+import net.minecraft.screen.NamedScreenHandlerFactory
+import net.minecraft.screen.ScreenHandler
+import net.minecraft.server.world.ServerWorld
+import net.minecraft.text.Text
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
+import net.remmintan.mods.minefortress.blocks.FortressBlocks
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea
+import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
+import java.time.LocalDateTime
+import java.util.*
+
+private const val MAX_BLOCKS_PER_UPDATE = 10
+
+class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
+    BlockEntity(FortressBlocks.BUILDING_ENT_TYPE, pos, state),
+    NamedScreenHandlerFactory,
+    IFortressBuilding {
+
+    private var buildingId: UUID? = null
+    private var blueprintMetadata: BlueprintMetadata? = null
+    private var start: BlockPos? = null
+    private var end: BlockPos? = null
+    private var blockData: FortressBuildingBlockData? = null
+
+    private var automationArea: IAutomationArea? = null
+
+    private val attackers: MutableSet<HostileEntity> = HashSet()
+    private var beds = listOf<BlockPos>()
+
+    fun init(
+        id: UUID,
+        metadata: BlueprintMetadata,
+        start: BlockPos,
+        end: BlockPos,
+        blockData: Map<BlockPos, BlockState>,
+        floorLevel: Int
+    ) {
+        buildingId = id
+        blueprintMetadata = metadata
+        this.start = start
+        this.end = end
+        this.blockData = FortressBuildingBlockData(blockData, floorLevel)
+        this.automationArea = BuildingAutomationAreaProvider(id, start, end, metadata.requirement)
+    }
+
+    fun tick(world: World?) {
+        world ?: return
+        blockData?.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world as? ServerWorld)
+
+        beds = BlockPos.iterate(start, end)
+            .filter { world.getBlockState(it).isIn(BlockTags.BEDS) }
+            .filter { world.getBlockState(it).get(BedBlock.PART) == BedPart.HEAD }
+            .map { it.toImmutable() }
+            .toList()
+    }
+
+    override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getDisplayName(): Text {
+        val nameStr = blueprintMetadata?.name ?: "Building"
+        return Text.of(nameStr)
+    }
+
+    override fun readNbt(nbt: NbtCompound) {
+        super.readNbt(nbt)
+        buildingId = nbt.getUuid("buildingId")
+        blueprintMetadata = BlueprintMetadata(nbt.getCompound("blueprintMetadata"))
+        start = BlockPos.fromLong(nbt.getLong("start"))
+        end = BlockPos.fromLong(nbt.getLong("end"))
+        blockData = FortressBuildingBlockData.fromNbt(nbt.getCompound("blockData"))
+        automationArea = BuildingAutomationAreaProvider(buildingId!!, start!!, end!!, blueprintMetadata!!.requirement)
+    }
+
+    override fun writeNbt(nbt: NbtCompound) {
+        super.writeNbt(nbt)
+        buildingId?.let { nbt.putUuid("buildingId", it) }
+        blueprintMetadata?.toNbt()?.let { nbt.put("blueprintMetadata", it) }
+        start?.let { nbt.putLong("start", it.asLong()) }
+        end?.let { nbt.putLong("end", it.asLong()) }
+        blockData?.toNbt()?.let { nbt.put("blockData", it) }
+    }
+
+    override fun getId(): UUID = buildingId ?: error("Building ID is not set")
+
+    override fun getHealth(): Int = blockData?.health ?: 0
+
+    override fun getStart(): BlockPos = start ?: error("Start position is not set")
+    override fun getEnd(): BlockPos = end ?: error("End position is not set")
+
+    override fun getFreeBed(world: World?): Optional<BlockPos> =
+        beds.firstOrNull { world?.getBlockState(it)?.get(BedBlock.OCCUPIED) == true }
+            .let { Optional.ofNullable(it) }
+
+    override fun getBedsCount(): Int = beds.size
+
+    override fun satisfiesRequirement(type: ProfessionType?, level: Int): Boolean =
+        blueprintMetadata?.requirement?.satisfies(type, level) ?: false
+
+    override fun attack(attacker: HostileEntity) {
+        if (blockData?.attack(attacker) == true) attackers.add(attacker)
+    }
+
+    override fun getAttackers() = attackers
+    override fun getAllBlockStatesToRepairTheBuilding() = blockData?.allBlockStatesToRepairTheBuilding ?: mapOf()
+
+    // IAutomationArea
+    override fun getUpdated(): LocalDateTime = automationArea?.updated ?: error("Automation area provider is not set")
+
+    override fun update() {
+        automationArea?.update()
+    }
+
+    override fun iterator(world: World?): MutableIterator<IAutomationBlockInfo> =
+        automationArea?.iterator(world) ?: error("Automation area provider is not set")
+
+
+}

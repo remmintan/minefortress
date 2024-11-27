@@ -16,9 +16,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.ISer
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
-import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
-import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
 import net.remmintan.mods.minefortress.networking.s2c.S2COpenBuildingRepairScreen;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +24,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FortressBuildingManager implements IAutomationAreaProvider, IServerBuildingsManager, ITickableManager, IWritableManager {
@@ -80,11 +77,11 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     public void tick(ServerPlayerEntity player) {
         if(player != null) {
             if (needSync) {
-                final var houses = buildings.stream()
-                        .map(it -> it.toEssentialInfo(getWorld()))
-                        .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-                final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
-                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
+//                final var houses = buildings.stream()
+//                        .map(it -> it.toEssentialInfo(getWorld()))
+//                        .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+//                final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
+//                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
 
                 needSync = false;
             }
@@ -117,7 +114,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
                         type == ProfessionType.WARRIOR
         ) {
             return requiredBuildings
-                    .mapToLong(it -> it.getBedsCount(getWorld()) * 10)
+                    .mapToLong(it -> it.getBedsCount(getWorld()) * 10L)
                     .sum() > minCount;
         }
         final var count = requiredBuildings.count();
@@ -210,7 +207,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         final NbtCompound buildingsTag = new NbtCompound();
         for (IFortressBuilding building : this.buildings) {
             final NbtCompound buildingTag = new NbtCompound();
-            building.writeToNbt(buildingTag);
+//            building.writeToNbt(buildingTag);
             buildingsTag.put("building" + i++, buildingTag);
         }
 

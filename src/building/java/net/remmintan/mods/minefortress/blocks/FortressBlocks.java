@@ -8,6 +8,8 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import net.remmintan.mods.minefortress.blocks.building.FortressBuildingBlock;
+import net.remmintan.mods.minefortress.blocks.building.FortressBuildingBlockEntity;
 
 public class FortressBlocks {
 

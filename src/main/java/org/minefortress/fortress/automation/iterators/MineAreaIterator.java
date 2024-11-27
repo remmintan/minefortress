@@ -4,12 +4,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.blocks.FortressBlocks;
 import net.remmintan.mods.minefortress.building.BuildingHelper;
+import net.remmintan.mods.minefortress.core.automation.AutomationBlockInfo;
+import net.remmintan.mods.minefortress.core.automation.iterators.AbstractFilteredIterator;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
-import org.minefortress.fortress.automation.AutomationBlockInfo;
 
 import java.util.List;
 
-public class MineAreaIterator extends AbstractFilteredIterator{
+public class MineAreaIterator extends AbstractFilteredIterator {
 
     private final World world;
 
