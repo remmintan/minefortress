@@ -8,7 +8,6 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -61,53 +60,51 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        if(player instanceof final FortressServerPlayerEntity fortressServerPlayer) {
-            final var manager = getFortressManager(server, player);
-            final var blueprintManager = fortressServerPlayer.get_ServerBlueprintManager();
-            final var provider = getManagersProvider(server, player);
+        final var manager = getFortressManager(server, player);
+        final var provider = getManagersProvider(server, player);
+        final var blueprintManager = provider.getBlueprintManager();
 
-            if ("campfire".equals(blueprintId)) {
-                final var task = blueprintManager.createInstantPlaceTask(blueprintId, startPos, rotation);
-                task.addFinishListener(() -> {
-                    final var start = task.getStart();
-                    final var end = task.getEnd();
+        if ("campfire".equals(blueprintId)) {
+            final var task = blueprintManager.createInstantPlaceTask(blueprintId, startPos, rotation);
+            task.addFinishListener(() -> {
+                final var start = task.getStart();
+                final var end = task.getEnd();
 
-                    final var center = BlockBox.create(start, end).getCenter();
+                final var center = BlockBox.create(start, end).getCenter();
 
-                    manager.setupCenter(center, player);
-                    return Unit.INSTANCE;
-                });
-                provider.getTaskManager().executeInstantTask(task, player, provider);
-                return;
-            }
+                manager.setupCenter(center, player);
+                return Unit.INSTANCE;
+            });
+            provider.getTaskManager().executeInstantTask(task, player, provider);
+            return;
+        }
 
-            Runnable executeBuildTask = () -> {
-                final var taskId = UUID.randomUUID();
-                final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
-                final var serverResourceManager = provider.getResourceManager();
+        Runnable executeBuildTask = () -> {
+            final var taskId = UUID.randomUUID();
+            final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
+            final var serverResourceManager = provider.getResourceManager();
 
-                if(manager.isSurvival()) {
-                    final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
-                    try {
-                        serverResourceManager.reserveItems(taskId, stacks);
-                    } catch (IllegalStateException e) {
-                        ModLogger.LOGGER.error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
-                        FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
-                        return;
-                    }
+            if (manager.isSurvival()) {
+                final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
+                try {
+                    serverResourceManager.reserveItems(taskId, stacks);
+                } catch (IllegalStateException e) {
+                    ModLogger.LOGGER.error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
+                    FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
+                    return;
                 }
-                final var ableToAssign = provider.getTaskManager().addTask(task, provider, manager, selectedPawns, player);
-                if (!ableToAssign) {
-                    serverResourceManager.returnReservedItems(taskId);
-                }
-            };
-            if (floorLevel > 0) {
-                final var digTask = blueprintManager.createDigTask(UUID.randomUUID(), startPos, floorLevel, blueprintId, rotation);
-                digTask.addFinishListener(executeBuildTask);
-                provider.getTaskManager().addTask(digTask, provider, manager, selectedPawns, player);
-            } else {
-                executeBuildTask.run();
             }
+            final var ableToAssign = provider.getTaskManager().addTask(task, provider, manager, selectedPawns, player);
+            if (!ableToAssign) {
+                serverResourceManager.returnReservedItems(taskId);
+            }
+        };
+        if (floorLevel > 0) {
+            final var digTask = blueprintManager.createDigTask(UUID.randomUUID(), startPos, floorLevel, blueprintId, rotation);
+            digTask.addFinishListener(executeBuildTask);
+            provider.getTaskManager().addTask(digTask, provider, manager, selectedPawns, player);
+        } else {
+            executeBuildTask.run();
         }
     }
 }

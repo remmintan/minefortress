@@ -9,7 +9,7 @@ import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
-import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
@@ -18,13 +18,12 @@ import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResource
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface IClientFortressManager extends IFortressManager {
 
     void jumpToCampfire();
 
-    void updateBuildings(List<IEssentialBuildingInfo> buildings);
+    void updateBuildings(List<BlockPos> buildings);
 
     void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks);
 
@@ -53,7 +52,7 @@ public interface IClientFortressManager extends IFortressManager {
 
     boolean isBuildingHovered();
 
-    Optional<IEssentialBuildingInfo> getHoveredBuilding();
+    Optional<IFortressBuilding> getHoveredBuilding();
 
     Optional<String> getHoveredBuildingName();
 
@@ -78,7 +77,7 @@ public interface IClientFortressManager extends IFortressManager {
 
     List<BuildingHealthRenderInfo> getBuildingHealths();
 
-    void openRepairBuildingScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair);
+    void openRepairBuildingScreen(BlockPos pos, Map<BlockPos, BlockState> blocksToRepair);
 
     IClientResourceManager getResourceManager();
 }

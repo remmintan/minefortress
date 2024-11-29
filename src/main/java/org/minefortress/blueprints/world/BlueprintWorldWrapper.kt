@@ -14,7 +14,7 @@ import net.minecraft.util.math.Vec3i
 import net.remmintan.mods.minefortress.blueprints.*
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintWorld
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
 
 class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
 
@@ -94,14 +94,17 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
         size.add(NbtInt.of(maxY - minY + 1))
         size.add(NbtInt.of(maxZ - minZ + 1))
         updatedStructure.put("size", size)
-        if (player is FortressServerPlayerEntity) {
-            player._ServerBlueprintManager.update(
-                id,
-                blueprintName,
-                metadata.group,
-                updatedStructure,
-                DEFAULT_FLOOR_LEVEL - blueprintMinY
-            )
+        if (server is IFortressServer) {
+            server._FortressModServerManager
+                .getManagersProvider(player)
+                .blueprintManager
+                .update(
+                    id,
+                    blueprintName,
+                    metadata.group,
+                    updatedStructure,
+                    DEFAULT_FLOOR_LEVEL - blueprintMinY
+                )
         }
     }
 

@@ -8,9 +8,9 @@ import net.minecraft.util.math.Vec3i
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider
 
 class ServerboundEditBlueprintPacket : FortressC2SPacket {
     private val blueprintId: String?
@@ -53,14 +53,13 @@ class ServerboundEditBlueprintPacket : FortressC2SPacket {
 
     override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
         if (server is IFortressServer) {
-            if (player is FortressServerPlayerEntity) {
+            if (server is IServerManagersProvider) {
                 if (actionType == ActionType.REMOVE) {
-                    player._ServerBlueprintManager.remove(blueprintId)
+                    server.blueprintManager.remove(blueprintId)
                 } else {
                     val blueprintsWorld = server._BlueprintWorld
                     if (actionType == ActionType.EDIT) {
-                        val blockData: IStructureBlockData = player
-                            ._ServerBlueprintManager
+                        val blockData: IStructureBlockData = server.blueprintManager
                             .blockDataManager
                             .getBlockData(blueprintId, BlockRotation.NONE)
                         val blueprintData = blockData

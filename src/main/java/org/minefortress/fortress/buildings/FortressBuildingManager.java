@@ -3,20 +3,27 @@ package org.minefortress.fortress.buildings;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.blocks.FortressBlocks;
+import net.remmintan.mods.minefortress.blocks.building.FortressBuildingBlockEntity;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
+import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
 import net.remmintan.mods.minefortress.networking.s2c.S2COpenBuildingRepairScreen;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,37 +36,50 @@ import java.util.stream.Stream;
 public class FortressBuildingManager implements IAutomationAreaProvider, IServerBuildingsManager, ITickableManager, IWritableManager {
 
     private int buildingPointer = 0;
-    private final List<IFortressBuilding> buildings = new ArrayList<>();
+    private final List<BlockPos> buildings = new ArrayList<>();
     private final Supplier<ServerWorld> overworldSupplier;
+    private final IServerFortressManager fortressManager;
     private final Cache<BlockPos, Object> bedsCache =
             CacheBuilder.newBuilder()
                     .expireAfterWrite(10, TimeUnit.SECONDS)
                     .build();
     private boolean needSync = false;
 
-    public FortressBuildingManager(Supplier<ServerWorld> overworldSupplier) {
-        this.overworldSupplier = overworldSupplier;
+    public FortressBuildingManager(Supplier<ServerWorld> worldSupplier, IServerFortressManager fortressManager) {
+        this.overworldSupplier = worldSupplier;
+        this.fortressManager = fortressManager;
     }
 
-    public void addBuilding(IFortressBuilding building) {
-        buildings.add(building);
+    public void addBuilding(BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> mergedBlockData) {
+        final var blockBox = BlockBox.create(start, end);
+        final var center = blockBox.getCenter();
+        final var ceilingY = blockBox.getMaxY() + 1;
+
+        final var buildingPos = new BlockPos(center.getX(), ceilingY, center.getZ());
+
+        final var world = getWorld();
+        world.setBlockState(buildingPos, FortressBlocks.FORTRESS_BUILDING.getDefaultState(), 3);
+        final var blockEntity = world.getBlockEntity(buildingPos);
+        if (blockEntity instanceof FortressBuildingBlockEntity b) {
+            b.init(metadata, start, end, mergedBlockData);
+        }
+
+        fortressManager.expandTheVillage(start);
+        fortressManager.expandTheVillage(end);
+
+        buildings.add(buildingPos);
         this.scheduleSync();
     }
 
     @Override
-    public void destroyBuilding(UUID id) {
-        getBuildingById(id)
-                .ifPresent(it -> {
-                    buildings.remove(it);
-                    BlockPos.iterate(it.getStart(), it.getEnd())
-                            .forEach(pos -> getWorld().setBlockState(pos, Blocks.AIR.getDefaultState()));
-                    this.scheduleSync();
-                });
+    public void destroyBuilding(BlockPos pos) {
+        if (buildings.remove(pos))
+            this.scheduleSync();
+        getBuilding(pos).ifPresent(IFortressBuilding::destroy);
     }
 
     public Optional<BlockPos> getFreeBed(){
-        final var freeBed = buildings
-                .stream()
+        final var freeBed = getBuildingsStream()
                 .map(it -> it.getFreeBed(getWorld()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -71,17 +91,14 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     }
 
     public long getTotalBedsCount() {
-        return buildings.stream().mapToLong(it -> it.getBedsCount(getWorld())).reduce(0, Long::sum);
+        return getBuildingsStream().mapToLong(IFortressBuilding::getBedsCount).reduce(0, Long::sum);
     }
 
     public void tick(ServerPlayerEntity player) {
         if(player != null) {
             if (needSync) {
-//                final var houses = buildings.stream()
-//                        .map(it -> it.toEssentialInfo(getWorld()))
-//                        .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-//                final var syncBuildings = new ClientboundSyncBuildingsPacket(houses);
-//                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
+                final var syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
 
                 needSync = false;
             }
@@ -89,13 +106,10 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
         if(!buildings.isEmpty()) {
             buildingPointer = buildingPointer % buildings.size();
-            final var building = buildings.get(buildingPointer++);
-            if(building.updateTheHealthState(getWorld())) {
+            final var pos = buildings.get(buildingPointer++);
+            if (this.getBuilding(pos).isEmpty()) {
+                buildings.remove(pos);
                 this.scheduleSync();
-            }
-
-            if(building.getHealth() < 1) {
-                this.destroyBuilding(building.getId());
             }
         }
     }
@@ -106,7 +120,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
     @Override
     public boolean hasRequiredBuilding(ProfessionType type, int level, int minCount) {
-        final var requiredBuildings = buildings.stream()
+        final var requiredBuildings = getBuildingsStream()
                 .filter(b -> b.satisfiesRequirement(type, level));
         if (
                 type == ProfessionType.MINER ||
@@ -114,7 +128,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
                         type == ProfessionType.WARRIOR
         ) {
             return requiredBuildings
-                    .mapToLong(it -> it.getBedsCount(getWorld()) * 10L)
+                    .mapToLong(it -> it.getBedsCount() * 10L)
                     .sum() > minCount;
         }
         final var count = requiredBuildings.count();
@@ -146,26 +160,28 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
     @Override
     public Stream<IAutomationArea> getAutomationAreaByProfessionType(ProfessionType type) {
-        return this.buildings.stream()
+        return getBuildingsStream()
                 .filter(building -> building.satisfiesRequirement(type, 0))
                 .map(IAutomationArea.class::cast);
     }
 
+    @Override
     public boolean isPartOfAnyBuilding(BlockPos pos) {
-        return buildings.stream().anyMatch(it -> it.isPartOfTheBuilding(pos));
+        return getBuildingsStream().anyMatch(it -> it.isPartOfTheBuilding(pos));
     }
 
+    @Override
     public Optional<IFortressBuilding> findNearest(BlockPos pos) {
         return findNearest(pos, null);
     }
 
+    @Override
     public Optional<IFortressBuilding> findNearest(BlockPos pos, ProfessionType type) {
         final Predicate<IFortressBuilding> buildingsFilter = type == null ?
                 it -> true :
                 it -> it.satisfiesRequirement(type, 0);
 
-        return buildings
-                .stream()
+        return getBuildingsStream()
                 .filter(buildingsFilter)
                 .sorted(Comparator.comparing(it -> it.getCenter().getSquaredDistance(pos)))
                 .filter(it -> it.getHealth() > 0)
@@ -173,25 +189,30 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     }
 
     @Override
-    public void doRepairConfirmation(UUID id, ServerPlayerEntity player) {
-        final var statesThatNeedsToBeRepaired = getBuildingById(id)
+    public void doRepairConfirmation(BlockPos pos, ServerPlayerEntity player) {
+        final var statesThatNeedsToBeRepaired = getBuilding(pos)
                 .map(IFortressBuilding::getAllBlockStatesToRepairTheBuilding)
                 .orElse(Collections.emptyMap());
 
-        final var packet = new S2COpenBuildingRepairScreen(id, statesThatNeedsToBeRepaired);
+        final var packet = new S2COpenBuildingRepairScreen(pos, statesThatNeedsToBeRepaired);
         FortressServerNetworkHelper.send(player, S2COpenBuildingRepairScreen.CHANNEL, packet);
     }
 
     @NotNull
-    public Optional<IFortressBuilding> getBuildingById(UUID id) {
+    public Optional<IFortressBuilding> getBuilding(BlockPos pos) {
+        final var blockEntity = getWorld().getBlockEntity(pos);
+        return blockEntity instanceof IFortressBuilding b ? Optional.of(b) : Optional.empty();
+    }
+
+    private @NotNull Stream<IFortressBuilding> getBuildingsStream() {
         return buildings.stream()
-                .filter(it -> it.getId().equals(id))
-                .findFirst();
+                .map(this::getBuilding)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
     }
 
     public Optional<HostileEntity> getRandomBuildingAttacker() {
-        final var attackersList = this.buildings
-                .stream()
+        final var attackersList = getBuildingsStream()
                 .map(IFortressBuilding::getAttackers)
                 .flatMap(Collection::stream)
                 .toList();
@@ -203,28 +224,19 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     }
 
     private NbtCompound toNbt() {
-        int i = 0;
+        final var buildingsPositions = this.buildings.stream().map(BlockPos::asLong).toList();
+
         final NbtCompound buildingsTag = new NbtCompound();
-        for (IFortressBuilding building : this.buildings) {
-            final NbtCompound buildingTag = new NbtCompound();
-//            building.writeToNbt(buildingTag);
-            buildingsTag.put("building" + i++, buildingTag);
-        }
-
+        buildingsTag.putLongArray("buildingPositions", buildingsPositions);
         buildingsTag.putInt("buildingPointer", buildingPointer);
-
         return buildingsTag;
     }
 
     private void readFromNbt(NbtCompound buildingsTag) {
-        int i = 0;
-        while(buildingsTag.contains("building" + i)) {
-            final NbtCompound buildingTag = buildingsTag.getCompound("building" + i++);
-            FortressBuilding building = new FortressBuilding(buildingTag);
-            buildings.add(building);
-            this.scheduleSync();
-        }
-
+        Arrays
+                .stream(buildingsTag.getLongArray("buildingPositions"))
+                .mapToObj(BlockPos::fromLong)
+                .forEach(buildings::add);
         buildingPointer = buildingsTag.getInt("buildingPointer");
     }
 

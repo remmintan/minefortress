@@ -9,22 +9,21 @@ import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPac
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class S2COpenBuildingRepairScreen implements FortressS2CPacket {
 
     public final static String CHANNEL = "open_building_repair_screen";
 
-    private final UUID buildingId;
+    private final BlockPos pos;
     private final Map<BlockPos, BlockState> blocksToRepair;
 
-    public S2COpenBuildingRepairScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair) {
-        this.buildingId = buildingId;
+    public S2COpenBuildingRepairScreen(BlockPos pos, Map<BlockPos, BlockState> blocksToRepair) {
+        this.pos = pos;
         this.blocksToRepair = blocksToRepair;
     }
 
     public S2COpenBuildingRepairScreen(PacketByteBuf buf) {
-        this.buildingId = buf.readUuid();
+        this.pos = BlockPos.fromLong(buf.readLong());
         final int blocksToRepairSize = buf.readInt();
         blocksToRepair = new HashMap<>(blocksToRepairSize);
         for (int i = 0; i < blocksToRepairSize; i++) {
@@ -36,7 +35,7 @@ public class S2COpenBuildingRepairScreen implements FortressS2CPacket {
 
     @Override
     public void write(PacketByteBuf buf) {
-        buf.writeUuid(buildingId);
+        buf.writeLong(pos.asLong());
         buf.writeInt(blocksToRepair.size());
 
 
@@ -51,6 +50,6 @@ public class S2COpenBuildingRepairScreen implements FortressS2CPacket {
     public void handle(MinecraftClient client) {
         final var provider = getManagersProvider();
         final var manager = provider.get_ClientFortressManager();
-        manager.openRepairBuildingScreen(buildingId, blocksToRepair);
+        manager.openRepairBuildingScreen(pos, blocksToRepair);
     }
 }

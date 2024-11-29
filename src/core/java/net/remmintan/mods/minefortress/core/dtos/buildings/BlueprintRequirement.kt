@@ -35,6 +35,4 @@ class BlueprintRequirement(blueprintId: String) : IBlueprintRequirement {
         this.upgrades = upgrades
     }
 
-    val icon = type?.icon
-
 }

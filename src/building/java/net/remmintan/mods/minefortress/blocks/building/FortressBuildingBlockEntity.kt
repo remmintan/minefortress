@@ -31,7 +31,6 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     NamedScreenHandlerFactory,
     IFortressBuilding {
 
-    private var buildingId: UUID? = null
     private var blueprintMetadata: BlueprintMetadata? = null
     private var start: BlockPos? = null
     private var end: BlockPos? = null
@@ -43,19 +42,16 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     private var beds = listOf<BlockPos>()
 
     fun init(
-        id: UUID,
         metadata: BlueprintMetadata,
         start: BlockPos,
         end: BlockPos,
         blockData: Map<BlockPos, BlockState>,
-        floorLevel: Int
     ) {
-        buildingId = id
         blueprintMetadata = metadata
         this.start = start
         this.end = end
-        this.blockData = FortressBuildingBlockData(blockData, floorLevel)
-        this.automationArea = BuildingAutomationAreaProvider(id, start, end, metadata.requirement)
+        this.blockData = FortressBuildingBlockData(blockData, metadata.floorLevel)
+        this.automationArea = BuildingAutomationAreaProvider(start, end, metadata.requirement)
     }
 
     fun tick(world: World?) {
@@ -78,26 +74,30 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         return Text.of(nameStr)
     }
 
+    override fun destroy() {
+        TODO("Not yet implemented")
+    }
+
+    override fun getName(): String = blueprintMetadata?.name ?: "Building"
+
     override fun readNbt(nbt: NbtCompound) {
         super.readNbt(nbt)
-        buildingId = nbt.getUuid("buildingId")
         blueprintMetadata = BlueprintMetadata(nbt.getCompound("blueprintMetadata"))
         start = BlockPos.fromLong(nbt.getLong("start"))
         end = BlockPos.fromLong(nbt.getLong("end"))
         blockData = FortressBuildingBlockData.fromNbt(nbt.getCompound("blockData"))
-        automationArea = BuildingAutomationAreaProvider(buildingId!!, start!!, end!!, blueprintMetadata!!.requirement)
+        automationArea = BuildingAutomationAreaProvider(start!!, end!!, blueprintMetadata!!.requirement)
     }
 
     override fun writeNbt(nbt: NbtCompound) {
         super.writeNbt(nbt)
-        buildingId?.let { nbt.putUuid("buildingId", it) }
         blueprintMetadata?.toNbt()?.let { nbt.put("blueprintMetadata", it) }
         start?.let { nbt.putLong("start", it.asLong()) }
         end?.let { nbt.putLong("end", it.asLong()) }
         blockData?.toNbt()?.let { nbt.put("blockData", it) }
     }
 
-    override fun getId(): UUID = buildingId ?: error("Building ID is not set")
+    override fun getId(): UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
 
     override fun getHealth(): Int = blockData?.health ?: 0
 

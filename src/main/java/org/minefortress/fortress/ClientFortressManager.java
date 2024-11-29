@@ -7,10 +7,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
-import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
-import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
@@ -35,6 +34,7 @@ import org.minefortress.utils.ModUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public final class ClientFortressManager implements IClientFortressManager {
@@ -49,9 +49,9 @@ public final class ClientFortressManager implements IClientFortressManager {
     private int colonistsCount = 0;
     private int reservedColonistCount = 0;
 
-    private IEssentialBuildingInfo hoveredBuilding = null;
+    private IFortressBuilding hoveredBuilding = null;
 
-    private List<IEssentialBuildingInfo> buildings = new ArrayList<>();
+    private List<BlockPos> buildings = new ArrayList<>();
     private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
     private Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
 
@@ -75,7 +75,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     @Override
-    public void updateBuildings(List<IEssentialBuildingInfo> buildings) {
+    public void updateBuildings(List<BlockPos> buildings) {
         this.buildings = buildings;
     }
 
@@ -174,7 +174,10 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     @Override
     public List<BlockPos> getBuildingSelection(BlockPos pos) {
-        for(IEssentialBuildingInfo building : buildings){
+        for (BlockPos buildingPos : buildings) {
+            final var buildingOpt = getBuilding(buildingPos);
+            if (buildingOpt.isEmpty()) continue;
+            final var building = buildingOpt.get();
             final BlockPos start = building.getStart();
             final BlockPos end = building.getEnd();
             if(BlockUtils.isPosBetween(pos, start, end)){
@@ -195,16 +198,13 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     @Override
-    public Optional<IEssentialBuildingInfo> getHoveredBuilding() {
+    public Optional<IFortressBuilding> getHoveredBuilding() {
         return Optional.ofNullable(hoveredBuilding);
     }
 
     @Override
     public Optional<String> getHoveredBuildingName() {
-        return getHoveredBuilding()
-                .map(IEssentialBuildingInfo::getBlueprintId)
-                .flatMap(it -> ModUtils.getBlueprintManager().getBlueprintMetadataManager().getByBlueprintId(it))
-                .map(BlueprintMetadata::getName);
+        return getHoveredBuilding().map(IFortressBuilding::getName);
     }
 
     @Override
@@ -214,13 +214,13 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(ProfessionType type, int level, int minCount) {
-        final var requiredBuilding = buildings.stream()
+        final var requiredBuilding = getBuildingsStream()
                 .filter(b -> b.satisfiesRequirement(type, level));
         if (type == ProfessionType.MINER ||
                 type == ProfessionType.LUMBERJACK ||
                 type == ProfessionType.WARRIOR) {
             return requiredBuilding
-                    .mapToLong(it -> it.getBedsCount() * 10)
+                    .mapToLong(it -> it.getBedsCount() * 10L)
                     .sum() > minCount;
         }
         final var count = requiredBuilding.count();
@@ -238,9 +238,21 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     @Override
     public int countBuildings(ProfessionType type, int level) {
-        return (int) buildings.stream()
+        return (int) getBuildingsStream()
                 .filter(b -> b.satisfiesRequirement(type, level))
                 .count();
+    }
+
+    private Optional<IFortressBuilding> getBuilding(BlockPos pos) {
+        final var blockEntity = MinecraftClient.getInstance().world.getBlockEntity(pos);
+        return blockEntity instanceof IFortressBuilding b ? Optional.of(b) : Optional.empty();
+    }
+
+    private Stream<IFortressBuilding> getBuildingsStream() {
+        return buildings.stream()
+                .map(this::getBuilding)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
     }
 
     @Override
@@ -318,13 +330,11 @@ public final class ClientFortressManager implements IClientFortressManager {
     @Override
     public List<BuildingHealthRenderInfo> getBuildingHealths() {
         return switch (this.getState()) {
-            case COMBAT -> buildings
-                    .stream()
+            case COMBAT -> getBuildingsStream()
                     .filter(it -> it.getHealth() < 100)
                     .map(this::buildingToHealthRenderInfo)
                     .toList();
-            case BUILD_SELECTION, BUILD_EDITING -> buildings
-                    .stream()
+            case BUILD_SELECTION, BUILD_EDITING -> getBuildingsStream()
                     .filter(it -> it.getHealth() < 33)
                     .map(this::buildingToHealthRenderInfo)
                     .toList();
@@ -332,7 +342,7 @@ public final class ClientFortressManager implements IClientFortressManager {
         };
     }
 
-    private BuildingHealthRenderInfo buildingToHealthRenderInfo(IEssentialBuildingInfo buildingInfo) {
+    private BuildingHealthRenderInfo buildingToHealthRenderInfo(IFortressBuilding buildingInfo) {
         final var start = buildingInfo.getStart();
         final var end = buildingInfo.getEnd();
 
@@ -347,7 +357,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     @Override
-    public void openRepairBuildingScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair) {
-        MinecraftClient.getInstance().setScreen(new RepairBuildingScreen(buildingId, blocksToRepair, resourceManager));
+    public void openRepairBuildingScreen(BlockPos pos, Map<BlockPos, BlockState> blocksToRepair) {
+        MinecraftClient.getInstance().setScreen(new RepairBuildingScreen(pos, blocksToRepair, resourceManager));
     }
 }

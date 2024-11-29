@@ -8,8 +8,6 @@ import net.minecraft.world.event.GameEvent
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask
-import org.minefortress.fortress.buildings.FortressBuilding
-import java.util.*
 
 class InstantPlaceTask(
     private val metadata: BlueprintMetadata,
@@ -59,17 +57,8 @@ class InstantPlaceTask(
             world.markDirty(pos)
         }
 
-        FortressBuilding(
-            UUID.randomUUID(),
-            start,
-            end,
-            metadata.id,
-            metadata.floorLevel,
-            blockData
-        ).apply {
-            getBuildingsManager().addBuilding(this)
-            listeners.forEach { it() }
-        }
+        getBuildingsManager().addBuilding(metadata, start, end, blockData)
+        listeners.forEach { it() }
 
     }
 

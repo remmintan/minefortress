@@ -8,15 +8,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
-import net.remmintan.mods.minefortress.networking.c2s.C2SRepairBuilding;
-import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.renderer.gui.WindowScreen;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.minefortress.utils.BlockInfoUtils.convertBlockStatesMapItemsMap;
@@ -25,7 +22,7 @@ import static org.minefortress.utils.BlockInfoUtils.convertBlockStatesMapItemsMa
 
 public class RepairBuildingScreen extends WindowScreen {
 
-    private final UUID buildingId;
+    private final BlockPos pos;
 
     private final Map<Item, Long> requiredItems;
     private Map<Item, Boolean> hasEnoughResources;
@@ -34,9 +31,9 @@ public class RepairBuildingScreen extends WindowScreen {
 
     private ButtonWidget confirmationButton;
 
-    public RepairBuildingScreen(UUID buildingId, Map<BlockPos, BlockState> blocksToRepair, IClientResourceManager clientResourceManager) {
+    public RepairBuildingScreen(BlockPos pos, Map<BlockPos, BlockState> blocksToRepair, IClientResourceManager clientResourceManager) {
         super(Text.of("Repair Building"));
-        this.buildingId = buildingId;
+        this.pos = pos;
         this.clientResourceManager = clientResourceManager;
         requiredItems = convertBlockStatesMapItemsMap(blocksToRepair);
 
@@ -67,8 +64,8 @@ public class RepairBuildingScreen extends WindowScreen {
                 button -> {
                     final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
                     final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
-                    final var packet = new C2SRepairBuilding(UUID.randomUUID(), buildingId, selectedPawnsIds);
-                    FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet);
+//                    final var packet = new C2SRepairBuilding(UUID.randomUUID(), buildingId, selectedPawnsIds);
+//                    FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet);
                     Optional.ofNullable(this.client).ifPresent(it -> it.setScreen(null));
                     selectionManager.resetSelection();
                 }

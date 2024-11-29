@@ -44,6 +44,11 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
     }
 
     @Override
+    public BlueprintMetadata get(String blueprintId) {
+        return blueprints.get(blueprintId);
+    }
+
+    @Override
     public void tick(ServerPlayerEntity player) {
         if (!initialized) {
             if (blueprints.isEmpty()) readDefaultBlueprints();
@@ -160,7 +165,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
     }
 
     @Override
-    public NbtCompound write() {
+    public void write(NbtCompound tag) {
         final var wholeManager = new NbtCompound();
 
         final var serializedBlueprints = new NbtCompound();
@@ -172,11 +177,13 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
 
         wholeManager.put("blueprints", serializedBlueprints);
 
-        return wholeManager;
+        tag.put("blueprintsManager", wholeManager);
     }
 
     @Override
-    public void read(NbtCompound wholeManager) {
+    public void read(NbtCompound tag) {
+        final var wholeManager = tag.getCompound("blueprintsManager");
+
         scheduledSyncs.clear();
         blueprints.clear();
         initialized = false;

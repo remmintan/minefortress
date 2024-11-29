@@ -3,7 +3,6 @@ package org.minefortress.mixins.entity.player;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -13,12 +12,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.blueprints.BlueprintsDimensionKt;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.MineFortressMod;
-import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.utils.FortressSpawnLocating;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +36,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     private float persistedYaw;
     private float persistedPitch;
 
-    private IServerBlueprintManager serverBlueprintManager;
 
     private boolean wasInBlueprintWorldWhenLoggedOut = false;
 
@@ -47,21 +43,9 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
         super(world, pos, yaw, profile);
     }
 
-    @Inject(method="<init>", at=@At("RETURN"))
-    public void init(MinecraftServer server, ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, CallbackInfo ci) {
-        serverBlueprintManager = new ServerBlueprintManager(server);
-    }
-
-    @Inject(method="tick", at=@At("TAIL"))
-    public void tick(CallbackInfo ci) {
-        serverBlueprintManager.tick((ServerPlayerEntity)(Object)this);
-    }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
-        final var blueprintManager = serverBlueprintManager.write();
-        nbt.put("blueprintManager", blueprintManager);
-
         NbtCompound playerState = new NbtCompound();
         playerState.putBoolean("wasInBlueprintWorldWhenLoggedOut", wasInBlueprintWorldWhenLoggedOut);
         if(persistedPos != null) {
@@ -74,12 +58,10 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        final var blueprintManager = nbt.contains("blueprintManager") ? nbt.getCompound("blueprintManager") : new NbtCompound();
-        serverBlueprintManager.read(blueprintManager);
-        if(nbt.contains("playerState")) {
+        if (nbt.contains("playerState")) {
             NbtCompound playerState = nbt.getCompound("playerState");
             wasInBlueprintWorldWhenLoggedOut = playerState.getBoolean("wasInBlueprintWorldWhenLoggedOut");
-            if(playerState.contains("persistedPosX")) {
+            if (playerState.contains("persistedPosX")) {
                 persistedPos = new Vec3d(
                         playerState.getDouble("persistedPosX"),
                         playerState.getDouble("persistedPosY"),
@@ -88,18 +70,6 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
             }
         }
 
-    }
-
-    @Override
-    public IServerBlueprintManager get_ServerBlueprintManager() {
-        return serverBlueprintManager;
-    }
-
-    @Inject(method = "copyFrom", at = @At("TAIL"))
-    public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-        if(oldPlayer instanceof FortressServerPlayerEntity fortressServerPlayer) {
-            this.serverBlueprintManager = fortressServerPlayer.get_ServerBlueprintManager();
-        }
     }
 
 

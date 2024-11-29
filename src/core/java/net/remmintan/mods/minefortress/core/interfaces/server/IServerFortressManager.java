@@ -33,7 +33,7 @@ public interface IServerFortressManager {
 
     void jumpToCampfire(ServerPlayerEntity player);
 
-    void repairBuilding(ServerPlayerEntity player, UUID taskId, UUID buildingId, List<Integer> selectedPawns);
+    void repairBuilding(ServerPlayerEntity player, UUID taskId, BlockPos pos, List<Integer> selectedPawns);
 
     boolean isSurvival();
 

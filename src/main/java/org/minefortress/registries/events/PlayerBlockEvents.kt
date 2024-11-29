@@ -11,7 +11,6 @@ import net.remmintan.mods.minefortress.blueprints.getPersonalBlueprintCell
 import net.remmintan.mods.minefortress.blueprints.isBlueprintWorld
 import net.remmintan.mods.minefortress.building.BuildingHelper
 import net.remmintan.mods.minefortress.core.FortressState
-import net.remmintan.mods.minefortress.core.interfaces.buildings.IEssentialBuildingInfo
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import org.minefortress.utils.BlockUtils
@@ -99,9 +98,9 @@ private fun updateFightSelection(hitResult: BlockHitResult, fortressManager: ICl
 }
 
 private fun openManageBuildingMenu(fortressManager: IClientFortressManager) {
-    fortressManager
-        .hoveredBuilding
-        .ifPresent { it: IEssentialBuildingInfo? -> }
+//    fortressManager
+//        .hoveredBuilding
+//        .ifPresent { it: IEssentialBuildingInfo? -> }
 }
 
 private fun clickBuild(useOnContext: ItemUsageContext, blockState: BlockState) {

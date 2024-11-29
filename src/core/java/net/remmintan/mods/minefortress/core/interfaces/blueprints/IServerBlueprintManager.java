@@ -4,12 +4,17 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 
 import java.util.UUID;
 
-public interface IServerBlueprintManager {
+public interface IServerBlueprintManager extends IServerManager, ITickableManager, IWritableManager {
+    BlueprintMetadata get(String blueprintId);
     void tick(ServerPlayerEntity player);
 
     void update(String blueprintId, String blueprintName, BlueprintGroup group, NbtCompound updatedStructure, int newFloorLevel);
@@ -23,8 +28,6 @@ public interface IServerBlueprintManager {
     ITask createDigTask(UUID taskId, BlockPos startPos, int floorLevel, String blueprintId, BlockRotation rotation);
 
     IInstantTask createInstantPlaceTask(String blueprintId, BlockPos start, BlockRotation rotation);
-
-    NbtCompound write();
 
     void read(NbtCompound nbt);
 }

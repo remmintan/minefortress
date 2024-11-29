@@ -12,7 +12,6 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 public interface IFortressBuilding extends IAutomationArea {
 
@@ -21,6 +20,10 @@ public interface IFortressBuilding extends IAutomationArea {
     BlockPos getStart();
 
     BlockPos getEnd();
+
+    void destroy();
+
+    String getName();
 
     default BlockPos getCenter() {
         final var start = getStart();
@@ -48,8 +51,6 @@ public interface IFortressBuilding extends IAutomationArea {
     int getBedsCount();
 
     boolean satisfiesRequirement(ProfessionType type, int level);
-
-    UUID getId();
 
     void attack(HostileEntity attacker);
 

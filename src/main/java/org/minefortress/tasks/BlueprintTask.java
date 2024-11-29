@@ -17,7 +17,6 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPaw
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.fortress.buildings.FortressBuilding;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 
@@ -103,21 +102,11 @@ public class BlueprintTask extends AbstractTask {
             if(blueprintEntityData != null) mergeBlockData.putAll(blueprintEntityData);
             if(blueprintAutomaticData != null) mergeBlockData.putAll(blueprintAutomaticData);
 
-            final FortressBuilding fortressBuilding = new FortressBuilding(
-                    UUID.randomUUID(),
-                    startingBlock,
-                    endingBlock,
-                    blueprintId,
-                    floorLevel,
-                    mergeBlockData
-            );
-            final var manager = worker.getServerFortressManager().orElseThrow();
-            manager.expandTheVillage(fortressBuilding.getStart());
-            manager.expandTheVillage(fortressBuilding.getEnd());
 
             final var provider = worker.getManagersProvider().orElseThrow();
+            final var metadata = provider.getBlueprintManager().get(blueprintId);
             final var buildingManager = provider.getBuildingsManager();
-            buildingManager.addBuilding(fortressBuilding);
+            buildingManager.addBuilding(metadata, startingBlock, endingBlock, mergeBlockData);
         }
         super.finishPart(part, worker);
     }

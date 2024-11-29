@@ -10,7 +10,6 @@ import java.time.LocalDateTime
 import java.util.*
 
 class BuildingAutomationAreaProvider(
-    private val id: UUID,
     private val start: BlockPos,
     private val end: BlockPos,
     private val requirement: IBlueprintRequirement
@@ -19,7 +18,7 @@ class BuildingAutomationAreaProvider(
     private var updated: LocalDateTime = LocalDateTime.MIN
     private var currentIterator: Iterator<IAutomationBlockInfo>? = null
 
-    override fun getId(): UUID = id
+    override fun getId(): UUID = error("Not id supported")
 
     override fun iterator(world: World?): Iterator<IAutomationBlockInfo> {
         if (currentIterator?.hasNext() != true) {

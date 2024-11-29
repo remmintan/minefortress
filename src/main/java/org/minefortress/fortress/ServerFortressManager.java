@@ -29,6 +29,7 @@ import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
@@ -51,6 +52,7 @@ import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPac
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
@@ -108,10 +110,11 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         registerManager(IServerTaskManager.class, new ServerTaskManager());
         registerManager(IServerProfessionsManager.class, new ServerProfessionManager(() -> this, () -> this, server));
         registerManager(IServerResourceManager.class, new ServerResourceManager(server));
-        registerManager(IServerBuildingsManager.class, new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD)));
+        registerManager(IServerBuildingsManager.class, new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD), this));
         registerManager(IServerAutomationAreaManager.class, new AreasServerManager());
         registerManager(IServerFightManager.class, new ServerFightManager(this));
         registerManager(ITasksCreator.class, new TasksCreator());
+        registerManager(IServerBlueprintManager.class, new ServerBlueprintManager(server));
 
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             this.gamemode = FortressGamemode.SURVIVAL;
@@ -710,12 +713,12 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     }
 
     @Override
-    public void repairBuilding(ServerPlayerEntity player, UUID taskId, UUID buildingId, List<Integer> selectedPawns) {
+    public void repairBuilding(ServerPlayerEntity player, UUID taskId, BlockPos pos, List<Integer> selectedPawns) {
         final var buildingManager = getBuildingsManager();
         final var resourceManager = getResourceManager();
 
         try {
-            final var building = buildingManager.getBuildingById(buildingId)
+            final var building = buildingManager.getBuilding(pos)
                     .orElseThrow(() -> new IllegalStateException("Building not found"));
 
             final var blocksToRepair = building.getAllBlockStatesToRepairTheBuilding();

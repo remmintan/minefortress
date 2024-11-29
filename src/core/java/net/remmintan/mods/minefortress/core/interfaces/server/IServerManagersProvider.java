@@ -2,6 +2,7 @@ package net.remmintan.mods.minefortress.core.interfaces.server;
 
 import net.minecraft.entity.LivingEntity;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
@@ -35,6 +36,10 @@ public interface IServerManagersProvider {
     }
     default IServerFightManager getFightManager() {
         return getManager(IServerFightManager.class);
+    }
+
+    default IServerBlueprintManager getBlueprintManager() {
+        return getManager(IServerBlueprintManager.class);
     }
 
     <T> T getManager(Class<T> managerClass);

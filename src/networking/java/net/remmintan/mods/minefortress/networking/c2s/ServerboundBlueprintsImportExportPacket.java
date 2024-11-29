@@ -7,8 +7,8 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerStructureBlockDataManager;
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.networking.NetworkActionType;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
@@ -88,20 +88,19 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
 
-        if(player instanceof FortressServerPlayerEntity serverPlayer) {
-            switch (type) {
-                case EXPORT -> handleExport(player, serverPlayer);
-                case IMPORT -> handleImport(player, serverPlayer);
-            }
+        final var sbm = getManagersProvider(server, player).getBlueprintManager();
+        switch (type) {
+            case EXPORT -> handleExport(player, sbm);
+            case IMPORT -> handleImport(player, sbm);
         }
     }
 
-    private void handleExport(ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
+    private void handleExport(ServerPlayerEntity player, IServerBlueprintManager sbm) {
         byte[] bytes;
         try {
-            final var sbm = serverPlayer.get_ServerBlueprintManager();
-            final var serializedSbm = sbm.write();
-            final var serializedBlueprints = serializedSbm.getCompound("blueprints");
+            final var tag = new NbtCompound();
+            sbm.write(tag);
+            final var serializedBlueprints = tag.getCompound("blueprintsManager").getCompound("blueprints");
 
             bytes = zipBlueprintsFolderToByteArray(serializedBlueprints, sbm.getBlockDataManager());
         }catch (RuntimeException | IOException exp) {
@@ -115,9 +114,8 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, packet);
     }
 
-    private void handleImport(ServerPlayerEntity player, FortressServerPlayerEntity serverPlayer) {
+    private void handleImport(ServerPlayerEntity player, IServerBlueprintManager sbm) {
         try {
-            final var sbm = serverPlayer.get_ServerBlueprintManager();
             final var blueprintsMap = new NbtCompound();
             try (
                 final var bais = new ByteArrayInputStream(bytes);
@@ -142,9 +140,12 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
                     }
                 }
             }
-            final var importedBlueprintManager = new NbtCompound();
-            importedBlueprintManager.put("blueprints", blueprintsMap);
-            sbm.read(importedBlueprintManager);
+            final var importedBlueprints = new NbtCompound();
+            importedBlueprints.put("blueprints", blueprintsMap);
+
+            final var tag = new NbtCompound();
+            tag.put("blueprintsManager", importedBlueprints);
+            sbm.read(tag);
             final var packet = new ClientboundBlueprintsProcessImportExportPacket(ClientboundBlueprintsProcessImportExportPacket.CurrentScreenAction.SUCCESS);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, packet);
         }catch (IOException | RuntimeException e) {
