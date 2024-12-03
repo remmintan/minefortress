@@ -106,11 +106,9 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun toUpdatePacket(): Packet<ClientPlayPacketListener> {
-        return BlockEntityUpdateS2CPacket.create(this) {
-            val nbt = NbtCompound()
-            writeNbt(nbt)
-            return@create nbt
-        }
+        val nbt = NbtCompound()
+        writeNbt(nbt)
+        return BlockEntityUpdateS2CPacket.create(this) { nbt }
     }
 
     override fun getId(): UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")

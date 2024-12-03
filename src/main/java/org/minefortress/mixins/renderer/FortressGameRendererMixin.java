@@ -10,7 +10,6 @@ import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.interfaces.FortressGameRenderer;
 import org.minefortress.renderer.CameraTools;
 import org.minefortress.utils.ModUtils;
@@ -51,10 +50,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Unique
     private static void resetAllSelectionManagers() {
-        final var provider = CoreModUtils.getMineFortressManagersProvider();
-
         ModUtils.getSelectionManager().resetSelection();
-        provider.get_PawnsSelectionManager().resetSelection();
         ModUtils.getAreasClientManager().resetSelection();
     }
 
@@ -73,12 +69,6 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
             }
 
             if(client.crosshairTarget instanceof BlockHitResult blockHitResult) {
-//                if(clientFortressManager.isCenterNotSet()) {
-//                    resetAllSelectionManagers();
-//                    clientFortressManager.updateRenderer(client.worldRenderer);
-//                    return;
-//                }
-
                 final IClientBlueprintManager clientBlueprintManager = provider.get_BlueprintManager();
                 if(clientBlueprintManager.isSelecting()) {
                     resetAllSelectionManagers();
