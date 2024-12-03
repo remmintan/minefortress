@@ -58,7 +58,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         return buildingPos;
     }
 
-    public void addBuilding(BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> mergedBlockData) {
+    public void addBuilding(BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> blockData) {
         final var blockBox = BlockBox.create(start, end);
         final var buildingPos = getCenterTop(blockBox);
 
@@ -66,7 +66,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         world.setBlockState(buildingPos, FortressBlocks.FORTRESS_BUILDING.getDefaultState(), 3);
         final var blockEntity = world.getBlockEntity(buildingPos);
         if (blockEntity instanceof FortressBuildingBlockEntity b) {
-            b.init(metadata, start, end, mergedBlockData);
+            b.init(metadata, start, end, blockData);
         }
 
         fortressManager.expandTheVillage(start);

@@ -121,7 +121,6 @@ class FortressBuildingBlockData {
     }
 
     private static boolean shouldSkipBlock(BlockPos pos, BlockState state, int floorYLevel) {
-
         if (state.isAir() || !state.getFluidState().isEmpty() || state.getBlock() == Blocks.STRUCTURE_VOID)
             return true;
 

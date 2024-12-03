@@ -54,7 +54,10 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         this.blueprintMetadata = metadata
         this.start = start
         this.end = end
-        this.blockData = FortressBuildingBlockData(blockData, metadata.floorLevel)
+
+        val movedBlocksData = blockData.mapKeys { it.key.add(start) }
+
+        this.blockData = FortressBuildingBlockData(movedBlocksData, metadata.floorLevel)
         this.automationArea = BuildingAutomationAreaProvider(start, end, metadata.requirement)
     }
 
