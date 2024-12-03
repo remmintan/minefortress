@@ -37,7 +37,7 @@ public class FortressBlocks {
         BUILDING_CONFIGURATION_ENT_TYPE = Registry.register(
                 Registries.BLOCK_ENTITY_TYPE,
                 buildingConfigurationBlockId,
-                FabricBlockEntityTypeBuilder.create(FortressBuildingConfigurationBlockEntity::new).build()
+                FabricBlockEntityTypeBuilder.create(FortressBuildingConfigurationBlockEntity::new, FORTRESS_BUILDING_CONFIGURATION).build()
         );
 
         final var buildingBlockId = Identifier.of("minefortress", "building");
@@ -45,7 +45,7 @@ public class FortressBlocks {
         BUILDING_ENT_TYPE = Registry.register(
                 Registries.BLOCK_ENTITY_TYPE,
                 buildingBlockId,
-                FabricBlockEntityTypeBuilder.create(FortressBuildingBlockEntity::new).build()
+                FabricBlockEntityTypeBuilder.create(FortressBuildingBlockEntity::new, FORTRESS_BUILDING).build()
         );
     }
 }

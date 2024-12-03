@@ -50,6 +50,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
 
     @Override
     public void tick(ServerPlayerEntity player) {
+        if (player == null) return;
         if (!initialized) {
             if (blueprints.isEmpty()) readDefaultBlueprints();
 

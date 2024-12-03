@@ -110,7 +110,8 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
         final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
         final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket(selectionManager);
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
-        ModUtils.getFortressClientManager().setupFortressCenter(getStructureBuildPos());
+        if ("campfire".equals(selectedStructure.getId()))
+            ModUtils.getFortressClientManager().setupFortressCenter(getStructureBuildPos());
         selectionManager.resetSelection();
         clearStructure();
     }

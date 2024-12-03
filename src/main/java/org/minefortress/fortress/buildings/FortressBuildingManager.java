@@ -50,12 +50,17 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         this.fortressManager = fortressManager;
     }
 
-    public void addBuilding(BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> mergedBlockData) {
-        final var blockBox = BlockBox.create(start, end);
+    private static @NotNull BlockPos getCenterTop(BlockBox blockBox) {
         final var center = blockBox.getCenter();
         final var ceilingY = blockBox.getMaxY() + 1;
 
         final var buildingPos = new BlockPos(center.getX(), ceilingY, center.getZ());
+        return buildingPos;
+    }
+
+    public void addBuilding(BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> mergedBlockData) {
+        final var blockBox = BlockBox.create(start, end);
+        final var buildingPos = getCenterTop(blockBox);
 
         final var world = getWorld();
         world.setBlockState(buildingPos, FortressBlocks.FORTRESS_BUILDING.getDefaultState(), 3);
@@ -97,8 +102,8 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     public void tick(ServerPlayerEntity player) {
         if(player != null) {
             if (needSync) {
-                final var syncBuildings = new ClientboundSyncBuildingsPacket(buildings);
-                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, syncBuildings);
+                final var packet = new ClientboundSyncBuildingsPacket(buildings);
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_BUILDINGS_SYNC, packet);
 
                 needSync = false;
             }

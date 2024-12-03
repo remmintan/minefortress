@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
 
-class FortressBuildingBlock : BlockWithEntity(FabricBlockSettings.create().dropsNothing()) {
+class FortressBuildingBlock : BlockWithEntity(FabricBlockSettings.create().dropsNothing().noCollision()) {
     override fun createBlockEntity(pos: BlockPos?, state: BlockState?): BlockEntity {
         return FortressBuildingBlockEntity(pos, state)
     }
@@ -20,7 +20,7 @@ class FortressBuildingBlock : BlockWithEntity(FabricBlockSettings.create().drops
         state: BlockState?,
         type: BlockEntityType<T>?
     ): BlockEntityTicker<T>? {
-        return if (type == FortressBlocks.BUILDING_ENT_TYPE) {
+        return if (world?.isClient != true && type == FortressBlocks.BUILDING_ENT_TYPE) {
             BlockEntityTicker { w, p, s, be -> if (be is FortressBuildingBlockEntity) be.tick(w) }
         } else {
             null

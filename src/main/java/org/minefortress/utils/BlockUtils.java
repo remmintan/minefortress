@@ -26,6 +26,8 @@ public class BlockUtils {
     }
 
     public static boolean isPosBetween(BlockPos pos, BlockPos start, BlockPos end) {
+        if (pos == null || start == null || end == null)
+            return false;
         return pos.getX() >= start.getX() && pos.getX() <= end.getX() &&
                 pos.getY() >= start.getY() && pos.getY() <= end.getY() &&
                 pos.getZ() >= start.getZ() && pos.getZ() <= end.getZ();
