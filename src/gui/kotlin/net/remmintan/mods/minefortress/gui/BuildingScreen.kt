@@ -10,7 +10,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
 
 
     override fun drawBackground(context: DrawContext?, delta: Float, mouseX: Int, mouseY: Int) {
-        TODO("Not yet implemented")
+
     }
 
 }

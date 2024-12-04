@@ -25,6 +25,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomati
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
+import net.remmintan.mods.minefortress.gui.BuildingScreenHandler
 import java.time.LocalDateTime
 import java.util.*
 
@@ -78,8 +79,8 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         }
     }
 
-    override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler? {
-        TODO("Not yet implemented")
+    override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
+        return BuildingScreenHandler(syncId, playerInventory)
     }
 
     override fun getDisplayName(): Text {
