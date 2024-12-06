@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings;
+package net.remmintan.mods.minefortress.core.interfaces.buildings;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.mob.HostileEntity;
@@ -6,7 +6,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
-import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;

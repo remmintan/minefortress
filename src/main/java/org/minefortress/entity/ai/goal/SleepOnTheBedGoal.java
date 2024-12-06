@@ -3,7 +3,7 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.block.BedBlock;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.jetbrains.annotations.NotNull;

@@ -13,7 +13,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import net.remmintan.mods.minefortress.core.FortressState;
-import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import org.minefortress.MineFortressMod;
 import org.minefortress.utils.ModUtils;
@@ -67,27 +66,27 @@ public abstract class FortressClientInteractionManagerMixin {
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if(!ModUtils.isClientInFortressGamemode()) return;
-        final var fortressClient = (IClientManagersProvider) this.client;
-        final var clientBlueprintManager = fortressClient.get_BlueprintManager();
-        final var manager = fortressClient.get_ClientFortressManager();
+        final var clientBlueprintManager = ModUtils.getBlueprintManager();
+        final var fortressManager = ModUtils.getFortressClientManager();
+        final var buildingsManager = ModUtils.getBuildingsManager();
 
-        if(manager.isCenterNotSet()) {
+        if (fortressManager.isCenterNotSet()) {
             cir.setReturnValue(false);
             return;
         }
 
-        if(manager.isBuildingHovered()) {
-            openManageBuildingMenu(manager);
+        if (buildingsManager.isBuildingHovered()) {
+            buildingsManager.openBuildingScreen(this.client.player);
             cir.setReturnValue(false);
             return;
         }
 
-        if(manager.getState() == FortressState.BUILD_SELECTION) {
+        if (fortressManager.getState() == FortressState.BUILD_SELECTION) {
             cir.setReturnValue(false);
             return;
         }
 
-        if(manager.getState() == FortressState.AREAS_SELECTION) {
+        if (fortressManager.getState() == FortressState.AREAS_SELECTION) {
             final var areasClientManager = ModUtils.getAreasClientManager();
             areasClientManager.select(client.crosshairTarget);
             cir.setReturnValue(false);
@@ -100,19 +99,8 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        fortressClient.get_SelectionManager().selectBlock(pos);
+        ModUtils.getSelectionManager().selectBlock(pos);
         cir.setReturnValue(false);
-    }
-
-    @Unique
-    private static void openManageBuildingMenu(IClientFortressManager fortressManager) {
-        fortressManager
-                .getHoveredBuilding()
-                .ifPresent(it -> {
-                    // TODO: open the new building screen
-//                    final var manageBuildingScreen = new ManageBuildingScreen(it);
-//                    MinecraftClient.getInstance().setScreen(manageBuildingScreen);
-                });
     }
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true)

@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
@@ -78,6 +79,10 @@ public class ModUtils {
 
     public static IClientBlueprintManager getBlueprintManager() {
         return getClientManagersProvider().get_BlueprintManager();
+    }
+
+    public static IClientBuildingsManager getBuildingsManager() {
+        return getClientManagersProvider().get_BuildingsManager();
     }
 
     public static ISelectionManager getSelectionManager() {

@@ -23,8 +23,7 @@ public class ClientboundSyncBuildingsPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        final var fortressManager = getManagersProvider().get_ClientFortressManager();
-        fortressManager.updateBuildings(buildingsPositions);
+        getManagersProvider().get_BuildingsManager().updateBuildings(buildingsPositions);
     }
 
     @Override

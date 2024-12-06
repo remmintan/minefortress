@@ -68,8 +68,10 @@ fun registerPlayerBlockEvents() {
             return@register ActionResult.SUCCESS
         }
 
-        if (fortressManager.isBuildingHovered) {
-            openManageBuildingMenu(fortressManager)
+        val buildingManager = ModUtils.getBuildingsManager()
+
+        if (buildingManager.isBuildingHovered()) {
+            buildingManager.openBuildingScreen(player)
             return@register ActionResult.SUCCESS
         }
 
@@ -95,12 +97,6 @@ fun registerPlayerBlockEvents() {
 private fun updateFightSelection(hitResult: BlockHitResult, fortressManager: IClientFortressManager) {
     val fightManager = fortressManager.fightManager
     fightManager.setTarget(hitResult, CoreModUtils.getMineFortressManagersProvider().targetedSelectionManager)
-}
-
-private fun openManageBuildingMenu(fortressManager: IClientFortressManager) {
-//    fortressManager
-//        .hoveredBuilding
-//        .ifPresent { it: IEssentialBuildingInfo? -> }
 }
 
 private fun clickBuild(useOnContext: ItemUsageContext, blockState: BlockState) {

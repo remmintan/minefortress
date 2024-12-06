@@ -2,7 +2,7 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.TrackTargetGoal;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.minefortress.entity.Colonist;
 

@@ -2,6 +2,7 @@ package net.remmintan.mods.minefortress.core.interfaces.buildings;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
@@ -14,6 +15,14 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface IFortressBuilding extends IAutomationArea {
+
+    default NamedScreenHandlerFactory getScreenHandlerFactory() {
+        if (this instanceof NamedScreenHandlerFactory nshf) {
+            return nshf;
+        } else {
+            throw new UnsupportedOperationException("This building does not have a screen handler factory");
+        }
+    }
 
     int getHealth();
 

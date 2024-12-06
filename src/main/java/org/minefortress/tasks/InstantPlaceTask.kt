@@ -6,7 +6,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.event.GameEvent
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask
 
 class InstantPlaceTask(

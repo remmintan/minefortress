@@ -38,7 +38,7 @@ public class MouseEvents {
         final var fortressManager = ModUtils.getFortressClientManager();
         final var state = fortressManager.getState();
         final var correctState = state == FortressState.COMBAT || state == FortressState.BUILD_SELECTION;
-        final var noBuildingHovered = ModUtils.getFortressClientManager().getHoveredBuilding().isEmpty();
+        final var noBuildingHovered = !ModUtils.getBuildingsManager().isBuildingHovered();
         final var noScreenOpened = MinecraftClient.getInstance().currentScreen == null;
         final var hudNotHovered = !ModUtils.getFortressClient().get_FortressHud().isHovered();
 

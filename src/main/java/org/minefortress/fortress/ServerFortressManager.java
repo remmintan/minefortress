@@ -31,7 +31,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomati
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;

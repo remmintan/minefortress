@@ -22,6 +22,7 @@ import net.remmintan.gobi.SelectionManager;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
@@ -41,6 +42,7 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fight.ClientPawnsSelectionManager;
 import org.minefortress.fortress.ClientFortressManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
+import org.minefortress.fortress.buildings.ClientBuildingManager;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
@@ -82,6 +84,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private AreasClientManager areasClientManager;
     @Unique
     private final IClientPawnsSelectionManager pawnsSelectionManager = new ClientPawnsSelectionManager();
+    @Unique
+    private final IClientBuildingsManager buildingsManager = new ClientBuildingManager();
 
     @Shadow
     @Final
@@ -277,8 +281,14 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return this.areasClientManager;
     }
 
+    @Override
     public IClientPawnsSelectionManager get_PawnsSelectionManager() {
         return pawnsSelectionManager;
+    }
+
+    @Override
+    public IClientBuildingsManager get_BuildingsManager() {
+        return buildingsManager;
     }
 
     @Inject(method = "close", at = @At("HEAD"))

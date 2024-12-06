@@ -1,15 +1,11 @@
 package org.minefortress.fortress;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
-import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
-import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
@@ -22,20 +18,17 @@ import net.remmintan.mods.minefortress.networking.c2s.C2SJumpToCampfire;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSetGamemodePacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import org.minefortress.MineFortressMod;
 import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.hire.ClientHireHandler;
-import org.minefortress.renderer.gui.fortress.RepairBuildingScreen;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
-import org.minefortress.utils.BlockUtils;
 import org.minefortress.utils.ModUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class ClientFortressManager implements IClientFortressManager {
 
@@ -49,9 +42,6 @@ public final class ClientFortressManager implements IClientFortressManager {
     private int colonistsCount = 0;
     private int reservedColonistCount = 0;
 
-    private IFortressBuilding hoveredBuilding = null;
-
-    private List<BlockPos> buildings = new ArrayList<>();
     private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
     private Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
 
@@ -74,10 +64,6 @@ public final class ClientFortressManager implements IClientFortressManager {
         FortressClientNetworkHelper.send(C2SJumpToCampfire.CHANNEL, packet);
     }
 
-    @Override
-    public void updateBuildings(List<BlockPos> buildings) {
-        this.buildings = buildings;
-    }
 
     @Override
     public void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks) {
@@ -109,23 +95,11 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     @Override
     public void tick(IHoveredBlockProvider fortressClient) {
-        final MinecraftClient client = (MinecraftClient) fortressClient;
-        if(
-                client.world == null ||
-                client.interactionManager == null ||
-                client.interactionManager.getCurrentGameMode() != MineFortressMod.FORTRESS
-        ) {
-            hoveredBuilding = null;
-            return;
-        }
-        if(!initialized) return;
+        if (!initialized) return;
 
-        if (state != FortressState.BUILD_EDITING && state != FortressState.BUILD_SELECTION) {
-            hoveredBuilding = null;
-        }
         resetBuildEditState();
 
-        if(isCenterNotSet()) {
+        if (isCenterNotSet()) {
             final var blueprintManager = CoreModUtils.getMineFortressManagersProvider().get_BlueprintManager();
             if (!blueprintManager.isSelecting()) {
                 blueprintManager.select("campfire");
@@ -139,7 +113,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     private void resetBuildEditState() {
-        if(this.state == FortressState.BUILD_EDITING && !CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().hasSelected()) {
+        if (this.state == FortressState.BUILD_EDITING && !CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().hasSelected()) {
             this.state = FortressState.BUILD_SELECTION;
         }
     }
@@ -168,44 +142,10 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     @Override
     public void setupFortressCenter(BlockPos pos) {
-        if(fortressCenter!=null) throw new IllegalStateException("Fortress center already set");
+        if (fortressCenter != null) throw new IllegalStateException("Fortress center already set");
         fortressCenter = pos;
     }
 
-    @Override
-    public List<BlockPos> getBuildingSelection(BlockPos pos) {
-        for (BlockPos buildingPos : buildings) {
-            final var buildingOpt = getBuilding(buildingPos);
-            if (buildingOpt.isEmpty()) continue;
-            final var building = buildingOpt.get();
-            final BlockPos start = building.getStart();
-            final BlockPos end = building.getEnd();
-            if(BlockUtils.isPosBetween(pos, start, end)){
-                hoveredBuilding = building;
-                return StreamSupport
-                        .stream(BlockPos.iterate(start, end).spliterator(), false)
-                        .map(BlockPos::toImmutable)
-                        .collect(Collectors.toList());
-            }
-        }
-        hoveredBuilding = null;
-        return Collections.emptyList();
-    }
-
-    @Override
-    public boolean isBuildingHovered() {
-        return hoveredBuilding != null;
-    }
-
-    @Override
-    public Optional<IFortressBuilding> getHoveredBuilding() {
-        return Optional.ofNullable(hoveredBuilding);
-    }
-
-    @Override
-    public Optional<String> getHoveredBuildingName() {
-        return getHoveredBuilding().map(IFortressBuilding::getName);
-    }
 
     @Override
     public IClientProfessionManager getProfessionManager() {
@@ -214,50 +154,13 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(ProfessionType type, int level, int minCount) {
-        final var requiredBuilding = getBuildingsStream()
-                .filter(b -> b.satisfiesRequirement(type, level));
-        if (type == ProfessionType.MINER ||
-                type == ProfessionType.LUMBERJACK ||
-                type == ProfessionType.WARRIOR) {
-            return requiredBuilding
-                    .mapToLong(it -> it.getBedsCount() * 10L)
-                    .sum() > minCount;
-        }
-        final var count = requiredBuilding.count();
-        if (type == ProfessionType.ARCHER)
-            return count * 10 > minCount;
-
-        if (type == ProfessionType.FARMER)
-            return count * 5 > minCount;
-
-        if (type == ProfessionType.FISHERMAN)
-            return count * 3 > minCount;
-
-        return count > minCount;
+        return ModUtils.getBuildingsManager().hasRequiredBuilding(type, level, minCount);
     }
 
-    @Override
-    public int countBuildings(ProfessionType type, int level) {
-        return (int) getBuildingsStream()
-                .filter(b -> b.satisfiesRequirement(type, level))
-                .count();
-    }
-
-    private Optional<IFortressBuilding> getBuilding(BlockPos pos) {
-        final var blockEntity = MinecraftClient.getInstance().world.getBlockEntity(pos);
-        return blockEntity instanceof IFortressBuilding b ? Optional.of(b) : Optional.empty();
-    }
-
-    private Stream<IFortressBuilding> getBuildingsStream() {
-        return buildings.stream()
-                .map(this::getBuilding)
-                .filter(Optional::isPresent)
-                .map(Optional::get);
-    }
 
     @Override
     public boolean hasRequiredBlock(Block block, boolean blueprint, int minCount) {
-        if(blueprint)
+        if (blueprint)
             return this.blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
         else
             return this.specialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
@@ -270,8 +173,8 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     @Override
     public void setGamemode(FortressGamemode gamemode) {
-        if(gamemode == null) throw new IllegalArgumentException("Gamemode cannot be null");
-        if(gamemode == FortressGamemode.NONE) throw new IllegalArgumentException("Gamemode cannot be NONE");
+        if (gamemode == null) throw new IllegalArgumentException("Gamemode cannot be null");
+        if (gamemode == FortressGamemode.NONE) throw new IllegalArgumentException("Gamemode cannot be NONE");
         final ServerboundSetGamemodePacket serverboundSetGamemodePacket = new ServerboundSetGamemodePacket(gamemode);
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_GAMEMODE, serverboundSetGamemodePacket);
     }
@@ -314,10 +217,10 @@ public final class ClientFortressManager implements IClientFortressManager {
     @Override
     public void setState(FortressState state) {
         this.state = state;
-        if(state == FortressState.AREAS_SELECTION) {
+        if (state == FortressState.AREAS_SELECTION) {
             ModUtils.getAreasClientManager().getSavedAreasHolder().setNeedRebuild(true);
         }
-        if(state == FortressState.BUILD_SELECTION || state == FortressState.BUILD_EDITING) {
+        if (state == FortressState.BUILD_SELECTION || state == FortressState.BUILD_EDITING) {
             CoreModUtils.getClientTasksHolder().ifPresent(it -> it.setNeedRebuild(true));
         }
     }
@@ -327,37 +230,5 @@ public final class ClientFortressManager implements IClientFortressManager {
         return this.state;
     }
 
-    @Override
-    public List<BuildingHealthRenderInfo> getBuildingHealths() {
-        return switch (this.getState()) {
-            case COMBAT -> getBuildingsStream()
-                    .filter(it -> it.getHealth() < 100)
-                    .map(this::buildingToHealthRenderInfo)
-                    .toList();
-            case BUILD_SELECTION, BUILD_EDITING -> getBuildingsStream()
-                    .filter(it -> it.getHealth() < 33)
-                    .map(this::buildingToHealthRenderInfo)
-                    .toList();
-            default -> Collections.emptyList();
-        };
-    }
 
-    private BuildingHealthRenderInfo buildingToHealthRenderInfo(IFortressBuilding buildingInfo) {
-        final var start = buildingInfo.getStart();
-        final var end = buildingInfo.getEnd();
-
-        final var maxY = Math.max(start.getY(), end.getY());
-        final var centerX = (start.getX() + end.getX()) / 2;
-        final var centerZ = (start.getZ() + end.getZ()) / 2;
-
-        final var center = new Vec3d(centerX, maxY, centerZ);
-        final var health = buildingInfo.getHealth();
-
-        return new BuildingHealthRenderInfo(center, health);
-    }
-
-    @Override
-    public void openRepairBuildingScreen(BlockPos pos, Map<BlockPos, BlockState> blocksToRepair) {
-        MinecraftClient.getInstance().setScreen(new RepairBuildingScreen(pos, blocksToRepair, resourceManager));
-    }
 }

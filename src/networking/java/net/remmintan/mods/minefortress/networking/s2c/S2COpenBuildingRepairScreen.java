@@ -48,8 +48,6 @@ public class S2COpenBuildingRepairScreen implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        final var provider = getManagersProvider();
-        final var manager = provider.get_ClientFortressManager();
-        manager.openRepairBuildingScreen(pos, blocksToRepair);
+        getManagersProvider().get_BuildingsManager().openRepairBuildingScreen(pos, blocksToRepair);
     }
 }
