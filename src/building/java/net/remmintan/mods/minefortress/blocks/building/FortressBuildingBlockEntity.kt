@@ -3,6 +3,7 @@ package net.remmintan.mods.minefortress.blocks.building
 import net.minecraft.block.BedBlock
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.enums.BedPart
 import net.minecraft.entity.mob.HostileEntity
@@ -67,8 +68,10 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         blockData?.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world as? ServerWorld)
 
         beds = BlockPos.iterate(start, end)
-            .filter { world.getBlockState(it).isIn(BlockTags.BEDS) }
-            .filter { world.getBlockState(it).get(BedBlock.PART) == BedPart.HEAD }
+            .filter {
+                val blockState = world.getBlockState(it)
+                blockState.isIn(BlockTags.BEDS) && blockState.get(BedBlock.PART) == BedPart.HEAD
+            }
             .map { it.toImmutable() }
             .toList()
 
@@ -80,8 +83,10 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
-        return BuildingScreenHandler(syncId, playerInventory)
+        return BuildingScreenHandler(syncId)
     }
+
+    override fun getPos(): BlockPos = super<BlockEntity>.getPos()
 
     override fun getDisplayName(): Text {
         val nameStr = blueprintMetadata?.name ?: "Building"
@@ -123,8 +128,10 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     override fun getEnd(): BlockPos? = end
 
     override fun getFreeBed(world: World?): Optional<BlockPos> =
-        beds.firstOrNull { world?.getBlockState(it)?.get(BedBlock.OCCUPIED) == true }
-            .let { Optional.ofNullable(it) }
+        beds.firstOrNull {
+            val blockState = world?.getBlockState(it) ?: Blocks.AIR.defaultState
+            blockState.isIn(BlockTags.BEDS) && blockState.get(BedBlock.OCCUPIED)
+        }.let { Optional.ofNullable(it) }
 
     override fun getBedsCount(): Int = beds.size
 

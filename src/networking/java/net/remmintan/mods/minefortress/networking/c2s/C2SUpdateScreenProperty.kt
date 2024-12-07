@@ -5,8 +5,6 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket
 
-val CHANNEL = "update_screen_property"
-
 class C2SUpdateScreenProperty(private val index: Int, private val value: Int) : FortressC2SPacket {
 
     constructor(buf: PacketByteBuf) : this(buf.readInt(), buf.readInt())
@@ -19,5 +17,9 @@ class C2SUpdateScreenProperty(private val index: Int, private val value: Int) : 
     override fun handle(server: MinecraftServer?, player: ServerPlayerEntity?) {
         val handler = player?.currentScreenHandler
         handler?.setProperty(index, value)
+    }
+
+    companion object {
+        const val CHANNEL = "update_screen_property"
     }
 }

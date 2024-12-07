@@ -31,9 +31,6 @@ interface IClientBuildingsManager {
 
     fun hasRequiredBuilding(type: ProfessionType, level: Int, minCount: Int): Boolean
 
-    fun openBuildingScreen(playerEntity: PlayerEntity) {
-        val hoveredBuilding = getHoveredBuilding().orElseThrow()
-        playerEntity.openHandledScreen(hoveredBuilding.screenHandlerFactory)
-    }
+    fun openBuildingScreen(playerEntity: PlayerEntity)
 
 }

@@ -2,6 +2,7 @@ package org.minefortress.fortress.buildings
 
 import net.minecraft.block.BlockState
 import net.minecraft.client.MinecraftClient
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.remmintan.mods.minefortress.core.FortressState.*
@@ -9,6 +10,8 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderI
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
+import net.remmintan.mods.minefortress.networking.c2s.C2SOpenBuildingScreen
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 import org.minefortress.renderer.gui.fortress.RepairBuildingScreen
 import org.minefortress.utils.BlockUtils
 import org.minefortress.utils.ModUtils
@@ -18,7 +21,7 @@ import java.util.stream.Stream
 import java.util.stream.StreamSupport
 import kotlin.math.max
 
-class ClientBuildingManager : IClientBuildingsManager {
+class ClientBuildingsManager : IClientBuildingsManager {
 
     private var buildings: List<BlockPos> = emptyList()
     private var hoveredBuilding: IFortressBuilding? = null
@@ -99,6 +102,13 @@ class ClientBuildingManager : IClientBuildingsManager {
             ProfessionType.FISHERMAN -> count * 3
             else -> count
         } > minCount
+    }
+
+    override fun openBuildingScreen(playerEntity: PlayerEntity) {
+        hoveredBuilding?.pos?.let {
+            val packet = C2SOpenBuildingScreen(it)
+            FortressClientNetworkHelper.send(C2SOpenBuildingScreen.CHANNEL, packet)
+        }
     }
 
     private fun buildingToHealthRenderInfo(buildingInfo: IFortressBuilding): BuildingHealthRenderInfo {

@@ -1,6 +1,7 @@
 package net.remmintan.mods.minefortress.gui
 
 import net.minecraft.client.gui.screen.ingame.HandledScreens
+import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.resource.featuretoggle.FeatureFlags
@@ -10,7 +11,10 @@ import net.minecraft.util.Identifier
 val BUILDING_SCREEN_HANDLER_TYPE: ScreenHandlerType<BuildingScreenHandler> = Registry.register(
     Registries.SCREEN_HANDLER,
     Identifier.of("minefortress", "building_screen_handler"),
-    ScreenHandlerType(::BuildingScreenHandler, FeatureFlags.VANILLA_FEATURES)
+    ScreenHandlerType(
+        { syncId: Int, i: PlayerInventory -> BuildingScreenHandler(syncId) },
+        FeatureFlags.VANILLA_FEATURES
+    )
 )
 
 val BUILDING_CONFIGURATION_SCREEN_HANDLER_TYPE: ScreenHandlerType<BuildingConfigurationScreenHandler> =

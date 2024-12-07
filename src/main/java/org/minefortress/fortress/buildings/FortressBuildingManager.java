@@ -54,8 +54,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         final var center = blockBox.getCenter();
         final var ceilingY = blockBox.getMaxY() + 1;
 
-        final var buildingPos = new BlockPos(center.getX(), ceilingY, center.getZ());
-        return buildingPos;
+        return new BlockPos(center.getX(), ceilingY, center.getZ());
     }
 
     public void addBuilding(BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> blockData) {

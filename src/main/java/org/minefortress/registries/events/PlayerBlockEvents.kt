@@ -17,7 +17,7 @@ import org.minefortress.utils.BlockUtils
 import org.minefortress.utils.ModUtils
 
 fun registerPlayerBlockEvents() {
-    UseBlockCallback.EVENT.register { player, world, hand, hitResult ->
+    UseBlockCallback.EVENT.register { player, world, _, hitResult ->
         if (!world.isBlueprintWorld() || world.getBlockState(hitResult.blockPos)
                 .isOf(FortressBlocks.FORTRESS_BUILDING_CONFIGURATION)
         )
@@ -30,7 +30,7 @@ fun registerPlayerBlockEvents() {
         return@register ActionResult.PASS
     }
 
-    AttackBlockCallback.EVENT.register { player, world, hand, blockPos, direction ->
+    AttackBlockCallback.EVENT.register { player, world, _, blockPos, _ ->
         if (!world.isBlueprintWorld())
             return@register ActionResult.PASS
         val cell = player.getPersonalBlueprintCell()
@@ -39,7 +39,7 @@ fun registerPlayerBlockEvents() {
     }
 
     // can't destroy building blocks
-    AttackBlockCallback.EVENT.register { player, world, hand, blockPos, direction ->
+    AttackBlockCallback.EVENT.register { _, world, _, blockPos, _ ->
         return@register if (world.getBlockState(blockPos).isOf(FortressBlocks.FORTRESS_BUILDING))
             ActionResult.FAIL else ActionResult.PASS
     }

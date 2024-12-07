@@ -42,7 +42,7 @@ import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fight.ClientPawnsSelectionManager;
 import org.minefortress.fortress.ClientFortressManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
-import org.minefortress.fortress.buildings.ClientBuildingManager;
+import org.minefortress.fortress.buildings.ClientBuildingsManager;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
@@ -85,7 +85,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Unique
     private final IClientPawnsSelectionManager pawnsSelectionManager = new ClientPawnsSelectionManager();
     @Unique
-    private final IClientBuildingsManager buildingsManager = new ClientBuildingManager();
+    private final IClientBuildingsManager buildingsManager = new ClientBuildingsManager();
 
     @Shadow
     @Final

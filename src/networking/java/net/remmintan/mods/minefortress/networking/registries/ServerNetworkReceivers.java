@@ -40,7 +40,8 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SRequestResourcesRefresh.CHANNEL, C2SRequestResourcesRefresh::new);
         registerReceiver(C2SSetNavigationTargetEntity.CHANNEL, C2SSetNavigationTargetEntity::new);
         registerReceiver(C2SAttractWarriorsToCampfire.CHANNEL, C2SAttractWarriorsToCampfire::new);
-        registerReceiver(C2SUpdateScreenPropertyKt.getCHANNEL(), C2SUpdateScreenProperty::new);
+        registerReceiver(C2SUpdateScreenProperty.CHANNEL, C2SUpdateScreenProperty::new);
+        registerReceiver(C2SOpenBuildingScreen.CHANNEL, C2SOpenBuildingScreen::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {

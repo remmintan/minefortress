@@ -10,7 +10,6 @@ import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.text.Text
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.networking.c2s.C2SUpdateScreenProperty
-import net.remmintan.mods.minefortress.networking.c2s.CHANNEL
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 
 class BuildingConfigurationScreen(
@@ -42,18 +41,18 @@ class BuildingConfigurationScreen(
             { _, prof ->
                 if (revision == 0) return@build
                 val packet = C2SUpdateScreenProperty(1, prof.ordinal)
-                FortressClientNetworkHelper.send(CHANNEL, packet)
+                FortressClientNetworkHelper.send(C2SUpdateScreenProperty.CHANNEL, packet)
             }
         adder.add(professionsLabel, grid.copyPositioner().marginTop(9))
         adder.add(professionSelector)
 
         val capacityLabel = TextWidget(Text.of("Building capacity [0-100]:"), this.textRenderer)
-        capacityWidget = TextFieldWidget(this.textRenderer, 200, 20, Text.of(handler.getCapacity().toString()))
+        capacityWidget = TextFieldWidget(this.textRenderer, 200, 20, Text.of(handler.getCapacity()))
         capacityWidget?.setChangedListener { text ->
             val capacity = if (text.isBlank()) 0 else text.toIntOrNull()
             if (capacity != null && capacity < 101 && revision > 0) {
                 val packet = C2SUpdateScreenProperty(0, capacity)
-                FortressClientNetworkHelper.send(CHANNEL, packet)
+                FortressClientNetworkHelper.send(C2SUpdateScreenProperty.CHANNEL, packet)
             }
         }
         capacityWidget?.setTextPredicate { text ->
