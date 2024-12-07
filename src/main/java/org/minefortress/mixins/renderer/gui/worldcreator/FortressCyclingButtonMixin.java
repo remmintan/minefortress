@@ -5,7 +5,7 @@ import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.text.Text;
-import org.minefortress.MineFortressMod;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -49,7 +49,7 @@ public abstract class FortressCyclingButtonMixin<T> extends PressableWidget {
                      CallbackInfo ci) {
         if(value instanceof WorldCreator.Mode) {
             var newValues = new ArrayList(values.getCurrent());
-            WorldCreator.Mode.DEBUG.defaultGameMode = MineFortressMod.FORTRESS;
+            WorldCreator.Mode.DEBUG.defaultGameMode = FortressGamemodeUtilsKt.getFORTRESS();
             WorldCreator.Mode.DEBUG.name = Text.translatable("selectWorld.gameMode.fortress");
             WorldCreator.Mode.DEBUG.info =  Text.translatable("selectWorld.gameMode.fortress");
             newValues.add(WorldCreator.Mode.DEBUG);

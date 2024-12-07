@@ -9,24 +9,23 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import org.minefortress.MineFortressMod;
-import org.minefortress.utils.ModUtils;
 
 public class FortressServerEvents {
 
     public static void register() {
         EntitySleepEvents.ALLOW_BED.register((entity, sleepingPos, state, vanillaResult) -> {
-            if(ModUtils.isFortressGamemode(entity)) {
+            if (FortressGamemodeUtilsKt.isFortressGamemode(entity)) {
                 return ActionResult.SUCCESS;
             }
             return ActionResult.PASS;
         });
 
         EntitySleepEvents.MODIFY_SLEEPING_DIRECTION.register((entity, pos, dir) -> {
-            if(ModUtils.isFortressGamemode(entity)) {
+            if (FortressGamemodeUtilsKt.isFortressGamemode(entity)) {
                 final var rotationVector = entity.getRotationVector();
                 return Direction.getFacing(rotationVector.x, rotationVector.y, rotationVector.z);
             }
@@ -34,7 +33,7 @@ public class FortressServerEvents {
         });
 
         EntitySleepEvents.ALLOW_NEARBY_MONSTERS.register((player, pos, vanilla) -> {
-            if(ModUtils.isFortressGamemode(player)) {
+            if (FortressGamemodeUtilsKt.isFortressGamemode(player)) {
                 return ActionResult.SUCCESS;
             }
             return ActionResult.PASS;
@@ -89,7 +88,7 @@ public class FortressServerEvents {
             if (destination.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY()) {
                 player.changeGameMode(GameMode.CREATIVE);
             } else if (origin.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY()) {
-                player.changeGameMode(MineFortressMod.FORTRESS);
+                player.changeGameMode(FortressGamemodeUtilsKt.getFORTRESS());
             }
         });
 

@@ -6,8 +6,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import org.minefortress.utils.GuiUtils;
-import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -22,7 +22,7 @@ public abstract class FortressHandledScreenMixin extends Screen {
 
     @Redirect(method = "drawSlot", at  = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V"))
     void changeSlotText(DrawContext instance, TextRenderer textRenderer, ItemStack stack, int x, int y, String countOverride) {
-        if(ModUtils.isClientInFortressGamemode() && Objects.isNull(countOverride) && stack.getCount() > 99) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && Objects.isNull(countOverride) && stack.getCount() > 99) {
             final var newCountLabel = GuiUtils.formatSlotCount(stack.getCount());
             instance.drawItemInSlot(textRenderer, stack, x, y, newCountLabel);
         } else {

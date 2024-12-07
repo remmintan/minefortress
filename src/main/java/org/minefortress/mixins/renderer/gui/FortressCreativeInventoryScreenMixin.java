@@ -27,8 +27,9 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
@@ -89,9 +90,14 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
 
 
+    @Unique
+    private static boolean isFortressSurvival() {
+        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative();
+    }
+
     @Redirect(method = "onMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/entity/ItemEntity;"))
     ItemEntity dropItem(ClientPlayerEntity instance, ItemStack itemStack, boolean b) {
-        if(ModUtils.isClientInFortressGamemode())
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode())
             return null;
         else {
             return instance.dropItem(itemStack, b);
@@ -100,15 +106,8 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Inject(method = "onMouseClick", at = @At("HEAD"), cancellable = true)
     void onCLickHead(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        if(ModUtils.isFortressGamemode(getClient().player) && actionType == SlotActionType.SWAP) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && actionType == SlotActionType.SWAP) {
             ci.cancel();
-        }
-    }
-
-    @Redirect(method = "onMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;dropCreativeStack(Lnet/minecraft/item/ItemStack;)V"))
-    void dropCreativeStack(ClientPlayerInteractionManager instance, ItemStack stack) {
-        if(!ModUtils.isClientInFortressGamemode()) {
-            instance.dropCreativeStack(stack);
         }
     }
 
@@ -188,13 +187,10 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         }
     }
 
-    @Inject(method = "handledScreenTick", at = @At("HEAD"), cancellable = true)
-    public void tick(CallbackInfo ci) {
-        if(ModUtils.isClientInFortressGamemode() && ModUtils.getFortressClientManager().isSurvival()) {
-            if(this.isInventoryTabSelected()) {
-                this.setSelectedTab(Registries.ITEM_GROUP.get(ItemGroups.BUILDING_BLOCKS));
-            }
-            ci.cancel();
+    @Redirect(method = "onMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;dropCreativeStack(Lnet/minecraft/item/ItemStack;)V"))
+    void dropCreativeStack(ClientPlayerInteractionManager instance, ItemStack stack) {
+        if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
+            instance.dropCreativeStack(stack);
         }
     }
 
@@ -250,9 +246,14 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         return MinecraftClient.getInstance();
     }
 
-    @Unique
-    private static boolean isFortressSurvival() {
-        return ModUtils.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative();
+    @Inject(method = "handledScreenTick", at = @At("HEAD"), cancellable = true)
+    public void tick(CallbackInfo ci) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && ModUtils.getFortressClientManager().isSurvival()) {
+            if(this.isInventoryTabSelected()) {
+                this.setSelectedTab(Registries.ITEM_GROUP.get(ItemGroups.BUILDING_BLOCKS));
+            }
+            ci.cancel();
+        }
     }
 
     @Unique

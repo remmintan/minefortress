@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.Items;
 import net.minecraft.resource.featuretoggle.FeatureSet;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundOpenCraftingScreenPacket;
@@ -102,7 +103,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
     }
 
     private boolean hasProfessionInAVillage(String professionId) {
-        return ModUtils.isClientInFortressGamemode() && ModUtils.getProfessionManager().hasProfession(professionId);
+        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && ModUtils.getProfessionManager().hasProfession(professionId);
     }
 
     @Override

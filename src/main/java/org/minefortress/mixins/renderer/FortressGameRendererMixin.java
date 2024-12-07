@@ -7,6 +7,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
@@ -62,7 +63,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         final var pawnsSelectionManager = provider.get_PawnsSelectionManager();
         final var areasClientManager = ModUtils.getAreasClientManager();
 
-        if (ModUtils.isClientInFortressGamemode()) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             final var clientState = clientFortressManager.getState();
             if(clientState == FortressState.COMBAT || clientState == FortressState.BUILD_SELECTION) {
                 pawnsSelectionManager.updateSelection(client.mouse);
@@ -94,7 +95,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;"))
     public Vec3d updateTargetedEntityGetRotation(Entity instance, float tickDelta) {
-        if(instance instanceof ClientPlayerEntity player && ModUtils.isFortressGamemode(player)) {
+        if (instance instanceof ClientPlayerEntity player && FortressGamemodeUtilsKt.isFortressGamemode(player)) {
             final var mouse = client.mouse;
             return CameraTools.getMouseBasedViewVector(client, mouse.getX(), mouse.getY());
         } else {
@@ -106,7 +107,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
     public double updateTargetedEntityRedirectDistanceToEntity(Vec3d instance, Vec3d vec) {
         final double realDistance = instance.squaredDistanceTo(vec);
 
-        if(!ModUtils.isClientInFortressGamemode()) return realDistance;
+        if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) return realDistance;
         if(realDistance > PICK_DISTANCE * PICK_DISTANCE) {
             return realDistance;
         } else {

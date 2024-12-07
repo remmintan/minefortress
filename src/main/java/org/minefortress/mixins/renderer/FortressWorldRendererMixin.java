@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import org.joml.Matrix4f;
@@ -67,7 +68,7 @@ public abstract class FortressWorldRendererMixin  {
         fortressClient.get_SelectionRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
         fortressClient.get_TasksRenderer().render(matrices, cameraPos.x, cameraPos.y, cameraPos.z, projectionMatrix);
 
-        if(!ModUtils.isClientInFortressGamemode()) return;
+        if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) return;
 
         final var selectionManager = ModUtils.getSelectionManager();
         final var immediate = this.bufferBuilders.getEntityVertexConsumers();

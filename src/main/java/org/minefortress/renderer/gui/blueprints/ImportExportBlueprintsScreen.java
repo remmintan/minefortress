@@ -7,6 +7,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundBlueprintsImportExportPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -54,7 +55,7 @@ public class ImportExportBlueprintsScreen extends Screen {
 
     @Override
     protected void init() {
-        if(!ModUtils.isClientInFortressGamemode()){
+        if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             closeMenu();
             return;
         }

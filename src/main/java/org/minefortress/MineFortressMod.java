@@ -1,12 +1,10 @@
 package org.minefortress;
 
 
-import com.chocohead.mm.api.ClassTinkerers;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.GameMode;
 import net.remmintan.mods.minefortress.blocks.FortressBlocks;
 import net.remmintan.mods.minefortress.networking.registries.ServerNetworkReceivers;
 import org.minefortress.commands.CommandsManager;
@@ -22,7 +20,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MineFortressMod implements ModInitializer {
 
-    public static final GameMode FORTRESS = ClassTinkerers.getEnum(GameMode.class, "FORTRESS");
     public static final String BLUEPRINTS_FOLDER_NAME = "minefortress-blueprints";
     public static final String BLUEPRINTS_EXTENSION = ".zip";
     public static final String MOD_ID = "minefortress";

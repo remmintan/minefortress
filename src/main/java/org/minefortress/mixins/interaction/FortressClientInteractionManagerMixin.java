@@ -12,9 +12,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import org.minefortress.MineFortressMod;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,15 +30,9 @@ import static org.minefortress.MineFortressConstants.PICK_DISTANCE_FLOAT;
 @Mixin(ClientPlayerInteractionManager.class)
 public abstract class FortressClientInteractionManagerMixin {
 
-    @Unique
-    private static final GameMode FORTRESS = MineFortressMod.FORTRESS;
-
     @Shadow
     @Final
     private MinecraftClient client;
-
-    @Shadow
-    public abstract GameMode getCurrentGameMode();
 
     @Inject(method = "setGameModes", at = @At("RETURN"))
     public void setGameModes(GameMode gameMode, GameMode previousGameMode, CallbackInfo ci) {
@@ -47,7 +41,7 @@ public abstract class FortressClientInteractionManagerMixin {
         if(selectionManager.isSelecting()) {
             selectionManager.resetSelection();
         }
-        if(gameMode == FORTRESS) {
+        if (gameMode == FortressGamemodeUtilsKt.getFORTRESS()) {
             setFortressMode();
         } else {
             unsetFortressMode();
@@ -56,7 +50,7 @@ public abstract class FortressClientInteractionManagerMixin {
 
     @Inject(method = "setGameMode", at = @At("RETURN"))
     public void setGameMode(GameMode gameMode, CallbackInfo ci) {
-        if(gameMode == FORTRESS) {
+        if (gameMode == FortressGamemodeUtilsKt.getFORTRESS()) {
             setFortressMode();
         } else {
             unsetFortressMode();
@@ -65,7 +59,7 @@ public abstract class FortressClientInteractionManagerMixin {
 
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if(!ModUtils.isClientInFortressGamemode()) return;
+        if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) return;
         final var clientBlueprintManager = ModUtils.getBlueprintManager();
         final var fortressManager = ModUtils.getFortressClientManager();
         final var buildingsManager = ModUtils.getBuildingsManager();
@@ -105,13 +99,13 @@ public abstract class FortressClientInteractionManagerMixin {
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true)
     public void updateBlockBreakingProgress(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if(ModUtils.isClientInFortressGamemode())
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode())
             cir.setReturnValue(true);
     }
 
     @Inject(method = "interactEntity", at = @At("HEAD"), cancellable = true)
     public void interactEntity(PlayerEntity player, Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        if(getCurrentGameMode() == FORTRESS) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             final var provider = (IClientManagersProvider) this.client;
             final var manager = provider.get_ClientFortressManager();
             if (manager.getState() == FortressState.COMBAT) {
@@ -130,25 +124,25 @@ public abstract class FortressClientInteractionManagerMixin {
 
     @Inject(method = "getReachDistance", at = @At("HEAD"), cancellable = true)
     public void getReachDistance(CallbackInfoReturnable<Float> cir) {
-        if(getCurrentGameMode()==FORTRESS)
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode())
             cir.setReturnValue(PICK_DISTANCE_FLOAT);
     }
 
     @Inject(method = "hasExtendedReach", at = @At("HEAD"), cancellable = true)
     public void hasExtendedReach(CallbackInfoReturnable<Boolean> cir) {
-        if(getCurrentGameMode()==FORTRESS)
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode())
             cir.setReturnValue(false);
     }
 
     @Inject(method = "isFlyingLocked", at = @At("HEAD"), cancellable = true)
     public void isFlyingLocked(CallbackInfoReturnable<Boolean> cir) {
-        if(getCurrentGameMode()==FORTRESS)
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode())
             cir.setReturnValue(true);
     }
 
     @Inject(method = "hasCreativeInventory", at = @At("HEAD"), cancellable = true)
     public void hasCreativeInventory(CallbackInfoReturnable<Boolean> cir) {
-        if(getCurrentGameMode()==FORTRESS)
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode())
             cir.setReturnValue(true);
     }
 

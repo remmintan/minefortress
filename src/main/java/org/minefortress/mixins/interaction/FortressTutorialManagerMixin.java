@@ -2,7 +2,7 @@ package org.minefortress.mixins.interaction;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.tutorial.TutorialManager;
-import org.minefortress.MineFortressMod;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,7 +17,7 @@ public class FortressTutorialManagerMixin {
 
     @Inject(method = "onInventoryOpened", at = @At("HEAD"), cancellable = true)
     public void onOpenInventory(CallbackInfo ci) {
-        if(client.interactionManager != null && client.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS) {
+        if (client.interactionManager != null && client.interactionManager.getCurrentGameMode() == FortressGamemodeUtilsKt.getFORTRESS()) {
             if(client.options.sprintKey.isPressed())
                 ci.cancel();
         }

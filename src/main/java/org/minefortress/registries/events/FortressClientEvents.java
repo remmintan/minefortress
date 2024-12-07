@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.util.ActionResult;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
@@ -39,7 +40,7 @@ public class FortressClientEvents {
         }));
 
         UseEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
-            if (!ModUtils.isFortressGamemode(player) || !world.isClient()) return ActionResult.PASS;
+            if (!FortressGamemodeUtilsKt.isFortressGamemode(player) || !world.isClient()) return ActionResult.PASS;
 
             if (ModUtils.getFortressClientManager().getState() == FortressState.COMBAT) {
                 final var provider = CoreModUtils.getMineFortressManagersProvider();
@@ -53,7 +54,7 @@ public class FortressClientEvents {
         });
 
         AttackEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
-            if (ModUtils.isFortressGamemode(player)) {
+            if (FortressGamemodeUtilsKt.isFortressGamemode(player)) {
                 if (entity instanceof IFortressAwareEntity fortressAwareEntity) {
                     final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
                     selectionManager.selectSingle(fortressAwareEntity);
@@ -65,7 +66,7 @@ public class FortressClientEvents {
     }
 
     private static void startClientTick(MinecraftClient client) {
-        if(!ModUtils.isClientInFortressGamemode()) return;
+        if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) return;
 
         MouseEvents.checkMouseStateAndFireEvents();
 

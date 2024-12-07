@@ -3,9 +3,6 @@ package org.minefortress.utils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager;
@@ -26,34 +23,12 @@ import java.util.UUID;
 @MethodsReturnNonnullByDefault
 public class ModUtils {
 
-    public static boolean isFortressGamemode(PlayerEntity player) {
-        if(player instanceof ServerPlayerEntity serverPlayer) {
-            return serverPlayer.interactionManager.getGameMode() == MineFortressMod.FORTRESS;
-        }
-        if(player instanceof ClientPlayerEntity) {
-            return isClientInFortressGamemode();
-        }
-        return false;
-    }
-
-    public static boolean isFortressGamemode(LivingEntity livingEntity) {
-        if(livingEntity instanceof PlayerEntity player) {
-            return isFortressGamemode(player);
-        }
-        return false;
-    }
-
     public static IFortressMinecraftClient getFortressClient() {
         return (IFortressMinecraftClient) MinecraftClient.getInstance();
     }
 
     private static IClientManagersProvider getClientManagersProvider() {
         return (IClientManagersProvider) MinecraftClient.getInstance();
-    }
-
-    public static boolean isClientInFortressGamemode() {
-        final var interactionManager = MinecraftClient.getInstance().interactionManager;
-        return interactionManager != null && interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
     }
 
     public static Path getBlueprintsFolder() {

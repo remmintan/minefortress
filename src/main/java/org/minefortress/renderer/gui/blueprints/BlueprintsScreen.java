@@ -15,6 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
@@ -66,7 +67,7 @@ public final class BlueprintsScreen extends Screen {
     @Override
     protected void init() {
         if(this.client != null) {
-            if(ModUtils.isClientInFortressGamemode()) {
+            if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
                 super.init();
                 this.x = (this.width - backgroundWidth - previewWidth - previewOffset) / 2;
                 this.y = (this.height - backgroundHeight) / 2;

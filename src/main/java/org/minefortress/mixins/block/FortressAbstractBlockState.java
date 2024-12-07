@@ -13,7 +13,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,7 +31,7 @@ public abstract class FortressAbstractBlockState extends State<Block, BlockState
 
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
     void onUse(World world, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
-        if(ModUtils.isFortressGamemode(player) && this.getBlock() instanceof BlockEntityProvider) {
+        if (FortressGamemodeUtilsKt.isFortressGamemode(player) && this.getBlock() instanceof BlockEntityProvider) {
             cir.setReturnValue(ActionResult.PASS);
         }
     }

@@ -9,11 +9,11 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
-import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,7 +39,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     @Override
     public HitResult raycast(double maxDistance, float tickDelta, boolean includeFluids) {
         final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
-        if(!fortressClient.is_FortressGamemode() || this.client.options.pickItemKey.isPressed()){
+        if (!FortressGamemodeUtilsKt.isClientInFortressGamemode() || this.client.options.pickItemKey.isPressed()) {
             return super.raycast(maxDistance, tickDelta, includeFluids);
         }
 
@@ -58,7 +58,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
 
     @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
-        if(ModUtils.isClientInFortressGamemode()) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             if(client.options.sprintKey.isPressed()) {
                 final var fortressClient = CoreModUtils.getMineFortressManagersProvider();
                 final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();

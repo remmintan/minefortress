@@ -3,8 +3,8 @@ package org.minefortress.mixins.world;
 import net.minecraft.client.session.telemetry.TelemetryEventProperty;
 import net.minecraft.client.session.telemetry.WorldLoadedEvent;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.MineFortressMod;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +18,7 @@ public abstract class WorldLoadedEventMixin {
 
     @Inject(method = "setGameMode", at = @At("HEAD"), cancellable = true)
     void setGameMode(GameMode gameMode, boolean hardcore, CallbackInfo ci){
-        if(gameMode == MineFortressMod.FORTRESS) {
+        if (gameMode == FortressGamemodeUtilsKt.getFORTRESS()) {
             this.gameMode = TelemetryEventProperty.GameMode.SURVIVAL;
             ci.cancel();
         }

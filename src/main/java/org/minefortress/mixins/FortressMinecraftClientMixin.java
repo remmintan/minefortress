@@ -19,6 +19,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.remmintan.gobi.SelectionManager;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
@@ -37,7 +38,6 @@ import net.remmintan.panama.renderer.FortressRenderLayer;
 import net.remmintan.panama.renderer.SelectionRenderer;
 import net.remmintan.panama.renderer.TasksRenderer;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.MineFortressMod;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fight.ClientPawnsSelectionManager;
 import org.minefortress.fortress.ClientFortressManager;
@@ -182,14 +182,9 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return selectionManager;
     }
 
-    @Override
-    public boolean is_FortressGamemode() {
-        return this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS;
-    }
-
     @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/TutorialManager;onInventoryOpened()V", shift = At.Shift.BEFORE))
     private void handleInputEvents(CallbackInfo ci) {
-        if(this.interactionManager != null && this.interactionManager.getCurrentGameMode() == MineFortressMod.FORTRESS) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             if(this.options.sprintKey.isPressed()) {
                 if(this.get_BlueprintManager().isSelecting()) {
                     this.get_BlueprintManager().rotateSelectedStructureClockwise();
@@ -202,7 +197,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreenMix(Screen screen, CallbackInfo ci) {
-        if(is_FortressGamemode()) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             if(this.options.sprintKey.isPressed() && screen instanceof InventoryScreen) {
                 ci.cancel();
             }
@@ -211,7 +206,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
     @Inject(method="doItemPick", at=@At("HEAD"), cancellable = true)
     public void doItemPick(CallbackInfo ci) {
-        if(this.is_FortressGamemode()) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             ci.cancel();
         }
     }

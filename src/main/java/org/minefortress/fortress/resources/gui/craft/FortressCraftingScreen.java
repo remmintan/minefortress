@@ -7,10 +7,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import org.minefortress.fortress.resources.gui.AbstractFortressRecipeScreen;
 import org.minefortress.fortress.resources.gui.FortressRecipeBookWidget;
-import org.minefortress.interfaces.IFortressMinecraftClient;
 
 public class FortressCraftingScreen extends AbstractFortressRecipeScreen<FortressCraftingScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/crafting_table.png");
@@ -36,15 +36,11 @@ public class FortressCraftingScreen extends AbstractFortressRecipeScreen<Fortres
     protected boolean professionRequirementSatisfied() {
         final var fortressClient = clientManagersProvider();
         final var clientManager = fortressClient.get_ClientFortressManager();
-        return fortressMinecraftClient().is_FortressGamemode() && clientManager.getProfessionManager().hasProfession("crafter");
+        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && clientManager.getProfessionManager().hasProfession("crafter");
     }
 
     private IClientManagersProvider clientManagersProvider() {
         return (IClientManagersProvider) MinecraftClient.getInstance();
-    }
-
-    private IFortressMinecraftClient fortressMinecraftClient() {
-        return (IFortressMinecraftClient) MinecraftClient.getInstance();
     }
 
 }

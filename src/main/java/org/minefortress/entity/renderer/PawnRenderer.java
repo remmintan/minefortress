@@ -17,6 +17,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.GameMode;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
@@ -25,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.minefortress.MineFortressMod;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.renderer.models.PawnModel;
 
@@ -84,7 +84,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
                 .map(ClientPlayerInteractionManager::getCurrentGameMode)
                 .orElse(GameMode.DEFAULT);
 
-        if(currentGamemode == MineFortressMod.FORTRESS) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == pawn;
             final var fightSelecting = isThisPawnSelected(pawn);
             var color = getHealthFoodLevelColor(pawn);

@@ -12,6 +12,7 @@ import net.remmintan.mods.minefortress.blueprints.isBlueprintWorld
 import net.remmintan.mods.minefortress.building.BuildingHelper
 import net.remmintan.mods.minefortress.core.FortressState
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager
+import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import org.minefortress.utils.BlockUtils
 import org.minefortress.utils.ModUtils
@@ -45,7 +46,7 @@ fun registerPlayerBlockEvents() {
     }
 
     UseBlockCallback.EVENT.register { player, world, hand, hitResult ->
-        if (!world.isClient || !ModUtils.isClientInFortressGamemode())
+        if (!world.isClient || !isClientInFortressGamemode())
             return@register ActionResult.PASS
 
         val clientBlueprintManager = ModUtils.getBlueprintManager()

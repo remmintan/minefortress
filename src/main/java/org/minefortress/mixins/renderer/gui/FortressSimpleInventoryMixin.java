@@ -6,11 +6,13 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.util.collection.DefaultedList;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import org.minefortress.interfaces.FortressSimpleInventory;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,13 +22,15 @@ import java.util.List;
 @Mixin(SimpleInventory.class)
 public abstract class FortressSimpleInventoryMixin implements FortressSimpleInventory {
 
+    @Shadow
+    @Final
+    public DefaultedList<ItemStack> stacks;
+    @Unique
     private int changeCount = 0;
-
-    @Shadow @Final private DefaultedList<ItemStack> stacks;
 
     @Override
     public int getMaxCountPerStack() {
-        final var clientFortressSurvival = FabricLoader.getInstance().getEnvironmentType() != EnvType.SERVER && ModUtils.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative();
+        final var clientFortressSurvival = FabricLoader.getInstance().getEnvironmentType() != EnvType.SERVER && FortressGamemodeUtilsKt.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative();
         if(clientFortressSurvival || FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER)
             return Integer.MAX_VALUE;
         else

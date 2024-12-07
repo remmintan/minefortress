@@ -18,10 +18,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.registries.FortressEntities;
-import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -69,7 +69,7 @@ public class FortressServerPlayNetworkHandlerMixin {
     @Redirect(method = "onPlayerInteractEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Box;squaredMagnitude(Lnet/minecraft/util/math/Vec3d;)D"))
     public double playerInteractEntitySquareDistance(Box instance, Vec3d pos) {
         final double realDistance = instance.squaredMagnitude(pos);
-        if(ModUtils.isFortressGamemode(this.player)) {
+        if (FortressGamemodeUtilsKt.isFortressGamemode(this.player)) {
             if(Math.sqrt(realDistance) < PICK_DISTANCE) return 1;
         }
         return realDistance;

@@ -8,10 +8,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import org.minefortress.MineFortressMod;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -40,7 +40,7 @@ public abstract class FortressItemEntityMixin extends Entity {
 
         if(!this.getWorld().isClient) {
             final var closestPlayer = this.getWorld().getClosestPlayer(this, 100.0D);
-            if(closestPlayer instanceof ServerPlayerEntity srvP && srvP.interactionManager.getGameMode() == MineFortressMod.FORTRESS) {
+            if (closestPlayer != null && FortressGamemodeUtilsKt.isFortressGamemode(closestPlayer)) {
                 final var fortressServer = (IFortressServer) closestPlayer.getServer();
                 if(fortressServer != null) {
                     final var modServerManager = fortressServer.get_FortressModServerManager();

@@ -12,14 +12,15 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.blueprints.BlueprintsDimensionKt;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.MineFortressMod;
 import org.minefortress.utils.FortressSpawnLocating;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -31,9 +32,13 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Shadow @Final public MinecraftServer server;
     @Shadow public ServerPlayNetworkHandler networkHandler;
+    @Unique
     private Vec3d persistedPos;
+    @Unique
     private Vec3d persistedVelocity;
+    @Unique
     private float persistedYaw;
+    @Unique
     private float persistedPitch;
 
 
@@ -101,7 +106,7 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Redirect(method = "moveToSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/SpawnLocating;findOverworldSpawn(Lnet/minecraft/server/world/ServerWorld;II)Lnet/minecraft/util/math/BlockPos;"))
     public BlockPos moveToSpawnFindOverworldSpawn(ServerWorld world, int x, int z) {
         final BlockPos actualSpawn = FortressSpawnLocating.findOverworldSpawn(world, x, z);
-        if(actualSpawn != null && this.server.getDefaultGameMode() == MineFortressMod.FORTRESS){
+        if (actualSpawn != null && this.server.getDefaultGameMode() == FortressGamemodeUtilsKt.getFORTRESS()) {
             return actualSpawn.up(20);
         } else {
             return actualSpawn;

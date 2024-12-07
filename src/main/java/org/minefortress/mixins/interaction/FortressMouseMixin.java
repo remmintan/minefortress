@@ -2,11 +2,13 @@ package org.minefortress.mixins.interaction;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -14,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Mouse.class)
 public class FortressMouseMixin {
 
+    @Unique
     private int fortressControlledLeftClicks;
     @Shadow
     @Final
@@ -25,14 +28,14 @@ public class FortressMouseMixin {
 
     @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
     public void lockCursor(CallbackInfo ci) {
-        if (ModUtils.isClientInFortressGamemode() && !ModUtils.shouldReleaseCamera()) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && !ModUtils.shouldReleaseCamera()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "updateMouse", at = @At("HEAD"), cancellable = true)
     public void updateMouse(CallbackInfo ci) {
-        if(((IFortressMinecraftClient) this.client).is_FortressGamemode() && !ModUtils.shouldReleaseCamera()) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && !ModUtils.shouldReleaseCamera()) {
             ci.cancel();
         }
     }
@@ -40,7 +43,7 @@ public class FortressMouseMixin {
     @Inject(method = "onMouseButton", at = @At("HEAD"))
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
         final IFortressMinecraftClient fortressClient = (IFortressMinecraftClient) this.client;
-        if(!fortressClient.is_FortressGamemode()) {
+        if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             return;
         }
 

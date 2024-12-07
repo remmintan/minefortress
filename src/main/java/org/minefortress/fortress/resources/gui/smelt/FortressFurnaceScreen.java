@@ -12,6 +12,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundOpenCraftingScreenPacket;
@@ -106,7 +107,7 @@ public class FortressFurnaceScreen extends AbstractFortressRecipeScreen<Fortress
     protected boolean professionRequirementSatisfied() {
         final var provider = getManagerProvider();
         final var clientManager = provider.get_ClientFortressManager();
-        return getFortressClient().is_FortressGamemode() && clientManager.getProfessionManager().hasProfession("blacksmith");
+        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && clientManager.getProfessionManager().hasProfession("blacksmith");
     }
 
     private IClientManagersProvider getManagerProvider() {
