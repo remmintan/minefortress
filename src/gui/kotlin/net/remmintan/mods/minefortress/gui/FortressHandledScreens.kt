@@ -7,6 +7,8 @@ import net.minecraft.registry.Registry
 import net.minecraft.resource.featuretoggle.FeatureFlags
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.util.Identifier
+import net.remmintan.mods.minefortress.gui.building.BuildingScreen
+import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
 
 val BUILDING_SCREEN_HANDLER_TYPE: ScreenHandlerType<BuildingScreenHandler> = Registry.register(
     Registries.SCREEN_HANDLER,

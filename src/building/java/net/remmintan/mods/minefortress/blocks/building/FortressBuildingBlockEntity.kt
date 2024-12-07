@@ -26,7 +26,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomati
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
-import net.remmintan.mods.minefortress.gui.BuildingScreenHandler
+import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
 import java.time.LocalDateTime
 import java.util.*
 
