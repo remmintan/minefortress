@@ -3,6 +3,7 @@ package org.minefortress.renderer.gui.blueprints.handler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
+import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;

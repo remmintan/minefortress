@@ -86,8 +86,8 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         renderBlueprintInGui(matrices, builtBlueprint, scale, x, y, z, true);
     }
 
-    public void renderBlueprintInGui(MatrixStack matrices, String fileName, BlockRotation blockRotation, int slotColumn, int slotRow, boolean isEnoughResources) {
-        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
+    public void renderBlueprintInGui(MatrixStack matrices, String blueprintId, BlockRotation blockRotation, int slotColumn, int slotRow, boolean isEnoughResources) {
+        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId, blockRotation);
 
         final Vec3i size = builtBlueprint.getSize();
         final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());

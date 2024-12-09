@@ -1,4 +1,4 @@
-package org.minefortress.renderer.gui.blueprints.handler;
+package net.remmintan.mods.minefortress.core.dtos.blueprints;
 
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;

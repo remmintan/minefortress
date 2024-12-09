@@ -10,9 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 import net.remmintan.mods.minefortress.gui.hud.interfaces.IHudButton;
 import net.remmintan.mods.minefortress.gui.hud.interfaces.IItemHudElement;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;

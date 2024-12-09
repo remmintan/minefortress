@@ -94,7 +94,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         }
 
         // rendering begins here
-        var yDelta = 10;
+        var yDelta = 10
 
         // Name
         context.drawText(this.textRenderer, metadata.name, x+5, y+yDelta, TEXT_COLOR, false)
@@ -108,7 +108,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         val textureX = x+5 + labelWidth
         val textureY = y + yDelta
 
-        val healthBasedWidth = MathHelper.map(handler.getHealth().toFloat(), 0f, 100f, 0f, 181f).toInt();
+        val healthBasedWidth = MathHelper.map(handler.getHealth().toFloat(), 0f, 100f, 0f, 181f).toInt()
         context.drawTexture(BARS_TEXTURE, textureX, textureY, 0, 30, 181, 5)
         context.drawTexture(BARS_TEXTURE, textureX, textureY, 0, 35, healthBasedWidth, 5)
 
@@ -134,6 +134,8 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
 
         // Upgrades
         context.drawText(this.textRenderer, Text.of("Building Upgrades:"), x+5, y+yDelta, TEXT_COLOR, false)
+        yDelta += 5
+
     }
 
     private fun renderWorkforce(context: DrawContext, mouseX: Int, mouseY: Int) {
@@ -153,6 +155,9 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
                 return true
             }
         }
+
+        destroyButton.mouseClicked(mouseX, mouseY, button)
+        repairButton.mouseClicked(mouseX, mouseY, button)
 
         return false
     }

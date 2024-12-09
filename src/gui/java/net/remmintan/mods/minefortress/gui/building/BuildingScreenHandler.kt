@@ -8,6 +8,7 @@ import net.minecraft.screen.ArrayPropertyDelegate
 import net.minecraft.screen.PropertyDelegate
 import net.minecraft.screen.ScreenHandler
 import net.minecraft.util.math.BlockPos
+import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
@@ -34,6 +35,10 @@ class BuildingScreenHandler(
 
         val blockPos = BlockPos(x, y, z)
         world.getBlockEntity(blockPos) as? IFortressBuilding ?: error("Can't access the building from the screen handler")
+    }
+
+    val upgrades: List<BlueprintSlot> by lazy<List<BlueprintSlot>> {
+        TODO()
     }
 
     init {
