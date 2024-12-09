@@ -6,10 +6,11 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
 import org.minefortress.renderer.gui.hud.hints.*;
-import org.minefortress.renderer.gui.hud.interfaces.IHintsLayer;
-import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.gui.hud.interfaces.IHintsLayer;
+import net.remmintan.mods.minefortress.gui.hud.interfaces.IHudLayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,15 +105,15 @@ public class FortressHud {
     }
 
     private HudState getState() {
-        final var fortressClientManager = ModUtils.getFortressClientManager();
+        final var fortressClientManager = CoreModUtils.getFortressClientManager();
         if(fortressClientManager.notInitialized()) return HudState.BLANK;
         if(fortressClientManager.isCenterNotSet()) return HudState.INITIALIZING;
 
-        if(ModUtils.getBlueprintManager().isSelecting()) return HudState.BLUEPRINT;
+        if(CoreModUtils.getBlueprintManager().isSelecting()) return HudState.BLUEPRINT;
         if (client.world != null && client.world.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY())
             return HudState.BLUEPRINT_EDITING;
 
-        return switch (ModUtils.getFortressClientManager().getState()) {
+        return switch (CoreModUtils.getFortressClientManager().getState()) {
             case BUILD_EDITING, BUILD_SELECTION -> HudState.BUILD;
             case COMBAT -> HudState.COMBAT;
             case AREAS_SELECTION -> HudState.AREAS_SELECTION;

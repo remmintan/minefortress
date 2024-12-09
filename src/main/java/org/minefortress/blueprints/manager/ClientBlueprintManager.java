@@ -111,7 +111,7 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
         final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket(selectionManager);
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
         if ("campfire".equals(selectedStructure.getId()))
-            ModUtils.getFortressClientManager().setupFortressCenter(getStructureBuildPos());
+            CoreModUtils.getFortressClientManager().setupFortressCenter(getStructureBuildPos());
         selectionManager.resetSelection();
         clearStructure();
     }

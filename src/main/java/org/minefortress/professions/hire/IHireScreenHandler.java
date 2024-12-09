@@ -5,8 +5,8 @@ import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.jetbrains.annotations.NotNull;
-import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public interface IHireScreenHandler {
 
     @NotNull
     private static Optional<IProfession> getProfession(String professionId) {
-        final var manager = ModUtils.getProfessionManager();
+        final var manager = CoreModUtils.getProfessionManager();
         final var profession = manager.getProfession(professionId);
         return Optional.ofNullable(profession);
     }

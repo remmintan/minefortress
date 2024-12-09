@@ -15,6 +15,7 @@ import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.screen.NamedScreenHandlerFactory
+import net.minecraft.screen.PropertyDelegate
 import net.minecraft.screen.ScreenHandler
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
@@ -83,7 +84,20 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
-        return BuildingScreenHandler(syncId)
+        val propertyDelegate = object : PropertyDelegate {
+            override fun get(index: Int): Int {
+                return when(index) {
+                    0 -> pos.x
+                    1 -> pos.y
+                    2 -> pos.z
+                    else -> throw  error("Invalid property index")
+                }
+            }
+            override fun set(index: Int, value: Int) {}
+            override fun size(): Int = 3
+        }
+
+        return BuildingScreenHandler(syncId, propertyDelegate)
     }
 
     override fun getPos(): BlockPos = super<BlockEntity>.getPos()
@@ -95,6 +109,10 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
 
     override fun destroy() {
         TODO("Not yet implemented")
+    }
+
+    override fun getMetadata(): BlueprintMetadata {
+        return this.blueprintMetadata ?: error("Blueprint metadata is not set")
     }
 
     override fun getName(): String = blueprintMetadata?.name ?: "Building"

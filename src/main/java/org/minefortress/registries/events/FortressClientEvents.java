@@ -30,7 +30,7 @@ public class FortressClientEvents {
     public static void register() {
         new ToastEvents().register();
 
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ModUtils.getFortressClientManager().reset());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> CoreModUtils.getFortressClientManager().reset());
         ClientTickEvents.START_CLIENT_TICK.register(FortressClientEvents::startClientTick);
         ClientTickEvents.END_CLIENT_TICK.register(FortressClientEvents::endClientTick);
         ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> {
@@ -42,10 +42,10 @@ public class FortressClientEvents {
         UseEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
             if (!FortressGamemodeUtilsKt.isFortressGamemode(player) || !world.isClient()) return ActionResult.PASS;
 
-            if (ModUtils.getFortressClientManager().getState() == FortressState.COMBAT) {
+            if (CoreModUtils.getFortressClientManager().getState() == FortressState.COMBAT) {
                 final var provider = CoreModUtils.getMineFortressManagersProvider();
                 final var selectionManager = provider.getTargetedSelectionManager();
-                final var fightManager = ModUtils.getFortressClientManager().getFightManager();
+                final var fightManager = CoreModUtils.getFortressClientManager().getFightManager();
 
                 fightManager.setTarget(entity, selectionManager);
             }

@@ -3,6 +3,7 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
 
 class PawnsSelectionHudLayer extends AbstractHudLayer {
 

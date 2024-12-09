@@ -3,10 +3,10 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import org.minefortress.renderer.gui.hud.interfaces.IHudButton;
-import org.minefortress.renderer.gui.hud.interfaces.IHudElement;
-import org.minefortress.renderer.gui.hud.interfaces.IHudLayer;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.gui.hud.interfaces.IHudButton;
+import net.remmintan.mods.minefortress.gui.hud.interfaces.IHudElement;
+import net.remmintan.mods.minefortress.gui.hud.interfaces.IHudLayer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +72,7 @@ public abstract class AbstractHudLayer implements IHudLayer {
             case CENTER -> screenHeight / 2 + basepointY;
         };
 
-        boolean creative = ModUtils.getFortressClientManager().isCreative();
+        boolean creative = CoreModUtils.getFortressClientManager().isCreative();
         for (IHudElement fortressHudButton : fortressHudElements) {
             fortressHudButton.setPosBasedOn(baseX, baseY);
             if(fortressHudButton.shouldRender(creative)) {

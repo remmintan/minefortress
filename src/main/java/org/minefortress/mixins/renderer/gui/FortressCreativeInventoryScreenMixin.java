@@ -29,9 +29,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
-import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -92,7 +92,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Unique
     private static boolean isFortressSurvival() {
-        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && !ModUtils.getFortressClientManager().isCreative();
+        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && !CoreModUtils.getFortressClientManager().isCreative();
     }
 
     @Redirect(method = "onMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/entity/ItemEntity;"))
@@ -179,7 +179,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
                         0f,
                         this.x + 88 - mouseX,
                         this.y + 45 - 30 - mouseY,
-                        ModUtils.getClientPlayer()
+                        CoreModUtils.getClientPlayer()
                 );
             }
 
@@ -248,7 +248,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Inject(method = "handledScreenTick", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo ci) {
-        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && ModUtils.getFortressClientManager().isSurvival()) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && CoreModUtils.getFortressClientManager().isSurvival()) {
             if(this.isInventoryTabSelected()) {
                 this.setSelectedTab(Registries.ITEM_GROUP.get(ItemGroups.BUILDING_BLOCKS));
             }
@@ -258,7 +258,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Unique
     private static IClientResourceManager getResourceManager() {
-        return ModUtils.getFortressClientManager().getResourceManager();
+        return CoreModUtils.getFortressClientManager().getResourceManager();
     }
 
 }

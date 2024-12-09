@@ -46,7 +46,6 @@ import org.minefortress.fortress.buildings.ClientBuildingsManager;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintsPauseScreen;
 import org.minefortress.renderer.gui.hud.FortressHud;
-import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -140,10 +139,10 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
 
         final Supplier<Boolean> isInBuildState = () -> manager.getState() == FortressState.BUILD_SELECTION || manager.getState() == FortressState.BUILD_EDITING;
         final Supplier<ISelectionInfoProvider> selectInfProvSup = () ->
-                isInBuildState.get() ? ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+                isInBuildState.get() ? CoreModUtils.getSelectionManager() : CoreModUtils.getAreasClientManager();
 
         final Supplier<ISelectionModelBuilderInfoProvider> selModBuildInfProv = () ->
-                isInBuildState.get() ? ModUtils.getSelectionManager() : ModUtils.getAreasClientManager();
+                isInBuildState.get() ? CoreModUtils.getSelectionManager() : CoreModUtils.getAreasClientManager();
 
         selectionRenderer = new SelectionRenderer(
                 client,

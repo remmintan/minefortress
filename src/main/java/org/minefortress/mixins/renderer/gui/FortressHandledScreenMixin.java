@@ -7,7 +7,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
-import org.minefortress.utils.GuiUtils;
+import net.remmintan.mods.minefortress.gui.util.GuiUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;

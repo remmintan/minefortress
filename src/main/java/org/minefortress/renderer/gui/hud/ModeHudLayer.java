@@ -3,8 +3,9 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.FortressState;
-import org.minefortress.renderer.gui.widget.ModeButtonWidget;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
+import net.remmintan.mods.minefortress.gui.widget.ModeButtonWidget;
 
 public final class ModeHudLayer extends AbstractHudLayer{
 
@@ -16,7 +17,7 @@ public final class ModeHudLayer extends AbstractHudLayer{
 
     @Override
     protected void init() {
-        final var fcm = ModUtils.getFortressClientManager();
+        final var fcm = CoreModUtils.getFortressClientManager();
         this.addElement(
                 new ModeButtonWidget(
                         36,

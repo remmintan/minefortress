@@ -5,14 +5,14 @@ import net.minecraft.client.gui.screen.ingame.BookScreen;
 import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSleepPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.renderer.gui.FortressBookContents;
-import org.minefortress.renderer.gui.widget.ItemButtonWidget;
-import org.minefortress.renderer.gui.widget.ItemToggleOtherItemWidget;
-import org.minefortress.renderer.gui.widget.TextButtonWidget;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.ItemToggleOtherItemWidget;
+import net.remmintan.mods.minefortress.gui.widget.TextButtonWidget;
 
 import java.util.EnumSet;
 
@@ -28,7 +28,7 @@ public class UtilsHudLayer extends AbstractHudLayer {
                     0,
                     50,
                     Items.CAMPFIRE,
-                    btn -> ModUtils.getFortressClientManager().jumpToCampfire(),
+                    btn -> CoreModUtils.getFortressClientManager().jumpToCampfire(),
                     "Jump to Campfire"
             ),
             new ItemButtonWidget(

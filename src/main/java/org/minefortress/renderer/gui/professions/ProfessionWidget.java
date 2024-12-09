@@ -13,7 +13,7 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessi
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
-import org.minefortress.utils.GuiUtils;
+import net.remmintan.mods.minefortress.gui.util.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.List;

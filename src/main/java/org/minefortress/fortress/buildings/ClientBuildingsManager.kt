@@ -10,11 +10,11 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderI
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import net.remmintan.mods.minefortress.networking.c2s.C2SOpenBuildingScreen
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 import org.minefortress.renderer.gui.fortress.RepairBuildingScreen
 import org.minefortress.utils.BlockUtils
-import org.minefortress.utils.ModUtils
 import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.Stream
@@ -67,7 +67,7 @@ class ClientBuildingsManager : IClientBuildingsManager {
 
     override fun getBuildingHealths(): List<BuildingHealthRenderInfo> {
 
-        return when (ModUtils.getFortressClientManager().state) {
+        return when (CoreModUtils.getFortressClientManager().state) {
             COMBAT -> getBuildingsStream()
                 .filter { it.health < 100 }
                 .map { buildingToHealthRenderInfo(it) }
@@ -83,7 +83,7 @@ class ClientBuildingsManager : IClientBuildingsManager {
     }
 
     override fun openRepairBuildingScreen(pos: BlockPos, blocksToRepair: Map<BlockPos, BlockState>) {
-        val resourceManager = ModUtils.getFortressClientManager().resourceManager
+        val resourceManager = CoreModUtils.getFortressClientManager().resourceManager
         MinecraftClient.getInstance().setScreen(RepairBuildingScreen(pos, blocksToRepair, resourceManager))
     }
 

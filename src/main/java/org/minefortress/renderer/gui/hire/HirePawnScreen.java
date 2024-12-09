@@ -2,13 +2,13 @@ package org.minefortress.renderer.gui.hire;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.gui.widget.*;
 import net.remmintan.mods.minefortress.networking.c2s.C2SCloseHireMenuPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.professions.hire.IHireScreenHandler;
 import org.minefortress.renderer.gui.WindowScreen;
-import org.minefortress.renderer.gui.widget.*;
-import org.minefortress.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class HirePawnScreen extends WindowScreen {
             final var button = btn.button;
             final var profId = btn.profId;
             final var enoughPlaceForNew = (handler.getCurrentCount(profId) + handler.getHireQueue(profId)) < this.handler.getMaxCount(profId);
-            button.active = btn.costs.isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0 && enoughPlaceForNew;
+            button.active = btn.costs.isEnough() && CoreModUtils.getProfessionManager().getFreeColonists() > 0 && enoughPlaceForNew;
         }
     }
 
@@ -106,7 +106,7 @@ public class HirePawnScreen extends WindowScreen {
 
     private boolean canIncreaseAmount(CostsWidget costs, String profId) {
         final var enoughPlaceForNew = (handler.getCurrentCount(profId) + handler.getHireQueue(profId)) < this.handler.getMaxCount(profId);
-        return costs.isEnough() && ModUtils.getProfessionManager().getFreeColonists() > 0 && enoughPlaceForNew;
+        return costs.isEnough() && CoreModUtils.getProfessionManager().getFreeColonists() > 0 && enoughPlaceForNew;
     }
 
     public IHireScreenHandler getHandler() {

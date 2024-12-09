@@ -15,7 +15,6 @@ import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressMan
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import org.minefortress.utils.BlockUtils
-import org.minefortress.utils.ModUtils
 
 fun registerPlayerBlockEvents() {
     UseBlockCallback.EVENT.register { player, world, _, hitResult ->
@@ -49,8 +48,10 @@ fun registerPlayerBlockEvents() {
         if (!world.isClient || !isClientInFortressGamemode())
             return@register ActionResult.PASS
 
-        val clientBlueprintManager = ModUtils.getBlueprintManager()
-        val fortressManager = ModUtils.getFortressClientManager()
+        val clientBlueprintManager =
+            CoreModUtils.getBlueprintManager()
+        val fortressManager =
+            CoreModUtils.getFortressClientManager()
 
         if (fortressManager.state == FortressState.COMBAT) {
             updateFightSelection(hitResult, fortressManager)
@@ -58,7 +59,8 @@ fun registerPlayerBlockEvents() {
         }
 
         if (fortressManager.state == FortressState.AREAS_SELECTION) {
-            val areasClientManager = ModUtils.getAreasClientManager()
+            val areasClientManager =
+                CoreModUtils.getAreasClientManager()
             if (areasClientManager.isSelecting) areasClientManager.resetSelection()
             else areasClientManager.removeHovered()
             return@register ActionResult.SUCCESS
@@ -69,7 +71,8 @@ fun registerPlayerBlockEvents() {
             return@register ActionResult.SUCCESS
         }
 
-        val buildingManager = ModUtils.getBuildingsManager()
+        val buildingManager =
+            CoreModUtils.getBuildingsManager()
 
         if (buildingManager.isBuildingHovered()) {
             buildingManager.openBuildingScreen(player)
@@ -84,7 +87,8 @@ fun registerPlayerBlockEvents() {
             clickBuild(useoncontext, blockStateFromItem)
             return@register ActionResult.SUCCESS
         }
-        val selectionManager = ModUtils.getSelectionManager()
+        val selectionManager =
+            CoreModUtils.getSelectionManager()
         if (selectionManager.isSelecting) {
             selectionManager.selectBlock(hitResult.blockPos, null)
             return@register ActionResult.SUCCESS
@@ -106,5 +110,6 @@ private fun clickBuild(useOnContext: ItemUsageContext, blockState: BlockState) {
         blockPos = blockPos.offset(useOnContext.side)
     }
 
-    ModUtils.getSelectionManager().selectBlock(blockPos, blockState)
+    CoreModUtils.getSelectionManager()
+        .selectBlock(blockPos, blockState)
 }

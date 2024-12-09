@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 
@@ -31,6 +32,8 @@ public interface IFortressBuilding extends IAutomationArea {
     BlockPos getEnd();
 
     void destroy();
+
+    BlueprintMetadata getMetadata();
 
     String getName();
 

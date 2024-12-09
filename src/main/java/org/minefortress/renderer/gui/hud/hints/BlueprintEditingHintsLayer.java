@@ -1,6 +1,6 @@
 package org.minefortress.renderer.gui.hud.hints;
 
-import org.minefortress.renderer.gui.hud.HudState;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
 
 import java.util.List;
 import java.util.Optional;

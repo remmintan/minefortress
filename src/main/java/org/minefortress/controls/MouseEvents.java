@@ -35,10 +35,10 @@ public class MouseEvents {
     }
 
     private static void firePressEvent(double mouseX, double mouseY) {
-        final var fortressManager = ModUtils.getFortressClientManager();
+        final var fortressManager = CoreModUtils.getFortressClientManager();
         final var state = fortressManager.getState();
         final var correctState = state == FortressState.COMBAT || state == FortressState.BUILD_SELECTION;
-        final var noBuildingHovered = !ModUtils.getBuildingsManager().isBuildingHovered();
+        final var noBuildingHovered = !CoreModUtils.getBuildingsManager().isBuildingHovered();
         final var noScreenOpened = MinecraftClient.getInstance().currentScreen == null;
         final var hudNotHovered = !ModUtils.getFortressClient().get_FortressHud().isHovered();
 

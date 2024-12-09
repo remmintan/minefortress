@@ -15,9 +15,9 @@ import net.remmintan.mods.minefortress.core.interfaces.combat.ITargetedSelection
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.core.utils.GlobalProjectionCache;
 import org.minefortress.renderer.CameraTools;
-import org.minefortress.utils.ModUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -52,7 +52,7 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
         this.mouseEndPos = null;
 
         if(!this.selectedPawns.isEmpty()) {
-            final var fortressManager = ModUtils.getFortressClientManager();
+            final var fortressManager = CoreModUtils.getFortressClientManager();
             if (this.selectedPawns.stream().allMatch(it -> it instanceof IWarrior)) {
                 fortressManager.setState(FortressState.COMBAT);
             } else if (this.selectedPawns.stream().noneMatch(it -> it instanceof IWarrior)) {
@@ -160,7 +160,7 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
 
     @Override
     public boolean isSelectingColonist() {
-        final var state = ModUtils.getFortressClientManager().getState();
+        final var state = CoreModUtils.getFortressClientManager().getState();
         return (state == FortressState.COMBAT || state == FortressState.BUILD_SELECTION || state==FortressState.BUILD_EDITING) && this.getSelectedPawn() != null;
     }
 

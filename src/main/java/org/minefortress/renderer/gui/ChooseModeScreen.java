@@ -5,7 +5,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 
 import java.util.Objects;
 
@@ -24,7 +24,7 @@ public class ChooseModeScreen extends Screen {
         final var creativeBtn = ButtonWidget
                 .builder(Text.translatable("key.minefortress.choose_mode_screen.creative_btn"), button -> {
                     setLoading();
-                    ModUtils.getFortressClientManager().setGamemode(FortressGamemode.CREATIVE);
+                    CoreModUtils.getFortressClientManager().setGamemode(FortressGamemode.CREATIVE);
                 })
                 .dimensions(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20)
                 .build();
@@ -33,7 +33,7 @@ public class ChooseModeScreen extends Screen {
         final var survivalBtn = ButtonWidget
                 .builder(Text.translatable("key.minefortress.choose_mode_screen.survival_btn"), button -> {
                     setLoading();
-                    ModUtils.getFortressClientManager().setGamemode(FortressGamemode.SURVIVAL);
+                    CoreModUtils.getFortressClientManager().setGamemode(FortressGamemode.SURVIVAL);
                 })
                 .dimensions(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20)
                 .build();
@@ -42,7 +42,7 @@ public class ChooseModeScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        if(!ModUtils.getFortressClientManager().gamemodeNeedsInitialization()) Objects.requireNonNull(this.client).setScreen(null);
+        if(!CoreModUtils.getFortressClientManager().gamemodeNeedsInitialization()) Objects.requireNonNull(this.client).setScreen(null);
         super.renderBackground(drawContext, mouseX, mouseY, delta);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, loading?loadingText:questionText, this.width / 2, 40, 0xFFFFFF);
         if(loading) return;

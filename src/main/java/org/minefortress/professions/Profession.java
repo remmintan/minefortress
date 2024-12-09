@@ -11,7 +11,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.utils.GuiUtils;
+import net.remmintan.mods.minefortress.gui.util.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

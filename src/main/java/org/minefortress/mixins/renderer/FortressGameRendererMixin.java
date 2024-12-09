@@ -11,9 +11,9 @@ import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.interfaces.FortressGameRenderer;
 import org.minefortress.renderer.CameraTools;
-import org.minefortress.utils.ModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,8 +51,8 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
 
     @Unique
     private static void resetAllSelectionManagers() {
-        ModUtils.getSelectionManager().resetSelection();
-        ModUtils.getAreasClientManager().resetSelection();
+        CoreModUtils.getSelectionManager().resetSelection();
+        CoreModUtils.getAreasClientManager().resetSelection();
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
@@ -61,7 +61,7 @@ public abstract class FortressGameRendererMixin implements FortressGameRenderer 
         final var selectionManager = provider.get_SelectionManager();
         final var clientFortressManager = provider.get_ClientFortressManager();
         final var pawnsSelectionManager = provider.get_PawnsSelectionManager();
-        final var areasClientManager = ModUtils.getAreasClientManager();
+        final var areasClientManager = CoreModUtils.getAreasClientManager();
 
         if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             final var clientState = clientFortressManager.getState();

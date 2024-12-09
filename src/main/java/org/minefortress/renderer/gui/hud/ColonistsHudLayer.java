@@ -8,6 +8,7 @@ import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundOpenCraftingScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -15,10 +16,9 @@ import org.minefortress.fortress.resources.gui.craft.MissingCraftsmanScreen;
 import org.minefortress.fortress.resources.gui.smelt.MissingBlacksmithScreen;
 import org.minefortress.renderer.gui.ColonistsScreen;
 import org.minefortress.renderer.gui.professions.ProfessionsScreen;
-import org.minefortress.renderer.gui.widget.DynamicTextButtonWidget;
-import org.minefortress.renderer.gui.widget.ItemButtonWidget;
-import org.minefortress.renderer.gui.widget.ItemHudElement;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.gui.widget.DynamicTextButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.ItemHudElement;
 
 public class ColonistsHudLayer extends AbstractHudLayer {
 
@@ -71,7 +71,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
                 Items.FURNACE,
                 btn -> {
                     if (hasProfessionInAVillage("blacksmith")){
-                        if(ModUtils.getFortressClientManager().hasRequiredBlock(Blocks.FURNACE, true, 0)) {
+                        if(CoreModUtils.getFortressClientManager().hasRequiredBlock(Blocks.FURNACE, true, 0)) {
                             FortressClientNetworkHelper.send(
                                     FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE,
                                     new ServerboundOpenCraftingScreenPacket(ScreenType.FURNACE)
@@ -99,17 +99,17 @@ public class ColonistsHudLayer extends AbstractHudLayer {
     }
 
     private String getColonistsCountText() {
-        return "x" + ModUtils.getFortressClientManager().getTotalColonistsCount();
+        return "x" + CoreModUtils.getFortressClientManager().getTotalColonistsCount();
     }
 
     private boolean hasProfessionInAVillage(String professionId) {
-        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && ModUtils.getProfessionManager().hasProfession(professionId);
+        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && CoreModUtils.getProfessionManager().hasProfession(professionId);
     }
 
     @Override
     public void tick() {
         super.tick();
-        if(ModUtils.getFortressClientManager().isCreative()) {
+        if(CoreModUtils.getFortressClientManager().isCreative()) {
             craftingButton.visible = false;
             furnaceButton.visible = false;
         } else {

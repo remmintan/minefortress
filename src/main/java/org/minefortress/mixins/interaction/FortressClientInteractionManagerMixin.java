@@ -15,7 +15,7 @@ import net.minecraft.world.GameMode;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -60,9 +60,9 @@ public abstract class FortressClientInteractionManagerMixin {
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) return;
-        final var clientBlueprintManager = ModUtils.getBlueprintManager();
-        final var fortressManager = ModUtils.getFortressClientManager();
-        final var buildingsManager = ModUtils.getBuildingsManager();
+        final var clientBlueprintManager = CoreModUtils.getBlueprintManager();
+        final var fortressManager = CoreModUtils.getFortressClientManager();
+        final var buildingsManager = CoreModUtils.getBuildingsManager();
 
         if (fortressManager.isCenterNotSet()) {
             cir.setReturnValue(false);
@@ -81,7 +81,7 @@ public abstract class FortressClientInteractionManagerMixin {
         }
 
         if (fortressManager.getState() == FortressState.AREAS_SELECTION) {
-            final var areasClientManager = ModUtils.getAreasClientManager();
+            final var areasClientManager = CoreModUtils.getAreasClientManager();
             areasClientManager.select(client.crosshairTarget);
             cir.setReturnValue(false);
             return;
@@ -93,7 +93,7 @@ public abstract class FortressClientInteractionManagerMixin {
             return;
         }
 
-        ModUtils.getSelectionManager().selectBlock(pos);
+        CoreModUtils.getSelectionManager().selectBlock(pos);
         cir.setReturnValue(false);
     }
 

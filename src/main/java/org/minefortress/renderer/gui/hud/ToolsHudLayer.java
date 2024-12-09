@@ -5,12 +5,12 @@ import net.minecraft.item.Items;
 import net.remmintan.gobi.SelectionType;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
-import org.minefortress.renderer.gui.widget.HideableButtonWidget;
-import org.minefortress.renderer.gui.widget.ItemButtonWidget;
-import org.minefortress.renderer.gui.widget.ItemToggleWidget;
-import org.minefortress.renderer.gui.widget.ModeButtonWidget;
-import org.minefortress.utils.ModUtils;
+import net.remmintan.mods.minefortress.gui.widget.HideableButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.ItemToggleWidget;
+import net.remmintan.mods.minefortress.gui.widget.ModeButtonWidget;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -42,7 +42,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         Items.OAK_DOOR,
                         btn -> {
                             if (blueprintSelected())
-                                ModUtils.getBlueprintManager().clearStructure();
+                                CoreModUtils.getBlueprintManager().clearStructure();
                             else {
                                 this.client.setScreen(new BlueprintsScreen());
                             }
@@ -57,9 +57,9 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         Items.DIAMOND_AXE,
                         btn -> {
                             if (treeCutterSelected()) {
-                                ModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
+                                CoreModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
                             } else {
-                                ModUtils.getSelectionManager().setSelectionType(SelectionType.TREE);
+                                CoreModUtils.getSelectionManager().setSelectionType(SelectionType.TREE);
                             }
                         },
                         (button) -> Optional.of(treeCutterSelected() ? "Cancel" : "Chop trees"),
@@ -72,9 +72,9 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         Items.DIAMOND_SHOVEL,
                         btn -> {
                             if (roadsSelected()) {
-                                ModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
+                                CoreModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
                             } else {
-                                ModUtils.getSelectionManager().setSelectionType(SelectionType.ROADS);
+                                CoreModUtils.getSelectionManager().setSelectionType(SelectionType.ROADS);
                             }
                         },
                         (button) -> Optional.of(roadsSelected() ? "Cancel" : "Build roads"),
@@ -118,7 +118,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                             20,
                             20,
                             type.getButtonText(),
-                            btn -> ModUtils.getSelectionManager().setSelectionType(type),
+                            btn -> CoreModUtils.getSelectionManager().setSelectionType(type),
                             type.name(),
                             () -> selection.checked && hudHasCorrectState(FortressState.BUILD_EDITING)
                     )
@@ -127,11 +127,11 @@ public class ToolsHudLayer extends AbstractHudLayer {
     }
 
     private boolean hudHasCorrectState(FortressState expectedState) {
-        return ModUtils.getFortressClientManager().getState() == expectedState;
+        return CoreModUtils.getFortressClientManager().getState() == expectedState;
     }
 
     private void setCorrectHudState(FortressState expectedState) {
-        ModUtils.getFortressClientManager().setState(expectedState);
+        CoreModUtils.getFortressClientManager().setState(expectedState);
     }
 
     @Override

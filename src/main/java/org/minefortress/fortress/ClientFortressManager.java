@@ -23,7 +23,6 @@ import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
-import org.minefortress.utils.ModUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -154,7 +153,7 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     @Override
     public boolean hasRequiredBuilding(ProfessionType type, int level, int minCount) {
-        return ModUtils.getBuildingsManager().hasRequiredBuilding(type, level, minCount);
+        return CoreModUtils.getBuildingsManager().hasRequiredBuilding(type, level, minCount);
     }
 
 
@@ -218,7 +217,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     public void setState(FortressState state) {
         this.state = state;
         if (state == FortressState.AREAS_SELECTION) {
-            ModUtils.getAreasClientManager().getSavedAreasHolder().setNeedRebuild(true);
+            CoreModUtils.getAreasClientManager().getSavedAreasHolder().setNeedRebuild(true);
         }
         if (state == FortressState.BUILD_SELECTION || state == FortressState.BUILD_EDITING) {
             CoreModUtils.getClientTasksHolder().ifPresent(it -> it.setNeedRebuild(true));

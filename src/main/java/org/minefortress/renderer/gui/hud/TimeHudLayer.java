@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
 
 import java.util.Optional;
 

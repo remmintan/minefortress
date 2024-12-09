@@ -19,6 +19,7 @@ import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.panama.renderer.BlueprintRenderer;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintSlot;
@@ -74,7 +75,7 @@ public final class BlueprintsScreen extends Screen {
 
                 this.handler = new BlueprintScreenHandler(this.client);
                 this.blueprintRenderer = ModUtils.getFortressClient().get_BlueprintRenderer();
-                final var connectedToTheServer = ModUtils.getFortressClientManager().isConnectedToTheServer();
+                final var connectedToTheServer = CoreModUtils.getFortressClientManager().isConnectedToTheServer();
                 if(!connectedToTheServer) {
                     importExportButton = ButtonWidget
                             .builder(Text.literal("Import / Export"), btn -> client.setScreen(new ImportExportBlueprintsScreen()))
@@ -219,7 +220,7 @@ public final class BlueprintsScreen extends Screen {
             this.drawSlot(drawContext, blueprintSlot, slotColumn, slotRow);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
-            final var fortressClientManager = ModUtils.getFortressClientManager();
+            final var fortressClientManager = CoreModUtils.getFortressClientManager();
             final var resourceManager = fortressClientManager.getResourceManager();
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(drawContext, slotX, slotY, 10);
@@ -364,7 +365,7 @@ public final class BlueprintsScreen extends Screen {
             drawItemInSlot(drawContext, matrices, 0.5f, item, slotX, slotY);
         } else {
             final BlueprintMetadata metadata = slot.getMetadata();
-            final var enoughResources = !ModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
+            final var enoughResources = !CoreModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
             final var matrices = drawContext.getMatrices();
             this.blueprintRenderer.renderBlueprintInGui(matrices, metadata.getId(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
 

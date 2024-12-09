@@ -5,7 +5,7 @@ import net.remmintan.gobi.SelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
-import org.minefortress.renderer.gui.hud.HudState;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
 
 import java.util.List;
 import java.util.Optional;

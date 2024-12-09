@@ -9,8 +9,8 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwa
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
 import org.minefortress.entity.Colonist;
-import org.minefortress.utils.ModUtils;
 
 import java.util.Optional;
 
@@ -54,7 +54,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
 
             if(pawn instanceof IProfessional professional) {
                 final var professionId = professional.getProfessionId();
-                final var professionManager = ModUtils.getProfessionManager();
+                final var professionManager = CoreModUtils.getProfessionManager();
                 final var professionName = Optional.ofNullable(professionManager.getProfession(professionId)).map(IProfession::getTitle).orElse("");
                 drawContext.drawTextWithShadow(textRenderer, "Profession:", colonistWinX + 5, heartIconY + textRenderer.fontHeight + 5, 0xFFFFFF);
                 drawContext.drawTextWithShadow(textRenderer, professionName, colonistWinX + 5, heartIconY + 2 * textRenderer.fontHeight + 5 , 0xFFFFFF);

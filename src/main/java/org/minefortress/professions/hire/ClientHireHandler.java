@@ -3,9 +3,9 @@ package org.minefortress.professions.hire;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireCost;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SHirePawnWithScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
-import org.minefortress.utils.ModUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -49,7 +49,7 @@ public final class ClientHireHandler implements IHireScreenHandler {
 
     @Override
     public int getCurrentCount(String professionId) {
-        return ModUtils
+        return CoreModUtils
                 .getFortressClientManager()
                 .getProfessionManager()
                 .getProfession(professionId)
@@ -57,13 +57,13 @@ public final class ClientHireHandler implements IHireScreenHandler {
     }
 
     public int getMaxCount(String professionId) {
-        final var profession = ModUtils
+        final var profession = CoreModUtils
                 .getFortressClientManager()
                 .getProfessionManager()
                 .getProfession(professionId);
         final var requirementType = profession.getRequirementType();
         final var requirementLevel = profession.getRequirementLevel();
-        return ModUtils.getBuildingsManager().countBuildings(requirementType, requirementLevel) * 10;
+        return CoreModUtils.getBuildingsManager().countBuildings(requirementType, requirementLevel) * 10;
     }
 
     @Override

@@ -7,8 +7,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.renderer.gui.hud.AbstractHudLayer;
 import org.minefortress.renderer.gui.hud.FortressHud;
-import org.minefortress.renderer.gui.hud.HudState;
-import org.minefortress.renderer.gui.hud.interfaces.IHintsLayer;
+import net.remmintan.mods.minefortress.gui.hud.HudState;
+import net.remmintan.mods.minefortress.gui.hud.interfaces.IHintsLayer;
 
 import java.util.List;
 import java.util.Optional;

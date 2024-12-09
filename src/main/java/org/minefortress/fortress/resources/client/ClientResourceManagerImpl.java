@@ -5,9 +5,9 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.SimilarItemsHelper;
-import org.minefortress.utils.ModUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +34,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
 
     @Override
     public boolean hasItems(final List<IItemInfo> stacks) {
-        if(ModUtils.getFortressClientManager().isCreative()) return true;
+        if(CoreModUtils.getFortressClientManager().isCreative()) return true;
         return stacks
                 .stream()
                 .allMatch(it -> {
@@ -87,7 +87,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
 
     @Override
     public int getItemAmount(Item item) {
-        if(ModUtils.getFortressClientManager().isCreative()) {
+        if(CoreModUtils.getFortressClientManager().isCreative()) {
             return 999;
         }
         final var group = groupManager.getGroup(item);
