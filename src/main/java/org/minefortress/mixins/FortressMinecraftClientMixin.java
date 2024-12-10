@@ -22,10 +22,13 @@ import net.remmintan.gobi.SelectionManager;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintsImportExportManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
+import net.remmintan.mods.minefortress.core.interfaces.renderers.IGuiBlueprintsRenderer;
+import net.remmintan.mods.minefortress.core.interfaces.renderers.IRenderersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionModelBuilderInfoProvider;
@@ -37,7 +40,9 @@ import net.remmintan.panama.renderer.BlueprintRenderer;
 import net.remmintan.panama.renderer.FortressRenderLayer;
 import net.remmintan.panama.renderer.SelectionRenderer;
 import net.remmintan.panama.renderer.TasksRenderer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.manager.BlueprintsImportExportManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fight.ClientPawnsSelectionManager;
 import org.minefortress.fortress.ClientFortressManager;
@@ -60,7 +65,8 @@ import java.util.function.Supplier;
 import static java.util.Map.entry;
 
 @Mixin(MinecraftClient.class)
-public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecutor<Runnable> implements IFortressMinecraftClient, IClientManagersProvider {
+public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecutor<Runnable>
+        implements IFortressMinecraftClient, IClientManagersProvider, IRenderersProvider {
 
     @Unique
     private ISelectionManager selectionManager;
@@ -85,6 +91,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private final IClientPawnsSelectionManager pawnsSelectionManager = new ClientPawnsSelectionManager();
     @Unique
     private final IClientBuildingsManager buildingsManager = new ClientBuildingsManager();
+    @Unique
+    private final IBlueprintsImportExportManager blueprintsImportExportManager = new BlueprintsImportExportManager();
 
     @Shadow
     @Final
@@ -285,6 +293,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return buildingsManager;
     }
 
+    @Override
+    public IBlueprintsImportExportManager get_BlueprintsImportExportManager() {
+        return blueprintsImportExportManager;
+    }
+
     @Inject(method = "close", at = @At("HEAD"))
     public void close(CallbackInfo ci) {
         this.blueprintRenderer.close();
@@ -294,5 +307,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Unique
     private IBlockDataProvider getProperBlockDataProviderBasedOnState() {
         return this.get_BlueprintManager().getBlockDataProvider();
+    }
+
+    @NotNull
+    @Override
+    public IGuiBlueprintsRenderer get_GuiBlueprintsRenderer() {
+        return get_BlueprintRenderer();
     }
 }

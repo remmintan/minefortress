@@ -1,8 +1,8 @@
 package org.minefortress.fortress.resources.server;
 
 import net.minecraft.item.Item;
+import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
 import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.fortress.resources.SimilarItemsHelper;
 
 import java.util.HashMap;
 import java.util.List;

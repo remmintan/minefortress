@@ -1,15 +1,34 @@
-package org.minefortress.fortress.resources;
+package net.remmintan.mods.minefortress.core.utils;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
-import org.minefortress.blueprints.data.StructureBlockData;
+import org.spongepowered.include.com.google.common.collect.Sets;
 
 import java.util.*;
 
 public class SimilarItemsHelper {
+
+    private static final List<TagKey<Item>> tags = Arrays.asList(
+            ItemTags.WOODEN_BUTTONS,
+            ItemTags.WOODEN_PRESSURE_PLATES,
+            ItemTags.WOODEN_SLABS,
+            ItemTags.WOODEN_STAIRS,
+            ItemTags.WOODEN_TRAPDOORS,
+            ItemTags.WOODEN_DOORS,
+            ItemTags.WOODEN_FENCES,
+            ItemTags.BOATS,
+            ItemTags.SIGNS,
+            ItemTags.FENCES,
+            ItemTags.LEAVES,
+            ItemTags.FLOWERS,
+            ItemTags.LOGS,
+            ItemTags.PLANKS,
+            ItemTags.WOOL_CARPETS,
+            ItemTags.WOOL
+    );
 
     private static final List<Item> strippedLogs = Arrays.asList(
             Items.STRIPPED_ACACIA_LOG,
@@ -31,25 +50,6 @@ public class SimilarItemsHelper {
             Items.STRIPPED_SPRUCE_WOOD,
             Items.STRIPPED_WARPED_HYPHAE,
             Items.STRIPPED_CRIMSON_HYPHAE
-    );
-
-    private static final List<TagKey<Item>> tags = Arrays.asList(
-            ItemTags.WOODEN_BUTTONS,
-            ItemTags.WOODEN_PRESSURE_PLATES,
-            ItemTags.WOODEN_SLABS,
-            ItemTags.WOODEN_STAIRS,
-            ItemTags.WOODEN_TRAPDOORS,
-            ItemTags.WOODEN_DOORS,
-            ItemTags.WOODEN_FENCES,
-            ItemTags.BOATS,
-            ItemTags.SIGNS,
-            ItemTags.FENCES,
-            ItemTags.LEAVES,
-            ItemTags.FLOWERS,
-            ItemTags.LOGS,
-            ItemTags.PLANKS,
-            ItemTags.WOOL_CARPETS,
-            ItemTags.WOOL
     );
 
     private static final List<Item> similarDirt = Arrays.asList(
@@ -111,37 +111,64 @@ public class SimilarItemsHelper {
             Items.BLACK_STAINED_GLASS_PANE
     );
 
+    private static final Set<Item> IGNORED_ITEMS;
+
+    static {
+        final var items = Sets.newHashSet(
+                Items.AIR,
+                Items.STRUCTURE_VOID,
+                Items.BARRIER,
+                Items.DIRT,
+                Items.GRASS_BLOCK,
+                Items.DIRT_PATH,
+                Items.WHITE_BED,
+                Items.ORANGE_BED,
+                Items.MAGENTA_BED,
+                Items.LIGHT_BLUE_BED,
+                Items.YELLOW_BED,
+                Items.LIME_BED,
+                Items.PINK_BED,
+                Items.GRAY_BED,
+                Items.LIGHT_GRAY_BED,
+                Items.CYAN_BED,
+                Items.PURPLE_BED,
+                Items.BLUE_BED,
+                Items.BROWN_BED,
+                Items.GREEN_BED,
+                Items.RED_BED,
+                Items.BLACK_BED,
+                Items.GRASS,
+                Items.TALL_GRASS,
+                Items.ACACIA_LEAVES,
+                Items.BIRCH_LEAVES,
+                Items.DARK_OAK_LEAVES,
+                Items.JUNGLE_LEAVES,
+                Items.OAK_LEAVES,
+                Items.SPRUCE_LEAVES,
+                Items.STRIPPED_ACACIA_LOG,
+                Items.STRIPPED_BIRCH_LOG,
+                Items.STRIPPED_DARK_OAK_LOG,
+                Items.STRIPPED_JUNGLE_LOG,
+                Items.STRIPPED_OAK_LOG,
+                Items.STRIPPED_SPRUCE_LOG,
+                Items.STRIPPED_WARPED_STEM,
+                Items.STRIPPED_CRIMSON_STEM
+        );
+        items.addAll(SimilarItemsHelper.getItems(ItemTags.FLOWERS));
+        items.addAll(SimilarItemsHelper.getItems(ItemTags.BANNERS));
+        items.addAll(SimilarItemsHelper.getItems(ItemTags.BEDS));
+        items.addAll(SimilarItemsHelper.getItems(ItemTags.DOORS));
+        IGNORED_ITEMS = items;
+    }
+
     public static boolean isIgnorable(Item it) {
-        final var defaultStack = it.getDefaultStack();
-        return StructureBlockData.IGNORED_ITEMS.contains(it) ||
-                defaultStack.isIn(ItemTags.BEDS) ||
-                defaultStack.isIn(ItemTags.DOORS) ||
-                defaultStack.isIn(ItemTags.BANNERS);
+        return IGNORED_ITEMS.contains(it);
     }
 
     public static List<Item> getSimilarItems(Item item) {
-        if (strippedLogs.contains(item)) {
-            return strippedLogs.stream().filter(i -> i != item).toList();
-        }
-
-        if (strippedWood.contains(item)) {
-            return strippedWood.stream().filter(i -> i != item).toList();
-        }
-
-        if (similarDirt.contains(item)) {
-            return similarDirt.stream().filter(i -> i != item).toList();
-        }
-
-        if (similarFenceGate.contains(item)) {
-            return similarFenceGate.stream().filter(i -> i != item).toList();
-        }
-
-        if (similarGlass.contains(item)) {
-            return similarGlass.stream().filter(i -> i != item).toList();
-        }
-
-        if (similarGlassPanes.contains(item)) {
-            return similarGlassPanes.stream().filter(i -> i != item).toList();
+        for (List<Item> items : Arrays.asList(strippedLogs, strippedWood, similarDirt, similarFenceGate, similarGlass, similarGlassPanes)) {
+            if (items.contains(item))
+                return items.stream().filter(i -> i != item).toList();
         }
 
         return getItemTag(item)
@@ -172,4 +199,10 @@ public class SimilarItemsHelper {
         return Collections.unmodifiableList(items);
     }
 
+    public static Item convertItemIconInTheGUI(Item item) {
+        if (Items.FARMLAND.equals(item)) {
+            return Items.DIRT;
+        }
+        return item;
+    }
 }

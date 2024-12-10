@@ -19,9 +19,9 @@ import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
+import net.remmintan.mods.minefortress.core.interfaces.renderers.IGuiBlueprintsRenderer;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
-import net.remmintan.panama.renderer.BlueprintRenderer;
+import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
 import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.utils.ModUtils;
 
@@ -49,7 +49,7 @@ public final class BlueprintsScreen extends Screen {
     private final int previewOffset = 4;
     private boolean sneakButtonDown = false;
 
-    private BlueprintRenderer blueprintRenderer;
+    private IGuiBlueprintsRenderer blueprintRenderer;
 
     private int x;
     private int y;
@@ -233,7 +233,7 @@ public final class BlueprintsScreen extends Screen {
                         final var hasItem = resourceManager.hasItem(stack, stacks);
                         final var itemX = x + 25 + i1%10 * 30;
                         final var itemY = i1/10 * 20 + this.backgroundHeight;
-                        final var convertedItem = convertItemIconInTheGUI(stack);
+                        final var convertedItem = SimilarItemsHelper.convertItemIconInTheGUI(stack.item());
                         drawContext.drawItem(new ItemStack(convertedItem), itemX, itemY);
                         drawContext.drawText(this.textRenderer, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000, false);
                     }
@@ -271,14 +271,6 @@ public final class BlueprintsScreen extends Screen {
 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         this.drawMouseoverTooltip(drawContext, mouseX, mouseY);
-    }
-
-    public static Item convertItemIconInTheGUI(IItemInfo stack) {
-        final var originalItem = stack.item();
-        if(Items.FARMLAND.equals(originalItem)) {
-            return Items.DIRT;
-        }
-        return originalItem;
     }
 
     @Override

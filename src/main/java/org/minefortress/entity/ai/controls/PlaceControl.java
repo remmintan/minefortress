@@ -11,8 +11,8 @@ import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
 
+import static net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper.isIgnorable;
 import static org.minefortress.entity.colonist.FortressHungerManager.ACTIVE_EXHAUSTION;
-import static org.minefortress.fortress.resources.SimilarItemsHelper.isIgnorable;
 
 
 public class PlaceControl extends PositionedActionControl {

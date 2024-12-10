@@ -6,8 +6,8 @@ import net.minecraft.item.ItemStack;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
 import org.minefortress.fortress.resources.ItemInfo;
-import org.minefortress.fortress.resources.SimilarItemsHelper;
 
 import java.util.HashSet;
 import java.util.List;

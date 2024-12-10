@@ -8,6 +8,7 @@ import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressMan
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
+import net.remmintan.mods.minefortress.core.interfaces.renderers.IRenderersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreasClientManager;
@@ -19,6 +20,14 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class CoreModUtils {
+
+    public static IRenderersProvider getRenderersProvider() {
+        final var client = MinecraftClient.getInstance();
+        if (client instanceof IRenderersProvider renderersProvider) {
+            return renderersProvider;
+        }
+        throw new IllegalStateException("MinecraftClient is not an instance of IRenderersProvider");
+    }
 
     public static IClientManagersProvider getMineFortressManagersProvider() {
         final var client = MinecraftClient.getInstance();

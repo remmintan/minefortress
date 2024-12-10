@@ -2,7 +2,7 @@ package org.minefortress.fortress.resources.client;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import org.minefortress.fortress.resources.SimilarItemsHelper;
+import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;

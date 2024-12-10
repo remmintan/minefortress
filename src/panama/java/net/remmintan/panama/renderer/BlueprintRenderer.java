@@ -15,6 +15,7 @@ import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureRenderInfoProvider;
+import net.remmintan.mods.minefortress.core.interfaces.renderers.IGuiBlueprintsRenderer;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.panama.model.BuiltBlueprint;
 import net.remmintan.panama.model.BuiltModel;
@@ -28,7 +29,7 @@ import org.joml.Vector3f;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public final class BlueprintRenderer extends AbstractCustomRenderer {
+public final class BlueprintRenderer extends AbstractCustomRenderer implements IGuiBlueprintsRenderer {
 
     private static final Vector3f WRONG_PLACEMENT_COLOR = new Vector3f(1.0F, 0.5F, 0.5F);
     private static final Vector3f CORRECT_PLACEMENT_COLOR = new Vector3f(1F, 1.0F, 1F);
@@ -71,6 +72,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         return getStructureRenderInfoProvider().getStructureRenderPos();
     }
 
+    @Override
     public void renderBlueprintPreview(MatrixStack matrices, String fileName, BlockRotation blockRotation) {
         final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
 
@@ -86,7 +88,13 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
         renderBlueprintInGui(matrices, builtBlueprint, scale, x, y, z, true);
     }
 
+    @Override
     public void renderBlueprintInGui(MatrixStack matrices, String blueprintId, BlockRotation blockRotation, int slotColumn, int slotRow, boolean isEnoughResources) {
+        renderBlueprintInGui(matrices, blueprintId, blockRotation, 8.5f, -17f, slotColumn, slotRow, isEnoughResources);
+    }
+
+    @Override
+    public void renderBlueprintInGui(MatrixStack matrices, String blueprintId, BlockRotation blockRotation, float anchorX, float anchorY, int slotColumn, int slotRow, boolean isEnoughResources) {
         final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId, blockRotation);
 
         final Vec3i size = builtBlueprint.getSize();
@@ -94,8 +102,8 @@ public final class BlueprintRenderer extends AbstractCustomRenderer {
 
         final float scale = 11.2f / biggestSideSize;
         final float scaleFactor = 2f/scale;
-        final float x = 8.5f * scaleFactor + 11.25f * slotColumn * scaleFactor / 1.25f;
-        final float y = -17f * scaleFactor - 11.25f * slotRow  * scaleFactor / 1.25f;
+        final float x = anchorX * scaleFactor + 11.25f * slotColumn * scaleFactor / 1.25f;
+        final float y = anchorY * scaleFactor - 11.25f * slotRow * scaleFactor / 1.25f;
         final float z = 22f * scaleFactor;
 
         renderBlueprintInGui(matrices, builtBlueprint, scale, x, y, z, isEnoughResources);

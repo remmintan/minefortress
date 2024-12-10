@@ -4,17 +4,26 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerInventory
+import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.text.Text
+import net.minecraft.util.BlockRotation
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
+import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils
+import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper
 import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget
 
 private const val TEXT_COLOR = 0x404040
 
 class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInventory, title: Text) :
     HandledScreen<BuildingScreenHandler>(handler, playerInventory, title) {
+
+    private val blueprintsRenderer = CoreModUtils.getRenderersProvider().get_GuiBlueprintsRenderer()
+    private val fortressManager = CoreModUtils.getFortressClientManager()
+    private val resourceManager = fortressManager.resourceManager
 
     private val destroyButton: ItemButtonWidget = ItemButtonWidget(
         0,
@@ -35,6 +44,22 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
     override fun handledScreenTick() {
         super.handledScreenTick()
         repairButton.active = handler.getHealth() < 100
+    }
+
+    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        super.mouseClicked(mouseX, mouseY, button)
+
+        handler.tabs.forEach {
+            if (it.isHovered(mouseX.toInt() - this.x, mouseY.toInt() - this.y)) {
+                handler.selectedTab = it
+                return true
+            }
+        }
+
+        destroyButton.mouseClicked(mouseX, mouseY, button)
+        repairButton.mouseClicked(mouseX, mouseY, button)
+
+        return false
     }
 
     override fun drawBackground(context: DrawContext?, delta: Float, mouseX: Int, mouseY: Int) {
@@ -136,6 +161,65 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         context.drawText(this.textRenderer, Text.of("Building Upgrades:"), x+5, y+yDelta, TEXT_COLOR, false)
         yDelta += 5
 
+        handler.upgrades.forEachIndexed { slotColumn, slot ->
+            val blueprintId = slot.metadata.id
+            val enoughResources = slot.isEnoughResources
+
+            val slotRow = 0
+            blueprintsRenderer.renderBlueprintInGui(
+                context.matrices,
+                blueprintId,
+                BlockRotation.NONE,
+                (x + 5).toFloat(),
+                (y + yDelta).toFloat(),
+                slotColumn,
+                slotRow,
+                enoughResources
+            )
+
+            val slotX = x + 5 + slotColumn * 18
+            val slotY = y + yDelta
+            if (isPointOverSlot(slotX, slotY, mouseX, mouseY)) {
+                drawSlotHighlight(context, slotX, slotY, 10)
+
+                if (fortressManager.isSurvival()) {
+                    val stacks: List<IItemInfo> = slot.blockData.getStacks()
+                    for (i1 in stacks.indices) {
+                        val stack = stacks[i1]
+                        val hasItem = resourceManager.hasItem(stack, stacks)
+                        val itemX = x + 25 + i1 % 10 * 30
+                        val itemY = i1 / 10 * 20 + this.backgroundHeight
+                        val convertedItem = SimilarItemsHelper.convertItemIconInTheGUI(stack.item())
+                        context.drawItem(ItemStack(convertedItem), itemX, itemY)
+                        context.drawText(
+                            this.textRenderer,
+                            stack.amount().toString(),
+                            itemX + 17,
+                            itemY + 7,
+                            if (hasItem) 0xFFFFFF else 0xFF0000,
+                            false
+                        )
+                    }
+                }
+            }
+        }
+
+        if (handler.upgrades.isEmpty() && handler.getBlueprintMetadata().requirement.isMaxLevel()) {
+            context.drawCenteredTextWithShadow(
+                this.textRenderer,
+                Text.of("Maximum building level reached"),
+                x + backgroundWidth / 2,
+                y + yDelta,
+                TEXT_COLOR
+            )
+        }
+    }
+
+    private fun isPointOverSlot(slotX: Int, slotY: Int, mouseX: Int, mouseY: Int): Boolean {
+        val screenX = this.x
+        val screenY = this.y
+
+        return mouseX >= screenX + slotX && mouseX < screenX + slotX + 18 && mouseY >= screenY + slotY && mouseY < screenY + slotY + 18
     }
 
     private fun renderWorkforce(context: DrawContext, mouseX: Int, mouseY: Int) {
@@ -146,21 +230,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
 
     }
 
-    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        super.mouseClicked(mouseX, mouseY, button)
 
-        handler.tabs.forEach {
-            if(it.isHovered(mouseX.toInt()-this.x, mouseY.toInt()-this.y)) {
-                handler.selectedTab = it
-                return true
-            }
-        }
-
-        destroyButton.mouseClicked(mouseX, mouseY, button)
-        repairButton.mouseClicked(mouseX, mouseY, button)
-
-        return false
-    }
 
     private fun renderTabIcon(context: DrawContext, tab: BuildingScreenTab) {
         val u = tab.tabU

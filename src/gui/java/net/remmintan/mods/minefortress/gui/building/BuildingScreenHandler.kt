@@ -7,11 +7,13 @@ import net.minecraft.item.Items
 import net.minecraft.screen.ArrayPropertyDelegate
 import net.minecraft.screen.PropertyDelegate
 import net.minecraft.screen.ScreenHandler
+import net.minecraft.util.BlockRotation
 import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import net.remmintan.mods.minefortress.gui.BUILDING_SCREEN_HANDLER_TYPE
 
 class BuildingScreenHandler(
@@ -37,8 +39,15 @@ class BuildingScreenHandler(
         world.getBlockEntity(blockPos) as? IFortressBuilding ?: error("Can't access the building from the screen handler")
     }
 
-    val upgrades: List<BlueprintSlot> by lazy<List<BlueprintSlot>> {
-        TODO()
+    val upgrades: List<BlueprintSlot> by lazy {
+        val blueprintManager = CoreModUtils.getBlueprintManager()
+        val resourceManager = CoreModUtils.getFortressClientManager().resourceManager
+        building.upgrades.map {
+            val metadata = blueprintManager.blueprintMetadataManager.getByBlueprintId(it).orElseThrow()
+            val blockData = blueprintManager.blockDataProvider.getBlockData(it, BlockRotation.NONE)
+            val enoughResources = resourceManager.hasItems(blockData.stacks)
+            BlueprintSlot(metadata, enoughResources, blockData)
+        }
     }
 
     init {

@@ -14,11 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.minefortress.blueprints.data.ClientStructureBlockDataProvider;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
-import org.minefortress.renderer.gui.blueprints.ImportExportBlueprintsScreen;
-import org.minefortress.utils.ModUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 
 public final class ClientBlueprintManager extends BaseClientStructureManager implements IClientBlueprintManager {
@@ -38,49 +34,6 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     @Override
     public boolean isSelecting() {
         return selectedStructure != null;
-    }
-
-    @Override
-    public void handleBlueprintsImport() {
-        this.success();
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void handleBlueprintsExport(String name, byte[] bytes) {
-        final var blueprintsFolder = ModUtils.getBlueprintsFolder();
-        if(!blueprintsFolder.toFile().exists()) {
-            blueprintsFolder.toFile().mkdirs();
-        }
-        final var path = blueprintsFolder.resolve(name);
-        final var file = path.toFile();
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-                Files.write(path, bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-                this.handleImportExportFailure();
-                return;
-            }
-        }
-
-        this.success();
-    }
-
-    @Override
-    public void handleImportExportFailure() {
-        final var currentScreen = MinecraftClient.getInstance().currentScreen;
-        if(currentScreen instanceof ImportExportBlueprintsScreen iebs) {
-            iebs.fail();
-        }
-    }
-
-    private void success() {
-        final var currentScreen = MinecraftClient.getInstance().currentScreen;
-        if(currentScreen instanceof ImportExportBlueprintsScreen iebs) {
-            iebs.success();
-        }
     }
 
     @Override

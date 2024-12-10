@@ -36,7 +36,7 @@ public class ClientboundBlueprintsProcessImportExportPacket implements FortressS
     @Override
     public void handle(MinecraftClient client) {
         final var provider = getManagersProvider();
-        final var blueprintManager = provider.get_BlueprintManager();
+        final var blueprintManager = provider.get_BlueprintsImportExportManager();
 
         if(action == CurrentScreenAction.FAILURE) {
             blueprintManager.handleImportExportFailure();

@@ -1,5 +1,6 @@
 package net.remmintan.mods.minefortress.core.interfaces.client;
 
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintsImportExportManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
@@ -13,6 +14,8 @@ public interface IClientManagersProvider {
     IClientBlueprintManager get_BlueprintManager();
     IClientFortressManager get_ClientFortressManager();
     IClientPawnsSelectionManager get_PawnsSelectionManager();
+
+    IBlueprintsImportExportManager get_BlueprintsImportExportManager();
 
     IClientBuildingsManager get_BuildingsManager();
     default ISelectedColonistProvider getSelectedColonistProvider() {

@@ -7,7 +7,7 @@ class BlueprintRequirement(blueprintId: String) : IBlueprintRequirement {
     override val type: ProfessionType?
     override val level: Int
     override val totalLevels: Int
-    val upgrades: List<String>
+    override val upgrades: List<String>
 
     init {
         var type: ProfessionType? = null
@@ -15,11 +15,11 @@ class BlueprintRequirement(blueprintId: String) : IBlueprintRequirement {
         var totalLevels = 0
         val upgrades = mutableListOf<String>()
 
-        for (entry in ProfessionType.entries) {
-            val requiredBlueprints = entry.blueprintIds
+        for (professionType in ProfessionType.entries) {
+            val requiredBlueprints = professionType.blueprintIds
             val index = requiredBlueprints.indexOf(blueprintId)
             if (index >= 0) {
-                type = entry
+                type = professionType
                 level = index
                 totalLevels = requiredBlueprints.size
 

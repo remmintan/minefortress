@@ -11,6 +11,7 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -23,6 +24,10 @@ public interface IFortressBuilding extends IAutomationArea {
         } else {
             throw new IllegalStateException("This building has no associated block entity!");
         }
+    }
+
+    default List<String> getUpgrades() {
+        return getMetadata().getRequirement().getUpgrades();
     }
 
     int getHealth();
