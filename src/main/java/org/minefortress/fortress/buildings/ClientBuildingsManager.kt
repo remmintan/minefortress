@@ -1,6 +1,5 @@
 package org.minefortress.fortress.buildings
 
-import net.minecraft.block.BlockState
 import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.BlockPos
@@ -13,7 +12,6 @@ import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuildi
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import net.remmintan.mods.minefortress.networking.c2s.C2SOpenBuildingScreen
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
-import org.minefortress.renderer.gui.fortress.RepairBuildingScreen
 import org.minefortress.utils.BlockUtils
 import java.util.*
 import java.util.stream.Collectors
@@ -80,11 +78,6 @@ class ClientBuildingsManager : IClientBuildingsManager {
 
             else -> emptyList()
         }
-    }
-
-    override fun openRepairBuildingScreen(pos: BlockPos, blocksToRepair: Map<BlockPos, BlockState>) {
-        val resourceManager = CoreModUtils.getFortressClientManager().resourceManager
-        MinecraftClient.getInstance().setScreen(RepairBuildingScreen(pos, blocksToRepair, resourceManager))
     }
 
     override fun hasRequiredBuilding(type: ProfessionType, level: Int, minCount: Int): Boolean {

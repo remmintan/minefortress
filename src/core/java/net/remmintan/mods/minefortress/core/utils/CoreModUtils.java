@@ -6,6 +6,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBluepri
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.renderers.IRenderersProvider;
@@ -62,6 +63,10 @@ public class CoreModUtils {
 
     public static IClientProfessionManager getProfessionManager() {
         return getFortressClientManager().getProfessionManager();
+    }
+
+    public static IClientPawnsSelectionManager getPawnsSelectionManager() {
+        return getClientManagersProvider().get_PawnsSelectionManager();
     }
 
     public static IClientBlueprintManager getBlueprintManager() {

@@ -1,6 +1,5 @@
 package net.remmintan.mods.minefortress.core.interfaces.buildings
 
-import net.minecraft.block.BlockState
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo
@@ -26,8 +25,6 @@ interface IClientBuildingsManager {
     fun countBuildings(type: ProfessionType, level: Int): Int
 
     fun getBuildingHealths(): List<BuildingHealthRenderInfo>
-
-    fun openRepairBuildingScreen(pos: BlockPos, blocksToRepair: Map<BlockPos, BlockState>)
 
     fun hasRequiredBuilding(type: ProfessionType, level: Int, minCount: Int): Boolean
 

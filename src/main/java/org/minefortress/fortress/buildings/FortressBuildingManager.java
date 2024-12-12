@@ -24,7 +24,6 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
-import net.remmintan.mods.minefortress.networking.s2c.S2COpenBuildingRepairScreen;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -190,16 +189,6 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
                 .sorted(Comparator.comparing(it -> it.getCenter().getSquaredDistance(pos)))
                 .filter(it -> it.getHealth() > 0)
                 .findFirst();
-    }
-
-    @Override
-    public void doRepairConfirmation(BlockPos pos, ServerPlayerEntity player) {
-        final var statesThatNeedsToBeRepaired = getBuilding(pos)
-                .map(IFortressBuilding::getAllBlockStatesToRepairTheBuilding)
-                .orElse(Collections.emptyMap());
-
-        final var packet = new S2COpenBuildingRepairScreen(pos, statesThatNeedsToBeRepaired);
-        FortressServerNetworkHelper.send(player, S2COpenBuildingRepairScreen.CHANNEL, packet);
     }
 
     @NotNull

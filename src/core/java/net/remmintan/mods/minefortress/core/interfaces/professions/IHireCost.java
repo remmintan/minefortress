@@ -1,9 +1,9 @@
 package net.remmintan.mods.minefortress.core.interfaces.professions;
 
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 
 public interface IHireCost {
-    IItemInfo toItemInfo();
+    ItemInfo toItemInfo();
 
     int amount();
 }

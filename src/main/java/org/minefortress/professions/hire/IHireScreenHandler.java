@@ -2,9 +2,9 @@ package org.minefortress.professions.hire;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +19,8 @@ public interface IHireScreenHandler {
     List<String> getProfessions();
     int getHireProgress(String professionId);
     int getHireQueue(String professionId);
-    List<IItemInfo> getCost(String professionId);
+
+    List<ItemInfo> getCost(String professionId);
     static ItemStack getProfessionItem(String professionId) {
         return getProfession(professionId).map(IProfession::getIcon).orElse(Items.PLAYER_HEAD.getDefaultStack());
     }

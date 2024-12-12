@@ -6,7 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.item.ItemStack;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.gui.util.GuiUtils;
 
@@ -16,9 +16,9 @@ public class CostsWidget implements Drawable, Element {
 
     private final int x;
     private final int y;
-    private final List<IItemInfo> costs;
+    private final List<ItemInfo> costs;
 
-    public CostsWidget(int x, int y, List<IItemInfo> costs) {
+    public CostsWidget(int x, int y, List<ItemInfo> costs) {
         this.x = x;
         this.y = y;
         this.costs = costs;

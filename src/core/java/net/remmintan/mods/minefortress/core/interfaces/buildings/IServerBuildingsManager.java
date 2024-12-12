@@ -2,7 +2,6 @@ package net.remmintan.mods.minefortress.core.interfaces.buildings;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
@@ -21,8 +20,6 @@ public interface IServerBuildingsManager extends IServerManager, IWritableManage
     Optional<IFortressBuilding> getBuilding(BlockPos pos);
 
     long getTotalBedsCount();
-
-    void doRepairConfirmation(BlockPos pos, ServerPlayerEntity player);
     Optional<IFortressBuilding> findNearest(BlockPos pos);
     Optional<IFortressBuilding> findNearest(BlockPos pos, ProfessionType requirement);
 

@@ -25,6 +25,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
@@ -39,7 +40,6 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessio
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.*;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
@@ -60,7 +60,6 @@ import org.minefortress.fight.ServerFightManager;
 import org.minefortress.fortress.automation.areas.AreasServerManager;
 import org.minefortress.fortress.automation.areas.ServerAutomationAreaInfo;
 import org.minefortress.fortress.buildings.FortressBuildingManager;
-import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandlerFactory;
 import org.minefortress.fortress.resources.gui.smelt.FurnaceScreenHandlerFactory;
 import org.minefortress.fortress.resources.server.ServerResourceManager;
@@ -69,7 +68,6 @@ import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.RepairBuildingTask;
 import org.minefortress.tasks.ServerTaskManager;
 import org.minefortress.tasks.TasksCreator;
-import org.minefortress.utils.BlockInfoUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -713,24 +711,20 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     }
 
     @Override
-    public void repairBuilding(ServerPlayerEntity player, UUID taskId, BlockPos pos, List<Integer> selectedPawns) {
+    public void repairBuilding(ServerPlayerEntity player, BlockPos pos, List<Integer> selectedPawns) {
         final var buildingManager = getBuildingsManager();
         final var resourceManager = getResourceManager();
 
+        final var taskId = UUID.randomUUID();
         try {
             final var building = buildingManager.getBuilding(pos)
                     .orElseThrow(() -> new IllegalStateException("Building not found"));
 
-            final var blocksToRepair = building.getAllBlockStatesToRepairTheBuilding();
+            final var itemInfos = building.getRepairItemInfos();
+            final var blocksToRepair = building.getBlocksToRepair();
 
             if(this.isSurvival()) {
-                final var blockInfos = BlockInfoUtils.convertBlockStatesMapItemsMap(blocksToRepair)
-                        .entrySet()
-                        .stream()
-                        .map(it -> new ItemInfo(it.getKey(), it.getValue().intValue()))
-                        .map(IItemInfo.class::cast)
-                        .toList();
-                resourceManager.reserveItems(taskId, blockInfos);
+                resourceManager.reserveItems(taskId, itemInfos);
             }
 
             final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);

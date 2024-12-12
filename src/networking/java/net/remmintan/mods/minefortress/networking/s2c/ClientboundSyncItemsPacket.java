@@ -4,8 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.networking.registries.NetworkingReadersRegistry;
 import org.apache.logging.log4j.LogManager;
 
@@ -15,18 +15,18 @@ import java.util.List;
 
 public class ClientboundSyncItemsPacket implements FortressS2CPacket {
 
-    private final List<IItemInfo> itemInfo;
+    private final List<ItemInfo> itemInfo;
     private final boolean needReset;
 
-    public ClientboundSyncItemsPacket(List<IItemInfo> itemInfo, boolean needReset) {
+    public ClientboundSyncItemsPacket(List<ItemInfo> itemInfo, boolean needReset) {
         this.itemInfo = Collections.unmodifiableList(itemInfo);
         this.needReset = needReset;
     }
 
     public ClientboundSyncItemsPacket(PacketByteBuf buf) {
         final int size = buf.readInt();
-        final var tempList = new ArrayList<IItemInfo>();
-        final var reader = NetworkingReadersRegistry.findReader(IItemInfo.class);
+        final var tempList = new ArrayList<ItemInfo>();
+        final var reader = NetworkingReadersRegistry.findReader(ItemInfo.class);
         for(int i = 0; i < size; i++) {
             tempList.add(reader.readBuffer(buf));
         }
@@ -40,7 +40,7 @@ public class ClientboundSyncItemsPacket implements FortressS2CPacket {
         final var provider = getManagersProvider();
         final var resourceManager = provider.get_ClientFortressManager().getResourceManager();
         if(needReset) resourceManager.reset();
-        for (IItemInfo info : itemInfo) {
+        for (ItemInfo info : itemInfo) {
             final var item = info.item();
             if(item == Items.STRUCTURE_VOID) continue;
             try {
@@ -55,7 +55,7 @@ public class ClientboundSyncItemsPacket implements FortressS2CPacket {
     @Override
     public void write(PacketByteBuf buf) {
         buf.writeInt(itemInfo.size());
-        for(IItemInfo itemInfo : itemInfo) {
+        for (ItemInfo itemInfo : itemInfo) {
             final var item = itemInfo.item();
             final var amount = itemInfo.amount();
 

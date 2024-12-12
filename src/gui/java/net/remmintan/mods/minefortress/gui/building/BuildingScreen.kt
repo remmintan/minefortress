@@ -11,7 +11,7 @@ import net.minecraft.util.BlockRotation
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper
 import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget
@@ -41,6 +41,21 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         "Repair this building"
     )
 
+    private val destroyConfirmationButton = ButtonWidget
+        .builder(Text.of("Destroy the building")) { handler.destroy() }
+        .dimensions(0, 0, 102, 20)
+        .build()
+
+    private val repairConfirmationButton = ButtonWidget
+        .builder(Text.of("Repair the building")) { handler.repair() }
+        .dimensions(0, 0, 102, 20)
+        .build()
+
+    private val cancelButton = ButtonWidget
+        .builder(Text.of("Cancel")) { handler.cancel() }
+        .dimensions(0, 0, 102, 20)
+        .build()
+
     override fun handledScreenTick() {
         super.handledScreenTick()
         repairButton.active = handler.getHealth() < 100
@@ -49,44 +64,122 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         super.mouseClicked(mouseX, mouseY, button)
 
-        handler.tabs.forEach {
-            if (it.isHovered(mouseX.toInt() - this.x, mouseY.toInt() - this.y)) {
-                handler.selectedTab = it
-                return true
+        when (handler.state) {
+            BuildingScreenHandler.State.TABS -> {
+                handler.tabs.forEach {
+                    if (it.isHovered(mouseX.toInt() - this.x, mouseY.toInt() - this.y)) {
+                        handler.selectedTab = it
+                    }
+                }
+
+                destroyButton.mouseClicked(mouseX, mouseY, button)
+                repairButton.mouseClicked(mouseX, mouseY, button)
+            }
+
+            BuildingScreenHandler.State.DESTROY -> {
+                destroyConfirmationButton.mouseClicked(mouseX, mouseY, button)
+                cancelButton.mouseClicked(mouseX, mouseY, button)
+            }
+
+            BuildingScreenHandler.State.REPAIR -> {
+                repairConfirmationButton.mouseClicked(mouseX, mouseY, button)
+                cancelButton.mouseClicked(mouseX, mouseY, button)
             }
         }
 
-        destroyButton.mouseClicked(mouseX, mouseY, button)
-        repairButton.mouseClicked(mouseX, mouseY, button)
-
-        return false
+        return true
     }
 
     override fun drawBackground(context: DrawContext?, delta: Float, mouseX: Int, mouseY: Int) {
         context ?: return
 
-        handler.tabs.forEach { tab -> if(tab != handler.selectedTab) renderTabIcon(context, tab) }
+        if (handler.state == BuildingScreenHandler.State.TABS)
+            handler.tabs.forEach { tab -> if (tab != handler.selectedTab) renderTabIcon(context, tab) }
         context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight)
-        renderTabIcon(context, handler.selectedTab)
+        if (handler.state == BuildingScreenHandler.State.TABS)
+            renderTabIcon(context, handler.selectedTab)
     }
 
     override fun drawForeground(context: DrawContext?, mouseX: Int, mouseY: Int) {
         context ?: return
 
-        val selectedTab = handler.selectedTab
-        context.drawText(this.textRenderer, selectedTab.name, x+5, y+5, TEXT_COLOR, false)
+        when (handler.state) {
+            BuildingScreenHandler.State.TABS -> renderTabsContents(context, mouseX, mouseY)
+            BuildingScreenHandler.State.DESTROY -> renderDestroyConfirmation(context, mouseX, mouseY)
+            BuildingScreenHandler.State.REPAIR -> renderRepairConfirmation(context, mouseX, mouseY)
+        }
 
-        when(selectedTab.type) {
+    }
+
+    private fun renderDestroyConfirmation(context: DrawContext, mouseX: Int, mouseY: Int) {
+        context.drawCenteredTextWithShadow(
+            this.textRenderer,
+            Text.of("Are you sure you want to destroy this building?"),
+            x + backgroundWidth / 2,
+            y + 25,
+            TEXT_COLOR
+        )
+
+        destroyConfirmationButton.setPosition(x + this.backgroundWidth / 2 - 102 - 3, y + 50)
+        cancelButton.setPosition(x + this.backgroundWidth / 2 + 3, y + 50)
+
+        destroyConfirmationButton.render(context, mouseX, mouseY, 0f)
+        cancelButton.render(context, mouseX, mouseY, 0f)
+    }
+
+    private fun renderRepairConfirmation(context: DrawContext, mouseX: Int, mouseY: Int) {
+        context.drawCenteredTextWithShadow(
+            this.textRenderer,
+            Text.of("Repair building?"),
+            x + backgroundWidth / 2,
+            y + 25,
+            TEXT_COLOR
+        )
+        context.drawCenteredTextWithShadow(
+            this.textRenderer,
+            Text.of("Required items:"),
+            x + backgroundWidth / 2,
+            y + 40,
+            TEXT_COLOR
+        )
+        val enoughItems = handler.getEnoughItems()
+        var itemX = x + 10
+        var itemY = y + 50
+        handler.getItemsToRepair().forEach {
+            context.drawItem(it.item.defaultStack, itemX, itemY)
+            val text = "x${it.amount}"
+            val color = if (enoughItems.getValue(it)) 0xFFFFFF else 0xb81d13
+            context.drawText(textRenderer, text, itemX + 16 + 2, itemY + 6, color, false)
+
+            val columnWidth = 16 + textRenderer.getWidth(text)
+            itemX += columnWidth + 5
+            if (x + columnWidth > x + backgroundWidth - 10) {
+                itemX = x + 10
+                itemY += 20
+            }
+        }
+
+        repairConfirmationButton.setPosition(x + this.backgroundWidth / 2 - 102 - 3, y + itemY + 20)
+        cancelButton.setPosition(x + this.backgroundWidth / 2 + 3, y + itemY + 20)
+
+        repairConfirmationButton.render(context, mouseX, mouseY, 0f)
+        cancelButton.render(context, mouseX, mouseY, 0f)
+    }
+
+    private fun renderTabsContents(context: DrawContext, mouseX: Int, mouseY: Int) {
+        val selectedTab = handler.selectedTab
+        context.drawText(this.textRenderer, selectedTab.name, x + 5, y + 5, TEXT_COLOR, false)
+
+        when (selectedTab.type) {
             BuildingScreenTabType.INFO -> renderInfo(context, mouseX, mouseY)
             BuildingScreenTabType.WORKFORCE -> renderWorkforce(context, mouseX, mouseY)
             BuildingScreenTabType.PRODUCTION_LINE -> renderProductionLine(context, mouseX, mouseY)
         }
 
         handler.tabs.forEach {
-            if(it.isHovered(mouseX-this.x, mouseY-this.y))
-                context.drawTooltip(this.textRenderer, it.name, mouseX-x, mouseY-y)
+            if (it.isHovered(mouseX - this.x, mouseY - this.y))
+                context.drawTooltip(this.textRenderer, it.name, mouseX - x, mouseY - y)
         }
-
     }
 
     private fun  renderInfo(context: DrawContext, mouseX: Int, mouseY: Int) {
@@ -183,7 +276,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
                 drawSlotHighlight(context, slotX, slotY, 10)
 
                 if (fortressManager.isSurvival()) {
-                    val stacks: List<IItemInfo> = slot.blockData.getStacks()
+                    val stacks: List<ItemInfo> = slot.blockData.getStacks()
                     for (i1 in stacks.indices) {
                         val stack = stacks[i1]
                         val hasItem = resourceManager.hasItem(stack, stacks)

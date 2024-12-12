@@ -6,11 +6,10 @@ import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
-import org.minefortress.fortress.resources.ItemInfo;
 import net.remmintan.mods.minefortress.gui.util.GuiUtils;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class Profession implements IProfession {
     private final List<Text> description;
     private final List<Text> unlockMoreMessage;
     private final List<Text> unlockMessage;
-    private final List<IItemInfo> itemsRequirement;
+    private final List<ItemInfo> itemsRequirement;
     private final ProfessionType requirementType;
     private final int requirementLevel;
     private final boolean hireMenu;
@@ -50,7 +49,7 @@ public class Profession implements IProfession {
             this.itemsRequirement = requirements
                     .items()
                     .stream()
-                    .map(it -> (IItemInfo)new ItemInfo(it.item(), it.count()))
+                    .map(it -> new ItemInfo(it.item(), it.count()))
                     .toList();
         } else {
             requirementType = null;
@@ -142,7 +141,7 @@ public class Profession implements IProfession {
     }
 
     @Override
-    public List<IItemInfo> getItemsRequirement() {
+    public List<ItemInfo> getItemsRequirement() {
         return itemsRequirement;
     }
 

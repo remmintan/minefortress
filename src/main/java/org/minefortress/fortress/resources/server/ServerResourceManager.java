@@ -8,7 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
@@ -17,7 +17,6 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncItemsPacket;
 import org.apache.logging.log4j.LogManager;
-import org.minefortress.fortress.resources.ItemInfo;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 
 import java.util.*;
@@ -37,7 +36,7 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
         }
     }
 
-    public IItemInfo createItemInfo(Item item, int amount) {
+    public ItemInfo createItemInfo(Item item, int amount) {
         return new ItemInfo(item, amount);
     }
 
@@ -58,12 +57,12 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
     }
 
     @Override
-    public void reserveItems(UUID taskId, List<IItemInfo> infos) {
+    public void reserveItems(UUID taskId, List<ItemInfo> infos) {
         if(!hasItems(infos)) throw new IllegalStateException("Not enough resources");
 
         final var reservedItemsManager = this.getManagerFromTaskId(taskId);
         final var infosToSync = new ArrayList<ItemInfo>();
-        for(IItemInfo info : infos) {
+        for (ItemInfo info : infos) {
             final var item = info.item();
             final var requiredAmount = info.amount();
             final var stack = resources.getStack(item);
@@ -136,8 +135,9 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
         removeReservedItem(taskId, item, true);
     }
 
-    public void removeItems(List<IItemInfo> items) {
-        for(IItemInfo itemInfo:items) {
+    @Override
+    public void removeItems(List<ItemInfo> items) {
+        for (ItemInfo itemInfo : items) {
             final var stack = resources.getStack(itemInfo.item());
             if(stack.getAmount()<=0)return;
             stack.decreaseBy(itemInfo.amount());
@@ -215,8 +215,8 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
     }
 
     @Override
-    public boolean hasItems(List<IItemInfo> infos) {
-        for(IItemInfo info : infos) {
+    public boolean hasItems(List<ItemInfo> infos) {
+        for (ItemInfo info : infos) {
             final var item = info.item();
             if(item == Items.FLINT_AND_STEEL || item == Items.WATER_BUCKET || item == Items.LAVA_BUCKET) continue;
             final var amount = info.amount();
@@ -230,7 +230,7 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
                 final var similarItemsSet = new HashSet<>(SimilarItemsHelper.getSimilarItems(item));
                 final var requiredSimilarItems = infos.stream()
                         .filter(it -> similarItemsSet.contains(it.item()))
-                        .mapToInt(IItemInfo::amount)
+                        .mapToInt(ItemInfo::amount)
                         .sum();
 
                 if(sumAmountOfSimilarItems - requiredSimilarItems + stack.getAmount() < amount) return false;
@@ -250,7 +250,7 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
 
     private static class Synchronizer {
 
-        private final List<IItemInfo> infosToSync = new ArrayList<>();
+        private final List<ItemInfo> infosToSync = new ArrayList<>();
         private boolean needReset = false;
 
         void reset() {

@@ -15,7 +15,6 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedP
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface IServerFortressManager {
     void scheduleSync();
@@ -33,7 +32,7 @@ public interface IServerFortressManager {
 
     void jumpToCampfire(ServerPlayerEntity player);
 
-    void repairBuilding(ServerPlayerEntity player, UUID taskId, BlockPos pos, List<Integer> selectedPawns);
+    void repairBuilding(ServerPlayerEntity player, BlockPos pos, List<Integer> selectedPawns);
 
     boolean isSurvival();
 

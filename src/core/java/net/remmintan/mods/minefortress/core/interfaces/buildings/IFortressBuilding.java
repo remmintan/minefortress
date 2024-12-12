@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
@@ -73,5 +74,7 @@ public interface IFortressBuilding extends IAutomationArea {
 
     Set<HostileEntity> getAttackers();
 
-    Map<BlockPos, BlockState> getAllBlockStatesToRepairTheBuilding();
+    List<ItemInfo> getRepairItemInfos();
+
+    Map<BlockPos, BlockState> getBlocksToRepair();
 }

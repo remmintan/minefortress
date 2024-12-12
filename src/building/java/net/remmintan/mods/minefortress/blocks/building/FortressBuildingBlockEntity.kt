@@ -22,6 +22,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo
@@ -161,7 +162,15 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun getAttackers() = attackers
-    override fun getAllBlockStatesToRepairTheBuilding() = blockData?.allBlockStatesToRepairTheBuilding ?: mapOf()
+    override fun getRepairItemInfos() = getRepairStates()
+        .entries
+        .groupingBy { it.value.block.asItem() }
+        .eachCount()
+        .map { ItemInfo(it.key, it.value) }
+
+    private fun getRepairStates() = blockData?.allBlockStatesToRepairTheBuilding ?: mapOf()
+
+    override fun getBlocksToRepair(): Map<BlockPos, BlockState> = getRepairStates()
 
     // IAutomationArea
     override fun getUpdated(): LocalDateTime = automationArea?.updated ?: error("Automation area provider is not set")

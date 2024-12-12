@@ -9,12 +9,16 @@ import net.minecraft.screen.PropertyDelegate
 import net.minecraft.screen.ScreenHandler
 import net.minecraft.util.BlockRotation
 import net.minecraft.util.math.BlockPos
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import net.remmintan.mods.minefortress.gui.BUILDING_SCREEN_HANDLER_TYPE
+import net.remmintan.mods.minefortress.networking.c2s.C2SDestroyBuilding
+import net.remmintan.mods.minefortress.networking.c2s.C2SRepairBuilding
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 
 class BuildingScreenHandler(
     syncId: Int,
@@ -27,6 +31,8 @@ class BuildingScreenHandler(
         BuildingScreenTab(Items.DIAMOND, 2, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
     )
     var selectedTab = tabs[0]
+    var state = State.TABS
+        private set
 
     private val building: IFortressBuilding by lazy {
         val world = MinecraftClient.getInstance().world ?: error("Can't access the world")
@@ -62,8 +68,46 @@ class BuildingScreenHandler(
 
     fun getBlueprintMetadata(): BlueprintMetadata = building.metadata
     fun getHealth() = building.health
+    fun getItemsToRepair(): List<ItemInfo> = building.repairItemInfos
 
-    fun destroy() {}
-    fun repair() {}
+    fun getEnoughItems(): Map<ItemInfo, Boolean> {
+        val itemsToRepair = getItemsToRepair()
+        val resourceManager = CoreModUtils.getFortressClientManager().resourceManager
+        return itemsToRepair
+            .associateWith { resourceManager.hasItem(it, itemsToRepair) }
+            .withDefault { false }
+    }
+
+
+    fun destroy() {
+        if (state == State.DESTROY) {
+            val packet = C2SDestroyBuilding(building.pos)
+            FortressClientNetworkHelper.send(C2SDestroyBuilding.CHANNEL, packet)
+            MinecraftClient.getInstance().setScreen(null)
+        } else {
+            state = State.DESTROY
+        }
+    }
+
+    fun repair() {
+        if (state == State.REPAIR) {
+            val selectedPawns = CoreModUtils.getPawnsSelectionManager().selectedPawnsIds
+            val packet = C2SRepairBuilding(building.pos, selectedPawns)
+            FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet)
+            MinecraftClient.getInstance().setScreen(null)
+        } else {
+            state = State.REPAIR
+        }
+    }
+
+    fun cancel() {
+        state = State.TABS
+    }
+
+    enum class State {
+        TABS,
+        DESTROY,
+        REPAIR,
+    }
 
 }

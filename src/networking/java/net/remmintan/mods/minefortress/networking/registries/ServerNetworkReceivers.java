@@ -35,7 +35,6 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SJumpToCampfire.CHANNEL, C2SJumpToCampfire::new);
         registerReceiver(C2SClearActiveBlueprint.CHANNEL, C2SClearActiveBlueprint::new);
         registerReceiver(C2SDestroyBuilding.CHANNEL, C2SDestroyBuilding::new);
-        registerReceiver(C2SOpenRepairBuildingScreen.CHANNEL, C2SOpenRepairBuildingScreen::new);
         registerReceiver(C2SRepairBuilding.CHANNEL, C2SRepairBuilding::new);
         registerReceiver(C2SRequestResourcesRefresh.CHANNEL, C2SRequestResourcesRefresh::new);
         registerReceiver(C2SSetNavigationTargetEntity.CHANNEL, C2SSetNavigationTargetEntity::new);

@@ -3,11 +3,10 @@ package org.minefortress.fortress.resources.client;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
-import org.minefortress.fortress.resources.ItemInfo;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,13 +26,13 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
         final var itemInfos = stacks
                 .stream()
                 .map(it -> new ItemInfo(it.getItem(), it.getCount()))
-                .map(IItemInfo.class::cast)
+                .map(ItemInfo.class::cast)
                 .toList();
         return hasItems(itemInfos);
     }
 
     @Override
-    public boolean hasItems(final List<IItemInfo> stacks) {
+    public boolean hasItems(final List<ItemInfo> stacks) {
         if(CoreModUtils.getFortressClientManager().isCreative()) return true;
         return stacks
                 .stream()
@@ -45,13 +44,13 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
     }
 
     @Override
-    public boolean hasItem(IItemInfo itemInfo, List<IItemInfo> items) {
+    public boolean hasItem(ItemInfo itemInfo, List<ItemInfo> items) {
         final var item = itemInfo.item();
         final var amount = itemInfo.amount();
         return hasItem(item, amount, items);
     }
 
-    private boolean hasItem(Item item, int amount, List<IItemInfo> items) {
+    private boolean hasItem(Item item, int amount, List<ItemInfo> items) {
         final var group = groupManager.getGroup(item);
         final var manager = groupManager.getStacksManager(group);
         final var stack = manager.getStack(item);
@@ -67,7 +66,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
         final var similarItemsSet = new HashSet<>(SimilarItemsHelper.getSimilarItems(item));
         final var requiredSimilarItems = items.stream()
                 .filter(it -> similarItemsSet.contains(it.item()))
-                .mapToInt(IItemInfo::amount)
+                .mapToInt(ItemInfo::amount)
                 .sum();
 
         return (amountOfNonEmptySimilarElements - requiredSimilarItems + availableAmount) >= amount;

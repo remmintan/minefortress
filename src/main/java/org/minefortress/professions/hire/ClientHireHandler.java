@@ -1,8 +1,8 @@
 package org.minefortress.professions.hire;
 
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireCost;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IItemInfo;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SHirePawnWithScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -43,7 +43,7 @@ public final class ClientHireHandler implements IHireScreenHandler {
     }
 
     @Override
-    public List<IItemInfo> getCost(String professionId) {
+    public List<ItemInfo> getCost(String professionId) {
         return professions.get(professionId).cost().stream().map(IHireCost::toItemInfo).toList();
     }
 
