@@ -15,6 +15,7 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils
+import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper
 import net.remmintan.mods.minefortress.gui.BUILDING_SCREEN_HANDLER_TYPE
 import net.remmintan.mods.minefortress.networking.c2s.C2SDestroyBuilding
 import net.remmintan.mods.minefortress.networking.c2s.C2SRepairBuilding
@@ -69,12 +70,13 @@ class BuildingScreenHandler(
     fun getBlueprintMetadata(): BlueprintMetadata = building.metadata
     fun getHealth() = building.health
     fun getItemsToRepair(): List<ItemInfo> = building.repairItemInfos
+    fun hasSelectedPawns() = CoreModUtils.getPawnsSelectionManager().hasSelected()
 
     fun getEnoughItems(): Map<ItemInfo, Boolean> {
         val itemsToRepair = getItemsToRepair()
         val resourceManager = CoreModUtils.getFortressClientManager().resourceManager
         return itemsToRepair
-            .associateWith { resourceManager.hasItem(it, itemsToRepair) }
+            .associateWith { SimilarItemsHelper.isIgnorable(it.item) || resourceManager.hasItem(it, itemsToRepair) }
             .withDefault { false }
     }
 

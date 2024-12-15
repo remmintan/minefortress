@@ -274,6 +274,10 @@ class FortressBuildingBlockData {
         return map;
     }
 
+    List<BlockPos> getAllPresevedBlockPositions() {
+        return preservedPositions;
+    }
+
     private enum BuildingBlockState {
         DESTROYED,
         PRESERVED,

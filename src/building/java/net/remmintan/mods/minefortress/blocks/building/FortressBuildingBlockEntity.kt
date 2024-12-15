@@ -109,7 +109,9 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun destroy() {
-        TODO("Not yet implemented")
+        blockData?.allPresevedBlockPositions?.forEach {
+            world?.removeBlock(it, false)
+        }
     }
 
     override fun getMetadata(): BlueprintMetadata {

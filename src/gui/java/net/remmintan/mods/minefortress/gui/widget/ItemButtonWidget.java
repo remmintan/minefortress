@@ -74,12 +74,18 @@ public class ItemButtonWidget extends TexturedButtonWidget implements IHudButton
         if(this.hovered) {
             final var client = MinecraftClient.getInstance();
             final var textRenderer = client.textRenderer;
+            final var currentScreen = client.currentScreen;
             final var tooltip = constructTooltip();
-            if (tooltip != null) {
+            if (tooltip != null && currentScreen == null) {
                 final List<OrderedText> lines = tooltip.getLines(client);
                 drawContext.drawTooltip(textRenderer, lines, this.getTooltipPositioner(), mouseX, mouseY);
             }
         }
+    }
+
+    @Override
+    protected boolean clicked(double mouseX, double mouseY) {
+        return this.active && this.visible && this.hovered;
     }
 
     @Nullable
