@@ -73,8 +73,8 @@ public final class BlueprintRenderer extends AbstractCustomRenderer implements I
     }
 
     @Override
-    public void renderBlueprintPreview(MatrixStack matrices, String fileName, BlockRotation blockRotation) {
-        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(fileName, blockRotation);
+    public void renderBlueprintPreview(String blueprintId) {
+        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId, BlockRotation.NONE);
 
         final Vec3i size = builtBlueprint.getSize();
         final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
@@ -85,35 +85,45 @@ public final class BlueprintRenderer extends AbstractCustomRenderer implements I
         final float y = -60f * scaleFactor;
         final float z = 45f * scaleFactor;
 
-        renderBlueprintInGui(matrices, builtBlueprint, scale, x, y, z, true);
+        renderBlueprintInGui(builtBlueprint, scale, x, y, z, true);
     }
 
     @Override
-    public void renderBlueprintInGui(MatrixStack matrices, String blueprintId, BlockRotation blockRotation, int slotColumn, int slotRow, boolean isEnoughResources) {
-        renderBlueprintInGui(matrices, blueprintId, blockRotation, 8.5f, -17f, slotColumn, slotRow, isEnoughResources);
-    }
-
-    @Override
-    public void renderBlueprintInGui(MatrixStack matrices, String blueprintId, BlockRotation blockRotation, float anchorX, float anchorY, int slotColumn, int slotRow, boolean isEnoughResources) {
-        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId, blockRotation);
+    public void renderBlueprintSlot(String blueprintId, int column, int row, boolean isEnoughResources) {
+        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId, BlockRotation.NONE);
 
         final Vec3i size = builtBlueprint.getSize();
         final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
 
         final float scale = 11.2f / biggestSideSize;
         final float scaleFactor = 2f/scale;
-        final float x = anchorX * scaleFactor + 11.25f * slotColumn * scaleFactor / 1.25f;
-        final float y = anchorY * scaleFactor - 11.25f * slotRow * scaleFactor / 1.25f;
+        final float x = 8.5f * scaleFactor + 11.25f * column * scaleFactor / 1.25f;
+        final float y = -17f * scaleFactor - 11.25f * row * scaleFactor / 1.25f;
         final float z = 22f * scaleFactor;
 
-        renderBlueprintInGui(matrices, builtBlueprint, scale, x, y, z, isEnoughResources);
+        renderBlueprintInGui(builtBlueprint, scale, x, y, z, isEnoughResources);
+    }
+
+    public void renderBlueprintUpgrade(String blueprintId, int number, boolean unlocked) {
+        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId, BlockRotation.NONE);
+
+        final Vec3i size = builtBlueprint.getSize();
+        final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
+
+        final float scale = 30f / biggestSideSize;
+        final float scaleFactor = 2f / scale;
+        final float x = 8.5f * scaleFactor + 30f * number * scaleFactor / 1.25f;
+        final float y = -17f * scaleFactor;
+        final float z = 22f * scaleFactor;
+
+        renderBlueprintInGui(builtBlueprint, scale, x, y, z, unlocked);
     }
 
     public BlueprintsModelBuilder getBlueprintsModelBuilder() {
         return blueprintsModelBuilder;
     }
 
-    private void renderBlueprintInGui(MatrixStack ignoredMatrices, BuiltBlueprint builtBlueprint, float scale, float x, float y, float z, boolean isEnoughResources) {
+    private void renderBlueprintInGui(BuiltBlueprint builtBlueprint, float scale, float x, float y, float z, boolean isEnoughResources) {
         super.client.getProfiler().push("blueprint_render_model");
         DiffuseLighting.enableGuiDepthLighting();
 

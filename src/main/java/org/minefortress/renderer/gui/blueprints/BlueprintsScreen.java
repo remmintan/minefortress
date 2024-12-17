@@ -12,7 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
-import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
@@ -239,7 +238,7 @@ public final class BlueprintsScreen extends Screen {
                     }
                 }
 
-                this.blueprintRenderer.renderBlueprintPreview(drawContext.getMatrices(), blueprintSlot.getMetadata().getId(), BlockRotation.NONE);
+                this.blueprintRenderer.renderBlueprintPreview(blueprintSlot.getMetadata().getId());
             }
         }
 
@@ -359,7 +358,7 @@ public final class BlueprintsScreen extends Screen {
             final BlueprintMetadata metadata = slot.getMetadata();
             final var enoughResources = !CoreModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
             final var matrices = drawContext.getMatrices();
-            this.blueprintRenderer.renderBlueprintInGui(matrices, metadata.getId(), BlockRotation.NONE, slotColumn, slotRow, enoughResources);
+            this.blueprintRenderer.renderBlueprintSlot(metadata.getId(), slotColumn, slotRow, enoughResources);
 
             final var requirement = metadata.getRequirement();
             final var icon = requirement.getIcon();

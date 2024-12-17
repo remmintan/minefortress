@@ -52,8 +52,9 @@ class BuildingScreenHandler(
         building.upgrades.map {
             val metadata = blueprintManager.blueprintMetadataManager.getByBlueprintId(it).orElseThrow()
             val blockData = blueprintManager.blockDataProvider.getBlockData(it, BlockRotation.NONE)
+            val theNextLevel = metadata.requirement.level == building.metadata.requirement.level + 1
             val enoughResources = resourceManager.hasItems(blockData.stacks)
-            BlueprintSlot(metadata, enoughResources, blockData)
+            BlueprintSlot(metadata, theNextLevel && enoughResources, blockData)
         }
     }
 
@@ -80,6 +81,9 @@ class BuildingScreenHandler(
             .withDefault { false }
     }
 
+    fun upgrade(slot: BlueprintSlot) {
+        TODO("Implement upgrading building")
+    }
 
     fun destroy() {
         if (state == State.DESTROY) {
