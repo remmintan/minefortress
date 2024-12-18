@@ -21,9 +21,11 @@ import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.HEA
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.PRIMARY_COLOR
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.SECONDARY_COLOR
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.WHITE_COLOR
+import net.remmintan.mods.minefortress.gui.building.handlers.IInfoTabHandler
+import net.remmintan.mods.minefortress.gui.building.handlers.InfoTabState
 import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget
 
-internal class InfoTab(private val handler: BuildingScreenHandler, private val textRenderer: TextRenderer) :
+internal class InfoTab(private val handler: IInfoTabHandler, private val textRenderer: TextRenderer) :
     ResizableTab {
 
     companion object {
@@ -316,19 +318,19 @@ internal class InfoTab(private val handler: BuildingScreenHandler, private val t
     }
 
     fun onMouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        when (handler.state) {
-            BuildingScreenHandler.State.TABS -> {
+        when (handler.getInfoTabState()) {
+            InfoTabState.TABS -> {
                 destroyButton.mouseClicked(mouseX, mouseY, button)
                 repairButton.mouseClicked(mouseX, mouseY, button)
                 hoveredUpgrade?.let { handler.upgrade(it) }
             }
 
-            BuildingScreenHandler.State.DESTROY -> {
+            InfoTabState.DESTROY -> {
                 destroyConfirmationButton.mouseClicked(mouseX, mouseY, button)
                 cancelButton.mouseClicked(mouseX, mouseY, button)
             }
 
-            BuildingScreenHandler.State.REPAIR -> {
+            InfoTabState.REPAIR -> {
                 repairConfirmationButton.mouseClicked(mouseX, mouseY, button)
                 cancelButton.mouseClicked(mouseX, mouseY, button)
             }

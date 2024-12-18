@@ -44,7 +44,8 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     }
     private void checkNotEnoughResources() {
         final var fortressClientManager = ((IClientManagersProvider)client).get_ClientFortressManager();
-        if(fortressClientManager.isSurvival()) {
+        final var campfire = getSelectedStructure().getId().equals("campfire");
+        if (fortressClientManager.isSurvival() && !campfire) {
             final var resourceManager = fortressClientManager.getResourceManager();
             final var stacks = getBlockData().getStacks();
             enoughResources = resourceManager.hasItems(stacks);

@@ -62,6 +62,10 @@ public class CostsWidget implements Drawable, Element {
         return true;
     }
 
+    public List<ItemInfo> getCosts() {
+        return costs;
+    }
+
     private static int getItemAmount(ItemStack stack) {
         final var fortressClientManager = CoreModUtils.getFortressClientManager();
         return fortressClientManager.getResourceManager().getItemAmount(stack.getItem());
@@ -73,7 +77,6 @@ public class CostsWidget implements Drawable, Element {
 
     @Override
     public void setFocused(boolean focused) {
-
     }
 
     @Override

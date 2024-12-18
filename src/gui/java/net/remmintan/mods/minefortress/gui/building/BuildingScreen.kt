@@ -7,6 +7,7 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import net.remmintan.mods.minefortress.gui.building.handlers.InfoTabState
 
 class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInventory, title: Text) :
     HandledScreen<BuildingScreenHandler>(handler, playerInventory, title) {
@@ -21,7 +22,8 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         const val WHITE_COLOR = 0xFFFFFF
     }
 
-    private val infoTab: InfoTab by lazy { InfoTab(handler, textRenderer) }
+    private val infoTab by lazy { InfoTab(handler, textRenderer) }
+    private val workforceTab by lazy { WorkforceTab(handler, textRenderer) }
 
     init {
         this.backgroundWidth = 248
@@ -30,29 +32,26 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
 
     override fun init() {
         super.init()
-        infoTab.x = x
-        infoTab.y = y
-        infoTab.backgroundWidth = backgroundWidth
-        infoTab.backgroundHeight = backgroundHeight
+        resizeAllTabs()
+
+        workforceTab.init()
     }
 
     override fun resize(client: MinecraftClient?, width: Int, height: Int) {
         super.resize(client, width, height)
-        infoTab.x = x
-        infoTab.y = y
-        infoTab.backgroundWidth = backgroundWidth
-        infoTab.backgroundHeight = backgroundHeight
+        resizeAllTabs()
     }
 
     override fun handledScreenTick() {
         super.handledScreenTick()
         infoTab.tick()
+        workforceTab.tick()
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         super.mouseClicked(mouseX, mouseY, button)
 
-        if (handler.state == BuildingScreenHandler.State.TABS) {
+        if (handler.getInfoTabState() == InfoTabState.TABS) {
             handler.tabs.forEach {
                 if (it.isHovered(mouseX.toInt() - this.x, mouseY.toInt() - this.y)) {
                     handler.selectedTab = it
@@ -61,6 +60,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         }
 
         infoTab.onMouseClicked(mouseX, mouseY, button)
+        workforceTab.onMouseClicked(mouseX, mouseY, button)
 
         return true
     }
@@ -68,22 +68,31 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
     override fun drawBackground(context: DrawContext?, delta: Float, mouseX: Int, mouseY: Int) {
         context ?: return
 
-        if (handler.state == BuildingScreenHandler.State.TABS)
+        if (handler.getInfoTabState() == InfoTabState.TABS)
             handler.tabs.forEach { tab -> if (tab != handler.selectedTab) renderTabIcon(context, tab) }
         context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight)
-        if (handler.state == BuildingScreenHandler.State.TABS)
+        if (handler.getInfoTabState() == InfoTabState.TABS)
             renderTabIcon(context, handler.selectedTab)
     }
 
     override fun drawForeground(context: DrawContext?, mouseX: Int, mouseY: Int) {
         context ?: return
 
-        when (handler.state) {
-            BuildingScreenHandler.State.TABS -> renderTabsContents(context, mouseX, mouseY)
-            BuildingScreenHandler.State.DESTROY -> infoTab.renderDestroyConfirmation(context, mouseX, mouseY)
-            BuildingScreenHandler.State.REPAIR -> infoTab.renderRepairConfirmation(context, mouseX, mouseY)
+        when (handler.getInfoTabState()) {
+            InfoTabState.TABS -> renderTabsContents(context, mouseX, mouseY)
+            InfoTabState.DESTROY -> infoTab.renderDestroyConfirmation(context, mouseX, mouseY)
+            InfoTabState.REPAIR -> infoTab.renderRepairConfirmation(context, mouseX, mouseY)
         }
 
+    }
+
+    private fun resizeAllTabs() {
+        for (tab in listOf(infoTab, workforceTab)) {
+            tab.x = x
+            tab.y = y
+            tab.backgroundWidth = backgroundWidth
+            tab.backgroundHeight = backgroundHeight
+        }
     }
 
     private fun renderTabsContents(context: DrawContext, mouseX: Int, mouseY: Int) {
@@ -92,7 +101,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
 
         when (selectedTab.type) {
             BuildingScreenTabType.INFO -> infoTab.render(context, mouseX, mouseY)
-            BuildingScreenTabType.WORKFORCE -> renderWorkforce(context, mouseX, mouseY)
+            BuildingScreenTabType.WORKFORCE -> workforceTab.render(context, mouseX, mouseY)
             BuildingScreenTabType.PRODUCTION_LINE -> renderProductionLine(context, mouseX, mouseY)
         }
 
@@ -102,14 +111,9 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         }
     }
 
-    private fun renderWorkforce(context: DrawContext, mouseX: Int, mouseY: Int) {
-
-    }
-
     private fun renderProductionLine(context: DrawContext, mouseX: Int, mouseY: Int) {
 
     }
-
 
     private fun renderTabIcon(context: DrawContext, tab: BuildingScreenTab) {
         val u = tab.tabU
@@ -128,22 +132,6 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         context.drawItemInSlot(textRenderer, tab.icon, iconX, iconY)
 
         context.matrices.pop()
-    }
-
-    class WorkforceTab {
-
-        fun init() {
-
-        }
-
-        fun tick(mouseX: Int, mouseY: Int) {
-
-        }
-
-        fun render(context: DrawContext, mouseX: Int, mouseY: Int) {
-
-        }
-
     }
 
 }
