@@ -1,6 +1,5 @@
 package net.remmintan.mods.minefortress.core.interfaces.client;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
@@ -17,8 +16,6 @@ import java.util.Map;
 public interface IClientFortressManager extends IFortressManager {
 
     void jumpToCampfire();
-
-    void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks);
 
     void open_HireScreen(MinecraftClient client, String screenName, Map<String, IHireInfo> professions, List<String> additionalInfo);
 

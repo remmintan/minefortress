@@ -81,20 +81,10 @@ class ClientBuildingsManager : IClientBuildingsManager {
     }
 
     override fun hasRequiredBuilding(type: ProfessionType, level: Int, minCount: Int): Boolean {
-        val requiredBuilding = getBuildingsStream().filter { b -> b.satisfiesRequirement(type, level) }
-        if (type == ProfessionType.MINER || type == ProfessionType.LUMBERJACK || type == ProfessionType.WARRIOR) {
-            return requiredBuilding
-                .mapToLong { it.getBedsCount() * 10L }
-                .sum() > minCount
-        }
-        val count = requiredBuilding.count()
-
-        return when (type) {
-            ProfessionType.ARCHER -> count * 10
-            ProfessionType.FARMER -> count * 5
-            ProfessionType.FISHERMAN -> count * 3
-            else -> count
-        } > minCount
+        return getBuildingsStream()
+            .filter { b -> b.satisfiesRequirement(type, level) }
+            .mapToInt { it.metadata.capacity }
+            .sum() > minCount
     }
 
     override fun openBuildingScreen(playerEntity: PlayerEntity) {

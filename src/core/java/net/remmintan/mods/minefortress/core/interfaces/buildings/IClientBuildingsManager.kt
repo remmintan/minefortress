@@ -17,7 +17,7 @@ interface IClientBuildingsManager {
     }
 
     fun getHoveredBuildingName(): Optional<String> {
-        return getHoveredBuilding().map { obj: IFortressBuilding -> obj.name }
+        return getHoveredBuilding().map { it.metadata.name }
     }
 
     fun getHoveredBuilding(): Optional<IFortressBuilding>

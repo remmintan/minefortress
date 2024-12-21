@@ -1,7 +1,6 @@
 package org.minefortress.entity.ai.controls;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -107,10 +106,6 @@ public class PlaceControl extends PositionedActionControl {
                             resourceManager.removeReservedItem(it, item);
                         }
                     });
-        }
-
-        if(item instanceof BlockItem blockItem && manager.isBlockSpecial(blockItem.getBlock())){
-            manager.addSpecialBlocks(blockItem.getBlock(), goal, taskControl.isBlueprintTask());
         }
     }
 

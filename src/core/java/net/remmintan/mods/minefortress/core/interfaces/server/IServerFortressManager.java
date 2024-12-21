@@ -1,6 +1,5 @@
 package net.remmintan.mods.minefortress.core.interfaces.server;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,11 +23,8 @@ public interface IServerFortressManager {
     void replaceColonistWithTypedPawn(LivingEntity colonist, String warriorId, EntityType<? extends LivingEntity> entityType);
 
     Optional<IAutomationArea> getAutomationAreaByProfessionType(ProfessionType professionType, ServerPlayerEntity masterPlayer);
-    List<BlockPos> getSpecialBlocksByType(Block block, boolean blueprint);
     double getCampfireWarmRadius();
     boolean isPositionWithinFortress(BlockPos pos);
-    void addSpecialBlocks(Block block, BlockPos blockPos, boolean blueprint);
-    boolean isBlockSpecial(Block block);
 
     void jumpToCampfire(ServerPlayerEntity player);
 

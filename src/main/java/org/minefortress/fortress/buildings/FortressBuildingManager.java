@@ -94,7 +94,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     }
 
     public long getTotalBedsCount() {
-        return getBuildingsStream().mapToLong(IFortressBuilding::getBedsCount).reduce(0, Long::sum);
+        return getBuildingsStream().mapToLong(it -> it.getMetadata().getCapacity()).reduce(0, Long::sum);
     }
 
     public void tick(ServerPlayerEntity player) {
@@ -123,28 +123,10 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
     @Override
     public boolean hasRequiredBuilding(ProfessionType type, int level, int minCount) {
-        final var requiredBuildings = getBuildingsStream()
-                .filter(b -> b.satisfiesRequirement(type, level));
-        if (
-                type == ProfessionType.MINER ||
-                        type == ProfessionType.LUMBERJACK ||
-                        type == ProfessionType.WARRIOR
-        ) {
-            return requiredBuildings
-                    .mapToLong(it -> it.getBedsCount() * 10L)
-                    .sum() > minCount;
-        }
-        final var count = requiredBuildings.count();
-        if (type == ProfessionType.ARCHER)
-            return count * 10 > minCount;
-
-        if (type == ProfessionType.FARMER)
-            return count * 5 > minCount;
-
-        if (type == ProfessionType.FISHERMAN)
-            return count * 3 > minCount;
-
-        return count > minCount;
+        return getBuildingsStream()
+                .filter(b -> b.satisfiesRequirement(type, level))
+                .mapToInt(it -> it.getMetadata().getCapacity())
+                .sum() > minCount;
     }
 
     @Override
@@ -195,6 +177,13 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     public Optional<IFortressBuilding> getBuilding(BlockPos pos) {
         final var blockEntity = getWorld().getBlockEntity(pos);
         return blockEntity instanceof IFortressBuilding b ? Optional.of(b) : Optional.empty();
+    }
+
+    @NotNull
+    public List<IFortressBuilding> getBuildings(ProfessionType profession) {
+        return getBuildingsStream()
+                .filter(it -> it.satisfiesRequirement(profession, 0))
+                .toList();
     }
 
     private @NotNull Stream<IFortressBuilding> getBuildingsStream() {

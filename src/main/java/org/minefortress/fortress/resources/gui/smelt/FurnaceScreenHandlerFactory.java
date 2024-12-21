@@ -1,6 +1,6 @@
 package org.minefortress.fortress.resources.gui.smelt;
 
-import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -10,6 +10,8 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,11 +39,14 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
             final var professionManager = provider.getProfessionsManager();
             final var blacksmithsCount = professionManager.getProfession("blacksmith").getAmount();
             final var otherFurnaceBlocks = modServerManager
-                    .getFortressManager(fortressServerPlayer)
-                    .getSpecialBlocksByType(Blocks.FURNACE, true)
+                    .getManagersProvider(fortressServerPlayer)
+                    .getBuildingsManager()
+                    .getBuildings(ProfessionType.BLACKSMITH)
                     .stream()
                     .limit(blacksmithsCount)
+                    .map(IFortressBuilding::getFurnace)
                     .filter(Objects::nonNull)
+                    .map(BlockEntity::getPos)
                     .toList();
 
             final BlockPos selectedFurnacePos = furnacePos == null ? otherFurnaceBlocks.get(0) : furnacePos;

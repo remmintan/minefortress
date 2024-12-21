@@ -5,7 +5,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.enums.BedPart
+import net.minecraft.block.entity.FurnaceBlockEntity
 import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
@@ -43,6 +43,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     private var start: BlockPos? = null
     private var end: BlockPos? = null
     private var blockData: FortressBuildingBlockData? = null
+    private var furnaceBlockPos: BlockPos? = null
 
     private var automationArea: IAutomationArea? = null
 
@@ -63,19 +64,17 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
 
         this.blockData = FortressBuildingBlockData(movedBlocksData, metadata.floorLevel)
         this.automationArea = BuildingAutomationAreaProvider(start, end, metadata.requirement)
+
+        this.furnaceBlockPos = BlockPos.stream(start, end)
+            .filter { pos -> world?.getBlockState(pos)?.block == Blocks.FURNACE }
+            .map { it.toImmutable() }
+            .findFirst()
+            .orElse(null)
     }
 
     fun tick(world: World?) {
         world ?: return
         blockData?.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world as? ServerWorld)
-
-        beds = BlockPos.iterate(start, end)
-            .filter {
-                val blockState = world.getBlockState(it)
-                blockState.isIn(BlockTags.BEDS) && blockState.get(BedBlock.PART) == BedPart.HEAD
-            }
-            .map { it.toImmutable() }
-            .toList()
 
         this.markDirty()
         if (this.world?.isClient == false) {
@@ -83,6 +82,9 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
             this.world?.updateListeners(this.pos, state, state, Block.NOTIFY_ALL)
         }
     }
+
+    override fun getFurnace(): FurnaceBlockEntity? =
+        furnaceBlockPos?.let { this.getWorld()?.let { w -> w.getBlockEntity(it) as? FurnaceBlockEntity } }
 
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
         val propertyDelegate = object : PropertyDelegate {
@@ -118,8 +120,6 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         return this.blueprintMetadata ?: error("Blueprint metadata is not set")
     }
 
-    override fun getName(): String = blueprintMetadata?.name ?: "Building"
-
     override fun readNbt(nbt: NbtCompound) {
         blueprintMetadata = BlueprintMetadata(nbt.getCompound("blueprintMetadata"))
         start = BlockPos.fromLong(nbt.getLong("start"))
@@ -148,13 +148,17 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     override fun getStart(): BlockPos? = start
     override fun getEnd(): BlockPos? = end
 
-    override fun getFreeBed(world: World?): Optional<BlockPos> =
-        beds.firstOrNull {
-            val blockState = world?.getBlockState(it) ?: Blocks.AIR.defaultState
-            blockState.isIn(BlockTags.BEDS) && blockState.get(BedBlock.OCCUPIED)
-        }.let { Optional.ofNullable(it) }
+    override fun getFreeBed(world: World?): Optional<BlockPos> {
+        return BlockPos
+            .stream(start, end)
+            .toList()
+            .firstOrNull {
+                val blockState = world?.getBlockState(it) ?: Blocks.AIR.defaultState
+                blockState.isIn(BlockTags.BEDS) && !blockState.get(BedBlock.OCCUPIED)
+            }
+            ?.let { Optional.of(it) } ?: Optional.empty()
+    }
 
-    override fun getBedsCount(): Int = beds.size
 
     override fun satisfiesRequirement(type: ProfessionType?, level: Int): Boolean =
         blueprintMetadata?.requirement?.satisfies(type, level) ?: false

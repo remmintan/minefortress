@@ -9,6 +9,7 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,6 +19,8 @@ public interface IServerBuildingsManager extends IServerManager, IWritableManage
     void destroyBuilding(BlockPos pos);
 
     Optional<IFortressBuilding> getBuilding(BlockPos pos);
+
+    List<IFortressBuilding> getBuildings(ProfessionType profession);
 
     long getTotalBedsCount();
     Optional<IFortressBuilding> findNearest(BlockPos pos);

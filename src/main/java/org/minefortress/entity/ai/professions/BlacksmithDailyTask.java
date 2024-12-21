@@ -1,13 +1,19 @@
 package org.minefortress.entity.ai.professions;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.FurnaceBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
+
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Random;
 
 public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
 
@@ -30,13 +36,17 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     @Override
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
-        return colonist
-                .getServerFortressManager()
-                .flatMap(it -> it
-                        .getSpecialBlocksByType(Blocks.FURNACE, true)
-                        .stream()
-                        .findFirst()
-                )
+        final var buildings = colonist
+                .getManagersProvider()
+                .map(it -> it.getBuildingsManager().getBuildings(ProfessionType.BLACKSMITH))
+                .orElse(Collections.emptyList());
+        if (buildings.isEmpty()) {
+            return null;
+        }
+        final var i = new Random().nextInt(buildings.size());
+        return Optional
+                .ofNullable(buildings.get(i).getFurnace())
+                .map(BlockEntity::getPos)
                 .orElse(null);
     }
 
@@ -50,18 +60,19 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     }
 
     private boolean atLeastOneFurnaceIsBurning(Colonist colonist){
-        return colonist.getServerFortressManager()
-                .map(it -> {
-                    final var furnaces = it.getSpecialBlocksByType(Blocks.FURNACE, true);
-                    for(BlockPos pos : furnaces){
-                        final var furnace = colonist.getWorld().getBlockEntity(pos);
-                        if(furnace instanceof FurnaceBlockEntity furnaceBlockEntity && furnaceBlockEntity.isBurning()){
-                            return true;
-                        }
-                    }
-                    return false;
-                })
-                .orElse(false);
+        final var buildings = colonist
+                .getManagersProvider()
+                .map(IServerManagersProvider::getBuildingsManager)
+                .map(it -> it.getBuildings(ProfessionType.BLACKSMITH))
+                .orElse(Collections.emptyList());
+        for (IFortressBuilding building : buildings) {
+            final var furnace = building.getFurnace();
+            if (furnace != null && furnace.isBurning()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean furnaceScreenIsOpen(Colonist colonist){

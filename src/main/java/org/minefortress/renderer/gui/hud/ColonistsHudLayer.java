@@ -1,6 +1,5 @@
 package org.minefortress.renderer.gui.hud;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.Items;
@@ -9,6 +8,9 @@ import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
+import net.remmintan.mods.minefortress.gui.widget.DynamicTextButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.ItemHudElement;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundOpenCraftingScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -16,9 +18,6 @@ import org.minefortress.fortress.resources.gui.craft.MissingCraftsmanScreen;
 import org.minefortress.fortress.resources.gui.smelt.MissingBlacksmithScreen;
 import org.minefortress.renderer.gui.ColonistsScreen;
 import org.minefortress.renderer.gui.professions.ProfessionsScreen;
-import net.remmintan.mods.minefortress.gui.widget.DynamicTextButtonWidget;
-import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
-import net.remmintan.mods.minefortress.gui.widget.ItemHudElement;
 
 public class ColonistsHudLayer extends AbstractHudLayer {
 
@@ -71,14 +70,10 @@ public class ColonistsHudLayer extends AbstractHudLayer {
                 Items.FURNACE,
                 btn -> {
                     if (hasProfessionInAVillage("blacksmith")){
-                        if(CoreModUtils.getFortressClientManager().hasRequiredBlock(Blocks.FURNACE, true, 0)) {
-                            FortressClientNetworkHelper.send(
-                                    FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE,
-                                    new ServerboundOpenCraftingScreenPacket(ScreenType.FURNACE)
-                            );
-                        } else {
-                            this.client.setScreen(new MissingBlacksmithScreen(true));
-                        }
+                        FortressClientNetworkHelper.send(
+                                FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE,
+                                new ServerboundOpenCraftingScreenPacket(ScreenType.FURNACE)
+                        );
                     } else {
                         this.client.setScreen(new MissingBlacksmithScreen(false));
                     }

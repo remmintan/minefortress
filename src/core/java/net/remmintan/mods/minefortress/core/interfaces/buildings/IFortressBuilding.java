@@ -2,6 +2,7 @@ package net.remmintan.mods.minefortress.core.interfaces.buildings;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
@@ -41,8 +42,6 @@ public interface IFortressBuilding extends IAutomationArea {
 
     BlueprintMetadata getMetadata();
 
-    String getName();
-
     default BlockPos getCenter() {
         final var start = getStart();
         final var end = getEnd();
@@ -66,8 +65,6 @@ public interface IFortressBuilding extends IAutomationArea {
 
     Optional<BlockPos> getFreeBed(World world);
 
-    int getBedsCount();
-
     boolean satisfiesRequirement(ProfessionType type, int level);
 
     void attack(HostileEntity attacker);
@@ -77,4 +74,6 @@ public interface IFortressBuilding extends IAutomationArea {
     List<ItemInfo> getRepairItemInfos();
 
     Map<BlockPos, BlockState> getBlocksToRepair();
+
+    FurnaceBlockEntity getFurnace();
 }

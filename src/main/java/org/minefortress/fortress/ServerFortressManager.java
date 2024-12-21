@@ -2,30 +2,21 @@ package org.minefortress.fortress;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.ScreenType;
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
@@ -47,7 +38,6 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksCreator;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncFortressManagerPacket;
-import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncSpecialBlocksPacket;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
@@ -81,8 +71,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
     private final MinecraftServer server;
     private final Set<LivingEntity> pawns = new HashSet<>();
-    private final Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
-    private final Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
     private final Map<Class<? extends IServerManager>, IServerManager> managers = new HashMap<>();
     
     private IPawnNameGenerator nameGenerator = new ColonistNameGenerator();
@@ -95,7 +83,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     private FortressGamemode gamemode = FortressGamemode.NONE;
 
     private boolean needSync = true;
-    private boolean needSyncSpecialBlocks = true;
 
     private BlockPos fortressCenter = null;
     private int maxColonistsCount = -1;
@@ -172,11 +159,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                 maxColonistsCount,
                 getReservedPawnsCount());
         FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_MANAGER_SYNC, syncFortressPacket);
-        if(needSyncSpecialBlocks){
-            final var syncBlocks = new ClientboundSyncSpecialBlocksPacket(specialBlocks, blueprintsSpecialBlocks);
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_SPECIAL_BLOCKS_SYNC, syncBlocks);
-            needSyncSpecialBlocks = false;
-        }
         needSync = false;
     }
 
@@ -211,30 +193,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
             scheduleSync();
         }
 
-        giveThePlayerCraftingTableInCaseItWasLost();
-
-        if(!(specialBlocks.isEmpty() || blueprintsSpecialBlocks.isEmpty())  && getWorld() != null && getWorld().getRegistryKey() == World.OVERWORLD) {
-            boolean needSync = false;
-            for(var entry : new HashSet<>(specialBlocks.entrySet())) {
-                final var block = entry.getKey();
-                final var positions = entry.getValue();
-                needSync = needSync || positions.removeIf(pos -> getWorld().getBlockState(pos).getBlock() != block);
-                if (positions.isEmpty()) {
-                    specialBlocks.remove(block);
-                }
-            }
-            for (var entry : new HashSet<>(blueprintsSpecialBlocks.entrySet())) {
-                final var block = entry.getKey();
-                final var positions = entry.getValue();
-                needSync = needSync || positions.removeIf(pos -> getWorld().getBlockState(pos).getBlock() != block);
-                if (positions.isEmpty()) {
-                    blueprintsSpecialBlocks.remove(block);
-                }
-            }
-            if(needSync) {
-                scheduleSyncSpecialBlocks();
-            }
-        }
 
         if(this.fortressCenter != null) {
             final var colonistsCount = this.pawns.size();
@@ -249,16 +207,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private void giveThePlayerCraftingTableInCaseItWasLost() {
-        if(allPawnsAreFree() && (!specialBlocks.containsKey(Blocks.CRAFTING_TABLE) || specialBlocks.get(Blocks.CRAFTING_TABLE).isEmpty())) {
-            final var ii = new ItemInfo(Items.CRAFTING_TABLE, 1);
-            final var resourceManager = getResourceManager();
-            if(!resourceManager.hasItems(Collections.singletonList(ii))) {
-                resourceManager.increaseItemAmount(Items.CRAFTING_TABLE, 1);
             }
         }
     }
@@ -379,7 +327,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     @Override
     public void syncOnJoin() {
         this.needSync = true;
-        this.needSyncSpecialBlocks = true;
         getAutomationAreaManager().sync();
         getFightManager().sync();
     }
@@ -388,12 +335,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     public void scheduleSync() {
         needSync = true;
     }
-
-    private void scheduleSyncSpecialBlocks() {
-        needSyncSpecialBlocks = true;
-        this.scheduleSync();
-    }
-
     public Set<IProfessional> getProfessionals() {
         return pawns
                 .stream()
@@ -417,32 +358,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         final NbtCompound nameGeneratorTag = new NbtCompound();
         this.nameGenerator.write(nameGeneratorTag);
         tag.put("nameGenerator", nameGeneratorTag);
-
-        if(!specialBlocks.isEmpty()) {
-            final NbtCompound specialBlocksTag = new NbtCompound();
-            for (var specialBlock : this.specialBlocks.entrySet()) {
-                final String blockId = Registries.BLOCK.getId(specialBlock.getKey()).toString();
-                final NbtList posList = new NbtList();
-                for (BlockPos pos : specialBlock.getValue()) {
-                    posList.add(NbtHelper.fromBlockPos(pos));
-                }
-                specialBlocksTag.put(blockId, posList);
-            }
-            tag.put("specialBlocks", specialBlocksTag);
-        }
-
-        if(!blueprintsSpecialBlocks.isEmpty()) {
-            final NbtCompound blueprintsSpecialBlocksTag = new NbtCompound();
-            for (var specialBlock : this.blueprintsSpecialBlocks.entrySet()) {
-                final String blockId = Registries.BLOCK.getId(specialBlock.getKey()).toString();
-                final NbtList posList = new NbtList();
-                for (BlockPos pos : specialBlock.getValue()) {
-                    posList.add(NbtHelper.fromBlockPos(pos));
-                }
-                blueprintsSpecialBlocksTag.put(blockId, posList);
-            }
-            tag.put("blueprintsSpecialBlocks", blueprintsSpecialBlocksTag);
-        }
         tag.putString("gamemode", this.gamemode.name());
 
         if(maxColonistsCount != -1) {
@@ -474,34 +389,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         if(tag.contains("nameGenerator")) {
             final NbtCompound nameGeneratorTag = tag.getCompound("nameGenerator");
             this.nameGenerator = new ColonistNameGenerator(nameGeneratorTag);
-        }
-
-        if (tag.contains("specialBlocks")) {
-            final NbtCompound specialBlocksTag = tag.getCompound("specialBlocks");
-            for (String blockId : specialBlocksTag.getKeys()) {
-                final Block block = Registries.BLOCK.get(new Identifier(blockId));
-                final NbtList posList = specialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
-                final var positions = new ArrayList<BlockPos>();
-                for (int j = 0; j < posList.size(); j++) {
-                    positions.add(NbtHelper.toBlockPos(posList.getCompound(j)));
-                }
-                this.specialBlocks.put(block, positions);
-            }
-            this.scheduleSyncSpecialBlocks();
-        }
-
-        if (tag.contains("blueprintsSpecialBlocks")) {
-            final NbtCompound blueprintsSpecialBlocksTag = tag.getCompound("blueprintsSpecialBlocks");
-            for (String blockId : blueprintsSpecialBlocksTag.getKeys()) {
-                final Block block = Registries.BLOCK.get(new Identifier(blockId));
-                final NbtList posList = blueprintsSpecialBlocksTag.getList(blockId, NbtElement.COMPOUND_TYPE);
-                final var positions = new ArrayList<BlockPos>();
-                for (int j = 0; j < posList.size(); j++) {
-                    positions.add(NbtHelper.toBlockPos(posList.getCompound(j)));
-                }
-                this.blueprintsSpecialBlocks.put(block, positions);
-            }
-            this.scheduleSyncSpecialBlocks();
         }
 
         if(tag.contains("gamemode")) {
@@ -604,27 +491,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
     }
 
     @Override
-    public boolean hasRequiredBlock(Block block, boolean blueprint, int minCount) {
-        if(blueprint)
-            return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
-        else
-            return this.specialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
-    }
-
-    public boolean isBlockSpecial(Block block) {
-        return block.equals(Blocks.CRAFTING_TABLE) || block.equals(Blocks.FURNACE);
-    }
-
-    public void addSpecialBlocks(Block block, BlockPos blockPos, boolean blueprint) {
-        final var blocks = blueprint ?
-                blueprintsSpecialBlocks.computeIfAbsent(block, k -> new ArrayList<>())
-                :
-                specialBlocks.computeIfAbsent(block, k -> new ArrayList<>());
-        if(!blocks.contains(blockPos)) blocks.add(blockPos);
-        scheduleSyncSpecialBlocks();
-    }
-
-    @Override
     public int getTotalColonistsCount() {
         return this.pawns.size();
     }
@@ -647,13 +513,6 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                 .toList();
     }
 
-    public List<BlockPos> getSpecialBlocksByType(Block block, boolean blueprint) {
-        if(blueprint)
-            return blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList());
-        else
-            return specialBlocks.getOrDefault(block, Collections.emptyList());
-    }
-
     @Override
     public void setGamemode(FortressGamemode gamemode) {
         this.gamemode = gamemode;
@@ -674,6 +533,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         return this.server.getWorld(World.OVERWORLD);
     }
 
+    @Override
     public void increaseMaxColonistsCount() {
         if(maxColonistsCount == -1) return;
         this.maxColonistsCount++;
@@ -683,6 +543,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         this.scheduleSync();
     }
 
+    @Override
     public void decreaseMaxColonistsCount() {
         if(maxColonistsCount == -1)
             this.maxColonistsCount = getTotalColonistsCount();

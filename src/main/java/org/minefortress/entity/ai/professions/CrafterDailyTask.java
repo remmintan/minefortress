@@ -1,12 +1,15 @@
 package org.minefortress.entity.ai.professions;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 
-public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
+import java.util.Collections;
+
+public class CrafterDailyTask extends AbstractStayNearBlockDailyTask {
 
     private int ticksAfterTableClose = 0;
 
@@ -25,7 +28,7 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
     @Override
     public void tick(Colonist colonist) {
         super.tick(colonist);
-        if(craftingTableMenuOpened(colonist)) {
+        if (craftingTableMenuOpened(colonist)) {
             ticksAfterTableClose = 400;
         } else {
             ticksAfterTableClose--;
@@ -45,19 +48,14 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask{
 
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
-         return colonist
-                    .getServerFortressManager()
-                    .map(it -> it
-                            .getSpecialBlocksByType(Blocks.CRAFTING_TABLE, true)
-                            .stream()
-                            .findFirst()
-                            .orElseGet(() -> it
-                                    .getSpecialBlocksByType(Blocks.CRAFTING_TABLE, false)
-                                    .stream()
-                                    .findFirst()
-                                    .orElse(null)
-                            )
-                    ).orElse(null);
+        return colonist
+                .getManagersProvider()
+                .map(it -> it.getBuildingsManager().getBuildings(ProfessionType.CRAFTSMAN))
+                .orElse(Collections.emptyList())
+                .stream()
+                .findFirst()
+                .map(IFortressBuilding::getCenter)
+                .orElse(null);
     }
 
     private boolean craftingTableMenuOpened(Colonist colonsit) {

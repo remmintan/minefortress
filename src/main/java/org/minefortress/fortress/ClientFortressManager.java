@@ -1,6 +1,5 @@
 package org.minefortress.fortress;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
@@ -24,8 +23,6 @@ import org.minefortress.professions.ClientProfessionManager;
 import org.minefortress.professions.hire.ClientHireHandler;
 import org.minefortress.renderer.gui.hire.HirePawnScreen;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +37,6 @@ public final class ClientFortressManager implements IClientFortressManager {
     private BlockPos fortressCenter = null;
     private int colonistsCount = 0;
     private int reservedColonistCount = 0;
-
-    private Map<Block, List<BlockPos>> specialBlocks = new HashMap<>();
-    private Map<Block, List<BlockPos>> blueprintsSpecialBlocks = new HashMap<>();
 
     private FortressGamemode gamemode;
 
@@ -61,13 +55,6 @@ public final class ClientFortressManager implements IClientFortressManager {
     public void jumpToCampfire() {
         final var packet = new C2SJumpToCampfire();
         FortressClientNetworkHelper.send(C2SJumpToCampfire.CHANNEL, packet);
-    }
-
-
-    @Override
-    public void setSpecialBlocks(Map<Block, List<BlockPos>> specialBlocks, Map<Block, List<BlockPos>> blueprintSpecialBlocks) {
-        this.specialBlocks = specialBlocks;
-        this.blueprintsSpecialBlocks = blueprintSpecialBlocks;
     }
 
     @Override
@@ -154,15 +141,6 @@ public final class ClientFortressManager implements IClientFortressManager {
     @Override
     public boolean hasRequiredBuilding(ProfessionType type, int level, int minCount) {
         return CoreModUtils.getBuildingsManager().hasRequiredBuilding(type, level, minCount);
-    }
-
-
-    @Override
-    public boolean hasRequiredBlock(Block block, boolean blueprint, int minCount) {
-        if (blueprint)
-            return this.blueprintsSpecialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
-        else
-            return this.specialBlocks.getOrDefault(block, Collections.emptyList()).size() > minCount;
     }
 
     @Override

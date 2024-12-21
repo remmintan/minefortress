@@ -2,7 +2,6 @@ package org.minefortress.tasks;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.BedBlock;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.enums.BedPart;
@@ -81,7 +80,6 @@ public class BlueprintTask extends AbstractTask {
                     world.setBlockState(realPos, state, 3);
                     final var item = state.getBlock().asItem();
                     removeReservedItem(worker, item);
-                    addSpecialBlueprintBlock(worker, state.getBlock(), realPos);
                 });
             }
 
@@ -91,7 +89,6 @@ public class BlueprintTask extends AbstractTask {
                         final var realpos = pos.add(startingBlock);
                         world.setBlockState(realpos, state, 3);
 
-                        addSpecialBlueprintBlock(worker, state.getBlock(), realpos);
                         if(!state.isIn(BlockTags.BEDS) || state.get(BedBlock.PART) != BedPart.FOOT) {
                             removeReservedItem(worker, state.getBlock().asItem());
                         }
@@ -109,10 +106,6 @@ public class BlueprintTask extends AbstractTask {
             buildingManager.addBuilding(metadata, startingBlock, endingBlock, mergeBlockData);
         }
         super.finishPart(part, worker);
-    }
-
-    private void addSpecialBlueprintBlock(IWorkerPawn colonist, Block block, BlockPos pos) {
-        colonist.getServerFortressManager().orElseThrow().addSpecialBlocks(block, pos, true);
     }
 
     private void removeReservedItem(IFortressAwareEntity colonist, Item item) {
