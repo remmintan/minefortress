@@ -3,8 +3,8 @@ package org.minefortress.professions;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintRequirement;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
@@ -95,12 +95,13 @@ public abstract class ProfessionManager implements IProfessionsManager {
     }
 
     @Override
-    public Optional<IProfession> getByBuildingRequirement(BlueprintRequirement requirement) {
+    public List<IProfession> getProfessionsByType(ProfessionType type) {
         return getProfessions()
                 .values()
                 .stream()
-                .filter(p -> requirement.satisfies(p.getRequirementType(), p.getRequirementLevel()))
-                .findFirst();
+                .filter(it -> it.getRequirementType() == type)
+                .sorted(Comparator.comparing(IProfession::getRequirementLevel))
+                .toList();
     }
 
     @Unmodifiable
@@ -168,10 +169,5 @@ public abstract class ProfessionManager implements IProfessionsManager {
         final int reservedColonists = abstractFortressManager.getReservedPawnsCount();
         final int totalWorkers = getProfessions().values().stream().mapToInt(IProfession::getAmount).sum();
         return totalColonists - totalWorkers - reservedColonists;
-    }
-
-    @Override
-    public Optional<String> findIdFromProfession(IProfession profession) {
-        return getProfessions().entrySet().stream().filter(entry -> entry.getValue() == profession).map(Map.Entry::getKey).findFirst();
     }
 }

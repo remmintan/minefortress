@@ -41,6 +41,7 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SAttractWarriorsToCampfire.CHANNEL, C2SAttractWarriorsToCampfire::new);
         registerReceiver(C2SUpdateScreenProperty.CHANNEL, C2SUpdateScreenProperty::new);
         registerReceiver(C2SOpenBuildingScreen.CHANNEL, C2SOpenBuildingScreen::new);
+        registerReceiver(C2SHireProfessional.CHANNEL, C2SHireProfessional::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {

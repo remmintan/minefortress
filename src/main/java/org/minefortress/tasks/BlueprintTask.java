@@ -103,7 +103,7 @@ public class BlueprintTask extends AbstractTask {
             final var provider = worker.getManagersProvider().orElseThrow();
             final var metadata = provider.getBlueprintManager().get(blueprintId);
             final var buildingManager = provider.getBuildingsManager();
-            buildingManager.addBuilding(metadata, startingBlock, endingBlock, mergeBlockData);
+            buildingManager.addBuilding(worker.getMasterId().orElseThrow(), metadata, startingBlock, endingBlock, mergeBlockData);
         }
         super.finishPart(part, worker);
     }

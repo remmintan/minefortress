@@ -76,4 +76,6 @@ public interface IFortressBuilding extends IAutomationArea {
     Map<BlockPos, BlockState> getBlocksToRepair();
 
     FurnaceBlockEntity getFurnace();
+
+    IBuildingHireHandler getHireHandler();
 }

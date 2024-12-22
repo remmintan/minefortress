@@ -56,7 +56,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         return new BlockPos(center.getX(), ceilingY, center.getZ());
     }
 
-    public void addBuilding(BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> blockData) {
+    public void addBuilding(UUID ownerId, BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> blockData) {
         final var blockBox = BlockBox.create(start, end);
         final var buildingPos = getCenterTop(blockBox);
 
@@ -64,7 +64,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         world.setBlockState(buildingPos, FortressBlocks.FORTRESS_BUILDING.getDefaultState(), 3);
         final var blockEntity = world.getBlockEntity(buildingPos);
         if (blockEntity instanceof FortressBuildingBlockEntity b) {
-            b.init(metadata, start, end, blockData);
+            b.init(ownerId, metadata, start, end, blockData);
         }
 
         fortressManager.expandTheVillage(start);
@@ -183,6 +183,13 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     public List<IFortressBuilding> getBuildings(ProfessionType profession) {
         return getBuildingsStream()
                 .filter(it -> it.satisfiesRequirement(profession, 0))
+                .toList();
+    }
+
+    @Override
+    public List<IFortressBuilding> getBuildings(ProfessionType type, int level) {
+        return getBuildingsStream()
+                .filter(it -> it.satisfiesRequirement(type, level))
                 .toList();
     }
 

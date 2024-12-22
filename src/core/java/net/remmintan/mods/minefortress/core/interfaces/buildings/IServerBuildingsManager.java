@@ -12,15 +12,18 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface IServerBuildingsManager extends IServerManager, IWritableManager, ITickableManager {
-    void addBuilding(BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> mergedBlockData);
+    void addBuilding(UUID ownerId, BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> mergedBlockData);
 
     void destroyBuilding(BlockPos pos);
 
     Optional<IFortressBuilding> getBuilding(BlockPos pos);
 
     List<IFortressBuilding> getBuildings(ProfessionType profession);
+
+    List<IFortressBuilding> getBuildings(ProfessionType type, int level);
 
     long getTotalBedsCount();
     Optional<IFortressBuilding> findNearest(BlockPos pos);

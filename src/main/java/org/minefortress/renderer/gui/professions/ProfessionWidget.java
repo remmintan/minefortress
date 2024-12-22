@@ -251,11 +251,9 @@ public class ProfessionWidget {
 
     public void onClick(int button) {
         if(button == 0) {
-            professionManager.findIdFromProfession(this.profession)
-                            .ifPresent(it -> professionManager.increaseAmount(it, false));
+            professionManager.increaseAmount(profession.getId(), false);
         } else if(button == 1) {
-            professionManager.findIdFromProfession(this.profession)
-                            .ifPresent(professionManager::decreaseAmount);
+            professionManager.decreaseAmount(profession.getId());
         }
     }
 

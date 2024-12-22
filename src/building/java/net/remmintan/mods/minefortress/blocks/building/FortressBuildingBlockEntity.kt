@@ -28,6 +28,10 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomati
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
 import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
 import java.time.LocalDateTime
 import java.util.*
@@ -39,23 +43,26 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     NamedScreenHandlerFactory,
     IFortressBuilding {
 
+    private var ownerId: UUID? = null
     private var blueprintMetadata: BlueprintMetadata? = null
     private var start: BlockPos? = null
     private var end: BlockPos? = null
     private var blockData: FortressBuildingBlockData? = null
     private var furnaceBlockPos: BlockPos? = null
+    private var hireHandler: BuildingHireHandler? = null
 
     private var automationArea: IAutomationArea? = null
 
     private val attackers: MutableSet<HostileEntity> = HashSet()
-    private var beds = listOf<BlockPos>()
 
     fun init(
+        ownerId: UUID,
         metadata: BlueprintMetadata,
         start: BlockPos,
         end: BlockPos,
         blockData: Map<BlockPos, BlockState>,
     ) {
+        this.ownerId = ownerId
         this.blueprintMetadata = metadata
         this.start = start
         this.end = end
@@ -70,11 +77,23 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
             .map { it.toImmutable() }
             .findFirst()
             .orElse(null)
+
+        this.hireHandler = BuildingHireHandler()
     }
 
     fun tick(world: World?) {
         world ?: return
         blockData?.checkTheNextBlocksState(MAX_BLOCKS_PER_UPDATE, world as? ServerWorld)
+
+        hireHandler?.let {
+            if (!it.initialized()) {
+                val professionType = metadata.requirement.type ?: return@let
+                val (prof, build, res) = getManagers(world)
+                it.init(professionType, prof, build, res)
+            }
+
+            it.tick()
+        }
 
         this.markDirty()
         if (this.world?.isClient == false) {
@@ -82,6 +101,20 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
             this.world?.updateListeners(this.pos, state, state, Block.NOTIFY_ALL)
         }
     }
+
+    private fun getManagers(world: World): Triple<IProfessionsManager, IServerBuildingsManager, IServerResourceManager> {
+        if (world is ServerWorld) {
+            val server = world.server
+            if (server is IFortressServer) {
+                return server._FortressModServerManager?.getManagersProvider(ownerId)?.let {
+                    Triple(it.professionsManager, it.buildingsManager, it.resourceManager)
+                } ?: error("Managers provider is not set")
+            }
+        }
+        error("Trying to get managers on the client side")
+    }
+
+    override fun getHireHandler() = hireHandler ?: error("Hire handler is not set")
 
     override fun getFurnace(): FurnaceBlockEntity? =
         furnaceBlockPos?.let { this.getWorld()?.let { w -> w.getBlockEntity(it) as? FurnaceBlockEntity } }
@@ -93,7 +126,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
                     0 -> pos.x
                     1 -> pos.y
                     2 -> pos.z
-                    else -> throw  error("Invalid property index")
+                    else -> error("Invalid property index")
                 }
             }
             override fun set(index: Int, value: Int) {}
@@ -121,18 +154,22 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun readNbt(nbt: NbtCompound) {
+        ownerId = nbt.getUuid("ownerId")
         blueprintMetadata = BlueprintMetadata(nbt.getCompound("blueprintMetadata"))
         start = BlockPos.fromLong(nbt.getLong("start"))
         end = BlockPos.fromLong(nbt.getLong("end"))
         blockData = FortressBuildingBlockData.fromNbt(nbt.getCompound("blockData"))
         automationArea = BuildingAutomationAreaProvider(start!!, end!!, blueprintMetadata!!.requirement)
+        hireHandler = BuildingHireHandler.fromNbt(nbt.getCompound("hireHandler"))
     }
 
     override fun writeNbt(nbt: NbtCompound) {
+        ownerId?.let { nbt.putUuid("ownerId", it) }
         blueprintMetadata?.toNbt()?.let { nbt.put("blueprintMetadata", it) }
         start?.let { nbt.putLong("start", it.asLong()) }
         end?.let { nbt.putLong("end", it.asLong()) }
         blockData?.toNbt()?.let { nbt.put("blockData", it) }
+        hireHandler?.toNbt()?.let { nbt.put("hireHandler", it) }
     }
 
     override fun toUpdatePacket(): Packet<ClientPlayPacketListener> {

@@ -7,7 +7,7 @@ interface IWorkforceTabHandler {
 
     fun getProfessions(): List<String>
 
-    fun getCost(professionId: String?): List<ItemInfo>
+    fun getCost(professionId: String): List<ItemInfo>
     fun getHireProgress(professionId: String): Int
     fun getHireQueue(professionId: String): Int
     fun getCurrentCount(professionId: String): Int

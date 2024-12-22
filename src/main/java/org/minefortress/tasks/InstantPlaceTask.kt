@@ -57,7 +57,7 @@ class InstantPlaceTask(
             world.markDirty(pos)
         }
 
-        getBuildingsManager().addBuilding(metadata, start, end, blockData)
+        getBuildingsManager().addBuilding(player.uuid, metadata, start, end, blockData)
         listeners.forEach { it() }
 
     }

@@ -1,8 +1,8 @@
 package net.remmintan.mods.minefortress.core.interfaces.professions;
 
-import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintRequirement;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface IProfessionsManager {
     IProfession getRootProfession();
@@ -11,13 +11,11 @@ public interface IProfessionsManager {
 
     IProfession getProfession(String id);
 
-    Optional<IProfession> getByBuildingRequirement(BlueprintRequirement requirement);
+    List<IProfession> getProfessionsByType(ProfessionType type);
 
     boolean hasProfession(String name);
 
     int getFreeColonists();
-
-    Optional<String> findIdFromProfession(IProfession profession);
 
     void increaseAmount(String professionId, boolean alreadyCharged);
 
