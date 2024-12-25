@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.gui.util.GuiUtils;
@@ -39,14 +40,23 @@ public class CostsWidget implements Drawable, Element {
             matrices.push();
             final var scaleFactor = 0.5f;
             matrices.scale(scaleFactor, scaleFactor, 1f);
-            matrices.translate(30, 0, 500);
+            matrices.translate(10, 0, 250);
 
             final var textX = x + i + countLabelWidth / 2f - 25 * scaleFactor;
             final var textY = y + 6 / scaleFactor;
             drawContext.drawText(getTextRenderer(), countLabel, (int)(textX / scaleFactor), (int)(textY / scaleFactor), color, false);
             matrices.pop();
             drawContext.drawItem(stack, x + i, y);
-            i += (25 + countLabelWidth) * scaleFactor;
+            i += (int) ((25 + countLabelWidth) * scaleFactor);
+        }
+
+
+        var endX = x + i;
+        var endY = y + 25;
+
+        if (mouseX >= x && mouseX <= endX && mouseY >= y && mouseY <= endY) {
+            final var tooltip = List.of("Recruitment Costs. Displays the resources", "required to hire a new unit.").stream().map(Text::of).toList();
+            drawContext.drawTooltip(getTextRenderer(), tooltip, mouseX, mouseY);
         }
     }
 

@@ -27,13 +27,12 @@ public class ProfessionAmountWidget extends MinefortressWidget implements Drawab
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         drawContext.drawItem(stack, x, y);
-        final var amount = amountSupplier.get();
-        final var total = maxAmountSupplier.get();
-        drawContext.drawText(getTextRenderer(), String.valueOf(amount), x+15, y + 9, 0xFFFFFF, false);
+        final var currentAmount = amountSupplier.get();
+        final var maxAmount = maxAmountSupplier.get();
+        drawContext.drawText(getTextRenderer(), "%d/%d".formatted(currentAmount, maxAmount), x + 15, y + 9, 0xFFFFFF, false);
 
         if (isHovered(mouseX, mouseY)) {
-            final var text = amount >= total ? "Build more profession related houses to hire more" : "Amount of professionals";
-            drawContext.drawTooltip(getTextRenderer(), Text.of(text), mouseX, mouseY);
+            drawContext.drawTooltip(getTextRenderer(), Text.of("Amount of units"), mouseX, mouseY);
         }
     }
 

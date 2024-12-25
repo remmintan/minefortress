@@ -341,14 +341,14 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         return this.dataTracker.get(CURRENT_TASK_DESCRIPTION);
     }
 
-
-    public void reserveColonist() {
+    public void reserve() {
         if(this.getProfessionId().equals(DEFAULT_PROFESSION_ID)) {
             this.setProfession(RESERVE_PROFESSION_ID);
         } else {
             throw new IllegalStateException("Colonist cannot be reserved because it is already assigned to a profession");
         }
     }
+
     public void setProfession(String professionId) {
         getManagersProvider().ifPresent(it -> {
             final var spm = it.getProfessionsManager();

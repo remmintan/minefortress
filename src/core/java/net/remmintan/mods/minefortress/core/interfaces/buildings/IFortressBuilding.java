@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public interface IFortressBuilding extends IAutomationArea {
+public interface IFortressBuilding {
 
     default BlockPos getPos() {
         if (this instanceof BlockEntity be) {
@@ -31,6 +31,8 @@ public interface IFortressBuilding extends IAutomationArea {
     default List<String> getUpgrades() {
         return getMetadata().getRequirement().getUpgrades();
     }
+
+    Optional<IAutomationArea> getAutomationArea();
 
     int getHealth();
 

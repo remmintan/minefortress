@@ -10,6 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class ServerResourceManager implements IServerResourceManager, ITickableManager, IWritableManager {
 
@@ -28,12 +30,15 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
     private final ItemStacksManager resources = new ItemStacksManager();
     private final Map<UUID, ItemStacksManager> reservedResources = new HashMap<>();
 
-    public ServerResourceManager(MinecraftServer server) {
+    private final Supplier<IServerFortressManager> fortressManagerSupplier;
+
+    public ServerResourceManager(MinecraftServer server, Supplier<IServerFortressManager> fortressManagerSupplier) {
         final var reader = new ServerStartingInventoryReader(server);
         final var inventoryStartingSlots = reader.readStartingSlots();
         for(var slot : inventoryStartingSlots) {
             resources.getStack(slot.item()).increaseBy(slot.amount());
         }
+        this.fortressManagerSupplier = fortressManagerSupplier;
     }
 
     public ItemInfo createItemInfo(Item item, int amount) {
@@ -216,6 +221,7 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
 
     @Override
     public boolean hasItems(List<ItemInfo> infos) {
+        if (fortressManagerSupplier.get().isCreative()) return true;
         for (ItemInfo info : infos) {
             final var item = info.item();
             if(item == Items.FLINT_AND_STEEL || item == Items.WATER_BUCKET || item == Items.LAVA_BUCKET) continue;

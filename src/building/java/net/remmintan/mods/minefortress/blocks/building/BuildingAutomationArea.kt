@@ -9,7 +9,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import java.time.LocalDateTime
 import java.util.*
 
-class BuildingAutomationAreaProvider(
+class BuildingAutomationArea(
     private val start: BlockPos,
     private val end: BlockPos,
     private val requirement: IBlueprintRequirement

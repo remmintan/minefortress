@@ -41,10 +41,8 @@ public final class ClientProfessionManager extends ProfessionManager implements 
             unlockedForNormalIncrease == ProfessionResearchState.UNLOCKED ||
             profession.isHireMenu() && unlockedForHireMenu == ProfessionResearchState.UNLOCKED
         ) {
-            final ServerboundChangeProfessionStatePacket.AmountChange change =
-                    ServerboundChangeProfessionStatePacket.AmountChange.ADD;
-            final ServerboundChangeProfessionStatePacket packet =
-                    new ServerboundChangeProfessionStatePacket(professionId, change);
+            final var change = ServerboundChangeProfessionStatePacket.AmountChange.ADD;
+            final var packet = new ServerboundChangeProfessionStatePacket(professionId, change);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
         } else if(profession.isHireMenu() && unlockedForHireMenu == ProfessionResearchState.LOCKED_PARENT) {
             final var parent = profession.getParent();

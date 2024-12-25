@@ -31,7 +31,7 @@ public class ProfessionNameWidget extends MinefortressWidget implements Element,
     }
 
     private float getScaleFactor() {
-        return 0.75f;
+        return 1f;
     }
 
     @Override

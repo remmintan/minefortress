@@ -24,13 +24,16 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
     override val upgrades: List<BlueprintSlot> by lazy {
         val blueprintManager = CoreModUtils.getBlueprintManager()
         val resourceManager = CoreModUtils.getFortressClientManager().resourceManager
-        building.upgrades.map {
-            val metadata = blueprintManager.blueprintMetadataManager.getByBlueprintId(it).orElseThrow()
-            val blockData = blueprintManager.blockDataProvider.getBlockData(it, BlockRotation.NONE)
-            val theNextLevel = metadata.requirement.level == building.metadata.requirement.level + 1
-            val enoughResources = resourceManager.hasItems(blockData.stacks)
-            BlueprintSlot(metadata, theNextLevel && enoughResources, blockData)
-        }
+        building.upgrades
+            .map { blueprintManager.blueprintMetadataManager.getByBlueprintId(it) }
+            .filter { it.isPresent }
+            .map { it.get() }
+            .map { metadata ->
+                val blockData = blueprintManager.blockDataProvider.getBlockData(metadata.id, BlockRotation.NONE)
+                val theNextLevel = metadata.requirement.level == building.metadata.requirement.level + 1
+                val enoughResources = resourceManager.hasItems(blockData.stacks)
+                BlueprintSlot(metadata, theNextLevel && enoughResources, blockData)
+            }
     }
 
 

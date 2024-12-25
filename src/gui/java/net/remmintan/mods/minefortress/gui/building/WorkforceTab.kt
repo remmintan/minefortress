@@ -3,9 +3,9 @@ package net.remmintan.mods.minefortress.gui.building
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.Drawable
+import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.text.Text
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import net.remmintan.mods.minefortress.gui.building.handlers.IWorkforceTabHandler
 import net.remmintan.mods.minefortress.gui.widget.*
 import kotlin.properties.Delegates
@@ -17,7 +17,7 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
     override var backgroundWidth = 0
     override var backgroundHeight = 0
 
-    private val hireButtons = mutableListOf<HireButtonWithInfo>()
+    private val hireButtons = mutableListOf<Pair<String, HireButtonWidget>>()
     private val drawables = mutableListOf<Drawable>()
 
     private var initialized: Boolean by Delegates.vetoable(false) { _, _, new -> new }
@@ -27,19 +27,34 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
             init()
             initialized = true
         }
-        for ((button, costs, profId) in hireButtons) {
-            val enoughPlaceForNew =
-                (handler.getCurrentCount(profId) + handler.getHireQueue(profId)) < handler.getMaxCount(profId)
-            button.active = costs.isEnough && CoreModUtils.getProfessionManager().freeColonists > 0 && enoughPlaceForNew
+        for ((profId, button) in hireButtons) {
+            val canHireMore = handler.canHireMore(profId)
+            button.active = canHireMore
+            button.tooltip = if (canHireMore) null else Tooltip.of(Text.of("Not enough resources or free colonists"))
         }
     }
 
     fun render(context: DrawContext, mouseX: Int, mouseY: Int) {
-        drawables.forEach { it.render(context, mouseX, mouseY, 0f) }
+        val recruitUnitsLabel = "Recruit Units"
+        context.drawText(this.textRenderer, recruitUnitsLabel, 7, 20, BuildingScreen.PRIMARY_COLOR, false)
+        val labelWidth = this.textRenderer.getWidth(recruitUnitsLabel)
+        context.drawText(
+            this.textRenderer,
+            "[Available pawns: ${handler.getAvailablePawns()}]",
+            7 + labelWidth + 2,
+            20,
+            BuildingScreen.SECONDARY_COLOR,
+            false
+        )
+
+        val (translatedMouseX, translatedMouseY) = context.matrices.translateMousePosition(mouseX, mouseY)
+        drawables.forEach { it.render(context, translatedMouseX, translatedMouseY, 0f) }
+
+        context.drawText(this.textRenderer, "Enhance Skills", 7, 100, BuildingScreen.PRIMARY_COLOR, false)
     }
 
     fun onMouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        return hireButtons.any { it.button.mouseClicked(mouseX, mouseY, button) }
+        return hireButtons.any { (_, btn) -> btn.mouseClicked(mouseX, mouseY, button) }
     }
 
     private fun init() {
@@ -47,58 +62,66 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
         hireButtons.clear()
 
         val professions = handler.getProfessions()
-        val rowY = y + 40
-        val leftX = x + 10
-        val rightX = x + backgroundWidth - 10
+        val rowY = 32
+        val leftX = 0
+        val rightX = backgroundWidth
 
         for (i in professions.indices) {
             addNewRow(professions[i], rowY + i * 30, leftX, rightX)
         }
-
-
     }
 
     private fun addNewRow(profId: String, rowY: Int, leftX: Int, rightX: Int) {
-        this.addDrawable(
-            ProgressArrowWidget(
-                rightX - 48,
-                rowY
-            ) { handler.getHireProgress(profId) }
-        )
+        // Name
         val professionName = ProfessionNameWidget(
             handler.getProfessionName(profId),
             leftX + 10,
             rowY + textRenderer.fontHeight / 2 + 3
         )
         this.addDrawable(professionName)
+
+        // Cost
+        val cost = handler.getCost(profId)
         val costsWidget = CostsWidget(
             leftX + professionName.offset + 15,
             rowY,
-            handler.getCost(profId)
+            cost
         )
         this.addDrawable(costsWidget)
-        val hireButton = ButtonWidget.builder(
+
+        // Hire button
+        val hireButton = HireButtonWidget.builder(
             Text.literal("+")
         ) { btn: ButtonWidget? ->
-            if (handler.canIncreaseAmount(costsWidget.costs, profId)) {
+            if (handler.canHireMore(profId)) {
                 handler.increaseAmount(profId)
             }
         }
-            .dimensions(rightX - 100, rowY, 20, 20)
+            .dimensions(rightX - 110, rowY, 20, 20)
             .build()
-
         this.addDrawable(hireButton)
-        hireButtons.add(HireButtonWithInfo(hireButton, costsWidget, profId))
+        hireButtons.add(profId to hireButton)
+
+        // Queue
         this.addDrawable(
             ProfessionQueueWidget(
-                rightX - 80,
+                rightX - 90,
                 rowY
             ) { handler.getHireQueue(profId) }
         )
 
+        // Progress arrow
+        this.addDrawable(
+            ProgressArrowWidget(
+                rightX - 58,
+                rowY
+            ) { handler.getHireProgress(profId) }
+        )
+
+        // Amount
         this.addDrawable(
             ProfessionAmountWidget(
-                rightX - 35,
+                rightX - 45,
                 rowY,
                 handler.getProfessionItem(profId),
                 { handler.getCurrentCount(profId) },
@@ -108,7 +131,4 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
     }
 
     private fun addDrawable(drawable: Drawable) = drawables.add(drawable)
-
-    private data class HireButtonWithInfo(val button: ButtonWidget, val costs: CostsWidget, val profId: String)
-
 }

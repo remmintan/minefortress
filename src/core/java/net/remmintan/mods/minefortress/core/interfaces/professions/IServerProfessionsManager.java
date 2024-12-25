@@ -14,4 +14,6 @@ public interface IServerProfessionsManager extends IProfessionsManager, IServerM
     void scheduleSync();
     void sendProfessions(ServerPlayerEntity player);
 
+    void reservePawn();
+
 }

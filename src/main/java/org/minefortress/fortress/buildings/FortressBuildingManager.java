@@ -145,9 +145,12 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
     @Override
     public Stream<IAutomationArea> getAutomationAreaByProfessionType(ProfessionType type) {
+        if (type != ProfessionType.FARMER) return Stream.empty();
         return getBuildingsStream()
                 .filter(building -> building.satisfiesRequirement(type, 0))
-                .map(IAutomationArea.class::cast);
+                .map(IFortressBuilding::getAutomationArea)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
     }
 
     @Override

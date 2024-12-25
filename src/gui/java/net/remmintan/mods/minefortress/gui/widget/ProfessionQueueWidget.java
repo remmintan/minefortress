@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class ProfessionQueueWidget extends MinefortressWidget implements Drawable, Element {
@@ -27,7 +28,8 @@ public class ProfessionQueueWidget extends MinefortressWidget implements Drawabl
         drawContext.drawText(getTextRenderer(), String.valueOf(amountSupplier.get()), x+14, y+10, 0xFFFFFF, false);
 
         if (mouseX >= x && mouseX <= x + 16 && mouseY >= y && mouseY <= y + 16) {
-            drawContext.drawTooltip(getTextRenderer(), Text.of("Number of pawns in queue"), mouseX, mouseY);
+            final var tooltip = List.of("Recruitment Queue: Shows the", "number of units awaiting", "recruitment.").stream().map(Text::of).toList();
+            drawContext.drawTooltip(getTextRenderer(), tooltip, mouseX, mouseY);
         }
     }
 }

@@ -94,7 +94,7 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
 
         registerManager(IServerTaskManager.class, new ServerTaskManager());
         registerManager(IServerProfessionsManager.class, new ServerProfessionManager(() -> this, () -> this, server));
-        registerManager(IServerResourceManager.class, new ServerResourceManager(server));
+        registerManager(IServerResourceManager.class, new ServerResourceManager(server, () -> this));
         registerManager(IServerBuildingsManager.class, new FortressBuildingManager(() -> server.getWorld(World.OVERWORLD), this));
         registerManager(IServerAutomationAreaManager.class, new AreasServerManager());
         registerManager(IServerFightManager.class, new ServerFightManager(this));
@@ -495,11 +495,11 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         return this.pawns.size();
     }
 
-    public Optional<Colonist> getPawnWithoutAProfession() {
+    public Optional<IProfessional> getPawnWithoutAProfession() {
         return pawns
                 .stream()
                 .filter(Colonist.class::isInstance)
-                .map(Colonist.class::cast)
+                .map(IProfessional.class::cast)
                 .filter(it -> it.getProfessionId().equals(Colonist.DEFAULT_PROFESSION_ID))
                 .findAny();
     }

@@ -5,4 +5,7 @@ public interface IProfessional {
     String getProfessionId();
     void resetProfession();
 
+    default void reserve() {
+    }
+
 }

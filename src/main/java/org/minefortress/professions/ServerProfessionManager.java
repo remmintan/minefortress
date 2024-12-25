@@ -14,6 +14,7 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessi
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
@@ -107,6 +108,13 @@ public final class ServerProfessionManager extends ProfessionManager implements 
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_PROFESSION_SYNC, packet);
             needsUpdate = false;
         }
+    }
+
+    @Override
+    public void reservePawn() {
+        ((IServerFortressManager) this.fortressManagerSupplier.get())
+                .getPawnWithoutAProfession()
+                .ifPresent(IProfessional::reserve);
     }
 
     public void sendProfessions(@NotNull ServerPlayerEntity player) {

@@ -15,6 +15,8 @@ interface IWorkforceTabHandler {
     fun increaseAmount(professionId: String)
     fun getProfessionItem(professionId: String): ItemStack
     fun getProfessionName(professionId: String): String
-    fun canIncreaseAmount(costs: List<ItemInfo>, professionId: String): Boolean
+    fun canHireMore(professionId: String): Boolean
+
+    fun getAvailablePawns(): Int
 
 }

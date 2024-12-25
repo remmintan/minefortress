@@ -10,6 +10,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomati
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 
 import java.util.List;
@@ -50,5 +51,7 @@ public interface IServerFortressManager {
     Optional<BlockPos> getRandomPositionAroundCampfire();
     void setSpawnPawns(boolean spawnPawns);
     void spawnDebugEntitiesAroundCampfire(EntityType<? extends IFortressAwareEntity> entityType, int num, ServerPlayerEntity player);
+
+    Optional<IProfessional> getPawnWithoutAProfession();
 
 }

@@ -21,12 +21,29 @@ class BuildingScreenHandler(
     IInfoTabHandler by InfoTabHandler(getBuildingProvider(propertyDelegate)),
     IWorkforceTabHandler by WorkforceTabHandler(getBuildingProvider(propertyDelegate)) {
 
-    val tabs = listOf(
-        BuildingScreenTab(Items.COBBLESTONE, 0, "Info", BuildingScreenTabType.INFO),
-        BuildingScreenTab(Items.PLAYER_HEAD, 1, "Workforce", BuildingScreenTabType.WORKFORCE),
-        BuildingScreenTab(Items.DIAMOND, 2, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
-    )
-    var selectedTab = tabs[0]
+    val tabs: List<BuildingScreenTab> by lazy {
+        if (this.getProfessions().isEmpty()) {
+            listOf(
+                BuildingScreenTab(Items.COBBLESTONE, 0, "Info", BuildingScreenTabType.INFO),
+//                BuildingScreenTab(Items.DIAMOND, 1, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
+            )
+        } else {
+            listOf(
+                BuildingScreenTab(Items.COBBLESTONE, 0, "Info", BuildingScreenTabType.INFO),
+                BuildingScreenTab(Items.PLAYER_HEAD, 1, "Workforce", BuildingScreenTabType.WORKFORCE),
+//                BuildingScreenTab(Items.DIAMOND, 2, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
+            )
+        }
+    }
+
+    private var selectedTabIndex = 0
+    var selectedTab: BuildingScreenTab
+        get() {
+            return tabs[selectedTabIndex]
+        }
+        set(value) {
+            selectedTabIndex = tabs.indexOf(value)
+        }
 
     init {
         addProperties(propertyDelegate)

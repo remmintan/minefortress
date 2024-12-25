@@ -7,13 +7,13 @@ import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionHireInfo
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IBuildingHireHandler
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
-import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager
+import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
 import java.util.*
 
 class BuildingHireHandler : IBuildingHireHandler {
 
-    private var professionManager: IProfessionsManager? = null
+    private var professionManager: IServerProfessionsManager? = null
     private var buildingsManager: IServerBuildingsManager? = null
     private var resourceManger: IServerResourceManager? = null
 
@@ -25,7 +25,7 @@ class BuildingHireHandler : IBuildingHireHandler {
 
     fun init(
         professionType: ProfessionType,
-        professionManager: IProfessionsManager,
+        professionManager: IServerProfessionsManager,
         buildingsManager: IServerBuildingsManager,
         resourceManager: IServerResourceManager
     ) {
@@ -64,6 +64,7 @@ class BuildingHireHandler : IBuildingHireHandler {
         if (!hireProgress.canHireMore) return
 
         val cost = professionManager?.getProfession(professionId)?.itemsRequirement ?: error("Profession not found")
+        professionManager?.reservePawn()
         resourceManger?.removeItems(cost)
 
         hireQueues.computeIfAbsent(professionId) { LinkedList() }.add(HireRequest())
@@ -94,16 +95,15 @@ class BuildingHireHandler : IBuildingHireHandler {
         val maxCount = profession
             ?.let { buildingsManager?.getBuildings(it.requirementType, it.requirementLevel) }
             ?.sumOf { it.metadata.capacity } ?: 0
-        val canHireMore =
-            currentCount < maxCount && (this.resourceManger?.hasItems(profession?.itemsRequirement ?: emptyList())
-                ?: false)
+        val hasEnoughItems = this.resourceManger?.hasItems(profession?.itemsRequirement ?: emptyList()) ?: false
+        val canHireMore = (currentCount + queueLength < maxCount) && hasEnoughItems
 
         return HireProgressInfo(
             professionId,
             queueLength,
             currentCount,
-            progress,
             maxCount,
+            progress,
             canHireMore
         )
     }
@@ -128,8 +128,9 @@ class BuildingHireHandler : IBuildingHireHandler {
         }
 
         val progressesTag = NbtCompound()
-        hireProgresses.forEach { (professionId, progress) ->
-            progressesTag.put(professionId, progress.toNbt())
+        professions.map { it.professionId }.forEach {
+            val hireProgress = getHireProgress(it)
+            progressesTag.put(it, hireProgress.toNbt())
         }
 
         rootTag.put("professions", profList)
@@ -139,32 +140,34 @@ class BuildingHireHandler : IBuildingHireHandler {
         return rootTag
     }
 
+    fun updateFromNbt(tag: NbtCompound) {
+        val professions = tag.getList("professions", 10).map { ProfessionHireInfo.fromNbt(it as NbtCompound) }
+        this.professions = professions
+
+        val queuesTag = tag.getCompound("queues")
+        queuesTag.keys.forEach { professionId ->
+            val queueTag = queuesTag.getCompound(professionId)
+            val queue = LinkedList<HireRequest>()
+            queueTag.keys.forEach { index ->
+                val requestTag = queueTag.getCompound(index)
+                val request = HireRequest()
+                request.progress = requestTag.getInt("progress")
+                queue.add(request)
+            }
+            this.hireQueues[professionId] = queue
+        }
+
+        val progressesTag = tag.getCompound("progresses")
+        progressesTag.keys.forEach { professionId ->
+            this.hireProgresses[professionId] =
+                HireProgressInfo.fromNbt(progressesTag.getCompound(professionId))
+        }
+    }
+
     companion object {
         fun fromNbt(tag: NbtCompound): BuildingHireHandler {
             val buildingHireHandler = BuildingHireHandler()
-
-            val professions = tag.getList("professions", 10).map { ProfessionHireInfo.fromNbt(it as NbtCompound) }
-            buildingHireHandler.professions = professions
-
-            val queuesTag = tag.getCompound("queues")
-            queuesTag.keys.forEach { professionId ->
-                val queueTag = queuesTag.getCompound(professionId)
-                val queue = LinkedList<HireRequest>()
-                queueTag.keys.forEach { index ->
-                    val requestTag = queueTag.getCompound(index)
-                    val request = HireRequest()
-                    request.progress = requestTag.getInt("progress")
-                    queue.add(request)
-                }
-                buildingHireHandler.hireQueues[professionId] = queue
-            }
-
-            val progressesTag = tag.getCompound("progresses")
-            progressesTag.keys.forEach { professionId ->
-                buildingHireHandler.hireProgresses[professionId] =
-                    HireProgressInfo.fromNbt(progressesTag.getCompound(professionId))
-            }
-
+            buildingHireHandler.updateFromNbt(tag)
             return buildingHireHandler
         }
     }
