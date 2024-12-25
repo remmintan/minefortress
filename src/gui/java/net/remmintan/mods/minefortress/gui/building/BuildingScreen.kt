@@ -33,8 +33,6 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
     override fun init() {
         super.init()
         resizeAllTabs()
-
-        workforceTab.init()
     }
 
     override fun resize(client: MinecraftClient?, width: Int, height: Int) {

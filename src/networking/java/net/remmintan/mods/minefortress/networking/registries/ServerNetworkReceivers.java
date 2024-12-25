@@ -28,8 +28,6 @@ public class ServerNetworkReceivers {
         registerReceiver(FortressChannelNames.FORTRESS_BLUEPRINTS_IMPORT_EXPORT, ServerboundBlueprintsImportExportPacket::new);
         registerReceiver(C2SMoveTargetPacket.CHANNEL, C2SMoveTargetPacket::new);
         registerReceiver(C2SFollowTargetPacket.CHANNEL, C2SFollowTargetPacket::new);
-        registerReceiver(C2SCloseHireMenuPacket.CHANNEL, C2SCloseHireMenuPacket::new);
-        registerReceiver(C2SHirePawnWithScreenPacket.CHANNEL, C2SHirePawnWithScreenPacket::new);
         registerReceiver(C2SAddAreaPacket.CHANNEL, C2SAddAreaPacket::new);
         registerReceiver(C2SRemoveAutomationAreaPacket.CHANNEL, C2SRemoveAutomationAreaPacket::new);
         registerReceiver(C2SJumpToCampfire.CHANNEL, C2SJumpToCampfire::new);

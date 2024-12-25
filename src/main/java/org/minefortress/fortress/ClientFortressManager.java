@@ -10,7 +10,6 @@ import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersPro
 import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IHireInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SJumpToCampfire;
@@ -20,11 +19,6 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkH
 import org.minefortress.fight.ClientFightManager;
 import org.minefortress.fortress.resources.client.ClientResourceManagerImpl;
 import org.minefortress.professions.ClientProfessionManager;
-import org.minefortress.professions.hire.ClientHireHandler;
-import org.minefortress.renderer.gui.hire.HirePawnScreen;
-
-import java.util.List;
-import java.util.Map;
 
 public final class ClientFortressManager implements IClientFortressManager {
 
@@ -102,13 +96,6 @@ public final class ClientFortressManager implements IClientFortressManager {
         if (this.state == FortressState.BUILD_EDITING && !CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().hasSelected()) {
             this.state = FortressState.BUILD_SELECTION;
         }
-    }
-
-    @Override
-    public void open_HireScreen(MinecraftClient client, String screenName, Map<String, IHireInfo> professions, List<String> additionalInfo) {
-        final var handler = new ClientHireHandler(screenName, professions, additionalInfo);
-        final var screen = new HirePawnScreen(handler);
-        client.setScreen(screen);
     }
 
     @Override

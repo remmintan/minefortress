@@ -8,6 +8,7 @@ import net.minecraft.text.Text
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import net.remmintan.mods.minefortress.gui.building.handlers.IWorkforceTabHandler
 import net.remmintan.mods.minefortress.gui.widget.*
+import kotlin.properties.Delegates
 
 class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRenderer: TextRenderer) : ResizableTab {
 
@@ -19,21 +20,13 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
     private val hireButtons = mutableListOf<HireButtonWithInfo>()
     private val drawables = mutableListOf<Drawable>()
 
-    fun init() {
-        drawables.clear()
-        hireButtons.clear()
-
-        val professions = handler.getProfessions()
-        val rowY = y + 40
-        val leftX = x + 10
-        val rightX = x + backgroundWidth - 10
-
-        for (i in professions.indices) {
-            addNewRow(professions[i], rowY + i * 30, leftX, rightX)
-        }
-    }
+    private var initialized: Boolean by Delegates.vetoable(false) { _, _, new -> new }
 
     fun tick() {
+        if (!initialized) {
+            init()
+            initialized = true
+        }
         for ((button, costs, profId) in hireButtons) {
             val enoughPlaceForNew =
                 (handler.getCurrentCount(profId) + handler.getHireQueue(profId)) < handler.getMaxCount(profId)
@@ -47,6 +40,22 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
 
     fun onMouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         return hireButtons.any { it.button.mouseClicked(mouseX, mouseY, button) }
+    }
+
+    private fun init() {
+        drawables.clear()
+        hireButtons.clear()
+
+        val professions = handler.getProfessions()
+        val rowY = y + 40
+        val leftX = x + 10
+        val rightX = x + backgroundWidth - 10
+
+        for (i in professions.indices) {
+            addNewRow(professions[i], rowY + i * 30, leftX, rightX)
+        }
+
+
     }
 
     private fun addNewRow(profId: String, rowY: Int, leftX: Int, rightX: Int) {

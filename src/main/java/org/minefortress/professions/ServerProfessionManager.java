@@ -10,8 +10,10 @@ import net.remmintan.mods.minefortress.core.dtos.professions.IProfessionEssentia
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
-import net.remmintan.mods.minefortress.core.interfaces.professions.*;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
+import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
@@ -19,16 +21,15 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionSyncPacket;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionsInitPacket;
-import net.remmintan.mods.minefortress.networking.s2c.S2COpenHireMenuPacket;
-import net.remmintan.mods.minefortress.networking.s2c.SyncHireProgress;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.ServerFortressManager;
-import org.minefortress.professions.hire.ServerHireHandler;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -42,8 +43,6 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     private String professionsTree;
     private boolean needsUpdate = false;
 
-    private final Map<ProfessionsHireTypes, ServerHireHandler> hireHandlers = new HashMap<>();
-    private ServerHireHandler currentHireHandler;
 
     private final Supplier<IServerManagersProvider> serverManagersProviderSupplier;
 
@@ -51,41 +50,6 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         super(fortressManagerSupplier);
         this.server = server;
         this.serverManagersProviderSupplier = serverManagersProviderSupplier;
-    }
-
-    public void openHireMenu(ProfessionsHireTypes hireType, ServerPlayerEntity player) {
-        currentHireHandler = hireHandlers.computeIfAbsent(hireType, k -> new ServerHireHandler(k.getIds(), this));
-        final var professions = currentHireHandler.getProfessions();
-        final var additionalInfo = currentHireHandler.getUnlockedProfessions();
-        final var screenName = hireType.getScreenName();
-        final var packet = new S2COpenHireMenuPacket(screenName, professions, additionalInfo);
-        FortressServerNetworkHelper.send(player, S2COpenHireMenuPacket.CHANNEL, packet);
-    }
-
-    @Override
-    public void closeHireMenu() {
-        currentHireHandler = null;
-    }
-
-    @Override
-    public void sendHireRequestToCurrentHandler(String professionId) {
-        if(currentHireHandler != null) {
-            final var profession = getProfession(professionId);
-            if(!profession.isHireMenu()) {
-                throw new IllegalArgumentException("Profession " + professionId + " is not a hire menu profession");
-            }
-            final var canHire = isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
-            final var abstractFortressManager = (IServerFortressManager)fortressManagerSupplier.get();
-            if(canHire == ProfessionResearchState.UNLOCKED && getFreeColonists() > 0 && abstractFortressManager instanceof ServerFortressManager fsm) {
-                final var resourceManager = serverManagersProviderSupplier.get().getResourceManager();
-                resourceManager.removeItems(profession.getItemsRequirement());
-                fsm.getPawnWithoutAProfession().ifPresent(Colonist::reserveColonist);
-                fsm.scheduleSync();
-                currentHireHandler.hire(professionId);
-            }
-        } else {
-            throw new IllegalStateException("No current hire handler");
-        }
     }
 
     @Override
@@ -129,12 +93,6 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     @Override
     public void tick(@Nullable ServerPlayerEntity player) {
         if(player == null) return;
-
-        hireHandlers.forEach((k, v) -> v.tick());
-        if(currentHireHandler != null) {
-            final var packet = new SyncHireProgress(currentHireHandler.getProfessions(), currentHireHandler.getUnlockedProfessions());
-            FortressServerNetworkHelper.send(player, SyncHireProgress.CHANNEL, packet);
-        }
 
         tickRemoveFromProfession();
 
