@@ -10,8 +10,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessionals;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
 import net.remmintan.mods.minefortress.gui.util.GuiUtils;
 
@@ -28,7 +28,7 @@ public class ProfessionWidget {
     private ProfessionWidget parent;
     private final List<ProfessionWidget> children = new ArrayList<>();
     private final IProfession profession;
-    private final IProfessionsManager professionManager;
+    private final IClientProfessionManager professionManager;
 
     private int x = 0;
     private int y = 0;
@@ -36,7 +36,7 @@ public class ProfessionWidget {
     private final int width;
     private final MinecraftClient client;
 
-    public ProfessionWidget(IProfession profession, IProfessionsManager professionManager) {
+    public ProfessionWidget(IProfession profession, IClientProfessionManager professionManager) {
         this.profession = profession;
         this.professionManager = professionManager;
         client = MinecraftClient.getInstance();
@@ -249,12 +249,8 @@ public class ProfessionWidget {
         );
     }
 
-    public void onClick(int button) {
-        if(button == 0) {
-            professionManager.increaseAmount(profession.getId(), false);
-        } else if(button == 1) {
-            professionManager.decreaseAmount(profession.getId());
-        }
+    public void onClick() {
+        professionManager.openBuildingHireScreen(profession.getId());
     }
 
     public ProfessionWidget getParent() {

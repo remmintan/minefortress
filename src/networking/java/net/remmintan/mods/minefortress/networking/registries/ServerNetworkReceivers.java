@@ -40,6 +40,7 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SUpdateScreenProperty.CHANNEL, C2SUpdateScreenProperty::new);
         registerReceiver(C2SOpenBuildingScreen.CHANNEL, C2SOpenBuildingScreen::new);
         registerReceiver(C2SHireProfessional.CHANNEL, C2SHireProfessional::new);
+        registerReceiver(C2SOpenBuildingHireScreen.CHANNEL, C2SOpenBuildingHireScreen::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {

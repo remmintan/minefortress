@@ -4,8 +4,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
-import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
@@ -33,9 +33,8 @@ public class ProfessionsLayer {
     private final int panExpand = 100;
 
 
-    public ProfessionsLayer(IClientManagersProvider client) {
-        final IProfessionsManager professionManager = client.get_ClientFortressManager().getProfessionManager();
-        ProfessionWidget root = createProfessionsTree(professionManager);
+    public ProfessionsLayer(IClientManagersProvider managersProvider) {
+        ProfessionWidget root = createProfessionsTree(managersProvider.get_ClientFortressManager().getProfessionManager());
 
         ProfessionsPositioner.arrangeForTree(root);
         for(ProfessionWidget widget:widgets) {
@@ -100,7 +99,7 @@ public class ProfessionsLayer {
     }
 
     @NotNull
-    private ProfessionWidget createProfessionsTree(IProfessionsManager professionManager) {
+    private ProfessionWidget createProfessionsTree(IClientProfessionManager professionManager) {
         final IProfession rootProfession = professionManager.getRootProfession();
         final ProfessionWidget rootWidget = new ProfessionWidget(rootProfession, professionManager);
 
@@ -109,7 +108,7 @@ public class ProfessionsLayer {
         return rootWidget;
     }
 
-    private void createTreeNode(ProfessionWidget parentWidget, IProfession parent, IProfessionsManager professionManager) {
+    private void createTreeNode(ProfessionWidget parentWidget, IProfession parent, IClientProfessionManager professionManager) {
         final List<IProfession> children = parent.getChildren();
         this.widgets.add(parentWidget);
         for(IProfession child:children) {
@@ -144,13 +143,13 @@ public class ProfessionsLayer {
         this.alpha = bl ? MathHelper.clamp(this.alpha + 0.02f, 0.0f, 0.3f) : MathHelper.clamp(this.alpha - 0.04f, 0.0f, 1.0f);
     }
 
-    public void onClick(double mouseX, double mouseY, int button) {
+    public void onClick(double mouseX, double mouseY, int _b) {
         int oX = MathHelper.floor(this.originX);
         int oY = MathHelper.floor(this.originY);
         if (mouseX > 0 && mouseX < layerWidth && mouseY > 0 && mouseY < layerHeight) {
             for (ProfessionWidget professionWidget : this.widgets) {
                 if (professionWidget.shouldNotRender(oX, oY, (int) mouseX, (int) mouseY)) continue;
-                professionWidget.onClick(button);
+                professionWidget.onClick();
                 break;
             }
         }

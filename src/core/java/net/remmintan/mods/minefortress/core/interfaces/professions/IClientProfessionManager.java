@@ -10,4 +10,5 @@ public interface IClientProfessionManager extends IProfessionsManager {
 
     void updateProfessions(List<IProfessionEssentialInfo> info);
 
+    void openBuildingHireScreen(String professionId);
 }
