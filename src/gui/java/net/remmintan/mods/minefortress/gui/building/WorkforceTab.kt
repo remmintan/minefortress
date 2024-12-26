@@ -17,7 +17,8 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
     override var backgroundWidth = 0
     override var backgroundHeight = 0
 
-    private val hireButtons = mutableListOf<Pair<String, HireButtonWidget>>()
+    private val hireButtons = mutableListOf<Pair<String, HireScreenButtonWidget>>()
+    private val minusButtons = mutableListOf<Pair<String, HireScreenButtonWidget>>()
     private val drawables = mutableListOf<Drawable>()
 
     private var initialized: Boolean by Delegates.vetoable(false) { _, _, new -> new }
@@ -31,6 +32,10 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
             val canHireMore = handler.canHireMore(profId)
             button.active = canHireMore
             button.tooltip = if (canHireMore) null else Tooltip.of(Text.of("Not enough resources or free colonists"))
+        }
+
+        for ((profId, button) in minusButtons) {
+            button.active = handler.getCurrentCount(profId) > 0
         }
     }
 
@@ -54,7 +59,8 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
     }
 
     fun onMouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        return hireButtons.any { (_, btn) -> btn.mouseClicked(mouseX, mouseY, button) }
+        return hireButtons.any { (_, btn) -> btn.mouseClicked(mouseX, mouseY, button) } ||
+                minusButtons.any { (_, btn) -> btn.mouseClicked(mouseX, mouseY, button) }
     }
 
     private fun init() {
@@ -67,30 +73,70 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
         val rightX = backgroundWidth
 
         for (i in professions.indices) {
-            addNewRow(professions[i], rowY + i * 30, leftX, rightX)
+            val profId = professions[i]
+            val legacy = handler.getCost(profId).isEmpty()
+            if (legacy)
+                addNewLegacyHireRow(profId, rowY + i * 30, leftX, rightX)
+            else
+                addNewHireProgressRow(profId, rowY + i * 30, leftX, rightX)
         }
     }
 
-    private fun addNewRow(profId: String, rowY: Int, leftX: Int, rightX: Int) {
+    private fun addNewLegacyHireRow(profId: String, rowY: Int, leftX: Int, rightX: Int) {
         // Name
-        val professionName = ProfessionNameWidget(
-            handler.getProfessionName(profId),
-            leftX + 10,
-            rowY + textRenderer.fontHeight / 2 + 3
+        addNameWidget(profId, leftX, rowY)
+
+        // Plus button
+        val plusButton = HireScreenButtonWidget.builder(
+            Text.literal("+")
+        ) { btn: ButtonWidget? ->
+            if (handler.canHireMore(profId)) {
+                handler.increaseAmount(profId)
+            }
+        }
+            .dimensions(rightX - 70, rowY, 20, 20)
+            .build()
+        this.addDrawable(plusButton)
+        hireButtons.add(profId to plusButton)
+
+        // Amount
+        this.addDrawable(
+            ProfessionAmountWidget(
+                rightX - 120,
+                rowY,
+                handler.getProfessionItem(profId),
+                { handler.getCurrentCount(profId) },
+                { handler.getMaxCount(profId) }
+            )
         )
-        this.addDrawable(professionName)
+
+        // Minus button
+        val minusButton = HireScreenButtonWidget.builder(
+            Text.literal("-")
+        ) { btn: ButtonWidget? ->
+            handler.decreaseAmount(profId)
+        }
+            .dimensions(rightX - 150, rowY, 20, 20)
+            .build()
+        this.addDrawable(minusButton)
+        minusButtons.add(profId to minusButton)
+    }
+
+    private fun addNewHireProgressRow(profId: String, rowY: Int, leftX: Int, rightX: Int) {
+        // Name
+        val nameOffset = addNameWidget(profId, leftX, rowY)
 
         // Cost
         val cost = handler.getCost(profId)
         val costsWidget = CostsWidget(
-            leftX + professionName.offset + 15,
+            leftX + nameOffset + 15,
             rowY,
             cost
         )
         this.addDrawable(costsWidget)
 
         // Hire button
-        val hireButton = HireButtonWidget.builder(
+        val hireButton = HireScreenButtonWidget.builder(
             Text.literal("+")
         ) { btn: ButtonWidget? ->
             if (handler.canHireMore(profId)) {
@@ -128,6 +174,17 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
                 { handler.getMaxCount(profId) }
             )
         )
+    }
+
+    private fun addNameWidget(profId: String, leftX: Int, rowY: Int): Int {
+        val professionName = ProfessionNameWidget(
+            handler.getProfessionName(profId),
+            leftX + 10,
+            rowY + textRenderer.fontHeight / 2 + 3
+        )
+        this.addDrawable(professionName)
+        val nameOffset = professionName.offset
+        return nameOffset
     }
 
     private fun addDrawable(drawable: Drawable) = drawables.add(drawable)

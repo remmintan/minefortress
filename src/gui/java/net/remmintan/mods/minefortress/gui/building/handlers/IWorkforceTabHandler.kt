@@ -13,6 +13,7 @@ interface IWorkforceTabHandler {
     fun getCurrentCount(professionId: String): Int
     fun getMaxCount(professionId: String): Int
     fun increaseAmount(professionId: String)
+    fun decreaseAmount(professionId: String)
     fun getProfessionItem(professionId: String): ItemStack
     fun getProfessionName(professionId: String): String
     fun canHireMore(professionId: String): Boolean

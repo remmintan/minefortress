@@ -4,7 +4,7 @@ import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.text.Text
 
-class HireButtonWidget private constructor(
+class HireScreenButtonWidget private constructor(
     x: Int,
     y: Int,
     width: Int,
@@ -64,8 +64,8 @@ class HireButtonWidget private constructor(
             return this
         }
 
-        fun build(): HireButtonWidget {
-            val buttonWidget = HireButtonWidget(
+        fun build(): HireScreenButtonWidget {
+            val buttonWidget = HireScreenButtonWidget(
                 this.x,
                 this.y,
                 this.width,

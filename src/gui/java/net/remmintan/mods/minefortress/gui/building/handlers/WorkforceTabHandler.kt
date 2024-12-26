@@ -42,9 +42,23 @@ class WorkforceTabHandler(private val provider: IBuildingProvider) : IWorkforceT
     }
 
     override fun increaseAmount(professionId: String) {
-        val pos = provider.building.pos
-        val packet = C2SHireProfessional(pos, professionId)
-        FortressClientNetworkHelper.send(C2SHireProfessional.CHANNEL, packet)
+        if (isLegacy(professionId)) {
+            CoreModUtils.getProfessionManager().increaseAmount(professionId, false)
+        } else {
+            val pos = provider.building.pos
+            val packet = C2SHireProfessional(pos, professionId)
+            FortressClientNetworkHelper.send(C2SHireProfessional.CHANNEL, packet)
+        }
+    }
+
+    override fun decreaseAmount(professionId: String) {
+        if (isLegacy(professionId)) {
+            CoreModUtils.getProfessionManager().decreaseAmount(professionId)
+        }
+    }
+
+    private fun isLegacy(profId: String): Boolean {
+        return getCost(profId).isEmpty()
     }
 
     override fun canHireMore(professionId: String): Boolean {
