@@ -4,6 +4,7 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.screen.NamedScreenHandlerFactory
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
+import net.remmintan.mods.minefortress.core.interfaces.IScreenHandlerWithTabs
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket
 
 class C2SOpenBuildingHireScreen(val profId: String) : FortressC2SPacket {
@@ -30,8 +31,9 @@ class C2SOpenBuildingHireScreen(val profId: String) : FortressC2SPacket {
             val building = buildings[0]
             if (building is NamedScreenHandlerFactory) {
                 player!!.openHandledScreen(building)
-                //player.currentScreenHandler.
-                // TODO tell screen handler or building to open hire menu
+                if (player.currentScreenHandler is IScreenHandlerWithTabs) {
+                    (player.currentScreenHandler as? IScreenHandlerWithTabs)?.selectedTabIndex = 1
+                }
             }
         }
     }

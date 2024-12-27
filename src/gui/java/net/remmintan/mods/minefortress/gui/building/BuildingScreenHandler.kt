@@ -8,6 +8,7 @@ import net.minecraft.screen.ArrayPropertyDelegate
 import net.minecraft.screen.PropertyDelegate
 import net.minecraft.screen.ScreenHandler
 import net.minecraft.util.math.BlockPos
+import net.remmintan.mods.minefortress.core.interfaces.IScreenHandlerWithTabs
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
 import net.remmintan.mods.minefortress.gui.BUILDING_SCREEN_HANDLER_TYPE
@@ -16,10 +17,11 @@ import net.remmintan.mods.minefortress.gui.building.handlers.*
 
 class BuildingScreenHandler(
     syncId: Int,
-    propertyDelegate: PropertyDelegate = ArrayPropertyDelegate(3)
+    private val propertyDelegate: PropertyDelegate = ArrayPropertyDelegate(4)
 ) : ScreenHandler(BUILDING_SCREEN_HANDLER_TYPE, syncId),
     IInfoTabHandler by InfoTabHandler(getBuildingProvider(propertyDelegate)),
-    IWorkforceTabHandler by WorkforceTabHandler(getBuildingProvider(propertyDelegate)) {
+    IWorkforceTabHandler by WorkforceTabHandler(getBuildingProvider(propertyDelegate)),
+    IScreenHandlerWithTabs {
 
     val tabs: List<BuildingScreenTab> by lazy {
         if (this.getProfessions().isEmpty()) {
@@ -36,7 +38,14 @@ class BuildingScreenHandler(
         }
     }
 
-    private var selectedTabIndex = 0
+    override var selectedTabIndex: Int
+        get() {
+            return propertyDelegate[3]
+        }
+        set(value) {
+            propertyDelegate[3] = value
+        }
+
     var selectedTab: BuildingScreenTab
         get() {
             return tabs[selectedTabIndex]

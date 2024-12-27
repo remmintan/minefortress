@@ -49,6 +49,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     private var furnaceBlockPos: BlockPos? = null
     private var hireHandler: BuildingHireHandler = BuildingHireHandler()
     private val attackers: MutableSet<HostileEntity> = HashSet()
+    var selectedTabIndex = 0
 
     override fun getAutomationArea(): Optional<IAutomationArea> {
         return Optional.ofNullable(
@@ -130,11 +131,19 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
                     0 -> pos.x
                     1 -> pos.y
                     2 -> pos.z
+                    3 -> selectedTabIndex
                     else -> error("Invalid property index")
                 }
             }
-            override fun set(index: Int, value: Int) {}
-            override fun size(): Int = 3
+
+            override fun set(index: Int, value: Int) {
+                when (index) {
+                    3 -> selectedTabIndex = value
+                    else -> error("Invalid property index")
+                }
+            }
+
+            override fun size(): Int = 4
         }
 
         return BuildingScreenHandler(syncId, propertyDelegate)
