@@ -24,7 +24,7 @@ public class ServerboundChangeMaxColonistsCountPacket implements FortressC2SPack
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var manager = getFortressManager(server, player);
+        final var manager = getFortressManager(player);
         switch (actionType) {
             case INCREASE -> manager.increaseMaxColonistsCount();
             case DECREASE -> manager.decreaseMaxColonistsCount();

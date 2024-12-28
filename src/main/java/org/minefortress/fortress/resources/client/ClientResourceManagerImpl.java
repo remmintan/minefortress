@@ -33,7 +33,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
 
     @Override
     public boolean hasItems(final List<ItemInfo> stacks) {
-        if(CoreModUtils.getFortressClientManager().isCreative()) return true;
+        if (CoreModUtils.getFortressManager().isCreative()) return true;
         return stacks
                 .stream()
                 .allMatch(it -> {
@@ -86,7 +86,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
 
     @Override
     public int getItemAmount(Item item) {
-        if(CoreModUtils.getFortressClientManager().isCreative()) {
+        if (CoreModUtils.getFortressManager().isCreative()) {
             return 999;
         }
         final var group = groupManager.getGroup(item);

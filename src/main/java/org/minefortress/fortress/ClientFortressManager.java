@@ -80,7 +80,7 @@ public final class ClientFortressManager implements IClientFortressManager {
         resetBuildEditState();
 
         if (isCenterNotSet()) {
-            final var blueprintManager = CoreModUtils.getMineFortressManagersProvider().get_BlueprintManager();
+            final var blueprintManager = CoreModUtils.getManagersProvider().get_BlueprintManager();
             if (!blueprintManager.isSelecting()) {
                 blueprintManager.select("campfire");
             } else {
@@ -93,7 +93,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     private void resetBuildEditState() {
-        if (this.state == FortressState.BUILD_EDITING && !CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().hasSelected()) {
+        if (this.state == FortressState.BUILD_EDITING && !CoreModUtils.getManagersProvider().get_PawnsSelectionManager().hasSelected()) {
             this.state = FortressState.BUILD_SELECTION;
         }
     }

@@ -43,7 +43,7 @@ class CombatHudLayer extends AbstractHudLayer{
     }
 
     private static IClientFightManager getFightManager() {
-        return CoreModUtils.getFortressClientManager().getFightManager();
+        return CoreModUtils.getFortressManager().getFightManager();
     }
 
 }

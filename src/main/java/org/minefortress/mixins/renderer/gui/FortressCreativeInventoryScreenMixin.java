@@ -92,7 +92,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Unique
     private static boolean isFortressSurvival() {
-        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && !CoreModUtils.getFortressClientManager().isCreative();
+        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && !CoreModUtils.getFortressManager().isCreative();
     }
 
     @Redirect(method = "onMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/entity/ItemEntity;"))
@@ -246,19 +246,19 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         return MinecraftClient.getInstance();
     }
 
+    @Unique
+    private static IClientResourceManager getResourceManager() {
+        return CoreModUtils.getFortressManager().getResourceManager();
+    }
+
     @Inject(method = "handledScreenTick", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo ci) {
-        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && CoreModUtils.getFortressClientManager().isSurvival()) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && CoreModUtils.getFortressManager().isSurvival()) {
             if(this.isInventoryTabSelected()) {
                 this.setSelectedTab(Registries.ITEM_GROUP.get(ItemGroups.BUILDING_BLOCKS));
             }
             ci.cancel();
         }
-    }
-
-    @Unique
-    private static IClientResourceManager getResourceManager() {
-        return CoreModUtils.getFortressClientManager().getResourceManager();
     }
 
 }

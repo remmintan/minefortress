@@ -51,7 +51,7 @@ fun registerPlayerBlockEvents() {
         val clientBlueprintManager =
             CoreModUtils.getBlueprintManager()
         val fortressManager =
-            CoreModUtils.getFortressClientManager()
+            CoreModUtils.getFortressManager()
 
         if (fortressManager.state == FortressState.COMBAT) {
             updateFightSelection(hitResult, fortressManager)
@@ -101,7 +101,7 @@ fun registerPlayerBlockEvents() {
 
 private fun updateFightSelection(hitResult: BlockHitResult, fortressManager: IClientFortressManager) {
     val fightManager = fortressManager.fightManager
-    fightManager.setTarget(hitResult, CoreModUtils.getMineFortressManagersProvider().targetedSelectionManager)
+    fightManager.setTarget(hitResult, CoreModUtils.getManagersProvider().targetedSelectionManager)
 }
 
 private fun clickBuild(useOnContext: ItemUsageContext, blockState: BlockState) {

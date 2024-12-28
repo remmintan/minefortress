@@ -4,6 +4,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBluepri
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,13 +12,27 @@ public class BuildBlueprintHintsLayer extends AbstractHintsLayer {
 
     private static final List<String> BUILD_HINTS = List.of(
             "hold ctrl - keep blueprint",
-            "ctrl + R - next blueprint",
+            "ctrl + Q - rotate left",
+            "ctrl + E - rotate right"
+    );
+
+    private static final List<String> UPGRADING_HINTS = List.of(
             "ctrl + Q - rotate left",
             "ctrl + E - rotate right"
     );
 
     @Override
     protected List<String> getHints() {
+        final var blueprintManager = CoreModUtils.getBlueprintManager();
+        if (blueprintManager.isUpgrading()) {
+            if (!blueprintManager.intersectsUpgradingBuilding()) {
+                final var hints = new ArrayList<String>();
+                hints.add("The upgrade must intersect with the building!");
+                hints.addAll(UPGRADING_HINTS);
+                return hints;
+            }
+            return UPGRADING_HINTS;
+        }
         return BUILD_HINTS;
     }
 
@@ -34,6 +49,6 @@ public class BuildBlueprintHintsLayer extends AbstractHintsLayer {
     }
 
     private IClientBlueprintManager getBlueprintManager() {
-        return CoreModUtils.getMineFortressManagersProvider().get_BlueprintManager();
+        return CoreModUtils.getManagersProvider().get_BlueprintManager();
     }
 }

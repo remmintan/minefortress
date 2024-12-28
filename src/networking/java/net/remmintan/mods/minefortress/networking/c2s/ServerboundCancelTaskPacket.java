@@ -31,9 +31,9 @@ public class ServerboundCancelTaskPacket implements FortressC2SPacket {
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final var id = this.getTaskId();
-        final var provider = getManagersProvider(server, player);
+        final var provider = getManagersProvider(player);
         final var taskManager = provider.getTaskManager();
-        final var manager = getFortressManager(server, player);
+        final var manager = getFortressManager(player);
         taskManager.cancelTask(id, provider, manager);
     }
 }

@@ -112,7 +112,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var provider = getManagersProvider(server, player);
+        final var provider = getManagersProvider(player);
         final var id = this.getId();
         final var taskType = this.getTaskType();
         final var taskManager = provider.getTaskManager();
@@ -122,7 +122,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
         final var hitResult = this.getHitResult();
         final var selectionType = this.getSelectionType();
         final var task = tasksCreator.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, positions, player);
-        final var manager = getFortressManager(server, player);
+        final var manager = getFortressManager(player);
 
         taskManager.addTask(task, provider, manager, selectedPawns, player);
     }

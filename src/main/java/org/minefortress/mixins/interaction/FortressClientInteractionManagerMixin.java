@@ -61,10 +61,16 @@ public abstract class FortressClientInteractionManagerMixin {
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) return;
         final var clientBlueprintManager = CoreModUtils.getBlueprintManager();
-        final var fortressManager = CoreModUtils.getFortressClientManager();
+        final var fortressManager = CoreModUtils.getFortressManager();
         final var buildingsManager = CoreModUtils.getBuildingsManager();
 
         if (fortressManager.isCenterNotSet()) {
+            cir.setReturnValue(false);
+            return;
+        }
+
+        if (clientBlueprintManager.isSelecting()) {
+            clientBlueprintManager.clearStructure();
             cir.setReturnValue(false);
             return;
         }
@@ -83,12 +89,6 @@ public abstract class FortressClientInteractionManagerMixin {
         if (fortressManager.getState() == FortressState.AREAS_SELECTION) {
             final var areasClientManager = CoreModUtils.getAreasClientManager();
             areasClientManager.select(client.crosshairTarget);
-            cir.setReturnValue(false);
-            return;
-        }
-
-        if(clientBlueprintManager.isSelecting()) {
-           clientBlueprintManager.clearStructure();
             cir.setReturnValue(false);
             return;
         }

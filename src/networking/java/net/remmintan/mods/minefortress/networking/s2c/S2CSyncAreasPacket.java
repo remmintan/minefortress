@@ -49,7 +49,7 @@ public class S2CSyncAreasPacket implements FortressS2CPacket {
     }
 
     private static IAreasClientManager getAutomationAreaManager() {
-        final var provider = CoreModUtils.getMineFortressManagersProvider();
+        final var provider = CoreModUtils.getManagersProvider();
         return provider.get_AreasClientManager();
     }
 }

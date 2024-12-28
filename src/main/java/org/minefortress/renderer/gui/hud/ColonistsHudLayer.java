@@ -42,7 +42,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
             new ItemButtonWidget(
                     35, 0,
                 Items.PLAYER_HEAD,
-                btn -> client.setScreen(new ProfessionsScreen(CoreModUtils.getMineFortressManagersProvider())),
+                    btn -> client.setScreen(new ProfessionsScreen(CoreModUtils.getManagersProvider())),
                 "Manage professions"
             )
         );
@@ -94,7 +94,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
     }
 
     private String getColonistsCountText() {
-        return "x" + CoreModUtils.getFortressClientManager().getTotalColonistsCount();
+        return "x" + CoreModUtils.getFortressManager().getTotalColonistsCount();
     }
 
     private boolean hasProfessionInAVillage(String professionId) {
@@ -104,7 +104,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
     @Override
     public void tick() {
         super.tick();
-        if(CoreModUtils.getFortressClientManager().isCreative()) {
+        if (CoreModUtils.getFortressManager().isCreative()) {
             craftingButton.visible = false;
             furnaceButton.visible = false;
         } else {

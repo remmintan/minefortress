@@ -65,7 +65,7 @@ class ClientBuildingsManager : IClientBuildingsManager {
 
     override fun getBuildingHealths(): List<BuildingHealthRenderInfo> {
 
-        return when (CoreModUtils.getFortressClientManager().state) {
+        return when (CoreModUtils.getFortressManager().state) {
             COMBAT -> getBuildingsStream()
                 .filter { it.health < 100 }
                 .map { buildingToHealthRenderInfo(it) }

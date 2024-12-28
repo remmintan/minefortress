@@ -4,8 +4,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.core.ScreenType;
+import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 
 public class ServerboundOpenCraftingScreenPacket implements FortressC2SPacket {
 
@@ -41,7 +41,7 @@ public class ServerboundOpenCraftingScreenPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        getFortressManager(server, player).openHandledScreen(screenType, player, blockPos);
+        getFortressManager(player).openHandledScreen(screenType, player, blockPos);
     }
 
 }

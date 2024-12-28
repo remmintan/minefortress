@@ -27,6 +27,6 @@ public class C2SRemoveAutomationAreaPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        getManagersProvider(server, player).getAutomationAreaManager().removeArea(id);
+        getManagersProvider(player).getAutomationAreaManager().removeArea(id);
     }
 }

@@ -21,7 +21,7 @@ class PawnsSelectionHudLayer extends AbstractHudLayer {
     }
 
     private void renderCurrentSelection(DrawContext drawContext) {
-        final var pawnsSelectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+        final var pawnsSelectionManager = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
         if(pawnsSelectionManager.isSelecting()) {
             final var selectionStartPos = pawnsSelectionManager.getMouseStartPos();
             final var selectionCurPos = pawnsSelectionManager.getMouseEndPos();

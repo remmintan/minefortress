@@ -29,7 +29,7 @@ public class ServerboundChangeProfessionStatePacket implements FortressC2SPacket
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var provider = getManagersProvider(server, player);
+        final var provider = getManagersProvider(player);
         final var manager = provider.getProfessionsManager();
         if (amountChange == AmountChange.ADD) {
             final var profession = manager.getProfession(professionId);

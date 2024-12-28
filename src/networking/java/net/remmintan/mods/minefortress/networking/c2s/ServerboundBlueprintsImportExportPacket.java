@@ -88,7 +88,7 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
 
-        final var sbm = getManagersProvider(server, player).getBlueprintManager();
+        final var sbm = getManagersProvider(player).getBlueprintManager();
         switch (type) {
             case EXPORT -> handleExport(player, sbm);
             case IMPORT -> handleImport(player, sbm);

@@ -15,7 +15,7 @@ class ToastEvents {
 
     fun register() {
         ClientTickEvents.START_CLIENT_TICK.register { client ->
-            if (isClientInFortressGamemode() && CoreModUtils.getFortressClientManager().isCenterNotSet) {
+            if (isClientInFortressGamemode() && CoreModUtils.getFortressManager().isCenterNotSet) {
                 synchronized(LOCK) {
                     if (campfireToast == null) {
                         campfireToast = FortressToast("Set up your Fortress", "Right-click to place", Items.CAMPFIRE)

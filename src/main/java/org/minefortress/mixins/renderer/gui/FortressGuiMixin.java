@@ -22,7 +22,7 @@ public abstract class FortressGuiMixin {
 
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     private void renderHotbar(float tickDelta, DrawContext context, CallbackInfo ci) {
-        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && CoreModUtils.getFortressClientManager().getState() == FortressState.COMBAT) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && CoreModUtils.getFortressManager().getState() == FortressState.COMBAT) {
             ci.cancel();
         }
     }

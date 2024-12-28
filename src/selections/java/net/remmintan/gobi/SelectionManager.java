@@ -100,7 +100,7 @@ public class SelectionManager implements ISelectionManager {
         if(this.selection.needUpdate(pickedPos, upSelectionDelta)) {
             this.selection.update(pickedPos, upSelectionDelta);
             this.setNeedsUpdate(true);
-            final var provider = CoreModUtils.getMineFortressManagersProvider();
+            final var provider = CoreModUtils.getManagersProvider();
             final var clientManager = provider.get_ClientFortressManager();
             if((clickType == ClickType.BUILD || clickType == ClickType.ROADS)&& clickingBlockState != null) {
                 if(clientManager.isSurvival()){

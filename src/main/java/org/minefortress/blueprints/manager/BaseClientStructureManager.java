@@ -1,9 +1,11 @@
 package org.minefortress.blueprints.manager;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.remmintan.mods.minefortress.blocks.FortressBlocks;
 import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
@@ -20,6 +22,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     private final MinecraftClient client;
     private boolean enoughResources = true;
     private boolean cantBuild = false;
+    private boolean intersectsUpgradingBuilding = false;
 
     private BlockPos structureBuildPos = null;
 
@@ -37,6 +40,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         structureBuildPos = getSelectedPos();
         if(structureBuildPos == null) return;
         checkNotEnoughResources();
+        checkIntersectUpgradingBuilding();
         checkCantBuild();
     }
     protected BlockPos getStructureBuildPos() {
@@ -59,6 +63,12 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
             cantBuild = true;
             return;
         }
+
+        if (!intersectsUpgradingBuilding) {
+            cantBuild = true;
+            return;
+        }
+
         final IStructureBlockData blockData = getBlockData();
         final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL)
                 .entrySet()
@@ -69,20 +79,72 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         final int floorLevel = getSelectedStructure().getFloorLevel();
 
 
-        final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
-                .filter(blockPos -> blockPos.getY() >= floorLevel)
-                .map(pos -> pos.add(structureBuildPos.down(floorLevel)))
-                .anyMatch(pos -> !BuildingHelper.canPlaceBlock(client.world, pos));
+        if (this instanceof ClientBlueprintManager clientBlueprintManager) {
+            final var upgrading = clientBlueprintManager.isUpgrading();
+            final var upgradingBuildingBox = clientBlueprintManager.getUpgradingBuildingBox();
 
-        final boolean blueprintPartInTheAir = blueprintDataPositions.stream()
-                .filter(blockPos -> {
-                    final int y = blockPos.getY();
-                    return y<=floorLevel;
-                })
-                .map(pos -> pos.add(structureBuildPos.down(floorLevel)))
-                .anyMatch(pos -> BuildingHelper.canPlaceBlock(client.world, pos.down()));
+            final boolean blueprintPartInTheSurface = blueprintDataPositions.stream()
+                    .filter(blockPos -> blockPos.getY() >= floorLevel)
+                    .map(pos -> pos.add(structureBuildPos.down(floorLevel)))
+                    .anyMatch(pos -> {
+                        boolean canBuild = BuildingHelper.canPlaceBlock(client.world, pos);
 
-        cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
+                        if (upgrading) {
+                            canBuild = canBuild || upgradingBuildingBox.contains(pos);
+                        }
+
+                        return !canBuild;
+                    });
+
+            final boolean blueprintPartInTheAir = blueprintDataPositions.stream()
+                    .filter(blockPos -> {
+                        final int y = blockPos.getY();
+                        return y <= floorLevel;
+                    })
+                    .map(pos -> pos.add(structureBuildPos.down(floorLevel)))
+                    .anyMatch(pos -> BuildingHelper.canPlaceBlock(client.world, pos.down()));
+
+
+            cantBuild = blueprintPartInTheSurface || blueprintPartInTheAir;
+        } else {
+            throw new IllegalStateException("This class should be ClientBlueprintManager");
+        }
+
+
+    }
+
+    private void checkIntersectUpgradingBuilding() {
+
+        if (this instanceof ClientBlueprintManager cbm) {
+            final var upgrading = cbm.isUpgrading();
+            if (!upgrading) {
+                intersectsUpgradingBuilding = true;
+                return;
+            }
+
+            if (!enoughResources) {
+                intersectsUpgradingBuilding = false;
+                return;
+            }
+
+            final IStructureBlockData blockData = getBlockData();
+            final Set<BlockPos> blueprintDataPositions = blockData.getLayer(BlueprintDataLayer.GENERAL)
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> !entry.getValue().isAir())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+            final int floorLevel = getSelectedStructure().getFloorLevel();
+
+            final var upgradingBuildingBox = cbm.getUpgradingBuildingBox();
+
+            intersectsUpgradingBuilding = blueprintDataPositions.stream()
+                    .filter(blockPos -> blockPos.getY() >= floorLevel)
+                    .map(pos -> pos.add(structureBuildPos.down(floorLevel)))
+                    .anyMatch(upgradingBuildingBox::contains);
+        } else {
+            throw new IllegalStateException("This class should be ClientBlueprintManager");
+        }
     }
 
     private IStructureBlockData getBlockData() {
@@ -92,18 +154,28 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
 
     @Nullable
     private BlockPos getSelectedPos() {
-        if(client.crosshairTarget instanceof final BlockHitResult crosshairTarget) {
+        if (client.crosshairTarget instanceof final BlockHitResult crosshairTarget && this instanceof ClientBlueprintManager cbm) {
             final BlockPos originalPos = crosshairTarget.getBlockPos();
-            if (client.world != null && originalPos != null && client.world.getBlockState(originalPos).isAir()) return null;
-            if(originalPos != null) return moveToStructureSize(originalPos);
+            if (originalPos != null) {
+                final var blockState = client.world != null ? client.world.getBlockState(originalPos) : Blocks.AIR.getDefaultState();
+                if (blockState.isAir()) return null;
+                var movedPos = originalPos;
+                final var upgradingBuildingBox = cbm.getUpgradingBuildingBox();
+                final var intersectingWithTheBuilding = cbm.isUpgrading() && (upgradingBuildingBox.contains(originalPos) || blockState.isOf(FortressBlocks.FORTRESS_BUILDING));
+                if (intersectingWithTheBuilding) {
+                    movedPos = new BlockPos(movedPos.getX(), upgradingBuildingBox.getMinY(), movedPos.getZ());
+                }
+
+                return moveToStructureSize(movedPos, intersectingWithTheBuilding);
+            }
         }
         return null;
     }
 
-    private BlockPos moveToStructureSize(BlockPos pos) {
+    private BlockPos moveToStructureSize(BlockPos pos, boolean intersectingWithTheBuilding) {
         if(getSelectedStructure() == null) return pos;
 
-        final boolean posSolid = !BuildingHelper.doesNotHaveCollisions(client.world, pos);
+        final boolean posSolid = !BuildingHelper.doesNotHaveCollisions(client.world, pos) && !intersectingWithTheBuilding;
         final IStructureBlockData blockData = getBlockData();
         final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);
@@ -121,6 +193,11 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     @Override
     public boolean canBuild() {
         return !cantBuild;
+    }
+
+    @Override
+    public boolean intersectsUpgradingBuilding() {
+        return intersectsUpgradingBuilding;
     }
 
     protected void reset() {

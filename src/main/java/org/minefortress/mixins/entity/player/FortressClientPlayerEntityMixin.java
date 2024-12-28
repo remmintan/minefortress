@@ -60,7 +60,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
         if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             if(client.options.sprintKey.isPressed()) {
-                final var fortressClient = CoreModUtils.getMineFortressManagersProvider();
+                final var fortressClient = CoreModUtils.getManagersProvider();
                 final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
                 if(clientBlueprintManager.isSelecting()) {
                     clientBlueprintManager.rotateSelectedStructureCounterClockwise();

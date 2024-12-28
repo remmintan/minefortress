@@ -22,7 +22,7 @@ public class C2SSetNavigationTargetEntity implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var provider = getManagersProvider(server, player);
+        final var provider = getManagersProvider(player);
         final var fightManager = provider.getFightManager();
         fightManager.setCurrentTarget(pos, player.getServerWorld());
     }

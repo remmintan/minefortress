@@ -186,7 +186,7 @@ public class WallsSelection extends Selection {
                             UUID uuid = UUID.randomUUID();
                             if(level instanceof ITasksInformationHolder holder)
                                 holder.get_ClientTasksHolder().addTask(uuid, getSelection(), taskType, supertaskUuid);
-                            final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+                            final var selectionManager = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
                             final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
                             final var packet = new ServerboundSimpleSelectionTaskPacket(
                                     uuid,

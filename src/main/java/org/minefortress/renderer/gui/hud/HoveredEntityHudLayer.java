@@ -44,7 +44,7 @@ public class HoveredEntityHudLayer extends AbstractHudLayer{
     }
 
     private static Optional<String> getHoveredEntityName() {
-        final var fortressManager = CoreModUtils.getFortressClientManager();
+        final var fortressManager = CoreModUtils.getFortressManager();
         if(fortressManager.getState() == FortressState.AREAS_SELECTION)
             return CoreModUtils.getAreasClientManager().getHoveredAreaName();
 

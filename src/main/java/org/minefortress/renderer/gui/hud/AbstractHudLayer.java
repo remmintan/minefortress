@@ -72,7 +72,7 @@ public abstract class AbstractHudLayer implements IHudLayer {
             case CENTER -> screenHeight / 2 + basepointY;
         };
 
-        boolean creative = CoreModUtils.getFortressClientManager().isCreative();
+        boolean creative = CoreModUtils.getFortressManager().isCreative();
         for (IHudElement fortressHudButton : fortressHudElements) {
             fortressHudButton.setPosBasedOn(baseX, baseY);
             if(fortressHudButton.shouldRender(creative)) {

@@ -77,7 +77,7 @@ public class ColonistsScreen extends Screen {
     }
 
     private IClientFortressManager getFortressClientManager() {
-        return CoreModUtils.getMineFortressManagersProvider().get_ClientFortressManager();
+        return CoreModUtils.getManagersProvider().get_ClientFortressManager();
     }
 
     @Override

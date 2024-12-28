@@ -2,6 +2,7 @@ package net.remmintan.mods.minefortress.gui.building.handlers
 
 import net.minecraft.client.MinecraftClient
 import net.minecraft.util.BlockRotation
+import net.minecraft.util.math.BlockBox
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
@@ -23,7 +24,7 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
 
     override val upgrades: List<BlueprintSlot> by lazy {
         val blueprintManager = CoreModUtils.getBlueprintManager()
-        val resourceManager = CoreModUtils.getFortressClientManager().resourceManager
+        val resourceManager = CoreModUtils.getFortressManager().resourceManager
         building.upgrades
             .map { blueprintManager.blueprintMetadataManager.getByBlueprintId(it) }
             .filter { it.isPresent }
@@ -44,14 +45,16 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
 
     override fun getEnoughItems(): Map<ItemInfo, Boolean> {
         val itemsToRepair = getItemsToRepair()
-        val resourceManager = CoreModUtils.getFortressClientManager().resourceManager
+        val resourceManager = CoreModUtils.getFortressManager().resourceManager
         return itemsToRepair
             .associateWith { SimilarItemsHelper.isIgnorable(it.item) || resourceManager.hasItem(it, itemsToRepair) }
             .withDefault { false }
     }
 
     override fun upgrade(slot: BlueprintSlot) {
-        TODO("Implement upgrading building")
+        val buildingBox = BlockBox.create(building.start, building.end)
+        CoreModUtils.getBlueprintManager().selectToUpgrade(slot.metadata, buildingBox, building.pos)
+        CoreModUtils.getClientPlayer().closeScreen()
     }
 
     override fun destroy() {

@@ -2,6 +2,7 @@ package org.minefortress.tasks;
 
 
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -10,18 +11,22 @@ import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.S2CAddClientTasksPacket;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
 
-public class ServerTaskManager implements IServerTaskManager, IWritableManager {
+public class ServerTaskManager implements IServerTaskManager, IWritableManager, ITickableManager {
     private final Map<UUID, ITask> nonFinishedTasks = new HashMap<>();
+    private final Queue<ITask> notStartedTasks = new LinkedList<>();
 
     @Override
     public boolean addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager, List<Integer> selectedPawns, ServerPlayerEntity player) {
@@ -44,6 +49,11 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
             }
         }
 
+        if (selectedPawns.isEmpty()) {
+            notStartedTasks.add(task);
+            return false;
+        }
+
         final var serverWorld = player.getWorld();
         final var selectedWorkers = selectedPawns
                 .stream()
@@ -61,6 +71,18 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager {
         }
 
         return assignmentResult;
+    }
+
+    @Override
+    public void tick(@Nullable ServerPlayerEntity player) {
+        if (player == null) return;
+        if (notStartedTasks.isEmpty()) return;
+        final var freeWorkers = CoreModUtils.getFortressManager(player).getFreeWorkers();
+        if (freeWorkers.size() > 2) {
+            final var task = notStartedTasks.remove();
+            final var freeWorkersIds = freeWorkers.stream().map(it -> ((Entity) it).getId()).toList();
+            this.addTask(task, CoreModUtils.getManagersProvider(player), CoreModUtils.getFortressManager(player), freeWorkersIds, player);
+        }
     }
 
     @Override

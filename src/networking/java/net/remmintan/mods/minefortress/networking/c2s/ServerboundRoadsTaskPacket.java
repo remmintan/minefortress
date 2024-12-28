@@ -51,7 +51,7 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var provider = getManagersProvider(server, player);
+        final var provider = getManagersProvider(player);
         final var taskManager = provider.getTaskManager();
         final var tasksCreator = provider.getTasksCreator();
         final var resourceManager = provider.getResourceManager();
@@ -59,7 +59,7 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
         final var stackInHand = player.getStackInHand(Hand.MAIN_HAND);
         final var item = stackInHand.getItem();
 
-        final var manager = getFortressManager(server, player);
+        final var manager = getFortressManager(player);
         if(manager.isSurvival())
             resourceManager.reserveItems(placeUuid, Collections.singletonList(resourceManager.createItemInfo(item, blocks.size())));
 

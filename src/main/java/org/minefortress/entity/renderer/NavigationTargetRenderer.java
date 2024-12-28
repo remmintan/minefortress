@@ -33,7 +33,7 @@ public class NavigationTargetRenderer extends EntityRenderer<NavigationTargetEnt
 
     @Override
     public boolean shouldRender(NavigationTargetEntity entity, Frustum frustum, double x, double y, double z) {
-        final var fortressManager = CoreModUtils.getMineFortressManagersProvider().get_ClientFortressManager();
+        final var fortressManager = CoreModUtils.getManagersProvider().get_ClientFortressManager();
         if(fortressManager.getState() != FortressState.COMBAT)
             return false;
 

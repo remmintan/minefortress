@@ -17,7 +17,7 @@ public final class ModeHudLayer extends AbstractHudLayer{
 
     @Override
     protected void init() {
-        final var fcm = CoreModUtils.getFortressClientManager();
+        final var fcm = CoreModUtils.getFortressManager();
         this.addElement(
                 new ModeButtonWidget(
                         36,

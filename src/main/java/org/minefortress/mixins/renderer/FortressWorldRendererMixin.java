@@ -73,7 +73,7 @@ public abstract class FortressWorldRendererMixin  {
         final var selectionManager = CoreModUtils.getSelectionManager();
         final var immediate = this.bufferBuilders.getEntityVertexConsumers();
         final var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
-        final var fcm = CoreModUtils.getFortressClientManager();
+        final var fcm = CoreModUtils.getFortressManager();
         if (!selectionManager.isSelecting() && (fcm.getState() == FortressState.BUILD_EDITING || fcm.getState() == FortressState.BUILD_SELECTION)){
             final var target = client.crosshairTarget;
             if(target instanceof BlockHitResult bhr) {

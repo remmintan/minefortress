@@ -33,6 +33,6 @@ public class BuildRoadsHintsLayer extends AbstractHintsLayer{
     }
 
     private ISelectionManager getSelectionManager() {
-        return CoreModUtils.getMineFortressManagersProvider().get_SelectionManager();
+        return CoreModUtils.getManagersProvider().get_SelectionManager();
     }
 }

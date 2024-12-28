@@ -1,6 +1,8 @@
 package net.remmintan.mods.minefortress.core.interfaces.blueprints;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 
 import java.util.List;
@@ -13,6 +15,10 @@ public interface IClientBlueprintManager extends IStructureRenderInfoProvider {
     default void select(String blueprintId) {
         getBlueprintMetadataManager().getByBlueprintId(blueprintId).ifPresent(this::select);
     }
+
+    void selectToUpgrade(BlueprintMetadata metadata, BlockBox buildingBox, BlockPos buildingPos);
+
+    boolean isUpgrading();
 
     List<BlueprintMetadata> getAllBlueprints(BlueprintGroup group);
 

@@ -52,7 +52,7 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
         this.mouseEndPos = null;
 
         if(!this.selectedPawns.isEmpty()) {
-            final var fortressManager = CoreModUtils.getFortressClientManager();
+            final var fortressManager = CoreModUtils.getFortressManager();
             if (this.selectedPawns.stream().allMatch(it -> it instanceof IWarrior)) {
                 fortressManager.setState(FortressState.COMBAT);
             } else if (this.selectedPawns.stream().noneMatch(it -> it instanceof IWarrior)) {
@@ -160,7 +160,7 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
 
     @Override
     public boolean isSelectingColonist() {
-        final var state = CoreModUtils.getFortressClientManager().getState();
+        final var state = CoreModUtils.getFortressManager().getState();
         return (state == FortressState.COMBAT || state == FortressState.BUILD_SELECTION || state==FortressState.BUILD_EDITING) && this.getSelectedPawn() != null;
     }
 

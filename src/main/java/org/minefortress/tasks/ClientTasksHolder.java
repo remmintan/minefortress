@@ -42,7 +42,7 @@ public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasks
         removeTask(lastTaskId);
         FortressClientNetworkHelper.send(FortressChannelNames.CANCEL_TASK, new ServerboundCancelTaskPacket(lastTaskId));
         if(tasksStack.empty()) {
-            CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().resetSelection();
+            CoreModUtils.getManagersProvider().get_PawnsSelectionManager().resetSelection();
         }
     }
 

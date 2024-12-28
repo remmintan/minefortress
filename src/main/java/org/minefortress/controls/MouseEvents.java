@@ -35,7 +35,7 @@ public class MouseEvents {
     }
 
     private static void firePressEvent(double mouseX, double mouseY) {
-        final var fortressManager = CoreModUtils.getFortressClientManager();
+        final var fortressManager = CoreModUtils.getFortressManager();
         final var state = fortressManager.getState();
         final var correctState = state == FortressState.COMBAT || state == FortressState.BUILD_SELECTION;
         final var noBuildingHovered = !CoreModUtils.getBuildingsManager().isBuildingHovered();
@@ -43,14 +43,14 @@ public class MouseEvents {
         final var hudNotHovered = !ModUtils.getFortressClient().get_FortressHud().isHovered();
 
         if (correctState && noBuildingHovered && noScreenOpened && hudNotHovered) {
-            final var provider = CoreModUtils.getMineFortressManagersProvider();
+            final var provider = CoreModUtils.getManagersProvider();
             final var pawnsSelection = provider.get_PawnsSelectionManager();
             pawnsSelection.startSelection(mouseX, mouseY);
         }
     }
 
     private static void fireReleaseEvent(double mouseX, double mouseY) {
-        final var provider = CoreModUtils.getMineFortressManagersProvider();
+        final var provider = CoreModUtils.getManagersProvider();
         final var pawnsSelection = provider.get_PawnsSelectionManager();
         pawnsSelection.endSelection(mouseX, mouseY);
     }

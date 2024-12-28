@@ -41,7 +41,7 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
     override var backgroundHeight: Int = 0
 
     private val blueprintsRenderer = CoreModUtils.getRenderersProvider().get_GuiBlueprintsRenderer()
-    private val fortressManager = CoreModUtils.getFortressClientManager()
+    private val fortressManager = CoreModUtils.getFortressManager()
     private val resourceManager = fortressManager.resourceManager
 
     private val destroyButton: ItemButtonWidget = ItemButtonWidget(

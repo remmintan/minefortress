@@ -15,7 +15,7 @@ public class C2SJumpToCampfire implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fortressServerManager = getFortressManager(server, player);
+        final var fortressServerManager = getFortressManager(player);
         fortressServerManager.jumpToCampfire(player);
     }
 

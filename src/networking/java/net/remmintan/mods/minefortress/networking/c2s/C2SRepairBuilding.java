@@ -33,7 +33,7 @@ public class C2SRepairBuilding implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var serverManager = getFortressManager(server, player);
+        final var serverManager = getFortressManager(player);
         serverManager.repairBuilding(player, pos, selectedPawns);
     }
 

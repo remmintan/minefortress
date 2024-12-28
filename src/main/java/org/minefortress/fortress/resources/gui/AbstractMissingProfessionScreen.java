@@ -43,7 +43,7 @@ public abstract class AbstractMissingProfessionScreen extends Screen {
                     .builder(Text.literal("To professions menu"),
                     button -> {
                         if (this.client != null)
-                            this.client.setScreen(new ProfessionsScreen(CoreModUtils.getMineFortressManagersProvider()));
+                            this.client.setScreen(new ProfessionsScreen(CoreModUtils.getManagersProvider()));
                     })
                     .dimensions(this.width / 2 - 102,
                             this.height / 2 + 48 - 16,

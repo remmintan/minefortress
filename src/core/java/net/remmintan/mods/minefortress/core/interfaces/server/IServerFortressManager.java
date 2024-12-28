@@ -12,6 +12,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerat
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,5 +54,7 @@ public interface IServerFortressManager {
     void spawnDebugEntitiesAroundCampfire(EntityType<? extends IFortressAwareEntity> entityType, int num, ServerPlayerEntity player);
 
     Optional<IProfessional> getPawnWithoutAProfession();
+
+    List<IWorkerPawn> getFreeWorkers();
 
 }

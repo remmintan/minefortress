@@ -24,7 +24,7 @@ public class ChooseModeScreen extends Screen {
         final var creativeBtn = ButtonWidget
                 .builder(Text.translatable("key.minefortress.choose_mode_screen.creative_btn"), button -> {
                     setLoading();
-                    CoreModUtils.getFortressClientManager().setGamemode(FortressGamemode.CREATIVE);
+                    CoreModUtils.getFortressManager().setGamemode(FortressGamemode.CREATIVE);
                 })
                 .dimensions(this.width / 2 - 102, this.height / 4 + 24 - 16, 204, 20)
                 .build();
@@ -33,7 +33,7 @@ public class ChooseModeScreen extends Screen {
         final var survivalBtn = ButtonWidget
                 .builder(Text.translatable("key.minefortress.choose_mode_screen.survival_btn"), button -> {
                     setLoading();
-                    CoreModUtils.getFortressClientManager().setGamemode(FortressGamemode.SURVIVAL);
+                    CoreModUtils.getFortressManager().setGamemode(FortressGamemode.SURVIVAL);
                 })
                 .dimensions(this.width / 2 - 102, this.height / 4 + 48 - 16, 204, 20)
                 .build();
@@ -42,7 +42,8 @@ public class ChooseModeScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        if(!CoreModUtils.getFortressClientManager().gamemodeNeedsInitialization()) Objects.requireNonNull(this.client).setScreen(null);
+        if (!CoreModUtils.getFortressManager().gamemodeNeedsInitialization())
+            Objects.requireNonNull(this.client).setScreen(null);
         super.renderBackground(drawContext, mouseX, mouseY, delta);
         drawContext.drawCenteredTextWithShadow(this.textRenderer, loading?loadingText:questionText, this.width / 2, 40, 0xFFFFFF);
         if(loading) return;

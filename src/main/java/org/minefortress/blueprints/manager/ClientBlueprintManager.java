@@ -2,6 +2,8 @@ package org.minefortress.blueprints.manager;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
@@ -25,6 +27,8 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
 
     private BlueprintMetadata selectedStructure;
     private IBlueprintRotation selectedRotation;
+    private BlockPos upgradingBuildingPos;
+    private BlockBox upgradingBuildingBox;
 
     public ClientBlueprintManager(MinecraftClient client) {
         super(client);
@@ -40,6 +44,21 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     public void select(BlueprintMetadata blueprintMetadata) {
         this.selectedStructure = blueprintMetadata;
         this.selectedRotation = new BlueprintRotation();
+        this.upgradingBuildingBox = null;
+        this.upgradingBuildingPos = null;
+    }
+
+    @Override
+    public void selectToUpgrade(BlueprintMetadata metadata, BlockBox buildingBox, BlockPos buildingPos) {
+        this.selectedStructure = metadata;
+        this.selectedRotation = new BlueprintRotation();
+        this.upgradingBuildingBox = buildingBox;
+        this.upgradingBuildingPos = buildingPos;
+    }
+
+    @Override
+    public boolean isUpgrading() {
+        return upgradingBuildingBox != null && upgradingBuildingPos != null;
     }
 
     @Override
@@ -60,11 +79,11 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
 
         if(!super.canBuild()) return;
 
-        final var selectionManager = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+        final var selectionManager = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
         final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket(selectionManager);
         FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
         if ("campfire".equals(selectedStructure.getId()))
-            CoreModUtils.getFortressClientManager().setupFortressCenter(getStructureBuildPos());
+            CoreModUtils.getFortressManager().setupFortressCenter(getStructureBuildPos());
         selectionManager.resetSelection();
         clearStructure();
     }
@@ -84,6 +103,8 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     @Override
     public void clearStructure() {
         this.selectedStructure = null;
+        this.upgradingBuildingBox = null;
+        this.upgradingBuildingPos = null;
     }
 
     @Override
@@ -158,4 +179,7 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
         }
     }
 
+    BlockBox getUpgradingBuildingBox() {
+        return upgradingBuildingBox;
+    }
 }

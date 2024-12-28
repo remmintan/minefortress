@@ -60,8 +60,8 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var manager = getFortressManager(server, player);
-        final var provider = getManagersProvider(server, player);
+        final var manager = getFortressManager(player);
+        final var provider = getManagersProvider(player);
         final var blueprintManager = provider.getBlueprintManager();
 
         if ("campfire".equals(blueprintId)) {

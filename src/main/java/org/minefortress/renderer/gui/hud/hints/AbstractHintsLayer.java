@@ -5,10 +5,10 @@ import com.google.common.collect.Lists;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
-import org.minefortress.renderer.gui.hud.AbstractHudLayer;
-import org.minefortress.renderer.gui.hud.FortressHud;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 import net.remmintan.mods.minefortress.gui.hud.interfaces.IHintsLayer;
+import org.minefortress.renderer.gui.hud.AbstractHudLayer;
+import org.minefortress.renderer.gui.hud.FortressHud;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +40,6 @@ abstract class AbstractHintsLayer  extends AbstractHudLayer implements IHintsLay
 
     @Override
     public boolean shouldRender(HudState hudState) {
-        return !CoreModUtils.getMineFortressManagersProvider().getSelectedColonistProvider().isSelectingColonist();
+        return !CoreModUtils.getManagersProvider().getSelectedColonistProvider().isSelectingColonist();
     }
 }

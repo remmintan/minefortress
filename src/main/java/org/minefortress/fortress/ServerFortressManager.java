@@ -504,6 +504,12 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
                 .findAny();
     }
 
+    public List<IWorkerPawn> getFreeWorkers() {
+        return getWorkersStream()
+                .filter(it -> !it.getTaskControl().hasTask() && !it.getTaskControl().isDoingEverydayTasks())
+                .toList();
+    }
+
     @Override
     public List<ITargetedPawn> getAllTargetedPawns() {
         return pawns

@@ -249,7 +249,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer implements I
 
     @NotNull
     private static IStructureRenderInfoProvider getStructureRenderInfoProvider() {
-        final var provider = CoreModUtils.getMineFortressManagersProvider();
+        final var provider = CoreModUtils.getManagersProvider();
         return provider.get_BlueprintManager();
     }
 

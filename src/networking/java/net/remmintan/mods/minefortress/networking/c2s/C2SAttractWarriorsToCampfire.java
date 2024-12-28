@@ -15,7 +15,7 @@ public class C2SAttractWarriorsToCampfire implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var fightManager = getManagersProvider(server, player).getFightManager();
+        final var fightManager = getManagersProvider(player).getFightManager();
         player.sendMessage(Text.literal("Attracting warriors to campfire..."), false);
         fightManager.attractWarriorsToCampfire();
     }

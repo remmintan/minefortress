@@ -6,11 +6,11 @@ import net.remmintan.gobi.SelectionType;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
-import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 import net.remmintan.mods.minefortress.gui.widget.HideableButtonWidget;
 import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
 import net.remmintan.mods.minefortress.gui.widget.ItemToggleWidget;
 import net.remmintan.mods.minefortress.gui.widget.ModeButtonWidget;
+import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -126,12 +126,12 @@ public class ToolsHudLayer extends AbstractHudLayer {
         }
     }
 
-    private boolean hudHasCorrectState(FortressState expectedState) {
-        return CoreModUtils.getFortressClientManager().getState() == expectedState;
+    private static boolean isAnyPawnSelected() {
+        return CoreModUtils.getManagersProvider().get_PawnsSelectionManager().hasSelected();
     }
 
-    private void setCorrectHudState(FortressState expectedState) {
-        CoreModUtils.getFortressClientManager().setState(expectedState);
+    private boolean hudHasCorrectState(FortressState expectedState) {
+        return CoreModUtils.getFortressManager().getState() == expectedState;
     }
 
     @Override
@@ -141,8 +141,8 @@ public class ToolsHudLayer extends AbstractHudLayer {
         buildEditMode.active = isAnyPawnSelected();
     }
 
-    private static boolean isAnyPawnSelected() {
-        return CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().hasSelected();
+    private void setCorrectHudState(FortressState expectedState) {
+        CoreModUtils.getFortressManager().setState(expectedState);
     }
 
     @Override
@@ -151,15 +151,15 @@ public class ToolsHudLayer extends AbstractHudLayer {
     }
 
     private boolean treeCutterSelected() {
-        return CoreModUtils.getMineFortressManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
+        return CoreModUtils.getManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
     }
 
     private boolean roadsSelected() {
-        return CoreModUtils.getMineFortressManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
+        return CoreModUtils.getManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
     }
 
     private boolean blueprintSelected() {
-        return CoreModUtils.getMineFortressManagersProvider().get_BlueprintManager().isSelecting();
+        return CoreModUtils.getManagersProvider().get_BlueprintManager().isSelecting();
     }
 
 }

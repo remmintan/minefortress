@@ -74,7 +74,7 @@ public final class BlueprintsScreen extends Screen {
 
                 this.handler = new BlueprintScreenHandler(this.client);
                 this.blueprintRenderer = ModUtils.getFortressClient().get_BlueprintRenderer();
-                final var connectedToTheServer = CoreModUtils.getFortressClientManager().isConnectedToTheServer();
+                final var connectedToTheServer = CoreModUtils.getFortressManager().isConnectedToTheServer();
                 if(!connectedToTheServer) {
                     importExportButton = ButtonWidget
                             .builder(Text.literal("Import / Export"), btn -> client.setScreen(new ImportExportBlueprintsScreen()))
@@ -219,7 +219,7 @@ public final class BlueprintsScreen extends Screen {
             this.drawSlot(drawContext, blueprintSlot, slotColumn, slotRow);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
-            final var fortressClientManager = CoreModUtils.getFortressClientManager();
+            final var fortressClientManager = CoreModUtils.getFortressManager();
             final var resourceManager = fortressClientManager.getResourceManager();
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(drawContext, slotX, slotY, 10);
@@ -356,7 +356,7 @@ public final class BlueprintsScreen extends Screen {
             drawItemInSlot(drawContext, matrices, 0.5f, item, slotX, slotY);
         } else {
             final BlueprintMetadata metadata = slot.getMetadata();
-            final var enoughResources = !CoreModUtils.getFortressClientManager().isSurvival() || slot.isEnoughResources();
+            final var enoughResources = !CoreModUtils.getFortressManager().isSurvival() || slot.isEnoughResources();
             final var matrices = drawContext.getMatrices();
             this.blueprintRenderer.renderBlueprintSlot(metadata.getId(), slotColumn, slotRow, enoughResources);
 

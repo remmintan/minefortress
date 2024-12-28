@@ -142,7 +142,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
                 entry(FortressRenderLayer.getLinesNoDepth(), new BufferBuilder(256))
         );
 
-        final var provider = CoreModUtils.getMineFortressManagersProvider();
+        final var provider = CoreModUtils.getManagersProvider();
         final var manager = provider.get_ClientFortressManager();
 
         final Supplier<Boolean> isInBuildState = () -> manager.getState() == FortressState.BUILD_SELECTION || manager.getState() == FortressState.BUILD_EDITING;
@@ -251,7 +251,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             ci.cancel();
         }
 
-        final var pawnsSelection = CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager();
+        final var pawnsSelection = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
         if(!pawnsSelection.getSelectedPawnsIds().isEmpty()) {
             pawnsSelection.resetSelection();
             ci.cancel();

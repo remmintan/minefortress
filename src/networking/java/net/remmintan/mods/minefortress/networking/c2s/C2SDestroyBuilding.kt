@@ -11,7 +11,7 @@ class C2SDestroyBuilding(private val pos: BlockPos) : FortressC2SPacket {
     constructor(buf: PacketByteBuf) : this(BlockPos.fromLong(buf.readLong()))
 
     override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
-        getManagersProvider(server, player).buildingsManager.destroyBuilding(pos)
+        getManagersProvider(player).buildingsManager.destroyBuilding(pos)
     }
 
     override fun write(buf: PacketByteBuf) {

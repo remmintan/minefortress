@@ -15,7 +15,7 @@ public class C2SRequestResourcesRefresh implements FortressC2SPacket {
 
     @Override
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var resourceManager = getManagersProvider(server, player).getResourceManager();
+        final var resourceManager = getManagersProvider(player).getResourceManager();
         resourceManager.syncAll();
     }
 

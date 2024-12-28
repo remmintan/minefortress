@@ -26,7 +26,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
 
     @Override
     protected void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {
-        final var selectedPawnsProvider = CoreModUtils.getMineFortressManagersProvider().getSelectedColonistProvider();
+        final var selectedPawnsProvider = CoreModUtils.getManagersProvider().getSelectedColonistProvider();
         if(selectedPawnsProvider.isSelectingColonist()) {
             final var pawn = selectedPawnsProvider.getSelectedPawn();
 

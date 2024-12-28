@@ -64,7 +64,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
 
     @NotNull
     private static Vector3f getColorBaseOnMode(BasePawnEntity pawn) {
-        final var state = CoreModUtils.getMineFortressManagersProvider().get_ClientFortressManager().getState();
+        final var state = CoreModUtils.getManagersProvider().get_ClientFortressManager().getState();
         final boolean warrior = pawn instanceof IWarrior;
         final var combatState = state == FortressState.COMBAT;
         if (combatState && warrior || !combatState && !warrior)
@@ -102,7 +102,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     }
 
     private boolean isThisPawnSelected(BasePawnEntity pawn) {
-        return CoreModUtils.getMineFortressManagersProvider().get_PawnsSelectionManager().isSelected(pawn);
+        return CoreModUtils.getManagersProvider().get_PawnsSelectionManager().isSelected(pawn);
     }
 
     private float getHealthFoodLevel(BasePawnEntity colonist) {

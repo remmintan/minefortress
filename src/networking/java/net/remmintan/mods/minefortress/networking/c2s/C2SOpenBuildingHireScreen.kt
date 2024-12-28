@@ -20,7 +20,7 @@ class C2SOpenBuildingHireScreen(val profId: String) : FortressC2SPacket {
     }
 
     override fun handle(server: MinecraftServer?, player: ServerPlayerEntity?) {
-        val provider = getManagersProvider(server, player)
+        val provider = getManagersProvider(player)
         val manager = provider.professionsManager
 
         val profession = manager.getProfession(profId)

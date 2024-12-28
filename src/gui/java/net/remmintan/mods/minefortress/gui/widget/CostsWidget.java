@@ -77,7 +77,7 @@ public class CostsWidget implements Drawable, Element {
     }
 
     private static int getItemAmount(ItemStack stack) {
-        final var fortressClientManager = CoreModUtils.getFortressClientManager();
+        final var fortressClientManager = CoreModUtils.getFortressManager();
         return fortressClientManager.getResourceManager().getItemAmount(stack.getItem());
     }
 

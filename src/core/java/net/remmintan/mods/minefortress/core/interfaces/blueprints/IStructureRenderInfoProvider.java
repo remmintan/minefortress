@@ -11,6 +11,8 @@ public interface IStructureRenderInfoProvider {
     Optional<BlockPos> getStructureRenderPos();
     boolean canBuild();
 
+    boolean intersectsUpgradingBuilding();
+
     BlueprintMetadata getSelectedStructure();
 
     IBlueprintRotation getSelectedRotation();
