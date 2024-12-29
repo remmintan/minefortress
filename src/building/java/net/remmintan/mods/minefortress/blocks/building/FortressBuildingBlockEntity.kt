@@ -157,7 +157,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun destroy() {
-        blockData?.allPresevedBlockPositions?.forEach {
+        blockData?.actualState?.forEach {
             world?.removeBlock(it, false)
         }
     }

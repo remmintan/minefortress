@@ -33,7 +33,6 @@ public class ServerboundCancelTaskPacket implements FortressC2SPacket {
         final var id = this.getTaskId();
         final var provider = getManagersProvider(player);
         final var taskManager = provider.getTaskManager();
-        final var manager = getFortressManager(player);
-        taskManager.cancelTask(id, provider, manager);
+        taskManager.cancelTask(id, player);
     }
 }

@@ -1,16 +1,11 @@
 package org.minefortress.tasks;
 
 
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.remmintan.mods.minefortress.core.TaskType;
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask;
@@ -19,58 +14,48 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.S2CAddClientTasksPacket;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.StreamSupport;
 
 public class ServerTaskManager implements IServerTaskManager, IWritableManager, ITickableManager {
     private final Map<UUID, ITask> nonFinishedTasks = new HashMap<>();
     private final Queue<ITask> notStartedTasks = new LinkedList<>();
 
-    @Override
-    public boolean addTask(ITask task, IServerManagersProvider provider, IServerFortressManager manager, List<Integer> selectedPawns, ServerPlayerEntity player) {
-        removeAllFinishedTasks();
-        task.prepareTask();
-        if(task.hasAvailableParts()) {
-            if(task instanceof SimpleSelectionTask simpleSelectionTask) {
-                if(manager.isSurvival() && task.getTaskType() == TaskType.BUILD) {
-                    final var spliterator = simpleSelectionTask
-                            .getBlocksForPart(Pair.of(simpleSelectionTask.getStartingBlock(), simpleSelectionTask.getEndingBlock()))
-                            .spliterator();
-
-                    final var blocksCount = (int)StreamSupport.stream(spliterator, false).count();
-                    final var placingItem = simpleSelectionTask.getPlacingItem();
-
-                    final var info = new ItemInfo(placingItem, blocksCount);
-
-                    provider.getResourceManager().reserveItems(task.getId(), Collections.singletonList(info));
-                }
-            }
-        }
-
-        if (selectedPawns.isEmpty()) {
-            notStartedTasks.add(task);
-            return false;
-        }
-
+    private static @NotNull List<IWorkerPawn> filterWorkers(List<Integer> selectedPawnIds, ServerPlayerEntity player) {
         final var serverWorld = player.getWorld();
-        final var selectedWorkers = selectedPawns
+        return selectedPawnIds
                 .stream()
                 .map(serverWorld::getEntityById)
                 .filter(IWorkerPawn.class::isInstance)
                 .map(IWorkerPawn.class::cast)
+                .filter(worker -> !worker.getTaskControl().isDoingEverydayTasks())
                 .toList();
+    }
 
-        final var assignmentResult = assignPawnsToTask(player, task, selectedWorkers);
+    @Override
+    public void addTask(ITask task, List<Integer> selectedPawnIds, ServerPlayerEntity player) {
+        removeAllFinishedTasks();
 
-        if(assignmentResult) {
-            final var packet = new S2CAddClientTasksPacket(task.toTaskInformationDto());
-            FortressServerNetworkHelper.send(player, S2CAddClientTasksPacket.CHANNEL, packet);
-            nonFinishedTasks.put(task.getId(), task);
+        final var packet = new S2CAddClientTasksPacket(task.toTaskInformationDto());
+        FortressServerNetworkHelper.send(player, S2CAddClientTasksPacket.CHANNEL, packet);
+        nonFinishedTasks.put(task.getId(), task);
+
+        if (selectedPawnIds.isEmpty()) {
+            notStartedTasks.add(task);
+            return;
         }
 
-        return assignmentResult;
+        final var selectedWorkers = filterWorkers(selectedPawnIds, player);
+        if (selectedWorkers.isEmpty()) {
+            player.sendMessage(Text.of("No appropriate workers selected. Put the task in the queue"), false);
+            notStartedTasks.add(task);
+            return;
+        }
+
+        task.prepareTask();
+        setPawnsToTask(task, selectedWorkers);
     }
 
     @Override
@@ -81,22 +66,22 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager, 
         if (freeWorkers.size() > 2) {
             final var task = notStartedTasks.remove();
             final var freeWorkersIds = freeWorkers.stream().map(it -> ((Entity) it).getId()).toList();
-            this.addTask(task, CoreModUtils.getManagersProvider(player), CoreModUtils.getFortressManager(player), freeWorkersIds, player);
+            this.addTask(task, freeWorkersIds, player);
         }
     }
 
     @Override
-    public void executeInstantTask(IInstantTask task, ServerPlayerEntity player, IServerManagersProvider provider) {
-        task.execute(player.getServerWorld(), player, provider::getBuildingsManager);
+    public void executeInstantTask(IInstantTask task, ServerPlayerEntity player) {
+        task.execute(player.getServerWorld(), player, getManagersProvider(player)::getBuildingsManager);
     }
 
     @Override
-    public void cancelTask(UUID id, IServerManagersProvider provider, IServerFortressManager manager) {
+    public void cancelTask(UUID id, ServerPlayerEntity player) {
         removeAllFinishedTasks();
         final var removedTask = nonFinishedTasks.remove(id);
         if(removedTask != null)
             removedTask.cancel();
-        provider.getResourceManager().returnReservedItems(id);
+        getManagersProvider(player).getResourceManager().returnReservedItems(id);
     }
 
     private void removeAllFinishedTasks() {
@@ -105,16 +90,6 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager, 
                 .filter(e -> e.getValue().taskFullyFinished())
                 .toList();
         finishedTasks.forEach(e -> nonFinishedTasks.remove(e.getKey()));
-    }
-
-    private boolean assignPawnsToTask(ServerPlayerEntity player, ITask task, List<IWorkerPawn> workers) {
-        workers = workers.stream().filter(worker -> !worker.getTaskControl().isDoingEverydayTasks()).toList();
-        if(workers.isEmpty()) {
-            player.sendMessage(Text.of("No appropriate workers selected"), false);
-            return false;
-        }
-        setPawnsToTask(task, workers);
-        return true;
     }
 
     private void setPawnsToTask(ITask task, List<IWorkerPawn> workers) {

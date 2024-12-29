@@ -3,17 +3,16 @@ package net.remmintan.mods.minefortress.networking.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
 
@@ -122,8 +121,16 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
         final var hitResult = this.getHitResult();
         final var selectionType = this.getSelectionType();
         final var task = tasksCreator.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, positions, player);
-        final var manager = getFortressManager(player);
 
-        taskManager.addTask(task, provider, manager, selectedPawns, player);
+        if (getFortressManager(player).isSurvival() && task.getTaskType() == TaskType.BUILD) {
+            final var blocksCount = positions.size();
+            final var placingItem = player.getStackInHand(Hand.MAIN_HAND).getItem();
+
+            final var info = new ItemInfo(placingItem, blocksCount);
+
+            getManagersProvider(player).getResourceManager().reserveItems(task.getId(), Collections.singletonList(info));
+        }
+
+        taskManager.addTask(task, selectedPawns, player);
     }
 }

@@ -63,7 +63,6 @@ public class ServerboundCutTreesTaskPacket implements FortressC2SPacket {
         final var taskManager = provider.getTaskManager();
         final var tasksCreator = provider.getTasksCreator();
         final var cutTreesTask = tasksCreator.createCutTreesTask(uuid, treeRoots, selection);
-        final var manager = getFortressManager(player);
-        taskManager.addTask(cutTreesTask, provider, manager, selectedPawns, player);
+        taskManager.addTask(cutTreesTask, selectedPawns, player);
     }
 }

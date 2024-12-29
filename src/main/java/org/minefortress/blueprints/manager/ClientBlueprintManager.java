@@ -68,16 +68,16 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
 
     @Override
     public void buildCurrentStructure() {
-        if(selectedStructure == null) {
+        if (selectedStructure == null) {
             ModLogger.LOGGER.error("No structure selected in client blueprint manager");
             return;
         }
-        if(super.getStructureRenderPos().isEmpty()) {
+        if (super.getStructureRenderPos().isEmpty()) {
             ModLogger.LOGGER.error("No position selected in client blueprint manager");
             return;
         }
 
-        if(!super.canBuild()) return;
+        if (!super.canBuild()) return;
 
         final var selectionManager = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
         final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket(selectionManager);
@@ -92,12 +92,13 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
     private ServerboundBlueprintTaskPacket getServerboundBlueprintTaskPacket(IClientPawnsSelectionManager manager) {
         final var selectedPawnsIds = manager.getSelectedPawnsIds();
         return new ServerboundBlueprintTaskPacket(
-                        selectedStructure.getId(),
-                        getStructureBuildPos(),
+                selectedStructure.getId(),
+                getStructureBuildPos(),
                 selectedRotation.getRotation(),
-                        getSelectedStructure().getFloorLevel(),
-                        selectedPawnsIds
-                );
+                getSelectedStructure().getFloorLevel(),
+                selectedPawnsIds,
+                this.upgradingBuildingPos
+        );
     }
 
     @Override
@@ -164,17 +165,18 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
         this.clearStructure();
         this.blueprintMetadataManager.reset();
         this.blockDataManager.reset();
-        if(client instanceof IFortressMinecraftClient fortressClient) {
+        if (client instanceof IFortressMinecraftClient fortressClient) {
             try {
                 fortressClient.get_BlueprintRenderer().getBlueprintsModelBuilder().reset();
-            }catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
         }
     }
 
     @Override
     public void updateSlotsInBlueprintsScreen() {
         final var currentScreen = MinecraftClient.getInstance().currentScreen;
-        if(currentScreen instanceof BlueprintsScreen bps) {
+        if (currentScreen instanceof BlueprintsScreen bps) {
             bps.updateSlots();
         }
     }

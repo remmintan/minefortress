@@ -278,6 +278,10 @@ class FortressBuildingBlockData {
         return preservedPositions;
     }
 
+    List<BlockPos> getActualState() {
+        return new ArrayList<>(actualState.keySet());
+    }
+
     private enum BuildingBlockState {
         DESTROYED,
         PRESERVED,

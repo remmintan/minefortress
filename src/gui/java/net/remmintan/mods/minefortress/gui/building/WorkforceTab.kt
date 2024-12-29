@@ -55,7 +55,7 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
         val (translatedMouseX, translatedMouseY) = context.matrices.translateMousePosition(mouseX, mouseY)
         drawables.forEach { it.render(context, translatedMouseX, translatedMouseY, 0f) }
 
-        context.drawText(this.textRenderer, "Enhance Skills", 7, 100, BuildingScreen.PRIMARY_COLOR, false)
+        context.drawText(this.textRenderer, "Enhance Skills", 7, 105, BuildingScreen.PRIMARY_COLOR, false)
     }
 
     fun onMouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
@@ -76,9 +76,9 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
             val profId = professions[i]
             val legacy = handler.getCost(profId).isEmpty()
             if (legacy)
-                addNewLegacyHireRow(profId, rowY + i * 30, leftX, rightX)
+                addNewLegacyHireRow(profId, rowY + i * 24, leftX, rightX)
             else
-                addNewHireProgressRow(profId, rowY + i * 30, leftX, rightX)
+                addNewHireProgressRow(profId, rowY + i * 24, leftX, rightX)
         }
     }
 

@@ -22,15 +22,16 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
     private final BlockPos startPos;
     private final BlockRotation rotation;
     private final int floorLevel;
-
     private final List<Integer> selectedPawns;
+    private final BlockPos upgradedBuildingPos;
 
-    public ServerboundBlueprintTaskPacket(String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel, List<Integer> selectedPawns) {
+    public ServerboundBlueprintTaskPacket(String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel, List<Integer> selectedPawns, BlockPos upgradedBuildingPos) {
         this.blueprintId = blueprintId;
         this.startPos = startPos;
         this.rotation = rotation;
         this.floorLevel = floorLevel;
         this.selectedPawns = selectedPawns;
+        this.upgradedBuildingPos = upgradedBuildingPos;
     }
 
     public ServerboundBlueprintTaskPacket(PacketByteBuf buf) {
@@ -43,7 +44,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
         for (int i = 0; i < size; i++) {
             selectedPawns.add(buf.readInt());
         }
-
+        this.upgradedBuildingPos = buf.readNullable(PacketByteBuf::readBlockPos);
     }
 
     @Override
@@ -56,6 +57,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
         for (Integer selectedPawn : selectedPawns) {
             buf.writeInt(selectedPawn);
         }
+        buf.writeNullable(upgradedBuildingPos, PacketByteBuf::writeBlockPos);
     }
 
     @Override
@@ -75,8 +77,12 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
                 manager.setupCenter(center, player);
                 return Unit.INSTANCE;
             });
-            provider.getTaskManager().executeInstantTask(task, player, provider);
+            provider.getTaskManager().executeInstantTask(task, player);
             return;
+        }
+
+        if (upgradedBuildingPos != null) {
+            provider.getBuildingsManager().destroyBuilding(upgradedBuildingPos);
         }
 
         Runnable executeBuildTask = () -> {
@@ -94,15 +100,12 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
                     return;
                 }
             }
-            final var ableToAssign = provider.getTaskManager().addTask(task, provider, manager, selectedPawns, player);
-            if (!ableToAssign) {
-                serverResourceManager.returnReservedItems(taskId);
-            }
+            provider.getTaskManager().addTask(task, selectedPawns, player);
         };
         if (floorLevel > 0) {
             final var digTask = blueprintManager.createDigTask(UUID.randomUUID(), startPos, floorLevel, blueprintId, rotation);
             digTask.addFinishListener(executeBuildTask);
-            provider.getTaskManager().addTask(digTask, provider, manager, selectedPawns, player);
+            provider.getTaskManager().addTask(digTask, selectedPawns, player);
         } else {
             executeBuildTask.run();
         }
