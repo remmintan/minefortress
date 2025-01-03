@@ -11,6 +11,7 @@ import net.remmintan.mods.minefortress.networking.c2s.ServerboundEditBlueprintPa
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.interfaces.IFortressMinecraftClient;
+import org.minefortress.renderer.gui.blueprints.EditUpgradesScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,17 +82,32 @@ public final class BlueprintScreenHandler {
         this.needScrollbar = this.totalSize > 9 * 5;
     }
 
-    public void sendRemovePacket() {
-        final var packet = ServerboundEditBlueprintPacket.remove(getFocusedSlot().getMetadata().getId());
-        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
+    public void edit() {
+        final BlueprintMetadata metadata = this.focusedSlot.getMetadata();
+        final String blueprintId = metadata.getId();
+        if (metadata.getRequirement().getTotalLevels() > 1) {
+            final var upgrades = metadata.getRequirement().getUpgrades();
+            final var ids = new ArrayList<String>();
+            ids.add(blueprintId);
+            ids.addAll(upgrades);
+            this.openEditUpgradesScreen(ids);
+        } else {
+            sendEditPacket(metadata);
+
+        }
     }
 
-    public void sendEditPacket() {
-        final BlueprintMetadata metadata = this.focusedSlot.getMetadata();
-        final String file = metadata.getId();
+    private void sendEditPacket(BlueprintMetadata metadata) {
         final int floorLevel = metadata.getFloorLevel();
-        final ServerboundEditBlueprintPacket packet = ServerboundEditBlueprintPacket.edit(file, floorLevel, selectedGroup);
+        final ServerboundEditBlueprintPacket packet = ServerboundEditBlueprintPacket.edit(metadata.getId(), floorLevel, selectedGroup);
         FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_EDIT_BLUEPRINT, packet);
+        MinecraftClient.getInstance().setScreen(null);
+    }
+
+    private void openEditUpgradesScreen(List<String> blueprintIdsList) {
+        final var handler = new EditUpgradesScreenHandler(blueprintIdsList, this::sendEditPacket);
+        final var screen = new EditUpgradesScreen(handler);
+        MinecraftClient.getInstance().setScreen(screen);
     }
 
     public void focusOnSlot(BlueprintSlot slot) {

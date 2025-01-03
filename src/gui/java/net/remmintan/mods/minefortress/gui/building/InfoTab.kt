@@ -4,25 +4,20 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
-import net.minecraft.client.render.DiffuseLighting
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils
-import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.HEADINGS_COLOR
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.PRIMARY_COLOR
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.SECONDARY_COLOR
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.WHITE_COLOR
 import net.remmintan.mods.minefortress.gui.building.handlers.IInfoTabHandler
 import net.remmintan.mods.minefortress.gui.building.handlers.InfoTabState
+import net.remmintan.mods.minefortress.gui.widget.BlueprintUpgradeSlot
 import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget
 
 internal class InfoTab(private val handler: IInfoTabHandler, private val textRenderer: TextRenderer) :
@@ -30,9 +25,6 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
 
     companion object {
         private val BARS_TEXTURE = Identifier("minefortress", "textures/gui/bars.png")
-        private const val SLOT_BACKGROUND_COLOR = (0xFF shl 24) or 0x8B8B8B
-        private const val SLOT_HIGHLIGHT_COLOR = (0x80 shl 24) or 0xFFFFFF
-        private const val UPGRADE_SLOT_SIDE_SIZE = 44
     }
 
     override var x: Int = 0
@@ -41,8 +33,6 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
     override var backgroundHeight: Int = 0
 
     private val blueprintsRenderer = CoreModUtils.getRenderersProvider().get_GuiBlueprintsRenderer()
-    private val fortressManager = CoreModUtils.getFortressManager()
-    private val resourceManager = fortressManager.resourceManager
 
     private val destroyButton: ItemButtonWidget = ItemButtonWidget(
         0,
@@ -177,71 +167,36 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
             )
         }
 
-        hoveredUpgrade = null
-        handler.upgrades.forEachIndexed { index, slot ->
-            val slotX = 1 + index * (UPGRADE_SLOT_SIDE_SIZE + 4)
-            val slotY = yDelta - 16
-            val slotEndX = slotX + UPGRADE_SLOT_SIDE_SIZE
-            val slotEndY = slotY + UPGRADE_SLOT_SIDE_SIZE
-            context.fillGradient(slotX, slotY, slotEndX, slotEndY, 10, SLOT_BACKGROUND_COLOR, SLOT_BACKGROUND_COLOR)
-
-            if (isPointOverUpgradeSlot(matrices, slotX, slotY, mouseX, mouseY)) {
-                DiffuseLighting.enableGuiDepthLighting()
-                context.fillGradient(
-                    RenderLayer.getGuiOverlay(),
-                    slotX + 1,
-                    slotY + 1,
-                    slotEndX - 1,
-                    slotEndY - 1,
-                    SLOT_HIGHLIGHT_COLOR,
-                    SLOT_HIGHLIGHT_COLOR,
-                    110
+        val upgradeSlots = handler
+            .upgrades
+            .mapIndexed { index, slot ->
+                BlueprintUpgradeSlot.create(
+                    1,
+                    yDelta - 16,
+                    index,
+                    25,
+                    0,
+                    slot,
+                    textRenderer
                 )
-
-                val (newMx, newMy) = matrices.translateMousePosition(mouseX, mouseY)
-                val upgradeTooltipText = slot.getUpgradeTooltipText(metadata.requirement.level, metadata.capacity)
-                context.drawTooltip(this.textRenderer, upgradeTooltipText, newMx, newMy)
-                if (slot.isEnoughResources) hoveredUpgrade = slot
-
-                if (fortressManager.isSurvival()) {
-                    val stacks: List<ItemInfo> = slot.blockData.getStacks()
-                    for (i1 in stacks.indices) {
-                        val stack = stacks[i1]
-                        val hasItem = resourceManager.hasItem(stack, stacks)
-                        val itemX = 25 + i1 % 10 * 30
-                        val itemY = i1 / 10 * 20
-                        val convertedItem = SimilarItemsHelper.convertItemIconInTheGUI(stack.item())
-                        context.drawItem(ItemStack(convertedItem), itemX, itemY)
-                        context.drawText(
-                            this.textRenderer,
-                            stack.amount().toString(),
-                            itemX + 17,
-                            itemY + 7,
-                            if (hasItem) 0xFFFFFF else 0xFF0000,
-                            false
-                        )
-                    }
-                }
             }
+
+        hoveredUpgrade = null
+        upgradeSlots.forEach {
+            it.render(context, mouseX, mouseY, 0f)
+            if (it.hovered)
+                hoveredUpgrade = it.slot
         }
 
         matrices.pop()
-
 
         val matrixStack = RenderSystem.getModelViewStack()
         matrixStack.push()
         matrixStack.translate(x.toDouble() + 13, y.toDouble() + yDelta + 10, 0.0)
         RenderSystem.applyModelViewMatrix()
-        handler.upgrades.forEachIndexed { index, slot ->
-            val blueprintId = slot.metadata.id
-            val enoughResources = slot.isEnoughResources
 
-            blueprintsRenderer.renderBlueprintUpgrade(
-                blueprintId,
-                index,
-                enoughResources
-            )
-        }
+        upgradeSlots.forEach { it.renderUpgradeBlueprint() }
+
         matrixStack.pop()
         RenderSystem.applyModelViewMatrix()
 
@@ -339,14 +294,4 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
         return true
     }
 
-    private fun isPointOverUpgradeSlot(
-        matrices: MatrixStack,
-        slotX: Int,
-        slotY: Int,
-        mouseX: Int,
-        mouseY: Int
-    ): Boolean {
-        val (mappedMouseX, mappedMouseY) = matrices.translateMousePosition(mouseX, mouseY)
-        return mappedMouseX >= slotX && mappedMouseX < slotX + UPGRADE_SLOT_SIDE_SIZE && mappedMouseY >= slotY && mappedMouseY < slotY + UPGRADE_SLOT_SIDE_SIZE
-    }
 }

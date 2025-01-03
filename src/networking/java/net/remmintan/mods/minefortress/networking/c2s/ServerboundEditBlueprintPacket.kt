@@ -10,7 +10,6 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider
 
 class ServerboundEditBlueprintPacket : FortressC2SPacket {
     private val blueprintId: String?
@@ -52,27 +51,27 @@ class ServerboundEditBlueprintPacket : FortressC2SPacket {
     }
 
     override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
-        if (server is IFortressServer) {
-            if (server is IServerManagersProvider) {
-                if (actionType == ActionType.REMOVE) {
-                    server.blueprintManager.remove(blueprintId)
-                } else {
-                    val blueprintsWorld = server._BlueprintWorld
-                    if (actionType == ActionType.EDIT) {
-                        val blockData: IStructureBlockData = server.blueprintManager
-                            .blockDataManager
-                            .getBlockData(blueprintId, BlockRotation.NONE)
-                        val blueprintData = blockData
-                            .getLayer(BlueprintDataLayer.GENERAL)
+        val managersProvider = getManagersProvider(player)
+        if (player.server is IFortressServer) {
+            val srv = player.server as IFortressServer
+            if (actionType == ActionType.REMOVE) {
+                managersProvider.blueprintManager.remove(blueprintId)
+            } else {
+                val blueprintsWorld = srv._BlueprintWorld
+                if (actionType == ActionType.EDIT) {
+                    val blockData: IStructureBlockData = managersProvider.blueprintManager
+                        .blockDataManager
+                        .getBlockData(blueprintId, BlockRotation.NONE)
+                    val blueprintData = blockData
+                        .getLayer(BlueprintDataLayer.GENERAL)
 
-                        blueprintsWorld.setBlueprintMetadata(player, blueprintId, blueprintName, blueprintGroup)
-                        blueprintsWorld.putBlueprintInAWorld(blueprintData, player, blockData.size, floorLevel)
-                    } else if (actionType == ActionType.CREATE) {
-                        blueprintsWorld.setBlueprintMetadata(player, blueprintId, blueprintName, blueprintGroup)
-                        blueprintsWorld.putBlueprintInAWorld(HashMap(), player, Vec3i(1, 1, 1), floorLevel)
-                    }
-                    player.moveToWorld(blueprintsWorld.world)
+                    blueprintsWorld.setBlueprintMetadata(player, blueprintId, blueprintName, blueprintGroup)
+                    blueprintsWorld.putBlueprintInAWorld(blueprintData, player, blockData.size, floorLevel)
+                } else if (actionType == ActionType.CREATE) {
+                    blueprintsWorld.setBlueprintMetadata(player, blueprintId, blueprintName, blueprintGroup)
+                    blueprintsWorld.putBlueprintInAWorld(HashMap(), player, Vec3i(1, 1, 1), floorLevel)
                 }
+                player.moveToWorld(blueprintsWorld.world)
             }
         }
     }

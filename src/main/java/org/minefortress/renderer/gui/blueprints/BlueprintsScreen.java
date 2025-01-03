@@ -159,10 +159,7 @@ public final class BlueprintsScreen extends Screen {
                             });
 
                 } else {
-                    this.handler.sendEditPacket();
-                    if(client != null) {
-                        this.client.setScreen(null);
-                    }
+                    this.handler.edit();
                 }
             }
         }
