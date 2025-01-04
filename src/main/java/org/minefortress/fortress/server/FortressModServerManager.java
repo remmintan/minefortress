@@ -22,11 +22,13 @@ public class FortressModServerManager implements IFortressModServerManager {
     private final MinecraftServer server;
     private final Map<UUID, ServerFortressManager> serverManagers = new HashMap<>();
 
+    private Boolean notEmpty = null;
 
     public FortressModServerManager(MinecraftServer server) {
         this.server = server;
     }
 
+    @Override
     public IServerManagersProvider getManagersProvider(ServerPlayerEntity player) {
         return getByPlayer(player);
     }
@@ -36,10 +38,12 @@ public class FortressModServerManager implements IFortressModServerManager {
         return serverManagers.computeIfAbsent(playerId, (it) -> new ServerFortressManager(server));
     }
 
+    @Override
     public IServerManagersProvider getManagersProvider(UUID uuid) {
         return getByPlayer(uuid);
     }
 
+    @Override
     public IServerFortressManager getFortressManager(ServerPlayerEntity player) {
         return getByPlayer(player);
     }
@@ -84,7 +88,9 @@ public class FortressModServerManager implements IFortressModServerManager {
     public void load() {
         final var nbtCompound = ModPathUtils.readNbt(MANAGERS_FILE_NAME, server.session);
 
-        for (String key : nbtCompound.getKeys()) {
+        final var keys = nbtCompound.getKeys();
+        notEmpty = !keys.isEmpty();
+        for (String key : keys) {
             final var managerNbt = nbtCompound.getCompound(key);
             final var masterPlayerId = UUID.fromString(key);
             final var manager = new ServerFortressManager(server);
@@ -92,6 +98,14 @@ public class FortressModServerManager implements IFortressModServerManager {
 
             serverManagers.put(masterPlayerId, manager);
         }
+    }
+
+    @Override
+    public boolean isNotEmpty() {
+        if (notEmpty == null) {
+            throw new IllegalStateException("Server managers not loaded yet");
+        }
+        return notEmpty;
     }
 
     public Optional<IServerManagersProvider> findReachableFortress(BlockPos pos, double reachRange) {

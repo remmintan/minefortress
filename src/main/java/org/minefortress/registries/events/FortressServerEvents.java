@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
@@ -13,6 +14,8 @@ import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import org.minefortress.world.ModVersionState;
 
 public class FortressServerEvents {
 
@@ -41,11 +44,21 @@ public class FortressServerEvents {
 
         // initialising the fortress server on join
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            final var fortressServer = (IFortressServer) server;
+            if (server instanceof IFortressServer fortressServer) {
+                final var modWasLoadedBefore = fortressServer.get_FortressModServerManager().isNotEmpty();
+                final var versionState = ModVersionState.Companion.getOrCreate(server);
+                if (modWasLoadedBefore) {
+                    if (versionState.isOutdated()) {
+                        handler.disconnect(Text.of("Outdated world version"));
+                    }
+                } else {
+                    versionState.setToCurrentVersion();
+                }
+            }
+
             final var player = handler.player;
-            final var fortressModServerManager = fortressServer.get_FortressModServerManager();
-            final var manager = fortressModServerManager.getFortressManager(player);
-            final var provider = fortressModServerManager.getManagersProvider(player);
+            final var manager = CoreModUtils.getFortressManager(player);
+            final var provider = CoreModUtils.getManagersProvider(player);
             manager.syncOnJoin();
             final var serverProfessionManager = provider.getProfessionsManager();
             serverProfessionManager.sendProfessions(player);

@@ -15,5 +15,7 @@ public interface IFortressModServerManager {
     void save();
     void load();
     void tick(PlayerManager manager);
+
+    boolean isNotEmpty();
     Optional<IServerManagersProvider> findReachableFortress(BlockPos pos, double reachRange);
 }

@@ -32,6 +32,7 @@
     "interaction.FortressGameModeMixin",
     "interaction.FortressMouseMixin",
     "interaction.FortressTutorialManagerMixin",
+    "network.FortressClientPlayNetworkHandlerMixin",
     "renderer.FortressFluidRendererMixin",
     "renderer.FortressGameRendererMixin",
     "renderer.FortressWorldRendererMixin",
