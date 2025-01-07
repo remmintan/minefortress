@@ -22,7 +22,8 @@
     "network.FortressPacketByteBufMixin",
     "network.FortressServerPlayNetworkHandlerMixin",
     "renderer.gui.FortressScreenHandler",
-    "renderer.gui.FortressSimpleInventoryMixin"
+    "renderer.gui.FortressSimpleInventoryMixin",
+    "server.FortressIntegratedServerLoaderMixin"
   ],
   "client": [
     "FortressMinecraftClientMixin",
