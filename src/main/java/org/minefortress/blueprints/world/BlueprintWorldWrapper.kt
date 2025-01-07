@@ -13,8 +13,10 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
 import net.remmintan.mods.minefortress.blueprints.*
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintWorld
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
+import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 
 class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
 
@@ -23,9 +25,11 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
         player: ServerPlayerEntity?,
         blueprintId: String?,
         blueprintName: String?,
-        group: BlueprintGroup?
+        group: BlueprintGroup?,
+        capacity: Int,
+        profession: ProfessionType
     ) {
-        world.setBlueprintMetadata(blueprintId, blueprintName, group, player)
+        world.setBlueprintMetadata(blueprintId, blueprintName, group, player, capacity, profession)
     }
 
     override fun clearBlueprint(player: ServerPlayerEntity?) {
@@ -95,13 +99,13 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
         size.add(NbtInt.of(maxZ - minZ + 1))
         updatedStructure.put("size", size)
         if (server is IFortressServer) {
-            server._FortressModServerManager
-                .getManagersProvider(player)
+            CoreModUtils.getManagersProvider(player)
                 .blueprintManager
                 .update(
                     id,
                     blueprintName,
                     metadata.group,
+                    metadata.capacity,
                     updatedStructure,
                     DEFAULT_FLOOR_LEVEL - blueprintMinY
                 )

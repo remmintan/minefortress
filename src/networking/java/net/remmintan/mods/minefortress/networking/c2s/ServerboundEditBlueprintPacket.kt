@@ -8,6 +8,7 @@ import net.minecraft.util.math.Vec3i
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
 
@@ -65,10 +66,26 @@ class ServerboundEditBlueprintPacket : FortressC2SPacket {
                     val blueprintData = blockData
                         .getLayer(BlueprintDataLayer.GENERAL)
 
-                    blueprintsWorld.setBlueprintMetadata(player, blueprintId, blueprintName, blueprintGroup)
+                    val metadata = managersProvider.blueprintManager.get(blueprintId)
+
+                    blueprintsWorld.setBlueprintMetadata(
+                        player,
+                        blueprintId,
+                        blueprintName,
+                        blueprintGroup,
+                        metadata.capacity,
+                        metadata.requirement.type ?: ProfessionType.NONE
+                    )
                     blueprintsWorld.putBlueprintInAWorld(blueprintData, player, blockData.size, floorLevel)
                 } else if (actionType == ActionType.CREATE) {
-                    blueprintsWorld.setBlueprintMetadata(player, blueprintId, blueprintName, blueprintGroup)
+                    blueprintsWorld.setBlueprintMetadata(
+                        player,
+                        blueprintId,
+                        blueprintName,
+                        blueprintGroup,
+                        4,
+                        ProfessionType.NONE
+                    )
                     blueprintsWorld.putBlueprintInAWorld(HashMap(), player, Vec3i(1, 1, 1), floorLevel)
                 }
                 player.moveToWorld(blueprintsWorld.world)

@@ -139,7 +139,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
     }
 
     @Override
-    public void update(String blueprintId, String blueprintName, BlueprintGroup group, NbtCompound tag, int newFloorLevel) {
+    public void update(String blueprintId, String blueprintName, BlueprintGroup group, int newCapacity, NbtCompound tag, int newFloorLevel) {
         final var obm = blueprints.computeIfAbsent(
                 blueprintId,
                 id -> new BlueprintMetadata(
@@ -154,7 +154,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                 obm.getName(),
                 blueprintId,
                 newFloorLevel,
-                obm.getCapacity(),
+                newCapacity,
                 obm.getGroup()
         );
 

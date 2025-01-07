@@ -21,9 +21,7 @@ class FortressBuildingConfigurationBlockEntity(pos: BlockPos?, state: BlockState
     var blueprintName: String? = null
     var blueprintGroup: BlueprintGroup = BlueprintGroup.LIVING_HOUSES
     var capacity: Int = 0
-        private set
     var profession: ProfessionType = ProfessionType.NONE
-        private set
 
 
     private val propertyDelegate = object : PropertyDelegate {

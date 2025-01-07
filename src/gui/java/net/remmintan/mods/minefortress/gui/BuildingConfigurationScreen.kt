@@ -2,10 +2,7 @@ package net.remmintan.mods.minefortress.gui
 
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
-import net.minecraft.client.gui.widget.CyclingButtonWidget
-import net.minecraft.client.gui.widget.GridWidget
-import net.minecraft.client.gui.widget.TextFieldWidget
-import net.minecraft.client.gui.widget.TextWidget
+import net.minecraft.client.gui.widget.*
 import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.text.Text
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
@@ -39,12 +36,13 @@ class BuildingConfigurationScreen(
             .initially(handler.getProfession())
             .build(this.x + 2, this.y + 2, 200, 20, Text.of("Profession"))
             { _, prof ->
-                if (revision == 0) return@build
-                val packet = C2SUpdateScreenProperty(1, prof.ordinal)
-                FortressClientNetworkHelper.send(C2SUpdateScreenProperty.CHANNEL, packet)
+//                if (revision == 0) return@build
+//                val packet = C2SUpdateScreenProperty(1, prof.ordinal)
+//                FortressClientNetworkHelper.send(C2SUpdateScreenProperty.CHANNEL, packet)
             }
         adder.add(professionsLabel, grid.copyPositioner().marginTop(9))
         adder.add(professionSelector)
+        professionSelector?.active = false
 
         val capacityLabel = TextWidget(Text.of("Building capacity [0-100]:"), this.textRenderer)
         capacityWidget = TextFieldWidget(this.textRenderer, 200, 20, Text.of(handler.getCapacity()))
@@ -61,6 +59,11 @@ class BuildingConfigurationScreen(
         adder.add(capacityLabel, grid.copyPositioner().marginTop(9))
         adder.add(capacityWidget)
 
+        val btn = ButtonWidget.Builder(Text.of("Save the metadata")) { this.close() }
+            .size(150, 20)
+            .position(this.width / 2 - 150 / 2, this.height - 100)
+            .build()
+        this.addDrawableChild(btn)
 
         grid.refreshPositions()
         grid.setPosition(this.width / 2 - grid.width / 2, this.y + 30)

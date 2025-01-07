@@ -7,6 +7,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 
 interface IBlueprintWorld {
 
@@ -14,7 +15,9 @@ interface IBlueprintWorld {
         player: ServerPlayerEntity?,
         blueprintId: String?,
         blueprintName: String?,
-        group: BlueprintGroup?
+        group: BlueprintGroup?,
+        capacity: Int,
+        profession: ProfessionType
     )
     fun clearBlueprint(player: ServerPlayerEntity?)
     fun putBlueprintInAWorld(

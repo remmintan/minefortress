@@ -70,7 +70,9 @@ fun ServerWorld.setBlueprintMetadata(
     blueprintId: String?,
     blueprintName: String?,
     group: BlueprintGroup?,
-    player: ServerPlayerEntity?
+    player: ServerPlayerEntity?,
+    capacity: Int,
+    profession: ProfessionType
 ) {
     player?.getPersonalBlueprintCell()?.let {
         val metadataPos = it.configBlock
@@ -79,6 +81,8 @@ fun ServerWorld.setBlueprintMetadata(
             this.blueprintId = blueprintId
             this.blueprintName = blueprintName
             this.blueprintGroup = group ?: BlueprintGroup.LIVING_HOUSES
+            this.capacity = capacity
+            this.profession = profession
         }
     } ?: error("Player not found")
 }

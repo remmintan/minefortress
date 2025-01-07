@@ -17,7 +17,7 @@ public interface IServerBlueprintManager extends IServerManager, ITickableManage
     BlueprintMetadata get(String blueprintId);
     void tick(ServerPlayerEntity player);
 
-    void update(String blueprintId, String blueprintName, BlueprintGroup group, NbtCompound updatedStructure, int newFloorLevel);
+    void update(String blueprintId, String blueprintName, BlueprintGroup group, int newCapacity, NbtCompound updatedStructure, int newFloorLevel);
 
     void remove(String blueprintId);
 
