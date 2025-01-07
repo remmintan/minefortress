@@ -155,7 +155,7 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
         this.goalSelector.add(4, new FollowFortressAttackTargetGoal(this, Colonist.FAST_MOVEMENT_SPEED, Colonist.WORK_REACH_DISTANCE));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
-        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
+//        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
         this.goalSelector.add(8, new SleepOnTheBedGoal(this));
         this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
