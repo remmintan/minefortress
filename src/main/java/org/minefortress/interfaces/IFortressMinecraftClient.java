@@ -1,12 +1,11 @@
 package org.minefortress.interfaces;
 
-import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import net.remmintan.panama.renderer.BlueprintRenderer;
 import net.remmintan.panama.renderer.SelectionRenderer;
 import net.remmintan.panama.renderer.TasksRenderer;
 import org.minefortress.renderer.gui.hud.FortressHud;
 
-public interface IFortressMinecraftClient extends IHoveredBlockProvider {
+public interface IFortressMinecraftClient {
 
     FortressHud get_FortressHud();
     BlueprintRenderer get_BlueprintRenderer();

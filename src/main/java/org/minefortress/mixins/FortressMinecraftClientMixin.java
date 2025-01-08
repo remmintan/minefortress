@@ -14,9 +14,7 @@ import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.remmintan.gobi.SelectionManager;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
@@ -226,16 +224,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public ClientFortressManager get_ClientFortressManager() {
         return clientFortressManager;
-    }
-
-    @Override
-    public BlockPos get_HoveredBlockPos() {
-        final HitResult hitResult = this.crosshairTarget;
-        if(hitResult instanceof BlockHitResult) {
-            return ((BlockHitResult) hitResult).getBlockPos();
-        } else {
-            return null;
-        }
     }
 
     @Inject(method = "openGameMenu", at = @At("HEAD"), cancellable = true)

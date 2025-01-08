@@ -57,7 +57,12 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
         CoreModUtils.getClientPlayer().closeScreen()
     }
 
+    override fun canDestroy(): Boolean {
+        return building.metadata.id != "campfire"
+    }
+
     override fun destroy() {
+        if (!canDestroy()) return
         if (infoTabState == InfoTabState.DESTROY) {
             val packet = C2SDestroyBuilding(building.pos)
             FortressClientNetworkHelper.send(C2SDestroyBuilding.CHANNEL, packet)

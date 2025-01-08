@@ -10,7 +10,6 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.HEADINGS_COLOR
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.PRIMARY_COLOR
 import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.SECONDARY_COLOR
@@ -31,8 +30,6 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
     override var y: Int = 0
     override var backgroundWidth: Int = 0
     override var backgroundHeight: Int = 0
-
-    private val blueprintsRenderer = CoreModUtils.getRenderersProvider().get_GuiBlueprintsRenderer()
 
     private val destroyButton: ItemButtonWidget = ItemButtonWidget(
         0,
@@ -68,6 +65,7 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
     private var hoveredUpgrade: BlueprintSlot? = null
 
     fun tick() {
+        destroyButton.active = handler.canDestroy()
         repairButton.active = handler.getHealth() < 100
         repairConfirmationButton.active = handler.hasSelectedPawns()
     }
@@ -174,8 +172,8 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
                     1,
                     yDelta - 16,
                     index,
-                    25,
                     0,
+                    this.backgroundHeight - 10,
                     slot,
                     textRenderer
                 )

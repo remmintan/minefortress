@@ -7,7 +7,6 @@ import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
@@ -74,7 +73,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     }
 
     @Override
-    public void tick(IHoveredBlockProvider fortressClient) {
+    public void tick() {
         if (!initialized) return;
 
         resetBuildEditState();

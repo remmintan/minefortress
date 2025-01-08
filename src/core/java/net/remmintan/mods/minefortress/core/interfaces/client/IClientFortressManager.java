@@ -20,7 +20,7 @@ public interface IClientFortressManager extends IFortressManager {
             int reservedColonistCount
     );
 
-    void tick(IHoveredBlockProvider fortressClient);
+    void tick();
 
     boolean isConnectedToTheServer();
 

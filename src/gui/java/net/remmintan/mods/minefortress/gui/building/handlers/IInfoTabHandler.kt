@@ -14,6 +14,7 @@ interface IInfoTabHandler {
     fun getEnoughItems(): Map<ItemInfo, Boolean>
     fun upgrade(slot: BlueprintSlot)
     fun destroy()
+    fun canDestroy(): Boolean
     fun repair()
     fun cancel()
 }

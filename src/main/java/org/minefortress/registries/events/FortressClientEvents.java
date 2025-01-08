@@ -12,7 +12,6 @@ import net.minecraft.util.ActionResult;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import net.remmintan.mods.minefortress.core.interfaces.client.IHoveredBlockProvider;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
@@ -83,14 +82,10 @@ public class FortressClientEvents {
         fortressClient.get_FortressHud().tick();
         final var provider = CoreModUtils.getManagersProvider();
         final var fortressClientManager = provider.get_ClientFortressManager();
-        fortressClientManager.tick(hoveredBlockProvider());
+        fortressClientManager.tick();
         if(fortressClientManager.gamemodeNeedsInitialization() && !(client.currentScreen instanceof ChooseModeScreen)) {
             client.setScreen(new ChooseModeScreen());
         }
-    }
-
-    private static IHoveredBlockProvider hoveredBlockProvider() {
-        return (IHoveredBlockProvider) MinecraftClient.getInstance();
     }
 
     private static void endClientTick(MinecraftClient client) {

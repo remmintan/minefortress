@@ -29,6 +29,20 @@ class ClientBuildingsManager : IClientBuildingsManager {
     }
 
     override fun getBuildingSelection(pos: BlockPos?): List<BlockPos> {
+        pos ?: return emptyList()
+
+        if (buildings.contains(pos)) {
+            val buildingOpt = getBuilding(pos)
+            if (buildingOpt.isPresent) {
+                val b = buildingOpt.get()
+                hoveredBuilding = b
+                return StreamSupport
+                    .stream(BlockPos.iterate(b.start, b.end).spliterator(), false)
+                    .map { obj: BlockPos -> obj.toImmutable() }
+                    .collect(Collectors.toList())
+            }
+        }
+
         for (buildingPos in buildings) {
             val buildingOpt: Optional<IFortressBuilding> = getBuilding(buildingPos)
             if (buildingOpt.isEmpty) continue
