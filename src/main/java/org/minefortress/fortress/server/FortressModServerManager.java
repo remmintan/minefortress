@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
@@ -91,12 +92,16 @@ public class FortressModServerManager implements IFortressModServerManager {
         final var keys = nbtCompound.getKeys();
         notEmpty = !keys.isEmpty();
         for (String key : keys) {
-            final var managerNbt = nbtCompound.getCompound(key);
-            final var masterPlayerId = UUID.fromString(key);
-            final var manager = new ServerFortressManager(server);
-            manager.readFromNbt(managerNbt);
+            try {
+                final var managerNbt = nbtCompound.getCompound(key);
+                final var masterPlayerId = UUID.fromString(key);
+                final var manager = new ServerFortressManager(server);
+                manager.readFromNbt(managerNbt);
 
-            serverManagers.put(masterPlayerId, manager);
+                serverManagers.put(masterPlayerId, manager);
+            } catch (RuntimeException exp) {
+                ModLogger.LOGGER.warn("Failed to load server manager for player with id " + key, exp);
+            }
         }
     }
 

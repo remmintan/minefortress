@@ -78,7 +78,7 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
         val villagersCapacity: Int = metadata.capacity
         if (villagersCapacity > 0) {
             val capacityLabel = Text.literal("Capacity: ").formatted(Formatting.DARK_GRAY)
-            val capacityText = Text.literal("+$villagersCapacity").formatted(Formatting.DARK_PURPLE)
+            val capacityText = Text.literal("$villagersCapacity").formatted(Formatting.DARK_PURPLE)
 
             texts.add(capacityLabel to capacityText)
         }

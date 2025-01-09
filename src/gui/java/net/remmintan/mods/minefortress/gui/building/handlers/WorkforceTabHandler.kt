@@ -38,7 +38,13 @@ class WorkforceTabHandler(private val provider: IBuildingProvider) : IWorkforceT
     }
 
     override fun getMaxCount(professionId: String): Int {
-        return handler.getHireProgress(professionId).maxCount
+        val maxCount = handler.getHireProgress(professionId).maxCount
+
+        val bookedCapacity = getProfessions().filter { it != professionId }.sumOf {
+            this.getCurrentCount(it) + this.getHireQueue(it)
+        }
+
+        return maxCount - bookedCapacity
     }
 
     override fun increaseAmount(professionId: String) {

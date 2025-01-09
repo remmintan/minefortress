@@ -63,7 +63,7 @@ public class FortressMouseMixin {
             }
         }
 
-        if(isPress && button == 0 && client.currentScreen == null) {
+        if (!isPress && button == 0 && client.currentScreen == null) {
             fortressClient.get_FortressHud().onClick(mouseX, mouseY);
         }
 

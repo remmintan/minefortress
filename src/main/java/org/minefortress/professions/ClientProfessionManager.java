@@ -89,13 +89,20 @@ public final class ClientProfessionManager extends ProfessionManager implements 
     @Override
     public void openBuildingHireScreen(String professionId) {
         final var profession = this.getProfession(professionId);
-        final var hasBuilding = fortressManagerSupplier.get().hasRequiredBuilding(profession.getRequirementType(), profession.getRequirementLevel(), 0);
+        final var requirementType = profession.getRequirementType();
+        final var requirementLevel = profession.getRequirementLevel();
+
+        if (requirementLevel < 0 || requirementType == null) {
+            return;
+        }
+
+        final var hasBuilding = fortressManagerSupplier.get().hasRequiredBuilding(requirementType, requirementLevel, 0);
         if (hasBuilding) {
             final var packet = new C2SOpenBuildingHireScreen(professionId);
             FortressClientNetworkHelper.send(C2SOpenBuildingHireScreen.CHANNEL, packet);
         } else {
-            final var type = profession.getRequirementType();
-            final var level = profession.getRequirementLevel();
+            final var type = requirementType;
+            final var level = requirementLevel;
             final var blueprintId = type.getBlueprintIds().get(level);
             CoreModUtils.getBlueprintManager()
                     .getBlueprintMetadataManager()

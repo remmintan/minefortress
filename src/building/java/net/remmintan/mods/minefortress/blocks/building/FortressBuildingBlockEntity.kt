@@ -51,10 +51,14 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     private val attackers: MutableSet<HostileEntity> = HashSet()
     var selectedTabIndex = 0
 
+    private val automationArea: IAutomationArea by lazy {
+        BuildingAutomationArea(start!!, end!!, metadata.requirement)
+    }
+
     override fun getAutomationArea(): Optional<IAutomationArea> {
         return Optional.ofNullable(
             if (start != null && end != null) {
-                BuildingAutomationArea(start!!, end!!, metadata.requirement)
+                automationArea
             } else {
                 null
             }
