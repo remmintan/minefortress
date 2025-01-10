@@ -33,7 +33,7 @@ class EditUpgradesScreen(private val handler: EditUpgradesScreenHandler) : Scree
 
     private val upgradeSlots: List<BlueprintUpgradeSlot> by lazy {
         handler.upgrades.mapIndexed { index, slot ->
-            BlueprintUpgradeSlot.create(SLOT_X, SLOT_Y, index, 0, 0, slot, this.textRenderer)
+            BlueprintUpgradeSlot.create(SLOT_X, SLOT_Y, index, 0, 0, slot, this.textRenderer, false)
         }
     }
 

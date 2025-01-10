@@ -24,7 +24,8 @@ class BlueprintUpgradeSlot(
     private val costsX: Int,
     private val costsY: Int,
     private val index: Int,
-    private val textRenderer: TextRenderer
+    private val textRenderer: TextRenderer,
+    private val showItems: Boolean
 ) : Drawable {
 
     private val slotEndX = slotX + UPGRADE_SLOT_SIDE_SIZE
@@ -60,7 +61,7 @@ class BlueprintUpgradeSlot(
             hovered = slot.isEnoughResources
 
             val fortressManager = CoreModUtils.getFortressManager()
-            if (fortressManager.isSurvival) {
+            if (fortressManager.isSurvival && showItems) {
                 val stacks: List<ItemInfo> = slot.blockData.getStacks()
                 for (i1 in stacks.indices) {
                     val stack = stacks[i1]
@@ -115,11 +116,12 @@ class BlueprintUpgradeSlot(
             costsX: Int,
             costsY: Int,
             slot: BlueprintSlot,
-            textRenderer: TextRenderer
+            textRenderer: TextRenderer,
+            showItems: Boolean = true
         ): BlueprintUpgradeSlot {
             val slotX = x + index * (UPGRADE_SLOT_SIDE_SIZE + 4)
             val slotY = y
-            return BlueprintUpgradeSlot(slot, slotX, slotY, costsX, costsY, index, textRenderer)
+            return BlueprintUpgradeSlot(slot, slotX, slotY, costsX, costsY, index, textRenderer, showItems)
         }
     }
 }
