@@ -1,132 +1,137 @@
 plugins {
-	id 'java'
-	id 'fabric-loom' version '1.4-SNAPSHOT'
-	id 'maven-publish'
+    id 'java'
+    id 'fabric-loom' version '1.4-SNAPSHOT'
+    id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '1.9.21'
 }
 
-if(System.getenv("BUILD_NUMBER") != null) {
-	archivesBaseName = "${project.archives_base_name}-nightly"
-	version = "${project.mod_version}+${System.getenv("BUILD_NUMBER")}"
+if (System.getenv("BUILD_NUMBER") != null) {
+    archivesBaseName = "${project.archives_base_name}-nightly"
+    version = "${project.mod_version}+${System.getenv("BUILD_NUMBER")}"
 } else {
-	archivesBaseName = project.archives_base_name
-	if(System.getenv("TAG_NAME") != null) {
-		version = System.getenv("TAG_NAME")
-	} else {
-		version = project.mod_version
-	}
+    archivesBaseName = project.archives_base_name
+    if (System.getenv("TAG_NAME") != null) {
+        version = System.getenv("TAG_NAME")
+    } else {
+        version = project.mod_version
+    }
 }
 
 sourceSets {
-	core {
-		compileClasspath += main.compileClasspath
-	}
-	networking {
-		compileClasspath += main.compileClasspath + core.output
-	}
-	gui {
-		compileClasspath += main.compileClasspath + core.output + networking.output
-	}
-	building {
-		compileClasspath += main.compileClasspath + core.output + gui.output
-	}
-	selections {
-		compileClasspath += main.compileClasspath + core.output + building.output + networking.output
-	}
-	panama {
-		compileClasspath += main.compileClasspath + core.output + selections.output + building.output
-	}
-	main {
-		compileClasspath += core.output + networking.output + building.output + panama.output + selections.output + gui.output
-		runtimeClasspath += core.output + networking.output + building.output + panama.output + selections.output + gui.output
-	}
+    core {
+        compileClasspath += main.compileClasspath
+    }
+    networking {
+        compileClasspath += main.compileClasspath + core.output
+    }
+    gui {
+        compileClasspath += main.compileClasspath + core.output + networking.output
+    }
+    building {
+        compileClasspath += main.compileClasspath + core.output + gui.output
+    }
+    selections {
+        compileClasspath += main.compileClasspath + core.output + building.output + networking.output
+    }
+    panama {
+        compileClasspath += main.compileClasspath + core.output + selections.output + building.output
+    }
+    main {
+        compileClasspath += core.output + networking.output + building.output + panama.output + selections.output + gui.output
+        runtimeClasspath += core.output + networking.output + building.output + panama.output + selections.output + gui.output
+    }
 }
 
 group = project.maven_group
 
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-	maven {
-		url = 'https://jitpack.io'
-	}
-	maven {
-		name = "Ladysnake Mods"
-		url = "https://maven.ladysnake.org/releases"
-		content {
-			includeGroup("org.ladysnake")
-			includeGroupByRegex("dev\\.emi.*")
-			includeGroupByRegex("dev\\.onyxstudios.*")
-		}
-	}
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+    maven {
+        url = 'https://jitpack.io'
+    }
+    maven {
+        name = "Ladysnake Mods"
+        url = "https://maven.ladysnake.org/releases"
+        content {
+            includeGroup("org.ladysnake")
+            includeGroupByRegex("dev\\.emi.*")
+            includeGroupByRegex("dev\\.onyxstudios.*")
+        }
+    }
     mavenCentral()
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release.set(17)
+    // Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+    it.options.release.set(17)
 }
 
 dependencies {
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
+    modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
 
-	modImplementation include("com.github.minefortress-mod:automatone:1.0.8-minefortress")
-	modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-base:5.2.9-minefortress")
-	modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-entity:5.2.9-minefortress")
-	modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-world:5.2.9-minefortress")
-	modImplementation include("net.fabricmc:fabric-language-kotlin:1.10.17+kotlin.1.9.22")
+    modImplementation include("com.github.minefortress-mod:automatone:1.0.8-minefortress")
+    modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-base:5.2.9-minefortress")
+    modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-entity:5.2.9-minefortress")
+    modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-world:5.2.9-minefortress")
+    modImplementation include("net.fabricmc:fabric-language-kotlin:1.10.17+kotlin.1.9.22")
 }
 
 processResources {
-	inputs.property "version", project.version
+    inputs.property "version", project.version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/minefortress.accesswidener")
+    accessWidenerPath = file("src/main/resources/minefortress.accesswidener")
 }
 
 jar {
-	from sourceSets.main.output, sourceSets.core.output, sourceSets.building.output, sourceSets.networking.output, sourceSets.selections.output, sourceSets.panama.output
+    from sourceSets.core.output,
+            sourceSets.building.output,
+            sourceSets.networking.output,
+            sourceSets.selections.output,
+            sourceSets.panama.output,
+            sourceSets.gui.output
 
-	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
-	}
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
 }
 
 publishing {
-	repositories {
-		maven {
-			name = "GitHubPackages"
-			url = uri("https://maven.pkg.github.com/" + (System.getenv("GITHUB_REPOSITORY") ?: "minefortress-mod/minefortress"))
-			credentials {
-				username = System.getenv("GITHUB_USERNAME")
-				password = System.getenv("GITHUB_TOKEN")
-			}
-		}
-	}
-	publications {
-		mavenJava(MavenPublication) {
-			artifactId = project.archivesBaseName
-			from components.java
-			pom {
-				description = System.getenv("GITHUB_COMMITS_TEXT") ?: "No description provided"
-			}
-		}
-	}
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/" + (System.getenv("GITHUB_REPOSITORY") ?: "minefortress-mod/minefortress"))
+            credentials {
+                username = System.getenv("GITHUB_USERNAME")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = project.archivesBaseName
+            from components.java
+            pom {
+                description = System.getenv("GITHUB_COMMITS_TEXT") ?: "No description provided"
+            }
+        }
+    }
 }
 kotlin {
     jvmToolchain(17)

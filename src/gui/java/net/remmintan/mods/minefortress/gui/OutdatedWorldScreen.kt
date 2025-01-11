@@ -11,15 +11,11 @@ private val TEXT = Text.of(TEXT_STRING)
 
 class OutdatedWorldScreen : Screen(Text.of("This world is no longer supported!")) {
 
-    private val btn: ButtonWidget
-
-    init {
-        btn = ButtonWidget.builder(Text.of("A shame, but so be it!")) {
-            this.client?.setScreen(null)
-        }
-            .size(200, 20)
-            .build()
+    private val btn: ButtonWidget = ButtonWidget.builder(Text.of("A shame, but so be it!")) {
+        this.client?.setScreen(null)
     }
+        .size(200, 20)
+        .build()
 
     override fun render(context: DrawContext?, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(context, mouseX, mouseY, delta)
