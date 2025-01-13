@@ -26,6 +26,11 @@ val BUILDING_CONFIGURATION_SCREEN_HANDLER_TYPE: ScreenHandlerType<BuildingConfig
         ScreenHandlerType(::BuildingConfigurationScreenHandler, FeatureFlags.VANILLA_FEATURES)
     )
 
+fun registerHandlerTypes() {
+    BUILDING_SCREEN_HANDLER_TYPE
+    BUILDING_CONFIGURATION_SCREEN_HANDLER_TYPE
+}
+
 fun registerScreens() {
     HandledScreens.register(BUILDING_SCREEN_HANDLER_TYPE, ::BuildingScreen)
     HandledScreens.register(BUILDING_CONFIGURATION_SCREEN_HANDLER_TYPE, ::BuildingConfigurationScreen)

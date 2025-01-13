@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.blocks.FortressBlocks;
+import net.remmintan.mods.minefortress.gui.FortressHandledScreensKt;
 import net.remmintan.mods.minefortress.networking.registries.ServerNetworkReceivers;
 import org.minefortress.commands.CommandsManager;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
@@ -47,6 +48,7 @@ public class MineFortressMod implements ModInitializer {
 
         CommandsManager.registerCommands();
         ServerNetworkReceivers.registerReceivers();
+        FortressHandledScreensKt.registerHandlerTypes();
     }
 
     public static ExecutorService getExecutor() {

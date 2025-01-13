@@ -10,7 +10,7 @@ import net.minecraft.screen.ScreenHandler
 import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.interfaces.IScreenHandlerWithTabs
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
-import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
+import net.remmintan.mods.minefortress.core.isFortressGamemode
 import net.remmintan.mods.minefortress.gui.BUILDING_SCREEN_HANDLER_TYPE
 import net.remmintan.mods.minefortress.gui.building.handlers.*
 
@@ -62,7 +62,7 @@ class BuildingScreenHandler(
         return ItemStack.EMPTY
     }
 
-    override fun canUse(player: PlayerEntity?): Boolean = isClientInFortressGamemode()
+    override fun canUse(player: PlayerEntity?): Boolean = isFortressGamemode(player)
 
 }
 
