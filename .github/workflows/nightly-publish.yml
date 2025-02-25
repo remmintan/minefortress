@@ -76,70 +76,68 @@ jobs:
         messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
         ./automation-scripts/discord-notification.sh ${{ secrets.DISCORD_WEBHOOK }} ${{ github.run_number }} "$messages" "${{ vars.DISCORD_ROLE_ID }}"
 
-  twitter-notification:
-    runs-on: ubuntu-latest
-    needs: [build]
-    permissions:
-      contents: read
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-
-    - name: Prepare twitter messages
-      id: prepare-twitter-messages
-      run: |
-          export messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
-          echo "Twitter messages: $messages"
-          echo "twitterMessages=${messages//$'\n'/'\\n'}" >> $GITHUB_OUTPUT
-
-    - name: Send Twitter Notification
-      uses: remmintan/send-tweet-action@1.0
-      with:
-        api-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
-        api-key-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET_KEY }}
-        access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-        access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-        tweet-text: |
-          MineFortress Dev Build ${{ github.run_number }} built successfully!
-          
-          Changes:
-          ${{ steps.prepare-twitter-messages.outputs.twitterMessages }}
-          ===next-tweet===
-          Dev Builds portal:
-          https://builds.minecraftfortress.org
-
-  reddit-notification:
-    runs-on: ubuntu-latest
-    needs: [build]
-    permissions:
-      contents: read
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-
-    - name: Prepare reddit messages
-      id: prepare-reddit-messages
-      run: |
-          export messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
-          echo "Reddit messages: $messages"
-          echo "redditMessages=${messages//$'\n'/'\\n'}" >> $GITHUB_OUTPUT
-
-    - name: Send Reddit Notification
-      uses: remmintan/reddit-post-action@1.0
-      with:
-        app-id: ${{ secrets.REDDIT_APP_ID }}
-        app-secret: ${{ secrets.REDDIT_APP_SECRET }}
-        username: ${{ secrets.REDDIT_USERNAME }}
-        password: ${{ secrets.REDDIT_PASSWORD }}
-        post-title: MineFortress dev build ${{ github.run_number }} built successfully!
-        post-text: |
-          Changes:
-          ${{ steps.prepare-reddit-messages.outputs.redditMessages }}
-          
-          https://builds.minecraftfortress.org
-
-
+#  twitter-notification:
+#    runs-on: ubuntu-latest
+#    needs: [build]
+#    permissions:
+#      contents: read
+#
+#    steps:
+#    - uses: actions/checkout@v3
+#      with:
+#        fetch-depth: 0
+#
+#    - name: Prepare twitter messages
+#      id: prepare-twitter-messages
+#      run: |
+#          export messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
+#          echo "Twitter messages: $messages"
+#          echo "twitterMessages=${messages//$'\n'/'\\n'}" >> $GITHUB_OUTPUT
+#
+#    - name: Send Twitter Notification
+#      uses: remmintan/send-tweet-action@1.0
+#      with:
+#        api-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
+#        api-key-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET_KEY }}
+#        access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+#        access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+#        tweet-text: |
+#          MineFortress Dev Build ${{ github.run_number }} built successfully!
+#
+#          Changes:
+#          ${{ steps.prepare-twitter-messages.outputs.twitterMessages }}
+#          ===next-tweet===
+#          Dev Builds portal:
+#          https://builds.minecraftfortress.org
+#
+#  reddit-notification:
+#    runs-on: ubuntu-latest
+#    needs: [build]
+#    permissions:
+#      contents: read
+#
+#    steps:
+#    - uses: actions/checkout@v3
+#      with:
+#        fetch-depth: 0
+#
+#    - name: Prepare reddit messages
+#      id: prepare-reddit-messages
+#      run: |
+#          export messages=$(git log --reverse --format='- %s' ${{ github.event.before }}..${{ github.sha }})
+#          echo "Reddit messages: $messages"
+#          echo "redditMessages=${messages//$'\n'/'\\n'}" >> $GITHUB_OUTPUT
+#
+#    - name: Send Reddit Notification
+#      uses: remmintan/reddit-post-action@1.0
+#      with:
+#        app-id: ${{ secrets.REDDIT_APP_ID }}
+#        app-secret: ${{ secrets.REDDIT_APP_SECRET }}
+#        username: ${{ secrets.REDDIT_USERNAME }}
+#        password: ${{ secrets.REDDIT_PASSWORD }}
+#        post-title: MineFortress dev build ${{ github.run_number }} built successfully!
+#        post-text: |
+#          Changes:
+#          ${{ steps.prepare-reddit-messages.outputs.redditMessages }}
+#
+#          https://builds.minecraftfortress.org

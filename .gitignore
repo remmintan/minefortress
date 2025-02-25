@@ -35,3 +35,5 @@ libs/
 /automation-scripts/commits.txt
 automation-scripts/tests.sh
 /amend-commits.sh
+
+ai-input.txt
