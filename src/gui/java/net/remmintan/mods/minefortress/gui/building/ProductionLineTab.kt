@@ -4,8 +4,6 @@ import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.text.Text
-import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.HEADINGS_COLOR
-import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.PRIMARY_COLOR
 import net.remmintan.mods.minefortress.gui.building.handlers.IProductionLineTabHandler
 
 class ProductionLineTab(
@@ -23,38 +21,31 @@ class ProductionLineTab(
     fun render(context: DrawContext, mouseX: Int, mouseY: Int) {
         if (handler.isCampfire()) {
             renderCampfireOptions(context, mouseX, mouseY)
-        } else {
-            context.drawText(
-                textRenderer,
-                "No production options available for this building",
-                10,
-                30,
-                PRIMARY_COLOR,
-                false
-            )
         }
     }
 
     private fun renderCampfireOptions(context: DrawContext, mouseX: Int, mouseY: Int) {
-        context.drawText(textRenderer, "Campfire Options", 10, 30, HEADINGS_COLOR, false)
-
+        // Create the button if it doesn't exist
         if (switchToSurvivalButton == null) {
             switchToSurvivalButton = ButtonWidget.builder(
-                Text.literal("Switch to First Person Mode"),
+                Text.literal("Explore your village!"),
                 { handler.switchToSurvivalMode() }
             )
-                .dimensions(x + 10, y + 50, 200, 20)
+                .dimensions(0, 0, 200, 20)
                 .build()
         } else {
-            switchToSurvivalButton!!.setPosition(x + 10, y + 50)
+            // Update button position when screen is resized
+            switchToSurvivalButton!!.setPosition(backgroundWidth / 2 - 100, 40)
         }
 
-        switchToSurvivalButton!!.render(context, mouseX, mouseY, 0f)
+        // Render the button
+        val (translatedMouseX, translatedMouseY) = context.matrices.translateMousePosition(mouseX, mouseY)
+        switchToSurvivalButton!!.render(context, translatedMouseX, translatedMouseY, 0f)
     }
 
     fun onMouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (handler.isCampfire() && switchToSurvivalButton != null) {
-            if (switchToSurvivalButton!!.isMouseOver(mouseX, mouseY)) {
+            if (switchToSurvivalButton!!.isHovered) {
                 switchToSurvivalButton!!.onClick(mouseX, mouseY)
                 return true
             }

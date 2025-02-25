@@ -25,18 +25,36 @@ class BuildingScreenHandler(
     IScreenHandlerWithTabs {
 
     val tabs: List<BuildingScreenTab> by lazy {
-        if (this.getProfessions().isEmpty()) {
-            listOf(
-                BuildingScreenTab(Items.COBBLESTONE, 0, "Info", BuildingScreenTabType.INFO),
-                BuildingScreenTab(Items.DIAMOND, 1, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
-            )
-        } else {
-            listOf(
-                BuildingScreenTab(Items.COBBLESTONE, 0, "Info", BuildingScreenTabType.INFO),
-                BuildingScreenTab(Items.PLAYER_HEAD, 1, "Workforce", BuildingScreenTabType.WORKFORCE),
-                BuildingScreenTab(Items.DIAMOND, 2, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
+        val tabsList = mutableListOf<BuildingScreenTab>()
+
+        // Always add the Info tab
+        tabsList.add(BuildingScreenTab(Items.COBBLESTONE, 0, "Info", BuildingScreenTabType.INFO))
+
+        // Add Workforce tab if there are professions
+        if (this.getProfessions().isNotEmpty()) {
+            tabsList.add(
+                BuildingScreenTab(
+                    Items.PLAYER_HEAD,
+                    tabsList.size,
+                    "Workforce",
+                    BuildingScreenTabType.WORKFORCE
+                )
             )
         }
+
+        // Add Production Line tab only for Campfire
+        if (this.isCampfire()) {
+            tabsList.add(
+                BuildingScreenTab(
+                    Items.DIAMOND,
+                    tabsList.size,
+                    "Functions",
+                    BuildingScreenTabType.PRODUCTION_LINE
+                )
+            )
+        }
+
+        tabsList
     }
 
     override var selectedTabIndex: Int
@@ -49,7 +67,8 @@ class BuildingScreenHandler(
 
     var selectedTab: BuildingScreenTab
         get() {
-            return tabs[selectedTabIndex]
+            val index = selectedTabIndex.coerceIn(0, tabs.size - 1)
+            return tabs[index]
         }
         set(value) {
             selectedTabIndex = tabs.indexOf(value)
