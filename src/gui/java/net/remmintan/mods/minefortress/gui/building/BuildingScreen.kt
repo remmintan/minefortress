@@ -24,6 +24,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
 
     private val infoTab by lazy { InfoTab(handler, textRenderer) }
     private val workforceTab by lazy { WorkforceTab(handler, textRenderer) }
+    private val productionLineTab by lazy { ProductionLineTab(handler, textRenderer) }
 
     init {
         this.backgroundWidth = 248
@@ -44,6 +45,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         super.handledScreenTick()
         infoTab.tick()
         workforceTab.tick()
+        productionLineTab.tick()
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
@@ -59,6 +61,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
 
         infoTab.onMouseClicked(mouseX, mouseY, button)
         workforceTab.onMouseClicked(mouseX, mouseY, button)
+        productionLineTab.onMouseClicked(mouseX, mouseY, button)
 
         return true
     }
@@ -85,7 +88,7 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
     }
 
     private fun resizeAllTabs() {
-        for (tab in listOf(infoTab, workforceTab)) {
+        for (tab in listOf(infoTab, workforceTab, productionLineTab)) {
             tab.x = x
             tab.y = y
             tab.backgroundWidth = backgroundWidth
@@ -100,17 +103,13 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
         when (selectedTab.type) {
             BuildingScreenTabType.INFO -> infoTab.render(context, mouseX, mouseY)
             BuildingScreenTabType.WORKFORCE -> workforceTab.render(context, mouseX, mouseY)
-            BuildingScreenTabType.PRODUCTION_LINE -> renderProductionLine(context, mouseX, mouseY)
+            BuildingScreenTabType.PRODUCTION_LINE -> productionLineTab.render(context, mouseX, mouseY)
         }
 
         handler.tabs.forEach {
             if (it.isHovered(mouseX - this.x, mouseY - this.y))
                 context.drawTooltip(this.textRenderer, it.name, mouseX - x, mouseY - y)
         }
-    }
-
-    private fun renderProductionLine(context: DrawContext, mouseX: Int, mouseY: Int) {
-
     }
 
     private fun renderTabIcon(context: DrawContext, tab: BuildingScreenTab) {

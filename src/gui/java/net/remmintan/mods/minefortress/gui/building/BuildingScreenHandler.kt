@@ -21,19 +21,20 @@ class BuildingScreenHandler(
 ) : ScreenHandler(BUILDING_SCREEN_HANDLER_TYPE, syncId),
     IInfoTabHandler by InfoTabHandler(getBuildingProvider(propertyDelegate)),
     IWorkforceTabHandler by WorkforceTabHandler(getBuildingProvider(propertyDelegate)),
+    IProductionLineTabHandler by ProductionLineTabHandler(getBuildingProvider(propertyDelegate)),
     IScreenHandlerWithTabs {
 
     val tabs: List<BuildingScreenTab> by lazy {
         if (this.getProfessions().isEmpty()) {
             listOf(
                 BuildingScreenTab(Items.COBBLESTONE, 0, "Info", BuildingScreenTabType.INFO),
-//                BuildingScreenTab(Items.DIAMOND, 1, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
+                BuildingScreenTab(Items.DIAMOND, 1, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
             )
         } else {
             listOf(
                 BuildingScreenTab(Items.COBBLESTONE, 0, "Info", BuildingScreenTabType.INFO),
                 BuildingScreenTab(Items.PLAYER_HEAD, 1, "Workforce", BuildingScreenTabType.WORKFORCE),
-//                BuildingScreenTab(Items.DIAMOND, 2, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
+                BuildingScreenTab(Items.DIAMOND, 2, "Production Line", BuildingScreenTabType.PRODUCTION_LINE),
             )
         }
     }
