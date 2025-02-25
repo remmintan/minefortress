@@ -30,6 +30,8 @@ public interface IServerFortressManager {
 
     void jumpToCampfire(ServerPlayerEntity player);
 
+    void teleportToCampfireGround(ServerPlayerEntity player);
+
     void repairBuilding(ServerPlayerEntity player, BlockPos pos, List<Integer> selectedPawns);
 
     boolean isSurvival();

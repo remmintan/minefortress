@@ -16,7 +16,11 @@ class C2SSwitchToMinecraftSurvival : FortressC2SPacket {
     constructor(ignoredBuf: PacketByteBuf?)
 
     override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
-        // Change the player's game mode to Survival directly on the server
+        // First teleport the player to the ground near the campfire
+        val fortressServerManager = getFortressManager(player)
+        fortressServerManager.teleportToCampfireGround(player)
+
+        // Then change the player's game mode to Survival directly on the server
         player.changeGameMode(GameMode.SURVIVAL)
     }
 

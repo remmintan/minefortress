@@ -307,6 +307,24 @@ public final class ServerFortressManager implements IFortressManager, IServerMan
         player.teleport(fortressCenter.getX() + 10, fortressCenter.getY() + 20, fortressCenter.getZ() + 10);
     }
 
+    @Override
+    public void teleportToCampfireGround(ServerPlayerEntity player) {
+        if (fortressCenter == null) return;
+        if (player.getWorld().getRegistryKey() != World.OVERWORLD) return;
+
+        // Get a position on the ground near the campfire
+        BlockPos groundPos = getRandomSpawnPosition();
+
+        // Set the player's orientation to look at the campfire
+        double dx = fortressCenter.getX() - groundPos.getX();
+        double dz = fortressCenter.getZ() - groundPos.getZ();
+        float yaw = (float) Math.toDegrees(Math.atan2(dz, dx));
+
+        player.setPitch(0); // Look straight ahead
+        player.setYaw(yaw);
+        player.teleport(groundPos.getX(), groundPos.getY(), groundPos.getZ());
+    }
+
     private static NbtCompound getColonistInfoTag(UUID masterPlayerId) {
         final NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putUuid(BasePawnEntity.FORTRESS_ID_NBT_KEY, masterPlayerId);
