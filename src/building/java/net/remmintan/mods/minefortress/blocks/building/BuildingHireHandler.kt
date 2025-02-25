@@ -53,7 +53,7 @@ class BuildingHireHandler : IBuildingHireHandler {
                 request.progress++
                 if (request.progress >= 100) {
                     queue.poll()
-                    professionManager?.increaseAmount(professionId, true)
+                    professionManager?.increaseAmount(professionId)
                 }
             }
         }

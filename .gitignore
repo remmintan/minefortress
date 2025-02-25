@@ -37,3 +37,4 @@ automation-scripts/tests.sh
 /amend-commits.sh
 
 ai-input.txt
+.aider*

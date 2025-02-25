@@ -9,7 +9,6 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessi
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -53,7 +52,7 @@ public abstract class ProfessionManager implements IProfessionsManager {
     }
 
     @Override
-    public final ProfessionResearchState isRequirementsFulfilled(IProfession profession, CountProfessionals countProfessionals, boolean countItems) {
+    public final ProfessionResearchState isRequirementsFulfilled(IProfession profession, CountProfessionals countProfessionals) {
         final var requirementType = profession.getRequirementType();
         if (requirementType == null) {
             return ProfessionResearchState.UNLOCKED;
@@ -61,7 +60,7 @@ public abstract class ProfessionManager implements IProfessionsManager {
 
         final IProfession parent = profession.getParent();
         if(Objects.nonNull(parent)) {
-            final var parentState = this.isRequirementsFulfilled(parent, CountProfessionals.DONT_COUNT, false);
+            final var parentState = this.isRequirementsFulfilled(parent, CountProfessionals.DONT_COUNT);
             if(parentState != ProfessionResearchState.UNLOCKED) {
                 return ProfessionResearchState.LOCKED_PARENT;
             }
@@ -78,14 +77,6 @@ public abstract class ProfessionManager implements IProfessionsManager {
         }
 
         boolean satisfied = fortressManager.hasRequiredBuilding(requirementType, profession.getRequirementLevel(), minRequirementCount);
-        if(countItems) {
-            final var itemsRequirement = profession.getItemsRequirement();
-            if(countProfessionals != CountProfessionals.DONT_COUNT && Objects.nonNull(itemsRequirement) && !itemsRequirement.isEmpty()) {
-                final var hasItems = fortressManager instanceof IServerManagersProvider smp && smp.getResourceManager().hasItems(itemsRequirement);
-                satisfied = satisfied && hasItems;
-            }
-        }
-
         return satisfied ? ProfessionResearchState.UNLOCKED : ProfessionResearchState.LOCKED_SELF;
     }
 

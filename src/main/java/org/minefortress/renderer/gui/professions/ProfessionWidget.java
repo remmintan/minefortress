@@ -76,8 +76,7 @@ public class ProfessionWidget {
     }
 
     public void renderWidgets(DrawContext drawContext, int x, int y){
-        final boolean unlockedWithCount = isUnlocked(true) == ProfessionResearchState.UNLOCKED;
-        final boolean unlocked = isUnlocked(false) == ProfessionResearchState.UNLOCKED;
+        final boolean unlockedWithCount = isUnlocked() == ProfessionResearchState.UNLOCKED;
 
         AdvancementObtainedStatus status = unlockedWithCount ? AdvancementObtainedStatus.OBTAINED : AdvancementObtainedStatus.UNOBTAINED;
         drawContext.drawGuiTexture(status.getFrameTexture(PROFESSIONS_FRAME), x + this.x + 3, y + this.y, 26, 26);
@@ -86,7 +85,7 @@ public class ProfessionWidget {
         final var matrices = drawContext.getMatrices();
         matrices.push();
         matrices.translate(0.0, 0.0, 200.0);
-        if(unlocked)
+        if (unlockedWithCount)
             drawContext.drawTextWithShadow(this.getTextRenderer(), String.valueOf(getAmount()), x + this.x + 6, y + this.y + 4, 0xFFFFFF);
         matrices.pop();
         final String title = profession.getTitle().contains("-") ? profession.getTitle().split("-")[0] : profession.getTitle();
@@ -125,11 +124,6 @@ public class ProfessionWidget {
     }
 
     boolean shouldNotRender(int originX, int originY, int mouseX, int mouseY) {
-//        final Profession parent = profession.getParent();
-//        if(parent != null && !this.professionManager.isRequirementsFulfilled(parent, ProfessionManager.CountProfessionals.DONT_COUNT, false)){
-//            return true;
-//        }
-
         int i = originX + this.x;
         int j = i + 26;
         int k = originY + this.y;
@@ -138,12 +132,11 @@ public class ProfessionWidget {
     }
 
     public void drawTooltip(DrawContext drawContext, int originX, int originY, int x, int screenWidth) {
-        final var unlocked = isUnlocked(false) == ProfessionResearchState.UNLOCKED;
-        final var unlockedWithCount = isUnlocked(true) == ProfessionResearchState.UNLOCKED;
+        final var unlocked = isUnlocked() == ProfessionResearchState.UNLOCKED;
 
-        final boolean parentUnlocked = isUnlocked(false) != ProfessionResearchState.LOCKED_PARENT;
+        final boolean parentUnlocked = isUnlocked() != ProfessionResearchState.LOCKED_PARENT;
 
-        AdvancementObtainedStatus status = unlockedWithCount?AdvancementObtainedStatus.OBTAINED:AdvancementObtainedStatus.UNOBTAINED;
+        AdvancementObtainedStatus status = unlocked ? AdvancementObtainedStatus.OBTAINED : AdvancementObtainedStatus.UNOBTAINED;
         int j = MathHelper.floor((float)this.width);
         int k = this.width - j;
         int l = originY + this.y;
@@ -152,10 +145,8 @@ public class ProfessionWidget {
 
         final String title = this.profession.getTitle();
         List<Text> description;
-        if(unlockedWithCount) {
+        if (unlocked) {
             description = this.profession.getDescription();
-        } else if(unlocked) {
-            description = this.profession.getUnlockMoreMessage();
         } else if (!parentUnlocked) {
             description = GuiUtils.splitTextInWordsForLength("You need to unlock the parent profession first!");
         } else {
@@ -205,30 +196,6 @@ public class ProfessionWidget {
         }
     }
 
-    protected void method_2324(DrawContext drawContext, Identifier identifier, int x, int y, int i, int j) {
-        drawContext.drawTexture(identifier, x, y, 0, 52, 10, 10);
-        this.method_2321(drawContext, identifier, x + 10, y, i - 10 - 10, 10, 10, 52, 200 - 10 - 10, 26);
-        drawContext.drawTexture(identifier, x + i - 10, y, 200 - 10, 52, 10, 10);
-        drawContext.drawTexture(identifier, x, y + j - 10, 0, 52 + 26 - 10, 10, 10);
-        this.method_2321(drawContext, identifier, x + 10, y + j - 10, i - 10 - 10, 10, 10, 52 + 26 - 10, 200 - 10 - 10, 26);
-        drawContext.drawTexture(identifier, x + i - 10, y + j - 10, 200 - 10, 52 + 26 - 10, 10, 10);
-        this.method_2321(drawContext, identifier, x, y + 10, 10, j - 10 - 10, 0, 52 + 10, 200, 26 - 10 - 10);
-        this.method_2321(drawContext, identifier, x + 10, y + 10, i - 10 - 10, j - 10 - 10, 10, 52 + 10, 200 - 10 - 10, 26 - 10 - 10);
-        this.method_2321(drawContext, identifier, x + i - 10, y + 10, 10, j - 10 - 10, 200 - 10, 52 + 10, 200, 26 - 10 - 10);
-    }
-
-    protected void method_2321(DrawContext drawContext, Identifier identifier, int x, int y, int i, int j, int k, int l, int m, int n) {
-        for (int o = 0; o < i; o += m) {
-            int p = x + o;
-            int q = Math.min(m, i - o);
-            for (int r = 0; r < j; r += n) {
-                int s = y + r;
-                int t = Math.min(n, j - r);
-                drawContext.drawTexture(identifier, p, s, k, l, q, t);
-            }
-        }
-    }
-
     int getX() {
         return x;
     }
@@ -237,15 +204,10 @@ public class ProfessionWidget {
         return y;
     }
 
-    public ProfessionResearchState isUnlocked(boolean countProfessionals) {
-        var shouldCountProfs = countProfessionals ? CountProfessionals.INCREASE : CountProfessionals.DONT_COUNT;
-        if(profession.isHireMenu()) {
-            shouldCountProfs = CountProfessionals.DONT_COUNT;
-        }
+    public ProfessionResearchState isUnlocked() {
         return this.professionManager.isRequirementsFulfilled(
                 this.profession,
-                shouldCountProfs,
-                true
+                CountProfessionals.DONT_COUNT
         );
     }
 

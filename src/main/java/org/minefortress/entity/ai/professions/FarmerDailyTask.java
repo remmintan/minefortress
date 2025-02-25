@@ -97,7 +97,7 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
             } else if (aboveBlockState.isAir()) {
                 final var seedsOpt = getSeeds(colonist);
                 if(seedsOpt.isPresent()) {
-                    final var blockItem = (BlockItem) seedsOpt.get();
+                    final var blockItem = seedsOpt.get();
                     final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlockPos, blockItem.getBlock().getDefaultState());
                     colonist.setGoal(bsTaskBlockInfo);
                     movementHelper.goTo(aboveBlockPos, Colonist.FAST_MOVEMENT_SPEED);

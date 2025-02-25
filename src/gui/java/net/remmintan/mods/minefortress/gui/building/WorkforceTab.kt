@@ -29,9 +29,15 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
             initialized = true
         }
         for ((profId, button) in hireButtons) {
-            val canHireMore = handler.canHireMore(profId)
+            val canHireMore = handler.canHireMore(profId) && handler.getAvailablePawns() > 0
             button.active = canHireMore
-            button.tooltip = if (canHireMore) null else Tooltip.of(Text.of("Not enough resources or free colonists"))
+            button.tooltip = if (canHireMore) null else {
+                if (handler.getAvailablePawns() <= 0) {
+                    Tooltip.of(Text.of("No available pawns"))
+                } else {
+                    Tooltip.of(Text.of("Not enough resources or capacity"))
+                }
+            }
         }
 
         for ((profId, button) in minusButtons) {

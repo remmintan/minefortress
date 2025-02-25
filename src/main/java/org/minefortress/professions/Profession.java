@@ -29,7 +29,7 @@ public class Profession implements IProfession {
     private final List<ItemInfo> itemsRequirement;
     private final ProfessionType requirementType;
     private final int requirementLevel;
-    private final boolean hireMenu;
+    // All professions use hire menu now
 
     private IProfession parent;
     private final List<IProfession> children = new ArrayList<>();
@@ -38,7 +38,7 @@ public class Profession implements IProfession {
         this.id = fullInfo.key();
         this.title = fullInfo.title();
         this.icon = new ItemStack(fullInfo.icon());
-        this.hireMenu = fullInfo.hireMenu();
+        // All professions use hire menu now, so we don't need to store this
 
         final var requirements = fullInfo.requirements();
 
@@ -73,10 +73,7 @@ public class Profession implements IProfession {
         return id;
     }
 
-    @Override
-    public boolean isHireMenu() {
-        return hireMenu;
-    }
+    // Using the default implementation from the interface
 
     @Override
     public String getTitle() {

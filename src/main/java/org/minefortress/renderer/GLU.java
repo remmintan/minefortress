@@ -42,7 +42,7 @@ class GLU {
         in[3] = 1.0f;
 
         // Map x and y from window coordinates
-        in[0] = (in[0] - viewport.get(viewport.position() + 0)) / viewport.get(viewport.position() + 2);
+        in[0] = (in[0] - viewport.get(viewport.position())) / viewport.get(viewport.position() + 2);
         in[1] = (in[1] - viewport.get(viewport.position() + 1)) / viewport.get(viewport.position() + 3);
 
         // Map to range -1 to 1
@@ -57,7 +57,7 @@ class GLU {
 
         out[3] = 1.0f / out[3];
 
-        obj_pos.put(obj_pos.position() + 0, out[0] * out[3]);
+        obj_pos.put(obj_pos.position(), out[0] * out[3]);
         obj_pos.put(obj_pos.position() + 1, out[1] * out[3]);
         obj_pos.put(obj_pos.position() + 2, out[2] * out[3]);
 
@@ -95,7 +95,7 @@ class GLU {
         in[2] = in[2] * in[3] + 0.5f;
 
         // Map x,y to viewport
-        win_pos.put(0, in[0] * viewport.get(viewport.position() + 2) + viewport.get(viewport.position() + 0));
+        win_pos.put(0, in[0] * viewport.get(viewport.position() + 2) + viewport.get(viewport.position()));
         win_pos.put(1, in[1] * viewport.get(viewport.position() + 3) + viewport.get(viewport.position() + 1));
         win_pos.put(2, in[2]);
 
@@ -106,7 +106,7 @@ class GLU {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 r.put(r.position() + i*4 + j,
-                        a.get(a.position() + i*4 + 0) * b.get(b.position() + 0*4 + j) + a.get(a.position() + i*4 + 1) * b.get(b.position() + 1*4 + j) + a.get(a.position() + i*4 + 2) * b.get(b.position() + 2*4 + j) + a.get(a.position() + i*4 + 3) * b.get(b.position() + 3*4 + j));
+                        a.get(a.position() + i * 4) * b.get(b.position() + j) + a.get(a.position() + i * 4 + 1) * b.get(b.position() + 4 + j) + a.get(a.position() + i * 4 + 2) * b.get(b.position() + 2 * 4 + j) + a.get(a.position() + i * 4 + 3) * b.get(b.position() + 3 * 4 + j));
             }
         }
     }
@@ -185,8 +185,8 @@ class GLU {
     private static void __gluMultMatrixVecf(FloatBuffer m, float[] in, float[] out) {
         for (int i = 0; i < 4; i++) {
             out[i] =
-                    in[0] * m.get(m.position() + 0*4 + i)
-                            + in[1] * m.get(m.position() + 1*4 + i)
+                    in[0] * m.get(m.position() + i)
+                            + in[1] * m.get(m.position() + 4 + i)
                             + in[2] * m.get(m.position() + 2*4 + i)
                             + in[3] * m.get(m.position() + 3*4 + i);
 

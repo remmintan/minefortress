@@ -46,7 +46,7 @@ public class EatGoal extends Goal {
         return entity instanceof IFortressAwareEntity f ?
                 f.getManagersProvider()
                 .map(IServerManagersProvider::getResourceManager)
-                .map(IServerResourceManager.class::cast) :
+                        .map(iServerResourceManager -> iServerResourceManager) :
                 Optional.empty();
     }
 

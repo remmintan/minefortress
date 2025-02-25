@@ -26,7 +26,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
         final var itemInfos = stacks
                 .stream()
                 .map(it -> new ItemInfo(it.getItem(), it.getCount()))
-                .map(ItemInfo.class::cast)
+                .map(itemInfo -> itemInfo)
                 .toList();
         return hasItems(itemInfos);
     }

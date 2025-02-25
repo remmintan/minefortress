@@ -7,7 +7,7 @@ import java.util.List;
 public interface IProfessionsManager {
     IProfession getRootProfession();
 
-    ProfessionResearchState isRequirementsFulfilled(IProfession profession, CountProfessionals countProfessionals, boolean countItems);
+    ProfessionResearchState isRequirementsFulfilled(IProfession profession, CountProfessionals countProfessionals);
 
     IProfession getProfession(String id);
 
@@ -17,7 +17,5 @@ public interface IProfessionsManager {
 
     int getFreeColonists();
 
-    void increaseAmount(String professionId, boolean alreadyCharged);
-
-    void decreaseAmount(String professionId);
+    void increaseAmount(String professionId);
 }

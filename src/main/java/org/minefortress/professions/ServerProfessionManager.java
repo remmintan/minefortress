@@ -54,38 +54,30 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     }
 
     @Override
-    public void increaseAmount(String professionId, boolean itemsAlreadyCharged) {
+    public void increaseAmount(String professionId) {
         final IProfession profession = super.getProfession(professionId);
         if(profession == null) return;
-        if (profession.isHireMenu()) {
-            if(this.fortressManagerSupplier.get() instanceof ServerFortressManager fsm && fsm.getReservedPawnsCount() <= 0) {
-                LoggerFactory.getLogger(ServerProfessionManager.class).error("No reserved pawns but trying to hire a profession");
-                return;
-            }
-        } else {
-            if(super.getFreeColonists() <= 0) return;
+        
+        // Check for reserved pawns
+        if(this.fortressManagerSupplier.get() instanceof ServerFortressManager fsm && fsm.getReservedPawnsCount() <= 0) {
+            LoggerFactory.getLogger(ServerProfessionManager.class).error("No reserved pawns but trying to hire a profession");
+            return;
         }
-        if(super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, !itemsAlreadyCharged) != ProfessionResearchState.UNLOCKED) return;
 
-        if(!itemsAlreadyCharged) {
-            final var resourceManager = serverManagersProviderSupplier.get().getResourceManager();
-            resourceManager.removeItems(profession.getItemsRequirement());
-        }
+        if (super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE) != ProfessionResearchState.UNLOCKED)
+            return;
 
         profession.setAmount(profession.getAmount() + 1);
         scheduleSync();
     }
 
-    @Override
-    public void decreaseAmount(String professionId) {
-        decreaseAmount(professionId, false);
-    }
-
     public void decreaseAmount(String professionId, boolean force) {
+        // Only allow decreasing if force is true (for internal use)
+        if (!force) return;
+        
         final IProfession profession = super.getProfession(professionId);
         if(profession == null) return;
         if(profession.getAmount() <= 0) return;
-        if(profession.isHireMenu() && !force) return;
 
         profession.setAmount(profession.getAmount() - 1);
         scheduleSync();
@@ -94,8 +86,6 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     @Override
     public void tick(@Nullable ServerPlayerEntity player) {
         if(player == null) return;
-
-        tickRemoveFromProfession();
 
         if(needsUpdate) {
             final var essentialInfos = new ArrayList<IProfessionEssentialInfo>();
@@ -140,22 +130,6 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         return profToEntityMapper.getEntityTypeForProfession(professionId);
     }
 
-    private void tickRemoveFromProfession() {
-        for(Map.Entry<String, IProfession> entry : getProfessions().entrySet()) {
-            final String professionId = entry.getKey();
-            final IProfession profession = entry.getValue();
-            if(profession.cantVoluntaryRemoveFromThisProfession()) continue;
-            final List<IProfessional> pawnsWithProf = this.getPawnsWithProfession(professionId);
-            final int redundantProfCount = pawnsWithProf.size() - profession.getAmount();
-            if(redundantProfCount <= 0) continue;
-
-            pawnsWithProf
-                    .stream()
-                    .limit(redundantProfCount)
-                    .forEach(IProfessional::resetProfession);
-        }
-    }
-
     public void scheduleSync() {
         needsUpdate = true;
     }
@@ -183,12 +157,12 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     }
 
     public Optional<String> getProfessionsWithAvailablePlaces(boolean professionRequiresReservation) {
+        // All professions require reservation now
+        if (!professionRequiresReservation) return Optional.empty();
+        
         for(Map.Entry<String, IProfession> entry : getProfessions().entrySet()) {
             final String professionId = entry.getKey();
             final IProfession profession = entry.getValue();
-
-            if(professionRequiresReservation && !profession.isHireMenu()) continue;
-            if(!professionRequiresReservation && profession.isHireMenu()) continue;
 
             if(profession.getAmount() > 0) {
                 final long colonistsWithProfession = countPawnsWithProfession(professionId);
@@ -207,15 +181,6 @@ public final class ServerProfessionManager extends ProfessionManager implements 
                 .stream()
                 .filter(colonist -> colonist.getProfessionId().equals(professionId))
                 .count();
-    }
-
-    private List<IProfessional> getPawnsWithProfession(String professionId) {
-        final ServerFortressManager serverFortressManager = (ServerFortressManager) super.fortressManagerSupplier.get();
-        return serverFortressManager
-                .getProfessionals()
-                .stream()
-                .filter(colonist -> colonist.getProfessionId().equals(professionId))
-                .collect(Collectors.toList());
     }
 
 }

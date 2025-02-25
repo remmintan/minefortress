@@ -11,8 +11,6 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
 import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SOpenBuildingHireScreen;
-import net.remmintan.mods.minefortress.networking.c2s.ServerboundChangeProfessionStatePacket;
-import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 
 import java.util.List;
@@ -34,19 +32,15 @@ public final class ClientProfessionManager extends ProfessionManager implements 
     }
 
     @Override
-    public void increaseAmount(String professionId, boolean alreadyCharged) {
+    public void increaseAmount(String professionId) {
         if ("colonist".equals(professionId)) return;
         final var profession = this.getProfession(professionId);
-        final var unlockedForNormalIncrease = super.isRequirementsFulfilled(profession, CountProfessionals.INCREASE, true);
-        final var unlockedForHireMenu = super.isRequirementsFulfilled(profession, CountProfessionals.DONT_COUNT, false);
-        if (
-                unlockedForNormalIncrease == ProfessionResearchState.UNLOCKED ||
-                        profession.isHireMenu() && unlockedForHireMenu == ProfessionResearchState.UNLOCKED
-        ) {
-            final var change = ServerboundChangeProfessionStatePacket.AmountChange.ADD;
-            final var packet = new ServerboundChangeProfessionStatePacket(professionId, change);
-            FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
-        } else if (profession.isHireMenu() && unlockedForHireMenu == ProfessionResearchState.LOCKED_PARENT) {
+        
+        // Check if profession is unlocked
+        final var unlocked = super.isRequirementsFulfilled(profession, CountProfessionals.DONT_COUNT);
+        if (unlocked == ProfessionResearchState.UNLOCKED) {
+            openBuildingHireScreen(professionId);
+        } else if (unlocked == ProfessionResearchState.LOCKED_PARENT) {
             final var parent = profession.getParent();
             final var message = Text.literal("§cCan't hire " + profession.getTitle() + "§c. " +
                     "You need to unlock the " + parent.getTitle() + "§c profession first.");
@@ -55,25 +49,6 @@ public final class ClientProfessionManager extends ProfessionManager implements 
             Optional.ofNullable(MinecraftClient.getInstance().player)
                     .ifPresent(it -> it.sendMessage(message, false));
         }
-    }
-
-    @Override
-    public void decreaseAmount(String professionId) {
-        if ("colonist".equals(professionId)) return;
-        final var profession = this.getProfession(professionId);
-        final var cantRemove = profession.cantVoluntaryRemoveFromThisProfession();
-        if (cantRemove) {
-            final var message = Text.literal("§cCan't remove pawn from profession: " + profession.getTitle());
-            MinecraftClient.getInstance().setScreen(null);
-            Optional.ofNullable(MinecraftClient.getInstance().player)
-                    .ifPresent(it -> it.sendMessage(message, true));
-            return;
-        }
-        final ServerboundChangeProfessionStatePacket.AmountChange change =
-                ServerboundChangeProfessionStatePacket.AmountChange.REMOVE;
-        final ServerboundChangeProfessionStatePacket packet =
-                new ServerboundChangeProfessionStatePacket(professionId, change);
-        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_PROFESSION_STATE_CHANGE, packet);
     }
 
     @Override

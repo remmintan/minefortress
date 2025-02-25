@@ -156,8 +156,19 @@
       "building": {
         "type": "FORESTER",
         "level": 0
-      }
-    }
+      },
+      "items": [
+        {
+          "id": "minecraft:wooden_axe",
+          "count": 1
+        },
+        {
+          "id": "minecraft:shears",
+          "count": 1
+        }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "fisherman",
@@ -170,8 +181,19 @@
       "building": {
         "type": "FISHERMAN",
         "level": 0
-      }
-    }
+      },
+      "items": [
+        {
+          "id": "minecraft:fishing_rod",
+          "count": 1
+        },
+        {
+          "id": "minecraft:bucket",
+          "count": 1
+        }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "farmer",
@@ -184,8 +206,19 @@
       "building": {
         "type": "FARMER",
         "level": 0
-      }
-    }
+      },
+      "items": [
+        {
+          "id": "minecraft:wooden_hoe",
+          "count": 1
+        },
+        {
+          "id": "minecraft:wheat_seeds",
+          "count": 5
+        }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "crafter",
@@ -198,8 +231,19 @@
       "building": {
         "type": "CRAFTSMAN",
         "level": "0"
-      }
-    }
+      },
+      "items": [
+        {
+          "id": "minecraft:crafting_table",
+          "count": 1
+        },
+        {
+          "id": "minecraft:oak_planks",
+          "count": 10
+        }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "blacksmith",
@@ -212,8 +256,19 @@
       "building": {
         "type": "BLACKSMITH",
         "level": 0
-      }
-    }
+      },
+      "items": [
+        {
+          "id": "minecraft:furnace",
+          "count": 1
+        },
+        {
+          "id": "minecraft:coal",
+          "count": 5
+        }
+      ]
+    },
+    "hireMenu": true
   },
   {
     "key": "warrior1",

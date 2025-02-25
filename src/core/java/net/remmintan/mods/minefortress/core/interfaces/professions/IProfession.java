@@ -12,12 +12,6 @@ import java.util.List;
 public interface IProfession {
     String getId();
 
-    boolean isHireMenu();
-
-    default boolean cantVoluntaryRemoveFromThisProfession() {
-        return isHireMenu();
-    }
-
     String getTitle();
 
     ItemStack getIcon();
