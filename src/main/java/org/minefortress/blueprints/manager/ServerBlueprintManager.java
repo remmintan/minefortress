@@ -146,7 +146,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                         blueprintName,
                         id,
                         0,
-                        10,
+                        2, // Default capacity for new blueprints at level 1
                         group
                 )
         );

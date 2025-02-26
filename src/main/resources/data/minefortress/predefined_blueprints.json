@@ -3,208 +3,248 @@
     {
       "name": "Campfire",
       "file": "campfire",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     }
   ],
   "LIVING_HOUSES": [
     {
       "name": "Small House 1",
       "file": "small_house_1",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Small House 2",
       "file": "small_house_2",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Small House 3",
       "file": "small_house_3",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Small House 4",
       "file": "small_house_4",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Small House 5",
       "file": "small_house_5",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 4
     },
     {
       "name": "Small House 6",
       "file": "small_house_6",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Small House 7",
       "file": "small_house_7",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Small House 8",
       "file": "small_house_8",
-      "floorLevel": 2
+      "floorLevel": 2,
+      "capacity": 6
     },
     {
       "name": "Medium House 1",
       "file": "medium_house_1",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 4
     },
     {
       "name": "Medium House 2",
       "file": "medium_house_2",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 4
     },
     {
       "name": "Big House 1",
       "file": "big_house_1",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 6
     },
     {
       "name": "Library 1",
       "file": "library_1",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Library 2",
       "file": "library_2",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 4
     },
     {
       "name": "Temple 3",
       "file": "temple_3",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Temple 4",
       "file": "temple_4",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     }
   ],
   "WORKSHOPS": [
     {
       "name": "Crafting table",
       "file": "crafting_table",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Tool Smith 1",
       "file": "tool_smith_1",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Forester's house",
       "file": "forester_house",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Wooden Miner's House",
       "file": "miner_house_wooden",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Stone Miner's house",
       "file": "miner_house_stone",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Miners' guild house",
       "file": "miner_house_guild",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 4
     },
     {
       "name": "Wooden Lumberjack's house",
       "file": "lumberjack_house_wooden",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Stone Lumberjack's house",
       "file": "lumberjack_house_stone",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Lumberjack's guild house",
       "file": "lumberjack_house_guild",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 4
     },
     {
       "name": "Blacksmith's house",
       "file": "small_house_3_with_furnace",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Weaponsmith 1",
       "file": "weaponsmith_1",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Small Warrior's house",
       "file": "warrior_1",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Medium Warrior's house",
       "file": "warrior_2",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 4
     },
     {
       "name": "Shooting gallery",
       "file": "shooting_gallery",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Fisher Cottage 1",
       "file": "fisher_cottage_1",
-      "floorLevel": 2
+      "floorLevel": 2,
+      "capacity": 6
     },
     {
       "name": "Small Farm 1",
       "file": "small_farm_1",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 2
     },
     {
       "name": "Large Farm 1",
       "file": "large_farm_1",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 4
     }
   ],
   "DECORATION": [
     {
       "name": "Accessory 1",
       "file": "accessory_1",
-      "floorLevel": 0
+      "floorLevel": 0,
+      "capacity": 0
     },
     {
       "name": "Fountain 01",
       "file": "fountain_01",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 0
     },
     {
       "name": "Meeting Point 1",
       "file": "meeting_point_1",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 0
     },
     {
       "name": "Meeting Point 2",
       "file": "meeting_point_2",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 0
     },
     {
       "name": "Meeting Point 3",
       "file": "meeting_point_3",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 0
     },
     {
       "name": "Meeting Point 4",
       "file": "meeting_point_4",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 0
     },
     {
       "name": "Meeting Point 5",
       "file": "meeting_point_5",
-      "floorLevel": 1
+      "floorLevel": 1,
+      "capacity": 0
     }
   ]
 }

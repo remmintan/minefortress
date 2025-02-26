@@ -58,17 +58,19 @@ public class BlueprintMetadataReader {
         String name = null;
         String file = null;
         int floorLevel = 0;
+        int capacity = 2; // Default capacity if not specified
         while (jsonReader.hasNext()) {
             final var propertyName = jsonReader.nextName();
             switch (propertyName) {
                 case "name" -> name = jsonReader.nextString();
                 case "file" -> file = jsonReader.nextString();
                 case "floorLevel" -> floorLevel = jsonReader.nextInt();
+                case "capacity" -> capacity = jsonReader.nextInt();
                 default -> throw new RuntimeException("Unknown property " + propertyName);
             }
         }
         jsonReader.endObject();
-        return new BlueprintMetadata(name, file, floorLevel, 10, group);
+        return new BlueprintMetadata(name, file, floorLevel, capacity, group);
     }
 
 }
