@@ -2,8 +2,7 @@ package net.remmintan.mods.minefortress.gui.building
 
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.widget.ButtonWidget
-import net.minecraft.text.Text
+import net.remmintan.mods.minefortress.gui.building.functions.IBuildingFunctions
 import net.remmintan.mods.minefortress.gui.building.handlers.IProductionLineTabHandler
 
 class ProductionLineTab(
@@ -16,44 +15,25 @@ class ProductionLineTab(
     override var backgroundWidth: Int = 0
     override var backgroundHeight: Int = 0
 
-    private var switchToSurvivalButton: ButtonWidget? = null
+    private var buildingFunctions: IBuildingFunctions? = null
 
     fun render(context: DrawContext, mouseX: Int, mouseY: Int) {
-        if (handler.isCampfire()) {
-            renderCampfireOptions(context, mouseX, mouseY)
-        }
-    }
+        if (handler.hasFunctions()) {
+            // Lazy initialize the building functions
+            if (buildingFunctions == null) {
+                buildingFunctions = handler.getBuildingFunctions(textRenderer)
+            }
 
-    private fun renderCampfireOptions(context: DrawContext, mouseX: Int, mouseY: Int) {
-        // Create the button if it doesn't exist
-        if (switchToSurvivalButton == null) {
-            switchToSurvivalButton = ButtonWidget.builder(
-                Text.literal("Explore your village!"),
-                { handler.switchToSurvivalMode() }
-            )
-                .dimensions(0, 0, 200, 20)
-                .build()
-        } else {
-            // Update button position when screen is resized
-            switchToSurvivalButton!!.setPosition(backgroundWidth / 2 - 100, 40)
+            // Render the building functions
+            buildingFunctions?.render(context, x, y, backgroundWidth, backgroundHeight, mouseX, mouseY)
         }
-
-        // Render the button
-        val (translatedMouseX, translatedMouseY) = context.matrices.translateMousePosition(mouseX, mouseY)
-        switchToSurvivalButton!!.render(context, translatedMouseX, translatedMouseY, 0f)
     }
 
     fun onMouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (handler.isCampfire() && switchToSurvivalButton != null) {
-            if (switchToSurvivalButton!!.isHovered) {
-                switchToSurvivalButton!!.onClick(mouseX, mouseY)
-                return true
-            }
-        }
-        return false
+        return buildingFunctions?.onMouseClicked(mouseX, mouseY, button) ?: false
     }
 
     fun tick() {
-        // No tick logic needed for now
+        buildingFunctions?.tick()
     }
 } 

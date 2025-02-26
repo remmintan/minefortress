@@ -42,8 +42,8 @@ class BuildingScreenHandler(
             )
         }
 
-        // Add Production Line tab only for Campfire
-        if (this.isCampfire()) {
+        // Add Production Line tab only for buildings with functions
+        if (this.hasFunctions()) {
             tabsList.add(
                 BuildingScreenTab(
                     Items.DIAMOND,
