@@ -1,7 +1,7 @@
 package org.minefortress.renderer.gui.hud.hints;
 
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class BuildBlueprintHintsLayer extends AbstractHintsLayer {
 
     @Override
     protected List<String> getHints() {
-        final var blueprintManager = CoreModUtils.getBlueprintManager();
+        final var blueprintManager = ClientModUtils.getBlueprintManager();
         if (blueprintManager.isUpgrading()) {
             if (!blueprintManager.intersectsUpgradingBuilding()) {
                 final var hints = new ArrayList<String>();
@@ -49,6 +49,6 @@ public class BuildBlueprintHintsLayer extends AbstractHintsLayer {
     }
 
     private IClientBlueprintManager getBlueprintManager() {
-        return CoreModUtils.getManagersProvider().get_BlueprintManager();
+        return ClientModUtils.getManagersProvider().get_BlueprintManager();
     }
 }

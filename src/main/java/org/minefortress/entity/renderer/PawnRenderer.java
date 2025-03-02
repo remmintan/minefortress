@@ -1,7 +1,6 @@
 package org.minefortress.entity.renderer;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -16,11 +15,10 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
-import net.minecraft.world.GameMode;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
@@ -28,8 +26,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.renderer.models.PawnModel;
-
-import java.util.Optional;
 
 public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel> {
 
@@ -64,7 +60,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
 
     @NotNull
     private static Vector3f getColorBaseOnMode(BasePawnEntity pawn) {
-        final var state = CoreModUtils.getManagersProvider().get_ClientFortressManager().getState();
+        final var state = ClientModUtils.getManagersProvider().get_ClientFortressManager().getState();
         final boolean warrior = pawn instanceof IWarrior;
         final var combatState = state == FortressState.COMBAT;
         if (combatState && warrior || !combatState && !warrior)
@@ -79,11 +75,6 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
         super.render(pawn, f, g, matrixStack, vertexConsumerProvider, i);
 
         final MinecraftClient client = getClient();
-        final GameMode currentGamemode = Optional
-                .ofNullable(client.interactionManager)
-                .map(ClientPlayerInteractionManager::getCurrentGameMode)
-                .orElse(GameMode.DEFAULT);
-
         if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == pawn;
             final var fightSelecting = isThisPawnSelected(pawn);
@@ -102,7 +93,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     }
 
     private boolean isThisPawnSelected(BasePawnEntity pawn) {
-        return CoreModUtils.getManagersProvider().get_PawnsSelectionManager().isSelected(pawn);
+        return ClientModUtils.getManagersProvider().get_PawnsSelectionManager().isSelected(pawn);
     }
 
     private float getHealthFoodLevel(BasePawnEntity colonist) {

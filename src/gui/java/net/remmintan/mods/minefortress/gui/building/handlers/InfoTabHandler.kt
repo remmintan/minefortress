@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockBox
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper
 import net.remmintan.mods.minefortress.networking.c2s.C2SDestroyBuilding
 import net.remmintan.mods.minefortress.networking.c2s.C2SRepairBuilding
@@ -23,8 +23,8 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
     }
 
     override val upgrades: List<BlueprintSlot> by lazy {
-        val blueprintManager = CoreModUtils.getBlueprintManager()
-        val resourceManager = CoreModUtils.getFortressManager().resourceManager
+        val blueprintManager = ClientModUtils.getBlueprintManager()
+        val resourceManager = ClientModUtils.getFortressManager().resourceManager
         building.upgrades
             .map { blueprintManager.blueprintMetadataManager.getByBlueprintId(it) }
             .filter { it.isPresent }
@@ -41,11 +41,11 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
     override fun getBlueprintMetadata(): BlueprintMetadata = building.metadata
     override fun getHealth() = building.health
     override fun getItemsToRepair(): List<ItemInfo> = building.repairItemInfos
-    override fun hasSelectedPawns() = CoreModUtils.getPawnsSelectionManager().hasSelected()
+    override fun hasSelectedPawns() = ClientModUtils.getPawnsSelectionManager().hasSelected()
 
     override fun getEnoughItems(): Map<ItemInfo, Boolean> {
         val itemsToRepair = getItemsToRepair()
-        val resourceManager = CoreModUtils.getFortressManager().resourceManager
+        val resourceManager = ClientModUtils.getFortressManager().resourceManager
         return itemsToRepair
             .associateWith { SimilarItemsHelper.isIgnorable(it.item) || resourceManager.hasItem(it, itemsToRepair) }
             .withDefault { false }
@@ -53,8 +53,8 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
 
     override fun upgrade(slot: BlueprintSlot) {
         val buildingBox = BlockBox.create(building.start, building.end)
-        CoreModUtils.getBlueprintManager().selectToUpgrade(slot.metadata, buildingBox, building.pos)
-        CoreModUtils.getClientPlayer().closeScreen()
+        ClientModUtils.getBlueprintManager().selectToUpgrade(slot.metadata, buildingBox, building.pos)
+        ClientModUtils.getClientPlayer().closeScreen()
     }
 
     override fun canDestroy(): Boolean {
@@ -74,7 +74,7 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
 
     override fun repair() {
         if (infoTabState == InfoTabState.REPAIR) {
-            val selectedPawns = CoreModUtils.getPawnsSelectionManager().selectedPawnsIds
+            val selectedPawns = ClientModUtils.getPawnsSelectionManager().selectedPawnsIds
             val packet = C2SRepairBuilding(building.pos, selectedPawns)
             FortressClientNetworkHelper.send(C2SRepairBuilding.CHANNEL, packet)
             MinecraftClient.getInstance().setScreen(null)

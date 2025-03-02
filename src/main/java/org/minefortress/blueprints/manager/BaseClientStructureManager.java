@@ -9,7 +9,8 @@ import net.remmintan.mods.minefortress.blocks.FortressBlocks;
 import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
-import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -47,9 +48,9 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
         return structureBuildPos;
     }
     private void checkNotEnoughResources() {
-        final var fortressClientManager = ((IClientManagersProvider)client).get_ClientFortressManager();
         final var campfire = getSelectedStructure().getId().equals("campfire");
-        if (fortressClientManager.isSurvival() && !campfire) {
+        if (ClientExtensionsKt.isSurvivalFortress(MinecraftClient.getInstance()) && !campfire) {
+            final var fortressClientManager = ClientModUtils.getFortressManager();
             final var resourceManager = fortressClientManager.getResourceManager();
             final var stacks = getBlockData().getStacks();
             enoughResources = resourceManager.hasItems(stacks);

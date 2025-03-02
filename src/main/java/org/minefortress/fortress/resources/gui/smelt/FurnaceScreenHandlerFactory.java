@@ -12,7 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -33,13 +33,11 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        if(player instanceof ServerPlayerEntity fortressServerPlayer) {
-            final var modServerManager = ((IFortressServer) fortressServerPlayer.server).get_FortressModServerManager();
-            final var provider = modServerManager.getManagersProvider(fortressServerPlayer);
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+            final var provider = ServerModUtils.getManagersProvider(serverPlayer);
             final var professionManager = provider.getProfessionsManager();
             final var blacksmithsCount = professionManager.getProfession("blacksmith").getAmount();
-            final var otherFurnaceBlocks = modServerManager
-                    .getManagersProvider(fortressServerPlayer)
+            final var otherFurnaceBlocks = provider
                     .getBuildingsManager()
                     .getBuildings(ProfessionType.BLACKSMITH)
                     .stream()
@@ -60,7 +58,6 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
                     })
                     .filter(Objects::nonNull)
                     .toList();
-
 
             final var selectedBlockEnt = player.getWorld().getBlockEntity(selectedFurnacePos);
             if(selectedBlockEnt instanceof FurnaceBlockEntity furnaceBlockEntity) {

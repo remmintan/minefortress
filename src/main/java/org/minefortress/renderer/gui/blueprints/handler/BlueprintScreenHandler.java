@@ -7,6 +7,7 @@ import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundEditBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -68,7 +69,7 @@ public final class BlueprintScreenHandler {
                 if (m >= 0 && m < this.totalSize) {
                     final BlueprintMetadata blueprintMetadata = allBlueprint.get(m);
                     final var blockData = blueprintManager.getBlockDataProvider().getBlockData(blueprintMetadata.getId(), BlockRotation.NONE);
-                    if(fortressClientManager.isSurvival()) {
+                    if (ClientExtensionsKt.isSurvivalFortress(MinecraftClient.getInstance())) {
                         final var stacks = blockData.getStacks();
                         final var hasEnoughItems = resourceManager.hasItems(stacks);
                         this.currentSlots.add(new BlueprintSlot(blueprintMetadata, hasEnoughItems, blockData));

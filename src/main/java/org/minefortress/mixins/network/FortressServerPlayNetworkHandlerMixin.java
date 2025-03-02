@@ -93,7 +93,7 @@ public class FortressServerPlayNetworkHandlerMixin {
             if(stack.getNbt() == null) stack.setNbt(new NbtCompound());
 
             final NbtCompound nbt = stack.getNbt();
-            nbt.putUuid(BasePawnEntity.FORTRESS_ID_NBT_KEY, player.getUuid());
+            nbt.putUuid(BasePawnEntity.FORTRESS_CENTER_BLOCK_KEY, player.getUuid());
         }
     }
 

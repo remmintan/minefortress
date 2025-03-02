@@ -11,7 +11,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundRoadsTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -31,7 +31,7 @@ public class RoadsSelection extends WallsSelection{
             final UUID digTaskId = UUID.randomUUID();
             final UUID placeTaskId = UUID.randomUUID();
 
-            final var selectionManager = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
+            final var selectionManager = ClientModUtils.getManagersProvider().get_PawnsSelectionManager();
             final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
             final var packet = new ServerboundRoadsTaskPacket(digTaskId, placeTaskId, getSelection(), selectedPawnsIds);
             FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_ROADS_TASK, packet);

@@ -2,7 +2,7 @@ package net.remmintan.mods.minefortress.gui.building.handlers
 
 import net.minecraft.item.ItemStack
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.networking.c2s.C2SHireProfessional
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 
@@ -64,6 +64,6 @@ class WorkforceTabHandler(private val provider: IBuildingProvider) : IWorkforceT
     }
 
     override fun getAvailablePawns(): Int {
-        return CoreModUtils.getProfessionManager().freeColonists
+        return ClientModUtils.getProfessionManager().freeColonists
     }
 }

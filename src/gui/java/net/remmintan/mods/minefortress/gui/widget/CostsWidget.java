@@ -8,10 +8,11 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.util.GuiUtils;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public class CostsWidget implements Drawable, Element {
 
@@ -55,29 +56,13 @@ public class CostsWidget implements Drawable, Element {
         var endY = y + 25;
 
         if (mouseX >= x && mouseX <= endX && mouseY >= y && mouseY <= endY) {
-            final var tooltip = List.of("Recruitment Costs. Displays the resources", "required to hire a new unit.").stream().map(Text::of).toList();
+            final var tooltip = Stream.of("Recruitment Costs. Displays the resources", "required to hire a new unit.").map(Text::of).toList();
             drawContext.drawTooltip(getTextRenderer(), tooltip, mouseX, mouseY);
         }
     }
 
-    public boolean isEnough() {
-        for(var ent : costs) {
-            final var stack = ent.item().getDefaultStack();
-            final var amount = ent.amount();
-            final var actualItemAmount = getItemAmount(stack);
-            if(actualItemAmount < amount) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public List<ItemInfo> getCosts() {
-        return costs;
-    }
-
     private static int getItemAmount(ItemStack stack) {
-        final var fortressClientManager = CoreModUtils.getFortressManager();
+        final var fortressClientManager = ClientModUtils.getFortressManager();
         return fortressClientManager.getResourceManager().getItemAmount(stack.getItem());
     }
 

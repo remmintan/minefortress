@@ -6,7 +6,8 @@ import net.minecraft.item.Items;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.ScreenType;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 import net.remmintan.mods.minefortress.gui.widget.DynamicTextButtonWidget;
 import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
@@ -42,7 +43,7 @@ public class ColonistsHudLayer extends AbstractHudLayer {
             new ItemButtonWidget(
                     35, 0,
                 Items.PLAYER_HEAD,
-                    btn -> client.setScreen(new ProfessionsScreen(CoreModUtils.getManagersProvider())),
+                    btn -> client.setScreen(new ProfessionsScreen(ClientModUtils.getManagersProvider())),
                 "Manage professions"
             )
         );
@@ -94,17 +95,17 @@ public class ColonistsHudLayer extends AbstractHudLayer {
     }
 
     private String getColonistsCountText() {
-        return "x" + CoreModUtils.getFortressManager().getTotalColonistsCount();
+        return "x" + ClientModUtils.getFortressManager().getTotalColonistsCount();
     }
 
     private boolean hasProfessionInAVillage(String professionId) {
-        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && CoreModUtils.getProfessionManager().hasProfession(professionId);
+        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && ClientModUtils.getProfessionManager().hasProfession(professionId);
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (CoreModUtils.getFortressManager().isCreative()) {
+        if (ClientExtensionsKt.isCreativeFortress(this.client)) {
             craftingButton.visible = false;
             furnaceButton.visible = false;
         } else {

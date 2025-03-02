@@ -4,7 +4,7 @@ package org.minefortress.renderer.gui.hud.hints;
 import com.google.common.collect.Lists;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 import net.remmintan.mods.minefortress.gui.hud.interfaces.IHintsLayer;
 import org.minefortress.renderer.gui.hud.AbstractHudLayer;
@@ -40,6 +40,6 @@ abstract class AbstractHintsLayer  extends AbstractHudLayer implements IHintsLay
 
     @Override
     public boolean shouldRender(HudState hudState) {
-        return !CoreModUtils.getManagersProvider().getSelectedColonistProvider().isSelectingColonist();
+        return !ClientModUtils.getManagersProvider().getSelectedColonistProvider().isSelectingColonist();
     }
 }

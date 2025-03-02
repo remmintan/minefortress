@@ -6,6 +6,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,8 +60,7 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
         final var stackInHand = player.getStackInHand(Hand.MAIN_HAND);
         final var item = stackInHand.getItem();
 
-        final var manager = getFortressManager(player);
-        if(manager.isSurvival())
+        if (ServerExtensionsKt.isSurvivalFortress(server))
             resourceManager.reserveItems(placeUuid, Collections.singletonList(resourceManager.createItemInfo(item, blocks.size())));
 
         final var digTask = tasksCreator.createRoadsTask(digUuid, blocks, null);

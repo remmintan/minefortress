@@ -15,7 +15,7 @@ import net.minecraft.world.GameMode;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -60,11 +60,12 @@ public abstract class FortressClientInteractionManagerMixin {
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     public void attackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) return;
-        final var clientBlueprintManager = CoreModUtils.getBlueprintManager();
-        final var fortressManager = CoreModUtils.getFortressManager();
-        final var buildingsManager = CoreModUtils.getBuildingsManager();
+        final var clientBlueprintManager = ClientModUtils.getBlueprintManager();
+        final var fortressManager = ClientModUtils.getFortressManager();
+        final var buildingsManager = ClientModUtils.getBuildingsManager();
+        final var fortressCenterManager = ClientModUtils.getFortressCenterManager();
 
-        if (fortressManager.isCenterNotSet()) {
+        if (fortressCenterManager.isCenterNotSet()) {
             cir.setReturnValue(false);
             return;
         }
@@ -87,13 +88,13 @@ public abstract class FortressClientInteractionManagerMixin {
         }
 
         if (fortressManager.getState() == FortressState.AREAS_SELECTION) {
-            final var areasClientManager = CoreModUtils.getAreasClientManager();
+            final var areasClientManager = ClientModUtils.getAreasClientManager();
             areasClientManager.select(client.crosshairTarget);
             cir.setReturnValue(false);
             return;
         }
 
-        CoreModUtils.getSelectionManager().selectBlock(pos);
+        ClientModUtils.getSelectionManager().selectBlock(pos);
         cir.setReturnValue(false);
     }
 

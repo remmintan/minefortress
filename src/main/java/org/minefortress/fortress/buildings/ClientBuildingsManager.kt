@@ -9,7 +9,7 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderI
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.networking.c2s.C2SOpenBuildingScreen
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 import org.minefortress.utils.BlockUtils
@@ -79,7 +79,7 @@ class ClientBuildingsManager : IClientBuildingsManager {
 
     override fun getBuildingHealths(): List<BuildingHealthRenderInfo> {
 
-        return when (CoreModUtils.getFortressManager().state) {
+        return when (ClientModUtils.getFortressManager().state) {
             COMBAT -> getBuildingsStream()
                 .filter { it.health < 100 }
                 .map { buildingToHealthRenderInfo(it) }

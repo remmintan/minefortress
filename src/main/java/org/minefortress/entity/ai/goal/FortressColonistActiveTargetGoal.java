@@ -5,6 +5,7 @@ import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.HostileEntity;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
 
 public class FortressColonistActiveTargetGoal extends ActiveTargetGoal<HostileEntity> {
@@ -27,13 +28,11 @@ public class FortressColonistActiveTargetGoal extends ActiveTargetGoal<HostileEn
         }
 
         if(this.targetEntity != null) {
-            final var manager = this.colonist.getServerFortressManager();
-            if(manager.isPresent()) {
-                final var serverManager = manager.get();
-                final var targetWithinFortress = serverManager.isPositionWithinFortress(this.targetEntity.getBlockPos());
-                if(targetWithinFortress) {
-                    return true;
-                }
+            // Using ServerModUtils.getFortressManager directly instead of colonist.getServerFortressManager()
+            final var serverManager = ServerModUtils.getFortressManager(this.colonist);
+            final var targetWithinFortress = serverManager.isPositionWithinFortress(this.targetEntity.getBlockPos());
+            if (targetWithinFortress) {
+                return true;
             }
         }
 

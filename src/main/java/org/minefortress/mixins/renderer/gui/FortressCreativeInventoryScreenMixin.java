@@ -29,7 +29,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.renderer.gui.resources.FortressSurvivalInventoryScreenHandler;
 import org.spongepowered.asm.mixin.Final;
@@ -92,7 +93,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
 
     @Unique
     private static boolean isFortressSurvival() {
-        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && !CoreModUtils.getFortressManager().isCreative();
+        return FortressGamemodeUtilsKt.isClientInFortressGamemode() && ClientExtensionsKt.isSurvivalFortress(MinecraftClient.getInstance());
     }
 
     @Redirect(method = "onMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;dropItem(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/entity/ItemEntity;"))
@@ -146,45 +147,9 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         }
     }
 
-
-    @Inject(method = "drawBackground", at = @At("HEAD"), cancellable = true)
-    public void drawBackground(DrawContext context, float delta, int mouseX, int mouseY, CallbackInfo ci) {
-        if(isFortressSurvival()) {
-            ItemGroup itemGroup = selectedTab;
-            for (ItemGroup itemGroup2 : getResourceManager().getGroups()) {
-                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-                RenderSystem.setShaderTexture(0, SCROLLER_TEXTURE);
-                if (itemGroup2 == selectedTab) continue;
-                this.renderTabIcon(context, itemGroup2);
-            }
-            final var texture = new Identifier(TAB_TEXTURE_PREFIX + itemGroup.getTexture());
-            context.drawTexture(texture, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
-            this.searchBox.render(context, mouseX, mouseY, delta);
-            int i = this.x + 175;
-            int j = this.y + 18;
-            int k = j + 112;
-            if (itemGroup.hasScrollbar()) {
-                Identifier identifier = this.hasScrollbar() ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
-                context.drawGuiTexture(identifier, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 12, 15);
-            }
-            this.renderTabIcon(context, itemGroup);
-            if (itemGroup == Registries.ITEM_GROUP.get(ItemGroups.INVENTORY)) {
-                InventoryScreen.drawEntity(
-                        context,
-                        this.x + 88,
-                        this.y + 45,
-                        this.x + 98,
-                        this.y + 55,
-                        20,
-                        0f,
-                        this.x + 88 - mouseX,
-                        this.y + 45 - 30 - mouseY,
-                        CoreModUtils.getClientPlayer()
-                );
-            }
-
-            ci.cancel();
-        }
+    @Unique
+    private static IClientResourceManager getResourceManager() {
+        return ClientModUtils.getFortressManager().getResourceManager();
     }
 
     @Redirect(method = "onMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;dropCreativeStack(Lnet/minecraft/item/ItemStack;)V"))
@@ -220,9 +185,7 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
             this.searchResultTags.clear();
             String string = this.searchBox.getText();
             if (string.isEmpty()) {
-                for (Item item : Registries.ITEM) {
-                    this.handler.itemList.addAll(selectedTab.getDisplayStacks());
-                }
+                this.handler.itemList.addAll(selectedTab.getDisplayStacks());
             } else {
                 final SearchProvider searchProvider;
                 if (string.startsWith("#")) {
@@ -246,14 +209,49 @@ public abstract class FortressCreativeInventoryScreenMixin extends AbstractInven
         return MinecraftClient.getInstance();
     }
 
-    @Unique
-    private static IClientResourceManager getResourceManager() {
-        return CoreModUtils.getFortressManager().getResourceManager();
+    @Inject(method = "drawBackground", at = @At("HEAD"), cancellable = true)
+    public void drawBackground(DrawContext context, float delta, int mouseX, int mouseY, CallbackInfo ci) {
+        if(isFortressSurvival()) {
+            ItemGroup itemGroup = selectedTab;
+            for (ItemGroup itemGroup2 : getResourceManager().getGroups()) {
+                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+                RenderSystem.setShaderTexture(0, SCROLLER_TEXTURE);
+                if (itemGroup2 == selectedTab) continue;
+                this.renderTabIcon(context, itemGroup2);
+            }
+            final var texture = new Identifier(TAB_TEXTURE_PREFIX + itemGroup.getTexture());
+            context.drawTexture(texture, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
+            this.searchBox.render(context, mouseX, mouseY, delta);
+            int i = this.x + 175;
+            int j = this.y + 18;
+            int k = j + 112;
+            if (itemGroup.hasScrollbar()) {
+                Identifier identifier = this.hasScrollbar() ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
+                context.drawGuiTexture(identifier, i, j + (int)((float)(k - j - 17) * this.scrollPosition), 12, 15);
+            }
+            this.renderTabIcon(context, itemGroup);
+            if (itemGroup == Registries.ITEM_GROUP.get(ItemGroups.INVENTORY)) {
+                InventoryScreen.drawEntity(
+                        context,
+                        this.x + 88,
+                        this.y + 45,
+                        this.x + 98,
+                        this.y + 55,
+                        20,
+                        0f,
+                        this.x + 88 - mouseX,
+                        this.y + 45 - 30 - mouseY,
+                        ClientModUtils.getClientPlayer()
+                );
+            }
+
+            ci.cancel();
+        }
     }
 
     @Inject(method = "handledScreenTick", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo ci) {
-        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && CoreModUtils.getFortressManager().isSurvival()) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode() && ClientExtensionsKt.isSurvivalFortress(MinecraftClient.getInstance())) {
             if(this.isInventoryTabSelected()) {
                 this.setSelectedTab(Registries.ITEM_GROUP.get(ItemGroups.BUILDING_BLOCKS));
             }

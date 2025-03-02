@@ -9,6 +9,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressA
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.HungryEntity;
 
@@ -43,10 +44,9 @@ public class EatGoal extends Goal {
     }
 
     private Optional<IServerResourceManager> getResourceManager() {
-        return entity instanceof IFortressAwareEntity f ?
-                f.getManagersProvider()
-                .map(IServerManagersProvider::getResourceManager)
-                        .map(iServerResourceManager -> iServerResourceManager) :
+        return entity instanceof IFortressAwareEntity fortressEntity ?
+                Optional.of(ServerModUtils.getManagersProvider(fortressEntity))
+                        .map(IServerManagersProvider::getResourceManager) :
                 Optional.empty();
     }
 

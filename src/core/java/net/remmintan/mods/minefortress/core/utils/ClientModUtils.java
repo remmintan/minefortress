@@ -2,19 +2,15 @@ package net.remmintan.mods.minefortress.core.utils;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.client.IFortressCenterManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.renderers.IRenderersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreasClientManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
@@ -23,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.Optional;
 
-public class CoreModUtils {
+public final class ClientModUtils {
 
     public static IRenderersProvider getRenderersProvider() {
         final var client = MinecraftClient.getInstance();
@@ -41,18 +37,6 @@ public class CoreModUtils {
         throw new IllegalStateException("MinecraftClient is not an instance of IMineFortressManagersProvider");
     }
 
-    public static IServerManagersProvider getManagersProvider(ServerPlayerEntity player) {
-        final var fortressServer = (IFortressServer) player.server;
-        return fortressServer.get_FortressModServerManager().getManagersProvider(player);
-    }
-
-    public static boolean isPlayerInCreative(IFortressAwareEntity colonist) {
-        return colonist
-                .getServerFortressManager()
-                .map(IServerFortressManager::isCreative)
-                .orElse(false);
-    }
-
     public static Optional<IClientTasksHolder> getClientTasksHolder() {
         return Optional
                 .ofNullable(MinecraftClient.getInstance())
@@ -65,9 +49,8 @@ public class CoreModUtils {
         return getManagersProvider().get_ClientFortressManager();
     }
 
-    public static IServerFortressManager getFortressManager(ServerPlayerEntity player) {
-        final var fortressServer = (IFortressServer) player.server;
-        return fortressServer.get_FortressModServerManager().getFortressManager(player);
+    public static IFortressCenterManager getFortressCenterManager() {
+        return getManagersProvider().get_FortressCenterManager();
     }
 
     public static IClientProfessionManager getProfessionManager() {

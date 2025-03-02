@@ -2,7 +2,7 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 
 class PawnsSelectionHudLayer extends AbstractHudLayer {
@@ -21,7 +21,7 @@ class PawnsSelectionHudLayer extends AbstractHudLayer {
     }
 
     private void renderCurrentSelection(DrawContext drawContext) {
-        final var pawnsSelectionManager = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
+        final var pawnsSelectionManager = ClientModUtils.getManagersProvider().get_PawnsSelectionManager();
         if(pawnsSelectionManager.isSelecting()) {
             final var selectionStartPos = pawnsSelectionManager.getMouseStartPos();
             final var selectionCurPos = pawnsSelectionManager.getMouseEndPos();

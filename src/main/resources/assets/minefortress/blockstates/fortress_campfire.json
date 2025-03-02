@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "minefortress:block/fortress_campfire",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "minefortress:block/fortress_campfire"
+    },
+    "facing=south": {
+      "model": "minefortress:block/fortress_campfire",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "minefortress:block/fortress_campfire",
+      "y": 270
+    }
+  }
+} 

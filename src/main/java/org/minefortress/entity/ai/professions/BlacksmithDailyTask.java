@@ -1,18 +1,14 @@
 package org.minefortress.entity.ai.professions;
 
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
 
-import java.util.Collections;
-import java.util.Optional;
 import java.util.Random;
 
 public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
@@ -36,18 +32,17 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     @Override
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
-        final var buildings = colonist
-                .getManagersProvider()
-                .map(it -> it.getBuildingsManager().getBuildings(ProfessionType.BLACKSMITH))
-                .orElse(Collections.emptyList());
+        // Use ServerModUtils to get buildings directly
+        final var buildingsManager = ServerModUtils.getManagersProvider(colonist).getBuildingsManager();
+        final var buildings = buildingsManager.getBuildings(ProfessionType.BLACKSMITH);
+
         if (buildings.isEmpty()) {
             return null;
         }
+
         final var i = new Random().nextInt(buildings.size());
-        return Optional
-                .ofNullable(buildings.get(i).getFurnace())
-                .map(BlockEntity::getPos)
-                .orElse(null);
+        final var furnace = buildings.get(i).getFurnace();
+        return furnace != null ? furnace.getPos() : null;
     }
 
     @Override
@@ -56,15 +51,14 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
     }
 
     private boolean shouldWork(Colonist colonist){
-        return atLeastOneFurnaceIsBurning(colonist) || furnaceScreenIsOpen(colonist);
+        return atLeastOneFurnaceIsBurning(colonist);
     }
 
     private boolean atLeastOneFurnaceIsBurning(Colonist colonist){
-        final var buildings = colonist
-                .getManagersProvider()
-                .map(IServerManagersProvider::getBuildingsManager)
-                .map(it -> it.getBuildings(ProfessionType.BLACKSMITH))
-                .orElse(Collections.emptyList());
+        // Use ServerModUtils to get buildings directly
+        final var buildingsManager = ServerModUtils.getManagersProvider(colonist).getBuildingsManager();
+        final var buildings = buildingsManager.getBuildings(ProfessionType.BLACKSMITH);
+
         for (IFortressBuilding building : buildings) {
             final var furnace = building.getFurnace();
             if (furnace != null && furnace.isBurning()) {
@@ -73,9 +67,5 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
         }
 
         return false;
-    }
-
-    private boolean furnaceScreenIsOpen(Colonist colonist){
-        return colonist.isScreenOpen(FortressFurnaceScreenHandler.class);
     }
 }

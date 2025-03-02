@@ -15,25 +15,29 @@ import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.interfaces.FortressSlimeEntity;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 public abstract class BasePawnEntity extends HungryEntity implements IFortressAwareEntity {
 
-    public static final String FORTRESS_ID_NBT_KEY = "fortress_id";
+    public static final String FORTRESS_CENTER_BLOCK_KEY = "fortress_center_block";
     private static final String BODY_TEXTURE_ID_NBT_KEY = "body_texture_id";
 
-    private static final TrackedData<Optional<UUID>> MASTER_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    private static final TrackedData<Optional<BlockPos>> FORTRESS_CENTER = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
     private static final TrackedData<Integer> BODY_TEXTURE_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     protected BasePawnEntity(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
@@ -43,7 +47,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(MASTER_ID, Optional.empty());
+        this.dataTracker.startTracking(FORTRESS_CENTER, Optional.empty());
         this.dataTracker.startTracking(BODY_TEXTURE_ID, new Random().nextInt(4));
     }
 
@@ -62,44 +66,48 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         if(entityNbt == null) throw new IllegalStateException("Entity nbt cannot be null");
-        final var masterPlayerId = entityNbt.getUuid(FORTRESS_ID_NBT_KEY);
-        this.setMasterId(masterPlayerId);
+        final var posLong = entityNbt.getLong(FORTRESS_CENTER_BLOCK_KEY);
+        final var fortressCenter = BlockPos.fromLong(posLong);
+        this.setFortressCenter(fortressCenter);
         addThisPawnToFortress();
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
 
     private void addThisPawnToFortress() {
-        getServerFortressManager().ifPresent(fsm -> fsm.addColonist(this));
+        ServerModUtils.getFortressManager(this).addPawn(this);
     }
 
-    private void setMasterId(UUID fortressId) {
-        this.dataTracker.set(MASTER_ID, Optional.ofNullable(fortressId));
+    private void setFortressCenter(BlockPos fortressCenter) {
+        this.dataTracker.set(FORTRESS_CENTER, Optional.ofNullable(fortressCenter));
     }
 
     @Override
-    public Optional<UUID> getMasterId() {
-        return this.dataTracker.get(MASTER_ID);
+    @NotNull
+    public BlockPos getFortressPos() {
+        return this.dataTracker.get(FORTRESS_CENTER).orElseThrow();
     }
 
     @Override
     public final @Nullable PlayerEntity getPlayer() {
-        return getMasterPlayer().orElse(null);
+        final var server = this.getServer();
+        if (server == null) return null;
+        return ServerExtensionsKt.getFortressOwner(server, this.getFortressPos());
     }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        this.getMasterId().ifPresent(it -> nbt.putUuid(FORTRESS_ID_NBT_KEY, it));
+        this.dataTracker.get(FORTRESS_CENTER).ifPresent(it -> nbt.putLong(FORTRESS_CENTER_BLOCK_KEY, it.asLong()));
         nbt.putInt(BODY_TEXTURE_ID_NBT_KEY, this.getBodyTextureId());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        if(nbt.contains(FORTRESS_ID_NBT_KEY)) {
-            final var fortressId = nbt.getUuid(FORTRESS_ID_NBT_KEY);
-            this.setMasterId(fortressId);
-            addThisPawnToFortress();
+        if (nbt.contains(FORTRESS_CENTER_BLOCK_KEY)) {
+            final var pos = BlockPos.fromLong(nbt.getLong(FORTRESS_CENTER_BLOCK_KEY));
+            this.setFortressCenter(pos);
+            addThisPawnToFortress(); // FIXME adding pawn every time when reading?
         }
         if(nbt.contains(BODY_TEXTURE_ID_NBT_KEY)) {
             final var bodyTexId = nbt.getInt(BODY_TEXTURE_ID_NBT_KEY);
@@ -133,10 +141,12 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         touchingSlimes.forEach(s -> ((FortressSlimeEntity)s).touch_Pawn(this));
     }
 
-    @Nullable
+    @NotNull
     @Override
     public MinecraftServer getServer() {
-        return super.getServer();
+        final var server = super.getServer();
+        if (server == null) throw new IllegalStateException("Entity is not attached to a server");
+        return server;
     }
 
     public int getAttackCooldown() {

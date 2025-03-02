@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.BookScreen;
 import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
 import net.remmintan.mods.minefortress.gui.widget.ItemToggleOtherItemWidget;
@@ -28,7 +28,7 @@ public class UtilsHudLayer extends AbstractHudLayer {
                     0,
                     50,
                     Items.CAMPFIRE,
-                    btn -> CoreModUtils.getFortressManager().jumpToCampfire(),
+                    btn -> ClientModUtils.getFortressManager().jumpToCampfire(),
                     "Jump to Campfire"
             ),
             new ItemButtonWidget(
@@ -47,10 +47,10 @@ public class UtilsHudLayer extends AbstractHudLayer {
                     0,
                     100,
                     Items.ENDER_EYE,
-                    (btn) -> CoreModUtils.getClientTasksHolder().ifPresent(IClientTasksHolder::toggleSelectionVisibility),
-                    (button) -> CoreModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden)
+                    (btn) -> ClientModUtils.getClientTasksHolder().ifPresent(IClientTasksHolder::toggleSelectionVisibility),
+                    (button) -> ClientModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden)
                             .map(it -> it ? "Show Tasks outline" : "Hide Tasks outline"),
-                    () -> CoreModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden).orElse(false),
+                    () -> ClientModUtils.getClientTasksHolder().map(IClientTasksHolder::isSelectionHidden).orElse(false),
                     () -> true,
                     Items.ENDER_PEARL
             ),

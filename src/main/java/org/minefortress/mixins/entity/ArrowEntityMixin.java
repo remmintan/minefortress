@@ -30,7 +30,7 @@ public abstract class ArrowEntityMixin extends ProjectileEntity {
             if(
                owner instanceof IFortressAwareEntity pawn1 &&
                collidedWith instanceof IFortressAwareEntity pawn2 &&
-               pawn1.getMasterId().equals(pawn2.getMasterId())
+                       pawn1.getFortressPos().equals(pawn2.getFortressPos())
             ) {
                 return null;
             }

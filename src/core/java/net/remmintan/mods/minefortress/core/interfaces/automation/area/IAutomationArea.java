@@ -1,11 +1,11 @@
 package net.remmintan.mods.minefortress.core.interfaces.automation.area;
 
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public interface IAutomationArea {
     UUID getId();
@@ -15,6 +15,8 @@ public interface IAutomationArea {
     default boolean isEmpty(World world) {
         return !iterator(world).hasNext();
     }
-    default void sendFinishMessage(ServerPlayerEntity entity) {}
+
+    default void sendFinishMessage(Consumer<String> messageConsumer) {
+    }
 
 }

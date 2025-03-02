@@ -30,7 +30,7 @@ import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuildi
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils
 import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
 import java.util.*
 
@@ -41,7 +41,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     NamedScreenHandlerFactory,
     IFortressBuilding {
 
-    private var ownerId: UUID? = null
+    private var fortressPos: BlockPos? = null
     private var blueprintMetadata: BlueprintMetadata? = null
     private var start: BlockPos? = null
     private var end: BlockPos? = null
@@ -66,13 +66,13 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     fun init(
-        ownerId: UUID,
+        fortressPos: BlockPos,
         metadata: BlueprintMetadata,
         start: BlockPos,
         end: BlockPos,
         blockData: Map<BlockPos, BlockState>,
     ) {
-        this.ownerId = ownerId
+        this.fortressPos = fortressPos
         this.blueprintMetadata = metadata
         this.start = start
         this.end = end
@@ -114,10 +114,8 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     private fun getManagers(world: World): Triple<IServerProfessionsManager, IServerBuildingsManager, IServerResourceManager> {
         if (world is ServerWorld) {
             val server = world.server
-            if (server is IFortressServer) {
-                return server._FortressModServerManager?.getManagersProvider(ownerId)?.let {
-                    Triple(it.professionsManager, it.buildingsManager, it.resourceManager)
-                } ?: error("Managers provider is not set")
+            return ServerModUtils.getManagersProvider(server, fortressPos).let {
+                Triple(it.professionsManager, it.buildingsManager, it.resourceManager)
             }
         }
         error("Trying to get managers on the client side")
@@ -171,7 +169,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun readNbt(nbt: NbtCompound) {
-        ownerId = nbt.getUuid("ownerId")
+        fortressPos = BlockPos.fromLong(nbt.getLong("fortressCenter"))
         blueprintMetadata = BlueprintMetadata(nbt.getCompound("blueprintMetadata"))
         start = BlockPos.fromLong(nbt.getLong("start"))
         end = BlockPos.fromLong(nbt.getLong("end"))
@@ -180,7 +178,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun writeNbt(nbt: NbtCompound) {
-        ownerId?.let { nbt.putUuid("ownerId", it) }
+        fortressPos?.let { nbt.putLong("fortressCenter", it.asLong()) }
         blueprintMetadata?.toNbt()?.let { nbt.put("blueprintMetadata", it) }
         start?.let { nbt.putLong("start", it.asLong()) }
         end?.let { nbt.putLong("end", it.asLong()) }

@@ -5,7 +5,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
+import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.dtos.professions.IProfessionEssentialInfo;
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionFullInfo;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
@@ -15,9 +17,8 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
-import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionSyncPacket;
@@ -31,26 +32,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
-public final class ServerProfessionManager extends ProfessionManager implements IServerProfessionsManager, ITickableManager, IWritableManager {
+public final class ServerProfessionManager extends ProfessionManager implements IServerProfessionsManager {
     public static final String PROFESSION_NBT_TAG = "professionId";
 
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
-    private final MinecraftServer server;
+
+
+    private final BlockPos fortressPos;
+    private MinecraftServer server;
+    private IServerFortressManager serverFortressManager;
+
     private List<ProfessionFullInfo> professionsInfos;
     private String professionsTree;
     private boolean needsUpdate = false;
 
-
-    private final Supplier<IServerManagersProvider> serverManagersProviderSupplier;
-
-    public ServerProfessionManager(Supplier<IFortressManager> fortressManagerSupplier, Supplier<IServerManagersProvider> serverManagersProviderSupplier, MinecraftServer server) {
-        super(fortressManagerSupplier);
-        this.server = server;
-        this.serverManagersProviderSupplier = serverManagersProviderSupplier;
+    public ServerProfessionManager(BlockPos fortressPos) {
+        this.fortressPos = fortressPos;
     }
 
     @Override
@@ -59,7 +59,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         if(profession == null) return;
         
         // Check for reserved pawns
-        if(this.fortressManagerSupplier.get() instanceof ServerFortressManager fsm && fsm.getReservedPawnsCount() <= 0) {
+        if (serverFortressManager instanceof ServerFortressManager fsm && fsm.getReservedPawnsCount() <= 0) {
             LoggerFactory.getLogger(ServerProfessionManager.class).error("No reserved pawns but trying to hire a profession");
             return;
         }
@@ -68,9 +68,15 @@ public final class ServerProfessionManager extends ProfessionManager implements 
             return;
 
         profession.setAmount(profession.getAmount() + 1);
-        scheduleSync();
+        sync();
     }
 
+    @Override
+    boolean isCreativeFortress() {
+        return ServerExtensionsKt.isCreativeFortress(server);
+    }
+
+    @Override
     public void decreaseAmount(String professionId, boolean force) {
         // Only allow decreasing if force is true (for internal use)
         if (!force) return;
@@ -80,13 +86,16 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         if(profession.getAmount() <= 0) return;
 
         profession.setAmount(profession.getAmount() - 1);
-        scheduleSync();
+        sync();
     }
 
     @Override
-    public void tick(@Nullable ServerPlayerEntity player) {
-        if(player == null) return;
+    public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
+        if (this.server == null) this.server = server;
+        if (serverFortressManager == null)
+            serverFortressManager = ServerModUtils.getFortressManager(server, fortressPos);
 
+        if(player == null) return;
         if(needsUpdate) {
             final var essentialInfos = new ArrayList<IProfessionEssentialInfo>();
             for(Map.Entry<String, IProfession> entry : getProfessions().entrySet())  {
@@ -102,7 +111,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
 
     @Override
     public void reservePawn() {
-        ((IServerFortressManager) this.fortressManagerSupplier.get())
+        serverFortressManager
                 .getPawnWithoutAProfession()
                 .ifPresent(IProfessional::reserve);
     }
@@ -130,7 +139,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         return profToEntityMapper.getEntityTypeForProfession(professionId);
     }
 
-    public void scheduleSync() {
+    public void sync() {
         needsUpdate = true;
     }
 
@@ -150,12 +159,13 @@ public final class ServerProfessionManager extends ProfessionManager implements 
                 final IProfession profession = super.getProfession(key);
                 if(profession == null) continue;
                 profession.readNbt(professionTag.getCompound(key));
-                scheduleSync();
+                sync();
             }
         }
 
     }
 
+    @Override
     public Optional<String> getProfessionsWithAvailablePlaces(boolean professionRequiresReservation) {
         // All professions require reservation now
         if (!professionRequiresReservation) return Optional.empty();
@@ -174,12 +184,16 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         return Optional.empty();
     }
 
+    @Override
+    protected IFortressManager getFortressManager() {
+        return serverFortressManager;
+    }
+
     private long countPawnsWithProfession(String professionId) {
-        final var fortressServerManager = (ServerFortressManager) super.fortressManagerSupplier.get();
-        return fortressServerManager
+        return serverFortressManager
                 .getProfessionals()
                 .stream()
-                .filter(colonist -> colonist.getProfessionId().equals(professionId))
+                .filter(pawn -> pawn.getProfessionId().equals(professionId))
                 .count();
     }
 

@@ -7,7 +7,6 @@ public interface FortressServerPlayerEntity {
 
     boolean was_InBlueprintWorldWhenLoggedOut();
     void set_WasInBlueprintWorldWhenLoggedOut(boolean wasInBlueprintWorldWhenLoggedOut);
-
     @Nullable
     Vec3d get_PersistedPos();
 }

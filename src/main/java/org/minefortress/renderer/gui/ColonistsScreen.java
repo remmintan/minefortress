@@ -5,7 +5,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundChangeMaxColonistsCountPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -77,7 +77,7 @@ public class ColonistsScreen extends Screen {
     }
 
     private IClientFortressManager getFortressClientManager() {
-        return CoreModUtils.getManagersProvider().get_ClientFortressManager();
+        return ClientModUtils.getManagersProvider().get_ClientFortressManager();
     }
 
     @Override

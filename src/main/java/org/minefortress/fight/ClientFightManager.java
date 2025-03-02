@@ -6,11 +6,11 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.ITargetedSelectionManager;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SAttractWarriorsToCampfire;
 import net.remmintan.mods.minefortress.networking.c2s.C2SSetNavigationTargetEntity;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.entity.Colonist;
-import org.minefortress.utils.ModUtils;
 
 public class ClientFightManager implements IClientFightManager {
     private int warriorCount;
@@ -28,10 +28,9 @@ public class ClientFightManager implements IClientFightManager {
     @Override
     public void setTarget(Entity entity, ITargetedSelectionManager targetedSelectionManager) {
         if(!(entity instanceof LivingEntity livingEntity)) return;
-        if(entity instanceof Colonist col) {
-            final var masterPlayerId = col.getMasterId();
-            final var playerId= ModUtils.getCurrentPlayerUUID();
-            if(masterPlayerId.map(it -> it.equals(playerId)).orElse(false))
+        if (entity instanceof Colonist pawn) {
+            final var manager = ClientModUtils.getFortressCenterManager();
+            if (manager.hasTheSameCenter(pawn))
                 return;
         }
         targetedSelectionManager.forEachTargetedPawn(it -> it.setAttackTarget(livingEntity));

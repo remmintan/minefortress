@@ -11,7 +11,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionType;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSimpleSelectionTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -62,7 +62,7 @@ public class TwoDotsSelection extends Selection {
         } else {
             if(pickedBlock != null && hitResult instanceof BlockHitResult && click == this.clickType && connection != null && selectionEnd != null) {
                 final var taskType = mapClickTypeToTaskType(clickType);
-                final var selectionManager = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
+                final var selectionManager = ClientModUtils.getManagersProvider().get_PawnsSelectionManager();
                 final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
                 final var packet = new ServerboundSimpleSelectionTaskPacket(
                         UUID.randomUUID(),

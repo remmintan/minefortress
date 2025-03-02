@@ -4,18 +4,18 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 
 public interface FortressC2SPacket extends FortressPacket {
 
     void handle(MinecraftServer server, ServerPlayerEntity player);
 
     default IServerManagersProvider getManagersProvider(ServerPlayerEntity player) {
-        return CoreModUtils.getManagersProvider(player);
+        return ServerModUtils.getManagersProvider(player);
     }
 
     default IServerFortressManager getFortressManager(ServerPlayerEntity player) {
-        return CoreModUtils.getFortressManager(player);
+        return ServerModUtils.getFortressManager(player);
     }
 
 }

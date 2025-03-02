@@ -4,11 +4,11 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 
 abstract class MineFortressCommand {
 
@@ -18,24 +18,20 @@ abstract class MineFortressCommand {
         return true;
     }
 
-    protected static IServerManagersProvider getServerManagersProvider(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        final var srvPlayer = context.getSource().getPlayerOrThrow();
-        final var modServerManager = getFortressModServerManager(srvPlayer);
-        return modServerManager.getManagersProvider(srvPlayer);
+    protected static BlockPos getFortressPos(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        var fortressPlayer = (IFortressPlayerEntity) context.getSource().getPlayerOrThrow();
+        return fortressPlayer.get_FortressPos().orElseThrow();
     }
 
-    private static IFortressModServerManager getFortressModServerManager(ServerPlayerEntity srvPlayer) {
-        final var server = (IFortressServer) srvPlayer.getServer();
-        if(server == null) {
-            throw new RuntimeException("Server is null");
-        }
-        return server.get_FortressModServerManager();
+
+    protected static IServerManagersProvider getServerManagersProvider(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        final var srvPlayer = context.getSource().getPlayerOrThrow();
+        return ServerModUtils.getManagersProvider(srvPlayer);
     }
 
     protected static IServerFortressManager getServerFortressManager(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final var srvPlayer = context.getSource().getPlayerOrThrow();
-        final IFortressModServerManager modServerManager = getFortressModServerManager(srvPlayer);
-        return modServerManager.getFortressManager(srvPlayer);
+        return ServerModUtils.getFortressManager(srvPlayer);
     }
 
 }

@@ -6,7 +6,6 @@ import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
@@ -14,9 +13,9 @@ import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.remmintan.gobi.SelectionManager;
+import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
@@ -24,6 +23,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintsImp
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.client.IFortressCenterManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.renderers.IGuiBlueprintsRenderer;
 import net.remmintan.mods.minefortress.core.interfaces.renderers.IRenderersProvider;
@@ -33,7 +33,7 @@ import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionMode
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.panama.renderer.BlueprintRenderer;
 import net.remmintan.panama.renderer.FortressRenderLayer;
 import net.remmintan.panama.renderer.SelectionRenderer;
@@ -44,6 +44,7 @@ import org.minefortress.blueprints.manager.BlueprintsImportExportManager;
 import org.minefortress.blueprints.manager.ClientBlueprintManager;
 import org.minefortress.fight.ClientPawnsSelectionManager;
 import org.minefortress.fortress.ClientFortressManager;
+import org.minefortress.fortress.FortressCenterManager;
 import org.minefortress.fortress.automation.areas.AreasClientManager;
 import org.minefortress.fortress.buildings.ClientBuildingsManager;
 import org.minefortress.interfaces.IFortressMinecraftClient;
@@ -76,6 +77,8 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     private final BlockBufferBuilderStorage blockBufferBuilderStorage = new BlockBufferBuilderStorage();
     @Unique
     private ClientBlueprintManager clientBlueprintManager;
+    @Unique
+    private IFortressCenterManager fortressCenterManager;
 
     @Unique
     private BlueprintRenderer blueprintRenderer;
@@ -92,12 +95,12 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Unique
     private final IBlueprintsImportExportManager blueprintsImportExportManager = new BlueprintsImportExportManager();
 
+    @Unique
+    private FortressGamemode gamemode;
+
     @Shadow
     @Final
     public GameOptions options;
-
-    @Shadow
-    public ClientPlayerInteractionManager interactionManager;
 
     @Shadow @Final public Mouse mouse;
     @Shadow
@@ -105,8 +108,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     public ClientPlayerEntity player;
 
     @Shadow @Nullable public ClientWorld world;
-
-    @Shadow @Nullable public HitResult crosshairTarget;
 
     @Shadow public abstract @Nullable IntegratedServer getServer();
 
@@ -129,6 +130,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         this.selectionManager = new SelectionManager(client);
         this.fortressHud = new FortressHud(client);
         this.clientFortressManager = new ClientFortressManager();
+        this.fortressCenterManager = new FortressCenterManager();
         this.areasClientManager = new AreasClientManager();
 
         clientBlueprintManager = new ClientBlueprintManager(client);
@@ -140,15 +142,15 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
                 entry(FortressRenderLayer.getLinesNoDepth(), new BufferBuilder(256))
         );
 
-        final var provider = CoreModUtils.getManagersProvider();
+        final var provider = ClientModUtils.getManagersProvider();
         final var manager = provider.get_ClientFortressManager();
 
         final Supplier<Boolean> isInBuildState = () -> manager.getState() == FortressState.BUILD_SELECTION || manager.getState() == FortressState.BUILD_EDITING;
         final Supplier<ISelectionInfoProvider> selectInfProvSup = () ->
-                isInBuildState.get() ? CoreModUtils.getSelectionManager() : CoreModUtils.getAreasClientManager();
+                isInBuildState.get() ? ClientModUtils.getSelectionManager() : ClientModUtils.getAreasClientManager();
 
         final Supplier<ISelectionModelBuilderInfoProvider> selModBuildInfProv = () ->
-                isInBuildState.get() ? CoreModUtils.getSelectionManager() : CoreModUtils.getAreasClientManager();
+                isInBuildState.get() ? ClientModUtils.getSelectionManager() : ClientModUtils.getAreasClientManager();
 
         selectionRenderer = new SelectionRenderer(
                 client,
@@ -226,6 +228,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return clientFortressManager;
     }
 
+    @Override
+    public IFortressCenterManager get_FortressCenterManager() {
+        return fortressCenterManager;
+    }
+
     @Inject(method = "openGameMenu", at = @At("HEAD"), cancellable = true)
     public void openGameMenu(boolean pauseOnly, CallbackInfo ci) {
         if (this.world != null && this.world.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY()) {
@@ -239,7 +246,7 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             ci.cancel();
         }
 
-        final var pawnsSelection = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
+        final var pawnsSelection = ClientModUtils.getManagersProvider().get_PawnsSelectionManager();
         if(!pawnsSelection.getSelectedPawnsIds().isEmpty()) {
             pawnsSelection.resetSelection();
             ci.cancel();
@@ -301,5 +308,15 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Override
     public IGuiBlueprintsRenderer get_GuiBlueprintsRenderer() {
         return get_BlueprintRenderer();
+    }
+
+    @Override
+    public FortressGamemode get_fortressGamemode() {
+        return gamemode;
+    }
+
+    @Override
+    public void set_fortressGamemode(FortressGamemode fortressGamemode) {
+        this.gamemode = fortressGamemode;
     }
 }

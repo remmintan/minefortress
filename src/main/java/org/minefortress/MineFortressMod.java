@@ -6,9 +6,14 @@ import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.blocks.FortressBlocks;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.services.FortressServiceLocator;
 import net.remmintan.mods.minefortress.gui.FortressHandledScreensKt;
 import net.remmintan.mods.minefortress.networking.registries.ServerNetworkReceivers;
 import org.minefortress.commands.CommandsManager;
+import org.minefortress.fortress.ServerFortressManager;
+import org.minefortress.fortress.ServerManagersProvider;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreenHandler;
 import org.minefortress.registries.FortressEntities;
@@ -49,6 +54,9 @@ public class MineFortressMod implements ModInitializer {
         CommandsManager.registerCommands();
         ServerNetworkReceivers.registerReceivers();
         FortressHandledScreensKt.registerHandlerTypes();
+
+        FortressServiceLocator.INSTANCE.register(IServerManagersProvider.class, ServerManagersProvider::new);
+        FortressServiceLocator.INSTANCE.register(IServerFortressManager.class, ServerFortressManager::new);
     }
 
     public static ExecutorService getExecutor() {

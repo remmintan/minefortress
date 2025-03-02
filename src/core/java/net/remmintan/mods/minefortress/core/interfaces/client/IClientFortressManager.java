@@ -1,7 +1,6 @@
 package net.remmintan.mods.minefortress.core.interfaces.client;
 
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
@@ -14,29 +13,15 @@ public interface IClientFortressManager extends IFortressManager {
     void sync(
             int colonistsCount,
             BlockPos fortressCenter,
-            FortressGamemode gamemode,
             boolean connectedToTheServer,
             int maxColonistsCount,
             int reservedColonistCount
     );
-
     void tick();
 
     boolean isConnectedToTheServer();
 
     boolean notInitialized();
-
-    boolean isCenterNotSet();
-
-    void setupFortressCenter(BlockPos pos);
-
-    IClientProfessionManager getProfessionManager();
-
-    boolean gamemodeNeedsInitialization();
-
-    boolean isSurvival();
-
-    IClientFightManager getFightManager();
 
     int getMaxColonistsCount();
 
@@ -44,8 +29,11 @@ public interface IClientFortressManager extends IFortressManager {
 
     // getter and setter for state
     void setState(FortressState state);
-
     FortressState getState();
 
     IClientResourceManager getResourceManager();
+
+    IClientFightManager getFightManager();
+
+    IClientProfessionManager getProfessionManager();
 }

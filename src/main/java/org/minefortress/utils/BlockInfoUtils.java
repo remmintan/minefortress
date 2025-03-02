@@ -6,24 +6,18 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.*;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.NotNull;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.FortressBlockPlaceContext;
 import org.minefortress.entity.ai.FortressUseOnContext;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class BlockInfoUtils {
 
@@ -62,19 +56,14 @@ public class BlockInfoUtils {
         return Blocks.AIR.getDefaultState();
     }
 
-    public static ItemUsageContext getUseOnContext(HitResult hitResult, Item placingItem, BlockPos goal, ServerWorld world, Colonist colonist) {
+    public static ItemUsageContext getUseOnContext(HitResult hitResult, Item placingItem, BlockPos goal, ServerWorld world, Colonist pawn) {
         if(hitResult instanceof BlockHitResult) {
-            ServerPlayerEntity masterPlayer = colonist
-                    .getMasterPlayer()
-                    .or(() -> Optional
-                            .ofNullable(colonist.getServer())
-                            .map(MinecraftServer::getOverworld)
-                            .map(ServerWorld::getRandomAlivePlayer))
-                    .orElseThrow(() -> new IllegalStateException("Colonist has no master player"));
+            final var owner = ServerExtensionsKt.getFortressOwner(pawn.getServer(), pawn.getFortressPos());
+            final var randomPlayer = Optional.ofNullable(owner).orElse(pawn.getServer().getOverworld().getRandomAlivePlayer());
             final BlockHitResult movedHitResult = moveHitResult((BlockHitResult)hitResult,  goal);
             return new FortressUseOnContext(
                     world,
-                    masterPlayer,
+                    randomPlayer,
                     Hand.MAIN_HAND,
                     new ItemStack(placingItem),
                     movedHitResult
@@ -89,15 +78,10 @@ public class BlockInfoUtils {
     }
 
 
-
-    private static ItemPlacementContext getBlockPlaceContext(HitResult hitResult, Direction horizontalDirection, Item placingItem, BlockPos goal, Colonist colonist) {
+    private static ItemPlacementContext getBlockPlaceContext(HitResult hitResult, Direction horizontalDirection, Item placingItem, BlockPos goal, Colonist pawn) {
         if(hitResult instanceof BlockHitResult) {
-            ServerPlayerEntity randomPlayer = colonist.getMasterPlayer()
-                    .or(() -> Optional
-                            .ofNullable(colonist.getServer())
-                            .map(MinecraftServer::getOverworld)
-                            .map(ServerWorld::getRandomAlivePlayer))
-                    .orElseThrow(() -> new IllegalStateException("Colonist has no master player"));
+            final var owner = ServerExtensionsKt.getFortressOwner(pawn.getServer(), pawn.getFortressPos());
+            final var randomPlayer = Optional.ofNullable(owner).orElse(pawn.getServer().getOverworld().getRandomAlivePlayer());
             final BlockHitResult movedHitResult = moveHitResult((BlockHitResult) hitResult, goal);
             if(horizontalDirection != null){
                 return new FortressBlockPlaceContext(
@@ -123,29 +107,6 @@ public class BlockInfoUtils {
     private static BlockHitResult moveHitResult(BlockHitResult blockHitResult, BlockPos goal) {
         final BlockPos clickedPos = goal.offset(blockHitResult.getSide().getOpposite()).toImmutable();
         return blockHitResult.withBlockPos(clickedPos);
-    }
-
-    @NotNull
-    public static Map<Item, Long> convertBlockStatesMapItemsMap(Map<BlockPos, BlockState> blocksToRepair) {
-        final var amountOfRequiredItems = blocksToRepair
-                .entrySet()
-                .stream()
-                .collect(Collectors
-                        .groupingBy(it -> it.getValue().getBlock().asItem(),
-                                Collectors.counting()
-                        )
-                );
-
-        for (Item item : Collections.unmodifiableSet(amountOfRequiredItems.keySet())) {
-            if(item instanceof BlockItem blockItem) {
-                final var defaultBlockState = blockItem.getBlock().getDefaultState();
-                if(defaultBlockState.isIn(BlockTags.DOORS) || defaultBlockState.isIn(BlockTags.BEDS)) {
-                    amountOfRequiredItems.put(item, amountOfRequiredItems.get(item) / 2);
-                }
-            }
-        }
-
-        return amountOfRequiredItems;
     }
 
 }

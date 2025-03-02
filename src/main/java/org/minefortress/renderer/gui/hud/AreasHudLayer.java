@@ -2,7 +2,7 @@ package org.minefortress.renderer.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 import net.remmintan.mods.minefortress.gui.widget.ModeButtonWidget;
 
@@ -15,9 +15,9 @@ public class AreasHudLayer extends AbstractHudLayer {
                 new ModeButtonWidget(
                      20 * type.ordinal(), 0,
                     type.getIcon(),
-                    btn -> CoreModUtils.getAreasClientManager().setSelectionType(type),
+                        btn -> ClientModUtils.getAreasClientManager().setSelectionType(type),
                     type.getTitle(),
-                    () -> type == CoreModUtils.getAreasClientManager().getSelectionType()
+                        () -> type == ClientModUtils.getAreasClientManager().getSelectionType()
                 )
             );
         }

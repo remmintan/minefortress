@@ -36,8 +36,8 @@ class ModVersionState : PersistentState() {
             null
         )
 
-        fun getOrCreate(server: MinecraftServer): ModVersionState {
-            return server.overworld.persistentStateManager.getOrCreate(TYPE, ID)
+        fun get(server: MinecraftServer): ModVersionState? {
+            return server.overworld.persistentStateManager.get(TYPE, ID)
         }
     }
 }

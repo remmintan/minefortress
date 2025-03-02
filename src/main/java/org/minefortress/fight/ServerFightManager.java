@@ -2,30 +2,33 @@ package org.minefortress.fight;
 
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.S2CSyncFightManager;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.fight.NavigationTargetEntity;
 import org.minefortress.registries.FortressEntities;
 
 import java.util.UUID;
 
-public class ServerFightManager implements IServerFightManager, IWritableManager, ITickableManager {
+public class ServerFightManager implements IServerFightManager {
 
-    private final IServerFortressManager serverFortressManager;
+    private final BlockPos fortressPos;
+    private IServerFortressManager serverFortressManager;
     private NavigationTargetEntity oldTarget;
     private UUID oldTargetUuid;
 
     private boolean syncNeeded = false;
 
-    public ServerFightManager(IServerFortressManager serverFortressManager) {
-        this.serverFortressManager = serverFortressManager;
+    public ServerFightManager(BlockPos fortressPos) {
+        this.fortressPos = fortressPos;
     }
 
     @Override
@@ -78,7 +81,10 @@ public class ServerFightManager implements IServerFightManager, IWritableManager
     }
 
     @Override
-    public void tick(ServerPlayerEntity player) {
+    public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
+        if (serverFortressManager == null) {
+            serverFortressManager = ServerModUtils.getFortressManager(server, fortressPos);
+        }
         if(player==null) return;
         if(syncNeeded) {
             final var packet = new S2CSyncFightManager(countAllWarriors());
@@ -86,8 +92,6 @@ public class ServerFightManager implements IServerFightManager, IWritableManager
             this.syncNeeded = false;
         }
     }
-
-
 
     private int countAllWarriors() {
         return serverFortressManager.getAllTargetedPawns().size();

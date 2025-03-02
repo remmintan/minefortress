@@ -2,22 +2,24 @@ package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
-import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.S2CSyncAreasPacket;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public final class AreasServerManager implements IServerAutomationAreaManager, ITickableManager, IWritableManager {
+public final class AreasServerManager implements IServerAutomationAreaManager {
 
     private boolean needSync = false;
     private final List<ServerAutomationAreaInfo> areas = new ArrayList<>();
@@ -37,19 +39,20 @@ public final class AreasServerManager implements IServerAutomationAreaManager, I
         sync();
     }
 
-    public void tick(ServerPlayerEntity serverPlayer) {
-        if(serverPlayer == null) return;
+
+    public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
+        if (player == null) return;
 
         if(tickCounter++ % 20 == 0) {
             if(areas.isEmpty()) return;
             if(refreshPointer >= areas.size()) refreshPointer = 0;
-            areas.get(refreshPointer++).refresh(serverPlayer.getWorld());
+            areas.get(refreshPointer++).refresh(world);
             sync();
         }
 
         if(needSync) {
             final var automationAreaInfos = areas.stream().map(IAutomationAreaInfo.class::cast).toList();
-            FortressServerNetworkHelper.send(serverPlayer, S2CSyncAreasPacket.CHANNEL, new S2CSyncAreasPacket(automationAreaInfos));
+            FortressServerNetworkHelper.send(player, S2CSyncAreasPacket.CHANNEL, new S2CSyncAreasPacket(automationAreaInfos));
             needSync = false;
         }
     }

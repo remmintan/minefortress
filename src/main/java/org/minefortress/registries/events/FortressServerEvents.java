@@ -1,111 +1,48 @@
 package org.minefortress.registries.events;
 
 
-import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.GameMode;
-import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.IFortressModVersionHolder;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
-import org.minefortress.world.ModVersionState;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.S2CSyncGamemodePacket;
 
 public class FortressServerEvents {
 
     public static void register() {
-        EntitySleepEvents.ALLOW_BED.register((entity, sleepingPos, state, vanillaResult) -> {
-            if (FortressGamemodeUtilsKt.isFortressGamemode(entity)) {
-                return ActionResult.SUCCESS;
-            }
-            return ActionResult.PASS;
-        });
-
-        EntitySleepEvents.MODIFY_SLEEPING_DIRECTION.register((entity, pos, dir) -> {
-            if (FortressGamemodeUtilsKt.isFortressGamemode(entity)) {
-                final var rotationVector = entity.getRotationVector();
-                return Direction.getFacing(rotationVector.x, rotationVector.y, rotationVector.z);
-            }
-            return dir;
-        });
-
-        EntitySleepEvents.ALLOW_NEARBY_MONSTERS.register((player, pos, vanilla) -> {
-            if (FortressGamemodeUtilsKt.isFortressGamemode(player)) {
-                return ActionResult.SUCCESS;
-            }
-            return ActionResult.PASS;
-        });
-
         // initialising the fortress server on join
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            if (server instanceof IFortressServer fortressServer) {
-                final var modWasLoadedBefore = fortressServer.get_FortressModServerManager().isNotEmpty();
-                final var versionState = ModVersionState.Companion.getOrCreate(server);
-                if (modWasLoadedBefore) {
-                    if (versionState.isOutdated()) {
-                        handler.disconnect(Text.of("Outdated world version"));
-                    }
-                } else {
-                    versionState.setToCurrentVersion();
-                }
+            if (server.getSaveProperties() instanceof IFortressModVersionHolder holder && holder.is_OutdatedVersion()) {
+                handler.disconnect(Text.of("Outdated world version"));
+                return;
             }
 
             final var player = handler.player;
-            final var manager = CoreModUtils.getFortressManager(player);
-            final var provider = CoreModUtils.getManagersProvider(player);
-            manager.syncOnJoin();
-            final var serverProfessionManager = provider.getProfessionsManager();
-            serverProfessionManager.sendProfessions(player);
-            serverProfessionManager.scheduleSync();
+            syncTheFortressGamemode((IFortressServer) server, player);
 
-            if(player instanceof FortressServerPlayerEntity fortressPlayer) {
-                if(fortressPlayer.was_InBlueprintWorldWhenLoggedOut() && fortressPlayer.get_PersistedPos() != null) {
-                    final var pos = fortressPlayer.get_PersistedPos();
-                    player.teleport(pos.x, pos.y, pos.z);
-                }
+            if (ServerModUtils.hasFortress(player)) {
+                final var manager = ServerModUtils.getFortressManager(player);
+                final var provider = ServerModUtils.getManagersProvider(player);
+                provider.sync();
+                manager.sync();
+                final var serverProfessionManager = provider.getProfessionsManager();
+                serverProfessionManager.sendProfessions(player);
+                serverProfessionManager.sync();
             }
         });
 
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-            final var inBlueprintWorldOnDisconnect = handler.player.getWorld().getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY();
-            if(handler.player instanceof FortressServerPlayerEntity fortressPlayer) {
-                fortressPlayer.set_WasInBlueprintWorldWhenLoggedOut(inBlueprintWorldOnDisconnect);
-            }
-        });
+        PlayerSleepEvents.INSTANCE.register();
+        BlueprintWorldEvents.INSTANCE.register();
+        PlayerBlockEvents.INSTANCE.register();
+    }
 
-        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            if (server instanceof IFortressServer fortressServer) {
-                fortressServer.get_FortressModServerManager().load();
-            }
-        });
-
-        ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-            if(server instanceof IFortressServer aserver) {
-                aserver.get_FortressModServerManager().save();
-            }
-        });
-
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if(server instanceof IFortressServer IFortressServer) {
-                IFortressServer.get_FortressModServerManager().tick(server.getPlayerManager());
-            }
-        });
-
-        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
-            if (destination.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY()) {
-                player.changeGameMode(GameMode.CREATIVE);
-            } else if (origin.getRegistryKey() == BlueprintsDimensionUtilsKt.getBLUEPRINT_DIMENSION_KEY()) {
-                player.changeGameMode(FortressGamemodeUtilsKt.getFORTRESS());
-            }
-        });
-
-        PlayerBlockEventsKt.registerPlayerBlockEvents();
+    private static void syncTheFortressGamemode(IFortressServer server, ServerPlayerEntity player) {
+        final var fortressGamemode = server.get_FortressGamemode();
+        final var packet = new S2CSyncGamemodePacket(fortressGamemode);
+        FortressServerNetworkHelper.send(player, S2CSyncGamemodePacket.CHANNEL, packet);
     }
 
 }

@@ -1,8 +1,6 @@
 package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
@@ -18,6 +16,7 @@ import org.minefortress.utils.AreasUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class ServerAutomationAreaInfo extends AutomationAreaInfo implements IAutomationArea {
@@ -63,9 +62,9 @@ public final class ServerAutomationAreaInfo extends AutomationAreaInfo implement
     }
 
     @Override
-    public void sendFinishMessage(ServerPlayerEntity entity) {
+    public void sendFinishMessage(Consumer<String> messageConsumer) {
         if(getAreaType() == ProfessionsSelectionType.QUARRY) {
-            entity.sendMessage(Text.literal("Mining area is finished!"));
+            messageConsumer.accept("Mining area is finished!");
         }
     }
 

@@ -9,7 +9,8 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.CountProfessi
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
 import net.remmintan.mods.minefortress.core.interfaces.professions.ProfessionResearchState;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SOpenBuildingHireScreen;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 
@@ -20,8 +21,15 @@ import java.util.stream.Collectors;
 
 public final class ClientProfessionManager extends ProfessionManager implements IClientProfessionManager {
 
+    private final Supplier<IFortressManager> fortressManagerSupplier;
+
     public ClientProfessionManager(Supplier<IFortressManager> fortressManagerSupplier) {
-        super(fortressManagerSupplier);
+        this.fortressManagerSupplier = fortressManagerSupplier;
+    }
+
+    @Override
+    protected IFortressManager getFortressManager() {
+        return fortressManagerSupplier.get();
     }
 
     @Override
@@ -62,6 +70,11 @@ public final class ClientProfessionManager extends ProfessionManager implements 
     }
 
     @Override
+    boolean isCreativeFortress() {
+        return ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance());
+    }
+
+    @Override
     public void openBuildingHireScreen(String professionId) {
         final var profession = this.getProfession(professionId);
         final var requirementType = profession.getRequirementType();
@@ -76,10 +89,8 @@ public final class ClientProfessionManager extends ProfessionManager implements 
             final var packet = new C2SOpenBuildingHireScreen(professionId);
             FortressClientNetworkHelper.send(C2SOpenBuildingHireScreen.CHANNEL, packet);
         } else {
-            final var type = requirementType;
-            final var level = requirementLevel;
-            final var blueprintId = type.getBlueprintIds().get(level);
-            CoreModUtils.getBlueprintManager()
+            final var blueprintId = requirementType.getBlueprintIds().get(requirementLevel);
+            ClientModUtils.getBlueprintManager()
                     .getBlueprintMetadataManager()
                     .getByBlueprintId(blueprintId)
                     .ifPresent(it -> {

@@ -12,6 +12,8 @@ import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -43,17 +45,14 @@ public abstract class FortressItemEntityMixin extends Entity {
             if (closestPlayer != null && FortressGamemodeUtilsKt.isFortressGamemode(closestPlayer)) {
                 final var fortressServer = (IFortressServer) closestPlayer.getServer();
                 if(fortressServer != null) {
-                    final var modServerManager = fortressServer.get_FortressModServerManager();
                     final var closestSPE = (ServerPlayerEntity) closestPlayer;
-                    final var provider = modServerManager.getManagersProvider(closestSPE);
-                    final var manager = modServerManager.getFortressManager(closestSPE);
-                    if(manager.isSurvival()) {
+                    final var provider = ServerModUtils.getManagersProvider(closestSPE);
+                    if (ServerExtensionsKt.isSurvivalFortress(closestSPE.server)) {
                         final var resourceManager = provider.getResourceManager();
                         final var stack = this.getStack();
                         final var item = stack.getItem();
                         if(shouldCollectInInventory(provider.getProfessionsManager(), item))
                             resourceManager.increaseItemAmount(item, stack.getCount());
-
                     }
                     this.discard();
                 }

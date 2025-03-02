@@ -3,12 +3,12 @@ package org.minefortress.entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.jetbrains.annotations.Nullable;
 
 abstract class NamedPawnEntity extends BasePawnEntity {
@@ -25,15 +25,10 @@ abstract class NamedPawnEntity extends BasePawnEntity {
     }
 
     private void setCustomNameIfNeeded() {
-        getServerFortressManager().ifPresent(it -> {
-            if(!this.hasCustomName()) {
-                this.setCustomName(Text.literal(it.getNameGenerator().generateRandomName()));
-            }
-        });
-    }
-
-    @Override
-    public boolean damage(DamageSource source, float amount) {
-        return super.damage(source, amount);
+        final var fortressManager = ServerModUtils.getFortressManager(this);
+        if (!this.hasCustomName()) {
+            final var name = fortressManager.getNameGenerator().generateRandomName();
+            this.setCustomName(Text.of(name));
+        }
     }
 }

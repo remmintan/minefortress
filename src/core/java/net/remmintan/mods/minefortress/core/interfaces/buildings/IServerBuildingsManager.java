@@ -12,10 +12,9 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface IServerBuildingsManager extends IServerManager, IWritableManager, ITickableManager {
-    void addBuilding(UUID ownerId, BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> mergedBlockData);
+    void addBuilding(BlockPos owningFortress, BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> mergedBlockData);
 
     void destroyBuilding(BlockPos pos);
 

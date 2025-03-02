@@ -95,7 +95,7 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
         // Plus button
         val plusButton = HireScreenButtonWidget.builder(
             Text.literal("+")
-        ) { btn: ButtonWidget? ->
+        ) { _: ButtonWidget? ->
             if (handler.canHireMore(profId)) {
                 handler.increaseAmount(profId)
             }
@@ -119,7 +119,7 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
         // Minus button
         val minusButton = HireScreenButtonWidget.builder(
             Text.literal("-")
-        ) { btn: ButtonWidget? ->
+        ) { _: ButtonWidget? ->
             handler.decreaseAmount(profId)
         }
             .dimensions(rightX - 150, rowY, 20, 20)
@@ -144,7 +144,7 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
         // Hire button
         val hireButton = HireScreenButtonWidget.builder(
             Text.literal("+")
-        ) { btn: ButtonWidget? ->
+        ) { _: ButtonWidget? ->
             if (handler.canHireMore(profId)) {
                 handler.increaseAmount(profId)
             }

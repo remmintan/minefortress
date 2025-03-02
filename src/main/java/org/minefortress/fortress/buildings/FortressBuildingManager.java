@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockBox;
@@ -19,34 +20,33 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBuildingsPacket;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class FortressBuildingManager implements IAutomationAreaProvider, IServerBuildingsManager, ITickableManager, IWritableManager {
+public class FortressBuildingManager implements IAutomationAreaProvider, IServerBuildingsManager {
 
     private int buildingPointer = 0;
     private final List<BlockPos> buildings = new ArrayList<>();
-    private final Supplier<ServerWorld> overworldSupplier;
-    private final IServerFortressManager fortressManager;
+    private final BlockPos fortressPos;
+    private ServerWorld world;
+    private IServerFortressManager fortressManager;
     private final Cache<BlockPos, Object> bedsCache =
             CacheBuilder.newBuilder()
                     .expireAfterWrite(10, TimeUnit.SECONDS)
                     .build();
     private boolean needSync = false;
 
-    public FortressBuildingManager(Supplier<ServerWorld> worldSupplier, IServerFortressManager fortressManager) {
-        this.overworldSupplier = worldSupplier;
-        this.fortressManager = fortressManager;
+    public FortressBuildingManager(BlockPos fortressPos) {
+        this.fortressPos = fortressPos;
     }
 
     private static @NotNull BlockPos getCenterTop(BlockBox blockBox) {
@@ -56,7 +56,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         return new BlockPos(center.getX(), ceilingY, center.getZ());
     }
 
-    public void addBuilding(UUID ownerId, BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> blockData) {
+    public void addBuilding(BlockPos owningFortress, BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> blockData) {
         final var blockBox = BlockBox.create(start, end);
         final var buildingPos = getCenterTop(blockBox);
 
@@ -64,7 +64,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         world.setBlockState(buildingPos, FortressBlocks.FORTRESS_BUILDING.getDefaultState(), 3);
         final var blockEntity = world.getBlockEntity(buildingPos);
         if (blockEntity instanceof FortressBuildingBlockEntity b) {
-            b.init(ownerId, metadata, start, end, blockData);
+            b.init(owningFortress, metadata, start, end, blockData);
         }
 
         fortressManager.expandTheVillage(start);
@@ -97,7 +97,13 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         return getBuildingsStream().mapToLong(it -> it.getMetadata().getCapacity()).reduce(0, Long::sum);
     }
 
-    public void tick(ServerPlayerEntity player) {
+    @Override
+    public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
+        if (this.world == null) {
+            this.world = world;
+            this.fortressManager = ServerModUtils.getFortressManager(server, fortressPos);
+        }
+
         if(player != null) {
             if (needSync) {
                 final var packet = new ClientboundSyncBuildingsPacket(buildings);
@@ -240,7 +246,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     }
 
     private ServerWorld getWorld() {
-        return this.overworldSupplier.get();
+        return world;
     }
 
 }

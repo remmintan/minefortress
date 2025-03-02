@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IScrollableHandler;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundScrollCurrentScreenPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -147,9 +147,8 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     @Override
     public void onClosed(PlayerEntity player) {
         super.onClosed(player);
-        if(player instanceof ServerPlayerEntity serverPlayer && serverPlayer.server instanceof IFortressServer IFortressServer) {
-            final var fortressServerManager = IFortressServer.get_FortressModServerManager().getManagersProvider(serverPlayer);
-            final var serverResourceManager = fortressServerManager.getResourceManager();
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+            final var serverResourceManager = ServerModUtils.getManagersProvider(serverPlayer).getResourceManager();
 
             returnInputs();
 

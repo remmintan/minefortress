@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IProfession;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 import org.minefortress.entity.Colonist;
 
@@ -26,7 +26,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
 
     @Override
     protected void renderHud(DrawContext drawContext, int screenWidth, int screenHeight) {
-        final var selectedPawnsProvider = CoreModUtils.getManagersProvider().getSelectedColonistProvider();
+        final var selectedPawnsProvider = ClientModUtils.getManagersProvider().getSelectedColonistProvider();
         if(selectedPawnsProvider.isSelectingColonist()) {
             final var pawn = selectedPawnsProvider.getSelectedPawn();
 
@@ -54,7 +54,7 @@ public class SelectedColonistHudLayer extends AbstractHudLayer{
 
             if(pawn instanceof IProfessional professional) {
                 final var professionId = professional.getProfessionId();
-                final var professionManager = CoreModUtils.getProfessionManager();
+                final var professionManager = ClientModUtils.getProfessionManager();
                 final var professionName = Optional.ofNullable(professionManager.getProfession(professionId)).map(IProfession::getTitle).orElse("");
                 drawContext.drawTextWithShadow(textRenderer, "Profession:", colonistWinX + 5, heartIconY + textRenderer.fontHeight + 5, 0xFFFFFF);
                 drawContext.drawTextWithShadow(textRenderer, professionName, colonistWinX + 5, heartIconY + 2 * textRenderer.fontHeight + 5 , 0xFFFFFF);

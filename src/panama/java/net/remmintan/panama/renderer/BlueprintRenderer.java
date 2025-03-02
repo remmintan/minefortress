@@ -16,7 +16,7 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureRenderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.renderers.IGuiBlueprintsRenderer;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.panama.model.BuiltBlueprint;
 import net.remmintan.panama.model.BuiltModel;
 import net.remmintan.panama.model.builder.BlueprintsModelBuilder;
@@ -74,7 +74,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer implements I
 
     @Override
     public void renderBlueprintPreview(String blueprintId) {
-        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId, BlockRotation.NONE);
+        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId);
 
         final Vec3i size = builtBlueprint.getSize();
         final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
@@ -90,7 +90,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer implements I
 
     @Override
     public void renderBlueprintSlot(String blueprintId, int column, int row, boolean isEnoughResources) {
-        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId, BlockRotation.NONE);
+        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId);
 
         final Vec3i size = builtBlueprint.getSize();
         final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
@@ -105,7 +105,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer implements I
     }
 
     public void renderBlueprintUpgrade(String blueprintId, int number, boolean unlocked) {
-        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId, BlockRotation.NONE);
+        final BuiltBlueprint builtBlueprint = getBuiltBlueprint(blueprintId);
 
         final Vec3i size = builtBlueprint.getSize();
         final int biggestSideSize = Math.max(Math.max(size.getX(), size.getY()), size.getZ());
@@ -154,9 +154,9 @@ public final class BlueprintRenderer extends AbstractCustomRenderer implements I
         return Optional.ofNullable(nullableBlueprint);
     }
 
-    private BuiltBlueprint getBuiltBlueprint(String fileName, BlockRotation blockRotation) {
+    private BuiltBlueprint getBuiltBlueprint(String fileName) {
         this.client.getProfiler().push("blueprint_build_model");
-        final BuiltBlueprint builtBlueprint = blueprintsModelBuilder.getOrBuildBlueprint(fileName, blockRotation);
+        final BuiltBlueprint builtBlueprint = blueprintsModelBuilder.getOrBuildBlueprint(fileName, BlockRotation.NONE);
         this.client.getProfiler().pop();
 
         return builtBlueprint;
@@ -249,7 +249,7 @@ public final class BlueprintRenderer extends AbstractCustomRenderer implements I
 
     @NotNull
     private static IStructureRenderInfoProvider getStructureRenderInfoProvider() {
-        final var provider = CoreModUtils.getManagersProvider();
+        final var provider = ClientModUtils.getManagersProvider();
         return provider.get_BlueprintManager();
     }
 

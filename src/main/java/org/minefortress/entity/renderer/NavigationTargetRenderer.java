@@ -8,7 +8,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.core.FortressState;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.minefortress.entity.fight.NavigationTargetEntity;
 import org.minefortress.entity.renderer.models.NavigationTargetModel;
 
@@ -33,7 +33,7 @@ public class NavigationTargetRenderer extends EntityRenderer<NavigationTargetEnt
 
     @Override
     public boolean shouldRender(NavigationTargetEntity entity, Frustum frustum, double x, double y, double z) {
-        final var fortressManager = CoreModUtils.getManagersProvider().get_ClientFortressManager();
+        final var fortressManager = ClientModUtils.getManagersProvider().get_ClientFortressManager();
         if(fortressManager.getState() != FortressState.COMBAT)
             return false;
 

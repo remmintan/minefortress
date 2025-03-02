@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
 import net.remmintan.gobi.SelectionType;
 import net.remmintan.mods.minefortress.core.FortressState;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 import net.remmintan.mods.minefortress.gui.widget.HideableButtonWidget;
 import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
@@ -42,7 +42,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         Items.OAK_DOOR,
                         btn -> {
                             if (blueprintSelected())
-                                CoreModUtils.getBlueprintManager().clearStructure();
+                                ClientModUtils.getBlueprintManager().clearStructure();
                             else {
                                 this.client.setScreen(new BlueprintsScreen());
                             }
@@ -57,9 +57,9 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         Items.DIAMOND_AXE,
                         btn -> {
                             if (treeCutterSelected()) {
-                                CoreModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
+                                ClientModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
                             } else {
-                                CoreModUtils.getSelectionManager().setSelectionType(SelectionType.TREE);
+                                ClientModUtils.getSelectionManager().setSelectionType(SelectionType.TREE);
                             }
                         },
                         (button) -> Optional.of(treeCutterSelected() ? "Cancel" : "Chop trees"),
@@ -72,9 +72,9 @@ public class ToolsHudLayer extends AbstractHudLayer {
                         Items.DIAMOND_SHOVEL,
                         btn -> {
                             if (roadsSelected()) {
-                                CoreModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
+                                ClientModUtils.getSelectionManager().setSelectionType(SelectionType.SQUARES);
                             } else {
-                                CoreModUtils.getSelectionManager().setSelectionType(SelectionType.ROADS);
+                                ClientModUtils.getSelectionManager().setSelectionType(SelectionType.ROADS);
                             }
                         },
                         (button) -> Optional.of(roadsSelected() ? "Cancel" : "Build roads"),
@@ -118,7 +118,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                             20,
                             20,
                             type.getButtonText(),
-                            btn -> CoreModUtils.getSelectionManager().setSelectionType(type),
+                            btn -> ClientModUtils.getSelectionManager().setSelectionType(type),
                             type.name(),
                             () -> selection.checked && hudHasCorrectState(FortressState.BUILD_EDITING)
                     )
@@ -127,11 +127,11 @@ public class ToolsHudLayer extends AbstractHudLayer {
     }
 
     private static boolean isAnyPawnSelected() {
-        return CoreModUtils.getManagersProvider().get_PawnsSelectionManager().hasSelected();
+        return ClientModUtils.getManagersProvider().get_PawnsSelectionManager().hasSelected();
     }
 
     private boolean hudHasCorrectState(FortressState expectedState) {
-        return CoreModUtils.getFortressManager().getState() == expectedState;
+        return ClientModUtils.getFortressManager().getState() == expectedState;
     }
 
     @Override
@@ -142,7 +142,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
     }
 
     private void setCorrectHudState(FortressState expectedState) {
-        CoreModUtils.getFortressManager().setState(expectedState);
+        ClientModUtils.getFortressManager().setState(expectedState);
     }
 
     @Override
@@ -151,15 +151,15 @@ public class ToolsHudLayer extends AbstractHudLayer {
     }
 
     private boolean treeCutterSelected() {
-        return CoreModUtils.getManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
+        return ClientModUtils.getManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.TREE.ordinal();
     }
 
     private boolean roadsSelected() {
-        return CoreModUtils.getManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
+        return ClientModUtils.getManagersProvider().get_SelectionManager().getSelectionTypeIndex() == SelectionType.ROADS.ordinal();
     }
 
     private boolean blueprintSelected() {
-        return CoreModUtils.getManagersProvider().get_BlueprintManager().isSelecting();
+        return ClientModUtils.getManagersProvider().get_BlueprintManager().isSelecting();
     }
 
 }

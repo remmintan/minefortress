@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionType;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundSimpleSelectionTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -186,7 +186,7 @@ public class WallsSelection extends Selection {
                             UUID uuid = UUID.randomUUID();
                             if(level instanceof ITasksInformationHolder holder)
                                 holder.get_ClientTasksHolder().addTask(uuid, getSelection(), taskType, supertaskUuid);
-                            final var selectionManager = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
+                            final var selectionManager = ClientModUtils.getManagersProvider().get_PawnsSelectionManager();
                             final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
                             final var packet = new ServerboundSimpleSelectionTaskPacket(
                                     uuid,

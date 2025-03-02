@@ -1,7 +1,6 @@
 package net.remmintan.mods.minefortress.core.interfaces.blueprints;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
@@ -15,7 +14,6 @@ import java.util.UUID;
 
 public interface IServerBlueprintManager extends IServerManager, ITickableManager, IWritableManager {
     BlueprintMetadata get(String blueprintId);
-    void tick(ServerPlayerEntity player);
 
     void update(String blueprintId, String blueprintName, BlueprintGroup group, int newCapacity, NbtCompound updatedStructure, int newFloorLevel);
 

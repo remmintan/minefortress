@@ -19,7 +19,6 @@ public class ServerNetworkReceivers {
         registerReceiver(FortressChannelNames.FORTRESS_SAVE_EDIT_BLUEPRINT, ServerboundFinishEditBlueprintPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_CUT_TREES_TASK, ServerboundCutTreesTaskPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_ROADS_TASK, ServerboundRoadsTaskPacket::new);
-        registerReceiver(FortressChannelNames.FORTRESS_SET_GAMEMODE, ServerboundSetGamemodePacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_OPEN_CRAFTING_TABLE, ServerboundOpenCraftingScreenPacket::new);
         registerReceiver(FortressChannelNames.SCROLL_CURRENT_SCREEN, ServerboundScrollCurrentScreenPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_SLEEP, ServerboundSleepPacket::new);
@@ -33,7 +32,6 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SClearActiveBlueprint.CHANNEL, C2SClearActiveBlueprint::new);
         registerReceiver(C2SDestroyBuilding.CHANNEL, C2SDestroyBuilding::new);
         registerReceiver(C2SRepairBuilding.CHANNEL, C2SRepairBuilding::new);
-        registerReceiver(C2SRequestResourcesRefresh.CHANNEL, C2SRequestResourcesRefresh::new);
         registerReceiver(C2SSetNavigationTargetEntity.CHANNEL, C2SSetNavigationTargetEntity::new);
         registerReceiver(C2SAttractWarriorsToCampfire.CHANNEL, C2SAttractWarriorsToCampfire::new);
         registerReceiver(C2SUpdateScreenProperty.CHANNEL, C2SUpdateScreenProperty::new);

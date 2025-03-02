@@ -9,7 +9,7 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundCancelTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -42,7 +42,7 @@ public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasks
         removeTask(lastTaskId);
         FortressClientNetworkHelper.send(FortressChannelNames.CANCEL_TASK, new ServerboundCancelTaskPacket(lastTaskId));
         if(tasksStack.empty()) {
-            CoreModUtils.getManagersProvider().get_PawnsSelectionManager().resetSelection();
+            ClientModUtils.getManagersProvider().get_PawnsSelectionManager().resetSelection();
         }
     }
 

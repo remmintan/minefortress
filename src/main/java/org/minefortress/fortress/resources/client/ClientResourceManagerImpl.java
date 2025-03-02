@@ -1,11 +1,12 @@
 package org.minefortress.fortress.resources.client;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
 
 import java.util.HashSet;
@@ -26,14 +27,13 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
         final var itemInfos = stacks
                 .stream()
                 .map(it -> new ItemInfo(it.getItem(), it.getCount()))
-                .map(itemInfo -> itemInfo)
                 .toList();
         return hasItems(itemInfos);
     }
 
     @Override
     public boolean hasItems(final List<ItemInfo> stacks) {
-        if (CoreModUtils.getFortressManager().isCreative()) return true;
+        if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) return true;
         return stacks
                 .stream()
                 .allMatch(it -> {
@@ -86,7 +86,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
 
     @Override
     public int getItemAmount(Item item) {
-        if (CoreModUtils.getFortressManager().isCreative()) {
+        if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) {
             return 999;
         }
         final var group = groupManager.getGroup(item);

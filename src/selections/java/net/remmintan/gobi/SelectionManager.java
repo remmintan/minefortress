@@ -19,7 +19,8 @@ import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelection;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionType;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 
@@ -100,14 +101,15 @@ public class SelectionManager implements ISelectionManager {
         if(this.selection.needUpdate(pickedPos, upSelectionDelta)) {
             this.selection.update(pickedPos, upSelectionDelta);
             this.setNeedsUpdate(true);
-            final var provider = CoreModUtils.getManagersProvider();
-            final var clientManager = provider.get_ClientFortressManager();
+            final var provider = ClientModUtils.getManagersProvider();
+
             if((clickType == ClickType.BUILD || clickType == ClickType.ROADS)&& clickingBlockState != null) {
-                if(clientManager.isSurvival()){
+                if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) {
                     if(isCountableBlock(clickingBlockState)) {
                         final var blocksAmount = this.selection.getSelection().size();
                         final var item = clickingBlockState.getBlock().asItem();
-                        final var resourceManager = clientManager.getResourceManager();
+                        final var fortressManager = ClientModUtils.getFortressManager();
+                        final var resourceManager = fortressManager.getResourceManager();
                         final var itemStack = new ItemStack(item, blocksAmount);
                         inCorrectState = resourceManager.hasStacks(Collections.singletonList(itemStack));
                     } else {

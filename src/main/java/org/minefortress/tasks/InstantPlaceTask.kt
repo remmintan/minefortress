@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.event.GameEvent
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask
 
 class InstantPlaceTask(
@@ -57,7 +58,13 @@ class InstantPlaceTask(
             world.markDirty(pos)
         }
 
-        getBuildingsManager().addBuilding(player.uuid, metadata, start, end, blockData)
+        getBuildingsManager().addBuilding(
+            (player as IFortressPlayerEntity).get_FortressPos().orElseThrow(),
+            metadata,
+            start,
+            end,
+            blockData
+        )
         listeners.forEach { it() }
 
     }

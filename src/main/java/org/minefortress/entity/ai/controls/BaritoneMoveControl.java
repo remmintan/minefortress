@@ -14,6 +14,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressA
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IBaritoneMoveControl;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.BaritonableEntity;
 import org.minefortress.entity.TargetedPawn;
@@ -127,7 +128,7 @@ public class BaritoneMoveControl implements IBaritoneMoveControl {
         private void checkFailedToCalc(PathEvent pathEvent) {
             if(pathEvent == PathEvent.CALC_FAILED) {
                 if(entity instanceof IFortressAwareEntity fae && entity instanceof TargetedPawn targetedPawn)  {
-                    fae.sendMessageToMasterPlayer(getPawnType(fae) + " " + entity.getName().getString() + " can't reach the target");
+                    ServerExtensionsKt.sendMessageToFortressOwner(fae.getServer(), fae.getFortressPos(), getPawnType(fae) + " " + entity.getName().getString() + " can't reach the target");
                     targetedPawn.resetTargets();
                 }
                 stuck = true;

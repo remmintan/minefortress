@@ -4,7 +4,7 @@ import kotlinx.atomicfu.locks.synchronized
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.item.Items
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import org.minefortress.fortress.FortressToast
 
 
@@ -15,7 +15,7 @@ class ToastEvents {
 
     fun register() {
         ClientTickEvents.START_CLIENT_TICK.register { client ->
-            if (isClientInFortressGamemode() && CoreModUtils.getFortressManager().isCenterNotSet) {
+            if (isClientInFortressGamemode() && ClientModUtils.getFortressCenterManager().isCenterNotSet()) {
                 synchronized(LOCK) {
                     if (campfireToast == null) {
                         campfireToast = FortressToast("Set up your Fortress", "Right-click to place", Items.CAMPFIRE)

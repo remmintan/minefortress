@@ -1,8 +1,9 @@
 package net.remmintan.mods.minefortress.core.interfaces.server;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServerAutomationAreaManager;
-import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
@@ -10,12 +11,7 @@ import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResource
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksCreator;
 
-import java.util.Optional;
-import java.util.UUID;
-
 public interface IServerManagersProvider {
-    void killAllPawns();
-    Optional<LivingEntity> spawnPawnNearCampfire(UUID id);
     default IServerAutomationAreaManager getAutomationAreaManager() {
         return getManager(IServerAutomationAreaManager.class);
     }
@@ -38,10 +34,14 @@ public interface IServerManagersProvider {
         return getManager(IServerFightManager.class);
     }
 
-    default IServerBlueprintManager getBlueprintManager() {
-        return getManager(IServerBlueprintManager.class);
-    }
+    void tick(MinecraftServer server, ServerWorld world);
 
-    <T> T getManager(Class<T> managerClass);
+    void write(NbtCompound tag);
+
+    void read(NbtCompound tag);
+
+    void sync();
+
+    <T extends IServerManager> T getManager(Class<T> managerClass);
 
 }

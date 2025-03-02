@@ -6,7 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.building.BuildingHelper;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
 
@@ -72,9 +72,10 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     private void gatherItemAndAddToInventory(Colonist colonist) {
         if(isSuccess(colonist)){
             final var item = getRandomForesterItem(colonist);
-            colonist.getManagersProvider().ifPresent(
-                    it -> it.getResourceManager().increaseItemAmount(item, 1)
-            );
+            // Using ServerModUtils.getManagersProvider directly - no try/catch
+            ServerModUtils.getManagersProvider(colonist)
+                    .getResourceManager()
+                    .increaseItemAmount(item, 1);
         }
     }
 
@@ -91,10 +92,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     private void setGoal(Colonist colonist) {
         final var world = colonist.getWorld();
 
-        final var fortressCenter = colonist.getServerFortressManager()
-                .map(IServerFortressManager::getFortressCenter)
-                .orElseThrow(() -> new IllegalStateException("No fortress center found"));
-
+        final var fortressCenter = ServerModUtils.getFortressManager(colonist).getFortressCenter();
 
         final var horizontalRange = 10;
         final var randPointAroundCenter = BlockPos.iterateRandomly(world.random, 1, fortressCenter, horizontalRange)

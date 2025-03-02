@@ -3,7 +3,10 @@ package org.minefortress.entity.ai.goal;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
+
+import java.util.Optional;
 
 import static org.minefortress.entity.colonist.FortressHungerManager.IDLE_EXHAUSTION;
 
@@ -19,8 +22,11 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
     public boolean canStart() {
         if(colonist.getEatControl().map(IEatControl::isEating).orElse(false)) return false;
         if(!isDay() || colonist.getTaskControl().hasTask()) return false;
-        final var posOptional = colonist.getServerFortressManager()
+
+        // Using ServerModUtils.getFortressManager instead of colonist.getServerFortressManager()
+        final var posOptional = Optional.of(ServerModUtils.getFortressManager(colonist))
                 .flatMap(IServerFortressManager::getRandomPositionAroundCampfire);
+
         if(posOptional.isPresent()) {
             goal = posOptional.get();
             return true;

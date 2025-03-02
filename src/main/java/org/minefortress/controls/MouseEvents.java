@@ -2,7 +2,7 @@ package org.minefortress.controls;
 
 import net.minecraft.client.MinecraftClient;
 import net.remmintan.mods.minefortress.core.FortressState;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.minefortress.utils.ModUtils;
 
 public class MouseEvents {
@@ -35,22 +35,22 @@ public class MouseEvents {
     }
 
     private static void firePressEvent(double mouseX, double mouseY) {
-        final var fortressManager = CoreModUtils.getFortressManager();
+        final var fortressManager = ClientModUtils.getFortressManager();
         final var state = fortressManager.getState();
         final var correctState = state == FortressState.COMBAT || state == FortressState.BUILD_SELECTION;
-        final var noBuildingHovered = !CoreModUtils.getBuildingsManager().isBuildingHovered();
+        final var noBuildingHovered = !ClientModUtils.getBuildingsManager().isBuildingHovered();
         final var noScreenOpened = MinecraftClient.getInstance().currentScreen == null;
         final var hudNotHovered = !ModUtils.getFortressClient().get_FortressHud().isHovered();
 
         if (correctState && noBuildingHovered && noScreenOpened && hudNotHovered) {
-            final var provider = CoreModUtils.getManagersProvider();
+            final var provider = ClientModUtils.getManagersProvider();
             final var pawnsSelection = provider.get_PawnsSelectionManager();
             pawnsSelection.startSelection(mouseX, mouseY);
         }
     }
 
     private static void fireReleaseEvent(double mouseX, double mouseY) {
-        final var provider = CoreModUtils.getManagersProvider();
+        final var provider = ClientModUtils.getManagersProvider();
         final var pawnsSelection = provider.get_PawnsSelectionManager();
         pawnsSelection.endSelection(mouseX, mouseY);
     }

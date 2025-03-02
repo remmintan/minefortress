@@ -6,7 +6,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAre
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 import net.remmintan.mods.minefortress.core.interfaces.networking.INetworkingReader;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreasClientManager;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.registries.NetworkingReadersRegistry;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class S2CSyncAreasPacket implements FortressS2CPacket {
     }
 
     private static IAreasClientManager getAutomationAreaManager() {
-        final var provider = CoreModUtils.getManagersProvider();
+        final var provider = ClientModUtils.getManagersProvider();
         return provider.get_AreasClientManager();
     }
 }

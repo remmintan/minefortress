@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
-import net.remmintan.mods.minefortress.core.utils.ResourceUtils;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,7 +146,7 @@ public class TreeHelper {
     }
 
     private static void removeBlockAddDropToTheResources(IWorkerPawn pawn, ServerWorld world, BlockPos blockPos) {
-        ResourceUtils.addDropToTheResourceManager(world, blockPos,  pawn);
+        ServerModUtils.addDropToTheResourceManager(world, blockPos, pawn);
         world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 3);
         world.emitGameEvent((Entity) pawn, GameEvent.BLOCK_DESTROY, blockPos);
     }

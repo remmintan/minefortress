@@ -6,9 +6,10 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.blocks.FortressBlocks;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressModServerManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 
 import java.util.EnumSet;
 
@@ -16,8 +17,6 @@ import java.util.EnumSet;
 public final class AttackBuildingGoal extends Goal {
 
     private static final int ATTACK_DISTANCE = 6;
-
-    private final IFortressModServerManager modServerManager;
     private final HostileEntity mob;
     private IFortressBuilding targetBuilding;
     private BlockPos targetPosition;
@@ -26,9 +25,8 @@ public final class AttackBuildingGoal extends Goal {
 
     private int cooldown = 0;
 
-    public AttackBuildingGoal(HostileEntity mob, IFortressModServerManager modServerManager) {
+    public AttackBuildingGoal(HostileEntity mob) {
         this.mob = mob;
-        this.modServerManager = modServerManager;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
     }
 
@@ -37,12 +35,23 @@ public final class AttackBuildingGoal extends Goal {
         if(lastUpdateTime + 20 > mob.getWorld().getTime()) return false;
         if(!mob.getWorld().isNight()) return false;
         lastUpdateTime = mob.getWorld().getTime();
+
         final var mobBlockPos = this.mob.getBlockPos();
-        this.modServerManager
-                .findReachableFortress(mobBlockPos, getFollowRange())
-                .map(IServerManagersProvider::getBuildingsManager)
-                .flatMap(it -> it.findNearest(mobBlockPos))
-                .ifPresent(building -> this.targetBuilding = building);
+        final var followRange = (int) getFollowRange();
+
+        IServerBuildingsManager buildingsManager = null;
+        for (var pos : BlockPos.iterateOutwards(mobBlockPos, followRange, 10, followRange)) {
+            if (this.mob.getWorld().getBlockState(pos).isOf(FortressBlocks.FORTRESS_CAMPFIRE)) {
+                buildingsManager = ServerModUtils.getManagersProvider(mob.getServer(), pos).getBuildingsManager();
+                break;
+            }
+        }
+
+        if (buildingsManager != null) {
+            buildingsManager
+                    .findNearest(mobBlockPos)
+                    .ifPresent(building -> this.targetBuilding = building);
+        }
 
         if(targetBuilding!=null) {
             this.targetPosition = targetBuilding.getNearestCornerXZ(mobBlockPos, mob.getWorld());

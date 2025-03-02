@@ -13,6 +13,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPaw
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import net.remmintan.mods.minefortress.core.utils.PathUtils;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
@@ -43,14 +44,6 @@ public abstract class AbstractTask implements ITask {
         this.taskType = taskType;
         this.startingBlock = startingBlock;
         this.endingBlock = endingBlock;
-    }
-
-    public BlockPos getStartingBlock() {
-        return startingBlock;
-    }
-
-    public BlockPos getEndingBlock() {
-        return endingBlock;
     }
 
     @Override
@@ -106,7 +99,10 @@ public abstract class AbstractTask implements ITask {
         }
 
         if(parts.isEmpty() && totalParts <= completedParts) {
-            worker.getMasterPlayer().ifPresent(this::sendFinishTaskNotificationToPlayer);
+            final var owner = ServerExtensionsKt.getFortressOwner(worker.getServer(), worker.getFortressPos());
+            if (owner != null) {
+                this.sendFinishTaskNotificationToPlayer(owner);
+            }
             taskFinishListeners.forEach(Runnable::run);
         }
     }

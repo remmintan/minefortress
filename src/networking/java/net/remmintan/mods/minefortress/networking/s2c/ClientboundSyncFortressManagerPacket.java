@@ -3,27 +3,23 @@ package net.remmintan.mods.minefortress.networking.s2c;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
 
 public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
 
     private final int colonistsCount;
     private final BlockPos fortressPos;
-    private final FortressGamemode fortressGamemode;
     private final boolean connectedToTheServer;
     private final int maxColonistsCount;
     private final int reservedColonistsCount;
 
     public ClientboundSyncFortressManagerPacket(int colonistsCount,
                                                 BlockPos fortressPos,
-                                                FortressGamemode fortressGamemode,
                                                 boolean connectedToTheServer,
                                                 int maxColonistsCount,
                                                 int reservedColonistsCount) {
         this.colonistsCount = colonistsCount;
         this.fortressPos = fortressPos;
-        this.fortressGamemode = fortressGamemode;
         this.connectedToTheServer = connectedToTheServer;
         this.maxColonistsCount = maxColonistsCount;
         this.reservedColonistsCount = reservedColonistsCount;
@@ -37,7 +33,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
         else
             this.fortressPos = null;
 
-        this.fortressGamemode = FortressGamemode.valueOf(buf.readString(100));
         this.maxColonistsCount = buf.readInt();
         this.connectedToTheServer = buf.readBoolean();
         this.reservedColonistsCount = buf.readInt();
@@ -50,7 +45,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
                 .sync(
                     colonistsCount,
                     fortressPos,
-                    this.fortressGamemode,
                     this.connectedToTheServer,
                     this.maxColonistsCount,
                         reservedColonistsCount
@@ -65,7 +59,6 @@ public class ClientboundSyncFortressManagerPacket implements FortressS2CPacket {
         if(centerExists)
             buf.writeBlockPos(fortressPos);
 
-        buf.writeString(fortressGamemode.name());
         buf.writeInt(maxColonistsCount);
         buf.writeBoolean(connectedToTheServer);
         buf.writeInt(reservedColonistsCount);

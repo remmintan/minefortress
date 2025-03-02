@@ -4,7 +4,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.minefortress.MineFortressMod;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 
@@ -37,9 +37,9 @@ public class ModUtils {
         final var client = MinecraftClient.getInstance();
         final var options = client.options;
 
-        final var blueprintManager = CoreModUtils.getBlueprintManager();
-        final var selectionManager = CoreModUtils.getSelectionManager();
-        final var areasClientManager = CoreModUtils.getAreasClientManager();
+        final var blueprintManager = ClientModUtils.getBlueprintManager();
+        final var selectionManager = ClientModUtils.getSelectionManager();
+        final var areasClientManager = ClientModUtils.getAreasClientManager();
 
         final var anyManagerSelecting = blueprintManager.isSelecting() ||
                 selectionManager.isSelecting() ||

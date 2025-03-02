@@ -9,6 +9,8 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ServerPlayerEntityExtensionsKt;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
@@ -64,7 +66,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
     public void handle(MinecraftServer server, ServerPlayerEntity player) {
         final var manager = getFortressManager(player);
         final var provider = getManagersProvider(player);
-        final var blueprintManager = provider.getBlueprintManager();
+        final var blueprintManager = ServerPlayerEntityExtensionsKt.getManagersProvider(player).getBlueprintManager();
 
         if ("campfire".equals(blueprintId)) {
             final var task = blueprintManager.createInstantPlaceTask(blueprintId, startPos, rotation);
@@ -74,7 +76,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
                 final var center = BlockBox.create(start, end).getCenter();
 
-                manager.setupCenter(center, player);
+                manager.setupCenter(center);
                 return Unit.INSTANCE;
             });
             provider.getTaskManager().executeInstantTask(task, player);
@@ -90,7 +92,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
             final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
             final var serverResourceManager = provider.getResourceManager();
 
-            if (manager.isSurvival()) {
+            if (ServerExtensionsKt.isSurvivalFortress(server)) {
                 final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
                 try {
                     serverResourceManager.reserveItems(taskId, stacks);

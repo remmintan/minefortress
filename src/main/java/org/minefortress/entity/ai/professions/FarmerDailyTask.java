@@ -14,7 +14,8 @@ import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.automation.iterators.FarmAreaIterator;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
@@ -163,13 +164,13 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
     }
 
     private Optional<BlockItem> getSeeds(Colonist colonist) {
-        if(CoreModUtils.isPlayerInCreative(colonist)) {
+        if (ServerExtensionsKt.isCreativeFortress(colonist.getServer())) {
             return Optional.of((BlockItem) Items.WHEAT_SEEDS);
         }
-        final var serverResourceManager = colonist
-                .getManagersProvider()
-                .orElseThrow()
-                .getResourceManager();
+
+        // Use ServerModUtils to get resource manager directly
+        final var serverResourceManager = ServerModUtils.getManagersProvider(colonist).getResourceManager();
+
         final var itemOpt = serverResourceManager
                 .getAllItems()
                 .stream()
@@ -185,8 +186,9 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
 
         itemOpt.ifPresent(
                 it -> serverResourceManager
-                    .removeItems(Collections.singletonList(new ItemInfo(it, 1)))
+                        .removeItems(Collections.singletonList(new ItemInfo(it, 1)))
         );
+
         return itemOpt.map(it -> (BlockItem) it);
     }
 }

@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
-import java.util.function.Supplier;
 
 public abstract class ProfessionManager implements IProfessionsManager {
 
@@ -40,11 +39,11 @@ public abstract class ProfessionManager implements IProfessionsManager {
 
     private IProfession root;
     private Map<String, IProfession> professions = Collections.emptyMap();
-    protected final Supplier<IFortressManager> fortressManagerSupplier;
 
-    public ProfessionManager(Supplier<IFortressManager> fortressManagerSupplier) {
-        this.fortressManagerSupplier = fortressManagerSupplier;
+    public ProfessionManager() {
     }
+
+    protected abstract IFortressManager getFortressManager();
 
     @Override
     public IProfession getRootProfession() {
@@ -65,9 +64,9 @@ public abstract class ProfessionManager implements IProfessionsManager {
                 return ProfessionResearchState.LOCKED_PARENT;
             }
         }
+        final var fortressManager = getFortressManager();
 
-        final var fortressManager = fortressManagerSupplier.get();
-        if (fortressManager.isCreative()) {
+        if (isCreativeFortress()) {
             return ProfessionResearchState.UNLOCKED;
         }
 
@@ -79,6 +78,8 @@ public abstract class ProfessionManager implements IProfessionsManager {
         boolean satisfied = fortressManager.hasRequiredBuilding(requirementType, profession.getRequirementLevel(), minRequirementCount);
         return satisfied ? ProfessionResearchState.UNLOCKED : ProfessionResearchState.LOCKED_SELF;
     }
+
+    abstract boolean isCreativeFortress();
 
     @Override
     public IProfession getProfession(String id) {
@@ -155,7 +156,7 @@ public abstract class ProfessionManager implements IProfessionsManager {
 
     @Override
     public int getFreeColonists() {
-        final var abstractFortressManager = fortressManagerSupplier.get();
+        final var abstractFortressManager = getFortressManager();
         final int totalColonists = abstractFortressManager.getTotalColonistsCount();
         final int reservedColonists = abstractFortressManager.getReservedPawnsCount();
         final int totalWorkers = getProfessions().values().stream().mapToInt(IProfession::getAmount).sum();

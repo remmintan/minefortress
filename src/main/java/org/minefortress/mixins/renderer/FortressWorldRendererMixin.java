@@ -16,7 +16,7 @@ import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.minefortress.interfaces.IFortressMinecraftClient;
@@ -47,7 +47,7 @@ public abstract class FortressWorldRendererMixin  {
         this.entityRenderer = new MineFortressLabelsRenderer(
                 client.textRenderer,
                 fortressClient::get_SelectionManager,
-                () -> CoreModUtils.getBuildingsManager().getBuildingHealths()
+                () -> ClientModUtils.getBuildingsManager().getBuildingHealths()
         );
     }
 
@@ -70,16 +70,16 @@ public abstract class FortressWorldRendererMixin  {
 
         if (!FortressGamemodeUtilsKt.isClientInFortressGamemode()) return;
 
-        final var selectionManager = CoreModUtils.getSelectionManager();
+        final var selectionManager = ClientModUtils.getSelectionManager();
         final var immediate = this.bufferBuilders.getEntityVertexConsumers();
         final var vertexConsumer = immediate.getBuffer(RenderLayer.getLines());
-        final var fcm = CoreModUtils.getFortressManager();
+        final var fcm = ClientModUtils.getFortressManager();
         if (!selectionManager.isSelecting() && (fcm.getState() == FortressState.BUILD_EDITING || fcm.getState() == FortressState.BUILD_SELECTION)){
             final var target = client.crosshairTarget;
             if(target instanceof BlockHitResult bhr) {
                 final var pos = bhr.getBlockPos();
                 if(pos != null && !world.getBlockState(pos).isAir()) {
-                    final var buildingSelection = CoreModUtils.getBuildingsManager().getBuildingSelection(pos);
+                    final var buildingSelection = ClientModUtils.getBuildingsManager().getBuildingSelection(pos);
                     renderBuildingSelection(matrices, camera, buildingSelection, vertexConsumer, cameraPos);
                 }
             }

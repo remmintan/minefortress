@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +52,6 @@ public class S2CAddClientTasksPacket implements FortressS2CPacket {
 
     @Override
     public void handle(MinecraftClient client) {
-        CoreModUtils.getClientTasksHolder().orElseThrow().addTasks(tasks);
+        ClientModUtils.getClientTasksHolder().orElseThrow().addTasks(tasks);
     }
 }

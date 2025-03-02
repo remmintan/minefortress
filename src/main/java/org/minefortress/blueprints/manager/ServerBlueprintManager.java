@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -16,6 +17,8 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkH
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundRemoveBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundResetBlueprintPacket;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBlueprintPacket;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.ServerStructureBlockDataManager;
 import org.minefortress.tasks.BlueprintDigTask;
 import org.minefortress.tasks.BlueprintTask;
@@ -28,20 +31,12 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
 
     private boolean initialized = false;
 
-    private final ServerStructureBlockDataManager blockDataManager;
-    private final BlueprintMetadataReader blueprintMetadataReader;
+    private ServerStructureBlockDataManager blockDataManager;
+    private BlueprintMetadataReader blueprintMetadataReader;
     private final Queue<FortressS2CPacket> scheduledSyncs = new ArrayDeque<>();
 
     private final Map<String, BlueprintMetadata> blueprints = new HashMap<>();
 
-    public ServerBlueprintManager(MinecraftServer server) {
-        this.blueprintMetadataReader = new BlueprintMetadataReader(server);
-        this.blockDataManager = new ServerStructureBlockDataManager(server);
-    }
-
-    private static BlockPos getEndPos(BlockPos startPos, Vec3i size) {
-        return startPos.add(new Vec3i(size.getX() - 1, size.getY() - 1, size.getZ() - 1));
-    }
 
     @Override
     public BlueprintMetadata get(String blueprintId) {
@@ -49,7 +44,11 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
     }
 
     @Override
-    public void tick(ServerPlayerEntity player) {
+    public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
+        if (blockDataManager == null || blueprintMetadataReader == null) {
+            this.blueprintMetadataReader = new BlueprintMetadataReader(server);
+            this.blockDataManager = new ServerStructureBlockDataManager(server);
+        }
         if (player == null) return;
         if (!initialized) {
             if (blueprints.isEmpty()) readDefaultBlueprints();
@@ -197,4 +196,9 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
             }
         }
     }
+
+    private static BlockPos getEndPos(BlockPos startPos, Vec3i size) {
+        return startPos.add(new Vec3i(size.getX() - 1, size.getY() - 1, size.getZ() - 1));
+    }
+
 }

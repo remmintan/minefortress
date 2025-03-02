@@ -7,6 +7,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.professions.fishing.FisherBlockFounderKt;
@@ -122,12 +123,11 @@ public class FisherDailyTask implements ProfessionDailyTask {
     }
 
     private FisherGoal setGoalAsync(Colonist pawn) {
-        final var managersProviderOpt = pawn.getManagersProvider();
-        if(managersProviderOpt.isEmpty()) return null;
-        final var managersProvider = managersProviderOpt.get();
+        final var managersProvider = ServerModUtils.getManagersProvider(pawn);
         final var buildingsManager = managersProvider.getBuildingsManager();
         final var buildingOpt = buildingsManager.findNearest(pawn.getBlockPos(), ProfessionType.FISHERMAN);
         final var world = pawn.getWorld();
+
         if(buildingOpt.isPresent()) {
             final var building = buildingOpt.get();
             final var center = building.getCenter();
@@ -149,16 +149,13 @@ public class FisherDailyTask implements ProfessionDailyTask {
         }
 
         // look for water near campfire
-        final var fortressManagerOpt = pawn.getServerFortressManager();
-        if(fortressManagerOpt.isEmpty()) return null;
-        final var fortressManager = fortressManagerOpt.get();
+        final var fortressManager = ServerModUtils.getFortressManager(pawn);
         final var fortressCenter = fortressManager.getFortressCenter();
         final var goalOpt = FisherBlockFounderKt
                 .getFisherGoal(pawn, fortressCenter, it -> world.getBlockState(it).isOf(Blocks.WATER));
         if(goalOpt.isPresent()) {
             return goalOpt.get();
         }
-
 
         // if goal is still not set then send a message to the player
         final var pawnName = pawn.getName().getString();

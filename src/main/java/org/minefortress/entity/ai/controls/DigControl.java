@@ -9,29 +9,29 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.event.GameEvent;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
-import net.remmintan.mods.minefortress.core.utils.ResourceUtils;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
 
 import static org.minefortress.entity.colonist.FortressHungerManager.ACTIVE_EXHAUSTION;
 
 public class DigControl extends PositionedActionControl {
 
-    private final Colonist colonist;
+    private final Colonist pawn;
     private final ServerWorld level;
 
     private float destroyProgress = 0.0f;
     private int destroyTicks = 0;
 
-    public DigControl(Colonist colonist, ServerWorld level) {
-        this.colonist = colonist;
+    public DigControl(Colonist pawn, ServerWorld level) {
+        this.pawn = pawn;
         this.level = level;
     }
 
     @Override
     public void tick() {
         if(isDone()) return;
-        if(!super.canReachTheGoal(colonist) || !colonist.getNavigation().isIdle()) return;
+        if (!super.canReachTheGoal(pawn) || !pawn.getNavigation().isIdle()) return;
 
         if(act()) {
             reset();
@@ -41,29 +41,29 @@ public class DigControl extends PositionedActionControl {
     private boolean act() {
         putProperItemInHand();
 
-        colonist.addHunger(ACTIVE_EXHAUSTION);
+        pawn.addHunger(ACTIVE_EXHAUSTION);
         if(destroyProgress >= 1.0f){
             this.destroyProgress = 0f;
-            ResourceUtils.addDropToTheResourceManager(level, goal, colonist);
-            level.breakBlock(this.goal, false, this.colonist);
-            level.emitGameEvent(this.colonist, GameEvent.BLOCK_DESTROY, goal);
+            ServerModUtils.addDropToTheResourceManager(level, goal, pawn);
+            level.breakBlock(this.goal, false, this.pawn);
+            level.emitGameEvent(this.pawn, GameEvent.BLOCK_DESTROY, goal);
             return true;
         } else {
-            this.destroyProgress += this.getDestroyProgress(level.getBlockState(goal), colonist, level, goal)/colonist.getHungerMultiplier();
-            this.colonist.lookAtGoal();
-            if(++destroyTicks % (4 * colonist.getHungerMultiplier()) == 0) {
-                this.colonist.swingHand(Hand.MAIN_HAND);
+            this.destroyProgress += this.getDestroyProgress(level.getBlockState(goal), pawn, level, goal) / pawn.getHungerMultiplier();
+            this.pawn.lookAtGoal();
+            if (++destroyTicks % (4 * pawn.getHungerMultiplier()) == 0) {
+                this.pawn.swingHand(Hand.MAIN_HAND);
             }
             return false;
         }
     }
 
     private void putProperItemInHand() {
-        final var creative = colonist.getServerFortressManager().orElseThrow().isCreative();
+        final var creative = ServerExtensionsKt.isCreativeFortress(pawn.getServer());
 
         final BlockState blockState = level.getBlockState(goal);
         Item item = null;
-        final String professionId = colonist.getProfessionId();
+        final String professionId = pawn.getProfessionId();
         if(blockState.isIn(BlockTags.PICKAXE_MINEABLE)) {
             if(creative) {
                 item = Items.DIAMOND_PICKAXE;
@@ -110,11 +110,11 @@ public class DigControl extends PositionedActionControl {
             }
         }
 
-        colonist.putItemInHand(item);
+        pawn.putItemInHand(item);
     }
 
     private float getDestroyProgress(BlockState state, Colonist pawn, StructureWorldAccess world, BlockPos pos) {
-        final boolean creative = colonist.getServerFortressManager().map(IServerFortressManager::isCreative).orElse(false);
+        final boolean creative = ServerExtensionsKt.isCreativeFortress(pawn.getServer());
         if(creative) return 1.0f;
 
         float f = state.getHardness(world, pos);

@@ -4,11 +4,8 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.text.Text
-import net.remmintan.mods.minefortress.core.FortressGamemode
 import net.remmintan.mods.minefortress.gui.building.translateMousePosition
 import net.remmintan.mods.minefortress.networking.c2s.C2SSwitchToMinecraftSurvival
-import net.remmintan.mods.minefortress.networking.c2s.ServerboundSetGamemodePacket
-import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 
 /**
@@ -52,10 +49,6 @@ class CampfireFunctions : IBuildingFunctions {
     private fun switchToSurvivalMode() {
         // Close the current screen first
         MinecraftClient.getInstance().setScreen(null)
-
-        // First, switch the Fortress gamemode to SURVIVAL
-        val fortressPacket = ServerboundSetGamemodePacket(FortressGamemode.SURVIVAL)
-        FortressClientNetworkHelper.send(FortressChannelNames.FORTRESS_SET_GAMEMODE, fortressPacket)
 
         // Then, send a packet to switch to actual Minecraft Survival mode
         // This works without requiring cheats to be enabled

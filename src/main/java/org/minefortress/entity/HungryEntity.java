@@ -12,14 +12,15 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import org.minefortress.entity.ai.controls.EatControl;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import org.minefortress.entity.ai.controls.EatControl;
 import org.minefortress.entity.ai.goal.EatGoal;
 import org.minefortress.entity.colonist.FakeHungerManager;
 import org.minefortress.entity.colonist.FortressHungerManager;
 import org.minefortress.entity.colonist.IFortressHungerManager;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IHungerAwareEntity;
 
 import java.util.Optional;
 
@@ -106,15 +107,21 @@ public abstract class HungryEntity extends BaritonableEntity implements IHungerA
     }
 
     private void sendHungerMessage() {
-        if(this instanceof IFortressAwareEntity fae && this instanceof NamedPawnEntity npe) {
+        if (this instanceof IFortressAwareEntity fae && this instanceof NamedPawnEntity npe) {
             final HungerManager hungerManager = getHungerManager();
             final var pawnName = npe.getName().getString();
-            if(hungerManager.prevFoodLevel > 0 && hungerManager.getFoodLevel() <= 0) {
-                fae.sendMessageToMasterPlayer(pawnName + " is starving! Do something!");
-            } else if(hungerManager.prevFoodLevel >= 5 && hungerManager.foodLevel < 5) {
-                fae.sendMessageToMasterPlayer(pawnName + " is very hungry! Bring some food to the village!");
-            } else if(hungerManager.prevFoodLevel >= 10 && hungerManager.foodLevel < 10) {
-                fae.sendMessageToMasterPlayer(pawnName + " is hungry. It's time to eat something!");
+
+            String message = null;
+            if (hungerManager.prevFoodLevel > 0 && hungerManager.getFoodLevel() <= 0) {
+                message = pawnName + " is starving! Do something!";
+            } else if (hungerManager.prevFoodLevel >= 5 && hungerManager.foodLevel < 5) {
+                message = pawnName + " is very hungry! Bring some food to the village!";
+            } else if (hungerManager.prevFoodLevel >= 10 && hungerManager.foodLevel < 10) {
+                message = pawnName + " is hungry. It's time to eat something!";
+            }
+
+            if (message != null) {
+                ServerExtensionsKt.sendMessageToFortressOwner(fae.getServer(), fae.getFortressPos(), message);
             }
         }
     }

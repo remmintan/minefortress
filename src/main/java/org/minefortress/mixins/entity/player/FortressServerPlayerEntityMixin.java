@@ -13,9 +13,12 @@ import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.blueprints.BlueprintsDimensionKt;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.server.IPlayerManagersProvider;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.blueprints.manager.ServerBlueprintManager;
 import org.minefortress.utils.FortressSpawnLocating;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,10 +31,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity {
+public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity, IPlayerManagersProvider {
 
     @Shadow @Final public MinecraftServer server;
     @Shadow public ServerPlayNetworkHandler networkHandler;
+
+    @Unique
+    private final IServerBlueprintManager blueprintManager = new ServerBlueprintManager();
+
     @Unique
     private Vec3d persistedPos;
     @Unique
@@ -40,14 +47,15 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     private float persistedYaw;
     @Unique
     private float persistedPitch;
-
-
+    @Unique
     private boolean wasInBlueprintWorldWhenLoggedOut = false;
+
+    @Shadow
+    public abstract ServerWorld getServerWorld();
 
     public FortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
     }
-
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
@@ -58,13 +66,16 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
             playerState.putDouble("persistedPosY", persistedPos.y);
             playerState.putDouble("persistedPosZ", persistedPos.z);
         }
-        nbt.put("playerState", playerState);
+
+        blueprintManager.write(playerState);
+
+        nbt.put("fortressPlayerState", playerState);
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        if (nbt.contains("playerState")) {
-            NbtCompound playerState = nbt.getCompound("playerState");
+        if (nbt.contains("fortressPlayerState")) {
+            NbtCompound playerState = nbt.getCompound("fortressPlayerState");
             wasInBlueprintWorldWhenLoggedOut = playerState.getBoolean("wasInBlueprintWorldWhenLoggedOut");
             if (playerState.contains("persistedPosX")) {
                 persistedPos = new Vec3d(
@@ -73,8 +84,8 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
                         playerState.getDouble("persistedPosZ")
                 );
             }
+            blueprintManager.read(playerState);
         }
-
     }
 
 
@@ -122,6 +133,11 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
             this.teleport(blockPos.getX(), blockPos.getY(), blockPos.getZ());
     }
 
+    @Inject(method = "tick", at = @At("TAIL"))
+    public void tick(CallbackInfo ci) {
+        this.blueprintManager.tick(this.server, this.getServerWorld(), (ServerPlayerEntity) (Object) this);
+    }
+
     @Override
     public boolean was_InBlueprintWorldWhenLoggedOut() {
         return wasInBlueprintWorldWhenLoggedOut;
@@ -137,5 +153,4 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     public Vec3d get_PersistedPos() {
         return persistedPos;
     }
-
 }

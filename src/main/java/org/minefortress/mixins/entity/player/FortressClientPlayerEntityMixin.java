@@ -11,7 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
 import org.spongepowered.asm.mixin.Final;
@@ -60,7 +60,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
         if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             if(client.options.sprintKey.isPressed()) {
-                final var fortressClient = CoreModUtils.getManagersProvider();
+                final var fortressClient = ClientModUtils.getManagersProvider();
                 final IClientBlueprintManager clientBlueprintManager = fortressClient.get_BlueprintManager();
                 if(clientBlueprintManager.isSelecting()) {
                     clientBlueprintManager.rotateSelectedStructureCounterClockwise();

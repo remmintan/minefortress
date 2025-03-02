@@ -14,14 +14,11 @@ import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
-import net.remmintan.mods.minefortress.networking.c2s.C2SRequestResourcesRefresh;
-import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.minefortress.controls.MouseEvents;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.registries.FortressKeybindings;
 import org.minefortress.registries.events.client.ToastEvents;
-import org.minefortress.renderer.gui.ChooseModeScreen;
 import org.minefortress.utils.ModUtils;
 
 public class FortressClientEvents {
@@ -29,22 +26,20 @@ public class FortressClientEvents {
     public static void register() {
         new ToastEvents().register();
 
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> CoreModUtils.getFortressManager().reset());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientModUtils.getFortressManager().reset());
         ClientTickEvents.START_CLIENT_TICK.register(FortressClientEvents::startClientTick);
         ClientTickEvents.END_CLIENT_TICK.register(FortressClientEvents::endClientTick);
         ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> {
             ItemGroups.updateDisplayContext(handler.getEnabledFeatures(), false, client.world.getRegistryManager());
-            final var packet = new C2SRequestResourcesRefresh();
-            FortressClientNetworkHelper.send(C2SRequestResourcesRefresh.CHANNEL, packet);
         }));
 
         UseEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
             if (!FortressGamemodeUtilsKt.isFortressGamemode(player) || !world.isClient()) return ActionResult.PASS;
 
-            if (CoreModUtils.getFortressManager().getState() == FortressState.COMBAT) {
-                final var provider = CoreModUtils.getManagersProvider();
+            if (ClientModUtils.getFortressManager().getState() == FortressState.COMBAT) {
+                final var provider = ClientModUtils.getManagersProvider();
                 final var selectionManager = provider.getTargetedSelectionManager();
-                final var fightManager = CoreModUtils.getFortressManager().getFightManager();
+                final var fightManager = ClientModUtils.getFortressManager().getFightManager();
 
                 fightManager.setTarget(entity, selectionManager);
             }
@@ -55,7 +50,7 @@ public class FortressClientEvents {
         AttackEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
             if (FortressGamemodeUtilsKt.isFortressGamemode(player)) {
                 if (entity instanceof IFortressAwareEntity fortressAwareEntity) {
-                    final var selectionManager = CoreModUtils.getManagersProvider().get_PawnsSelectionManager();
+                    final var selectionManager = ClientModUtils.getManagersProvider().get_PawnsSelectionManager();
                     selectionManager.selectSingle(fortressAwareEntity);
                 }
                 return ActionResult.FAIL;
@@ -80,12 +75,10 @@ public class FortressClientEvents {
 
         final var fortressClient = (IFortressMinecraftClient) client;
         fortressClient.get_FortressHud().tick();
-        final var provider = CoreModUtils.getManagersProvider();
+        final var provider = ClientModUtils.getManagersProvider();
         final var fortressClientManager = provider.get_ClientFortressManager();
         fortressClientManager.tick();
-        if(fortressClientManager.gamemodeNeedsInitialization() && !(client.currentScreen instanceof ChooseModeScreen)) {
-            client.setScreen(new ChooseModeScreen());
-        }
+        provider.get_FortressCenterManager().tick();
     }
 
     private static void endClientTick(MinecraftClient client) {

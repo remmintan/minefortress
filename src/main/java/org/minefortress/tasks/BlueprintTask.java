@@ -15,7 +15,10 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressA
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 
@@ -100,18 +103,19 @@ public class BlueprintTask extends AbstractTask {
             if(blueprintAutomaticData != null) mergeBlockData.putAll(blueprintAutomaticData);
 
 
-            final var provider = worker.getManagersProvider().orElseThrow();
-            final var metadata = provider.getBlueprintManager().get(blueprintId);
-            final var buildingManager = provider.getBuildingsManager();
-            buildingManager.addBuilding(worker.getMasterId().orElseThrow(), metadata, startingBlock, endingBlock, mergeBlockData);
+            final var provider = ServerModUtils.getManagersProvider(worker);
+
+            throw new NotImplementedException("send blueprint metadata together with task");
+//            final var metadata = provider.getBlueprintManager().get(blueprintId);
+//            final var buildingManager = provider.getBuildingsManager();
+//            buildingManager.addBuilding(worker.getFortressPos(), metadata, startingBlock, endingBlock, mergeBlockData);
         }
         super.finishPart(part, worker);
     }
 
-    private void removeReservedItem(IFortressAwareEntity colonist, Item item) {
-        final var provider = colonist.getManagersProvider().orElseThrow();
-        final var manager = colonist.getServerFortressManager().orElseThrow();
-        if(manager.isSurvival()) {
+    private void removeReservedItem(IFortressAwareEntity worker, Item item) {
+        final var provider = ServerModUtils.getManagersProvider(worker);
+        if (ServerExtensionsKt.isSurvivalFortress(worker.getServer())) {
             final var resourceManager = provider
                     .getResourceManager();
             if (SimilarItemsHelper.isIgnorable(item)) {

@@ -2,12 +2,13 @@ package org.minefortress.mixins.renderer.gui;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.util.collection.DefaultedList;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
 import org.minefortress.interfaces.FortressSimpleInventory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,7 +31,9 @@ public abstract class FortressSimpleInventoryMixin implements FortressSimpleInve
 
     @Override
     public int getMaxCountPerStack() {
-        final var clientFortressSurvival = FabricLoader.getInstance().getEnvironmentType() != EnvType.SERVER && FortressGamemodeUtilsKt.isClientInFortressGamemode() && !CoreModUtils.getFortressManager().isCreative();
+        final var clientFortressSurvival = FabricLoader.getInstance().getEnvironmentType() != EnvType.SERVER &&
+                FortressGamemodeUtilsKt.isClientInFortressGamemode() &&
+                ClientExtensionsKt.isSurvivalFortress(MinecraftClient.getInstance());
         if(clientFortressSurvival || FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER)
             return Integer.MAX_VALUE;
         else

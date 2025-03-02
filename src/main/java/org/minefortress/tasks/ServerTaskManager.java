@@ -3,7 +3,9 @@ package org.minefortress.tasks;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
@@ -11,7 +13,7 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.S2CAddClientTasksPacket;
 import org.jetbrains.annotations.NotNull;
@@ -59,10 +61,10 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager, 
     }
 
     @Override
-    public void tick(@Nullable ServerPlayerEntity player) {
+    public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
         if (player == null) return;
         if (notStartedTasks.isEmpty()) return;
-        final var freeWorkers = CoreModUtils.getFortressManager(player).getFreeWorkers();
+        final var freeWorkers = ServerModUtils.getFortressManager(player).getFreeWorkers();
         if (freeWorkers.size() > 2) {
             final var task = notStartedTasks.remove();
             final var freeWorkersIds = freeWorkers.stream().map(it -> ((Entity) it).getId()).toList();
@@ -72,7 +74,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager, 
 
     @Override
     public void executeInstantTask(IInstantTask task, ServerPlayerEntity player) {
-        task.execute(player.getServerWorld(), player, getManagersProvider(player)::getBuildingsManager);
+        task.execute(player.getServerWorld(), player, ServerModUtils.getManagersProvider(player)::getBuildingsManager);
     }
 
     @Override
@@ -81,7 +83,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager, 
         final var removedTask = nonFinishedTasks.remove(id);
         if(removedTask != null)
             removedTask.cancel();
-        getManagersProvider(player).getResourceManager().returnReservedItems(id);
+        ServerModUtils.getManagersProvider(player).getResourceManager().returnReservedItems(id);
     }
 
     private void removeAllFinishedTasks() {

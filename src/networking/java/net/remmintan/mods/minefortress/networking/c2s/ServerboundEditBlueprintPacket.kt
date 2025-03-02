@@ -11,6 +11,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBloc
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
+import net.remmintan.mods.minefortress.core.utils.getManagersProvider
 
 class ServerboundEditBlueprintPacket : FortressC2SPacket {
     private val blueprintId: String?
@@ -55,18 +56,19 @@ class ServerboundEditBlueprintPacket : FortressC2SPacket {
         val managersProvider = getManagersProvider(player)
         if (player.server is IFortressServer) {
             val srv = player.server as IFortressServer
+            val mp = player.getManagersProvider()
             if (actionType == ActionType.REMOVE) {
-                managersProvider.blueprintManager.remove(blueprintId)
+                mp.getBlueprintManager().remove(blueprintId)
             } else {
                 val blueprintsWorld = srv._BlueprintWorld
                 if (actionType == ActionType.EDIT) {
-                    val blockData: IStructureBlockData = managersProvider.blueprintManager
+                    val blockData: IStructureBlockData = mp.getBlueprintManager()
                         .blockDataManager
                         .getBlockData(blueprintId, BlockRotation.NONE)
                     val blueprintData = blockData
                         .getLayer(BlueprintDataLayer.GENERAL)
 
-                    val metadata = managersProvider.blueprintManager.get(blueprintId)
+                    val metadata = mp.getBlueprintManager().get(blueprintId)
 
                     blueprintsWorld.setBlueprintMetadata(
                         player,

@@ -16,7 +16,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.IBlueprintWorld
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils
+import net.remmintan.mods.minefortress.core.utils.getManagersProvider
 
 class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
 
@@ -99,8 +99,8 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
         size.add(NbtInt.of(maxZ - minZ + 1))
         updatedStructure.put("size", size)
         if (server is IFortressServer) {
-            CoreModUtils.getManagersProvider(player)
-                .blueprintManager
+            player.getManagersProvider()
+                .getBlueprintManager()
                 .update(
                     id,
                     blueprintName,

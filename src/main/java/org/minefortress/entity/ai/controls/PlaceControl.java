@@ -6,6 +6,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.event.GameEvent;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.ItemTaskBlockInfo;
@@ -92,10 +94,9 @@ public class PlaceControl extends PositionedActionControl {
     }
 
     private void decreaseResourcesAndAddSpecialBlocksAmount() {
-        final var provider = colonist.getManagersProvider().orElseThrow();
-        final var manager = colonist.getServerFortressManager().orElseThrow();
+        final var provider = ServerModUtils.getManagersProvider(colonist);
         final var taskControl = colonist.getTaskControl();
-        if(manager.isSurvival()) {
+        if (ServerExtensionsKt.isCreativeFortress(colonist.getServer())) {
             taskControl
                     .getTaskId()
                     .ifPresent(it -> {

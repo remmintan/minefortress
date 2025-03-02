@@ -13,6 +13,8 @@ public interface IClientManagersProvider {
     IAreasClientManager get_AreasClientManager();
     IClientBlueprintManager get_BlueprintManager();
     IClientFortressManager get_ClientFortressManager();
+
+    IFortressCenterManager get_FortressCenterManager();
     IClientPawnsSelectionManager get_PawnsSelectionManager();
 
     IBlueprintsImportExportManager get_BlueprintsImportExportManager();

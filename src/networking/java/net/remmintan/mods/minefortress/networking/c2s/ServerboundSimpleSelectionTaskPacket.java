@@ -11,6 +11,7 @@ import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
+import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 
 import java.util.*;
 
@@ -122,7 +123,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
         final var selectionType = this.getSelectionType();
         final var task = tasksCreator.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, positions, player);
 
-        if (getFortressManager(player).isSurvival() && task.getTaskType() == TaskType.BUILD) {
+        if (ServerExtensionsKt.isSurvivalFortress(server) && task.getTaskType() == TaskType.BUILD) {
             final var blocksCount = positions.size();
             final var placingItem = player.getStackInHand(Hand.MAIN_HAND).getItem();
 

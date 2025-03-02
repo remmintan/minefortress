@@ -3,7 +3,7 @@ package org.minefortress.renderer.gui.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.remmintan.mods.minefortress.core.FortressState;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
 
 import java.util.Optional;
@@ -44,11 +44,11 @@ public class HoveredEntityHudLayer extends AbstractHudLayer{
     }
 
     private static Optional<String> getHoveredEntityName() {
-        final var fortressManager = CoreModUtils.getFortressManager();
+        final var fortressManager = ClientModUtils.getFortressManager();
         if(fortressManager.getState() == FortressState.AREAS_SELECTION)
-            return CoreModUtils.getAreasClientManager().getHoveredAreaName();
+            return ClientModUtils.getAreasClientManager().getHoveredAreaName();
 
-        return CoreModUtils.getBuildingsManager().getHoveredBuildingName();
+        return ClientModUtils.getBuildingsManager().getHoveredBuildingName();
     }
 
     @Override

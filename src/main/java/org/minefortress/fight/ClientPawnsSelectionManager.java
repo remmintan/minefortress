@@ -4,7 +4,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.remmintan.mods.minefortress.core.FortressState;
@@ -15,11 +14,14 @@ import net.remmintan.mods.minefortress.core.interfaces.combat.ITargetedSelection
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.core.utils.GlobalProjectionCache;
 import org.minefortress.renderer.CameraTools;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager, ITargetedSelectionManager, ISelectedColonistProvider {
@@ -33,9 +35,9 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
     @Override
     public void selectSingle(IFortressAwareEntity fortressAwareEntity) {
         this.resetSelection();
-        final var uuid = Optional.ofNullable(MinecraftClient.getInstance().player).map(PlayerEntity::getUuid);
-        final var masterId = fortressAwareEntity.getMasterId();
-        if (masterId.isPresent() && uuid.isPresent() && uuid.get().equals(masterId.get())) {
+
+        final var centerManager = ClientModUtils.getFortressCenterManager();
+        if (centerManager.hasTheSameCenter(fortressAwareEntity)) {
             selectedPawns.add(fortressAwareEntity);
         }
     }
@@ -52,7 +54,7 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
         this.mouseEndPos = null;
 
         if(!this.selectedPawns.isEmpty()) {
-            final var fortressManager = CoreModUtils.getFortressManager();
+            final var fortressManager = ClientModUtils.getFortressManager();
             if (this.selectedPawns.stream().allMatch(it -> it instanceof IWarrior)) {
                 fortressManager.setState(FortressState.COMBAT);
             } else if (this.selectedPawns.stream().noneMatch(it -> it instanceof IWarrior)) {
@@ -85,12 +87,12 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
             final var world = MinecraftClient.getInstance().world;
 
             final Map<Vec3d, IFortressAwareEntity> entitesMap = new HashMap<>();
-            final UUID playerUUID = MinecraftClient.getInstance().player.getUuid();
+            final var fortressManager = ClientModUtils.getFortressCenterManager();
             world
                 .getEntities()
                 .forEach(
                     entity -> {
-                        if(entity instanceof IFortressAwareEntity fae && fae.getMasterId().map(it -> it.equals(playerUUID)).orElse(false)) {
+                        if (entity instanceof IFortressAwareEntity fae && fortressManager.hasTheSameCenter(fae)) {
                             final var pos = entity.getPos();
                             entitesMap.put(pos, fae);
                         }
@@ -160,7 +162,7 @@ public class ClientPawnsSelectionManager implements IClientPawnsSelectionManager
 
     @Override
     public boolean isSelectingColonist() {
-        final var state = CoreModUtils.getFortressManager().getState();
+        final var state = ClientModUtils.getFortressManager().getState();
         return (state == FortressState.COMBAT || state == FortressState.BUILD_SELECTION || state==FortressState.BUILD_EDITING) && this.getSelectedPawn() != null;
     }
 

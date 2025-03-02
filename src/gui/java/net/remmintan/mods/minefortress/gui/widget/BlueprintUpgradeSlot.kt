@@ -1,5 +1,6 @@
 package net.remmintan.mods.minefortress.gui.widget
 
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.Drawable
@@ -9,8 +10,9 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.item.ItemStack
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
-import net.remmintan.mods.minefortress.core.utils.CoreModUtils
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper
+import net.remmintan.mods.minefortress.core.utils.isSurvivalFortress
 import net.remmintan.mods.minefortress.gui.building.translateMousePosition
 
 private const val SLOT_BACKGROUND_COLOR = (0xFF shl 24) or 0x8B8B8B
@@ -60,8 +62,9 @@ class BlueprintUpgradeSlot(
             context.drawTooltip(this.textRenderer, upgradeTooltipText, newMx, newMy)
             hovered = slot.isEnoughResources
 
-            val fortressManager = CoreModUtils.getFortressManager()
-            if (fortressManager.isSurvival && showItems) {
+
+            if (MinecraftClient.getInstance().isSurvivalFortress() && showItems) {
+                val fortressManager = ClientModUtils.getFortressManager()
                 val stacks: List<ItemInfo> = slot.blockData.getStacks()
                 for (i1 in stacks.indices) {
                     val stack = stacks[i1]
@@ -89,7 +92,7 @@ class BlueprintUpgradeSlot(
         val blueprintId = slot.metadata.id
         val enoughResources = slot.isEnoughResources
 
-        val blueprintsRenderer = CoreModUtils.getRenderersProvider().get_GuiBlueprintsRenderer()
+        val blueprintsRenderer = ClientModUtils.getRenderersProvider().get_GuiBlueprintsRenderer()
         blueprintsRenderer.renderBlueprintUpgrade(
             blueprintId,
             index,

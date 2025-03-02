@@ -4,13 +4,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.ISyncableServerManager;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface IServerResourceManager extends IResourceManager, IServerManager {
-    void syncAll();
-
+public interface IServerResourceManager extends IResourceManager, IServerManager, ISyncableServerManager {
     ItemInfo createItemInfo(Item item, int amount);
     void setItemAmount(Item item, int amount);
     void increaseItemAmount(Item item, int amount);

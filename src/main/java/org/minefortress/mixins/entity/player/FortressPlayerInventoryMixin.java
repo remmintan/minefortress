@@ -6,7 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,8 +23,7 @@ public abstract class FortressPlayerInventoryMixin {
     void populateFinder(RecipeMatcher finder, CallbackInfo ci) {
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             final var player = (ServerPlayerEntity) this.player;
-            final var server = (IFortressServer)player.getServer();
-            final var serverManager = server.get_FortressModServerManager().getManagersProvider(player);
+            final var serverManager = ServerModUtils.getManagersProvider(player);
             final var allItems = serverManager.getResourceManager().getAllItems();
             finder.clear();
             allItems.forEach(it -> finder.addInput(it, Integer.MAX_VALUE));

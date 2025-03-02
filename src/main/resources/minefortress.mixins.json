@@ -13,6 +13,7 @@
     "entity.FurnaceBlockEntityMixin",
     "entity.mob.FortressMobMixin",
     "entity.mob.FortressSlimeEntityMixin",
+    "entity.player.FortressPlayerEntityMixin",
     "entity.player.FortressPlayerInventoryMixin",
     "entity.player.FortressServerPlayerEntityMixin",
     "entity.player.PlayerManagerMixin",
@@ -23,6 +24,7 @@
     "network.FortressServerPlayNetworkHandlerMixin",
     "renderer.gui.FortressScreenHandler",
     "renderer.gui.FortressSimpleInventoryMixin",
+    "renderer.gui.worldcreator.LevelPropertiesMixin",
     "server.FortressIntegratedServerLoaderMixin"
   ],
   "client": [
@@ -44,6 +46,7 @@
     "renderer.gui.GameModeSelectionScreenMixin",
     "renderer.gui.worldcreator.FortressCreateWorldScreenMixin",
     "renderer.gui.worldcreator.FortressCyclingButtonMixin",
+    "renderer.gui.worldcreator.GameTabMixin",
     "renderer.gui.worldcreator.WorldCreatorMixin",
     "world.ClientWorldMixin",
     "world.WorldLoadedEventMixin"
