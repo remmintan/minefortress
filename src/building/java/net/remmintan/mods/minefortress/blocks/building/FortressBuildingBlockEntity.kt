@@ -114,7 +114,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     private fun getManagers(world: World): Triple<IServerProfessionsManager, IServerBuildingsManager, IServerResourceManager> {
         if (world is ServerWorld) {
             val server = world.server
-            return ServerModUtils.getManagersProvider(server, fortressPos).let {
+            return ServerModUtils.getManagersProvider(server, fortressPos).orElseThrow().let {
                 Triple(it.professionsManager, it.buildingsManager, it.resourceManager)
             }
         }

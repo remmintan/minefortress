@@ -83,7 +83,7 @@ public class ServerFightManager implements IServerFightManager {
     @Override
     public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
         if (serverFortressManager == null) {
-            serverFortressManager = ServerModUtils.getFortressManager(server, fortressPos);
+            ServerModUtils.getFortressManager(server, fortressPos).ifPresent(it -> serverFortressManager = it);
         }
         if(player==null) return;
         if(syncNeeded) {

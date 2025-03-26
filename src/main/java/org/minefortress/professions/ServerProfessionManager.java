@@ -93,7 +93,7 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
         if (this.server == null) this.server = server;
         if (serverFortressManager == null)
-            serverFortressManager = ServerModUtils.getFortressManager(server, fortressPos);
+            ServerModUtils.getFortressManager(server, fortressPos).ifPresent(it -> this.serverFortressManager = it);
 
         if(player == null) return;
         if(needsUpdate) {

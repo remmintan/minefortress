@@ -15,6 +15,8 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersPro
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 public final class ServerModUtils {
 
     public static boolean hasFortress(@NotNull ServerPlayerEntity player) {
@@ -23,51 +25,33 @@ public final class ServerModUtils {
     }
 
     @NotNull
-    public static IServerManagersProvider getManagersProvider(ServerPlayerEntity player) {
-        final var fortressPos = ((IFortressPlayerEntity) player).get_FortressPos().orElseThrow();
-        final var fortressHolder = getFortressHolder(player.getServer(), fortressPos);
-        return fortressHolder.getServerManagersProvider();
+    public static Optional<IServerManagersProvider> getManagersProvider(ServerPlayerEntity player) {
+        return ((IFortressPlayerEntity) player).get_FortressPos().flatMap(it -> getManagersProvider(player.getServer(), it));
     }
 
     @NotNull
-    public static IServerFortressManager getFortressManager(ServerPlayerEntity player) {
-        final var fortressPos = ((IFortressPlayerEntity) player).get_FortressPos().orElseThrow();
-        final var fortressHolder = getFortressHolder(player.getServer(), fortressPos);
-        return fortressHolder.getServerFortressManager();
-    }
-
-    public static IServerFortressManager getFortressManager(MinecraftServer server, BlockPos fortressCenter) {
-        final var fortressHolder = getFortressHolder(server, fortressCenter);
-        return fortressHolder.getServerFortressManager();
+    public static Optional<IServerFortressManager> getFortressManager(ServerPlayerEntity player) {
+        return ((IFortressPlayerEntity) player).get_FortressPos().flatMap(it -> getFortressManager(player.getServer(), it));
     }
 
     @NotNull
     public static IServerManagersProvider getManagersProvider(IFortressAwareEntity entity) {
-        final var fortressPos = entity.getFortressPos();
-        final var fortressHolder = getFortressHolder(entity.getServer(), fortressPos);
-        return fortressHolder.getServerManagersProvider();
+        return getManagersProvider(entity.getServer(), entity.getFortressPos()).orElseThrow();
     }
 
     @NotNull
     public static IServerFortressManager getFortressManager(IFortressAwareEntity entity) {
-        final var fortressPos = entity.getFortressPos();
-        final var fortressHolder = getFortressHolder(entity.getServer(), fortressPos);
-        return fortressHolder.getServerFortressManager();
+        return getFortressManager(entity.getServer(), entity.getFortressPos()).orElseThrow();
     }
 
     @NotNull
-    public static IServerManagersProvider getManagersProvider(MinecraftServer server, BlockPos fortressCenter) {
-        return getFortressHolder(server, fortressCenter).getServerManagersProvider();
+    public static Optional<IServerManagersProvider> getManagersProvider(MinecraftServer server, BlockPos fortressCenter) {
+        return getFortressHolder(server, fortressCenter).map(IFortressHolder::getServerManagersProvider);
     }
 
     @NotNull
-    private static IFortressHolder getFortressHolder(@Nullable MinecraftServer server, BlockPos p) {
-        if (server == null) throw new IllegalArgumentException("Server cannot be null");
-        final var blockEntity = server.getOverworld().getBlockEntity(p);
-        if (blockEntity instanceof IFortressHolder holder) {
-            return holder;
-        }
-        throw new IllegalStateException("Could not find fortress at " + p);
+    public static Optional<IServerFortressManager> getFortressManager(MinecraftServer server, BlockPos fortressCenter) {
+        return getFortressHolder(server, fortressCenter).map(IFortressHolder::getServerFortressManager);
     }
 
     public static void addDropToTheResourceManager(ServerWorld w, BlockPos g, IFortressAwareEntity c) {
@@ -84,5 +68,15 @@ public final class ServerModUtils {
                 serverResourceManager.increaseItemAmount(item, count);
             }
         }
+    }
+
+    @NotNull
+    private static Optional<IFortressHolder> getFortressHolder(@Nullable MinecraftServer server, @Nullable BlockPos p) {
+        if (server == null || p == null) return Optional.empty();
+        final var blockEntity = server.getOverworld().getBlockEntity(p);
+        if (blockEntity instanceof IFortressHolder holder) {
+            return Optional.of(holder);
+        }
+        return Optional.empty();
     }
 }

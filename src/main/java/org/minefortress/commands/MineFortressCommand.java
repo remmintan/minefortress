@@ -26,12 +26,12 @@ abstract class MineFortressCommand {
 
     protected static IServerManagersProvider getServerManagersProvider(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final var srvPlayer = context.getSource().getPlayerOrThrow();
-        return ServerModUtils.getManagersProvider(srvPlayer);
+        return ServerModUtils.getManagersProvider(srvPlayer).orElseThrow();
     }
 
     protected static IServerFortressManager getServerFortressManager(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final var srvPlayer = context.getSource().getPlayerOrThrow();
-        return ServerModUtils.getFortressManager(srvPlayer);
+        return ServerModUtils.getFortressManager(srvPlayer).orElseThrow();
     }
 
 }

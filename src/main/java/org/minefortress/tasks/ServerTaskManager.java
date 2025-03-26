@@ -8,6 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask;
@@ -64,7 +65,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager, 
     public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
         if (player == null) return;
         if (notStartedTasks.isEmpty()) return;
-        final var freeWorkers = ServerModUtils.getFortressManager(player).getFreeWorkers();
+        final var freeWorkers = ServerModUtils.getFortressManager(player).map(IServerFortressManager::getFreeWorkers).orElse(Collections.emptyList());
         if (freeWorkers.size() > 2) {
             final var task = notStartedTasks.remove();
             final var freeWorkersIds = freeWorkers.stream().map(it -> ((Entity) it).getId()).toList();
@@ -74,7 +75,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager, 
 
     @Override
     public void executeInstantTask(IInstantTask task, ServerPlayerEntity player) {
-        task.execute(player.getServerWorld(), player, ServerModUtils.getManagersProvider(player)::getBuildingsManager);
+        ServerModUtils.getManagersProvider(player).ifPresent(it -> task.execute(player.getServerWorld(), player, it::getBuildingsManager));
     }
 
     @Override
@@ -83,7 +84,7 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager, 
         final var removedTask = nonFinishedTasks.remove(id);
         if(removedTask != null)
             removedTask.cancel();
-        ServerModUtils.getManagersProvider(player).getResourceManager().returnReservedItems(id);
+        ServerModUtils.getManagersProvider(player).ifPresent(it -> it.getResourceManager().returnReservedItems(id));
     }
 
     private void removeAllFinishedTasks() {

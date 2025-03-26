@@ -101,7 +101,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
         if (this.world == null) {
             this.world = world;
-            this.fortressManager = ServerModUtils.getFortressManager(server, fortressPos);
+            ServerModUtils.getFortressManager(server, fortressPos).ifPresent(it -> this.fortressManager = it);
         }
 
         if(player != null) {

@@ -34,7 +34,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         if (player instanceof ServerPlayerEntity serverPlayer) {
-            final var provider = ServerModUtils.getManagersProvider(serverPlayer);
+            final var provider = ServerModUtils.getManagersProvider(serverPlayer).orElseThrow();
             final var professionManager = provider.getProfessionsManager();
             final var blacksmithsCount = professionManager.getProfession("blacksmith").getAmount();
             final var otherFurnaceBlocks = provider

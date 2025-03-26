@@ -24,8 +24,8 @@ public class FortressServerEvents {
             syncTheFortressGamemode((IFortressServer) server, player);
 
             if (ServerModUtils.hasFortress(player)) {
-                final var manager = ServerModUtils.getFortressManager(player);
-                final var provider = ServerModUtils.getManagersProvider(player);
+                final var manager = ServerModUtils.getFortressManager(player).orElseThrow();
+                final var provider = ServerModUtils.getManagersProvider(player).orElseThrow();
                 provider.sync();
                 manager.sync();
                 final var serverProfessionManager = provider.getProfessionsManager();

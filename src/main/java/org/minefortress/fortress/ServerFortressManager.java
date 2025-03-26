@@ -71,7 +71,7 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     private boolean needSync = true;
 
-    private BlockPos fortressCenter = null;
+    private final BlockPos fortressCenter;
     private int maxColonistsCount = -1;
 
     private boolean spawnPawns = true;
@@ -114,16 +114,15 @@ public final class ServerFortressManager implements IServerFortressManager {
             if(pawn instanceof LivingEntity le)
                 pawns.add(le);
         }
-        getManagersProvider().getFightManager().sync();
     }
 
     private @NotNull IServerManagersProvider getManagersProvider() {
-        return ServerModUtils.getManagersProvider(server, fortressCenter);
+        return ServerModUtils.getManagersProvider(server, fortressCenter).orElseThrow();
     }
 
     @Override
     public void tick(@Nullable final ServerPlayerEntity player) {
-        tickFortress(fortressCenter);
+        tickFortress();
 
         if(!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
@@ -193,7 +192,7 @@ public final class ServerFortressManager implements IServerFortressManager {
                 .map(IWorkerPawn.class::cast);
     }
 
-    private void tickFortress(@NotNull BlockPos fortressCenter) {
+    private void tickFortress() {
         keepColonistsBelowMax();
 
         final var deadPawns = pawns.stream()
@@ -227,7 +226,6 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     @Override
     public void setupCenter(@NotNull BlockPos fortressCenter) {
-        this.fortressCenter = fortressCenter;
 
         if(minX > this.fortressCenter.getX()-10) minX = this.fortressCenter.getX()-10;
         if(minZ > this.fortressCenter.getZ()-10) minZ = this.fortressCenter.getZ()-10;
@@ -322,12 +320,6 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     @Override
     public void write(NbtCompound tag) {
-        if(fortressCenter != null) {
-            tag.putInt("centerX", fortressCenter.getX());
-            tag.putInt("centerY", fortressCenter.getY());
-            tag.putInt("centerZ", fortressCenter.getZ());
-        }
-
         tag.putInt("minX", minX);
         tag.putInt("minZ", minZ);
         tag.putInt("maxX", maxX);
@@ -346,13 +338,6 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     @Override
     public void read(NbtCompound tag) {
-        final int centerX = tag.getInt("centerX");
-        final int centerY = tag.getInt("centerY");
-        final int centerZ = tag.getInt("centerZ");
-        if(centerX != 0 || centerY != 0 || centerZ != 0) {
-            fortressCenter = new BlockPos(centerX, centerY, centerZ);
-        }
-
         if(tag.contains("minX")) minX = tag.getInt("minX");
         if(tag.contains("minZ")) minZ = tag.getInt("minZ");
         if(tag.contains("maxX")) maxX = tag.getInt("maxX");

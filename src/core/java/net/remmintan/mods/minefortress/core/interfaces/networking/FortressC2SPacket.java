@@ -11,11 +11,11 @@ public interface FortressC2SPacket extends FortressPacket {
     void handle(MinecraftServer server, ServerPlayerEntity player);
 
     default IServerManagersProvider getManagersProvider(ServerPlayerEntity player) {
-        return ServerModUtils.getManagersProvider(player);
+        return ServerModUtils.getManagersProvider(player).orElseThrow();
     }
 
     default IServerFortressManager getFortressManager(ServerPlayerEntity player) {
-        return ServerModUtils.getFortressManager(player);
+        return ServerModUtils.getFortressManager(player).orElseThrow();
     }
 
 }

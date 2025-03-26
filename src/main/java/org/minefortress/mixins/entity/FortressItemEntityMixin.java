@@ -27,32 +27,35 @@ import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
 @Mixin(ItemEntity.class)
 public abstract class FortressItemEntityMixin extends Entity {
 
-    @Shadow public abstract ItemStack getStack();
+    @Shadow
+    public abstract ItemStack getStack();
 
     public FortressItemEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
 
-    @Inject(method = "tick", at =@At("RETURN"))
+    @Inject(method = "tick", at = @At("RETURN"))
     void tickReturn(CallbackInfo ci) {
-        if(isBlueprintsWorld()) {
+        if (isBlueprintsWorld()) {
             this.discard();
             return;
         }
 
-        if(!this.getWorld().isClient) {
+        if (!this.getWorld().isClient) {
             final var closestPlayer = this.getWorld().getClosestPlayer(this, 100.0D);
             if (closestPlayer != null && FortressGamemodeUtilsKt.isFortressGamemode(closestPlayer)) {
                 final var fortressServer = (IFortressServer) closestPlayer.getServer();
-                if(fortressServer != null) {
+                if (fortressServer != null) {
                     final var closestSPE = (ServerPlayerEntity) closestPlayer;
-                    final var provider = ServerModUtils.getManagersProvider(closestSPE);
                     if (ServerExtensionsKt.isSurvivalFortress(closestSPE.server)) {
-                        final var resourceManager = provider.getResourceManager();
-                        final var stack = this.getStack();
-                        final var item = stack.getItem();
-                        if(shouldCollectInInventory(provider.getProfessionsManager(), item))
-                            resourceManager.increaseItemAmount(item, stack.getCount());
+                        ServerModUtils.getManagersProvider(closestSPE).ifPresent(
+                                provider -> {
+                                    final var resourceManager = provider.getResourceManager();
+                                    final var stack = this.getStack();
+                                    final var item = stack.getItem();
+                                    if (shouldCollectInInventory(provider.getProfessionsManager(), item))
+                                        resourceManager.increaseItemAmount(item, stack.getCount());
+                                });
                     }
                     this.discard();
                 }
@@ -62,13 +65,13 @@ public abstract class FortressItemEntityMixin extends Entity {
 
     @Unique
     private boolean shouldCollectInInventory(IServerProfessionsManager serverProfessionManager, Item item) {
-        if(item.getDefaultStack().isIn(ItemTags.SAPLINGS))
+        if (item.getDefaultStack().isIn(ItemTags.SAPLINGS))
             return serverProfessionManager.hasProfession("forester");
 
-        if(FORESTER_ITEMS.contains(item))
+        if (FORESTER_ITEMS.contains(item))
             return serverProfessionManager.hasProfession("forester") || serverProfessionManager.hasProfession("farmer");
 
-        if(FISHERMAN_ITEMS.contains(item))
+        if (FISHERMAN_ITEMS.contains(item))
             return serverProfessionManager.hasProfession("fisherman");
 
         return true;

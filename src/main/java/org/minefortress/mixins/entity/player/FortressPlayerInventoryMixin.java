@@ -6,6 +6,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +15,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Collections;
 
 @Mixin(PlayerInventory.class)
 public abstract class FortressPlayerInventoryMixin {
@@ -23,8 +27,10 @@ public abstract class FortressPlayerInventoryMixin {
     void populateFinder(RecipeMatcher finder, CallbackInfo ci) {
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             final var player = (ServerPlayerEntity) this.player;
-            final var serverManager = ServerModUtils.getManagersProvider(player);
-            final var allItems = serverManager.getResourceManager().getAllItems();
+            final var allItems = ServerModUtils.getManagersProvider(player)
+                    .map(IServerManagersProvider::getResourceManager)
+                    .map(IServerResourceManager::getAllItems)
+                    .orElse(Collections.emptyList());
             finder.clear();
             allItems.forEach(it -> finder.addInput(it, Integer.MAX_VALUE));
             ci.cancel();

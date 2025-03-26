@@ -42,7 +42,7 @@ public final class AttackBuildingGoal extends Goal {
         IServerBuildingsManager buildingsManager = null;
         for (var pos : BlockPos.iterateOutwards(mobBlockPos, followRange, 10, followRange)) {
             if (this.mob.getWorld().getBlockState(pos).isOf(FortressBlocks.FORTRESS_CAMPFIRE)) {
-                buildingsManager = ServerModUtils.getManagersProvider(mob.getServer(), pos).getBuildingsManager();
+                buildingsManager = ServerModUtils.getManagersProvider(mob.getServer(), pos).orElseThrow().getBuildingsManager();
                 break;
             }
         }

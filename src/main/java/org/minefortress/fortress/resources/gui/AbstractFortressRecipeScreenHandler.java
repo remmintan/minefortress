@@ -148,14 +148,17 @@ public abstract class AbstractFortressRecipeScreenHandler<T extends Inventory> e
     public void onClosed(PlayerEntity player) {
         super.onClosed(player);
         if (player instanceof ServerPlayerEntity serverPlayer) {
-            final var serverResourceManager = ServerModUtils.getManagersProvider(serverPlayer).getResourceManager();
+
 
             returnInputs();
 
             final var diff = this.virtualInventory.getDiff();
-            diff.added.forEach(stack -> serverResourceManager.increaseItemAmount(stack.item(), stack.amount()));
-            diff.updated.forEach(stack -> serverResourceManager.increaseItemAmount(stack.item(), stack.amount()));
-            diff.removed.forEach(stack -> serverResourceManager.increaseItemAmount(stack.item(), -stack.amount()));
+            ServerModUtils.getManagersProvider(serverPlayer).ifPresent(provider -> {
+                final var serverResourceManager = provider.getResourceManager();
+                diff.added.forEach(stack -> serverResourceManager.increaseItemAmount(stack.item(), stack.amount()));
+                diff.updated.forEach(stack -> serverResourceManager.increaseItemAmount(stack.item(), stack.amount()));
+                diff.removed.forEach(stack -> serverResourceManager.increaseItemAmount(stack.item(), -stack.amount()));
+            });
         }
     }
 
