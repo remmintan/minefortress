@@ -1,11 +1,9 @@
 package net.remmintan.mods.minefortress.networking.c2s;
 
-import kotlin.Unit;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
@@ -14,6 +12,7 @@ import net.remmintan.mods.minefortress.core.utils.ServerPlayerEntityExtensionsKt
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,25 +62,9 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
     }
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
-        final var manager = getFortressManager(player);
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         final var provider = getManagersProvider(player);
-        final var blueprintManager = ServerPlayerEntityExtensionsKt.getManagersProvider(player).getBlueprintManager();
-
-        if ("campfire".equals(blueprintId)) {
-            final var task = blueprintManager.createInstantPlaceTask(blueprintId, startPos, rotation);
-            task.addFinishListener(() -> {
-                final var start = task.getStart();
-                final var end = task.getEnd();
-
-                final var center = BlockBox.create(start, end).getCenter();
-
-                manager.setupCenter(center);
-                return Unit.INSTANCE;
-            });
-            provider.getTaskManager().executeInstantTask(task, player);
-            return;
-        }
+        final var blueprintManager = ServerPlayerEntityExtensionsKt.getManagersProvider(player).get_BlueprintManager();
 
         if (upgradedBuildingPos != null) {
             provider.getBuildingsManager().destroyBuilding(upgradedBuildingPos);

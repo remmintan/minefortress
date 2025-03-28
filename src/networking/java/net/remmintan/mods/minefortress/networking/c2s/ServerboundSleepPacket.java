@@ -4,6 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import org.jetbrains.annotations.NotNull;
 
 public class ServerboundSleepPacket implements FortressC2SPacket {
 
@@ -17,7 +18,7 @@ public class ServerboundSleepPacket implements FortressC2SPacket {
     public void write(PacketByteBuf buf) {}
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         if(!player.isSleeping()) {
             player.trySleep(player.getBlockPos()).ifLeft((reason) -> {
                 if (reason != null && reason.getMessage() != null) {

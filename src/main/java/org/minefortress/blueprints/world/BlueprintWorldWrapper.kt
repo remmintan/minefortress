@@ -100,7 +100,7 @@ class BlueprintWorldWrapper(server: MinecraftServer) : IBlueprintWorld {
         updatedStructure.put("size", size)
         if (server is IFortressServer) {
             player.getManagersProvider()
-                .getBlueprintManager()
+                .get_BlueprintManager()
                 .update(
                     id,
                     blueprintName,

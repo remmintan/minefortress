@@ -46,7 +46,7 @@ public interface IServerFortressManager extends IFortressManager, IWritableManag
     void increaseMaxColonistsCount();
     void decreaseMaxColonistsCount();
 
-    void setupCenter(BlockPos pos);
+    void spawnInitialPawns();
 
     void openHandledScreen(ScreenType type, ServerPlayerEntity player, BlockPos pos);
 

@@ -49,7 +49,7 @@ class InstantPlaceTask(
     override fun execute(
         world: ServerWorld,
         player: ServerPlayerEntity,
-        getBuildingsManager: () -> IServerBuildingsManager
+        buildingsManager: IServerBuildingsManager
     ) {
         BlockPos.iterate(start, end).forEach { pos ->
             val blockState = blocks[pos] ?: return@forEach
@@ -58,7 +58,7 @@ class InstantPlaceTask(
             world.markDirty(pos)
         }
 
-        getBuildingsManager().addBuilding(
+        buildingsManager.addBuilding(
             (player as IFortressPlayerEntity).get_FortressPos().orElseThrow(),
             metadata,
             start,

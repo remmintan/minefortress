@@ -21,15 +21,15 @@ import org.minefortress.professions.ServerProfessionManager
 import org.minefortress.tasks.ServerTaskManager
 import org.minefortress.tasks.TasksCreator
 
-class ServerManagersProvider(private val fortressPos: BlockPos) : IServerManagersProvider {
+class ServerManagersProvider(private val fortressPos: BlockPos, world: ServerWorld) : IServerManagersProvider {
 
     private val managers = mutableMapOf<Class<out IServerManager>, IServerManager>()
 
     init {
         registerManager(IServerTaskManager::class.java, ServerTaskManager())
-        registerManager(IServerProfessionsManager::class.java, ServerProfessionManager(fortressPos))
+        registerManager(IServerProfessionsManager::class.java, ServerProfessionManager(fortressPos, world))
         registerManager(IServerResourceManager::class.java, ServerResourceManager())
-        registerManager(IServerBuildingsManager::class.java, FortressBuildingManager(fortressPos))
+        registerManager(IServerBuildingsManager::class.java, FortressBuildingManager(fortressPos, world))
         registerManager(IServerAutomationAreaManager::class.java, AreasServerManager())
         registerManager(IServerFightManager::class.java, ServerFightManager(fortressPos))
         registerManager(ITasksCreator::class.java, TasksCreator())

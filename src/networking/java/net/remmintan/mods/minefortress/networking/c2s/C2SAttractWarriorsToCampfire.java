@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import org.jetbrains.annotations.NotNull;
 
 public class C2SAttractWarriorsToCampfire implements FortressC2SPacket {
 
@@ -14,7 +15,7 @@ public class C2SAttractWarriorsToCampfire implements FortressC2SPacket {
     public C2SAttractWarriorsToCampfire(PacketByteBuf ignored) {}
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         final var fightManager = getManagersProvider(player).getFightManager();
         player.sendMessage(Text.literal("Attracting warriors to campfire..."), false);
         fightManager.attractWarriorsToCampfire();

@@ -4,6 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public class C2SRemoveAutomationAreaPacket implements FortressC2SPacket {
     }
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         getManagersProvider(player).getAutomationAreaManager().removeArea(id);
     }
 }

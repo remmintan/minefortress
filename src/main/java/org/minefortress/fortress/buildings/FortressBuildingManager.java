@@ -36,17 +36,17 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
     private int buildingPointer = 0;
     private final List<BlockPos> buildings = new ArrayList<>();
-    private final BlockPos fortressPos;
-    private ServerWorld world;
-    private IServerFortressManager fortressManager;
+    private final ServerWorld world;
+    private final IServerFortressManager fortressManager;
     private final Cache<BlockPos, Object> bedsCache =
             CacheBuilder.newBuilder()
                     .expireAfterWrite(10, TimeUnit.SECONDS)
                     .build();
     private boolean needSync = false;
 
-    public FortressBuildingManager(BlockPos fortressPos) {
-        this.fortressPos = fortressPos;
+    public FortressBuildingManager(BlockPos fortressPos, ServerWorld world) {
+        this.world = world;
+        this.fortressManager = ServerModUtils.getFortressManager(world.getServer(), fortressPos).orElseThrow();
     }
 
     private static @NotNull BlockPos getCenterTop(BlockBox blockBox) {
@@ -99,11 +99,6 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
     @Override
     public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
-        if (this.world == null) {
-            this.world = world;
-            ServerModUtils.getFortressManager(server, fortressPos).ifPresent(it -> this.fortressManager = it);
-        }
-
         if(player != null) {
             if (needSync) {
                 final var packet = new ClientboundSyncBuildingsPacket(buildings);

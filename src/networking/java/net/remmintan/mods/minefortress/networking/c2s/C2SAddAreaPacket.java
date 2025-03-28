@@ -6,6 +6,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.networking.registries.NetworkingReadersRegistry;
+import org.jetbrains.annotations.NotNull;
 
 public class C2SAddAreaPacket implements FortressC2SPacket {
 
@@ -22,7 +23,7 @@ public class C2SAddAreaPacket implements FortressC2SPacket {
     }
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         final var provider = getManagersProvider(player);
         final var areasManager = provider.getAutomationAreaManager();
         areasManager.addArea(automationAreaInfo);

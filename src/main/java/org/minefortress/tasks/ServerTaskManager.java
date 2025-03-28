@@ -11,7 +11,6 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPaw
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.IInstantTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
@@ -71,11 +70,6 @@ public class ServerTaskManager implements IServerTaskManager, IWritableManager, 
             final var freeWorkersIds = freeWorkers.stream().map(it -> ((Entity) it).getId()).toList();
             this.addTask(task, freeWorkersIds, player);
         }
-    }
-
-    @Override
-    public void executeInstantTask(IInstantTask task, ServerPlayerEntity player) {
-        ServerModUtils.getManagersProvider(player).ifPresent(it -> task.execute(player.getServerWorld(), player, it::getBuildingsManager));
     }
 
     @Override

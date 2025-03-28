@@ -9,6 +9,7 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientPawnsSelectionManager;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
+import net.remmintan.mods.minefortress.networking.c2s.C2SSetupCampfirePacket;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundBlueprintTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
@@ -79,10 +80,16 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
 
         if (!super.canBuild()) return;
 
-        final var selectionManager = ClientModUtils.getManagersProvider().get_PawnsSelectionManager();
-        final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket(selectionManager);
-        FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
-        selectionManager.resetSelection();
+        if (selectedStructure.getId().equals("campfire")) {
+            final var packet = new C2SSetupCampfirePacket(getStructureBuildPos());
+            FortressClientNetworkHelper.send(C2SSetupCampfirePacket.CHANNEL, packet);
+        } else {
+            final var selectionManager = ClientModUtils.getManagersProvider().get_PawnsSelectionManager();
+            final var serverboundBlueprintTaskPacket = getServerboundBlueprintTaskPacket(selectionManager);
+            FortressClientNetworkHelper.send(FortressChannelNames.NEW_BLUEPRINT_TASK, serverboundBlueprintTaskPacket);
+            selectionManager.resetSelection();
+        }
+
         clearStructure();
     }
 

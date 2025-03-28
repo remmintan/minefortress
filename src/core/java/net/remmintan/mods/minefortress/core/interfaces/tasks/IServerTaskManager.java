@@ -9,7 +9,6 @@ import java.util.UUID;
 public interface IServerTaskManager extends IServerManager {
     void addTask(ITask task, List<Integer> selectedPawnIds, ServerPlayerEntity player);
 
-    void executeInstantTask(IInstantTask task, ServerPlayerEntity player);
 
     void cancelTask(UUID id, ServerPlayerEntity player);
 }

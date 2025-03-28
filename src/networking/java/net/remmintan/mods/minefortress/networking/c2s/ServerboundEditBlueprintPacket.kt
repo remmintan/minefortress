@@ -58,17 +58,17 @@ class ServerboundEditBlueprintPacket : FortressC2SPacket {
             val srv = player.server as IFortressServer
             val mp = player.getManagersProvider()
             if (actionType == ActionType.REMOVE) {
-                mp.getBlueprintManager().remove(blueprintId)
+                mp.get_BlueprintManager().remove(blueprintId)
             } else {
                 val blueprintsWorld = srv._BlueprintWorld
                 if (actionType == ActionType.EDIT) {
-                    val blockData: IStructureBlockData = mp.getBlueprintManager()
+                    val blockData: IStructureBlockData = mp.get_BlueprintManager()
                         .blockDataManager
                         .getBlockData(blueprintId, BlockRotation.NONE)
                     val blueprintData = blockData
                         .getLayer(BlueprintDataLayer.GENERAL)
 
-                    val metadata = mp.getBlueprintManager().get(blueprintId)
+                    val metadata = mp.get_BlueprintManager().get(blueprintId)
 
                     blueprintsWorld.setBlueprintMetadata(
                         player,

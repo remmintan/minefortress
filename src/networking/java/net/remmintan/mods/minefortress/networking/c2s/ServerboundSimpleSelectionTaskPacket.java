@@ -12,6 +12,7 @@ import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -111,7 +112,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
     }
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         final var provider = getManagersProvider(player);
         final var id = this.getId();
         final var taskType = this.getTaskType();

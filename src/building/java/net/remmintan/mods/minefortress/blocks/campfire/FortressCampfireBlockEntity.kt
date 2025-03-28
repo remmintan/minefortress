@@ -18,10 +18,20 @@ class FortressCampfireBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(FortressBlocks.CAMPFIRE_ENT_TYPE, pos, state), IFortressHolder {
 
     var placerId: UUID? = null
-    private var fortressManager: IServerFortressManager =
-        FortressServiceLocator.get(IServerFortressManager::class.java, pos)
-    private val managersProvider: IServerManagersProvider =
-        FortressServiceLocator.get(IServerManagersProvider::class.java, pos)
+    private var mpTag: NbtCompound? = null
+    private var fmTag: NbtCompound? = null
+
+    private val fortressManager: IServerFortressManager by lazy {
+        val manager = FortressServiceLocator.get(IServerFortressManager::class.java, pos, world as? ServerWorld)
+        mpTag?.let { manager.read(it) }
+        manager
+    }
+    private val managersProvider: IServerManagersProvider by lazy {
+        val provider = FortressServiceLocator.get(IServerManagersProvider::class.java, pos, world as? ServerWorld)
+        fmTag?.let { provider.read(it) }
+        provider
+    }
+
 
     fun tick(world: World, pos: BlockPos?, state: BlockState?) {
         if (world.isClient) return
@@ -45,18 +55,15 @@ class FortressCampfireBlockEntity(pos: BlockPos, state: BlockState) :
 
     override fun readNbt(nbt: NbtCompound?) {
         super.readNbt(nbt)
-        if (nbt?.contains("placerId") == true) {
+        if (nbt?.contains("placerId") == true)
             placerId = nbt.getUuid("placerId")
-        }
-        if (nbt?.contains("managersProvider") == true) {
-            val mpTag = nbt.getCompound("managersProvider")
-            managersProvider.read(mpTag)
-        }
 
-        if (nbt?.contains("fortressManager") == true) {
-            val fmTag = nbt.getCompound("fortressManager")
-            fortressManager.read(fmTag)
-        }
+        if (nbt?.contains("managersProvider") == true)
+            mpTag = nbt.getCompound("managersProvider")
+
+        if (nbt?.contains("fortressManager") == true)
+            fmTag = nbt.getCompound("fortressManager")
+
     }
 
     override fun getServerFortressManager() = fortressManager

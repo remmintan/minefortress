@@ -5,10 +5,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
+import org.jetbrains.annotations.NotNull;
 
 public interface FortressC2SPacket extends FortressPacket {
 
-    void handle(MinecraftServer server, ServerPlayerEntity player);
+    void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player);
 
     default IServerManagersProvider getManagersProvider(ServerPlayerEntity player) {
         return ServerModUtils.getManagersProvider(player).orElseThrow();

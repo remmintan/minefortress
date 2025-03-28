@@ -14,8 +14,8 @@ class C2SUpdateScreenProperty(private val index: Int, private val value: Int) : 
         buf?.writeInt(value)
     }
 
-    override fun handle(server: MinecraftServer?, player: ServerPlayerEntity?) {
-        val handler = player?.currentScreenHandler
+    override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
+        val handler = player.currentScreenHandler
         handler?.setProperty(index, value)
     }
 

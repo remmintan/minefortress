@@ -16,9 +16,12 @@ import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.server.IFortressCenterSetupManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IPlayerManagersProvider;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.manager.ServerBlueprintManager;
+import org.minefortress.fortress.FortressCenterSetupManager;
 import org.minefortress.utils.FortressSpawnLocating;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,6 +41,8 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
 
     @Unique
     private final IServerBlueprintManager blueprintManager = new ServerBlueprintManager();
+    @Unique
+    private final IFortressCenterSetupManager fortressCenterSetupManager = new FortressCenterSetupManager((ServerPlayerEntity) (Object) this);
 
     @Unique
     private Vec3d persistedPos;
@@ -152,5 +157,15 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Nullable
     public Vec3d get_PersistedPos() {
         return persistedPos;
+    }
+
+    @Override
+    public @NotNull IServerBlueprintManager get_BlueprintManager() {
+        return blueprintManager;
+    }
+
+    @Override
+    public @NotNull IFortressCenterSetupManager get_FortressCenterSetupManager() {
+        return fortressCenterSetupManager;
     }
 }

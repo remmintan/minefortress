@@ -6,6 +6,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import org.jetbrains.annotations.NotNull;
 
 public class C2SMoveTargetPacket implements FortressC2SPacket {
 
@@ -25,7 +26,7 @@ public class C2SMoveTargetPacket implements FortressC2SPacket {
     }
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         final var entity = player.getWorld().getEntityById(id);
         if(entity instanceof ITargetedPawn pawn) {
             pawn.setMoveTarget(pos);

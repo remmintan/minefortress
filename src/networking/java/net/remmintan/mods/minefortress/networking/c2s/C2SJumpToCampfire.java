@@ -4,6 +4,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import org.jetbrains.annotations.NotNull;
 
 public class C2SJumpToCampfire implements FortressC2SPacket {
 
@@ -14,7 +15,7 @@ public class C2SJumpToCampfire implements FortressC2SPacket {
     public C2SJumpToCampfire(PacketByteBuf ignoredBuf) {}
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         final var fortressServerManager = getFortressManager(player);
         fortressServerManager.jumpToCampfire(player);
     }

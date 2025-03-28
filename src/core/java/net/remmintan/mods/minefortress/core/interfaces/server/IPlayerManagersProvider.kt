@@ -4,6 +4,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBluepri
 
 interface IPlayerManagersProvider {
 
-    fun getBlueprintManager(): IServerBlueprintManager
+    fun get_BlueprintManager(): IServerBlueprintManager
+    fun get_FortressCenterSetupManager(): IFortressCenterSetupManager
 
 }

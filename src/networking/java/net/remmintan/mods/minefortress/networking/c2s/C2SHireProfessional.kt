@@ -20,7 +20,7 @@ class C2SHireProfessional(private val pos: BlockPos, private val professionId: S
         buf.writeString(professionId)
     }
 
-    override fun handle(server: MinecraftServer?, player: ServerPlayerEntity?) {
-        (player?.world?.getBlockEntity(pos) as? IFortressBuilding)?.hireHandler?.hire(professionId)
+    override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
+        (player.world?.getBlockEntity(pos) as? IFortressBuilding)?.hireHandler?.hire(professionId)
     }
 }

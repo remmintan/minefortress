@@ -19,7 +19,7 @@ class C2SOpenBuildingHireScreen(val profId: String) : FortressC2SPacket {
         buf.writeString(profId)
     }
 
-    override fun handle(server: MinecraftServer?, player: ServerPlayerEntity?) {
+    override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
         val provider = getManagersProvider(player)
         val manager = provider.professionsManager
 
@@ -30,7 +30,7 @@ class C2SOpenBuildingHireScreen(val profId: String) : FortressC2SPacket {
         if (buildings.isNotEmpty()) {
             val building = buildings[0]
             if (building is NamedScreenHandlerFactory) {
-                player!!.openHandledScreen(building)
+                player.openHandledScreen(building)
                 if (player.currentScreenHandler is IScreenHandlerWithTabs) {
                     (player.currentScreenHandler as? IScreenHandlerWithTabs)?.selectedTabIndex = 1
                 }

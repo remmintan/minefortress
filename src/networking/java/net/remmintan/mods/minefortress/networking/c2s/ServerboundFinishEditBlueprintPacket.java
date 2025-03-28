@@ -7,6 +7,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import org.jetbrains.annotations.NotNull;
 
 public class ServerboundFinishEditBlueprintPacket implements FortressC2SPacket {
 
@@ -26,7 +27,7 @@ public class ServerboundFinishEditBlueprintPacket implements FortressC2SPacket {
     }
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         if (shouldSave && server instanceof IFortressServer fortressServer) {
             fortressServer.get_BlueprintWorld().saveBlueprintFromWorld(server, player);
         }

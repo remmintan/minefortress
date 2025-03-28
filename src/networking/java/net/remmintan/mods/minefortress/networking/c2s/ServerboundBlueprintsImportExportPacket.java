@@ -17,6 +17,7 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkH
 import net.remmintan.mods.minefortress.networking.helpers.NetworkUtils;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundBlueprintsProcessImportExportPacket;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -86,10 +87,10 @@ public class ServerboundBlueprintsImportExportPacket implements FortressC2SPacke
     }
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
 
-        final var sbm = ServerPlayerEntityExtensionsKt.getManagersProvider(player).getBlueprintManager();
+        final var sbm = ServerPlayerEntityExtensionsKt.getManagersProvider(player).get_BlueprintManager();
         switch (type) {
             case EXPORT -> handleExport(player, sbm);
             case IMPORT -> handleImport(player, sbm);

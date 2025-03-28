@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IScrollableHandler;
+import org.jetbrains.annotations.NotNull;
 
 public class ServerboundScrollCurrentScreenPacket implements FortressC2SPacket {
 
@@ -24,7 +25,7 @@ public class ServerboundScrollCurrentScreenPacket implements FortressC2SPacket {
     }
 
     @Override
-    public void handle(MinecraftServer server, ServerPlayerEntity player) {
+    public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         if(player.currentScreenHandler instanceof IScrollableHandler handler) {
             handler.scrollItems(scrollPosition);
         }

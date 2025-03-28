@@ -42,15 +42,16 @@ public final class ServerProfessionManager extends ProfessionManager implements 
 
 
     private final BlockPos fortressPos;
-    private MinecraftServer server;
+    private final MinecraftServer server;
     private IServerFortressManager serverFortressManager;
 
     private List<ProfessionFullInfo> professionsInfos;
     private String professionsTree;
     private boolean needsUpdate = false;
 
-    public ServerProfessionManager(BlockPos fortressPos) {
+    public ServerProfessionManager(BlockPos fortressPos, ServerWorld world) {
         this.fortressPos = fortressPos;
+        this.server = world.getServer();
     }
 
     @Override
@@ -91,7 +92,6 @@ public final class ServerProfessionManager extends ProfessionManager implements 
 
     @Override
     public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
-        if (this.server == null) this.server = server;
         if (serverFortressManager == null)
             ServerModUtils.getFortressManager(server, fortressPos).ifPresent(it -> this.serverFortressManager = it);
 

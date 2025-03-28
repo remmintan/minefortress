@@ -56,8 +56,8 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     private static final int DEFAULT_COLONIST_COUNT = 5;
 
-    private final MinecraftServer server = null;
-    private final ServerWorld world = null;
+    private final MinecraftServer server;
+    private final ServerWorld world;
     private final Set<LivingEntity> pawns = new HashSet<>();
     private final Map<Class<? extends IServerManager>, IServerManager> managers = new HashMap<>();
     
@@ -76,8 +76,10 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     private boolean spawnPawns = true;
 
-    public ServerFortressManager(BlockPos fortressPos) {
+    public ServerFortressManager(BlockPos fortressPos, ServerWorld world) {
         this.fortressCenter = fortressPos;
+        this.world = world;
+        this.server = world.getServer();
     }
 
     public void addPawn(LivingEntity colonist) {
@@ -225,8 +227,7 @@ public final class ServerFortressManager implements IServerFortressManager {
     }
 
     @Override
-    public void setupCenter(@NotNull BlockPos fortressCenter) {
-
+    public void spawnInitialPawns() {
         if(minX > this.fortressCenter.getX()-10) minX = this.fortressCenter.getX()-10;
         if(minZ > this.fortressCenter.getZ()-10) minZ = this.fortressCenter.getZ()-10;
         if(maxX < this.fortressCenter.getX()+10) maxX = this.fortressCenter.getX()+10;

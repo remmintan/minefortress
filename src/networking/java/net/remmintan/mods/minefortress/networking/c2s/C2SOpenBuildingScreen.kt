@@ -11,10 +11,10 @@ class C2SOpenBuildingScreen(private val pos: BlockPos) : FortressC2SPacket {
 
     constructor(buf: PacketByteBuf) : this(buf.readBlockPos())
 
-    override fun handle(server: MinecraftServer?, player: ServerPlayerEntity?) {
-        player?.world?.getBlockEntity(pos).let {
+    override fun handle(server: MinecraftServer, player: ServerPlayerEntity) {
+        player.world?.getBlockEntity(pos).let {
             if (it is NamedScreenHandlerFactory) {
-                player?.openHandledScreen(it)
+                player.openHandledScreen(it)
             }
         }
 

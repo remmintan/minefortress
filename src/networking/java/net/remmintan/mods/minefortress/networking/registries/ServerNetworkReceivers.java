@@ -39,10 +39,13 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SHireProfessional.CHANNEL, C2SHireProfessional::new);
         registerReceiver(C2SOpenBuildingHireScreen.CHANNEL, C2SOpenBuildingHireScreen::new);
         registerReceiver(C2SSwitchToMinecraftSurvival.CHANNEL, C2SSwitchToMinecraftSurvival::new);
+        registerReceiver(C2SSetupCampfirePacket.CHANNEL, C2SSetupCampfirePacket::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {
         ServerPlayNetworking.registerGlobalReceiver(new Identifier(FortressChannelNames.NAMESPACE, channelName), (server, player, handler, buf, sender) -> {
+            if (player == null || server == null)
+                throw new IllegalArgumentException("Player and server must not be null in the server packet receiver");
             final FortressC2SPacket packet = packetConstructor.apply(buf);
             server.execute(() -> packet.handle(server, player));
         });
