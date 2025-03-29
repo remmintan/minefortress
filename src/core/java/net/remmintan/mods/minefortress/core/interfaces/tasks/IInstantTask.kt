@@ -9,7 +9,7 @@ interface IInstantTask {
 
     val start: BlockPos
     val end: BlockPos
-    fun execute(world: ServerWorld, player: ServerPlayerEntity, getBuildingsManager: IServerBuildingsManager)
+    fun execute(world: ServerWorld, player: ServerPlayerEntity, buildingsManager: IServerBuildingsManager)
     fun addFinishListener(listener: () -> Unit)
 
 }

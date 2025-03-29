@@ -5,6 +5,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.event.GameEvent
+import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity
@@ -53,6 +54,7 @@ class InstantPlaceTask(
     ) {
         BlockPos.iterate(start, end).forEach { pos ->
             val blockState = blocks[pos] ?: return@forEach
+            if (world.getBlockState(pos).isOf(FortressBlocks.FORTRESS_CAMPFIRE)) return@forEach
             world.setBlockState(pos, blockState, 3)
             world.emitGameEvent(player, GameEvent.BLOCK_PLACE, pos)
             world.markDirty(pos)

@@ -155,9 +155,11 @@ public final class ServerFortressManager implements IServerFortressManager {
     }
 
     private void sendMessageToFortressOwner(String message) {
-        final var text = Text.of(message);
-        // TODO
-        throw new UnsupportedOperationException("Not yet implemented");
+        final var owner = ServerExtensionsKt.getFortressOwner(server, fortressCenter);
+        if (owner != null) {
+            final var text = Text.of(message);
+            owner.sendMessage(text);
+        }
     }
 
     private void keepColonistsBelowMax() {

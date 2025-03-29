@@ -19,22 +19,22 @@ fun MinecraftServer.isCreativeFortress(): Boolean {
 
 fun MinecraftServer.sendMessageToFortressOwner(fortressPos: BlockPos, message: String) {
     val fortressHolder = getFortressHolder(fortressPos)
-    fortressHolder.getFortressOwner()?.sendMessage(Text.of(message))
+    fortressHolder?.getFortressOwner()?.sendMessage(Text.of(message))
 }
 
 private fun MinecraftServer.getFortressHolder(fortressPos: BlockPos) =
-    this.overworld.getBlockEntity(fortressPos) as IFortressHolder
+    this.overworld.getBlockEntity(fortressPos) as? IFortressHolder
 
 fun MinecraftServer.fortressOwnerHasScreenOpened(
     fortressPos: BlockPos,
     screenHandlerClass: Class<out ScreenHandler>
 ): Boolean {
     return this.getFortressHolder(fortressPos)
-        .getFortressOwner()
+        ?.getFortressOwner()
         ?.currentScreenHandler
         ?.let { screenHandlerClass.isInstance(it) } ?: false
 }
 
 fun MinecraftServer.getFortressOwner(fortressPos: BlockPos): ServerPlayerEntity? {
-    return this.getFortressHolder(fortressPos).getFortressOwner()
+    return this.getFortressHolder(fortressPos)?.getFortressOwner()
 }
