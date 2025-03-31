@@ -18,7 +18,12 @@ class FortressCenterManager : IFortressCenterManager {
 
     override fun tick() {
         val blueprintManager = ClientModUtils.getManagersProvider()._BlueprintManager
-        if (!blueprintManager.isSelecting || blueprintManager.selectedStructure.id != "campfire") {
+
+        if (getFortressPlayer().get_FortressPos().isPresent) {
+            if (blueprintManager.isSelecting && blueprintManager.selectedStructure.id == "campfire") {
+                blueprintManager.clearStructure()
+            }
+        } else if (!blueprintManager.isSelecting || blueprintManager.selectedStructure.id != "campfire") {
             blueprintManager.select("campfire")
         }
     }

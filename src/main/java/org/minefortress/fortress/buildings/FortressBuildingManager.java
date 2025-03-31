@@ -37,7 +37,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     private int buildingPointer = 0;
     private final List<BlockPos> buildings = new ArrayList<>();
     private final ServerWorld world;
-    private final IServerFortressManager fortressManager;
+    private final BlockPos fortressPos;
     private final Cache<BlockPos, Object> bedsCache =
             CacheBuilder.newBuilder()
                     .expireAfterWrite(10, TimeUnit.SECONDS)
@@ -46,7 +46,8 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
     public FortressBuildingManager(BlockPos fortressPos, ServerWorld world) {
         this.world = world;
-        this.fortressManager = ServerModUtils.getFortressManager(world.getServer(), fortressPos).orElseThrow();
+        this.fortressPos = fortressPos;
+
     }
 
     private static @NotNull BlockPos getCenterTop(BlockBox blockBox) {
@@ -56,7 +57,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         return new BlockPos(center.getX(), ceilingY, center.getZ());
     }
 
-    public void addBuilding(BlockPos owningFortress, BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> blockData) {
+    public void addBuilding(BlueprintMetadata metadata, BlockPos start, BlockPos end, Map<BlockPos, BlockState> blockData) {
         final var blockBox = BlockBox.create(start, end);
         final var buildingPos = getCenterTop(blockBox);
 
@@ -64,11 +65,11 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         world.setBlockState(buildingPos, FortressBlocks.FORTRESS_BUILDING.getDefaultState(), 3);
         final var blockEntity = world.getBlockEntity(buildingPos);
         if (blockEntity instanceof FortressBuildingBlockEntity b) {
-            b.init(owningFortress, metadata, start, end, blockData);
+            b.init(fortressPos, metadata, start, end, blockData);
         }
 
-        fortressManager.expandTheVillage(start);
-        fortressManager.expandTheVillage(end);
+        getFortressManager().expandTheVillage(start);
+        getFortressManager().expandTheVillage(end);
 
         buildings.add(buildingPos);
         this.scheduleSync();
@@ -242,6 +243,10 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
 
     private ServerWorld getWorld() {
         return world;
+    }
+
+    private IServerFortressManager getFortressManager() {
+        return ServerModUtils.getFortressManager(world.getServer(), fortressPos).orElseThrow();
     }
 
 }

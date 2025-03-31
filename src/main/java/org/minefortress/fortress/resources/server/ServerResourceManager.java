@@ -31,7 +31,17 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
 
     private final ItemStacksManager resources = new ItemStacksManager();
     private final Map<UUID, ItemStacksManager> reservedResources = new HashMap<>();
-    private MinecraftServer server;
+    private final MinecraftServer server;
+
+    public ServerResourceManager(MinecraftServer server) {
+        this.server = server;
+
+        final var reader = new ServerStartingInventoryReader(server);
+        final var inventoryStartingSlots = reader.readStartingSlots();
+        for (var slot : inventoryStartingSlots) {
+            resources.getStack(slot.item()).increaseBy(slot.amount());
+        }
+    }
 
 
     public ItemInfo createItemInfo(Item item, int amount) {
@@ -179,7 +189,6 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
         }
 
         tag.put("resources", stacks);
-//        this.resources.clear();
     }
 
     @Override
@@ -201,16 +210,6 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
 
     @Override
     public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
-        if (this.server == null) {
-            this.server = server;
-
-            final var reader = new ServerStartingInventoryReader(server);
-            final var inventoryStartingSlots = reader.readStartingSlots();
-            for (var slot : inventoryStartingSlots) {
-                resources.getStack(slot.item()).increaseBy(slot.amount());
-            }
-        }
-
         synchronizer.sync(player);
     }
 

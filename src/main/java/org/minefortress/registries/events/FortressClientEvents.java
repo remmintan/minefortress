@@ -76,8 +76,7 @@ public class FortressClientEvents {
         final var fortressClient = (IFortressMinecraftClient) client;
         fortressClient.get_FortressHud().tick();
         final var provider = ClientModUtils.getManagersProvider();
-        final var fortressClientManager = provider.get_ClientFortressManager();
-        fortressClientManager.tick();
+        provider.get_ClientFortressManager().tick();
         provider.get_FortressCenterManager().tick();
     }
 

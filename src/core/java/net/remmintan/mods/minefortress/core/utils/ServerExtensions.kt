@@ -8,6 +8,8 @@ import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.FortressGamemode
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressHolder
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider
 
 fun MinecraftServer.isSurvivalFortress(): Boolean {
     return (this as IFortressServer)._FortressGamemode == FortressGamemode.SURVIVAL
@@ -37,4 +39,12 @@ fun MinecraftServer.fortressOwnerHasScreenOpened(
 
 fun MinecraftServer.getFortressOwner(fortressPos: BlockPos): ServerPlayerEntity? {
     return this.getFortressHolder(fortressPos)?.getFortressOwner()
+}
+
+fun MinecraftServer.getManagersProvider(fortressPos: BlockPos): IServerManagersProvider? {
+    return this.getFortressHolder(fortressPos)?.getServerManagersProvider()
+}
+
+fun MinecraftServer.getFortressManager(fortressPos: BlockPos): IServerFortressManager? {
+    return this.getFortressHolder(fortressPos)?.getServerFortressManager()
 }

@@ -28,7 +28,7 @@ class ServerManagersProvider(private val fortressPos: BlockPos, world: ServerWor
     init {
         registerManager(IServerTaskManager::class.java, ServerTaskManager())
         registerManager(IServerProfessionsManager::class.java, ServerProfessionManager(fortressPos, world))
-        registerManager(IServerResourceManager::class.java, ServerResourceManager())
+        registerManager(IServerResourceManager::class.java, ServerResourceManager(world.server))
         registerManager(IServerBuildingsManager::class.java, FortressBuildingManager(fortressPos, world))
         registerManager(IServerAutomationAreaManager::class.java, AreasServerManager())
         registerManager(IServerFightManager::class.java, ServerFightManager(fortressPos))

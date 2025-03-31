@@ -8,27 +8,26 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressHolder
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider
 import net.remmintan.mods.minefortress.core.services.FortressServiceLocator
-import java.util.*
 
 class FortressCampfireBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(FortressBlocks.CAMPFIRE_ENT_TYPE, pos, state), IFortressHolder {
 
-    var placerId: UUID? = null
     private var mpTag: NbtCompound? = null
     private var fmTag: NbtCompound? = null
 
     private val fortressManager: IServerFortressManager by lazy {
-        val manager = FortressServiceLocator.get(IServerFortressManager::class.java, pos, world as? ServerWorld)
-        mpTag?.let { manager.read(it) }
+        val manager = FortressServiceLocator.get(IServerFortressManager::class.java, super.pos, world as? ServerWorld)
+        fmTag?.let { manager.read(it) }
         manager
     }
     private val managersProvider: IServerManagersProvider by lazy {
-        val provider = FortressServiceLocator.get(IServerManagersProvider::class.java, pos, world as? ServerWorld)
-        fmTag?.let { provider.read(it) }
+        val provider = FortressServiceLocator.get(IServerManagersProvider::class.java, super.pos, world as? ServerWorld)
+        mpTag?.let { provider.read(it) }
         provider
     }
 
@@ -42,7 +41,6 @@ class FortressCampfireBlockEntity(pos: BlockPos, state: BlockState) :
 
     override fun writeNbt(nbt: NbtCompound?) {
         super.writeNbt(nbt)
-        if (placerId != null) nbt?.putUuid("placerId", placerId)
 
         val mpTag = NbtCompound()
         managersProvider.write(mpTag)
@@ -55,9 +53,6 @@ class FortressCampfireBlockEntity(pos: BlockPos, state: BlockState) :
 
     override fun readNbt(nbt: NbtCompound?) {
         super.readNbt(nbt)
-        if (nbt?.contains("placerId") == true)
-            placerId = nbt.getUuid("placerId")
-
         if (nbt?.contains("managersProvider") == true)
             mpTag = nbt.getCompound("managersProvider")
 
@@ -69,6 +64,8 @@ class FortressCampfireBlockEntity(pos: BlockPos, state: BlockState) :
     override fun getServerFortressManager() = fortressManager
     override fun getServerManagersProvider() = managersProvider
     override fun getFortressOwner(): ServerPlayerEntity? {
-        return world?.server?.playerManager?.getPlayer(placerId)
+        return world?.server?.playerManager?.playerList?.find {
+            (it as IFortressPlayerEntity).get_FortressPos().map { p -> p.equals(pos) }.orElse(false)
+        }
     }
 }

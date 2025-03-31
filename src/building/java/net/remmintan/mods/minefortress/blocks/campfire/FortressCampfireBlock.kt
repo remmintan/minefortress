@@ -8,10 +8,7 @@ import net.minecraft.block.BlockWithEntity
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityTicker
 import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemPlacementContext
-import net.minecraft.item.ItemStack
-import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.DirectionProperty
 import net.minecraft.state.property.Properties
@@ -48,19 +45,8 @@ class FortressCampfireBlock : BlockWithEntity(
         return FortressCampfireBlockEntity(pos, state)
     }
 
-    override fun onPlaced(
-        world: World?,
-        pos: BlockPos?,
-        state: BlockState?,
-        placer: LivingEntity?,
-        itemStack: ItemStack?
-    ) {
-        super.onPlaced(world, pos, state, placer, itemStack)
-        if (placer is ServerPlayerEntity) {
-            (world?.getBlockEntity(pos) as? FortressCampfireBlockEntity)?.placerId = placer.uuid
-        }
-    }
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun getRenderType(state: BlockState): BlockRenderType {
         return BlockRenderType.MODEL
     }
