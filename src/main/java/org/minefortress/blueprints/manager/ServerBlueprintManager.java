@@ -98,10 +98,11 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
     }
 
     @Override
-    public BlueprintTask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel) {
-        final IStructureBlockData serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation, floorLevel);
+    public BlueprintTask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation) {
+        final var blueprintMetadata = this.get(blueprintId);
+        final IStructureBlockData serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation, blueprintMetadata.getFloorLevel());
         final Vec3i size = serverStructureInfo.getSize();
-        startPos = startPos.down(floorLevel);
+        startPos = startPos.down(blueprintMetadata.getFloorLevel());
         final BlockPos endPos = getEndPos(startPos, size);
         final Map<BlockPos, BlockState> manualLayer = serverStructureInfo.getLayer(BlueprintDataLayer.MANUAL);
         final Map<BlockPos, BlockState> automatic = serverStructureInfo.getLayer(BlueprintDataLayer.AUTOMATIC);
@@ -110,11 +111,10 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                 taskId,
                 startPos,
                 endPos,
+                blueprintMetadata,
                 manualLayer,
                 automatic,
-                entityLayer,
-                floorLevel,
-                blueprintId
+                entityLayer
         );
     }
 

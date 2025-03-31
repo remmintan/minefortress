@@ -10,6 +10,7 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
@@ -18,7 +19,6 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 
@@ -26,28 +26,25 @@ import java.util.*;
 
 public class BlueprintTask extends AbstractTask {
 
+    private final BlueprintMetadata blueprintMetadata;
     private final Map<BlockPos, BlockState> blueprintData;
     private final Map<BlockPos, BlockState> blueprintEntityData;
     private final Map<BlockPos, BlockState> blueprintAutomaticData;
-    private final int floorLevel;
-    private final String blueprintId;
 
     public BlueprintTask(
             UUID id,
             BlockPos startingPos,
             BlockPos endingPos,
+            BlueprintMetadata blueprintMetadata,
             Map<BlockPos, BlockState> blueprintData,
             Map<BlockPos, BlockState> blueprintEntityData,
-            Map<BlockPos, BlockState> blueprintAutomaticData,
-            int floorLevel,
-            @NotNull String blueprintId
+            Map<BlockPos, BlockState> blueprintAutomaticData
     ) {
         super(id, TaskType.BUILD, startingPos, endingPos);
+        this.blueprintMetadata = blueprintMetadata;
         this.blueprintData = blueprintData;
         this.blueprintEntityData = blueprintEntityData;
         this.blueprintAutomaticData = blueprintAutomaticData;
-        this.floorLevel = floorLevel;
-        this.blueprintId = blueprintId;
     }
 
     @Override
@@ -65,7 +62,7 @@ public class BlueprintTask extends AbstractTask {
 
         List<ITaskBlockInfo> blockInfos = new ArrayList<>();
         for (BlockPos pos : allPositionsInPart) {
-            final BlockState state = blueprintData.getOrDefault(pos.subtract(start).add(delta), pos.subtract(start).add(delta).getY()<floorLevel?Blocks.DIRT.getDefaultState():Blocks.AIR.getDefaultState());
+            final BlockState state = blueprintData.getOrDefault(pos.subtract(start).add(delta), pos.subtract(start).add(delta).getY() < blueprintMetadata.getFloorLevel() ? Blocks.DIRT.getDefaultState() : Blocks.AIR.getDefaultState());
             if(state.isAir()) continue;
             final BlockStateTaskBlockInfo blockStateTaskBlockInfo = new BlockStateTaskBlockInfo(getItemFromState(state), pos.toImmutable(), state);
             blockInfos.add(blockStateTaskBlockInfo);
@@ -102,13 +99,9 @@ public class BlueprintTask extends AbstractTask {
             if(blueprintEntityData != null) mergeBlockData.putAll(blueprintEntityData);
             if(blueprintAutomaticData != null) mergeBlockData.putAll(blueprintAutomaticData);
 
-
             final var provider = ServerModUtils.getManagersProvider(worker);
-
-            throw new NotImplementedException("send blueprint metadata together with task");
-//            final var metadata = provider.getBlueprintManager().get(blueprintId);
-//            final var buildingManager = provider.getBuildingsManager();
-//            buildingManager.addBuilding(worker.getFortressPos(), metadata, startingBlock, endingBlock, mergeBlockData);
+            final var buildingManager = provider.getBuildingsManager();
+            buildingManager.addBuilding(blueprintMetadata, startingBlock, endingBlock, mergeBlockData);
         }
         super.finishPart(part, worker);
     }

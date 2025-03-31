@@ -72,7 +72,7 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
 
         Runnable executeBuildTask = () -> {
             final var taskId = UUID.randomUUID();
-            final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation, floorLevel);
+            final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation);
             final var serverResourceManager = provider.getResourceManager();
 
             if (ServerExtensionsKt.isSurvivalFortress(server)) {

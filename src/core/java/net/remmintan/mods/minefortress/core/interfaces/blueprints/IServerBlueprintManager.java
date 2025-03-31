@@ -21,7 +21,7 @@ public interface IServerBlueprintManager extends IServerManager, ITickableManage
 
     IServerStructureBlockDataManager getBlockDataManager();
 
-    ITask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, int floorLevel);
+    ITask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation);
 
     ITask createDigTask(UUID taskId, BlockPos startPos, int floorLevel, String blueprintId, BlockRotation rotation);
 
