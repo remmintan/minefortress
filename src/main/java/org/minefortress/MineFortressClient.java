@@ -2,8 +2,11 @@ package org.minefortress;
 
 import com.chocohead.mm.api.ClassTinkerers;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.minecraft.client.gui.screen.GameModeSelectionScreen;
+import net.minecraft.client.render.RenderLayer;
+import net.remmintan.mods.minefortress.blocks.FortressBlocks;
 import net.remmintan.mods.minefortress.gui.FortressHandledScreensKt;
 import net.remmintan.mods.minefortress.gui.building.functions.BuildingFunctionsRegistry;
 import net.remmintan.mods.minefortress.networking.registries.ClientNetworkReceivers;
@@ -28,6 +31,8 @@ public class MineFortressClient implements ClientModInitializer {
 
         ScreenRegistry.register(FORTRESS_CRAFTING_SCREEN_HANDLER, FortressCraftingScreen::new);
         ScreenRegistry.register(FORTRESS_FURNACE_SCREEN_HANDLER, FortressFurnaceScreen::new);
+
+        BlockRenderLayerMap.INSTANCE.putBlock(FortressBlocks.FORTRESS_CAMPFIRE, RenderLayer.getCutout());
 
         FortressHandledScreensKt.registerScreens();
 
