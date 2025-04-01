@@ -20,7 +20,7 @@ enum class ProfessionType(val icon: Item, val displayName: String, val blueprint
     WARRIOR(Items.STONE_SWORD, "Warrior", listOf("warrior_1", "warrior_2")),
     ARCHER(Items.BOW, "Archer", listOf("shooting_gallery")),
     FISHERMAN(Items.FISHING_ROD, "Fisher", listOf("fisher_cottage_1")),
-    CRAFTSMAN(Items.CRAFTING_TABLE, "Craftsman", listOf("crafting_table", "tool_smith_1"));
+    CRAFTSMAN(Items.CRAFTING_TABLE, "Craftsman", listOf("campfire"));
 
     override fun asString() = name.lowercase()
 }

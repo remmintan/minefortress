@@ -25,7 +25,6 @@ import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionSyncP
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundProfessionsInitPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.minefortress.fortress.ServerFortressManager;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -40,10 +39,8 @@ public final class ServerProfessionManager extends ProfessionManager implements 
 
     private final ProfessionEntityTypesMapper profToEntityMapper = new ProfessionEntityTypesMapper();
 
-
     private final BlockPos fortressPos;
     private final MinecraftServer server;
-    private IServerFortressManager serverFortressManager;
 
     private List<ProfessionFullInfo> professionsInfos;
     private String professionsTree;
@@ -58,9 +55,8 @@ public final class ServerProfessionManager extends ProfessionManager implements 
     public void increaseAmount(String professionId) {
         final IProfession profession = super.getProfession(professionId);
         if(profession == null) return;
-        
-        // Check for reserved pawns
-        if (serverFortressManager instanceof ServerFortressManager fsm && fsm.getReservedPawnsCount() <= 0) {
+
+        if (getServerFortressManager().getReservedPawnsCount() <= 0) {
             LoggerFactory.getLogger(ServerProfessionManager.class).error("No reserved pawns but trying to hire a profession");
             return;
         }
@@ -92,14 +88,11 @@ public final class ServerProfessionManager extends ProfessionManager implements 
 
     @Override
     public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
-        if (serverFortressManager == null)
-            ServerModUtils.getFortressManager(server, fortressPos).ifPresent(it -> this.serverFortressManager = it);
-
         if(player == null) return;
         if(needsUpdate) {
             final var essentialInfos = new ArrayList<IProfessionEssentialInfo>();
             for(Map.Entry<String, IProfession> entry : getProfessions().entrySet())  {
-                final ProfessionEssentialInfo professionEssentialInfo = new ProfessionEssentialInfo(entry.getKey(), entry.getValue().getAmount());
+                final var professionEssentialInfo = new ProfessionEssentialInfo(entry.getKey(), entry.getValue().getAmount());
                 essentialInfos.add(professionEssentialInfo);
             }
 
@@ -111,11 +104,12 @@ public final class ServerProfessionManager extends ProfessionManager implements 
 
     @Override
     public void reservePawn() {
-        serverFortressManager
+        getServerFortressManager()
                 .getPawnWithoutAProfession()
                 .ifPresent(IProfessional::reserve);
     }
 
+    @Override
     public void sendProfessions(@NotNull ServerPlayerEntity player) {
         initProfessionsIfNeeded();
         final var packet = new ClientboundProfessionsInitPacket(professionsInfos, professionsTree);
@@ -135,10 +129,12 @@ public final class ServerProfessionManager extends ProfessionManager implements 
         }
     }
 
+    @Override
     public EntityType<? extends LivingEntity> getEntityTypeForProfession(String professionId) {
         return profToEntityMapper.getEntityTypeForProfession(professionId);
     }
 
+    @Override
     public void sync() {
         needsUpdate = true;
     }
@@ -186,15 +182,19 @@ public final class ServerProfessionManager extends ProfessionManager implements 
 
     @Override
     protected IFortressManager getFortressManager() {
-        return serverFortressManager;
+        return getServerFortressManager();
     }
 
     private long countPawnsWithProfession(String professionId) {
-        return serverFortressManager
+        return getServerFortressManager()
                 .getProfessionals()
                 .stream()
                 .filter(pawn -> pawn.getProfessionId().equals(professionId))
                 .count();
+    }
+
+    private IServerFortressManager getServerFortressManager() {
+        return ServerModUtils.getFortressManager(server, fortressPos).orElseThrow();
     }
 
 }

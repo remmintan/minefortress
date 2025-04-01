@@ -4,7 +4,7 @@
       "name": "Campfire",
       "file": "campfire",
       "floorLevel": 0,
-      "capacity": 2
+      "capacity": 3
     }
   ],
   "LIVING_HOUSES": [
@@ -100,12 +100,6 @@
     }
   ],
   "WORKSHOPS": [
-    {
-      "name": "Crafting table",
-      "file": "crafting_table",
-      "floorLevel": 0,
-      "capacity": 2
-    },
     {
       "name": "Tool Smith 1",
       "file": "tool_smith_1",

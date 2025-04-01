@@ -65,7 +65,8 @@ class PlaceCampfireTask(
         }
 
 
-        fortressPos?.let { world.server.getManagersProvider(it) }
+        val managersProvider = fortressPos?.let { world.server.getManagersProvider(it) }
+        managersProvider
             ?.buildingsManager
             ?.addBuilding(
                 metadata,
@@ -73,6 +74,8 @@ class PlaceCampfireTask(
                 end,
                 blockData
             )
+
+        managersProvider?.professionsManager?.sendProfessions(player)
 
         fortressPos?.let { world.server.getFortressManager(it) }?.spawnInitialPawns()
 
