@@ -5,6 +5,8 @@ import net.minecraft.block.*
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityTicker
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.client.MinecraftClient
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.particle.ParticleTypes
@@ -14,6 +16,9 @@ import net.minecraft.state.StateManager
 import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.DirectionProperty
 import net.minecraft.state.property.Properties
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.random.Random
@@ -21,6 +26,8 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
+import net.remmintan.mods.minefortress.core.isFortressGamemode
+import net.remmintan.mods.minefortress.gui.SurvivalCampfireScreen
 
 class FortressCampfireBlock : BlockWithEntity(
     FabricBlockSettings.create()
@@ -123,6 +130,25 @@ class FortressCampfireBlock : BlockWithEntity(
         return SHAPE // Return the defined shape
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onUse(
+        state: BlockState,
+        world: World,
+        pos: BlockPos,
+        player: PlayerEntity,
+        hand: Hand?,
+        hit: BlockHitResult?
+    ): ActionResult {
+        if (!isFortressGamemode(player) && world.isClient) {
+            MinecraftClient.getInstance().execute {
+                MinecraftClient.getInstance().setScreen(SurvivalCampfireScreen())
+            }
+            return ActionResult.SUCCESS
+        }
+        return ActionResult.PASS
+    }
+
+
     override fun <T : BlockEntity?> getTicker(
         world: World?,
         state: BlockState?,
@@ -134,4 +160,4 @@ class FortressCampfireBlock : BlockWithEntity(
             null
         }
     }
-} 
+}

@@ -60,7 +60,7 @@ public final class ServerFortressManager implements IServerFortressManager {
     private final ServerWorld world;
     private final Set<LivingEntity> pawns = new HashSet<>();
     private final Map<Class<? extends IServerManager>, IServerManager> managers = new HashMap<>();
-    
+
     private IPawnNameGenerator nameGenerator = new ColonistNameGenerator();
 
     private int maxX = Integer.MIN_VALUE;
@@ -256,8 +256,7 @@ public final class ServerFortressManager implements IServerFortressManager {
     public void jumpToCampfire(ServerPlayerEntity player) {
         if(fortressCenter == null) return;
         if(player.getWorld().getRegistryKey() != World.OVERWORLD) return;
-        player.setPitch(60);
-        player.setYaw(90 + 45);
+
         player.teleport(fortressCenter.getX() + 10, fortressCenter.getY() + 20, fortressCenter.getZ() + 10);
     }
 
@@ -268,14 +267,6 @@ public final class ServerFortressManager implements IServerFortressManager {
 
         // Get a position on the ground near the campfire
         BlockPos groundPos = getRandomSpawnPosition();
-
-        // Set the player's orientation to look at the campfire
-        double dx = fortressCenter.getX() - groundPos.getX();
-        double dz = fortressCenter.getZ() - groundPos.getZ();
-        float yaw = (float) Math.toDegrees(Math.atan2(dz, dx));
-
-        player.setPitch(0); // Look straight ahead
-        player.setYaw(yaw);
         player.teleport(groundPos.getX(), groundPos.getY(), groundPos.getZ());
     }
 

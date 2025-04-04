@@ -40,6 +40,7 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SOpenBuildingHireScreen.CHANNEL, C2SOpenBuildingHireScreen::new);
         registerReceiver(C2SSwitchToMinecraftSurvival.CHANNEL, C2SSwitchToMinecraftSurvival::new);
         registerReceiver(C2SSetupCampfirePacket.CHANNEL, C2SSetupCampfirePacket::new);
+        registerReceiver(C2SSwitchToFortressModePacket.CHANNEL, C2SSwitchToFortressModePacket::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {
