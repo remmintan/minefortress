@@ -28,15 +28,10 @@ public class FortressColonistActiveTargetGoal extends ActiveTargetGoal<HostileEn
         }
 
         if(this.targetEntity != null) {
-            // Using ServerModUtils.getFortressManager directly instead of colonist.getServerFortressManager()
-            final var serverManager = ServerModUtils.getFortressManager(this.colonist);
-            final var targetWithinFortress = serverManager.isPositionWithinFortress(this.targetEntity.getBlockPos());
-            if (targetWithinFortress) {
-                return true;
-            }
+            return ServerModUtils.getFortressManager(this.colonist)
+                    .map(it -> it.isPositionWithinFortress(targetEntity.getBlockPos()))
+                    .orElse(false);
         }
-
-        this.targetEntity = null;
         return false;
     }
 }

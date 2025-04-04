@@ -2,11 +2,14 @@ package org.minefortress.entity.ai.professions;
 
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
+
+import java.util.Collections;
 
 public class CrafterDailyTask extends AbstractStayNearBlockDailyTask {
 
@@ -48,8 +51,10 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask {
     @Nullable
     protected BlockPos getBlockPos(Colonist colonist) {
         // Use ServerModUtils to get buildings directly
-        final var buildingsManager = ServerModUtils.getManagersProvider(colonist).getBuildingsManager();
-        final var buildings = buildingsManager.getBuildings(ProfessionType.CRAFTSMAN);
+        final var buildings = ServerModUtils.getManagersProvider(colonist)
+                .map(IServerManagersProvider::getBuildingsManager)
+                .map(it -> it.getBuildings(ProfessionType.CRAFTSMAN))
+                .orElse(Collections.emptyList());
 
         if (buildings.isEmpty()) {
             return null;

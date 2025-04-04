@@ -56,8 +56,8 @@ abstract class AbstractAutomationAreaTask implements ProfessionDailyTask{
     }
 
     private Optional<IAutomationArea> getArea(Colonist colonist) {
-        final var fortressManager = ServerModUtils.getFortressManager(colonist);
-        return fortressManager.getAutomationAreaByProfessionType(getProfessionType());
+        return ServerModUtils.getFortressManager(colonist)
+                .flatMap(it -> it.getAutomationAreaByProfessionType(getProfessionType()));
     }
 
 }

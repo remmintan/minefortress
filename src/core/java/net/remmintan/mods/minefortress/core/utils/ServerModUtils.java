@@ -35,13 +35,13 @@ public final class ServerModUtils {
     }
 
     @NotNull
-    public static IServerManagersProvider getManagersProvider(IFortressAwareEntity entity) {
-        return getManagersProvider(entity.getServer(), entity.getFortressPos()).orElseThrow();
+    public static Optional<IServerManagersProvider> getManagersProvider(IFortressAwareEntity entity) {
+        return getManagersProvider(entity.getServer(), entity.getFortressPos());
     }
 
     @NotNull
-    public static IServerFortressManager getFortressManager(IFortressAwareEntity entity) {
-        return getFortressManager(entity.getServer(), entity.getFortressPos()).orElseThrow();
+    public static Optional<IServerFortressManager> getFortressManager(IFortressAwareEntity entity) {
+        return getFortressManager(entity.getServer(), entity.getFortressPos());
     }
 
     @NotNull
@@ -60,13 +60,15 @@ public final class ServerModUtils {
         final var drop = Block.getDroppedStacks(blockState, w, g, blockEntity);
 
         if (ServerExtensionsKt.isSurvivalFortress(c.getServer())) {
-            final var provider = getManagersProvider(c);
-            final var serverResourceManager = provider.getResourceManager();
-            for (ItemStack itemStack : drop) {
-                final var item = itemStack.getItem();
-                final var count = itemStack.getCount();
-                serverResourceManager.increaseItemAmount(item, count);
-            }
+            getManagersProvider(c).ifPresent(it -> {
+                final var serverResourceManager = it.getResourceManager();
+                for (ItemStack itemStack : drop) {
+                    final var item = itemStack.getItem();
+                    final var count = itemStack.getCount();
+                    serverResourceManager.increaseItemAmount(item, count);
+                }
+            });
+
         }
     }
 

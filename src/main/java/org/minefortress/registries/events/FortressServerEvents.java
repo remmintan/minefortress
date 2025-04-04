@@ -6,14 +6,18 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressModVersionHolder;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.S2CSyncGamemodePacket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FortressServerEvents {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FortressServerEvents.class);
+
     public static void register() {
-        // initialising the fortress server on join
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             if (server.getSaveProperties() instanceof IFortressModVersionHolder holder && holder.is_OutdatedVersion()) {
                 handler.disconnect(Text.of("Outdated world version"));
@@ -24,13 +28,24 @@ public class FortressServerEvents {
             syncTheFortressGamemode((IFortressServer) server, player);
 
             if (ServerModUtils.hasFortress(player)) {
-                final var manager = ServerModUtils.getFortressManager(player).orElseThrow();
-                final var provider = ServerModUtils.getManagersProvider(player).orElseThrow();
-                provider.sync();
-                manager.sync();
-                final var serverProfessionManager = provider.getProfessionsManager();
-                serverProfessionManager.sendProfessions(player);
-                serverProfessionManager.sync();
+                ServerModUtils
+                        .getFortressManager(player)
+                        .ifPresentOrElse(
+                                IServerFortressManager::sync,
+                                () -> LOGGER.warn("Can't find the fortress block while the fortress is set up!")
+                        );
+                ServerModUtils
+                        .getManagersProvider(player)
+                        .ifPresentOrElse(
+                                provider -> {
+                                    provider.sync();
+                                    final var serverProfessionManager = provider.getProfessionsManager();
+                                    serverProfessionManager.sendProfessions(player);
+                                    serverProfessionManager.sync();
+                                },
+                                () -> LOGGER.warn("Can't find the fortress block while the fortress is set up!")
+                        );
+
             }
         });
 

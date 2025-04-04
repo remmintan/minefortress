@@ -74,7 +74,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     }
 
     private void addThisPawnToFortress() {
-        ServerModUtils.getFortressManager(this).addPawn(this);
+        ServerModUtils.getFortressManager(this).ifPresent(it -> it.addPawn(this));
     }
 
     private void setFortressCenter(BlockPos fortressCenter) {
@@ -82,9 +82,9 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     }
 
     @Override
-    @NotNull
+    @Nullable
     public BlockPos getFortressPos() {
-        return this.dataTracker.get(FORTRESS_CENTER).orElseThrow();
+        return this.dataTracker.get(FORTRESS_CENTER).orElse(null);
     }
 
     @Override

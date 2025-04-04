@@ -2,6 +2,7 @@ package org.minefortress.entity.ai.goal;
 
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
 
@@ -22,8 +23,8 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
         if(colonist.getTaskControl().hasTask()) return false;
         if(!isFarFromCenter()) return false;
 
-        final var fortressManager = ServerModUtils.getFortressManager(colonist);
-        fortressManager.getRandomPositionAroundCampfire()
+        ServerModUtils.getFortressManager(colonist)
+                .flatMap(IServerFortressManager::getRandomPositionAroundCampfire)
                 .ifPresent(it -> positionAroundCampfire = it);
 
         return  positionAroundCampfire != null;
@@ -52,10 +53,12 @@ public class ReturnToFireGoal extends AbstractFortressGoal {
     }
 
     private boolean isFarFromCenter() {
-        final var fortressManager = ServerModUtils.getFortressManager(colonist);
-        final BlockPos fortressCenter = fortressManager.getFortressCenter();
-        if (fortressCenter == null) return false;
-        final var distanseToCenter = Math.sqrt(colonist.squaredDistanceTo(fortressCenter.getX(), fortressCenter.getY(), fortressCenter.getZ()));
-        return distanseToCenter > fortressManager.getCampfireWarmRadius();
+        return ServerModUtils.getFortressManager(colonist)
+                .map(it -> {
+                    final var fortressPos = colonist.getFortressPos();
+                    final var campfireWarmRadius = it.getCampfireWarmRadius();
+                    return colonist.getBlockPos().getSquaredDistance(fortressPos) > campfireWarmRadius * campfireWarmRadius;
+                })
+                .orElse(false);
     }
 }

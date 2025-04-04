@@ -32,9 +32,12 @@ import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfes
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils
 import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.util.*
 
 private const val MAX_BLOCKS_PER_UPDATE = 10
+private val LOGGER: Logger = LoggerFactory.getLogger(FortressBuildingBlockEntity::class.java)
 
 class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     BlockEntity(FortressBlocks.BUILDING_ENT_TYPE, pos, state),
@@ -162,6 +165,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         blockData?.actualState?.forEach {
             world?.removeBlock(it, false)
         }
+        LOGGER.info("The building ${blueprintMetadata?.name ?: "No Name"} was destroyed!")
     }
 
     override fun getMetadata(): BlueprintMetadata {

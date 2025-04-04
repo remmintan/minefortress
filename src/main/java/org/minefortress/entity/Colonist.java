@@ -32,6 +32,8 @@ import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.jetbrains.annotations.Nullable;
@@ -201,9 +203,9 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     private void tickProfessionCheck() {
         final String professionId = this.dataTracker.get(PROFESSION_ID);
         if(DEFAULT_PROFESSION_ID.equals(professionId) || RESERVE_PROFESSION_ID.equals(professionId)) {
-            final var managersProvider = ServerModUtils.getManagersProvider(this);
-            final var professionsManager = managersProvider.getProfessionsManager();
-            professionsManager.getProfessionsWithAvailablePlaces(RESERVE_PROFESSION_ID.equals(professionId))
+            ServerModUtils.getManagersProvider(this)
+                    .map(IServerManagersProvider::getProfessionsManager)
+                    .flatMap(it -> it.getProfessionsWithAvailablePlaces(RESERVE_PROFESSION_ID.equals(professionId)))
                     .ifPresent(this::setProfession);
         }
     }
@@ -349,16 +351,17 @@ public final class Colonist extends NamedPawnEntity implements IMinefortressEnti
     }
 
     public void setProfession(String professionId) {
-        final var managersProvider = ServerModUtils.getManagersProvider(this);
-        final var spm = managersProvider.getProfessionsManager();
-        final var type = spm.getEntityTypeForProfession(professionId);
+        final var type = ServerModUtils.getManagersProvider(this)
+                .map(IServerManagersProvider::getProfessionsManager)
+                .map(it -> it.getEntityTypeForProfession(professionId))
+                .orElse(null);
+        final var fmOpt = ServerModUtils.getFortressManager(this);
         if (type == FortressEntities.COLONIST_ENTITY_TYPE) {
             this.dataTracker.set(PROFESSION_ID, professionId);
         } else if (type == FortressEntities.WARRIOR_PAWN_ENTITY_TYPE || type == FortressEntities.ARCHER_PAWN_ENTITY_TYPE) {
-            final var fortressManager = ServerModUtils.getFortressManager(this);
-            fortressManager.replaceColonistWithTypedPawn(this, professionId, type);
+            fmOpt.ifPresent(it -> it.replaceColonistWithTypedPawn(this, professionId, type));
         }
-        ServerModUtils.getFortressManager(this).scheduleSync();
+        fmOpt.ifPresent(IServerFortressManager::scheduleSync);
     }
 
     public void resetProfession() {

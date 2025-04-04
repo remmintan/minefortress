@@ -14,6 +14,7 @@ import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
@@ -169,26 +170,24 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
         }
 
         // Use ServerModUtils to get resource manager directly
-        final var serverResourceManager = ServerModUtils.getManagersProvider(colonist).getResourceManager();
-
-        final var itemOpt = serverResourceManager
-                .getAllItems()
-                .stream()
-                .filter(it -> !it.isEmpty())
-                .map(ItemStack::getItem)
-                .filter(FARMER_SEEDS::contains)
-                .min(Comparator.comparingInt(it -> {
-                    if (it == Items.WHEAT_SEEDS) return 0;
-                    if (it == Items.POTATO) return 1;
-                    if (it == Items.CARROT) return 2;
-                    return 3;
-                }));
-
-        itemOpt.ifPresent(
-                it -> serverResourceManager
-                        .removeItems(Collections.singletonList(new ItemInfo(it, 1)))
-        );
-
-        return itemOpt.map(it -> (BlockItem) it);
+        return ServerModUtils.getManagersProvider(colonist)
+                .map(IServerManagersProvider::getResourceManager)
+                .flatMap(srm -> srm
+                        .getAllItems()
+                        .stream()
+                        .filter(it -> !it.isEmpty())
+                        .map(ItemStack::getItem)
+                        .filter(FARMER_SEEDS::contains)
+                        .min(Comparator.comparingInt(it -> {
+                            if (it == Items.WHEAT_SEEDS) return 0;
+                            if (it == Items.POTATO) return 1;
+                            if (it == Items.CARROT) return 2;
+                            return 3;
+                        }))
+                        .map(it -> {
+                            srm.removeItems(Collections.singletonList(new ItemInfo(it, 1)));
+                            return (BlockItem) it;
+                        })
+                );
     }
 }

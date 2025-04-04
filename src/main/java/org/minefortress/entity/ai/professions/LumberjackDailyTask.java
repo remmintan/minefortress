@@ -11,6 +11,7 @@ import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
@@ -99,19 +100,19 @@ public class LumberjackDailyTask extends AbstractAutomationAreaTask {
         if (ServerExtensionsKt.isCreativeFortress(colonist.getServer())) {
             return Optional.of((BlockItem) Items.OAK_SAPLING);
         } else {
-            final var resourceManager = ServerModUtils.getManagersProvider(colonist).getResourceManager();
-            final var blockItem = resourceManager
-                    .getAllItems()
-                    .stream()
-                    .filter(it -> !it.isEmpty() && it.isIn(ItemTags.SAPLINGS))
-                    .findFirst()
-                    .map(it -> (BlockItem) it.getItem());
-
-            blockItem.ifPresent(
-                    it -> resourceManager.removeItems(Collections.singletonList(new ItemInfo(it, 1)))
-            );
-
-            return blockItem;
+            return ServerModUtils.getManagersProvider(colonist)
+                    .map(IServerManagersProvider::getResourceManager)
+                    .flatMap(rm -> rm
+                            .getAllItems()
+                            .stream()
+                            .filter(it -> !it.isEmpty() && it.isIn(ItemTags.SAPLINGS))
+                            .findFirst()
+                            .map(it -> (BlockItem) it.getItem())
+                            .map(it -> {
+                                rm.removeItems(Collections.singletonList(new ItemInfo(it, 1)));
+                                return it;
+                            })
+                    );
         }
     }
 

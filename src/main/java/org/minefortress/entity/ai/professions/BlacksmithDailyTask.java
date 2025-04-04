@@ -5,10 +5,14 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
@@ -29,20 +33,11 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
         return shouldWork(colonist);
     }
 
-    @Override
-    @Nullable
-    protected BlockPos getBlockPos(Colonist colonist) {
-        // Use ServerModUtils to get buildings directly
-        final var buildingsManager = ServerModUtils.getManagersProvider(colonist).getBuildingsManager();
-        final var buildings = buildingsManager.getBuildings(ProfessionType.BLACKSMITH);
-
-        if (buildings.isEmpty()) {
-            return null;
-        }
-
-        final var i = new Random().nextInt(buildings.size());
-        final var furnace = buildings.get(i).getFurnace();
-        return furnace != null ? furnace.getPos() : null;
+    private static @NotNull List<IFortressBuilding> getBuildings(Colonist colonist) {
+        return ServerModUtils.getManagersProvider(colonist)
+                .map(IServerManagersProvider::getBuildingsManager)
+                .map(it -> it.getBuildings(ProfessionType.BLACKSMITH))
+                .orElse(Collections.emptyList());
     }
 
     @Override
@@ -54,10 +49,24 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
         return atLeastOneFurnaceIsBurning(colonist);
     }
 
+    @Override
+    @Nullable
+    protected BlockPos getBlockPos(Colonist colonist) {
+        // Use ServerModUtils to get buildings directly
+        final var buildings = getBuildings(colonist);
+
+        if (buildings.isEmpty()) {
+            return null;
+        }
+
+        final var i = new Random().nextInt(buildings.size());
+        final var furnace = buildings.get(i).getFurnace();
+        return furnace != null ? furnace.getPos() : null;
+    }
+
     private boolean atLeastOneFurnaceIsBurning(Colonist colonist){
         // Use ServerModUtils to get buildings directly
-        final var buildingsManager = ServerModUtils.getManagersProvider(colonist).getBuildingsManager();
-        final var buildings = buildingsManager.getBuildings(ProfessionType.BLACKSMITH);
+        final var buildings = getBuildings(colonist);
 
         for (IFortressBuilding building : buildings) {
             final var furnace = building.getFurnace();

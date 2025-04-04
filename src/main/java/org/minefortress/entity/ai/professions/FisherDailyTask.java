@@ -7,6 +7,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.MineFortressMod;
 import org.minefortress.entity.Colonist;
@@ -123,14 +124,16 @@ public class FisherDailyTask implements ProfessionDailyTask {
     }
 
     private FisherGoal setGoalAsync(Colonist pawn) {
-        final var managersProvider = ServerModUtils.getManagersProvider(pawn);
-        final var buildingsManager = managersProvider.getBuildingsManager();
-        final var buildingOpt = buildingsManager.findNearest(pawn.getBlockPos(), ProfessionType.FISHERMAN);
+        final var buildingsManagerOpt = ServerModUtils
+                .getManagersProvider(pawn)
+                .map(IServerManagersProvider::getBuildingsManager);
+        final var buildingOpt = buildingsManagerOpt.flatMap(it -> it.findNearest(pawn.getBlockPos(), ProfessionType.FISHERMAN));
         final var world = pawn.getWorld();
 
         if(buildingOpt.isPresent()) {
             final var building = buildingOpt.get();
             final var center = building.getCenter();
+            final var buildingsManager = buildingsManagerOpt.get();
             final Function1<BlockPos, Boolean> predicate = it -> world.getBlockState(it).isOf(Blocks.WATER) &&
                     !buildingsManager.isPartOfAnyBuilding(it);
             final var goalOpt = FisherBlockFounderKt.getFisherGoal(pawn, center, predicate);
@@ -149,8 +152,7 @@ public class FisherDailyTask implements ProfessionDailyTask {
         }
 
         // look for water near campfire
-        final var fortressManager = ServerModUtils.getFortressManager(pawn);
-        final var fortressCenter = fortressManager.getFortressCenter();
+        final var fortressCenter = pawn.getFortressPos();
         final var goalOpt = FisherBlockFounderKt
                 .getFisherGoal(pawn, fortressCenter, it -> world.getBlockState(it).isOf(Blocks.WATER));
         if(goalOpt.isPresent()) {

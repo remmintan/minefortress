@@ -45,7 +45,7 @@ public class EatGoal extends Goal {
 
     private Optional<IServerResourceManager> getResourceManager() {
         return entity instanceof IFortressAwareEntity fortressEntity ?
-                Optional.of(ServerModUtils.getManagersProvider(fortressEntity))
+                ServerModUtils.getManagersProvider(fortressEntity)
                         .map(IServerManagersProvider::getResourceManager) :
                 Optional.empty();
     }

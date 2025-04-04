@@ -14,6 +14,7 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
@@ -99,9 +100,11 @@ public class BlueprintTask extends AbstractTask {
             if(blueprintEntityData != null) mergeBlockData.putAll(blueprintEntityData);
             if(blueprintAutomaticData != null) mergeBlockData.putAll(blueprintAutomaticData);
 
-            final var provider = ServerModUtils.getManagersProvider(worker);
-            final var buildingManager = provider.getBuildingsManager();
-            buildingManager.addBuilding(blueprintMetadata, startingBlock, endingBlock, mergeBlockData);
+            ServerModUtils.getManagersProvider(worker)
+                    .map(IServerManagersProvider::getBuildingsManager)
+                    .ifPresent(it -> {
+                        it.addBuilding(blueprintMetadata, startingBlock, endingBlock, mergeBlockData);
+                    });
         }
         super.finishPart(part, worker);
     }
@@ -109,15 +112,15 @@ public class BlueprintTask extends AbstractTask {
     private void removeReservedItem(IFortressAwareEntity worker, Item item) {
         final var provider = ServerModUtils.getManagersProvider(worker);
         if (ServerExtensionsKt.isSurvivalFortress(worker.getServer())) {
-            final var resourceManager = provider
-                    .getResourceManager();
-            if (SimilarItemsHelper.isIgnorable(item)) {
-                resourceManager
-                        .removeItemIfExists(this.getId(), item);
-            } else {
-                resourceManager
-                        .removeReservedItem(this.getId(), item);
-            }
+            provider
+                    .map(IServerManagersProvider::getResourceManager)
+                    .ifPresent(it -> {
+                        if (SimilarItemsHelper.isIgnorable(item)) {
+                            it.removeItemIfExists(this.getId(), item);
+                        } else {
+                            it.removeReservedItem(this.getId(), item);
+                        }
+                    });
         }
     }
 

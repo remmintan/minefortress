@@ -6,8 +6,6 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressMan
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
 
-import java.util.Optional;
-
 import static org.minefortress.entity.colonist.FortressHungerManager.IDLE_EXHAUSTION;
 
 public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
@@ -24,7 +22,7 @@ public class WanderAroundTheFortressGoal extends AbstractFortressGoal {
         if(!isDay() || colonist.getTaskControl().hasTask()) return false;
 
         // Using ServerModUtils.getFortressManager instead of colonist.getServerFortressManager()
-        final var posOptional = Optional.of(ServerModUtils.getFortressManager(colonist))
+        final var posOptional = ServerModUtils.getFortressManager(colonist)
                 .flatMap(IServerFortressManager::getRandomPositionAroundCampfire);
 
         if(posOptional.isPresent()) {

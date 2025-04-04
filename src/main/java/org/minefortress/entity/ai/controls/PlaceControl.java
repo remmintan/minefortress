@@ -94,18 +94,19 @@ public class PlaceControl extends PositionedActionControl {
     }
 
     private void decreaseResourcesAndAddSpecialBlocksAmount() {
-        final var provider = ServerModUtils.getManagersProvider(colonist);
         final var taskControl = colonist.getTaskControl();
         if (ServerExtensionsKt.isCreativeFortress(colonist.getServer())) {
             taskControl
                     .getTaskId()
                     .ifPresent(it -> {
-                        final var resourceManager = provider.getResourceManager();
-                        if (isIgnorable(item)) {
-                            resourceManager.removeItemIfExists(it, item);
-                        } else {
-                            resourceManager.removeReservedItem(it, item);
-                        }
+                        ServerModUtils.getManagersProvider(colonist).ifPresent(mp -> {
+                            final var resourceManager = mp.getResourceManager();
+                            if (isIgnorable(item)) {
+                                resourceManager.removeItemIfExists(it, item);
+                            } else {
+                                resourceManager.removeReservedItem(it, item);
+                            }
+                        });
                     });
         }
     }

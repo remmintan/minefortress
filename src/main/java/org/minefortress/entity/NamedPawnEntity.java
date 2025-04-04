@@ -25,10 +25,13 @@ abstract class NamedPawnEntity extends BasePawnEntity {
     }
 
     private void setCustomNameIfNeeded() {
-        final var fortressManager = ServerModUtils.getFortressManager(this);
-        if (!this.hasCustomName()) {
-            final var name = fortressManager.getNameGenerator().generateRandomName();
-            this.setCustomName(Text.of(name));
-        }
+        ServerModUtils
+                .getFortressManager(this)
+                .ifPresent(it -> {
+                    if (!this.hasCustomName()) {
+                        final var name = it.getNameGenerator().generateRandomName();
+                        this.setCustomName(Text.of(name));
+                    }
+                });
     }
 }

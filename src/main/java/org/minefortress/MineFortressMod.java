@@ -45,10 +45,10 @@ public class MineFortressMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        FortressServerEvents.register();
         FortressBlocks.register();
         FortressEntities.register();
         FortressItems.register();
-        FortressServerEvents.register();
         NetworkReaders.register();
 
         CommandsManager.registerCommands();
