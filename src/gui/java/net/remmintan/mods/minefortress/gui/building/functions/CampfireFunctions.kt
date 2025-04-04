@@ -27,7 +27,7 @@ class CampfireFunctions : IBuildingFunctions {
         }
 
         // Update button position
-        switchToSurvivalButton!!.setPosition(x + width / 2 - 100, y + 40)
+        switchToSurvivalButton!!.setPosition(width / 2 - 100, 40)
 
         // Render the button
         val (translatedMouseX, translatedMouseY) = context.matrices.translateMousePosition(mouseX, mouseY)
