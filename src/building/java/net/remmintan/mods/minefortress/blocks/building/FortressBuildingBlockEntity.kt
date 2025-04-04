@@ -100,11 +100,11 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         hireHandler.let {
             if (!it.initialized()) {
                 val professionType = metadata.requirement.type ?: return@let
-                val (prof, build, res) = getManagers(world)
-                it.init(professionType, prof, build, res)
+                getManagers(world).ifPresent { (prof, build, res) -> it.init(professionType, prof, build, res) }
             }
 
-            it.tick()
+            if (it.initialized())
+                it.tick()
         }
 
         this.markDirty()
@@ -114,10 +114,10 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         }
     }
 
-    private fun getManagers(world: World): Triple<IServerProfessionsManager, IServerBuildingsManager, IServerResourceManager> {
+    private fun getManagers(world: World): Optional<Triple<IServerProfessionsManager, IServerBuildingsManager, IServerResourceManager>> {
         if (world is ServerWorld) {
             val server = world.server
-            return ServerModUtils.getManagersProvider(server, fortressPos).orElseThrow().let {
+            return ServerModUtils.getManagersProvider(server, fortressPos).map {
                 Triple(it.professionsManager, it.buildingsManager, it.resourceManager)
             }
         }
