@@ -39,6 +39,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
 
     public PawnRenderer(EntityRendererFactory.Context context) {
         super(context, new PawnModel(context), 0.5f);
+        this.addFeature(new VillagerHeadFeatureRenderer(this, context));
         this.addFeature(new PawnClothesFeature(this));
     }
 
@@ -72,6 +73,8 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     @Override
     public void render(BasePawnEntity pawn, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         setClothesVilibility(pawn);
+        getModel().head.visible = false;
+        getModel().hat.visible = false;
         super.render(pawn, f, g, matrixStack, vertexConsumerProvider, i);
 
         final MinecraftClient client = getClient();
@@ -118,12 +121,6 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
         final var green = 0x55 / maxLevelOfEachColor;
         final var blue = 0x55 / maxLevelOfEachColor;
         return new Vector3f(red, green, blue);
-    }
-
-    @Nullable
-    @Override
-    protected RenderLayer getRenderLayer(BasePawnEntity entity, boolean showBody, boolean translucent, boolean showOutline) {
-        return super.getRenderLayer(entity, showBody, translucent, showOutline);
     }
 
     private MinecraftClient getClient() {

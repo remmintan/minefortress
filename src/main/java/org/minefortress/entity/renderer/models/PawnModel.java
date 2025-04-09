@@ -14,17 +14,6 @@ public class PawnModel extends PlayerEntityModel<BasePawnEntity> {
 
     @Override
     public void animateModel(BasePawnEntity pawn, float f, float g, float h) {
-//        this.rightArmPose = ArmPose.EMPTY;
-//        this.leftArmPose = ArmPose.EMPTY;
-//        ItemStack itemStack = mobEntity.getStackInHand(Hand.MAIN_HAND);
-//        if (itemStack.isOf(Items.BOW) && mobEntity.isAttacking()) {
-//            if (mobEntity.getMainArm() == Arm.RIGHT) {
-//                this.rightArmPose = ArmPose.BOW_AND_ARROW;
-//            } else {
-//                this.leftArmPose = ArmPose.BOW_AND_ARROW;
-//            }
-//        }
-
         this.rightArmPose = ArmPose.EMPTY;
 
         if(pawn.isAttacking() && pawn.isItemInHand(Items.BOW)) {
