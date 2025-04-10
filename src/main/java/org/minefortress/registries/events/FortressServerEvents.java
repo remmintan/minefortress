@@ -5,13 +5,17 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressModVersionHolder;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.S2CSyncGamemodePacket;
+import org.minefortress.MineFortressMod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 public class FortressServerEvents {
 
@@ -46,6 +50,14 @@ public class FortressServerEvents {
                                 () -> LOGGER.warn("Can't find the fortress block while the fortress is set up!")
                         );
 
+            }
+
+            if (player instanceof final IFortressServerPlayerEntity fortressPlayer) {
+                MineFortressMod.getScheduledExecutor().schedule(() -> server.execute(() -> {
+                    if (!fortressPlayer.is_ModVersionValidated()) {
+                        player.networkHandler.disconnect(Text.of("Couldn't validate mod version"));
+                    }
+                }), 5, TimeUnit.SECONDS);
             }
         });
 

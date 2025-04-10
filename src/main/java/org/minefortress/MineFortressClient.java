@@ -37,7 +37,7 @@ public class MineFortressClient implements ClientModInitializer {
         FortressHandledScreensKt.registerScreens();
 
         ClientNetworkReceivers.registerReceivers();
-        FortressClientEvents.register();
+        FortressClientEvents.registerEvents();
         BuildingFunctionsRegistry.INSTANCE.register();
     }
 }

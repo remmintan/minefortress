@@ -11,7 +11,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.world.GameMode
 import net.remmintan.mods.minefortress.core.FORTRESS
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BLUEPRINT_DIMENSION_KEY
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressServerPlayerEntity
 
 object BlueprintWorldEvents {
 
@@ -19,7 +19,7 @@ object BlueprintWorldEvents {
         // initialising the fortress server on join
         ServerPlayConnectionEvents.JOIN.register(ServerPlayConnectionEvents.Join { handler: ServerPlayNetworkHandler, sender: PacketSender?, server: MinecraftServer ->
             val player = handler.player
-            if (player is FortressServerPlayerEntity) {
+            if (player is IFortressServerPlayerEntity) {
                 if (player.was_InBlueprintWorldWhenLoggedOut() && player._PersistedPos != null) {
                     val pos = player._PersistedPos
                     player.teleport(pos!!.x, pos.y, pos.z)
@@ -30,7 +30,7 @@ object BlueprintWorldEvents {
         ServerPlayConnectionEvents.DISCONNECT.register(ServerPlayConnectionEvents.Disconnect { handler: ServerPlayNetworkHandler, server: MinecraftServer? ->
             val player = handler.player
             val inBlueprintWorldOnDisconnect = player.world.registryKey === BLUEPRINT_DIMENSION_KEY
-            if (player is FortressServerPlayerEntity) {
+            if (player is IFortressServerPlayerEntity) {
                 player.set_WasInBlueprintWorldWhenLoggedOut(inBlueprintWorldOnDisconnect)
             }
         })

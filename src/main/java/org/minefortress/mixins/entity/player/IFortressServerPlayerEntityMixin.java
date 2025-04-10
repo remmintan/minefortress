@@ -15,7 +15,7 @@ import net.remmintan.mods.minefortress.blueprints.BlueprintsDimensionKt;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
-import net.remmintan.mods.minefortress.core.interfaces.entities.player.FortressServerPlayerEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IPlayerManagersProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class FortressServerPlayerEntityMixin extends PlayerEntity implements FortressServerPlayerEntity, IPlayerManagersProvider {
+public abstract class IFortressServerPlayerEntityMixin extends PlayerEntity implements IFortressServerPlayerEntity, IPlayerManagersProvider {
 
     @Shadow @Final public MinecraftServer server;
     @Shadow public ServerPlayNetworkHandler networkHandler;
@@ -49,11 +49,13 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     private float persistedPitch;
     @Unique
     private boolean wasInBlueprintWorldWhenLoggedOut = false;
+    @Unique
+    private boolean modVersionValidated = false;
 
     @Shadow
     public abstract ServerWorld getServerWorld();
 
-    public FortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
+    public IFortressServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
     }
 
@@ -157,5 +159,15 @@ public abstract class FortressServerPlayerEntityMixin extends PlayerEntity imple
     @Override
     public @NotNull IServerBlueprintManager get_BlueprintManager() {
         return blueprintManager;
+    }
+
+    @Override
+    public boolean is_ModVersionValidated() {
+        return modVersionValidated;
+    }
+
+    @Override
+    public void set_ModVersionValidated(boolean validated) {
+        modVersionValidated = validated;
     }
 }

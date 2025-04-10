@@ -15,7 +15,7 @@
     "entity.mob.FortressSlimeEntityMixin",
     "entity.player.FortressPlayerEntityMixin",
     "entity.player.FortressPlayerInventoryMixin",
-    "entity.player.FortressServerPlayerEntityMixin",
+    "entity.player.IFortressServerPlayerEntityMixin",
     "entity.player.PlayerManagerMixin",
     "interaction.FortressGameModeMixin",
     "item.DisabledBlockItemMixin",

@@ -22,6 +22,7 @@ import org.minefortress.registries.events.FortressServerEvents;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MineFortressMod implements ModInitializer {
@@ -36,11 +37,15 @@ public class MineFortressMod implements ModInitializer {
     public static final ScreenHandlerType<FortressFurnaceScreenHandler> FORTRESS_FURNACE_SCREEN_HANDLER =  ScreenHandlerRegistry.registerSimple(FORTRESS_FURNACE_SCREEN_HANDLER_ID, FortressFurnaceScreenHandler::new);
 
     private static final ExecutorService executor;
+    private static final ScheduledExecutorService scheduledExecutor;
 
     static  {
-        var incrementer = new AtomicInteger(0);
+        final var tpIncrementor = new AtomicInteger(0);
         executor = Executors.newCachedThreadPool(r ->
-                new Thread(r, "MineFortress Worker " + incrementer.incrementAndGet()));
+                new Thread(r, "MineFortress Worker " + tpIncrementor.incrementAndGet()));
+        final var scheduledTpIncrementor = new AtomicInteger(0);
+        scheduledExecutor = Executors.newScheduledThreadPool(1, r ->
+                new Thread(r, "MineFortress Scheduled Worker " + scheduledTpIncrementor.incrementAndGet()));
     }
 
     @Override
@@ -61,6 +66,10 @@ public class MineFortressMod implements ModInitializer {
 
     public static ExecutorService getExecutor() {
         return executor;
+    }
+
+    public static ScheduledExecutorService getScheduledExecutor() {
+        return scheduledExecutor;
     }
 
 }
