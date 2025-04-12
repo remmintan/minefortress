@@ -18,9 +18,8 @@ import org.minefortress.entity.renderer.models.PawnModel
 class VillagerHeadFeatureRenderer(
     context: FeatureRendererContext<BasePawnEntity?, PawnModel?>?,
     entityContext: EntityRendererFactory.Context
-) :
-    FeatureRenderer<BasePawnEntity, PawnModel?>(context) {
-    // Load the villager model parts from the context
+) : FeatureRenderer<BasePawnEntity, PawnModel?>(context) {
+
     private val villagerHeadModel =
         VillagerResemblingModel<BasePawnEntity>(entityContext.getPart(EntityModelLayers.VILLAGER))
 

@@ -67,25 +67,8 @@ public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, PawnMode
         super(context);
     }
 
-    @Override
-    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, BasePawnEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
-        if(entity.isSleeping()) return;
-        final var clothingId = entity.getClothingId();
-        if(isWarrior(clothingId)) {
-            PawnClothesFeature.renderModel(this.getContextModel(), SOLDIER_BLUE, matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
-        }
-        PawnClothesFeature.renderModel(this.getContextModel(), this.getClothesTexture(clothingId), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
-
-    }
-
-    protected static <T extends LivingEntity> void renderModel(EntityModel<T> model, Identifier texture, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float red, float green, float blue) {
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(texture));
-        model.render(matrices, vertexConsumer, light, LivingEntityRenderer.getOverlay(entity, 0.0f), red, green, blue, 1f);
-    }
-
-
-    private Identifier getClothesTexture(String professionId) {
-        return switch (professionId) {
+    public static Identifier getClothesTexture(String clothingId) {
+        return switch (clothingId) {
             case "miner1" -> MINER;
             case "miner2" -> MINER_T2;
             case "miner3" -> MINER_T3;
@@ -110,6 +93,22 @@ public class PawnClothesFeature extends FeatureRenderer<BasePawnEntity, PawnMode
             case "archer1" -> ARCHER;
             default -> COLONIST;
         };
+    }
+
+    protected static <T extends LivingEntity> void renderModel(EntityModel<T> model, Identifier texture, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float red, float green, float blue) {
+        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(texture));
+        model.render(matrices, vertexConsumer, light, LivingEntityRenderer.getOverlay(entity, 0.0f), red, green, blue, 1f);
+    }
+
+    @Override
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, BasePawnEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+        if(entity.isSleeping()) return;
+        final var clothingId = entity.getClothingId();
+        if(isWarrior(clothingId)) {
+            PawnClothesFeature.renderModel(this.getContextModel(), SOLDIER_BLUE, matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+        }
+        PawnClothesFeature.renderModel(this.getContextModel(), getClothesTexture(clothingId), matrices, vertexConsumers, light, entity, 1.0f, 1.0f, 1.0f);
+
     }
 
     private boolean isWarrior(String professionId) {

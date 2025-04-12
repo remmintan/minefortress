@@ -39,8 +39,9 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
 
     public PawnRenderer(EntityRendererFactory.Context context) {
         super(context, new PawnModel(context), 0.5f);
-//        this.addFeature(new VillagerHeadFeatureRenderer(this, context));
+        this.addFeature(new VillagerHeadFeatureRenderer(this, context));
         this.addFeature(new PawnClothesFeature(this));
+        this.addFeature(new VillagerHeadwearFeatureRenderer(this, context));
     }
 
     @Override
@@ -73,8 +74,8 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     @Override
     public void render(BasePawnEntity pawn, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         setClothesVilibility(pawn);
-//        getModel().head.visible = false;
-//        getModel().hat.visible = false;
+        getModel().head.visible = false;
+        getModel().hat.visible = false;
         super.render(pawn, f, g, matrixStack, vertexConsumerProvider, i);
 
         final MinecraftClient client = getClient();
