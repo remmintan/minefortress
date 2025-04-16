@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.gui.widget
+package net.remmintan.mods.minefortress.gui.widget.professions
 
 import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.widget.ButtonWidget

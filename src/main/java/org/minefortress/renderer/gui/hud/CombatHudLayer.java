@@ -7,7 +7,7 @@ import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
-import net.remmintan.mods.minefortress.gui.widget.ItemHudElement;
+import net.remmintan.mods.minefortress.gui.widget.hud.ItemHudElement;
 
 class CombatHudLayer extends AbstractHudLayer{
     CombatHudLayer(MinecraftClient client) {

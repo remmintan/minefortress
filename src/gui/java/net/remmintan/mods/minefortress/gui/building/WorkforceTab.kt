@@ -7,7 +7,7 @@ import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.text.Text
 import net.remmintan.mods.minefortress.gui.building.handlers.IWorkforceTabHandler
-import net.remmintan.mods.minefortress.gui.widget.*
+import net.remmintan.mods.minefortress.gui.widget.professions.*
 import kotlin.properties.Delegates
 
 class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRenderer: TextRenderer) : ResizableTab {
@@ -134,12 +134,13 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
 
         // Cost
         val cost = handler.getCost(profId)
-        val costsWidget = CostsWidget(
-            leftX + nameOffset + 15,
-            rowY,
-            cost
-        )
-        this.addDrawable(costsWidget)
+        val professionCostsWidget =
+            ProfessionCostsWidget(
+                leftX + nameOffset + 15,
+                rowY,
+                cost
+            )
+        this.addDrawable(professionCostsWidget)
 
         // Hire button
         val hireButton = HireScreenButtonWidget.builder(

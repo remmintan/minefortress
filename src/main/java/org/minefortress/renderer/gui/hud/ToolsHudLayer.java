@@ -6,10 +6,10 @@ import net.remmintan.gobi.SelectionType;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
-import net.remmintan.mods.minefortress.gui.widget.HideableButtonWidget;
-import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget;
-import net.remmintan.mods.minefortress.gui.widget.ItemToggleWidget;
-import net.remmintan.mods.minefortress.gui.widget.ModeButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.hud.HideableButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.hud.ItemButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.hud.ItemToggleWidget;
+import net.remmintan.mods.minefortress.gui.widget.hud.ModeButtonWidget;
 import org.minefortress.renderer.gui.blueprints.BlueprintsScreen;
 
 import java.util.Arrays;

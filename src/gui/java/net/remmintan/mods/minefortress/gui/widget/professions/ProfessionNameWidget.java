@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.gui.widget;
+package net.remmintan.mods.minefortress.gui.widget.professions;
 
 
 import net.minecraft.client.gui.DrawContext;
@@ -7,7 +7,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.text.Text;
 
 
-public class ProfessionNameWidget extends MinefortressWidget implements Element, Drawable {
+public class ProfessionNameWidget extends BaseProfessionWidget implements Element, Drawable {
 
     private static final int MAX_NAME_LENGTH = 8;
     private final String fullName;

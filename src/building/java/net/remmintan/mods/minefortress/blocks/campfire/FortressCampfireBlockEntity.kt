@@ -12,7 +12,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortress
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressHolder
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider
-import net.remmintan.mods.minefortress.core.services.FortressServiceLocator
+import net.remmintan.mods.minefortress.core.services.FortressManagerLocator
 
 class FortressCampfireBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(FortressBlocks.CAMPFIRE_ENT_TYPE, pos, state), IFortressHolder {
@@ -21,12 +21,12 @@ class FortressCampfireBlockEntity(pos: BlockPos, state: BlockState) :
     private var fmTag: NbtCompound? = null
 
     private val fortressManager: IServerFortressManager by lazy {
-        val manager = FortressServiceLocator.get(IServerFortressManager::class.java, super.pos, world as? ServerWorld)
+        val manager = FortressManagerLocator.get(IServerFortressManager::class.java, super.pos, world as? ServerWorld)
         fmTag?.let { manager.read(it) }
         manager
     }
     private val managersProvider: IServerManagersProvider by lazy {
-        val provider = FortressServiceLocator.get(IServerManagersProvider::class.java, super.pos, world as? ServerWorld)
+        val provider = FortressManagerLocator.get(IServerManagersProvider::class.java, super.pos, world as? ServerWorld)
         mpTag?.let { provider.read(it) }
         provider
     }

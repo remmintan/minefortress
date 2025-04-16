@@ -4,7 +4,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import java.util.concurrent.ConcurrentHashMap
 
-object FortressServiceLocator {
+object FortressManagerLocator {
 
     private val servicesRegistry = ConcurrentHashMap<Class<Any>, (fortressPos: BlockPos, server: ServerWorld) -> Any>()
 

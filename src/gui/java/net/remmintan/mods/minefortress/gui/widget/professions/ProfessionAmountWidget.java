@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.gui.widget;
+package net.remmintan.mods.minefortress.gui.widget.professions;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
@@ -8,7 +8,7 @@ import net.minecraft.text.Text;
 
 import java.util.function.Supplier;
 
-public class ProfessionAmountWidget extends MinefortressWidget implements Drawable, Element {
+public class ProfessionAmountWidget extends BaseProfessionWidget implements Drawable, Element {
 
     private final int x;
     private final int y;

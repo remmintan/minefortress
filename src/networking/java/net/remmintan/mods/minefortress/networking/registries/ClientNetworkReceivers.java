@@ -26,6 +26,7 @@ public class ClientNetworkReceivers {
         registerReceiver(S2CSyncFightManager.CHANNEL, S2CSyncFightManager::new);
         registerReceiver(S2CAddClientTasksPacket.CHANNEL, S2CAddClientTasksPacket::new);
         registerReceiver(S2CSyncGamemodePacket.CHANNEL, S2CSyncGamemodePacket::new);
+        registerReceiver(S2CStartFortressConfiguration.CHANNEL, S2CStartFortressConfiguration::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressS2CPacket> packetConstructor) {

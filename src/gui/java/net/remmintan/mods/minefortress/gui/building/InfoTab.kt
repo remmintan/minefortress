@@ -17,7 +17,7 @@ import net.remmintan.mods.minefortress.gui.building.BuildingScreen.Companion.WHI
 import net.remmintan.mods.minefortress.gui.building.handlers.IInfoTabHandler
 import net.remmintan.mods.minefortress.gui.building.handlers.InfoTabState
 import net.remmintan.mods.minefortress.gui.widget.BlueprintUpgradeSlot
-import net.remmintan.mods.minefortress.gui.widget.ItemButtonWidget
+import net.remmintan.mods.minefortress.gui.widget.hud.ItemButtonWidget
 
 internal class InfoTab(private val handler: IInfoTabHandler, private val textRenderer: TextRenderer) :
     ResizableTab {
@@ -31,21 +31,23 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
     override var backgroundWidth: Int = 0
     override var backgroundHeight: Int = 0
 
-    private val destroyButton: ItemButtonWidget = ItemButtonWidget(
-        0,
-        0,
-        Items.TNT,
-        { _: ButtonWidget -> handler.destroy() },
-        "Destroy this building"
-    )
+    private val destroyButton: ItemButtonWidget =
+        ItemButtonWidget(
+            0,
+            0,
+            Items.TNT,
+            { _: ButtonWidget -> handler.destroy() },
+            "Destroy this building"
+        )
 
-    private val repairButton: ItemButtonWidget = ItemButtonWidget(
-        0,
-        0,
-        Items.IRON_INGOT,
-        { _: ButtonWidget -> handler.repair() },
-        "Repair this building"
-    )
+    private val repairButton: ItemButtonWidget =
+        ItemButtonWidget(
+            0,
+            0,
+            Items.IRON_INGOT,
+            { _: ButtonWidget -> handler.repair() },
+            "Repair this building"
+        )
 
     private val destroyConfirmationButton = ButtonWidget
         .builder(Text.of("Destroy")) { handler.destroy() }

@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.gui.widget;
+package net.remmintan.mods.minefortress.gui.widget.hud;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;

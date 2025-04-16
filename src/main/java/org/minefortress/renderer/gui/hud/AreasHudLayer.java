@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.remmintan.mods.minefortress.core.interfaces.automation.ProfessionsSelectionType;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
-import net.remmintan.mods.minefortress.gui.widget.ModeButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.hud.ModeButtonWidget;
 
 public class AreasHudLayer extends AbstractHudLayer {
 

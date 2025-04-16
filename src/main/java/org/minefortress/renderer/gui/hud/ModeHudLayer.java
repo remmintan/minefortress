@@ -5,7 +5,7 @@ import net.minecraft.item.Items;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.gui.hud.HudState;
-import net.remmintan.mods.minefortress.gui.widget.ModeButtonWidget;
+import net.remmintan.mods.minefortress.gui.widget.hud.ModeButtonWidget;
 
 public final class ModeHudLayer extends AbstractHudLayer{
 

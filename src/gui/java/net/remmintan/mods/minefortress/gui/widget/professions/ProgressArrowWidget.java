@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.gui.widget;
+package net.remmintan.mods.minefortress.gui.widget.professions;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;

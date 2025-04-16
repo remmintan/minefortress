@@ -1,4 +1,4 @@
-package net.remmintan.mods.minefortress.gui.widget;
+package net.remmintan.mods.minefortress.gui.widget.professions;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -14,13 +14,13 @@ import net.remmintan.mods.minefortress.gui.util.GuiUtils;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class CostsWidget implements Drawable, Element {
+public class ProfessionCostsWidget implements Drawable, Element {
 
     private final int x;
     private final int y;
     private final List<ItemInfo> costs;
 
-    public CostsWidget(int x, int y, List<ItemInfo> costs) {
+    public ProfessionCostsWidget(int x, int y, List<ItemInfo> costs) {
         this.x = x;
         this.y = y;
         this.costs = costs;
