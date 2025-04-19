@@ -7,9 +7,9 @@ import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressModVersionHolder;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
+import net.remmintan.mods.minefortress.networking.s2c.S2CStartFortressConfiguration;
 import net.remmintan.mods.minefortress.networking.s2c.S2CSyncGamemodePacket;
 import org.minefortress.MineFortressMod;
 import org.slf4j.Logger;
@@ -35,7 +35,11 @@ public class FortressServerEvents {
                 ServerModUtils
                         .getFortressManager(player)
                         .ifPresentOrElse(
-                                IServerFortressManager::sync,
+                                it -> {
+                                    it.sync();
+                                    final var packet = new S2CStartFortressConfiguration();
+                                    FortressServerNetworkHelper.send(player, S2CStartFortressConfiguration.CHANNEL, packet);
+                                },
                                 () -> LOGGER.warn("Can't find the fortress block while the fortress is set up!")
                         );
                 ServerModUtils
