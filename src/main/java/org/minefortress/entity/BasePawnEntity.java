@@ -20,25 +20,29 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawnSkinnable;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.MineFortressMod;
 import org.minefortress.interfaces.FortressSlimeEntity;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-public abstract class BasePawnEntity extends HungryEntity implements IFortressAwareEntity {
+public abstract class BasePawnEntity extends HungryEntity implements IFortressAwareEntity, IPawnSkinnable {
 
     public static final String FORTRESS_CENTER_BLOCK_KEY = "fortress_center_block";
     private static final String BODY_TEXTURE_ID_NBT_KEY = "body_texture_id";
 
     private static final TrackedData<Optional<BlockPos>> FORTRESS_CENTER = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
     private static final TrackedData<Integer> BODY_TEXTURE_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<PawnSkin> PAWN_SKIN = DataTracker.registerData(BasePawnEntity.class, MineFortressMod.pawnSkinTrackedDataHandler);
 
     protected BasePawnEntity(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world, enableHunger);
@@ -49,6 +53,16 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         super.initDataTracker();
         this.dataTracker.startTracking(FORTRESS_CENTER, Optional.empty());
         this.dataTracker.startTracking(BODY_TEXTURE_ID, new Random().nextInt(4));
+        this.dataTracker.startTracking(PAWN_SKIN, PawnSkin.VILLAGER);
+    }
+
+    @NotNull
+    public PawnSkin getPawnSkin() {
+        return this.dataTracker.get(PAWN_SKIN);
+    }
+
+    public void setPawnSkin(@NotNull PawnSkin skin) {
+        this.dataTracker.set(PAWN_SKIN, skin);
     }
 
     public int getBodyTextureId() {

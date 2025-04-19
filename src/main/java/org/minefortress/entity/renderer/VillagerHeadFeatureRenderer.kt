@@ -11,6 +11,7 @@ import net.minecraft.client.render.entity.model.ModelWithHead
 import net.minecraft.client.render.entity.model.VillagerResemblingModel
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
+import net.remmintan.mods.minefortress.core.dtos.PawnSkin
 import org.minefortress.entity.BasePawnEntity
 import org.minefortress.entity.renderer.models.PawnModel
 
@@ -35,6 +36,10 @@ class VillagerHeadFeatureRenderer(
         headYaw: Float,
         headPitch: Float
     ) {
+        val pawnSkin = entity.pawnSkin
+        if (pawnSkin != PawnSkin.ZOMBIE_VILLAGER && pawnSkin != PawnSkin.VILLAGER) {
+            return
+        }
         if (entity.isInvisible) {
             return
         }
@@ -49,11 +54,14 @@ class VillagerHeadFeatureRenderer(
         villagerHeadPart.copyTransform(originalModel!!.head)
 
         // Render only the villager head part
-        val vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(VILLAGER_TEXTURE))
+        val villagerTexture = if (pawnSkin == PawnSkin.ZOMBIE_VILLAGER) ZOMBIE_VILLAGER_TEXTURE else VILLAGER_TEXTURE
+        val vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(villagerTexture))
         villagerHeadPart.render(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV)
     }
 
     companion object {
         private val VILLAGER_TEXTURE: Identifier = Identifier("textures/entity/villager/villager.png")
+        private val ZOMBIE_VILLAGER_TEXTURE: Identifier =
+            Identifier("textures/entity/zombie_villager/zombie_villager.png")
     }
 }

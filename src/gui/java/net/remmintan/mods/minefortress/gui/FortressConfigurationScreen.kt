@@ -1,6 +1,5 @@
 package net.remmintan.mods.minefortress.gui
 
-import PawnSkin
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
@@ -8,6 +7,8 @@ import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.TextWidget
 import net.minecraft.entity.LivingEntity
 import net.minecraft.text.Text
+import net.remmintan.mods.minefortress.core.dtos.PawnSkin
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawnSkinnable
 import net.remmintan.mods.minefortress.gui.widget.PawnSkinButton
 
 class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEntity) :
@@ -104,7 +105,14 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
         val skinToRender = hoveredSkin ?: selectedSkin ?: return
         val x = startX + 5
         val y = startY + buttonSide + 15
+
+        val pawnToRender = fakePawn
+
+        if (pawnToRender is IPawnSkinnable) {
+            pawnToRender.pawnSkin = skinToRender
+        }
+
         context.drawText(this.textRenderer, skinToRender.skinName, x + 50 + 5, y, 0xFFFFFF, false)
-        InventoryScreen.drawEntity(context, x, y, x + 50, y + 78, 45, 0.4f, mouseX, mouseY, fakePawn)
+        InventoryScreen.drawEntity(context, x, y, x + 50, y + 78, 45, 0.4f, mouseX, mouseY, pawnToRender)
     }
 }

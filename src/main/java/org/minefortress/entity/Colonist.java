@@ -46,7 +46,7 @@ import org.minefortress.registries.FortressEntities;
 
 import java.util.Optional;
 
-public final class Colonist extends NamedPawnEntity implements IMinefortressEntity, IWorkerPawn {
+public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IWorkerPawn {
 
     public static final float FAST_MOVEMENT_SPEED = 0.15f;
     public static final float SLOW_MOVEMENT_SPEED = 0.05f;

@@ -3,9 +3,12 @@ package org.minefortress;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
+import net.minecraft.entity.data.TrackedDataHandler;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.blocks.FortressBlocks;
+import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.services.FortressManagerLocator;
@@ -38,6 +41,7 @@ public class MineFortressMod implements ModInitializer {
 
     private static final ExecutorService executor;
     private static final ScheduledExecutorService scheduledExecutor;
+    public static final TrackedDataHandler<PawnSkin> pawnSkinTrackedDataHandler = TrackedDataHandler.ofEnum(PawnSkin.class);
 
     static  {
         final var tpIncrementor = new AtomicInteger(0);
@@ -46,6 +50,8 @@ public class MineFortressMod implements ModInitializer {
         final var scheduledTpIncrementor = new AtomicInteger(0);
         scheduledExecutor = Executors.newScheduledThreadPool(1, r ->
                 new Thread(r, "MineFortress Scheduled Worker " + scheduledTpIncrementor.incrementAndGet()));
+
+        TrackedDataHandlerRegistry.register(pawnSkinTrackedDataHandler);
     }
 
     @Override

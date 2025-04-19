@@ -1,6 +1,7 @@
+package net.remmintan.mods.minefortress.core.dtos
+
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-
 
 val PAWN_SKIN_TEXTURE = Identifier("minefortress", "textures/races_big.png")
 

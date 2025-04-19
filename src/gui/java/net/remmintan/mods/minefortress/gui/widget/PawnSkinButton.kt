@@ -1,14 +1,11 @@
 package net.remmintan.mods.minefortress.gui.widget
 
-import PAWN_SKIN_SPRITE_SIZE
-import PAWN_SKIN_TEXTURE
-import PAWN_SKIN_TEXTURE_SIZE_X
-import PAWN_SKIN_TEXTURE_SIZE_Y
-import PawnSkin
+
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.util.Identifier
+import net.remmintan.mods.minefortress.core.dtos.*
 
 val BUTTON_TEXTURE = Identifier("minefortress", "textures/gui/btn_big.png")
 

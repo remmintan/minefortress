@@ -9,6 +9,7 @@ import net.minecraft.client.render.entity.feature.FeatureRendererContext
 import net.minecraft.client.render.entity.model.EntityModelLayers
 import net.minecraft.client.render.entity.model.PlayerEntityModel
 import net.minecraft.client.util.math.MatrixStack
+import net.remmintan.mods.minefortress.core.dtos.PawnSkin
 import org.minefortress.entity.BasePawnEntity
 import org.minefortress.entity.renderer.models.PawnModel
 
@@ -34,6 +35,10 @@ class VillagerHeadwearFeatureRenderer(
         headYaw: Float,
         headPitch: Float
     ) {
+        val pawnSkin = entity.pawnSkin
+        if (pawnSkin != PawnSkin.ZOMBIE_VILLAGER && pawnSkin != PawnSkin.VILLAGER) {
+            return
+        }
         if (entity.isInvisible || entity.isSleeping) { // Also don't render headwear if sleeping
             return
         }

@@ -17,6 +17,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
+import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     private static final Identifier GUY2 = new Identifier("minefortress", "textures/skins/guy2.png");
     private static final Identifier GUY3 = new Identifier("minefortress", "textures/skins/guy3.png");
     private static final Identifier GUY4 = new Identifier("minefortress", "textures/skins/guy4.png");
+    private static final Identifier GUY_ZOMBIE = new Identifier("minefortress", "textures/skins/guy_zombie.png");
 
     public PawnRenderer(EntityRendererFactory.Context context) {
         super(context, new PawnModel(context), 0.5f);
@@ -46,6 +48,12 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
 
     @Override
     public Identifier getTexture(BasePawnEntity pawn) {
+        final var pawnSkin = pawn.getPawnSkin();
+        if (pawnSkin == PawnSkin.ZOMBIE || pawnSkin == PawnSkin.ZOMBIE_VILLAGER) {
+            return GUY_ZOMBIE;
+        }
+
+
         final var bodyTextureId = pawn.getBodyTextureId();
         return switch (bodyTextureId) {
             case 0 -> GUY;
@@ -74,8 +82,12 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     @Override
     public void render(BasePawnEntity pawn, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         setClothesVilibility(pawn);
-        getModel().head.visible = false;
-        getModel().hat.visible = false;
+
+        final var pawnSkin = pawn.getPawnSkin();
+        final var shouldRenderHead = pawnSkin == PawnSkin.STEVE || pawnSkin == PawnSkin.ZOMBIE;
+        getModel().head.visible = shouldRenderHead;
+        getModel().hat.visible = shouldRenderHead;
+
         super.render(pawn, f, g, matrixStack, vertexConsumerProvider, i);
 
         final MinecraftClient client = getClient();

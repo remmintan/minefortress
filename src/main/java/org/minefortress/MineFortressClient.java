@@ -15,7 +15,7 @@ import net.remmintan.mods.minefortress.gui.FortressConfigurationScreen;
 import net.remmintan.mods.minefortress.gui.FortressHandledScreensKt;
 import net.remmintan.mods.minefortress.gui.building.functions.BuildingFunctionsRegistry;
 import net.remmintan.mods.minefortress.networking.registries.ClientNetworkReceivers;
-import org.minefortress.entity.Colonist;
+import org.minefortress.entity.FakeColonistSkinPreview;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreen;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreen;
 import org.minefortress.registries.FortressEntities;
@@ -39,7 +39,7 @@ public class MineFortressClient implements ClientModInitializer {
         HandledScreens.register(FORTRESS_FURNACE_SCREEN_HANDLER, FortressFurnaceScreen::new);
 
 
-        final Function0<LivingEntity> pawnProvider = () -> new Colonist(FortressEntities.COLONIST_ENTITY_TYPE, MinecraftClient.getInstance().world);
+        final Function0<LivingEntity> pawnProvider = () -> new FakeColonistSkinPreview(MinecraftClient.getInstance().world);
         ScreensLocator.INSTANCE.register("fortress configuration", () -> new FortressConfigurationScreen(pawnProvider));
 
         BlockRenderLayerMap.INSTANCE.putBlock(FortressBlocks.FORTRESS_CAMPFIRE, RenderLayer.getCutout());
