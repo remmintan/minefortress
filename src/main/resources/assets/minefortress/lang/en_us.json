@@ -24,5 +24,18 @@
   "key.minefortress.hire_pawns": "Hire Pawns",
   "selectWorld.gameMode.fortress": "Fortress",
   "selectWorld.gameMode.fortress.line1": "Real-Time Strategy in Minecraft",
-  "selectWorld.gameMode.fortress.line2": "Manage a group of people and Survive"
+  "selectWorld.gameMode.fortress.line2": "Manage a group of people and Survive",
+  "minefortress.config.title": "Configure Your Fortress!",
+  "minefortress.config.select_skin_prompt": "Select a skin for your Pawns:",
+  "minefortress.config.select_skin_tooltip": "Please select a skin first!",
+  "minefortress.config.exclusive_tag": "[Exclusive]",
+  "minefortress.exclusive_skin.title": "Exclusive Skin Locked",
+  "minefortress.exclusive_skin.message": "Support MineFortress and unlock the skin!",
+  "minefortress.exclusive_skin.explanation": "Donations help the mod grow and improve. This skin is exclusively available to our Patreon supporters as a thank you!",
+  "minefortress.exclusive_skin.cta": "Want to support the project or already a supporter? Click below!",
+  "minefortress.exclusive_skin.unlock_button": "Unlock the skin",
+  "minefortress.skin.villager": "Villager",
+  "minefortress.skin.zombie_villager": "Zombie Villager",
+  "minefortress.skin.headless": "Headless",
+  "minefortress.skin.steve": "Steve"
 }

@@ -8,12 +8,15 @@ import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.TextWidget
 import net.minecraft.entity.LivingEntity
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import net.remmintan.mods.minefortress.core.dtos.PawnSkin
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawnSkinnable
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.gui.widget.PawnSkinButton
 
 class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEntity) :
-    Screen(Text.of("Let's configure your village!")) {
+    Screen(Text.translatable("minefortress.config.title")) { // Use translatable title
 
     private var selectedSkin: PawnSkin? = null
     private var hoveredSkin: PawnSkin? = null
@@ -24,6 +27,9 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
 
     private var startX: Int = 0
     private var startY: Int = 0
+    private var entityPreviewX: Int = 0
+    private var entityPreviewY: Int = 0
+    private var entityRenderSize = 45 // Size for the preview on this screen
 
     private val fakePawn: LivingEntity by lazy { fakePawnProvider() }
     private val skinButtons = mutableListOf<PawnSkinButton>()
@@ -31,13 +37,17 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
     override fun init() {
         super.init()
 
-        val skinValues = PawnSkin.entries
+        val skinValues = PawnSkin.entries // Use entries for enums
         val totalButtonWidth = skinValues.size * buttonSide + (skinValues.size - 1) * buttonSpacing
-        startX = (this.width - totalButtonWidth) / 2 // Center the buttons horizontally
-        startY = 60 // Position buttons vertically (adjust as needed)
+        startX = (this.width - totalButtonWidth) / 2
+        startY = 60 // Buttons Y position
 
-        addCenteredText(this.getTitle(), 20)
-        addCenteredText(Text.of("Select a skin for your pawns:"), startY - 15)
+        // Calculate positions for entity preview area
+        entityPreviewX = startX + buttonSide / 2 // Align preview start roughly with first button center
+        entityPreviewY = startY + buttonSide + 15 // Below buttons
+
+        addCenteredText(this.title, 20) // Use translatable title
+        addCenteredText(Text.translatable("minefortress.config.select_skin_prompt"), startY - 15)
 
         var currentX = startX
         this.skinButtons.clear()
@@ -47,33 +57,59 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
                 startY,
                 buttonSide,
                 skin
-            ) { this.selectedSkin = it }
+            ) { newlySelected ->
+                if (this.selectedSkin != newlySelected) {
+                    this.selectedSkin = newlySelected
+                }
+            }
 
             this.skinButtons.add(button)
             this.addDrawableChild(button)
-
-            // Move X position for the next button
             currentX += buttonSide + buttonSpacing
         }
 
         confirmButton = ButtonWidget.builder(Text.translatable("gui.done")) {
-            println("Configuration confirmed with skin: ${selectedSkin?.name}")
-            this.client?.setScreen(null) // Close the screen
+            val currentSelectedSkin = this.selectedSkin
+            if (currentSelectedSkin != null && currentSelectedSkin.exclusive) {
+
+                val player = ClientModUtils.getClientPlayer()
+                val isSupporter = player is IFortressPlayerEntity && player.get_SupportLevel().patron
+
+                if (!isSupporter) {
+                    this.client?.setScreen(
+                        ExclusiveSkinScreen(this, currentSelectedSkin, this.fakePawnProvider)
+                    )
+                    return@builder
+                }
+            }
+
+            if (currentSelectedSkin != null) {
+                println("Configuration confirmed with skin: ${currentSelectedSkin.name}")
+                // TODO: Save the selected skin preference somewhere
+                this.client?.setScreen(null)
+            }
         }
-            .position(this.width / 2 - 100, this.height - 40) // Position example
+            .position(this.width / 2 - 100, this.height - 40)
             .size(200, 20)
             .build()
         addDrawableChild(confirmButton)
+
+        updateConfirmButtonState()
     }
+
+    private fun updateConfirmButtonState() {
+        confirmButton?.active = selectedSkin != null
+        confirmButton?.tooltip = if (selectedSkin == null) {
+            Tooltip.of(Text.translatable("minefortress.config.select_skin_tooltip"))
+        } else {
+            null
+        }
+    }
+
 
     override fun tick() {
         super.tick()
-        confirmButton?.active = selectedSkin != null
-        if (confirmButton?.active == false) {
-            confirmButton?.tooltip = Tooltip.of(Text.of("Please select a skin for your pawns!"))
-        } else {
-            confirmButton?.tooltip = null
-        }
+        updateConfirmButtonState()
         checkAndUpdateHoveredSkin()
     }
 
@@ -88,18 +124,19 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
     }
 
     private fun addCenteredText(text: Text?, textY: Int) {
+        if (text == null) return
         val textWidth = this.textRenderer.getWidth(text)
-        val textHeight = this.textRenderer.fontHeight
-        val textX = (this.width - textWidth) / 2
-
-        val textWidget = TextWidget(textX, textY, textWidth, textHeight, text, this.textRenderer)
+        // Create a TextWidget for better handling within the UI framework
+        val textWidget = TextWidget(text, this.textRenderer)
+        textWidget.setPosition((this.width - textWidget.width) / 2, textY) // Center based on widget width
         this.addDrawableChild(textWidget)
     }
 
-    override fun render(context: DrawContext?, mouseX: Int, mouseY: Int, delta: Float) {
-        super.render(context, mouseX, mouseY, delta)
+    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+        super.renderBackground(context, mouseX, mouseY, delta) // Render background first
+        super.render(context, mouseX, mouseY, delta) // Render widgets (text, buttons)
 
-        if (context == null) return
+        // Render entity preview separately, potentially overlapping widgets if needed
         renderEntityInGui(context, mouseX.toFloat(), mouseY.toFloat())
     }
 
@@ -118,10 +155,18 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
             pawnToRender.pawnSkin = skinToRender
         }
 
-        context.drawText(this.textRenderer, skinToRender.skinName, x + 50 + 5, y, 0xFFFFFF, false)
+        val nameY = startY + buttonSide + 15
+        val nameX = entityPreviewX + 55
+        context.drawTextWithShadow(this.textRenderer, skinToRender.skinName, nameX, nameY, 0xFFFFFF)
         // golden color text if the skin is exclusive that it is exclusive
         if (skinToRender.exclusive) {
-            context.drawText(this.textRenderer, "Exclusive", x + 50 + 5, y + 10, 0xE6C200, false)
+            context.drawTextWithShadow(
+                this.textRenderer,
+                Text.translatable("minefortress.config.exclusive_tag").formatted(Formatting.GOLD),
+                nameX,
+                nameY + 10,
+                0xFFFFFF
+            )
         }
         InventoryScreen.drawEntity(context, x, y, x + 50, y + 78, 45, 0.4f, mouseX, mouseY, pawnToRender)
     }
