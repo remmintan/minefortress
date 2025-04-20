@@ -66,6 +66,8 @@ public interface IServerFortressManager extends IFortressManager, IWritableManag
 
     void setPawnsSkin(PawnSkin skin);
 
+    boolean isPawnsSkinSet();
+
     void tick(@Nullable final ServerPlayerEntity fortressOwner);
 
 }

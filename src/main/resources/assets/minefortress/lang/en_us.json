@@ -37,5 +37,6 @@
   "minefortress.skin.villager": "Villager",
   "minefortress.skin.zombie_villager": "Zombie Villager",
   "minefortress.skin.headless": "Headless",
-  "minefortress.skin.steve": "Steve"
+  "minefortress.skin.steve": "Steve",
+  "minefortress.exclusive_skin.restart_required": "Thank you for supporting the project! Please restart the game after unlocking the reward on Patreon. After the restart you will be able to apply the skin."
 }

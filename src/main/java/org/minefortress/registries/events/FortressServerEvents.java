@@ -43,8 +43,10 @@ public class FortressServerEvents {
                         .ifPresentOrElse(
                                 it -> {
                                     it.sync();
-                                    final var packet = new S2CStartFortressConfiguration();
-                                    FortressServerNetworkHelper.send(player, S2CStartFortressConfiguration.CHANNEL, packet);
+                                    if (!it.isPawnsSkinSet()) {
+                                        final var packet = new S2CStartFortressConfiguration();
+                                        FortressServerNetworkHelper.send(player, S2CStartFortressConfiguration.CHANNEL, packet);
+                                    }
                                 },
                                 () -> LOGGER.warn("Can't find the fortress block while the fortress is set up!")
                         );

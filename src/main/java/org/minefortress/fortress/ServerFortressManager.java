@@ -74,7 +74,7 @@ public final class ServerFortressManager implements IServerFortressManager {
     private int maxColonistsCount = -1;
 
     private boolean spawnPawns = true;
-    private PawnSkin pawnsSkin = PawnSkin.VILLAGER;
+    private PawnSkin pawnsSkin = null;
 
     public ServerFortressManager(BlockPos fortressPos, ServerWorld world) {
         this.fortressCenter = fortressPos;
@@ -98,6 +98,11 @@ public final class ServerFortressManager implements IServerFortressManager {
     }
 
     @Override
+    public boolean isPawnsSkinSet() {
+        return pawnsSkin != null;
+    }
+
+    @Override
     public void setSpawnPawns(boolean spawnPawns) {
         this.spawnPawns = spawnPawns;
     }
@@ -105,7 +110,8 @@ public final class ServerFortressManager implements IServerFortressManager {
     private NbtCompound getColonistInfoTag() {
         final NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.putLong(BasePawnEntity.FORTRESS_CENTER_BLOCK_KEY, fortressCenter.asLong());
-        nbtCompound.putString(BasePawnEntity.PAWN_SKIN_NBT_KEY, pawnsSkin.name());
+        if (pawnsSkin != null)
+            nbtCompound.putString(BasePawnEntity.PAWN_SKIN_NBT_KEY, pawnsSkin.name());
         return nbtCompound;
     }
 
@@ -329,7 +335,8 @@ public final class ServerFortressManager implements IServerFortressManager {
         tag.putInt("maxX", maxX);
         tag.putInt("maxZ", maxZ);
 
-        tag.putString(BasePawnEntity.PAWN_SKIN_NBT_KEY, pawnsSkin.name());
+        if (pawnsSkin != null)
+            tag.putString(BasePawnEntity.PAWN_SKIN_NBT_KEY, pawnsSkin.name());
 
         final NbtCompound nameGeneratorTag = new NbtCompound();
         this.nameGenerator.write(nameGeneratorTag);

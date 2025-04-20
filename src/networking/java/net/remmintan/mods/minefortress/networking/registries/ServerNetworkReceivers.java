@@ -42,6 +42,7 @@ public class ServerNetworkReceivers {
         registerReceiver(C2SSetupCampfirePacket.CHANNEL, C2SSetupCampfirePacket::new);
         registerReceiver(C2SSwitchToFortressModePacket.CHANNEL, C2SSwitchToFortressModePacket::new);
         registerReceiver(C2SClientReadyPacket.CHANNEL, C2SClientReadyPacket::new);
+        registerReceiver(C2SSetPawnSkinPacket.CHANNEL, C2SSetPawnSkinPacket::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressC2SPacket> packetConstructor) {

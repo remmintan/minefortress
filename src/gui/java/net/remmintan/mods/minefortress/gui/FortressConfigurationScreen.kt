@@ -14,6 +14,8 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IPawnSkinn
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.gui.widget.PawnSkinButton
+import net.remmintan.mods.minefortress.networking.c2s.C2SSetPawnSkinPacket
+import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 
 class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEntity) :
     Screen(Text.translatable("minefortress.config.title")) { // Use translatable title
@@ -83,10 +85,9 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
                 }
             }
 
-            if (currentSelectedSkin != null) {
-                println("Configuration confirmed with skin: ${currentSelectedSkin.name}")
-                // TODO: Save the selected skin preference somewhere
-                this.client?.setScreen(null)
+            selectedSkin?.let { skin ->
+                FortressClientNetworkHelper.send(C2SSetPawnSkinPacket.CHANNEL, C2SSetPawnSkinPacket(skin))
+                close()
             }
         }
             .position(this.width / 2 - 100, this.height - 40)

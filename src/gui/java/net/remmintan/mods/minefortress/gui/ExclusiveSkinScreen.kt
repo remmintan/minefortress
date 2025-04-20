@@ -24,6 +24,8 @@ class ExclusiveSkinScreen(
 ) : Screen(Text.translatable("minefortress.exclusive_skin.title")) {
 
     private val patreonUrl = "https://www.patreon.com/minefortress"
+    private var showRestartMessage = false
+
     private val iconSize = 32
 
     private val entityPreviewWidth = 50
@@ -53,6 +55,31 @@ class ExclusiveSkinScreen(
 
     override fun init() {
         super.init()
+
+        if (showRestartMessage) {
+            // Show only the restart message and a close button when showRestartMessage is true
+            val messageWidget = MultilineTextWidget(
+                (width - 300) / 2, // x center
+                height / 2 - 20, // y position, slightly above center
+                Text.translatable("minefortress.exclusive_skin.restart_required"),
+                textRenderer
+            )
+            messageWidget.setMaxWidth(300)
+            messageWidget.setCentered(true)
+            addDrawableChild(messageWidget)
+
+            // Add a close button below the message
+            addDrawableChild(
+                ButtonWidget.builder(
+                    Text.of("Didn't work? Try again!"),
+                    { button -> Util.getOperatingSystem().open(URI(patreonUrl)) }
+                )
+                    .dimensions((width - 150) / 2, height / 2 + 20, 150, 20)
+                    .build()
+            )
+            return
+        }
+
 
         val textBlockX = (this.width - textWidth) / 2
         var currentY = contentStartY
@@ -101,7 +128,7 @@ class ExclusiveSkinScreen(
 
         addDrawableChild(
             ButtonWidget.builder(Text.translatable("minefortress.exclusive_skin.unlock_button")) {
-                Util.getOperatingSystem().open(URI(patreonUrl))
+                onUnlockClick()
             }
                 .position(buttonStartX, buttonStartY) // Positioned right of preview, vertically centered
                 .size(buttonWidth, 20)
@@ -118,9 +145,18 @@ class ExclusiveSkinScreen(
         )
     }
 
+    private fun onUnlockClick() {
+        Util.getOperatingSystem().open(URI(patreonUrl))
+        showRestartMessage = true
+        clearChildren() // Clear existing widgets
+        init()
+    }
+
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.renderBackground(context, mouseX, mouseY, delta)
         super.render(context, mouseX, mouseY, delta) // Draw widgets (text, buttons)
+
+        if (showRestartMessage) return
 
         // --- Render Skin Preview Elements --- (Using calculated positions from init)
         val textHeight = textRenderer.fontHeight
