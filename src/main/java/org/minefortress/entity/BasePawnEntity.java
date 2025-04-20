@@ -85,9 +85,11 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         final var fortressCenter = BlockPos.fromLong(posLong);
         this.setFortressCenter(fortressCenter);
 
-        final var pawnSkingString = entityNbt.getString(PAWN_SKIN_NBT_KEY);
-        final var pawnSkin = PawnSkin.valueOf(pawnSkingString);
-        this.setPawnSkin(pawnSkin);
+        if (entityNbt.contains(PAWN_SKIN_NBT_KEY)) {
+            final var pawnSkingString = entityNbt.getString(PAWN_SKIN_NBT_KEY);
+            final var pawnSkin = PawnSkin.valueOf(pawnSkingString);
+            this.setPawnSkin(pawnSkin);
+        }
 
         addThisPawnToFortress();
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);

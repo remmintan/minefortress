@@ -10,6 +10,8 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IPlaceCampfireTask
 import net.remmintan.mods.minefortress.core.utils.getFortressManager
 import net.remmintan.mods.minefortress.core.utils.getManagersProvider
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
+import net.remmintan.mods.minefortress.networking.s2c.S2CStartFortressConfiguration
 
 class PlaceCampfireTask(
     private val metadata: BlueprintMetadata,
@@ -77,7 +79,12 @@ class PlaceCampfireTask(
 
         managersProvider?.professionsManager?.sendProfessions(player)
 
-        fortressPos?.let { world.server.getFortressManager(it) }?.spawnInitialPawns()
+        val fortressManager = fortressPos?.let { world.server.getFortressManager(it) }
+        fortressManager?.spawnInitialPawns()
+        fortressManager?.let {
+            val packet = S2CStartFortressConfiguration()
+            FortressServerNetworkHelper.send(player, S2CStartFortressConfiguration.CHANNEL, packet)
+        }
 
         return fortressPos ?: error("Fortress pos is null")
     }
