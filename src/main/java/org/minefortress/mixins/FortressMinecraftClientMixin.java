@@ -5,6 +5,7 @@ import net.minecraft.client.Mouse;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.BufferBuilder;
@@ -18,6 +19,7 @@ import net.remmintan.gobi.SelectionManager;
 import net.remmintan.mods.minefortress.core.FortressGamemode;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
+import net.remmintan.mods.minefortress.core.config.MineFortressClientConfig;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlockDataProvider;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IBlueprintsImportExportManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
@@ -34,6 +36,7 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHo
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
+import net.remmintan.mods.minefortress.gui.DisclaimerScreen;
 import net.remmintan.panama.renderer.BlueprintRenderer;
 import net.remmintan.panama.renderer.FortressRenderLayer;
 import net.remmintan.panama.renderer.SelectionRenderer;
@@ -252,6 +255,19 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             ci.cancel();
         }
     }
+
+    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
+    public void setScreen(Screen screen, CallbackInfo ci) {
+        if (screen instanceof SelectWorldScreen) {
+            final var disclaimerAcknowledged = MineFortressClientConfig.INSTANCE.getDisclaimerAcknowledged();
+            if (!disclaimerAcknowledged) {
+                this.setScreen(new DisclaimerScreen(screen));
+                ci.cancel();
+            }
+        }
+
+    }
+
 
     @Override
     public BlueprintRenderer get_BlueprintRenderer() {
