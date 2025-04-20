@@ -3,6 +3,7 @@ package net.remmintan.mods.minefortress.gui
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.TextWidget
 import net.minecraft.entity.LivingEntity
@@ -36,7 +37,7 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
         startY = 60 // Position buttons vertically (adjust as needed)
 
         addCenteredText(this.getTitle(), 20)
-        addCenteredText(Text.literal("Select your pawn skin:"), startY - 15)
+        addCenteredText(Text.of("Select a skin for your pawns:"), startY - 15)
 
         var currentX = startX
         this.skinButtons.clear()
@@ -68,6 +69,11 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
     override fun tick() {
         super.tick()
         confirmButton?.active = selectedSkin != null
+        if (confirmButton?.active == false) {
+            confirmButton?.tooltip = Tooltip.of(Text.of("Please select a skin for your pawns!"))
+        } else {
+            confirmButton?.tooltip = null
+        }
         checkAndUpdateHoveredSkin()
     }
 
@@ -113,6 +119,10 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
         }
 
         context.drawText(this.textRenderer, skinToRender.skinName, x + 50 + 5, y, 0xFFFFFF, false)
+        // golden color text if the skin is exclusive that it is exclusive
+        if (skinToRender.exclusive) {
+            context.drawText(this.textRenderer, "Exclusive", x + 50 + 5, y + 10, 0xE6C200, false)
+        }
         InventoryScreen.drawEntity(context, x, y, x + 50, y + 78, 45, 0.4f, mouseX, mouseY, pawnToRender)
     }
 }

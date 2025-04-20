@@ -16,6 +16,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.ScreenType;
+import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
@@ -25,7 +26,6 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessio
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedPawn;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
-import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
@@ -59,7 +59,6 @@ public final class ServerFortressManager implements IServerFortressManager {
     private final MinecraftServer server;
     private final ServerWorld world;
     private final Set<LivingEntity> pawns = new HashSet<>();
-    private final Map<Class<? extends IServerManager>, IServerManager> managers = new HashMap<>();
 
     private IPawnNameGenerator nameGenerator = new ColonistNameGenerator();
 
@@ -75,6 +74,7 @@ public final class ServerFortressManager implements IServerFortressManager {
     private int maxColonistsCount = -1;
 
     private boolean spawnPawns = true;
+    private PawnSkin pawnsSkin = PawnSkin.VILLAGER;
 
     public ServerFortressManager(BlockPos fortressPos, ServerWorld world) {
         this.fortressCenter = fortressPos;
@@ -88,19 +88,30 @@ public final class ServerFortressManager implements IServerFortressManager {
     }
 
     @Override
+    public void setPawnsSkin(PawnSkin pawnsSkin) {
+        this.pawnsSkin = pawnsSkin;
+        this.pawns.forEach(it -> {
+            if (it instanceof BasePawnEntity bpe) {
+                bpe.setPawnSkin(pawnsSkin);
+            }
+        });
+    }
+
+    @Override
     public void setSpawnPawns(boolean spawnPawns) {
         this.spawnPawns = spawnPawns;
     }
 
-    private static NbtCompound getColonistInfoTag(BlockPos fortressCampfire) {
+    private NbtCompound getColonistInfoTag() {
         final NbtCompound nbtCompound = new NbtCompound();
-        nbtCompound.putLong(BasePawnEntity.FORTRESS_CENTER_BLOCK_KEY, fortressCampfire.asLong());
+        nbtCompound.putLong(BasePawnEntity.FORTRESS_CENTER_BLOCK_KEY, fortressCenter.asLong());
+        nbtCompound.putString(BasePawnEntity.PAWN_SKIN_NBT_KEY, pawnsSkin.name());
         return nbtCompound;
     }
 
     @Override
     public void spawnDebugEntitiesAroundCampfire(EntityType<? extends IFortressAwareEntity> entityType, int num, ServerPlayerEntity requester) {
-        final var infoTag = getColonistInfoTag(fortressCenter);
+        final var infoTag = getColonistInfoTag();
 
         for (int i = 0; i < num; i++) {
             final var spawnPosition = getRandomSpawnPosition();
@@ -142,9 +153,8 @@ public final class ServerFortressManager implements IServerFortressManager {
     public void replaceColonistWithTypedPawn(LivingEntity colonist, String warriorId, EntityType<? extends LivingEntity> entityType) {
         final var pos = getRandomSpawnPosition();
         final var world = (ServerWorld) colonist.getEntityWorld();
-        final var fortressPos = ((IFortressAwareEntity) colonist).getFortressPos();
 
-        final var infoTag = getColonistInfoTag(fortressPos);
+        final var infoTag = getColonistInfoTag();
         infoTag.putString(ServerProfessionManager.PROFESSION_NBT_TAG, warriorId);
 
         colonist.damage(getOutOfWorldDamageSource(), Float.MAX_VALUE);
@@ -274,7 +284,7 @@ public final class ServerFortressManager implements IServerFortressManager {
     public Optional<LivingEntity> spawnPawnNearCampfire() {
         final var randomSpawnPosition = getRandomSpawnPosition();
 
-        final var tag = getColonistInfoTag(fortressCenter);
+        final var tag = getColonistInfoTag();
         final var colonistType = FortressEntities.COLONIST_ENTITY_TYPE;
         final var world = getWorld();
         final var spawnedPawn = colonistType.spawn(world, tag, (it) -> {}, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
@@ -319,6 +329,8 @@ public final class ServerFortressManager implements IServerFortressManager {
         tag.putInt("maxX", maxX);
         tag.putInt("maxZ", maxZ);
 
+        tag.putString(BasePawnEntity.PAWN_SKIN_NBT_KEY, pawnsSkin.name());
+
         final NbtCompound nameGeneratorTag = new NbtCompound();
         this.nameGenerator.write(nameGeneratorTag);
         tag.put("nameGenerator", nameGeneratorTag);
@@ -336,6 +348,9 @@ public final class ServerFortressManager implements IServerFortressManager {
         if(tag.contains("minZ")) minZ = tag.getInt("minZ");
         if(tag.contains("maxX")) maxX = tag.getInt("maxX");
         if(tag.contains("maxZ")) maxZ = tag.getInt("maxZ");
+
+        if (tag.contains(BasePawnEntity.PAWN_SKIN_NBT_KEY))
+            pawnsSkin = PawnSkin.valueOf(tag.getString(BasePawnEntity.PAWN_SKIN_NBT_KEY));
 
         if(tag.contains("nameGenerator")) {
             final NbtCompound nameGeneratorTag = tag.getCompound("nameGenerator");

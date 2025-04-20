@@ -9,6 +9,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.blocks.FortressBlocks;
 import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
+import net.remmintan.mods.minefortress.core.dtos.SupportLevel;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.services.FortressManagerLocator;
@@ -41,7 +42,8 @@ public class MineFortressMod implements ModInitializer {
 
     private static final ExecutorService executor;
     private static final ScheduledExecutorService scheduledExecutor;
-    public static final TrackedDataHandler<PawnSkin> pawnSkinTrackedDataHandler = TrackedDataHandler.ofEnum(PawnSkin.class);
+    public static final TrackedDataHandler<PawnSkin> PAWN_SKIN_TRACKED_DATA_HANDLER = TrackedDataHandler.ofEnum(PawnSkin.class);
+    public static final TrackedDataHandler<SupportLevel> SUPPORT_LEVEL_TRACKED_DATA_HANDLER = TrackedDataHandler.ofEnum(SupportLevel.class);
 
     static  {
         final var tpIncrementor = new AtomicInteger(0);
@@ -51,7 +53,8 @@ public class MineFortressMod implements ModInitializer {
         scheduledExecutor = Executors.newScheduledThreadPool(1, r ->
                 new Thread(r, "MineFortress Scheduled Worker " + scheduledTpIncrementor.incrementAndGet()));
 
-        TrackedDataHandlerRegistry.register(pawnSkinTrackedDataHandler);
+        TrackedDataHandlerRegistry.register(PAWN_SKIN_TRACKED_DATA_HANDLER);
+        TrackedDataHandlerRegistry.register(SUPPORT_LEVEL_TRACKED_DATA_HANDLER);
     }
 
     @Override

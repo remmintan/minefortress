@@ -9,9 +9,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.dtos.SupportLevel;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.minefortress.MineFortressMod;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,6 +31,9 @@ public abstract class FortressPlayerEntityMixin extends LivingEntity implements 
     @Unique
     private static final TrackedData<Optional<BlockPos>> FORTRESS_POS = DataTracker.registerData(FortressPlayerEntityMixin.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
 
+    @Unique
+    private static final TrackedData<SupportLevel> SUPPORT_LEVEL_TRACKED_DATA = DataTracker.registerData(FortressPlayerEntityMixin.class, MineFortressMod.SUPPORT_LEVEL_TRACKED_DATA_HANDLER);
+
     protected FortressPlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -36,6 +41,7 @@ public abstract class FortressPlayerEntityMixin extends LivingEntity implements 
     @Inject(method = "initDataTracker", at = @At("TAIL"))
     protected void initDataTracker(CallbackInfo ci) {
         this.dataTracker.startTracking(FORTRESS_POS, Optional.empty());
+        this.dataTracker.startTracking(SUPPORT_LEVEL_TRACKED_DATA, SupportLevel.NONE);
     }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
@@ -66,5 +72,15 @@ public abstract class FortressPlayerEntityMixin extends LivingEntity implements 
     @Override
     public void set_FortressPos(@Nullable BlockPos blockPos) {
         this.dataTracker.set(FORTRESS_POS, Optional.ofNullable(blockPos));
+    }
+
+    @Override
+    public @NotNull SupportLevel get_SupportLevel() {
+        return this.dataTracker.get(SUPPORT_LEVEL_TRACKED_DATA);
+    }
+
+    @Override
+    public void set_SupportLevel(@NotNull SupportLevel level) {
+        this.dataTracker.set(SUPPORT_LEVEL_TRACKED_DATA, level);
     }
 }

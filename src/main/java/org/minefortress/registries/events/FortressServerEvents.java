@@ -2,11 +2,14 @@ package org.minefortress.registries.events;
 
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressModVersionHolder;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IFortressServer;
+import net.remmintan.mods.minefortress.core.services.PatronStatusService;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.S2CStartFortressConfiguration;
@@ -22,6 +25,9 @@ public class FortressServerEvents {
     private static final Logger LOGGER = LoggerFactory.getLogger(FortressServerEvents.class);
 
     public static void register() {
+        ServerPlayConnectionEvents.INIT.register((handler, server) -> {
+            setSupporterStatus(server, handler.player);
+        });
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             if (server.getSaveProperties() instanceof IFortressModVersionHolder holder && holder.is_OutdatedVersion()) {
                 handler.disconnect(Text.of("Outdated world version"));
@@ -68,6 +74,17 @@ public class FortressServerEvents {
         PlayerSleepEvents.INSTANCE.register();
         BlueprintWorldEvents.INSTANCE.register();
         PlayerBlockEvents.INSTANCE.register();
+    }
+
+    private static void setSupporterStatus(MinecraftServer server, ServerPlayerEntity player) {
+        final var profile = player.getGameProfile();
+        final var name = profile.getName();
+        final var supporterStatus = PatronStatusService.INSTANCE.getSupporterStatus(name);
+        server.execute(() -> {
+            if (player instanceof IFortressPlayerEntity playerEntity) {
+                playerEntity.set_SupportLevel(supporterStatus);
+            }
+        });
     }
 
     private static void syncTheFortressGamemode(IFortressServer server, ServerPlayerEntity player) {

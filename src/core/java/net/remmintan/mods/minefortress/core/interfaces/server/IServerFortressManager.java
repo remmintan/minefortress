@@ -5,6 +5,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ScreenType;
+import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
@@ -62,6 +63,8 @@ public interface IServerFortressManager extends IFortressManager, IWritableManag
     Optional<IProfessional> getPawnWithoutAProfession();
 
     List<IWorkerPawn> getFreeWorkers();
+
+    void setPawnsSkin(PawnSkin skin);
 
     void tick(@Nullable final ServerPlayerEntity fortressOwner);
 

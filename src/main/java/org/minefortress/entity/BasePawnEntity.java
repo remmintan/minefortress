@@ -38,11 +38,12 @@ import java.util.Random;
 public abstract class BasePawnEntity extends HungryEntity implements IFortressAwareEntity, IPawnSkinnable {
 
     public static final String FORTRESS_CENTER_BLOCK_KEY = "fortress_center_block";
+    public static final String PAWN_SKIN_NBT_KEY = "pawn_skin";
     private static final String BODY_TEXTURE_ID_NBT_KEY = "body_texture_id";
 
     private static final TrackedData<Optional<BlockPos>> FORTRESS_CENTER = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
     private static final TrackedData<Integer> BODY_TEXTURE_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<PawnSkin> PAWN_SKIN = DataTracker.registerData(BasePawnEntity.class, MineFortressMod.pawnSkinTrackedDataHandler);
+    private static final TrackedData<PawnSkin> PAWN_SKIN = DataTracker.registerData(BasePawnEntity.class, MineFortressMod.PAWN_SKIN_TRACKED_DATA_HANDLER);
 
     protected BasePawnEntity(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world, enableHunger);
@@ -83,6 +84,11 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         final var posLong = entityNbt.getLong(FORTRESS_CENTER_BLOCK_KEY);
         final var fortressCenter = BlockPos.fromLong(posLong);
         this.setFortressCenter(fortressCenter);
+
+        final var pawnSkingString = entityNbt.getString(PAWN_SKIN_NBT_KEY);
+        final var pawnSkin = PawnSkin.valueOf(pawnSkingString);
+        this.setPawnSkin(pawnSkin);
+
         addThisPawnToFortress();
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
@@ -104,8 +110,9 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     @Override
     public final @Nullable PlayerEntity getPlayer() {
         final var server = this.getServer();
-        if (server == null) return null;
-        return ServerExtensionsKt.getFortressOwner(server, this.getFortressPos());
+        final var fortressPos = this.getFortressPos();
+        if (fortressPos == null) return null;
+        return ServerExtensionsKt.getFortressOwner(server, fortressPos);
     }
 
     @Override
@@ -113,6 +120,7 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         super.writeCustomDataToNbt(nbt);
         this.dataTracker.get(FORTRESS_CENTER).ifPresent(it -> nbt.putLong(FORTRESS_CENTER_BLOCK_KEY, it.asLong()));
         nbt.putInt(BODY_TEXTURE_ID_NBT_KEY, this.getBodyTextureId());
+        nbt.putString(PAWN_SKIN_NBT_KEY, String.valueOf(this.getPawnSkin()));
     }
 
     @Override
@@ -126,6 +134,10 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
         if(nbt.contains(BODY_TEXTURE_ID_NBT_KEY)) {
             final var bodyTexId = nbt.getInt(BODY_TEXTURE_ID_NBT_KEY);
             this.dataTracker.set(BODY_TEXTURE_ID, bodyTexId);
+        }
+        if (nbt.contains(PAWN_SKIN_NBT_KEY)) {
+            final var skin = PawnSkin.valueOf(nbt.getString(PAWN_SKIN_NBT_KEY));
+            this.dataTracker.set(PAWN_SKIN, skin);
         }
     }
 
