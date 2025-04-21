@@ -23,7 +23,6 @@
     "network.FortressPacketByteBufMixin",
     "network.FortressServerPlayNetworkHandlerMixin",
     "renderer.gui.FortressScreenHandler",
-    "renderer.gui.FortressSimpleInventoryMixin",
     "renderer.gui.worldcreator.LevelPropertiesMixin",
     "server.FortressIntegratedServerLoaderMixin"
   ],
@@ -43,6 +42,7 @@
     "renderer.gui.FortressGuiMixin",
     "renderer.gui.FortressHandledScreenMixin",
     "renderer.gui.FortressInGameHudMixin",
+    "renderer.gui.FortressSimpleInventoryMixin",
     "renderer.gui.GameModeSelectionScreenMixin",
     "renderer.gui.worldcreator.FortressCreateWorldScreenMixin",
     "renderer.gui.worldcreator.FortressCyclingButtonMixin",
