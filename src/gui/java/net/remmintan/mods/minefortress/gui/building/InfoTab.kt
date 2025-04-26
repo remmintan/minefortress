@@ -69,7 +69,6 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
     fun tick() {
         destroyButton.active = handler.canDestroy()
         repairButton.active = handler.getHealth() < 100
-        repairConfirmationButton.active = handler.hasSelectedPawns()
     }
 
     fun render(context: DrawContext, mouseX: Int, mouseY: Int) {
@@ -258,18 +257,6 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
 
         repairConfirmationButton.render(context, mouseX, mouseY, 0f)
         cancelButton.render(context, mouseX, mouseY, 0f)
-
-        if (!handler.hasSelectedPawns()) {
-            val warnLabel = Text.of("Select pawns who will repair the building!")
-            context.drawText(
-                this.textRenderer,
-                warnLabel,
-                x + backgroundWidth / 2 - this.textRenderer.getWidth(warnLabel) / 2,
-                itemY + 30,
-                0xb81d13,
-                false
-            )
-        }
     }
 
     fun onMouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {

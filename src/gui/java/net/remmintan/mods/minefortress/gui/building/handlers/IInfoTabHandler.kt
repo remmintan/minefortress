@@ -10,7 +10,6 @@ interface IInfoTabHandler {
     fun getBlueprintMetadata(): BlueprintMetadata
     fun getHealth(): Int
     fun getItemsToRepair(): List<ItemInfo>
-    fun hasSelectedPawns(): Boolean
     fun getEnoughItems(): Map<ItemInfo, Boolean>
     fun upgrade(slot: BlueprintSlot)
     fun destroy()

@@ -30,7 +30,7 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     private int maxColonistsCount;
 
-    private FortressState state = FortressState.BUILD_SELECTION;
+    private FortressState state = FortressState.BUILD_EDITING;
 
     public ClientFortressManager() {
         professionManager = new ClientProfessionManager(
@@ -66,15 +66,6 @@ public final class ClientFortressManager implements IClientFortressManager {
 
     @Override
     public void tick() {
-        if (!initialized) return;
-
-        resetBuildEditState();
-    }
-
-    private void resetBuildEditState() {
-        if (this.state == FortressState.BUILD_EDITING && !ClientModUtils.getManagersProvider().get_PawnsSelectionManager().hasSelected()) {
-            this.state = FortressState.BUILD_SELECTION;
-        }
     }
 
     @Override

@@ -41,7 +41,6 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
     override fun getBlueprintMetadata(): BlueprintMetadata = building.metadata
     override fun getHealth() = building.health
     override fun getItemsToRepair(): List<ItemInfo> = building.repairItemInfos
-    override fun hasSelectedPawns() = ClientModUtils.getPawnsSelectionManager().hasSelected()
 
     override fun getEnoughItems(): Map<ItemInfo, Boolean> {
         val itemsToRepair = getItemsToRepair()

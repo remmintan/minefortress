@@ -88,7 +88,7 @@ public class ToolsHudLayer extends AbstractHudLayer {
                 125,
                 Items.BRICKS,
                 btn -> setCorrectHudState(FortressState.BUILD_EDITING),
-                () -> isAnyPawnSelected()? "Building Mode" : "Select any pawn to build",
+                () -> "Building Mode",
                 () -> hudHasCorrectState(FortressState.BUILD_EDITING)
         );
         this.addElement(
@@ -126,10 +126,6 @@ public class ToolsHudLayer extends AbstractHudLayer {
         }
     }
 
-    private static boolean isAnyPawnSelected() {
-        return ClientModUtils.getManagersProvider().get_PawnsSelectionManager().hasSelected();
-    }
-
     private boolean hudHasCorrectState(FortressState expectedState) {
         return ClientModUtils.getFortressManager().getState() == expectedState;
     }
@@ -138,7 +134,6 @@ public class ToolsHudLayer extends AbstractHudLayer {
     public void tick() {
         super.tick();
         selection.visible = hudHasCorrectState(FortressState.BUILD_EDITING);
-        buildEditMode.active = isAnyPawnSelected();
     }
 
     private void setCorrectHudState(FortressState expectedState) {
