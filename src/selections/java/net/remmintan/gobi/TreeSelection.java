@@ -34,13 +34,8 @@ public class TreeSelection extends Selection {
     }
 
     @Override
-    protected final Optional<BlockPos> getSelectionStart() {
-        return Optional.ofNullable(start);
-    }
-
-    @Override
     public boolean needUpdate(BlockPos pickedBlock, int upDelta) {
-        return start != null && !Objects.equals(pickedBlock, end) && super.needUpdate(pickedBlock, upDelta);
+        return start != null && !Objects.equals(pickedBlock, end);
     }
 
     @Override

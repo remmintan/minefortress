@@ -16,7 +16,10 @@ import net.remmintan.mods.minefortress.networking.c2s.ServerboundSimpleSelection
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class WallsSelection extends Selection {
@@ -36,7 +39,6 @@ public class WallsSelection extends Selection {
     @Override
     public boolean needUpdate(BlockPos pickedBlock, int upDelta) {
         if(corners.isEmpty()) return false;
-        if(!super.needUpdate(pickedBlock, upDelta)) return false;
         if(this.upDelta != upDelta) return true;
         BlockPos last = getLastCorner();
 
@@ -45,11 +47,6 @@ public class WallsSelection extends Selection {
         return !last.equals(pickedBlock);
     }
 
-    @Override
-    protected Optional<BlockPos> getSelectionStart() {
-        if (corners.isEmpty()) return Optional.empty();
-        return Optional.of(corners.get(0));
-    }
 
     @Override
     public void update(BlockPos pickedBlock, final int upDelta) {

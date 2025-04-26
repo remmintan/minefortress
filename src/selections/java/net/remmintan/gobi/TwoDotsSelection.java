@@ -18,7 +18,6 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkH
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -39,12 +38,7 @@ public class TwoDotsSelection extends Selection {
     public boolean needUpdate(BlockPos pickedBlock, int upSelectionDelta) {
         if(pickedBlock == null) return false;
         pickedBlock = pickedBlock.up(upSelectionDelta);
-        return this.selectionStart!=null && !pickedBlock.equals(this.selectionEnd) && super.needUpdate(pickedBlock, upSelectionDelta);
-    }
-
-    @Override
-    protected Optional<BlockPos> getSelectionStart() {
-        return Optional.ofNullable(selectionStart);
+        return this.selectionStart!=null && !pickedBlock.equals(this.selectionEnd);
     }
 
     @Override
