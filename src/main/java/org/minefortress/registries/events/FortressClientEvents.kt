@@ -9,8 +9,8 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.item.ItemGroups
 import net.minecraft.util.ActionResult
 import net.remmintan.mods.minefortress.core.FortressState
-import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity
+import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksInformationHolder
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
 import net.remmintan.mods.minefortress.core.isFortressGamemode
@@ -29,6 +29,7 @@ object FortressClientEvents {
     @JvmStatic
     fun registerEvents() {
         ToastEvents().register()
+        InputTracker.initialize()
 
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> ClientModUtils.getFortressManager().reset() }
         ClientTickEvents.START_CLIENT_TICK.register { startClientTick(it) }
@@ -85,9 +86,23 @@ object FortressClientEvents {
     }
 
     private fun endClientTick(client: MinecraftClient) {
+        val selectionManager = ClientModUtils.getSelectionManager()
+
+        if (InputTracker.wasLeftMouseButtonPressedLastTick()) {
+            if (selectionManager.clickType in listOf(ClickType.ROADS, ClickType.BUILD)) {
+                selectionManager.resetSelection()
+            }
+        }
+
+        if (InputTracker.wasRightMouseButtonPressedLastTick()) {
+            if (selectionManager.clickType in listOf(ClickType.REMOVE)) {
+                selectionManager.resetSelection()
+            }
+        }
+
+
         while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
-            val fortressClient = client as IClientManagersProvider
-            fortressClient._SelectionManager.toggleSelectionType()
+            selectionManager.toggleSelectionType()
         }
 
         while (FortressKeybindings.cancelTaskKeybinding.wasPressed()) {

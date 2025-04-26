@@ -101,7 +101,6 @@ public class SelectionManager implements ISelectionManager {
         if(this.selection.needUpdate(pickedPos, upSelectionDelta)) {
             this.selection.update(pickedPos, upSelectionDelta);
             this.setNeedsUpdate(true);
-            final var provider = ClientModUtils.getManagersProvider();
 
             if((clickType == ClickType.BUILD || clickType == ClickType.ROADS)&& clickingBlockState != null) {
                 if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) {

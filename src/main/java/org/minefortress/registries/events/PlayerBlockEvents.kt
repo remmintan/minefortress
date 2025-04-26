@@ -49,10 +49,8 @@ object PlayerBlockEvents {
             if (!world.isClient || !isClientInFortressGamemode())
                 return@register ActionResult.PASS
 
-            val clientBlueprintManager =
-                ClientModUtils.getBlueprintManager()
-            val fortressManager =
-                ClientModUtils.getFortressManager()
+            val clientBlueprintManager = ClientModUtils.getBlueprintManager()
+            val fortressManager = ClientModUtils.getFortressManager()
 
             if (fortressManager.state == FortressState.COMBAT) {
                 updateFightSelection(hitResult, fortressManager)
@@ -60,8 +58,7 @@ object PlayerBlockEvents {
             }
 
             if (fortressManager.state == FortressState.AREAS_SELECTION) {
-                val areasClientManager =
-                    ClientModUtils.getAreasClientManager()
+                val areasClientManager = ClientModUtils.getAreasClientManager()
                 if (areasClientManager.isSelecting) areasClientManager.resetSelection()
                 else areasClientManager.removeHovered()
                 return@register ActionResult.SUCCESS
