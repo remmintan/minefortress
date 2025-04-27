@@ -2,15 +2,12 @@ package org.minefortress.utils;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.annotation.MethodsReturnNonnullByDefault;
-import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.minefortress.MineFortressMod;
 import org.minefortress.interfaces.IFortressMinecraftClient;
+import org.minefortress.registries.FortressKeybindings;
 
 import java.nio.file.Path;
-import java.util.Optional;
-import java.util.UUID;
 
 @MethodsReturnNonnullByDefault
 public class ModUtils {
@@ -25,27 +22,11 @@ public class ModUtils {
                 .resolve(MineFortressMod.BLUEPRINTS_FOLDER_NAME);
     }
 
-    public static UUID getCurrentPlayerUUID() {
-        return Optional
-                .ofNullable(MinecraftClient.getInstance().player)
-                .map(ClientPlayerEntity::getUuid)
-                .orElseThrow(() -> new IllegalStateException("Player is null"));
-    }
-
 
     public static boolean shouldReleaseCamera() {
         final var client = MinecraftClient.getInstance();
         final var options = client.options;
-
-        final var blueprintManager = ClientModUtils.getBlueprintManager();
-        final var selectionManager = ClientModUtils.getSelectionManager();
-        final var areasClientManager = ClientModUtils.getAreasClientManager();
-
-        final var anyManagerSelecting = blueprintManager.isSelecting() ||
-                selectionManager.isSelecting() ||
-                areasClientManager.isSelecting();
-
-        return options.pickItemKey.isPressed() || (options.sprintKey.isPressed() && !anyManagerSelecting);
+        return options.pickItemKey.isPressed() || FortressKeybindings.releaseCameraKeybinding.isPressed();
     }
 
 }

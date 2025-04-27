@@ -47,13 +47,6 @@ public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasks
     }
 
     @Override
-    public void cancelAllTasks() {
-        while(!tasksStack.empty()) {
-            cancelLatestTask();
-        }
-    }
-
-    @Override
     public void addTasks(List<TaskInformationDto> tasks) {
         for(TaskInformationDto task: tasks) {
             addTask(task.id(), task.positions(), task.type(), null);

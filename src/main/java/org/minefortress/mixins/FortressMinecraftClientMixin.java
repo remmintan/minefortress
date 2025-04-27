@@ -4,10 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
@@ -101,10 +99,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
     @Unique
     private FortressGamemode gamemode;
 
-    @Shadow
-    @Final
-    public GameOptions options;
-
     @Shadow @Final public Mouse mouse;
     @Shadow
     @Nullable
@@ -192,27 +186,6 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
         return selectionManager;
     }
 
-    @Inject(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/TutorialManager;onInventoryOpened()V", shift = At.Shift.BEFORE))
-    private void handleInputEvents(CallbackInfo ci) {
-        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
-            if(this.options.sprintKey.isPressed()) {
-                if(this.get_BlueprintManager().isSelecting()) {
-                    this.get_BlueprintManager().rotateSelectedStructureClockwise();
-                } else {
-                    this.get_SelectionManager().moveSelectionUp();
-                }
-            }
-        }
-    }
-
-    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
-    public void setScreenMix(Screen screen, CallbackInfo ci) {
-        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
-            if(this.options.sprintKey.isPressed() && screen instanceof InventoryScreen) {
-                ci.cancel();
-            }
-        }
-    }
 
     @Inject(method="doItemPick", at=@At("HEAD"), cancellable = true)
     public void doItemPick(CallbackInfo ci) {

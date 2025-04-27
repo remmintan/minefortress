@@ -100,6 +100,22 @@ object FortressClientEvents {
             }
         }
 
+        val blueprintManager = ClientModUtils.getBlueprintManager()
+        while (FortressKeybindings.moveSelectionUpKeybinding.wasPressed()) {
+            if (selectionManager.isSelecting)
+                selectionManager.moveSelectionUp()
+
+            if (blueprintManager.isSelecting)
+                blueprintManager.rotateSelectedStructureClockwise()
+        }
+
+        while (FortressKeybindings.moveSelectionDownKeybinding.wasPressed()) {
+            if (selectionManager.isSelecting)
+                selectionManager.moveSelectionDown()
+
+            if (blueprintManager.isSelecting)
+                blueprintManager.rotateSelectedStructureCounterClockwise()
+        }
 
         while (FortressKeybindings.switchSelectionKeybinding.wasPressed()) {
             selectionManager.toggleSelectionType()
@@ -109,12 +125,7 @@ object FortressClientEvents {
             val world = client.world
             if (world != null) {
                 val clientVisualTasksHolder = (world as ITasksInformationHolder)._ClientTasksHolder
-
-                if (client.options.sprintKey.isPressed) {
-                    clientVisualTasksHolder.cancelAllTasks()
-                } else {
-                    clientVisualTasksHolder.cancelLatestTask()
-                }
+                clientVisualTasksHolder.cancelLatestTask()
             }
         }
     }

@@ -10,6 +10,11 @@ public class FortressKeybindings {
 
     public static final KeyBinding cancelTaskKeybinding;
 
+    public static final KeyBinding releaseCameraKeybinding;
+
+    public static final KeyBinding moveSelectionUpKeybinding;
+    public static final KeyBinding moveSelectionDownKeybinding;
+
     static {
         switchSelectionKeybinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.minefortress.switch_selection",
@@ -23,13 +28,33 @@ public class FortressKeybindings {
                 InputUtil.GLFW_KEY_Z,
                 "category.minefortress.general"
         ));
+        releaseCameraKeybinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.minefortress.release_camera",
+                InputUtil.Type.KEYSYM,
+                InputUtil.GLFW_KEY_LEFT_ALT,
+                "category.minefortress.general"
+        ));
+        moveSelectionUpKeybinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.minefortress.move_selection_up",
+                InputUtil.Type.KEYSYM,
+                InputUtil.GLFW_KEY_I,
+                "category.minefortress.general"
+        ));
+        moveSelectionDownKeybinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.minefotress.move_selection_down",
+                InputUtil.Type.KEYSYM,
+                InputUtil.GLFW_KEY_U,
+                "category.minefortress.general"
+        ));
     }
     public static void init() {
         // do nothing
     }
 
 
-
+    public static String getBoundKeyName(KeyBinding keyBinding) {
+        return KeyBindingHelper.getBoundKeyOf(keyBinding).getLocalizedText().getString();
+    }
 
 
 }

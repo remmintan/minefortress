@@ -14,7 +14,6 @@ public interface IClientTasksHolder extends ITasksModelBuilderInfoProvider, ITas
     void removeTask(UUID id);
     void addTask(UUID uuid, Iterable<BlockPos> blocks, TaskType type, UUID superTaskId);
 
-    void cancelAllTasks();
     void cancelLatestTask();
 
     void toggleSelectionVisibility();

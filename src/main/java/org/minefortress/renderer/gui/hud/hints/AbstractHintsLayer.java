@@ -13,7 +13,7 @@ import org.minefortress.renderer.gui.hud.FortressHud;
 import java.util.List;
 import java.util.Optional;
 
-abstract class AbstractHintsLayer  extends AbstractHudLayer implements IHintsLayer {
+public abstract class AbstractHintsLayer extends AbstractHudLayer implements IHintsLayer {
 
     public AbstractHintsLayer() {
         super(MinecraftClient.getInstance());
