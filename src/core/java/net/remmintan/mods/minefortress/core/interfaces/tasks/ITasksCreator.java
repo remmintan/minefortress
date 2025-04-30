@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public interface ITasksCreator extends IServerManager {
 
-    ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots, List<BlockPos> positions);
+    ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots);
 
     ITask createRoadsTask(UUID uuid, List<BlockPos> blocks, Item itemInHand);
 
