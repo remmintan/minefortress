@@ -15,10 +15,11 @@ import java.util.*
 fun findTree(pos: BlockPos, world: World, globalProcessedLogs: MutableSet<BlockPos>): TreeData? {
     val logs = findConnectedLogsBFS(pos, world, globalProcessedLogs)
     if (logs.isEmpty()) return null
-    val leaves = findAssociatedLeavesBFS(world, logs)
+    val candidateLeaves = findAssociatedLeavesBFS(world, logs)
+    val searchRadius = 2
+    val filteredLeaves = candidateLeaves.filterNot { hasForeignLogNearby(world, it, searchRadius, logs) }.toSet()
     val root = findRootOfTree(logs)
-
-    return TreeData(logs, leaves, root)
+    return TreeData(logs, filteredLeaves, root)
 }
 
 private fun findConnectedLogsBFS(
@@ -149,6 +150,35 @@ private fun findRootOfTree(treeLogBlocks: Set<BlockPos>): BlockPos {
 
 fun isTreeLog(block: Block): Boolean {
     return block.defaultState.isIn(BlockTags.LOGS)
+}
+
+private fun hasForeignLogNearby(
+    world: World,
+    centerPos: BlockPos,
+    radius: Int,
+    originalTreeLogs: Set<BlockPos>
+): Boolean {
+    for (dx in -radius..radius) {
+        for (dy in -radius..radius) {
+            for (dz in -radius..radius) {
+                if (dx == 0 && dy == 0 && dz == 0) continue // Skip self
+
+                val nearbyPos = centerPos.add(dx, dy, dz)
+                if (!world.isInBuildLimit(nearbyPos)) continue
+
+                val nearbyState = world.getBlockState(nearbyPos)
+                if (isTreeLog(nearbyState.block)) {
+                    // Found a log nearby. Is it part of the original tree?
+                    if (!originalTreeLogs.contains(nearbyPos)) {
+                        // It's a foreign log!
+                        return true
+                    }
+                }
+            }
+        }
+    }
+    // No foreign logs found within the radius
+    return false
 }
 
 private fun isTreeLeaf(block: Block): Boolean {
