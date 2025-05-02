@@ -7,7 +7,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.BlockPos
-import net.remmintan.gobi.helpers.findTree
+import net.remmintan.gobi.helpers.TreeFinder
 import net.remmintan.mods.minefortress.core.TaskType
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask
@@ -16,8 +16,8 @@ import java.util.*
 
 class TasksCreator(private val serverWorld: ServerWorld) : ITasksCreator {
     override fun createCutTreesTask(uuid: UUID, treeRoots: List<BlockPos>): ITask {
-        val visitedBlocks = mutableSetOf<BlockPos>()
-        val trees = treeRoots.associateWith { findTree(it, serverWorld, visitedBlocks)!! }
+        val treeFinder = TreeFinder(serverWorld)
+        val trees = treeRoots.associateWith { treeFinder.findTree(it)!! }
 
         return CutTreesTask(uuid, trees)
     }

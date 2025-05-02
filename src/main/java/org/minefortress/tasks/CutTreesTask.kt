@@ -3,7 +3,7 @@ package org.minefortress.tasks
 import com.mojang.datafixers.util.Pair
 import net.minecraft.util.math.BlockPos
 import net.remmintan.gobi.helpers.TreeData
-import net.remmintan.gobi.helpers.removeTheTree
+import net.remmintan.gobi.helpers.TreeRemover
 import net.remmintan.mods.minefortress.core.TaskType
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn
@@ -58,7 +58,7 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
         val world = pawn.serverWorld
         val root = part.startAndEnd.first
         val tree = trees[root] ?: return
-        removeTheTree(pawn, tree, world)
+        TreeRemover.removeTheTree(pawn, tree, world)
 
         removedTrees++
         check(removedTrees <= totalTreesCount) { "Removed more roots than total roots" }

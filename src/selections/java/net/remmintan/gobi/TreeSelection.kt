@@ -10,13 +10,15 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
 import net.minecraft.world.World
 import net.remmintan.gobi.helpers.TreeData
-import net.remmintan.gobi.helpers.findTree
+import net.remmintan.gobi.helpers.TreeFinder
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundCutTreesTaskPacket
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 class TreeSelection : Selection() {
     private var start: BlockPos? = null
@@ -66,7 +68,7 @@ class TreeSelection : Selection() {
 
     override fun update(pickedBlock: BlockPos, upDelta: Int) {
         if (start != null) {
-            end?.let { prevBox = BlockBox.create(start, it) }
+            end?.let { prevBox = start!! boxTo it }
             end = pickedBlock.up(upDelta)
             updateSelection()
         }
@@ -87,19 +89,19 @@ class TreeSelection : Selection() {
         val world = getWorld()
 
         // removing old trees
-        val newBox = BlockBox.create(start!!, end!!)
+        val newBox = start!! boxTo end!!
         selectedTrees
             .filter { (_, tree) -> tree.treeLogBlocks.none { newBox.contains(it) } }
             .keys
             .forEach { selectedTrees.remove(it) }
 
         // adding new trees
-        val visitedBlocks = mutableSetOf<BlockPos>()
-        for (pos in BlockPos.iterate(start, end).map { it.toImmutable() }) {
+        val treeFinder = TreeFinder(world)
+        for (pos in start!! iterateTo end!!) {
             if (prevBox?.contains(pos) == true) continue
-            if (visitedBlocks.contains(pos)) continue
+            if (treeFinder.visited(pos)) continue
 
-            findTree(pos, world, visitedBlocks)?.let { tree ->
+            treeFinder.findTree(pos)?.let { tree ->
                 selectedTrees[tree.treeRootBlock] = tree
             }
         }
@@ -107,6 +109,24 @@ class TreeSelection : Selection() {
 
     private fun getWorld(): World {
         return MinecraftClient.getInstance().world ?: error("No world available")
+    }
+
+    private infix fun BlockPos.boxTo(other: BlockPos): BlockBox {
+        val (newStart, newEnd) = moveStartEnd(this, other)
+        return BlockBox.create(newStart, newEnd)
+    }
+
+    private infix fun BlockPos.iterateTo(other: BlockPos): List<BlockPos> {
+        val (newStart, newEnd) = moveStartEnd(this, other)
+        return BlockPos.iterate(newStart, newEnd).map { it.toImmutable() }
+    }
+
+    private fun moveStartEnd(start: BlockPos, end: BlockPos): kotlin.Pair<BlockPos, BlockPos> {
+        val world = getWorld()
+
+        val newStart = BlockPos(start.x, max(world.bottomY, start.y - 20), start.z)
+        val newEnd = BlockPos(end.x, min(world.topY, end.y + 20), end.z)
+        return kotlin.Pair(newStart, newEnd)
     }
 
 }
