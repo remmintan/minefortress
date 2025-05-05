@@ -2,14 +2,14 @@ package net.remmintan.gobi.helpers
 
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
-import net.minecraft.entity.Entity
+import net.minecraft.entity.LivingEntity
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
-import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn
-import net.remmintan.mods.minefortress.core.utils.ServerModUtils
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
+import net.remmintan.mods.minefortress.core.utils.isSurvivalFortress
 import java.util.*
 
 
@@ -152,17 +152,41 @@ class TreeFinder(private val world: World) {
     }
 }
 
-object TreeRemover {
-    fun removeTheTree(pawn: IWorkerPawn, tree: TreeData, world: ServerWorld) {
-        tree.treeLogBlocks.filter { it != tree.treeRootBlock }
-            .forEach { removeBlockAddDropToTheResources(pawn, world, it) }
-        tree.treeLeavesBlocks.forEach { removeBlockAddDropToTheResources(pawn, world, it) }
+class TreeRemover(
+    private val world: ServerWorld,
+    private val resourceManager: IServerResourceManager,
+    private val entity: LivingEntity? = null
+) {
+
+    fun removeTheTree(tree: TreeData) {
+        if (world.getBlockState(tree.treeRootBlock).isIn(BlockTags.LOGS)) {
+            removeBlockAddDropToTheResources(tree.treeRootBlock)
+        }
+        tree.treeLogBlocks
+            .filter { it != tree.treeRootBlock }
+            .forEach { removeBlockAddDropToTheResources(it) }
+        tree.treeLeavesBlocks
+            .forEach { removeBlockAddDropToTheResources(it) }
     }
 
-    private fun removeBlockAddDropToTheResources(pawn: IWorkerPawn, world: ServerWorld, blockPos: BlockPos) {
-        ServerModUtils.addDropToTheResourceManager(world, blockPos, pawn)
+    private fun removeBlockAddDropToTheResources(blockPos: BlockPos) {
+        addDropToTheResourceManager(blockPos)
         world.setBlockState(blockPos, Blocks.AIR.defaultState, 3)
-        world.emitGameEvent(pawn as Entity, GameEvent.BLOCK_DESTROY, blockPos)
+        world.emitGameEvent(entity, GameEvent.BLOCK_DESTROY, blockPos)
+    }
+
+    private fun addDropToTheResourceManager(pos: BlockPos) {
+        if (world.server.isSurvivalFortress()) {
+            val blockState = world.getBlockState(pos)
+            val blockEntity = world.getBlockEntity(pos)
+            // FIXME: consider the tool and the entity
+            val drop = Block.getDroppedStacks(blockState, world, pos, blockEntity)
+            for (itemStack in drop) {
+                val item = itemStack.item
+                val count = itemStack.count
+                resourceManager.increaseItemAmount(item, count)
+            }
+        }
     }
 }
 

@@ -111,7 +111,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     @Override
     public void reset() {
         this.initialized = false;
-        this.state = FortressState.BUILD_SELECTION;
+        this.state = FortressState.BUILD_EDITING;
     }
 
     // getter and setter for state

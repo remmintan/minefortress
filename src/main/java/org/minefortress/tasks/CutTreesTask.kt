@@ -1,6 +1,7 @@
 package org.minefortress.tasks
 
 import com.mojang.datafixers.util.Pair
+import net.minecraft.entity.LivingEntity
 import net.minecraft.util.math.BlockPos
 import net.remmintan.gobi.helpers.TreeData
 import net.remmintan.gobi.helpers.TreeRemover
@@ -9,6 +10,7 @@ import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils
 import net.remmintan.mods.minefortress.core.utils.getFortressOwner
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
@@ -55,16 +57,16 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
     }
 
     override fun finishPart(part: ITaskPart, pawn: IWorkerPawn) {
-        val world = pawn.serverWorld
         val root = part.startAndEnd.first
         val tree = trees[root] ?: return
-        TreeRemover.removeTheTree(pawn, tree, world)
+        val managersProvider = ServerModUtils.getManagersProvider(pawn).orElseThrow()
+        TreeRemover(pawn.serverWorld, managersProvider.resourceManager, pawn as LivingEntity).removeTheTree(tree)
 
         removedTrees++
         check(removedTrees <= totalTreesCount) { "Removed more roots than total roots" }
 
         if (treeRoots.isEmpty() && removedTrees == totalTreesCount) {
-            pawn.server.getFortressOwner(pawn.fortressPos!!)?.let {
+            (pawn as IWorkerPawn).server.getFortressOwner(pawn.fortressPos!!)?.let {
                 FortressServerNetworkHelper.send(
                     it,
                     FortressChannelNames.FINISH_TASK,

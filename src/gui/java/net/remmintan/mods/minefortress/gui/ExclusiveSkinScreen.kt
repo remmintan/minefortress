@@ -82,7 +82,6 @@ class ExclusiveSkinScreen(
 
 
         val textBlockX = (this.width - textWidth) / 2
-        var currentY = contentStartY
 
         // --- Add Informational Text ---
         val message = Text.translatable(
@@ -94,7 +93,7 @@ class ExclusiveSkinScreen(
             .append("\n\n")
             .append(Text.translatable("minefortress.exclusive_skin.cta"))
 
-        val textWidget = MultilineTextWidget(textBlockX, currentY, message, this.textRenderer)
+        val textWidget = MultilineTextWidget(textBlockX, contentStartY, message, this.textRenderer)
             .setMaxWidth(textWidth)
             .setCentered(true)
         this.addDrawableChild(textWidget)
@@ -174,7 +173,7 @@ class ExclusiveSkinScreen(
         context.drawTexture(
             PAWN_SKIN_TEXTURE,
             iconX, previewAreaYStart, // Use stored Y start
-            lockedSkin.u.toFloat(), lockedSkin.v.toFloat(),
+            lockedSkin.u, lockedSkin.v,
             iconSize, iconSize,
             PAWN_SKIN_TEXTURE_SIZE_X, PAWN_SKIN_TEXTURE_SIZE_Y
         )
@@ -234,4 +233,6 @@ class ExclusiveSkinScreen(
     override fun close() {
         this.client?.setScreen(this.parent)
     }
+
+    override fun shouldPause() = false
 }

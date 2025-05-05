@@ -5,8 +5,9 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.world.ServerWorld;
-import net.remmintan.gobi.helpers.TreeBlocks;
-import net.remmintan.gobi.helpers.TreeHelper;
+import net.remmintan.gobi.helpers.TreeData;
+import net.remmintan.gobi.helpers.TreeFinder;
+import net.remmintan.gobi.helpers.TreeRemover;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationBlockInfo;
@@ -24,7 +25,7 @@ import java.util.Optional;
 public class LumberjackDailyTask extends AbstractAutomationAreaTask {
 
     private IAutomationBlockInfo goal;
-    private TreeBlocks blocks;
+    private TreeData tree;
 
     @Override
     protected ProfessionType getProfessionType() {
@@ -83,15 +84,18 @@ public class LumberjackDailyTask extends AbstractAutomationAreaTask {
         final var world = colonist.getWorld();
         final var blockState = world.getBlockState(pos);
         if(blockState.isIn(BlockTags.AXE_MINEABLE)) {
-            TreeHelper.getTreeBlocks(pos, world).ifPresent(it -> this.blocks = it);
+            this.tree = new TreeFinder(world).findTree(pos);
             colonist.setGoal(new DigTaskBlockInfo(pos));
         } else {
-            if(blocks == null) {
+            if (tree == null) {
                 this.goal = null;
                 colonist.getMovementHelper().reset();
             } else {
-               TreeHelper.removeTheRestOfATree(colonist, blocks, (ServerWorld) world);
-               blocks = null;
+                ServerModUtils.getManagersProvider(colonist)
+                        .ifPresent(it ->
+                                new TreeRemover((ServerWorld) world, null, colonist).removeTheTree(tree));
+
+                tree = null;
             }
         }
     }

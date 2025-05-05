@@ -5,8 +5,11 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.event.GameEvent
+import net.remmintan.gobi.helpers.TreeFinder
+import net.remmintan.gobi.helpers.TreeRemover
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IPlaceCampfireTask
 import net.remmintan.mods.minefortress.core.utils.getFortressManager
 import net.remmintan.mods.minefortress.core.utils.getManagersProvider
@@ -66,27 +69,45 @@ class PlaceCampfireTask(
             }
         }
 
-
-        val managersProvider = fortressPos?.let { world.server.getManagersProvider(it) }
-        managersProvider
-            ?.buildingsManager
-            ?.addBuilding(
+        val stableFortressCenter = fortressPos ?: error("Fortress pos is null")
+        world.server.getManagersProvider(stableFortressCenter)?.let {
+            it.buildingsManager?.addBuilding(
                 metadata,
                 start,
                 end,
                 blockData
             )
+            it.professionsManager?.sendProfessions(player)
+            removeAllTreesInTheRadius(world, stableFortressCenter, it.resourceManager)
+        }
 
-        managersProvider?.professionsManager?.sendProfessions(player)
-
-        val fortressManager = fortressPos?.let { world.server.getFortressManager(it) }
+        val fortressManager = world.server.getFortressManager(stableFortressCenter)
         fortressManager?.spawnInitialPawns()
         fortressManager?.let {
             val packet = S2CStartFortressConfiguration()
             FortressServerNetworkHelper.send(player, S2CStartFortressConfiguration.CHANNEL, packet)
         }
 
-        return fortressPos ?: error("Fortress pos is null")
+        return stableFortressCenter
+    }
+
+    private fun removeAllTreesInTheRadius(
+        world: ServerWorld,
+        center: BlockPos,
+        resourceManager: IServerResourceManager
+    ) {
+        val c = center.toImmutable()
+        val tf = TreeFinder(world)
+        val tr = TreeRemover(world, resourceManager)
+        val r = 20
+        BlockPos.iterate(c.add(-r, -r, -r), c.add(r, r, r))
+            .asSequence()
+            .map { it.toImmutable() }
+            .filter { pos -> center.getSquaredDistance(pos) <= r * r }
+            .filter { world.isInBuildLimit(it) }
+            .map { tf.findTree(it) }
+            .filterNotNull()
+            .forEach { tr.removeTheTree(it) }
     }
 
 }

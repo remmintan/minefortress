@@ -31,7 +31,6 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
     private var startY: Int = 0
     private var entityPreviewX: Int = 0
     private var entityPreviewY: Int = 0
-    private var entityRenderSize = 45 // Size for the preview on this screen
 
     private val fakePawn: LivingEntity by lazy { fakePawnProvider() }
     private val skinButtons = mutableListOf<PawnSkinButton>()
@@ -126,7 +125,6 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
 
     private fun addCenteredText(text: Text?, textY: Int) {
         if (text == null) return
-        val textWidth = this.textRenderer.getWidth(text)
         // Create a TextWidget for better handling within the UI framework
         val textWidget = TextWidget(text, this.textRenderer)
         textWidget.setPosition((this.width - textWidget.width) / 2, textY) // Center based on widget width
@@ -141,9 +139,8 @@ class FortressConfigurationScreen(private val fakePawnProvider: () -> LivingEnti
         renderEntityInGui(context, mouseX.toFloat(), mouseY.toFloat())
     }
 
-    override fun shouldCloseOnEsc(): Boolean {
-        return false
-    }
+    override fun shouldCloseOnEsc() = false
+    override fun shouldPause() = false
 
     private fun renderEntityInGui(context: DrawContext, mouseX: Float, mouseY: Float) {
         val skinToRender = hoveredSkin ?: selectedSkin ?: return

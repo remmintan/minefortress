@@ -1,10 +1,10 @@
 package org.minefortress.fortress.automation.iterators;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
-import net.remmintan.gobi.helpers.TreeHelper;
 import net.remmintan.mods.minefortress.core.automation.AutomationBlockInfo;
 import net.remmintan.mods.minefortress.core.automation.iterators.AbstractFilteredIterator;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.AutomationActionType;
@@ -48,13 +48,27 @@ public class LoggingAreaIterator extends AbstractFilteredIterator {
         return cache.get(pos);
     }
 
+    private static Optional<BlockPos> findRootDownFromLog(BlockPos start, World world) {
+        BlockPos cursor = start;
+        BlockState cursorState;
+
+        do {
+            cursor = cursor.down();
+            cursorState = world.getBlockState(cursor);
+        } while (cursorState.isIn(BlockTags.LOGS));
+
+        if (cursorState.isAir()) return Optional.empty();
+        return Optional.of(cursor.up());
+    }
+
     private Optional<BlockPos> getTreeRoot(BlockPos pos) {
         if(!world.getBlockState(pos.down()).isIn(BlockTags.LOGS)) {
             return Optional.empty();
         }
 
-        return TreeHelper.findRootDownFromLog(pos, world);
+        return findRootDownFromLog(pos, world);
     }
+
 
     private boolean noOtherTreesOrSaplingsAround(BlockPos pos) {
         final var state = world.getBlockState(pos);

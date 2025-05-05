@@ -1,7 +1,6 @@
 package net.remmintan.mods.minefortress.core.utils;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -54,21 +53,22 @@ public final class ServerModUtils {
         return getFortressHolder(server, fortressCenter).map(IFortressHolder::getServerFortressManager);
     }
 
-    public static void addDropToTheResourceManager(ServerWorld w, BlockPos g, IFortressAwareEntity c) {
-        final var blockState = w.getBlockState(g);
-        final var blockEntity = blockState instanceof BlockEntityProvider provider ? provider.createBlockEntity(g, blockState) : null;
-        final var drop = Block.getDroppedStacks(blockState, w, g, blockEntity);
-
+    public static void addDropToTheResourceManager(ServerWorld w, BlockPos pos, IFortressAwareEntity c) {
         if (ServerExtensionsKt.isSurvivalFortress(c.getServer())) {
             getManagersProvider(c).ifPresent(it -> {
                 final var serverResourceManager = it.getResourceManager();
+
+                final var blockState = w.getBlockState(pos);
+                final var blockEntity = w.getBlockEntity(pos);
+                // FIXME: consider the tool and the entity
+                final var drop = Block.getDroppedStacks(blockState, w, pos, blockEntity);
+
                 for (ItemStack itemStack : drop) {
                     final var item = itemStack.getItem();
                     final var count = itemStack.getCount();
                     serverResourceManager.increaseItemAmount(item, count);
                 }
             });
-
         }
     }
 
