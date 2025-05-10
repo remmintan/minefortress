@@ -57,19 +57,19 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
             } while(goalAlreadyInCorrectState(colonist));
             movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
-        if(this.goal != null && movementHelper.getWorkGoal() == null) {
+        if (this.goal != null && movementHelper.getGoal() == null) {
             movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
 
-        if(movementHelper.hasReachedWorkGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone()) {
+        if (movementHelper.hasReachedGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone()) {
             switch (this.goal.info()) {
                 case FARM_CROPS -> doFarmCrops(colonist);
                 case FARM_WATER -> doSetWater(colonist);
             }
         }
 
-        if(movementHelper.getWorkGoal() != null && !movementHelper.hasReachedWorkGoal() && movementHelper.isStuck()){
-            final var workGoal = movementHelper.getWorkGoal().up();
+        if (movementHelper.getGoal() != null && !movementHelper.hasReachedGoal() && movementHelper.isStuck()) {
+            final var workGoal = movementHelper.getGoal().up();
             colonist.teleport(workGoal.getX(), workGoal.getY(), workGoal.getZ());
         }
     }

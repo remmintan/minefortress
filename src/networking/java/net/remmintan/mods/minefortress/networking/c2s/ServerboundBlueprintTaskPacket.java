@@ -6,7 +6,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
+import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.ServerPlayerEntityExtensionsKt;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
@@ -70,29 +72,26 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
             provider.getBuildingsManager().destroyBuilding(upgradedBuildingPos);
         }
 
-        Runnable executeBuildTask = () -> {
-            final var taskId = UUID.randomUUID();
-            final var task = blueprintManager.createTask(taskId, blueprintId, startPos, rotation);
-            final var serverResourceManager = provider.getResourceManager();
+        final var taskId = UUID.randomUUID();
+        final var task = blueprintManager.createAreaBasedTask(taskId, blueprintId, startPos, rotation);
+        final var serverResourceManager = provider.getResourceManager();
 
-            if (ServerExtensionsKt.isSurvivalFortress(server)) {
-                final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
-                try {
-                    serverResourceManager.reserveItems(taskId, stacks);
-                } catch (IllegalStateException e) {
-                    ModLogger.LOGGER.error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
-                    FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
-                    return;
-                }
-            }
+        if (reserveItems(server, player, blueprintManager, serverResourceManager, taskId))
             provider.getTaskManager().addTask(task, selectedPawns, player);
-        };
-        if (floorLevel > 0) {
-            final var digTask = blueprintManager.createDigTask(UUID.randomUUID(), startPos, floorLevel, blueprintId, rotation);
-            digTask.addFinishListener(executeBuildTask);
-            provider.getTaskManager().addTask(digTask, selectedPawns, player);
-        } else {
-            executeBuildTask.run();
+
+    }
+
+    private boolean reserveItems(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player, IServerBlueprintManager blueprintManager, IServerResourceManager serverResourceManager, UUID taskId) {
+        if (ServerExtensionsKt.isSurvivalFortress(server)) {
+            final var stacks = blueprintManager.getBlockDataManager().getBlockData(blueprintId, rotation).getStacks();
+            try {
+                serverResourceManager.reserveItems(taskId, stacks);
+            } catch (IllegalStateException e) {
+                ModLogger.LOGGER.error("Failed to reserve items for task " + taskId + ": " + e.getMessage());
+                FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
+                return false;
+            }
         }
+        return true;
     }
 }

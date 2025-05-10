@@ -463,7 +463,7 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     public List<IWorkerPawn> getFreeWorkers() {
         return getWorkersStream()
-                .filter(it -> !it.getTaskControl().hasTask() && !it.getTaskControl().isDoingEverydayTasks())
+                .filter(it -> !it.getTaskControl().hasTask() && !it.getTaskControl().isDoingEverydayTasks() && !it.getAreaBasedTaskControl().hasTask())
                 .toList();
     }
 

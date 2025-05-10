@@ -5,8 +5,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.BuildingHelper;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
@@ -37,7 +37,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     public void tick(Colonist colonist) {
         if(this.goal == null) return;
         final MovementHelper movementHelper = colonist.getMovementHelper();
-        if(movementHelper.hasReachedWorkGoal()) {
+        if (movementHelper.hasReachedGoal()) {
             if(workingTicks % 10 * colonist.getHungerMultiplier() == 0) {
                 colonist.swingHand(colonist.getWorld().random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
                 colonist.putItemInHand(Items.WOODEN_HOE);
@@ -54,7 +54,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
             workingTicks++;
         }
 
-        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isStuck())
+        if (!movementHelper.hasReachedGoal() && movementHelper.isStuck())
             colonist.teleport(this.goal.getX(), this.goal.getY(), this.goal.getZ());
     }
 

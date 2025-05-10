@@ -52,7 +52,7 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
         canceled = true
     }
 
-    override fun isCanceled(): Boolean {
+    override fun notCancelled(): Boolean {
         return canceled
     }
 
@@ -70,18 +70,18 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
                 FortressServerNetworkHelper.send(
                     it,
                     FortressChannelNames.FINISH_TASK,
-                    ClientboundTaskExecutedPacket(this.id)
+                    ClientboundTaskExecutedPacket(this.getId())
                 )
             }
         }
     }
 
-    override fun taskFullyFinished(): Boolean {
+    override fun isComplete(): Boolean {
         return removedTrees == totalTreesCount
     }
 
     override fun toTaskInformationDto(): List<TaskInformationDto> {
         val positions = trees.values.flatMap { listOf(it.treeLogBlocks, it.treeLeavesBlocks).flatten() }
-        return listOf(TaskInformationDto(id, positions, TaskType.REMOVE))
+        return listOf(TaskInformationDto(getId(), positions, TaskType.REMOVE))
     }
 }

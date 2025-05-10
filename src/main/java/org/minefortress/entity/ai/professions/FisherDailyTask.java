@@ -54,10 +54,10 @@ public class FisherDailyTask implements ProfessionDailyTask {
 
         final var movementHelper = colonist.getMovementHelper();
         final var earthPos = goal.getEarthPos();
-        if(!earthPos.equals(movementHelper.getWorkGoal()))
+        if (!earthPos.equals(movementHelper.getGoal()))
             movementHelper.goTo(earthPos, Colonist.FAST_MOVEMENT_SPEED);
 
-        if(movementHelper.hasReachedWorkGoal()) {
+        if (movementHelper.hasReachedGoal()) {
             colonist.putItemInHand(Items.FISHING_ROD);
             colonist.lookAt(goal.getWaterPos());
             workingTicks++;
@@ -89,7 +89,7 @@ public class FisherDailyTask implements ProfessionDailyTask {
 //            }
         }
 
-        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isStuck())
+        if (!movementHelper.hasReachedGoal() && movementHelper.isStuck())
             colonist.teleport(earthPos.getX(), earthPos.getY(), earthPos.getZ());
 
 

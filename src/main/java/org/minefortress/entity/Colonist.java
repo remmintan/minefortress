@@ -30,6 +30,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IAreaBasedTaskControl;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
@@ -38,6 +39,7 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.ai.MovementHelper;
+import org.minefortress.entity.ai.controls.AreaBasedTaskControl;
 import org.minefortress.entity.ai.controls.DigControl;
 import org.minefortress.entity.ai.controls.PlaceControl;
 import org.minefortress.entity.ai.controls.TaskControl;
@@ -63,6 +65,7 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
     private final DigControl digControl;
     private final PlaceControl placeControl;
     private final ITaskControl taskControl;
+    private final IAreaBasedTaskControl areaBasedTaskControl;
     private final MovementHelper movementHelper;
     private final IBaritone baritone;
 
@@ -75,12 +78,14 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
             digControl = new DigControl(this, (ServerWorld) world);
             placeControl = new PlaceControl(this);
             taskControl = new TaskControl(this);
+            areaBasedTaskControl = new AreaBasedTaskControl(this);
             baritone = BaritoneAPI.getProvider().getBaritone(this);
             movementHelper = new MovementHelper(this);
         } else {
             digControl = null;
             placeControl = null;
             taskControl = null;
+            areaBasedTaskControl = null;
             baritone = null;
             movementHelper = null;
         }
@@ -156,6 +161,7 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
         this.goalSelector.add(4, new FollowFortressAttackTargetGoal(this, Colonist.FAST_MOVEMENT_SPEED, Colonist.WORK_REACH_DISTANCE));
         this.goalSelector.add(5, new DailyProfessionTasksGoal(this));
         this.goalSelector.add(6, new ColonistExecuteTaskGoal(this));
+        this.goalSelector.add(6, new PawnExecuteAreaBasedTaskGoal(this));
 //        this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
         this.goalSelector.add(8, new SleepOnTheBedGoal(this));
         this.goalSelector.add(9, new ReturnToFireGoal(this));
@@ -188,6 +194,7 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
         if(this.taskControl.hasTask()) {
             this.taskControl.fail();
         }
+        this.areaBasedTaskControl.fail();
     }
 
     @Override
@@ -213,8 +220,10 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
     @Override
     public void tick() {
         super.tick();
-        if(this.taskControl != null)
-            this.setHasTask(this.taskControl.hasTask() || this.taskControl.isDoingEverydayTasks());
+
+        boolean taskControlHasTask = this.taskControl != null && (taskControl.hasTask() || taskControl.isDoingEverydayTasks());
+        boolean areaTaskControlHasTask = this.areaBasedTaskControl != null && areaBasedTaskControl.hasTask();
+        this.setHasTask(taskControlHasTask || areaTaskControlHasTask);
 
 
         if((isHalfInWall() || isEyesInTheWall()) && !this.isSleeping())
@@ -370,6 +379,11 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
 
     public ITaskControl getTaskControl() {
         return taskControl;
+    }
+
+    @Override
+    public IAreaBasedTaskControl getAreaBasedTaskControl() {
+        return areaBasedTaskControl;
     }
 
     private void setHasTask(boolean hasTask) {

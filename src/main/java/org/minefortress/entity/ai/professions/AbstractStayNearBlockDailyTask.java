@@ -30,7 +30,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
     public void tick(Colonist colonist) {
         if(this.blockPos == null) return;
         final MovementHelper movementHelper = colonist.getMovementHelper();
-        if(movementHelper.hasReachedWorkGoal()) {
+        if (movementHelper.hasReachedGoal()) {
             if(workingTicks % 10 * colonist.getHungerMultiplier() == 0) {
                 colonist.swingHand(colonist.getWorld().random.nextFloat() < 0.5F? Hand.MAIN_HAND : Hand.OFF_HAND);
                 colonist.putItemInHand(getWorkingItem());
@@ -40,7 +40,7 @@ abstract class AbstractStayNearBlockDailyTask implements ProfessionDailyTask {
             workingTicks++;
         }
 
-        if(!movementHelper.hasReachedWorkGoal() && movementHelper.isStuck() )
+        if (!movementHelper.hasReachedGoal() && movementHelper.isStuck())
             colonist.teleport(this.blockPos.getX(), this.blockPos.getY(), this.blockPos.getZ());
     }
 

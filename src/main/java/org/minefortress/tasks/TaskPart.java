@@ -36,7 +36,7 @@ public class TaskPart implements ITaskPart {
 
     @Override
     public boolean hasNext() {
-        return !task.isCanceled() && iterator.hasNext();
+        return task.notCancelled() && iterator.hasNext();
     }
 
     @Override

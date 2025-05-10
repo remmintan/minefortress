@@ -2,12 +2,12 @@ package org.minefortress.fortress.automation.areas;
 
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.gobi.ClientTask;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ISavedAreasHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
+import net.remmintan.mods.minefortress.core.utils.BuildingHelper;
 
 import java.util.Collections;
 import java.util.List;

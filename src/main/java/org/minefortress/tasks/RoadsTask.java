@@ -133,8 +133,8 @@ public class RoadsTask implements ITask {
     }
 
     @Override
-    public boolean isCanceled() {
-        return canceled;
+    public boolean notCancelled() {
+        return !canceled;
     }
 
     @Override
@@ -148,7 +148,7 @@ public class RoadsTask implements ITask {
     }
 
     @Override
-    public boolean taskFullyFinished() {
+    public boolean isComplete() {
         return finishedParts == totalParts;
     }
 }

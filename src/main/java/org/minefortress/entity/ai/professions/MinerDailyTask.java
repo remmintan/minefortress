@@ -20,16 +20,16 @@ public class MinerDailyTask extends AbstractAutomationAreaTask{
             goal = iterator.next();
         }
 
-        if (goal != null && movementHelper.getWorkGoal() == null) {
+        if (goal != null && movementHelper.getGoal() == null) {
             movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
         }
 
-        if (movementHelper.hasReachedWorkGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone())
+        if (movementHelper.hasReachedGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone())
             doActionWithTheGoal(colonist);
 
 
-        if(movementHelper.getWorkGoal() != null && !movementHelper.hasReachedWorkGoal() && movementHelper.isStuck()){
-            final var workGoal = movementHelper.getWorkGoal().up();
+        if (movementHelper.getGoal() != null && !movementHelper.hasReachedGoal() && movementHelper.isStuck()) {
+            final var workGoal = movementHelper.getGoal().up();
             colonist.teleport(workGoal.getX() + 0.5, workGoal.getY(), workGoal.getZ() + 0.5);
         }
     }

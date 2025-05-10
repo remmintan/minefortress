@@ -16,6 +16,7 @@ import net.minecraft.world.World
 class FortressScaffoldBlock : BlockWithEntity(
     FabricBlockSettings
         .create()
+        .replaceable()
         .strength(2.0f, 3.0f)
         .sounds(BlockSoundGroup.WOOD)
 ) {

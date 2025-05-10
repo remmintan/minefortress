@@ -125,6 +125,7 @@ public class BlueprintTask extends AbstractTask {
     }
 
     @Override
+    @NotNull
     public List<TaskInformationDto> toTaskInformationDto() {
         Set<BlockPos> allBlocks = new HashSet<>(blueprintData.keySet());
         if(blueprintEntityData != null) allBlocks.addAll(blueprintEntityData.keySet());

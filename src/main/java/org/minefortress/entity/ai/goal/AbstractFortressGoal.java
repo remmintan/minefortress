@@ -8,7 +8,7 @@ import org.minefortress.entity.Colonist;
 
 import java.util.EnumSet;
 
-abstract class AbstractFortressGoal extends Goal {
+public abstract class AbstractFortressGoal extends Goal {
 
     protected final Colonist colonist;
 

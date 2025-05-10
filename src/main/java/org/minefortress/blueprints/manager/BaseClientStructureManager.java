@@ -6,9 +6,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.blocks.FortressBlocks;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
+import net.remmintan.mods.minefortress.core.utils.BuildingHelper;
 import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.jetbrains.annotations.Nullable;
@@ -176,7 +176,7 @@ public abstract class BaseClientStructureManager implements IStructureRenderInfo
     private BlockPos moveToStructureSize(BlockPos pos, boolean intersectingWithTheBuilding) {
         if(getSelectedStructure() == null) return pos;
 
-        final boolean posSolid = !BuildingHelper.doesNotHaveCollisions(client.world, pos) && !intersectingWithTheBuilding;
+        final boolean posSolid = BuildingHelper.hasCollisions(client.world, pos) && !intersectingWithTheBuilding;
         final IStructureBlockData blockData = getBlockData();
         final Vec3i size = blockData.getSize();
         final Vec3i halfSize = new Vec3i(size.getX() / 2, 0, size.getZ() / 2);

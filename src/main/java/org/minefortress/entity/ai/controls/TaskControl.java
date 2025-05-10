@@ -2,6 +2,7 @@ package org.minefortress.entity.ai.controls;
 
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IBaseTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
@@ -28,40 +29,19 @@ public class TaskControl implements ITaskControl {
     }
 
     @Override
-    public void setTask(@NotNull ITask task) {
-        this.task = task;
+    public void setTask(@NotNull IBaseTask exTask) {
+        if (!(exTask instanceof ITask t))
+            throw new IllegalArgumentException("TaskControl can only handle ITask tasks");
+        this.task = t;
         this.taskPart = task.getNextPart(worker);
         this.updateCurrentTaskDesription();
-    }
-
-    private void updateCurrentTaskDesription() {
-        if(task instanceof SimpleSelectionTask) {
-            if(task.getTaskType() == TaskType.REMOVE) {
-                worker.setCurrentTaskDesc("Digging");
-            } else {
-                worker.setCurrentTaskDesc("Building");
-            }
-        } else if(task instanceof BlueprintTask) {
-            worker.setCurrentTaskDesc("Building blueprint");
-        } else if(task instanceof CutTreesTask) {
-            worker.setCurrentTaskDesc("Falling trees");
-        } else if(task instanceof RoadsTask) {
-            worker.setCurrentTaskDesc("Building roads");
-        }
-    }
-
-    @Override
-    public void resetTask() {
-        if(task!=null && task.taskFullyFinished())
-            this.task = null;
-        this.taskPart = null;
     }
 
     @Override
     public void fail() {
         if(taskPart!=null)
             taskPart.returnTaskPart();
-        this.resetTask();
+        this.resetTaskPart();
     }
 
     @Override
@@ -75,7 +55,7 @@ public class TaskControl implements ITaskControl {
 
     @Override
     public boolean hasTask() {
-        return task != null && !task.isCanceled();
+        return task != null && task.notCancelled();
     }
 
     @Override
@@ -94,11 +74,6 @@ public class TaskControl implements ITaskControl {
     }
 
     @Override
-    public boolean is(TaskType type) {
-        return task != null && task.getTaskType() == type;
-    }
-
-    @Override
     public boolean partHasMoreBlocks() {
         return taskPart != null && taskPart.hasNext();
     }
@@ -108,7 +83,7 @@ public class TaskControl implements ITaskControl {
         if(task.hasAvailableParts()) {
             this.setTask(task);
         } else {
-            this.resetTask();
+            this.resetTaskPart();
         }
     }
 
@@ -123,9 +98,26 @@ public class TaskControl implements ITaskControl {
         return taskPart.next();
     }
 
-    @Override
-    public boolean isBlueprintTask() {
-        return task instanceof BlueprintTask;
+    private void updateCurrentTaskDesription() {
+        if (task instanceof SimpleSelectionTask) {
+            if (task.getTaskType() == TaskType.REMOVE) {
+                worker.setCurrentTaskDesc("Digging");
+            } else {
+                worker.setCurrentTaskDesc("Building");
+            }
+        } else if (task instanceof BlueprintTask) {
+            worker.setCurrentTaskDesc("Building blueprint");
+        } else if (task instanceof CutTreesTask) {
+            worker.setCurrentTaskDesc("Falling trees");
+        } else if (task instanceof RoadsTask) {
+            worker.setCurrentTaskDesc("Building roads");
+        }
+    }
+
+    private void resetTaskPart() {
+        if (task != null && task.isComplete())
+            this.task = null;
+        this.taskPart = null;
     }
 
 }

@@ -9,10 +9,10 @@ import net.minecraft.util.hit.BlockHitResult
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.blueprints.getPersonalBlueprintCell
 import net.remmintan.mods.minefortress.blueprints.isBlueprintWorld
-import net.remmintan.mods.minefortress.building.BuildingHelper
 import net.remmintan.mods.minefortress.core.FortressState
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
+import net.remmintan.mods.minefortress.core.utils.BuildingHelper
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import org.minefortress.utils.BlockUtils
 

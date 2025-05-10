@@ -2,13 +2,13 @@ package org.minefortress.tasks;
 
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.gobi.ClientTask;
-import net.remmintan.mods.minefortress.building.BuildingHelper;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
+import net.remmintan.mods.minefortress.core.utils.BuildingHelper;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundCancelTaskPacket;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;

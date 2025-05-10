@@ -12,15 +12,17 @@ import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskWithPreparation;
 import net.remmintan.mods.minefortress.core.utils.PathUtils;
 import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public abstract class AbstractTask implements ITask {
+public abstract class AbstractTask implements ITask, ITaskWithPreparation {
 
     protected static final int PART_SIZE = 3;
 
@@ -108,7 +110,7 @@ public abstract class AbstractTask implements ITask {
     }
 
     @Override
-    public boolean taskFullyFinished() {
+    public boolean isComplete() {
         return totalParts <= completedParts;
     }
 
@@ -118,11 +120,12 @@ public abstract class AbstractTask implements ITask {
     }
 
     @Override
-    public boolean isCanceled() {
-        return canceled;
+    public boolean notCancelled() {
+        return !canceled;
     }
 
     @Override
+    @NotNull
     public List<TaskInformationDto> toTaskInformationDto() {
         final var blocks = new ArrayList<BlockPos>();
         BlockPos.iterate(startingBlock, endingBlock).forEach(it -> blocks.add(it.toImmutable()));

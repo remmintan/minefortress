@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3i;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreaBasedTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IPlaceCampfireTask;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
@@ -20,10 +21,7 @@ import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBlueprintPa
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.ServerStructureBlockDataManager;
-import org.minefortress.tasks.BlueprintDigTask;
-import org.minefortress.tasks.BlueprintTask;
-import org.minefortress.tasks.PlaceCampfireTask;
-import org.minefortress.tasks.SimpleSelectionTask;
+import org.minefortress.tasks.*;
 
 import java.util.*;
 
@@ -100,7 +98,7 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
     @Override
     public BlueprintTask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation) {
         final var blueprintMetadata = this.get(blueprintId);
-        final IStructureBlockData serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation, blueprintMetadata.getFloorLevel());
+        final var serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation, blueprintMetadata.getFloorLevel());
         final Vec3i size = serverStructureInfo.getSize();
         startPos = startPos.down(blueprintMetadata.getFloorLevel());
         final BlockPos endPos = getEndPos(startPos, size);
@@ -115,6 +113,18 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                 manualLayer,
                 automatic,
                 entityLayer
+        );
+    }
+
+    @Override
+    public IAreaBasedTask createAreaBasedTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation) {
+        final var metadata = this.get(blueprintId);
+        final var structureData = blockDataManager.getBlockData(blueprintId, rotation, metadata.getFloorLevel());
+        return new AreaBlueprintTask(
+                taskId,
+                metadata,
+                startPos,
+                structureData
         );
     }
 

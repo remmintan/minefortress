@@ -1,7 +1,6 @@
 package net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls;
 
-import net.remmintan.mods.minefortress.core.TaskType;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITask;
+import net.remmintan.mods.minefortress.core.interfaces.tasks.IBaseTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,9 +10,7 @@ import java.util.UUID;
 
 public interface ITaskControl {
 
-    void setTask(@NotNull ITask task);
-
-    void resetTask();
+    void setTask(@NotNull IBaseTask task);
 
     void fail();
 
@@ -27,8 +24,6 @@ public interface ITaskControl {
 
     boolean isDoingEverydayTasks();
 
-    boolean is(TaskType type);
-
     boolean partHasMoreBlocks();
 
     void findNextPart();
@@ -36,6 +31,4 @@ public interface ITaskControl {
     Optional<UUID> getTaskId();
 
     @Nullable ITaskBlockInfo getNextBlock();
-
-    boolean isBlueprintTask();
 }
