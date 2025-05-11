@@ -129,6 +129,12 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     override fun getFurnace(): FurnaceBlockEntity? =
         furnaceBlockPos?.let { this.getWorld()?.let { w -> w.getBlockEntity(it) as? FurnaceBlockEntity } }
 
+    override fun getFurnacePos(): BlockPos? =
+        this.blockData?.referenceState
+            ?.filter { it.blockState.block?.translationKey == "block.minecraft.furnace" }
+            ?.map { it.pos }
+            ?.get(0)
+
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
         val propertyDelegate = object : PropertyDelegate {
             override fun get(index: Int): Int {

@@ -37,18 +37,17 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
             final var provider = ServerModUtils.getManagersProvider(serverPlayer).orElseThrow();
             final var professionManager = provider.getProfessionsManager();
             final var blacksmithsCount = professionManager.getProfession("blacksmith").getAmount();
-            final var otherFurnaceBlocks = provider
+            final var otherFurnacePositions = provider
                     .getBuildingsManager()
                     .getBuildings(ProfessionType.BLACKSMITH)
                     .stream()
                     .limit(blacksmithsCount)
-                    .map(IFortressBuilding::getFurnace)
+                    .map(IFortressBuilding::getFurnacePos)
                     .filter(Objects::nonNull)
-                    .map(BlockEntity::getPos)
                     .toList();
 
-            final BlockPos selectedFurnacePos = furnacePos == null ? otherFurnaceBlocks.get(0) : furnacePos;
-            final var otherFurnacesDelegates = otherFurnaceBlocks.stream()
+            final BlockPos selectedFurnacePos = furnacePos == null ?  otherFurnacePositions.get(0) : furnacePos;
+            final var otherFurnacesDelegates = otherFurnacePositions.stream()
                     .map(it -> {
                         final var blockEnt = player.getWorld().getBlockEntity(it);
                         if (blockEnt instanceof FurnaceBlockEntity furnaceBlockEntity) {
