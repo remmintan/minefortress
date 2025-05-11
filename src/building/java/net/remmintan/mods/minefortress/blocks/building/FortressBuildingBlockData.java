@@ -52,6 +52,10 @@ class FortressBuildingBlockData {
         }
     }
 
+    public List<PositionedState> getReferenceState() {
+        return referenceState;
+    }
+
     private FortressBuildingBlockData(NbtCompound tag) {
         if (tag.contains("pointer", NbtType.NUMBER))
             blockPointer = tag.getInt("pointer");
@@ -287,7 +291,7 @@ class FortressBuildingBlockData {
         PRESERVED,
     }
 
-    private record PositionedState(BlockPos pos, BlockState blockState) {
+    public record PositionedState(BlockPos pos, BlockState blockState) {
     }
 
 }

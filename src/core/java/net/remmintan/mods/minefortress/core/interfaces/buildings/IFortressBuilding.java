@@ -79,5 +79,7 @@ public interface IFortressBuilding {
 
     FurnaceBlockEntity getFurnace();
 
+    BlockPos getFurnacePos();
+
     IBuildingHireHandler getHireHandler();
 }
