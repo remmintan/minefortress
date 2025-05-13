@@ -132,8 +132,8 @@ public abstract class AbstractTask implements ITask, ITaskWithPreparation {
         return Collections.singletonList(new TaskInformationDto(id, blocks, taskType));
     }
 
-    protected void sendFinishTaskNotificationToPlayer(ServerPlayerEntity randomPlayer) {
-        FortressServerNetworkHelper.send(randomPlayer, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
+    protected void sendFinishTaskNotificationToPlayer(ServerPlayerEntity player) {
+        FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
     }
 
     public void addFinishListener(Runnable listener) {

@@ -51,7 +51,7 @@ class ServerTaskManager : IServerTaskManager, IWritableManager, ITickableManager
             .getFortressManager(player)
             .map { it.freeWorkers }
             .orElse(emptyList())
-        if (freeWorkers.size > 2) {
+        if (freeWorkers.size > 0) {
             val task = notStartedTasks.remove()
             val freeWorkersIds = freeWorkers.map { it: IWorkerPawn -> (it as Entity).id }.toList()
             this.addTask(task, freeWorkersIds, player)

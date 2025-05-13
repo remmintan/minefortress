@@ -110,8 +110,8 @@ public class BlueprintTask extends AbstractTask {
     }
 
     private void removeReservedItem(IFortressAwareEntity worker, Item item) {
-        final var provider = ServerModUtils.getManagersProvider(worker);
         if (ServerExtensionsKt.isSurvivalFortress(worker.getServer())) {
+            final var provider = ServerModUtils.getManagersProvider(worker);
             provider
                     .map(IServerManagersProvider::getResourceManager)
                     .ifPresent(it -> {

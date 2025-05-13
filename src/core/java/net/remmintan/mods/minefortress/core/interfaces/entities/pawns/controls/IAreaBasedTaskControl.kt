@@ -13,6 +13,6 @@ interface IAreaBasedTaskControl {
     fun getAreaData(): Pair<BlockPos, Double>
     fun getCurrentBlock(): ITaskBlockInfo?
     fun moveToNextBlock(): ITaskBlockInfo?
-    fun fail()
+    fun reset()
 
 }

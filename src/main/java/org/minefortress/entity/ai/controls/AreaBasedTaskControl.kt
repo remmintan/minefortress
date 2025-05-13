@@ -15,11 +15,12 @@ class AreaBasedTaskControl(private val pawn: Colonist) : IAreaBasedTaskControl {
 
     override fun setTask(task: IAreaBasedTask) {
         this.task = task
-
     }
 
     override fun hasTask() = task != null
-    override fun hasMoreBlocks() = task?.hasMoreBlocks() ?: false
+    override fun hasMoreBlocks() = task
+        ?.let { it.notCancelled() && it.hasMoreBlocks() }
+        ?: false
 
     override fun isWithinTheArea(): Boolean {
         return task?.let {
@@ -35,13 +36,19 @@ class AreaBasedTaskControl(private val pawn: Colonist) : IAreaBasedTaskControl {
     override fun moveToNextBlock(): ITaskBlockInfo? {
         currentBlock?.let { task?.successBlock(it.pos) }
         currentBlock = task?.getNextBlock()
+        if (task?.isComplete() == true) {
+            task?.onCompletion(pawn)
+        }
+
         return currentBlock
     }
 
     override fun getCurrentBlock() = currentBlock
 
-    override fun fail() {
+    override fun reset() {
         currentBlock?.let { task?.failBlock(it) }
+        this.task = null
+        this.currentBlock = null
     }
 
 

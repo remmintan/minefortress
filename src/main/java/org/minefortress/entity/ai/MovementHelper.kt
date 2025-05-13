@@ -43,7 +43,6 @@ class MovementHelper(private val colonist: Colonist) {
         colonist.navigation.stop()
         baritone.pathingBehavior.cancelEverything()
         baritone.followProcess.cancel()
-        colonist.isAllowToPlaceBlockFromFarAway = false
         val settings = baritone.settings()
         settings.allowParkour.set(true)
         settings.maxFallHeightBucket.set(1000)
@@ -89,7 +88,7 @@ class MovementHelper(private val colonist: Colonist) {
     fun hasReachedGoal(): Boolean {
         return goal?.let {
             val withinDistance =
-                it.isWithinDistance(colonist.blockPos, distance) || colonist.isAllowToPlaceBlockFromFarAway
+                it.isWithinDistance(colonist.blockPos, distance) || isStuck
             withinDistance && !baritone.pathingBehavior.isPathing
         } ?: false
     }
@@ -112,7 +111,6 @@ class MovementHelper(private val colonist: Colonist) {
                     colonistName,
                     goal
                 )
-                colonist.isAllowToPlaceBlockFromFarAway = true
                 isStuck = true
                 stuckTicks = 0
             }
@@ -168,7 +166,7 @@ class MovementHelper(private val colonist: Colonist) {
 
             if (pathEvent == PathEvent.CALC_FAILED) {
                 ModLogger.LOGGER.debug("{} can't find path to {}", colonistName, goal)
-                colonist.isAllowToPlaceBlockFromFarAway = true
+                isStuck = true
             }
         }
     }

@@ -53,7 +53,7 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
     }
 
     override fun notCancelled(): Boolean {
-        return canceled
+        return !canceled
     }
 
     override fun finishPart(part: ITaskPart, pawn: IWorkerPawn) {

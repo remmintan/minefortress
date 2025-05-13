@@ -7,18 +7,21 @@ class PawnExecuteAreaBasedTaskGoal(colonist: Colonist) : AbstractFortressGoal(co
 
 
     override fun canStart(): Boolean {
-        return colonist.areaBasedTaskControl.hasTask() && !isHungry
+        return colonist.areaBasedTaskControl.hasMoreBlocks() && !isHungry
     }
 
     override fun start() {
+        colonist.resetControls()
+        colonist.isAllowToPlaceBlockFromFarAway = true
         if (colonist.isSleeping) {
             colonist.wakeUp()
         }
     }
 
     override fun tick() {
-        val hasMoreBlocks = colonist.areaBasedTaskControl.hasMoreBlocks()
-        if (!hasMoreBlocks) return
+        val haveSomethingToWorkOn =
+            colonist.areaBasedTaskControl.hasMoreBlocks() || colonist.areaBasedTaskControl.getCurrentBlock() != null
+        if (!haveSomethingToWorkOn) return
 
         val areaBasedTaskControl = colonist.areaBasedTaskControl
         if (!areaBasedTaskControl.isWithinTheArea()) {
@@ -53,6 +56,12 @@ class PawnExecuteAreaBasedTaskGoal(colonist: Colonist) : AbstractFortressGoal(co
     }
 
     override fun shouldContinue(): Boolean {
-        return canStart() && colonist.areaBasedTaskControl.hasMoreBlocks()
+        return canStart() || colonist.areaBasedTaskControl.getCurrentBlock() != null
+    }
+
+    override fun stop() {
+        colonist.isAllowToPlaceBlockFromFarAway = false
+        colonist.areaBasedTaskControl.reset()
+        colonist.resetControls()
     }
 }

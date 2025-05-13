@@ -3,6 +3,7 @@ package net.remmintan.mods.minefortress.core.utils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
@@ -15,7 +16,7 @@ public class BuildingHelper {
         if (level == null || pos == null) return false;
         final BlockState state = level.getBlockState(pos);
         if (state == null) return false;
-        return level.isInBuildLimit(pos) && state.isReplaceable();
+        return level.isInBuildLimit(pos) && (state.isReplaceable() || state.isIn(BlockTags.FLOWERS));
     }
 
     public static boolean canRemoveBlock(@Nullable World level, @Nullable BlockPos pos) {

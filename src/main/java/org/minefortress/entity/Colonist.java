@@ -194,7 +194,7 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
         if(this.taskControl.hasTask()) {
             this.taskControl.fail();
         }
-        this.areaBasedTaskControl.fail();
+        this.areaBasedTaskControl.reset();
     }
 
     @Override
