@@ -34,6 +34,8 @@ public class RoadsTask implements ITask {
     private boolean canceled = false;
     private final List<Runnable> taskFinishListeners = new ArrayList<>();
 
+    private int assignedWorkers = 0;
+
     public RoadsTask(UUID id, List<BlockPos> blocks, Item item) {
         this.id = id;
         this.blocks = blocks;
@@ -150,5 +152,20 @@ public class RoadsTask implements ITask {
     @Override
     public boolean isComplete() {
         return finishedParts == totalParts;
+    }
+
+    @Override
+    public boolean canTakeMoreWorkers() {
+        return assignedWorkers < Math.max(totalParts / 2, 1);
+    }
+
+    @Override
+    public void addWorker() {
+        assignedWorkers++;
+    }
+
+    @Override
+    public void removeWorker() {
+        assignedWorkers++;
     }
 }

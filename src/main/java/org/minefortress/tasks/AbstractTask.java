@@ -37,6 +37,8 @@ public abstract class AbstractTask implements ITask, ITaskWithPreparation {
     protected int totalParts;
     private int completedParts;
 
+    private int assignedWorkers = 0;
+
     private final List<Runnable> taskFinishListeners = new ArrayList<>();
 
     protected boolean canceled = false;
@@ -122,6 +124,21 @@ public abstract class AbstractTask implements ITask, ITaskWithPreparation {
     @Override
     public boolean notCancelled() {
         return !canceled;
+    }
+
+    @Override
+    public boolean canTakeMoreWorkers() {
+        return assignedWorkers < parts.size();
+    }
+
+    @Override
+    public void removeWorker() {
+        this.assignedWorkers++;
+    }
+
+    @Override
+    public void addWorker() {
+        this.assignedWorkers--;
     }
 
     @Override

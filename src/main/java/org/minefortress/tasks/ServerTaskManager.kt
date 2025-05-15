@@ -14,18 +14,16 @@ import net.remmintan.mods.minefortress.core.utils.ServerModUtils
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
 import net.remmintan.mods.minefortress.networking.s2c.S2CAddClientTasksPacket
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 
 class ServerTaskManager : IServerTaskManager, IWritableManager, ITickableManager {
-    private val nonFinishedTasks: MutableMap<UUID, IBaseTask> = HashMap()
+    private val tasksInProgress: MutableMap<UUID, IBaseTask> = ConcurrentHashMap()
     private val notStartedTasks: Queue<IBaseTask> = LinkedList()
 
     override fun addTask(task: IBaseTask, selectedPawnIds: List<Int>, player: ServerPlayerEntity) {
-        removeAllFinishedTasks()
-
         val packet = S2CAddClientTasksPacket(task.toTaskInformationDto())
         FortressServerNetworkHelper.send(player, S2CAddClientTasksPacket.CHANNEL, packet)
-        nonFinishedTasks[task.getId()] = task
 
         if (selectedPawnIds.isEmpty()) {
             notStartedTasks.add(task)
@@ -40,27 +38,37 @@ class ServerTaskManager : IServerTaskManager, IWritableManager, ITickableManager
 
         if (task is ITaskWithPreparation)
             task.prepareTask()
+        tasksInProgress[task.getId()] = task
         setPawnsToTask(task, selectedWorkers)
     }
 
     override fun tick(server: MinecraftServer, world: ServerWorld, player: ServerPlayerEntity?) {
+        removeAllFinishedTasks()
+
         //FIXME take planned tasks even when the player is offline
         if (player == null) return
-        if (notStartedTasks.isEmpty()) return
-        val freeWorkers = ServerModUtils
+        if (notStartedTasks.isEmpty() && tasksInProgress.isEmpty()) return
+        val readyWorkers = ServerModUtils
             .getFortressManager(player)
-            .map { it.freeWorkers }
+            .map { it.readyWorkers }
             .orElse(emptyList())
-        if (freeWorkers.size > 0) {
-            val task = notStartedTasks.remove()
-            val freeWorkersIds = freeWorkers.map { it: IWorkerPawn -> (it as Entity).id }.toList()
-            this.addTask(task, freeWorkersIds, player)
+
+        if (readyWorkers.isNotEmpty()) {
+            val inProgressTask = tasksInProgress.values
+                .firstOrNull { it.notCancelled() && it.canTakeMoreWorkers() }
+                ?.also { setPawnsToTask(it, readyWorkers) }
+
+            if (inProgressTask == null) {
+                notStartedTasks.poll()?.let {
+                    val selectedPawnIds = readyWorkers.map { w -> (w as Entity).id }
+                    this.addTask(it, selectedPawnIds, player)
+                }
+            }
         }
     }
 
     override fun cancelTask(id: UUID, player: ServerPlayerEntity) {
-        removeAllFinishedTasks()
-        val removedTask = nonFinishedTasks.remove(id)
+        val removedTask = tasksInProgress.remove(id)
         removedTask?.cancel()
         ServerModUtils.getManagersProvider(player).ifPresent { it: IServerManagersProvider ->
             it.resourceManager.returnReservedItems(id)
@@ -68,21 +76,23 @@ class ServerTaskManager : IServerTaskManager, IWritableManager, ITickableManager
     }
 
     private fun removeAllFinishedTasks() {
-        val finishedTasks = nonFinishedTasks.filterValues { it.isComplete() }.keys
-        finishedTasks.forEach { nonFinishedTasks.remove(it) }
+        val finishedTasks = tasksInProgress.filterValues { it.isComplete() }.keys
+        finishedTasks.forEach { tasksInProgress.remove(it) }
     }
 
     private fun setPawnsToTask(task: IBaseTask, workers: List<IWorkerPawn>) {
         when (task) {
             is ITask ->
                 for (worker in workers) {
-                    if (!task.hasAvailableParts()) break
+                    if (!task.hasAvailableParts() || !task.canTakeMoreWorkers()) break
+                    task.addWorker()
                     worker.taskControl.setTask(task)
                 }
 
             is IAreaBasedTask ->
                 for (worker in workers) {
-                    if (!task.hasMoreBlocks()) break
+                    if (!task.hasMoreBlocks() || !task.canTakeMoreWorkers()) break
+                    task.addWorker()
                     worker.areaBasedTaskControl.setTask(task)
                 }
 

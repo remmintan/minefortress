@@ -33,7 +33,7 @@ class PawnExecuteAreaBasedTaskGoal(colonist: Colonist) : AbstractFortressGoal(co
             }
 
             if (!movementHelper.hasReachedGoal() && movementHelper.isStuck) {
-                TODO("Fail the task, can't reach the area")
+                colonist.areaBasedTaskControl.reset()
             }
         } else {
             val currentBlock = colonist.areaBasedTaskControl.getCurrentBlock()
@@ -56,7 +56,7 @@ class PawnExecuteAreaBasedTaskGoal(colonist: Colonist) : AbstractFortressGoal(co
     }
 
     override fun shouldContinue(): Boolean {
-        return canStart() || colonist.areaBasedTaskControl.getCurrentBlock() != null
+        return colonist.areaBasedTaskControl.hasTask() && (canStart() || colonist.areaBasedTaskControl.getCurrentBlock() != null)
     }
 
     override fun stop() {

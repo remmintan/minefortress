@@ -19,6 +19,7 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkH
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo
 import java.util.*
+import kotlin.math.max
 import kotlin.math.sqrt
 
 class AreaBlueprintTask(
@@ -32,19 +33,28 @@ class AreaBlueprintTask(
     private val totalManualBlocks: Int
     private val succeededBlocks: MutableSet<BlockPos> = mutableSetOf()
     private var canceled: Boolean = false
-    private val endPos: BlockPos
+    private val endPos = startPos.down(metadata.floorLevel).add(blueprintData.size)
+
+    private var assignedWorkers = 0
 
     init {
-        endPos = startPos.down(metadata.floorLevel).add(blueprintData.size)
         val areaBox = BlockBox.create(startPos, endPos)
-
         areaData = areaBox.center to areaBox.dimensions.len() / 1.5
-
 
         val preparedBlockInfos = blueprintData.getLayer(BlueprintDataLayer.MANUAL)
             .map { (p, s) -> BlockStateTaskBlockInfo(s.block.asItem(), p.add(startPos), s) }
         blocksQueue.addAll(preparedBlockInfos)
         totalManualBlocks = preparedBlockInfos.size
+    }
+
+    override fun canTakeMoreWorkers() = hasMoreBlocks() && assignedWorkers < max(totalManualBlocks / 10, 1)
+
+    override fun addWorker() {
+        assignedWorkers++
+    }
+
+    override fun removeWorker() {
+        assignedWorkers--
     }
 
     override fun getId() = id

@@ -62,7 +62,7 @@ public interface IServerFortressManager extends IFortressManager, IWritableManag
 
     Optional<IProfessional> getPawnWithoutAProfession();
 
-    List<IWorkerPawn> getFreeWorkers();
+    List<IWorkerPawn> getReadyWorkers();
 
     void setPawnsSkin(PawnSkin skin);
 

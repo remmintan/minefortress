@@ -31,4 +31,8 @@ public interface ITaskControl {
     Optional<UUID> getTaskId();
 
     @Nullable ITaskBlockInfo getNextBlock();
+
+    void tick();
+
+    boolean readyToTakeNewTask();
 }

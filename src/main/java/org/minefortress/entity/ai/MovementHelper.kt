@@ -3,7 +3,6 @@ package org.minefortress.entity.ai
 import baritone.api.IBaritone
 import baritone.api.event.events.PathEvent
 import baritone.api.event.listener.AbstractGameEventListener
-import baritone.api.pathing.calc.IPath
 import baritone.api.pathing.goals.GoalNear
 import baritone.api.utils.BetterBlockPos
 import net.minecraft.entity.Entity
@@ -11,6 +10,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.ModLogger
 import org.minefortress.entity.Colonist
+import kotlin.math.floor
 
 
 class MovementHelper(private val colonist: Colonist) {
@@ -64,7 +64,7 @@ class MovementHelper(private val colonist: Colonist) {
         ModLogger.LOGGER.debug("{} set new goal {}. speed: {}", colonistName, goal, speed)
         this.reset()
         this.goal = goal
-        this.distance = reachDistance
+        this.distance = floor(reachDistance)
         if (this.goal == null) return
         colonist.movementSpeed = speed
         if (this.hasReachedGoal()) {
@@ -75,7 +75,7 @@ class MovementHelper(private val colonist: Colonist) {
             colonist.wakeUp()
         }
 
-        baritone.customGoalProcess.setGoalAndPath(GoalNear(this.goal, reachDistance.toInt() - 1))
+        baritone.customGoalProcess.setGoalAndPath(GoalNear(this.goal, this.distance.toInt() - 1))
     }
 
     fun follow(entity: LivingEntity, speed: Float) {
@@ -87,9 +87,7 @@ class MovementHelper(private val colonist: Colonist) {
 
     fun hasReachedGoal(): Boolean {
         return goal?.let {
-            val withinDistance =
-                it.isWithinDistance(colonist.blockPos, distance) || isStuck
-            withinDistance && !baritone.pathingBehavior.isPathing
+            it.isWithinDistance(colonist.pos, distance) && !baritone.pathingBehavior.isPathing
         } ?: false
     }
 
@@ -139,7 +137,7 @@ class MovementHelper(private val colonist: Colonist) {
             }
 
             if (pathEvent == PathEvent.CALC_FINISHED_NOW_EXECUTING) {
-                val dest = baritone.pathingBehavior.path.map { obj: IPath -> obj.dest }.orElse(BetterBlockPos.ORIGIN)
+                val dest = baritone.pathingBehavior.path.map { it.dest }.orElse(BetterBlockPos.ORIGIN)
                 if (lastDestination != null) {
                     if (dest == lastDestination) {
                         stuckCounter++
@@ -147,7 +145,7 @@ class MovementHelper(private val colonist: Colonist) {
                             "{} Calculated destination is the same as previous for {} ticks (going in circles). [Goal: {}]",
                             colonistName, stuckCounter, goal
                         )
-                        if (stuckCounter > 1) {
+                        if (stuckCounter > 3) {
                             ModLogger.LOGGER.debug(
                                 "{} going in circles for too much time {} [goal: {}]",
                                 colonistName, stuckCounter, goal

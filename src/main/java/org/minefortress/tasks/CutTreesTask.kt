@@ -17,6 +17,7 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkH
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket
 import org.minefortress.tasks.block.info.DigTaskBlockInfo
 import java.util.*
+import kotlin.math.max
 
 class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, TreeData>) : ITask {
     private val treeRoots: Queue<BlockPos> = ArrayDeque(trees.keys)
@@ -24,6 +25,8 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
 
     private var removedTrees = 0
     private var canceled = false
+
+    private var assignedWorkers = 0
 
     override fun getId(): UUID {
         return uuid
@@ -83,5 +86,17 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
     override fun toTaskInformationDto(): List<TaskInformationDto> {
         val positions = trees.values.flatMap { listOf(it.treeLogBlocks, it.treeLeavesBlocks).flatten() }
         return listOf(TaskInformationDto(getId(), positions, TaskType.REMOVE))
+    }
+
+    override fun canTakeMoreWorkers(): Boolean {
+        return assignedWorkers < max(totalTreesCount / 3, 1)
+    }
+
+    override fun addWorker() {
+        assignedWorkers++
+    }
+
+    override fun removeWorker() {
+        assignedWorkers--
     }
 }

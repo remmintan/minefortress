@@ -24,6 +24,8 @@ public class TaskControl implements ITaskControl {
     private ITask task;
     private ITaskPart taskPart;
 
+    private int cooldown = 0;
+
     public TaskControl(Colonist worker) {
         this.worker = worker;
     }
@@ -41,7 +43,7 @@ public class TaskControl implements ITaskControl {
     public void fail() {
         if(taskPart!=null)
             taskPart.returnTaskPart();
-        this.resetTaskPart();
+        this.resetAll();
     }
 
     @Override
@@ -98,6 +100,16 @@ public class TaskControl implements ITaskControl {
         return taskPart.next();
     }
 
+    @Override
+    public void tick() {
+        if (cooldown > 0) cooldown--;
+    }
+
+    @Override
+    public boolean readyToTakeNewTask() {
+        return cooldown <= 0 && !hasTask() && !isDoingEverydayTasks();
+    }
+
     private void updateCurrentTaskDesription() {
         if (task instanceof SimpleSelectionTask) {
             if (task.getTaskType() == TaskType.REMOVE) {
@@ -114,9 +126,20 @@ public class TaskControl implements ITaskControl {
         }
     }
 
+
     private void resetTaskPart() {
-        if (task != null && task.isComplete())
+        if (task != null && task.isComplete()) {
+            resetAll();
+        }
+
+        this.taskPart = null;
+    }
+
+    private void resetAll() {
+        if (task != null) {
+            this.task.removeWorker();
             this.task = null;
+        }
         this.taskPart = null;
     }
 

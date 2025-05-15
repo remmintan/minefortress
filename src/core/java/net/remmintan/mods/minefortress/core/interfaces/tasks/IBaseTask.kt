@@ -12,4 +12,8 @@ interface IBaseTask {
     fun cancel()
     fun notCancelled(): Boolean
 
+    fun canTakeMoreWorkers(): Boolean
+    fun addWorker()
+    fun removeWorker()
+
 }
