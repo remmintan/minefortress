@@ -1,13 +1,12 @@
 package org.minefortress.blueprints.manager;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.*;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressS2CPacket;
@@ -21,7 +20,8 @@ import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncBlueprintPa
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.blueprints.data.ServerStructureBlockDataManager;
-import org.minefortress.tasks.*;
+import org.minefortress.tasks.AreaBlueprintTask;
+import org.minefortress.tasks.PlaceCampfireTask;
 
 import java.util.*;
 
@@ -96,46 +96,16 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
     }
 
     @Override
-    public BlueprintTask createTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation) {
-        final var blueprintMetadata = this.get(blueprintId);
-        final var serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation, blueprintMetadata.getFloorLevel());
-        final Vec3i size = serverStructureInfo.getSize();
-        startPos = startPos.down(blueprintMetadata.getFloorLevel());
-        final BlockPos endPos = getEndPos(startPos, size);
-        final Map<BlockPos, BlockState> manualLayer = serverStructureInfo.getLayer(BlueprintDataLayer.MANUAL);
-        final Map<BlockPos, BlockState> automatic = serverStructureInfo.getLayer(BlueprintDataLayer.AUTOMATIC);
-        final Map<BlockPos, BlockState> entityLayer = serverStructureInfo.getLayer(BlueprintDataLayer.ENTITY);
-        return new BlueprintTask(
-                taskId,
-                startPos,
-                endPos,
-                blueprintMetadata,
-                manualLayer,
-                automatic,
-                entityLayer
-        );
-    }
-
-    @Override
-    public IAreaBasedTask createAreaBasedTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation) {
+    public IAreaBasedTask createAreaBasedTask(UUID taskId, String blueprintId, BlockPos startPos, BlockRotation rotation, World world) {
         final var metadata = this.get(blueprintId);
         final var structureData = blockDataManager.getBlockData(blueprintId, rotation, metadata.getFloorLevel());
         return new AreaBlueprintTask(
                 taskId,
                 metadata,
                 startPos,
-                structureData
+                structureData,
+                world
         );
-    }
-
-    @Override
-    public SimpleSelectionTask createDigTask(UUID taskId, BlockPos startPos, int floorLevel, String blueprintId, BlockRotation rotation) {
-        final IStructureBlockData serverStructureInfo = blockDataManager.getBlockData(blueprintId, rotation);
-        final Vec3i size = serverStructureInfo.getSize();
-        startPos = startPos.down(floorLevel);
-        final BlockPos endPos = getEndPos(startPos, size);
-
-        return new BlueprintDigTask(taskId, startPos, endPos);
     }
 
     @Override
@@ -205,10 +175,6 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
                 blueprints.put(blueprintId, metadata);
             }
         }
-    }
-
-    private static BlockPos getEndPos(BlockPos startPos, Vec3i size) {
-        return startPos.add(new Vec3i(size.getX() - 1, size.getY() - 1, size.getZ() - 1));
     }
 
 }

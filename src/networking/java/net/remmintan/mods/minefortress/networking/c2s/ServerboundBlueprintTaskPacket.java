@@ -73,12 +73,11 @@ public class ServerboundBlueprintTaskPacket implements FortressC2SPacket {
         }
 
         final var taskId = UUID.randomUUID();
-        final var task = blueprintManager.createAreaBasedTask(taskId, blueprintId, startPos, rotation);
+        final var task = blueprintManager.createAreaBasedTask(taskId, blueprintId, startPos, rotation, server.getOverworld());
         final var serverResourceManager = provider.getResourceManager();
 
         if (reserveItems(server, player, blueprintManager, serverResourceManager, taskId))
             provider.getTaskManager().addTask(task, selectedPawns, player);
-
     }
 
     private boolean reserveItems(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player, IServerBlueprintManager blueprintManager, IServerResourceManager serverResourceManager, UUID taskId) {

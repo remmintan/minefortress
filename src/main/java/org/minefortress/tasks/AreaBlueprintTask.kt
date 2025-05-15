@@ -4,6 +4,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.util.math.BlockBox
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
+import net.minecraft.world.World
 import net.remmintan.mods.minefortress.core.TaskType
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto
@@ -12,12 +13,14 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBloc
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreaBasedTask
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo
+import net.remmintan.mods.minefortress.core.utils.BuildingHelper
 import net.remmintan.mods.minefortress.core.utils.getFortressOwner
 import net.remmintan.mods.minefortress.core.utils.getManagersProvider
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo
+import org.minefortress.tasks.block.info.DigTaskBlockInfo
 import java.util.*
 import kotlin.math.max
 import kotlin.math.sqrt
@@ -25,29 +28,43 @@ import kotlin.math.sqrt
 class AreaBlueprintTask(
     private val id: UUID,
     private val metadata: BlueprintMetadata,
-    private val startPos: BlockPos,
+    placePos: BlockPos,
     private val blueprintData: IStructureBlockData,
+    world: World
 ) : IAreaBasedTask {
     override val areaData: Pair<BlockPos, Double>
+    private val startPos = placePos.down(metadata.floorLevel)
+    private val endPos = startPos.add(blueprintData.size)
     private val blocksQueue: Queue<ITaskBlockInfo> = LinkedList()
     private val totalManualBlocks: Int
     private val succeededBlocks: MutableSet<BlockPos> = mutableSetOf()
-    private var canceled: Boolean = false
-    private val endPos = startPos.down(metadata.floorLevel).add(blueprintData.size)
 
+    private var canceled: Boolean = false
     private var assignedWorkers = 0
 
     init {
         val areaBox = BlockBox.create(startPos, endPos)
         areaData = areaBox.center to areaBox.dimensions.len() / 1.5
 
-        val preparedBlockInfos = blueprintData.getLayer(BlueprintDataLayer.MANUAL)
+        val manualLayer = blueprintData.getLayer(BlueprintDataLayer.MANUAL)
+        val autoLayer = blueprintData.getLayer(BlueprintDataLayer.AUTOMATIC)
+        val entityLayer = blueprintData.getLayer(BlueprintDataLayer.ENTITY)
+
+        val digPositions = (manualLayer + autoLayer + entityLayer)
+            .filterValues { !it.isAir }
+            .keys
+            .map { it.add(startPos) }
+            .filter { !BuildingHelper.canPlaceBlock(world, it) }
+            .map { DigTaskBlockInfo(it) }
+        blocksQueue.addAll(digPositions)
+
+        val preparedBlockInfos = manualLayer
             .map { (p, s) -> BlockStateTaskBlockInfo(s.block.asItem(), p.add(startPos), s) }
         blocksQueue.addAll(preparedBlockInfos)
         totalManualBlocks = preparedBlockInfos.size
     }
 
-    override fun canTakeMoreWorkers() = hasMoreBlocks() && assignedWorkers < max(totalManualBlocks / 10, 1)
+    override fun canTakeMoreWorkers() = hasMoreBlocks() && (assignedWorkers < max(totalManualBlocks / 10, 1))
 
     override fun addWorker() {
         assignedWorkers++
