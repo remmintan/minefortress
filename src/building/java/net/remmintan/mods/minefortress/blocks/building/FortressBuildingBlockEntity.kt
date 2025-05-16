@@ -129,9 +129,6 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         this.furnaceBlockPositions = this.blockData?.referenceState
             ?.filter { it.blockState?.isOf(Blocks.FURNACE) == true }
             ?.map { it.pos.toImmutable() }
-            ?.asSequence()
-            ?.take(this.upgrades.size * 2) // +1 building level = +2 furnaces
-            ?.toList()
     }
 
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
