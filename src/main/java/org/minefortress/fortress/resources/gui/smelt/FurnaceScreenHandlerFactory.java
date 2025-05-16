@@ -48,7 +48,7 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
                     .toList();
 
             final BlockPos selectedFurnacePos = furnacePos == null ?  otherFurnacePositions.get(0).get(0) : furnacePos;
-            final var otherFurnacesDelegates = otherFurnacePositions.stream().flatMap(List::stream)
+            final var otherFurnacesDelegates = otherFurnacePositions.stream().flatMap(List::stream).limit(blacksmithsCount)
                     .map(it -> {
                         final var blockEnt = player.getWorld().getBlockEntity(it);
                         if (blockEnt instanceof FurnaceBlockEntity furnaceBlockEntity) {
