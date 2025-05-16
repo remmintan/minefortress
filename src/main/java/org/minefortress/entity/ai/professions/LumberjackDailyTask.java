@@ -93,7 +93,7 @@ public class LumberjackDailyTask extends AbstractAutomationAreaTask {
             } else {
                 ServerModUtils.getManagersProvider(colonist)
                         .ifPresent(it ->
-                                new TreeRemover((ServerWorld) world, null, colonist).removeTheTree(tree));
+                                new TreeRemover((ServerWorld) world, it.getResourceManager(), colonist).removeTheTree(tree));
 
                 tree = null;
             }
