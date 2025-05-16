@@ -1,5 +1,6 @@
 package org.minefortress.entity.ai.professions;
 
+import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
@@ -59,19 +60,31 @@ public class BlacksmithDailyTask extends AbstractStayNearBlockDailyTask{
             return null;
         }
 
-        final var i = new Random().nextInt(buildings.size());
-        final var furnace = buildings.get(i).getFurnace();
-        return furnace != null ? furnace.getPos() : null;
+        // Choose a random furnace in a random building
+        final var randBuilding = new Random().nextInt(buildings.size());
+        final var randFurnace = new Random().nextInt(buildings.get(randBuilding).getFurnacePos().size());
+        return buildings.get(randBuilding).getFurnacePos().get(randFurnace);
     }
 
     private boolean atLeastOneFurnaceIsBurning(Colonist colonist){
         // Use ServerModUtils to get buildings directly
         final var buildings = getBuildings(colonist);
+        List<BlockPos> furnaces = null;
 
         for (IFortressBuilding building : buildings) {
-            final var furnace = building.getFurnace();
-            if (furnace != null && furnace.isBurning()) {
-                return true;
+            // Attempt to get the furnace position. If it's null, find all furnaces and cache them.
+            furnaces = building.getFurnacePos();
+
+            if (null != furnaces) {
+                for (BlockPos pos : building.getFurnacePos()) {
+                    final var furnace = (FurnaceBlockEntity) colonist.getWorld().getBlockEntity(pos);
+                    if (furnace != null && furnace.isBurning()) {
+                        return true;
+                    }
+                }
+            } else {
+                // Find and cache furnaces.
+                building.findFurnaces();
             }
         }
 
