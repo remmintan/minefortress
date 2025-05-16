@@ -77,9 +77,9 @@ public interface IFortressBuilding {
 
     Map<BlockPos, BlockState> getBlocksToRepair();
 
-    FurnaceBlockEntity getFurnace();
+    List<BlockPos> getFurnacePos();
 
-    BlockPos getFurnacePos();
+    void findFurnaces();
 
     IBuildingHireHandler getHireHandler();
 }

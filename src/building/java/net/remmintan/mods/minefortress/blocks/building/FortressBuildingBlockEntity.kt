@@ -49,7 +49,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     private var start: BlockPos? = null
     private var end: BlockPos? = null
     private var blockData: FortressBuildingBlockData? = null
-    private var furnaceBlockPos: BlockPos? = null
+    private var furnaceBlockPositions: List<BlockPos>? = null
     private var hireHandler: BuildingHireHandler = BuildingHireHandler()
     private val attackers: MutableSet<HostileEntity> = HashSet()
     var selectedTabIndex = 0
@@ -84,11 +84,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
 
         this.blockData = FortressBuildingBlockData(movedBlocksData, metadata.floorLevel)
 
-        this.furnaceBlockPos = BlockPos.stream(start, end)
-            .filter { pos -> world?.getBlockState(pos)?.block == Blocks.FURNACE }
-            .map { it.toImmutable() }
-            .findFirst()
-            .orElse(null)
+        this.findFurnaces();
 
         this.hireHandler = BuildingHireHandler()
     }
@@ -126,14 +122,17 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
 
     override fun getHireHandler() = hireHandler
 
-    override fun getFurnace(): FurnaceBlockEntity? =
-        furnaceBlockPos?.let { this.getWorld()?.let { w -> w.getBlockEntity(it) as? FurnaceBlockEntity } }
+    override fun getFurnacePos(): List<BlockPos>? =
+        furnaceBlockPositions;
 
-    override fun getFurnacePos(): BlockPos? =
-        this.blockData?.referenceState
-            ?.filter { it.blockState.block?.translationKey == "block.minecraft.furnace" }
-            ?.map { it.pos }
-            ?.get(0)
+    override fun findFurnaces() {
+        this.furnaceBlockPositions = this.blockData?.referenceState
+            ?.filter { it.blockState?.isOf(Blocks.FURNACE) == true }
+            ?.map { it.pos.toImmutable() }
+            ?.asSequence()
+            ?.take(this.upgrades.size * 2) // +1 building level = +2 furnaces
+            ?.toList()
+    }
 
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
         val propertyDelegate = object : PropertyDelegate {

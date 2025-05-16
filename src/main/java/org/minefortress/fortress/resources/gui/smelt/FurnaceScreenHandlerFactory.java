@@ -15,6 +15,7 @@ import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuildi
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
 
 public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
@@ -46,12 +47,12 @@ public class FurnaceScreenHandlerFactory implements NamedScreenHandlerFactory {
                     .filter(Objects::nonNull)
                     .toList();
 
-            final BlockPos selectedFurnacePos = furnacePos == null ?  otherFurnacePositions.get(0) : furnacePos;
-            final var otherFurnacesDelegates = otherFurnacePositions.stream()
+            final BlockPos selectedFurnacePos = furnacePos == null ?  otherFurnacePositions.get(0).get(0) : furnacePos;
+            final var otherFurnacesDelegates = otherFurnacePositions.stream().flatMap(List::stream)
                     .map(it -> {
                         final var blockEnt = player.getWorld().getBlockEntity(it);
                         if (blockEnt instanceof FurnaceBlockEntity furnaceBlockEntity) {
-                            return (PropertyDelegate)new FortressFurnacePropertyDelegateImpl(furnaceBlockEntity, furnaceBlockEntity.getPos().equals(selectedFurnacePos));
+                            return (PropertyDelegate) new FortressFurnacePropertyDelegateImpl(furnaceBlockEntity, furnaceBlockEntity.getPos().equals(selectedFurnacePos));
                         }
                         return null;
                     })
