@@ -133,12 +133,12 @@ public abstract class AbstractTask implements ITask, ITaskWithPreparation {
 
     @Override
     public void removeWorker() {
-        this.assignedWorkers++;
+        this.assignedWorkers--;
     }
 
     @Override
     public void addWorker() {
-        this.assignedWorkers--;
+        this.assignedWorkers++;
     }
 
     @Override

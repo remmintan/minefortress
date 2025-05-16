@@ -22,7 +22,7 @@ class TasksCreator(private val serverWorld: ServerWorld) : ITasksCreator {
         return CutTreesTask(uuid, trees)
     }
 
-    override fun createRoadsTask(uuid: UUID, blocks: List<BlockPos>, itemInHand: Item): ITask {
+    override fun createRoadsTask(uuid: UUID, blocks: List<BlockPos>, itemInHand: Item?): ITask {
         return RoadsTask(uuid, blocks, itemInHand)
     }
 
