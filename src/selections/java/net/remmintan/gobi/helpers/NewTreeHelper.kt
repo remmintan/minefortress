@@ -13,14 +13,19 @@ import net.remmintan.mods.minefortress.core.utils.isSurvivalFortress
 import java.util.*
 
 
-class TreeFinder(private val world: World) {
+class TreeFinder(private val world: World, alreadySelectedLogs: Set<BlockPos> = emptySet()) {
 
     private val globalProcessedLogs = mutableSetOf<BlockPos>()
+
+    init {
+        globalProcessedLogs.addAll(alreadySelectedLogs)
+    }
 
     fun findTree(pos: BlockPos): TreeData? {
         val logs = findConnectedLogsBFS(pos)
         if (logs.isEmpty()) return null
         val leaves = findAssociatedLeavesBFS(logs)
+        if (leaves.isEmpty()) return null
         val root = findRootOfTree(logs)
         return TreeData(logs, leaves, root)
     }

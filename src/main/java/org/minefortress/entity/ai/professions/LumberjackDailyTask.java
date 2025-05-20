@@ -84,7 +84,7 @@ public class LumberjackDailyTask extends AbstractAutomationAreaTask {
         final var world = colonist.getWorld();
         final var blockState = world.getBlockState(pos);
         if(blockState.isIn(BlockTags.AXE_MINEABLE)) {
-            this.tree = new TreeFinder(world).findTree(pos);
+            this.tree = new TreeFinder(world, Collections.emptySet()).findTree(pos);
             colonist.setGoal(new DigTaskBlockInfo(pos));
         } else {
             if (tree == null) {

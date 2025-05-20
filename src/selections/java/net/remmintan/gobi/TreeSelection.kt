@@ -96,7 +96,7 @@ class TreeSelection : Selection() {
             .forEach { selectedTrees.remove(it) }
 
         // adding new trees
-        val treeFinder = TreeFinder(world)
+        val treeFinder = TreeFinder(world, selectedTrees.values.flatMap { it.treeLogBlocks }.toSet())
         for (pos in start!! iterateTo end!!) {
             if (prevBox?.contains(pos) == true) continue
             if (treeFinder.visited(pos)) continue
