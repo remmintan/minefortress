@@ -9,8 +9,9 @@ import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResource
 import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ClientResourceManagerImpl implements IClientResourceManager {
@@ -32,44 +33,141 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
     }
 
     @Override
-    public boolean hasItems(final List<ItemInfo> stacks) {
+    public boolean hasItems(final List<ItemInfo> costs) {
         if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) return true;
-        return stacks
-                .stream()
-                .allMatch(it -> {
-                    final var item = it.item();
-                    final var amount = it.amount();
-                    return this.hasItem(item, amount, stacks);
-                });
+
+        // Create a mutable copy of available resources for simulation
+        Map<Item, Integer> availableResourcesCopy = new HashMap<>();
+        for (ItemGroup group : groupManager.getGroups()) { // groupManager is StackGroupsManager
+            for (ItemStack stackInGroup : groupManager.getStacksFromGroup(group)) {
+                availableResourcesCopy.merge(stackInGroup.getItem(), stackInGroup.getCount(), Integer::sum);
+            }
+        }
+
+        for (ItemInfo cost : costs) {
+            Item requiredItem = cost.item();
+            int requiredAmount = cost.amount();
+
+            // Try exact match first
+            int countFromExact = availableResourcesCopy.getOrDefault(requiredItem, 0);
+            if (countFromExact >= requiredAmount) {
+                availableResourcesCopy.put(requiredItem, countFromExact - requiredAmount);
+                continue; // Requirement met by exact item
+            }
+
+            // Use whatever exact amount is available
+            int remainingNeeded = requiredAmount;
+            if (countFromExact > 0) {
+                availableResourcesCopy.put(requiredItem, 0);
+                remainingNeeded -= countFromExact;
+            }
+
+            if (remainingNeeded == 0) continue;
+
+            // Try similar items
+            List<Item> similarItems = SimilarItemsHelper.getSimilarItems(requiredItem);
+            boolean foundEnoughForThisCostItem = false;
+            for (Item similarItem : similarItems) {
+                int countFromSimilar = availableResourcesCopy.getOrDefault(similarItem, 0);
+                if (countFromSimilar > 0) {
+                    if (countFromSimilar >= remainingNeeded) {
+                        availableResourcesCopy.put(similarItem, countFromSimilar - remainingNeeded);
+                        remainingNeeded = 0;
+                        foundEnoughForThisCostItem = true;
+                        break;
+                    } else {
+                        availableResourcesCopy.put(similarItem, 0);
+                        remainingNeeded -= countFromSimilar;
+                    }
+                }
+            }
+
+            if (!foundEnoughForThisCostItem && remainingNeeded > 0) {
+                return false; // Cannot satisfy this cost
+            }
+        }
+        return true; // All costs satisfied
     }
 
     @Override
-    public boolean hasItem(ItemInfo itemInfo, List<ItemInfo> items) {
-        final var item = itemInfo.item();
-        final var amount = itemInfo.amount();
-        return hasItem(item, amount, items);
+    public int getCountIncludingSimilars(Item item) {
+        if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) {
+            return 999; // Or Integer.MAX_VALUE
+        }
+        int count = getItemAmount(item); // Gets exact item count from existing method
+        for (Item similar : SimilarItemsHelper.getSimilarItems(item)) {
+            count += getItemAmount(similar); // Adds counts of similar items
+        }
+        return count;
     }
 
-    private boolean hasItem(Item item, int amount, List<ItemInfo> items) {
-        final var group = groupManager.getGroup(item);
-        final var manager = groupManager.getStacksManager(group);
-        final var stack = manager.getStack(item);
-        if (stack == null) return false;
-        final var availableAmount = stack.getCount();
-        if(availableAmount >= amount) return true;
-        final var amountOfNonEmptySimilarElements = groupManager
-                .getNonEmptySimilarStacks(item)
-                .stream()
-                .map(ItemStack::getCount)
-                .reduce(0, Integer::sum);
+    @Override
+    public boolean hasItem(ItemInfo singleCostItem, List<ItemInfo> allCostItems) {
+        // This method is tricky if allCostItems contains other items that might compete for similars.
+        // A true check would be to call hasItems on a list containing just singleCostItem,
+        // but that doesn't account for shared resources.
+        // For display purposes, it's better to rely on the global check.
+        // However, if it must provide *some* individual estimate:
+        if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) return true;
 
-        final var similarItemsSet = new HashSet<>(SimilarItemsHelper.getSimilarItems(item));
-        final var requiredSimilarItems = items.stream()
-                .filter(it -> similarItemsSet.contains(it.item()))
-                .mapToInt(ItemInfo::amount)
-                .sum();
+        // Create a mutable copy of available resources FOR THIS CHECK ONLY
+        Map<Item, Integer> availableResourcesCopy = new HashMap<>();
+        for (ItemGroup group : groupManager.getGroups()) {
+            for (ItemStack stackInGroup : groupManager.getStacksFromGroup(group)) {
+                availableResourcesCopy.merge(stackInGroup.getItem(), stackInGroup.getCount(), Integer::sum);
+            }
+        }
 
-        return (amountOfNonEmptySimilarElements - requiredSimilarItems + availableAmount) >= amount;
+        // Simulate satisfying all items UP TO AND INCLUDING singleCostItem from allCostItems.
+        // This is to ensure that previous items in the list "consume" resources first.
+        for (ItemInfo costItemFromList : allCostItems) {
+            Item requiredItem = costItemFromList.item();
+            int requiredAmount = costItemFromList.amount();
+
+            int countFromExact = availableResourcesCopy.getOrDefault(requiredItem, 0);
+            if (countFromExact >= requiredAmount) {
+                availableResourcesCopy.put(requiredItem, countFromExact - requiredAmount);
+                if (costItemFromList.equals(singleCostItem)) return true; // Current item satisfied
+                continue;
+            }
+
+            int remainingNeeded = requiredAmount - countFromExact;
+            if (countFromExact > 0)
+                availableResourcesCopy.put(requiredItem, 0);
+
+            if (remainingNeeded == 0 && costItemFromList.equals(singleCostItem)) return true;
+            if (remainingNeeded == 0) continue;
+
+            List<Item> similarItems = SimilarItemsHelper.getSimilarItems(requiredItem);
+            boolean currentItemSatisfied = false;
+            for (Item similar : similarItems) {
+                int countFromSimilar = availableResourcesCopy.getOrDefault(similar, 0);
+                if (countFromSimilar > 0) {
+                    if (countFromSimilar >= remainingNeeded) {
+                        availableResourcesCopy.put(similar, countFromSimilar - remainingNeeded);
+                        remainingNeeded = 0;
+                        currentItemSatisfied = true;
+                        break;
+                    } else {
+                        availableResourcesCopy.put(similar, 0);
+                        remainingNeeded -= countFromSimilar;
+                    }
+                }
+            }
+
+            if (costItemFromList.equals(singleCostItem)) {
+                return currentItemSatisfied && remainingNeeded == 0;
+            }
+
+            if (!currentItemSatisfied && remainingNeeded > 0) {
+                // A previous item in the list could not be satisfied.
+                // If singleCostItem hasn't been reached yet, this means it's effectively false too
+                // as resources are consumed in order.
+                return false;
+            }
+        }
+        // Should ideally not be reached if singleCostItem is in allCostItems
+        return false;
     }
 
     @Override

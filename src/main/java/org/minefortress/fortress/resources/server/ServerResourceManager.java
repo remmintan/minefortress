@@ -1,9 +1,7 @@
 package org.minefortress.fortress.resources.server;
 
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
@@ -24,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.minefortress.fortress.resources.client.FortressItemStack;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ServerResourceManager implements IServerResourceManager, ITickableManager, IWritableManager {
 
@@ -66,45 +65,56 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
 
     @Override
     public void reserveItems(UUID taskId, List<ItemInfo> infos) {
-        if(!hasItems(infos)) throw new IllegalStateException("Not enough resources");
+        if (!hasItems(infos)) {
+            String availableResStr = resources.getAll().stream().map(it -> it.item().toString() + ":" + it.amount()).collect(Collectors.joining(", "));
+            String requiredResStr = infos.stream().map(it -> it.item().toString() + ":" + it.amount()).collect(Collectors.joining(", "));
+            LogManager.getLogger().error("ResourceManager: Not enough resources to reserve. TaskId: " + taskId +
+                    ", Required: [" + requiredResStr + "], Available: [" + availableResStr + "]");
+            throw new IllegalStateException("Not enough resources to reserve items for task " + taskId);
+        }
 
         final var reservedItemsManager = this.getManagerFromTaskId(taskId);
         final var infosToSync = new ArrayList<ItemInfo>();
-        for (ItemInfo info : infos) {
-            final var item = info.item();
-            final var requiredAmount = info.amount();
-            final var stack = resources.getStack(item);
-            final var reservedStack = reservedItemsManager.getStack(item);
 
-            var yetToFulfill = requiredAmount - stack.getAmount();
+        for (ItemInfo costInfo : infos) {
+            Item requiredItem = costInfo.item();
+            int amountToReserve = costInfo.amount();
 
-            if(yetToFulfill>0) {
-                final var existingAmount = stack.getAmount();
-                stack.decreaseBy(existingAmount);
-                reservedStack.increaseBy(existingAmount);
-            } else {
-                stack.decreaseBy(requiredAmount);
-                reservedStack.increaseBy(requiredAmount);
+            // Try to take from exact item first
+            EasyItemStack exactResourceStack = resources.getStack(requiredItem);
+            int takenFromExact = Math.min(amountToReserve, exactResourceStack.getAmount());
+
+            if (takenFromExact > 0) {
+                exactResourceStack.decreaseBy(takenFromExact);
+                reservedItemsManager.getStack(requiredItem).increaseBy(takenFromExact);
+                infosToSync.add(new ItemInfo(requiredItem, exactResourceStack.getAmount()));
+                amountToReserve -= takenFromExact;
             }
-            infosToSync.add(new ItemInfo(item, stack.getAmount()));
 
-            if(yetToFulfill>0) {
-                final var similarItems = resources.getNonEmptySimilarStacks(item);
-                for(var similarStack : similarItems) {
-                    var newReservedStack = reservedItemsManager.getStack(similarStack.getItem());
-                    final var similarStackAmount = similarStack.getAmount();
-                    if(similarStackAmount >=yetToFulfill) {
-                        similarStack.decreaseBy(yetToFulfill);
-                        newReservedStack.increaseBy(yetToFulfill);
-                        yetToFulfill = 0;
-                    } else {
-                        yetToFulfill -= similarStackAmount;
-                        similarStack.decreaseBy(similarStackAmount);
-                        newReservedStack.increaseBy(similarStackAmount);
+            if (amountToReserve > 0) {
+                // Need to take from similar items
+                List<Item> similarItems = SimilarItemsHelper.getSimilarItems(requiredItem);
+                for (Item similarItem : similarItems) {
+                    if (amountToReserve == 0) break;
+
+                    EasyItemStack similarResourceStack = resources.getStack(similarItem);
+                    int takenFromSimilar = Math.min(amountToReserve, similarResourceStack.getAmount());
+
+                    if (takenFromSimilar > 0) {
+                        similarResourceStack.decreaseBy(takenFromSimilar);
+                        reservedItemsManager.getStack(similarItem).increaseBy(takenFromSimilar);
+                        infosToSync.add(new ItemInfo(similarItem, similarResourceStack.getAmount()));
+                        amountToReserve -= takenFromSimilar;
                     }
-                    infosToSync.add(new ItemInfo(similarStack.getItem(), similarStack.getAmount()));
-                    if(yetToFulfill==0) break;
                 }
+            }
+
+            if (amountToReserve > 0) {
+                // This should not be reached if hasItems is correct and there are no concurrency issues.
+                LogManager.getLogger().error("ResourceManager: Error during reservation. Could not fully reserve " +
+                        requiredItem + " (needed " + costInfo.amount() + ", still need " + amountToReserve +
+                        " after trying exact and similars). TaskId: " + taskId);
+                // Potentially throw an exception or handle this state if partial reservation is not allowed.
             }
         }
 
@@ -112,44 +122,104 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
     }
 
     @Override
-    public void removeReservedItem(UUID taskId, Item item) {
-        boolean ignoreWhenNotEnough = false;
-
-        removeReservedItem(taskId, item, ignoreWhenNotEnough);
+    public void removeReservedItem(UUID taskId, Item itemUsedInConcept) {
+        removeReservedItemInternal(taskId, itemUsedInConcept, false);
     }
 
-    private void removeReservedItem(UUID taskId, Item item, boolean ignoreWhenNotEnough) {
-        if(!(item instanceof BlockItem)) return;
+    @Override
+    public void removeItemIfExists(UUID taskId, Item itemUsedInConcept) {
+        removeReservedItemInternal(taskId, itemUsedInConcept, true);
+    }
 
-        final var reservedItemsManager = this.getManagerFromTaskId(taskId);
-        final var reservedStack = reservedItemsManager.getStack(item);
-        if(reservedStack.getAmount() >= 1) {
-            reservedStack.decrease();
-        } else {
-            final var nonEmptySimilarStacks = reservedItemsManager.getNonEmptySimilarStacks(item);
-            if(!nonEmptySimilarStacks.isEmpty()) {
-                final var similarStack = nonEmptySimilarStacks.get(0);
-                similarStack.decrease();
-            } else{
-                if(!ignoreWhenNotEnough) {
-                    LogManager.getLogger().warn("Tried to remove reserved item, but not enough items: " + item.getName().getContent());
-                }
+    private void removeReservedItemInternal(UUID taskId, Item itemUsedInConcept, boolean ignoreIfNotEnough) {
+        if (!reservedResources.containsKey(taskId)) {
+            if (!ignoreIfNotEnough) {
+                LogManager.getLogger().warn("Task ID " + taskId + " not found in reserved resources for item " + itemUsedInConcept);
             }
+            return;
+        }
+
+        final var taskReservedItems = reservedResources.get(taskId); // ItemStacksManager for this task's reservations
+
+        // Try to consume the exact item if it was specifically reserved under its own type
+        EasyItemStack specificReservedStack = taskReservedItems.getStack(itemUsedInConcept);
+        if (specificReservedStack.getAmount() > 0) {
+            specificReservedStack.decrease();
+            return;
+        }
+
+        // If the exact item (itemUsedInConcept) wasn't found or is depleted in the reservation,
+        // it implies a similar item might have been substituted during reservation.
+        // We iterate through items similar to itemUsedInConcept to find what might have been reserved.
+        List<Item> potentialSubstitutes = SimilarItemsHelper.getSimilarItems(itemUsedInConcept);
+        for (Item substituteItem : potentialSubstitutes) {
+            EasyItemStack substituteReservedStack = taskReservedItems.getStack(substituteItem);
+            if (substituteReservedStack.getAmount() > 0) {
+                substituteReservedStack.decrease();
+                return; // Consumed a similar item that was in the reservation
+            }
+        }
+
+        if (!ignoreIfNotEnough) {
+            LogManager.getLogger().warn("Could not fulfill consumption of conceptual item " + itemUsedInConcept +
+                    " from task " + taskId + " reservation. Neither exact nor a suitable similar item found in the task's reservation.");
         }
     }
 
     @Override
-    public void removeItemIfExists(UUID taskId, Item item) {
-        removeReservedItem(taskId, item, true);
-    }
+    public void removeItems(List<ItemInfo> itemsToRemove) {
+        if (ServerExtensionsKt.isCreativeFortress(server)) return; // No need to remove in creative
 
-    @Override
-    public void removeItems(List<ItemInfo> items) {
-        for (ItemInfo itemInfo : items) {
-            final var stack = resources.getStack(itemInfo.item());
-            if(stack.getAmount()<=0)return;
-            stack.decreaseBy(itemInfo.amount());
-            synchronizer.syncItem(itemInfo.item(), stack.getAmount());
+        final var infosToSync = new ArrayList<ItemInfo>();
+
+        for (ItemInfo itemInfoToRemove : itemsToRemove) {
+            Item conceptualItem = itemInfoToRemove.item();
+            int amountStillNeededToRemove = itemInfoToRemove.amount();
+
+            if (amountStillNeededToRemove <= 0) continue;
+
+            // Try to remove from the exact item first
+            final EasyItemStack exactItemStack = resources.getStack(conceptualItem);
+            int amountInExactStack = exactItemStack.getAmount();
+            if (amountInExactStack > 0) {
+                int amountToRemoveFromExact = Math.min(amountStillNeededToRemove, amountInExactStack);
+                exactItemStack.decreaseBy(amountToRemoveFromExact);
+                amountStillNeededToRemove -= amountToRemoveFromExact;
+                infosToSync.add(new ItemInfo(conceptualItem, exactItemStack.getAmount()));
+            }
+
+            if (amountStillNeededToRemove > 0) {
+                // Still need to remove more, try similar items
+                List<Item> similarItems = SimilarItemsHelper.getSimilarItems(conceptualItem);
+                for (Item similarItem : similarItems) {
+                    if (amountStillNeededToRemove == 0) break;
+
+                    final EasyItemStack similarItemStack = resources.getStack(similarItem);
+                    int amountInSimilarStack = similarItemStack.getAmount();
+
+                    if (amountInSimilarStack > 0) {
+                        int amountToRemoveFromSimilar = Math.min(amountStillNeededToRemove, amountInSimilarStack);
+                        similarItemStack.decreaseBy(amountToRemoveFromSimilar);
+                        amountStillNeededToRemove -= amountToRemoveFromSimilar;
+                        infosToSync.add(new ItemInfo(similarItem, similarItemStack.getAmount()));
+                    }
+                }
+            }
+
+            if (amountStillNeededToRemove > 0) {
+                // This case should ideally not be reached if hasItems was checked properly before calling removeItems
+                // Or if the game logic allows for partial removal.
+                LogManager.getLogger().warn(
+                        String.format("Could not remove full amount of %s. Still needed: %d. This might indicate an issue with pre-checks.",
+                                conceptualItem.getName().getString(),
+                                amountStillNeededToRemove
+                        )
+                );
+            }
+        }
+
+        if (!infosToSync.isEmpty()) {
+            synchronizer.syncAll(infosToSync);
         }
     }
 
@@ -224,27 +294,56 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
     @Override
     public boolean hasItems(List<ItemInfo> infos) {
         if (ServerExtensionsKt.isCreativeFortress(server)) return true;
-        for (ItemInfo info : infos) {
-            final var item = info.item();
-            if(item == Items.FLINT_AND_STEEL || item == Items.WATER_BUCKET || item == Items.LAVA_BUCKET) continue;
-            final var amount = info.amount();
-            final var stack = resources.getStack(item);
-            if(!stack.hasEnough(amount)) {
-                final var sumAmountOfSimilarItems = resources.getNonEmptySimilarStacks(item)
-                        .stream()
-                        .map(EasyItemStack::getAmount)
-                        .reduce(0, Integer::sum);
 
-                final var similarItemsSet = new HashSet<>(SimilarItemsHelper.getSimilarItems(item));
-                final var requiredSimilarItems = infos.stream()
-                        .filter(it -> similarItemsSet.contains(it.item()))
-                        .mapToInt(ItemInfo::amount)
-                        .sum();
+        // Create a mutable copy of available resources for simulation
+        Map<Item, Integer> availableResourcesCopy = new HashMap<>();
+        for (ItemInfo currentItemInfo : resources.getAll()) { // resources is ItemStacksManager
+            availableResourcesCopy.put(currentItemInfo.item(), currentItemInfo.amount());
+        }
 
-                if(sumAmountOfSimilarItems - requiredSimilarItems + stack.getAmount() < amount) return false;
+        for (ItemInfo cost : infos) {
+            Item requiredItem = cost.item();
+            int requiredAmount = cost.amount();
+
+            // Try exact match first
+            int countFromExact = availableResourcesCopy.getOrDefault(requiredItem, 0);
+            if (countFromExact >= requiredAmount) {
+                availableResourcesCopy.put(requiredItem, countFromExact - requiredAmount);
+                continue; // Requirement met by exact item
+            }
+
+            // Use whatever exact amount is available
+            int remainingNeeded = requiredAmount;
+            if (countFromExact > 0) {
+                availableResourcesCopy.put(requiredItem, 0);
+                remainingNeeded -= countFromExact;
+            }
+
+            if (remainingNeeded == 0) continue;
+
+            // Try similar items
+            List<Item> similarItems = SimilarItemsHelper.getSimilarItems(requiredItem);
+            boolean foundEnoughForThisCostItem = false;
+            for (Item similarItem : similarItems) {
+                int countFromSimilar = availableResourcesCopy.getOrDefault(similarItem, 0);
+                if (countFromSimilar > 0) {
+                    if (countFromSimilar >= remainingNeeded) {
+                        availableResourcesCopy.put(similarItem, countFromSimilar - remainingNeeded);
+                        remainingNeeded = 0;
+                        foundEnoughForThisCostItem = true;
+                        break;
+                    } else {
+                        availableResourcesCopy.put(similarItem, 0);
+                        remainingNeeded -= countFromSimilar;
+                    }
+                }
+            }
+
+            if (!foundEnoughForThisCostItem && remainingNeeded > 0) {
+                return false; // Cannot satisfy this cost
             }
         }
-        return true;
+        return true; // All costs satisfied
     }
     
     private ItemStacksManager getManagerFromTaskId(UUID taskId) {

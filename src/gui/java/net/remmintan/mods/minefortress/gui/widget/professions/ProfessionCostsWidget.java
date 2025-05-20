@@ -5,7 +5,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item;
 import net.minecraft.text.Text;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
@@ -26,15 +26,22 @@ public class ProfessionCostsWidget implements Drawable, Element {
         this.costs = costs;
     }
 
+    private static int getItemAmountIncludingSimilars(Item item) { // Changed from getItemAmount
+        final var fortressClientManager = ClientModUtils.getFortressManager();
+        return fortressClientManager.getResourceManager().getCountIncludingSimilars(item);
+    }
+
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         int i = 0;
+
         for(var ent : costs) {
             final var stack = ent.item().getDefaultStack();
-            final var amount = ent.amount();
-            final var actualItemAmount = getItemAmount(stack);
-            final var color = actualItemAmount >= amount ? 0xFFFFFF : 0xFF0000;
-            final var countLabel = amount + "/" + GuiUtils.formatSlotCount(actualItemAmount);
+            final var requiredAmount = ent.amount();
+            final var totalAvailableForThisType = getItemAmountIncludingSimilars(ent.item());
+            final var color = totalAvailableForThisType >= requiredAmount ? 0xFFFFFF : 0xFF0000; // Color based on overall check
+
+            final var countLabel = requiredAmount + "/" + GuiUtils.formatSlotCount(totalAvailableForThisType);
             final var textRenderer = getTextRenderer();
             final var countLabelWidth = textRenderer.getWidth(countLabel);
             final var matrices = drawContext.getMatrices();
@@ -51,7 +58,6 @@ public class ProfessionCostsWidget implements Drawable, Element {
             i += (int) ((25 + countLabelWidth) * scaleFactor);
         }
 
-
         var endX = x + i;
         var endY = y + 25;
 
@@ -59,11 +65,6 @@ public class ProfessionCostsWidget implements Drawable, Element {
             final var tooltip = Stream.of("Recruitment Costs. Displays the resources", "required to hire a new unit.").map(Text::of).toList();
             drawContext.drawTooltip(getTextRenderer(), tooltip, mouseX, mouseY);
         }
-    }
-
-    private static int getItemAmount(ItemStack stack) {
-        final var fortressClientManager = ClientModUtils.getFortressManager();
-        return fortressClientManager.getResourceManager().getItemAmount(stack.getItem());
     }
 
     private static TextRenderer getTextRenderer() {

@@ -234,12 +234,8 @@
       },
       "items": [
         {
-          "id": "minecraft:crafting_table",
+          "id": "minecraft:oak_log",
           "count": 1
-        },
-        {
-          "id": "minecraft:oak_planks",
-          "count": 10
         }
       ]
     },

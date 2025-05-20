@@ -19,4 +19,6 @@ public interface IClientResourceManager extends IResourceManager {
     int getItemAmount(Item item);
     void reset();
 
+    int getCountIncludingSimilars(Item item);
+
 }

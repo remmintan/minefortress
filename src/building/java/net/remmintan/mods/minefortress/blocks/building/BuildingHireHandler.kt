@@ -164,14 +164,6 @@ class BuildingHireHandler : IBuildingHireHandler {
         }
     }
 
-    companion object {
-        fun fromNbt(tag: NbtCompound): BuildingHireHandler {
-            val buildingHireHandler = BuildingHireHandler()
-            buildingHireHandler.updateFromNbt(tag)
-            return buildingHireHandler
-        }
-    }
-
     private class HireRequest {
         var progress: Int = 0
     }
