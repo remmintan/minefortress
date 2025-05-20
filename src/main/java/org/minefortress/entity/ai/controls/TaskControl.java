@@ -110,6 +110,10 @@ public class TaskControl implements ITaskControl {
         return cooldown <= 0 && !hasTask() && !isDoingEverydayTasks();
     }
 
+    public boolean taskIsOfType(Class<? extends IBaseTask> taskClass) {
+        return taskClass.isInstance(task);
+    }
+
     private void updateCurrentTaskDesription() {
         if (task instanceof SimpleSelectionTask) {
             if (task.getTaskType() == TaskType.REMOVE) {
@@ -141,6 +145,7 @@ public class TaskControl implements ITaskControl {
             this.task = null;
         }
         this.taskPart = null;
+        cooldown = 20;
     }
 
 }

@@ -110,7 +110,6 @@ class MovementHelper(private val colonist: Colonist) {
                     goal
                 )
                 isStuck = true
-                stuckTicks = 0
             }
         } else {
             stuckTicks = 0

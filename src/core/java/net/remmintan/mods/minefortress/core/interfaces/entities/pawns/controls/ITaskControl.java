@@ -35,4 +35,6 @@ public interface ITaskControl {
     void tick();
 
     boolean readyToTakeNewTask();
+
+    boolean taskIsOfType(Class<? extends IBaseTask> taskClass);
 }

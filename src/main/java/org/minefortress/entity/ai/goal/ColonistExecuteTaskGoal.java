@@ -7,6 +7,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.I
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.ai.MovementHelper;
+import org.minefortress.tasks.CutTreesTask;
 
 public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     private final ServerWorld world;
@@ -34,6 +35,9 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         if(colonist.isSleeping()) {
             colonist.wakeUp();
         }
+        if (getTaskControl().taskIsOfType(CutTreesTask.class)) {
+            colonist.setAllowToPlaceBlockFromFarAway(true);
+        }
         moveToNextBlock();
     }
 
@@ -60,7 +64,8 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         }
 
         if (getMovementHelper().getGoal() == null) {
-            getMovementHelper().goTo(goal.getPos());
+            var distance = getTaskControl().taskIsOfType(CutTreesTask.class) ? 6f : Colonist.WORK_REACH_DISTANCE;
+            getMovementHelper().goTo(goal.getPos(), Colonist.FAST_MOVEMENT_SPEED, distance);
         }
 
         if (getMovementHelper().hasReachedGoal()) {
@@ -94,6 +99,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
                 taskControl.success();
             }
         }
+        this.colonist.setAllowToPlaceBlockFromFarAway(false);
         this.colonist.resetControls();
         this.goal = null;
     }

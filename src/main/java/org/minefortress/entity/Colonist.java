@@ -238,6 +238,7 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
         if(getPlaceControl() != null) getPlaceControl().tick();
         if(getMovementHelper() != null) getMovementHelper().tick();
         if (getAreaBasedTaskControl() != null) getAreaBasedTaskControl().tick();
+        if (getTaskControl() != null) getTaskControl().tick();
     }
 
     private boolean isHalfInWall() {
