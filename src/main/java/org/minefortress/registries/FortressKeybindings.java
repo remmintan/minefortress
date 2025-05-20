@@ -31,19 +31,19 @@ public class FortressKeybindings {
         releaseCameraKeybinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.minefortress.release_camera",
                 InputUtil.Type.KEYSYM,
-                InputUtil.GLFW_KEY_LEFT_ALT,
+                InputUtil.GLFW_KEY_LEFT_CONTROL,
                 "category.minefortress.general"
         ));
         moveSelectionUpKeybinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.minefortress.move_selection_up",
                 InputUtil.Type.KEYSYM,
-                InputUtil.GLFW_KEY_I,
+                InputUtil.GLFW_KEY_E,
                 "category.minefortress.general"
         ));
         moveSelectionDownKeybinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.minefotress.move_selection_down",
                 InputUtil.Type.KEYSYM,
-                InputUtil.GLFW_KEY_U,
+                InputUtil.GLFW_KEY_Q,
                 "category.minefortress.general"
         ));
     }

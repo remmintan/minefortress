@@ -63,6 +63,14 @@ repositories {
             includeGroupByRegex("dev\\.onyxstudios.*")
         }
     }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            // Only resolve dependencies with the group "maven.modrinth" from Modrinth
+            includeGroup "maven.modrinth"
+        }
+    }
     mavenCentral()
 }
 
@@ -77,14 +85,15 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "net.fabricmc:fabric-language-kotlin:1.10.20+kotlin.1.9.24"
+    modRuntimeOnly "maven.modrinth:keybind-fix:1.0.0"
 
     modImplementation include("com.github.Chocohead:Fabric-ASM:v2.3")
-
     modImplementation include("com.github.minefortress-mod:automatone:1.0.8-minefortress")
     modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-base:5.2.9-minefortress")
     modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-entity:5.2.9-minefortress")
     modImplementation include("com.github.minefortress-mod.minefortress-cc-api:cardinal-components-world:5.2.9-minefortress")
-    modImplementation include("net.fabricmc:fabric-language-kotlin:1.10.17+kotlin.1.9.22")
+
 }
 
 processResources {

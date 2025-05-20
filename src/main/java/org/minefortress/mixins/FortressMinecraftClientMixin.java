@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
@@ -239,6 +240,11 @@ public abstract class FortressMinecraftClientMixin extends ReentrantThreadExecut
             }
         }
 
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
+            if (screen instanceof InventoryScreen && (selectionManager.isSelecting() || clientBlueprintManager.isSelecting())) {
+                ci.cancel();
+            }
+        }
     }
 
 

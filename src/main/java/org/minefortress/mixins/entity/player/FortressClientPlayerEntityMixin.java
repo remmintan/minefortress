@@ -10,11 +10,15 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
 public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlayerEntity {
@@ -49,6 +53,18 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
         Vec3d vec31 = CameraTools.getMouseBasedViewVector(this.client, mouse.getX(), mouse.getY());
         Vec3d vec32 = vec3.add(vec31.x * maxDistance, vec31.y * maxDistance, vec31.z * maxDistance);
         return this.getWorld().raycast(new RaycastContext(vec3, vec32, RaycastContext.ShapeType.OUTLINE, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, this));
+    }
+
+    @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
+    public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
+        if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
+            final var fortressClient = ClientModUtils.getManagersProvider();
+            final var blueprintManager = fortressClient.get_BlueprintManager();
+            final var selectionManager = fortressClient.get_SelectionManager();
+            if (blueprintManager.isSelecting() || selectionManager.isSelecting()) {
+                cir.setReturnValue(false);
+            }
+        }
     }
 
 }
