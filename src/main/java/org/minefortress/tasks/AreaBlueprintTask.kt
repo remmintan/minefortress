@@ -1,6 +1,10 @@
 package org.minefortress.tasks
 
+import net.minecraft.block.BedBlock
+import net.minecraft.block.enums.BedPart
 import net.minecraft.entity.LivingEntity
+import net.minecraft.item.Item
+import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.math.BlockBox
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
@@ -13,9 +17,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBloc
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IAreaBasedTask
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo
-import net.remmintan.mods.minefortress.core.utils.BuildingHelper
-import net.remmintan.mods.minefortress.core.utils.getFortressOwner
-import net.remmintan.mods.minefortress.core.utils.getManagersProvider
+import net.remmintan.mods.minefortress.core.utils.*
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket
@@ -104,8 +106,8 @@ class AreaBlueprintTask(
 
     override fun isComplete() = succeededBlocks.size == totalManualBlocks
 
-    override fun onCompletion(pawn: IFortressAwareEntity) {
-        val world = (pawn as LivingEntity).world
+    override fun onCompletion(worker: IFortressAwareEntity) {
+        val world = (worker as LivingEntity).world
 
         val entityLayer = blueprintData.getLayer(BlueprintDataLayer.ENTITY)
         val automaticLayer = blueprintData.getLayer(BlueprintDataLayer.AUTOMATIC)
@@ -114,10 +116,12 @@ class AreaBlueprintTask(
             .forEach { (p, s) ->
                 val realPos = p.add(startPos)
                 world.setBlockState(realPos, s)
+                if (!s.isIn(BlockTags.BEDS) || s.get(BedBlock.PART) != BedPart.FOOT)
+                    removeReservedItem(worker, s.block.asItem())
             }
 
-        val pos = pawn.fortressPos ?: error("No fortress pos")
-        val server = (pawn as IFortressAwareEntity).server
+        val pos = worker.fortressPos ?: error("No fortress pos")
+        val server = (worker as IFortressAwareEntity).server
 
         val manualLayer = blueprintData.getLayer(BlueprintDataLayer.MANUAL)
         server.getManagersProvider(pos)
@@ -127,6 +131,20 @@ class AreaBlueprintTask(
         server.getFortressOwner(pos)?.let {
             val packet = ClientboundTaskExecutedPacket(this.id)
             FortressServerNetworkHelper.send(it, FortressChannelNames.FINISH_TASK, packet)
+        }
+    }
+
+    private fun removeReservedItem(worker: IFortressAwareEntity, item: Item) {
+        if (worker.server.isSurvivalFortress()) {
+            ServerModUtils.getManagersProvider(worker)
+                .map { it.resourceManager }
+                .ifPresent {
+                    if (SimilarItemsHelper.isIgnorable(item)) {
+                        it.removeItemIfExists(this.getId(), item)
+                    } else {
+                        it.removeReservedItem(this.getId(), item)
+                    }
+                }
         }
     }
 
