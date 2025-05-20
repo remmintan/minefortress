@@ -15,6 +15,7 @@ import net.remmintan.mods.minefortress.blueprints.BlueprintsDimensionKt;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IServerBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.world.BlueprintsDimensionUtilsKt;
+import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressServerPlayerEntity;
 import net.remmintan.mods.minefortress.core.interfaces.server.IPlayerManagersProvider;
 import org.jetbrains.annotations.NotNull;
@@ -138,6 +139,14 @@ public abstract class IFortressServerPlayerEntityMixin extends PlayerEntity impl
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick(CallbackInfo ci) {
         this.blueprintManager.tick(this.server, this.getServerWorld(), (ServerPlayerEntity) (Object) this);
+    }
+
+    @Inject(method = "copyFrom", at = @At("HEAD"))
+    public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
+        if (oldPlayer instanceof IFortressPlayerEntity o && this instanceof IFortressPlayerEntity t) {
+            t.set_SupportLevel(o.get_SupportLevel());
+            o.get_FortressPos().ifPresent(t::set_FortressPos);
+        }
     }
 
     @Override
