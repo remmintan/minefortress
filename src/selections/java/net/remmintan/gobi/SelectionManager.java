@@ -103,7 +103,7 @@ public class SelectionManager implements ISelectionManager {
             this.setNeedsUpdate(true);
 
             if((clickType == ClickType.BUILD || clickType == ClickType.ROADS)&& clickingBlockState != null) {
-                if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) {
+                if (ClientExtensionsKt.isSurvivalFortress(MinecraftClient.getInstance())) {
                     if(isCountableBlock(clickingBlockState)) {
                         final var blocksAmount = this.selection.getSelection().size();
                         final var item = clickingBlockState.getBlock().asItem();

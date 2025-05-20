@@ -10,7 +10,6 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
-import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import org.minefortress.interfaces.IFortressMinecraftClient;
 import org.minefortress.renderer.CameraTools;
 import org.spongepowered.asm.mixin.Final;
@@ -58,12 +57,7 @@ public abstract class FortressClientPlayerEntityMixin extends AbstractClientPlay
     @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
         if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
-            final var fortressClient = ClientModUtils.getManagersProvider();
-            final var blueprintManager = fortressClient.get_BlueprintManager();
-            final var selectionManager = fortressClient.get_SelectionManager();
-            if (blueprintManager.isSelecting() || selectionManager.isSelecting()) {
-                cir.setReturnValue(false);
-            }
+            cir.setReturnValue(false);
         }
     }
 
