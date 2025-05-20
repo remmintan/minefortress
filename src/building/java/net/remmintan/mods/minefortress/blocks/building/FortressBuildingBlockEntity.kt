@@ -167,6 +167,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         blockData?.actualState?.forEach {
             world?.removeBlock(it, false)
         }
+        world?.removeBlock(pos, false)
         LOGGER.info("The building ${blueprintMetadata?.name ?: "No Name"} was destroyed!")
     }
 
