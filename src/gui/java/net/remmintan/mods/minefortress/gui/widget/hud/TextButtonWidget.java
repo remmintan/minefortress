@@ -14,7 +14,7 @@ public class TextButtonWidget extends ButtonWidget implements IHudButton {
 
     public TextButtonWidget(int anchorX, int anchorY, int width, int height, String message, PressAction onPress, String tooltipText) {
         super(0, 0, width, height, Text.literal(message), onPress, null);
-        this.setTooltip(Tooltip.of(Text.literal(tooltipText)));
+        this.setTooltip(Tooltip.of(Text.translatable(tooltipText)));
         this.anchorX = anchorX;
         this.anchorY = anchorY;
     }

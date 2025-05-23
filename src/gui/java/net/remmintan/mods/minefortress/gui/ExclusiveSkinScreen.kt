@@ -23,7 +23,7 @@ class ExclusiveSkinScreen(
     private val fakePawnProvider: () -> LivingEntity
 ) : Screen(Text.translatable("minefortress.exclusive_skin.title")) {
 
-    private val patreonUrl = "https://www.patreon.com/posts/unlock-exclusive-127116061"
+    private val patreonUrl = "https://www.minefortress.net/donate/unlock/skin"
     private var showRestartMessage = false
 
     private val iconSize = 32
