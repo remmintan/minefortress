@@ -19,10 +19,10 @@ public class FortressHud {
 
     private final MinecraftClient client;
 
-   public final static int MOD_GUI_COLOR = 0xf0f0f0;
+    public final static int MOD_GUI_COLOR = 0xf0f0f0;
 
-   private final List<IHintsLayer> hintsLayers = new ArrayList<>();
-   private final List<IHudLayer> hudLayers = new ArrayList<>();
+    private final List<IHintsLayer> hintsLayers = new ArrayList<>();
+    private final List<IHudLayer> hudLayers = new ArrayList<>();
 
     public FortressHud(MinecraftClient client) {
         this.client = client;
@@ -92,17 +92,35 @@ public class FortressHud {
         for (IHudLayer layer : hudLayers) {
             if(layer.shouldRender(getState()) && layer.isHovered()) return true;
         }
+        for (IHintsLayer layer : hintsLayers) { // Also check hints layers if they can be hovered
+            if (layer.shouldRender(getState()) && layer.isHovered()) return true;
+        }
         return false;
     }
 
-    public void onClick(double mouseX, double mouseY) {
+    // New method to handle press
+    public boolean onPress(double mouseX, double mouseY) {
+        if (isHudHidden()) return false;
+        for (IHudLayer layer : this.hudLayers) {
+            if (layer.shouldRender(getState())) {
+                if (layer.onHudPress(mouseX, mouseY)) {
+                    return true; // Event consumed
+                }
+            }
+        }
+        return false; // Event not consumed
+    }
+
+    // Renamed from onClick to onRelease for clarity
+    public void onRelease(double mouseX, double mouseY) {
         if(isHudHidden()) return;
         for(IHudLayer layer : this.hudLayers) {
             if(layer.shouldRender(getState())) {
-                layer.onClick(mouseX, mouseY);
+                layer.onHudRelease(mouseX, mouseY);
             }
         }
     }
+
 
     private HudState getState() {
         final var fortressClientManager = ClientModUtils.getFortressManager();

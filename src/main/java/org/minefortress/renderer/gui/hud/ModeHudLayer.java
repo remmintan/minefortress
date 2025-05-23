@@ -39,7 +39,7 @@ public final class ModeHudLayer extends AbstractHudLayer{
                         12,
                         0,
                         Items.STONE_SHOVEL,
-                        (btn) -> fcm.setState(FortressState.BUILD_SELECTION),
+                        (btn) -> fcm.setState(FortressState.BUILD_EDITING),
                         "Build Mode",
                         () -> fcm.getState() == FortressState.BUILD_EDITING || fcm.getState() == FortressState.BUILD_SELECTION
                 )

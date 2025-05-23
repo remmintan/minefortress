@@ -49,24 +49,27 @@ public class FortressMouseMixin {
 
         double mouseX = this.x * (double)this.client.getWindow().getScaledWidth() / (double)this.client.getWindow().getWidth();
         double mouseY = this.y * (double)this.client.getWindow().getScaledHeight() / (double)this.client.getWindow().getHeight();
-        boolean isPress = action == 1;
 
-        if (MinecraftClient.IS_SYSTEM_MAC && button == 0) {
-            if (isPress) {
-                if ((mods & 2) == 2) {
-                    button = 1;
+        int effectiveButton = button;
+        if (MinecraftClient.IS_SYSTEM_MAC && button == 0) { // left click
+            if (action == 1) { // press
+                if ((mods & 2) == 2) { // control down
+                    effectiveButton = 1; // treat as right click
                     ++this.fortressControlledLeftClicks;
                 }
-            } else if (this.fortressControlledLeftClicks > 0) {
-                button = 1;
+            } else if (this.fortressControlledLeftClicks > 0) { // release
+                effectiveButton = 1; // treat as right click
                 --this.fortressControlledLeftClicks;
             }
         }
 
-        if (!isPress && button == 0 && client.currentScreen == null) {
-            fortressClient.get_FortressHud().onClick(mouseX, mouseY);
+        if (client.currentScreen == null) { // Only interact with HUD if no screen is open
+            if (action == 1) { // Press
+                fortressClient.get_FortressHud().onPress(mouseX, mouseY);
+            } else if (action == 0 && effectiveButton == 0) { // Release (only for original left click)
+                fortressClient.get_FortressHud().onRelease(mouseX, mouseY);
+            }
         }
-
     }
 
 }
