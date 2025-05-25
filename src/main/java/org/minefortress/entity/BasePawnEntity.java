@@ -15,6 +15,7 @@ import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.LocalDifficulty;
@@ -44,6 +45,8 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
     private static final TrackedData<Optional<BlockPos>> FORTRESS_CENTER = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
     private static final TrackedData<Integer> BODY_TEXTURE_ID = DataTracker.registerData(BasePawnEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<PawnSkin> PAWN_SKIN = DataTracker.registerData(BasePawnEntity.class, MineFortressMod.PAWN_SKIN_TRACKED_DATA_HANDLER);
+
+    private volatile ServerPlayerEntity serverPlayer;
 
     protected BasePawnEntity(EntityType<? extends BasePawnEntity> entityType, World world, boolean enableHunger) {
         super(entityType, world, enableHunger);
@@ -111,10 +114,15 @@ public abstract class BasePawnEntity extends HungryEntity implements IFortressAw
 
     @Override
     public final @Nullable PlayerEntity getPlayer() {
+        if (this.serverPlayer != null && !this.serverPlayer.isDisconnected()) {
+            return this.serverPlayer;
+        }
+
         final var server = this.getServer();
         final var fortressPos = this.getFortressPos();
         if (fortressPos == null) return null;
-        return ServerExtensionsKt.getFortressOwner(server, fortressPos);
+        server.submit(() -> ServerExtensionsKt.getFortressOwner(server, fortressPos)).thenAccept(it -> this.serverPlayer = it);
+        return serverPlayer;
     }
 
     @Override
