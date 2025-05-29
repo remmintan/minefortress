@@ -246,8 +246,8 @@
     "title": "Blacksmith",
     "icon": "minecraft:iron_ingot",
     "description": "Can smelt ores and cook food in furnace",
-    "unlockMessage": "Build any blueprint with a Furnace to unlock",
-    "unlockMoreMessage": "Build more blueprints with Furnaces to unlock more",
+    "unlockMessage": "Build Blacksmith's house to unlock",
+    "unlockMoreMessage": "Build more Blacksmith's houses to unlock more",
     "requirements": {
       "building": {
         "type": "BLACKSMITH",
