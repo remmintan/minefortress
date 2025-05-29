@@ -71,16 +71,8 @@ public class ArcherPawn extends TargetedPawn implements IWarrior, RangedAttackMo
         this.getWorld().spawnEntity(persistentProjectileEntity);
     }
 
-
-
     @Override
     public String getProfessionId() {
         return "archer1";
-    }
-
-    @Override
-    public void resetProfession() {
-        final var damageSources = this.getWorld().getDamageSources();
-        this.damage(damageSources.outOfWorld(), 40f);
     }
 }

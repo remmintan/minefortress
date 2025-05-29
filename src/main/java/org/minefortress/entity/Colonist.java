@@ -375,10 +375,7 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
         fmOpt.ifPresent(IServerFortressManager::scheduleSync);
     }
 
-    public void resetProfession() {
-        this.setProfession(DEFAULT_PROFESSION_ID);
-    }
-
+    @Override
     public ITaskControl getTaskControl() {
         return taskControl;
     }

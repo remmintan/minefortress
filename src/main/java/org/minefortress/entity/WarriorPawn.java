@@ -70,12 +70,6 @@ public final class WarriorPawn extends TargetedPawn implements IProfessional, IW
     }
 
     @Override
-    public void resetProfession() {
-        this.damage(getWorld().getDamageSources().outOfWorld(), 40f);
-    }
-
-
-    @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putString(ServerProfessionManager.PROFESSION_NBT_TAG, getProfessionId());
