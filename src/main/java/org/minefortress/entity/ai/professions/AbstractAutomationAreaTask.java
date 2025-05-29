@@ -10,8 +10,11 @@ import org.minefortress.entity.Colonist;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Random;
 
 abstract class AbstractAutomationAreaTask implements ProfessionDailyTask{
+
+    private final Random rand = new Random();
 
     protected IAutomationArea area;
     protected Iterator<IAutomationBlockInfo> iterator;
@@ -43,7 +46,7 @@ abstract class AbstractAutomationAreaTask implements ProfessionDailyTask{
     protected abstract String getTaskDesc();
 
     private boolean isEnoughTimeSinceLastTimePassed(Colonist colonist) {
-        return colonist.getWorld().getTime() - stopTime > 100;
+        return colonist.getWorld().getTime() - stopTime > rand.nextInt(500) + 300;
     }
 
     private void initIterator(World world) {
