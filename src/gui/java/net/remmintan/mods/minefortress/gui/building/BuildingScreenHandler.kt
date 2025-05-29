@@ -48,7 +48,7 @@ class BuildingScreenHandler(
                 BuildingScreenTab(
                     Items.DIAMOND,
                     tabsList.size,
-                    "Functions",
+                    "Actions",
                     BuildingScreenTabType.PRODUCTION_LINE
                 )
             )
