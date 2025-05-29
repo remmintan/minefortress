@@ -95,10 +95,10 @@
         "level": 0
       },
       "items": [
-          {
+        {
           "id": "minecraft:stone_axe",
           "count": 1
-          }
+        }
       ]
     },
     "hireMenu": true
@@ -116,10 +116,10 @@
         "level": 1
       },
       "items": [
-          {
+        {
           "id": "minecraft:iron_axe",
           "count": 1
-          }
+        }
       ]
     },
     "hireMenu": true
@@ -137,10 +137,10 @@
         "level": 2
       },
       "items": [
-          {
+        {
           "id": "minecraft:diamond_axe",
           "count": 1
-          }
+        }
       ]
     },
     "hireMenu": true
@@ -255,12 +255,12 @@
       },
       "items": [
         {
-          "id": "minecraft:furnace",
-          "count": 1
-        },
-        {
           "id": "minecraft:chest",
           "count": 2
+        },
+        {
+          "id": "minecraft:stone_shovel",
+          "count": 1
         }
       ]
     },
