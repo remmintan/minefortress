@@ -163,7 +163,7 @@
           "count": 1
         },
         {
-          "id": "minecraft:shears",
+          "id": "minecraft:wooden_hoe",
           "count": 1
         }
       ]
@@ -259,8 +259,8 @@
           "count": 1
         },
         {
-          "id": "minecraft:coal",
-          "count": 5
+          "id": "minecraft:chest",
+          "count": 2
         }
       ]
     },
