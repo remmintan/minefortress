@@ -5,7 +5,6 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.FurnaceBlockEntity
 import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
@@ -35,6 +34,7 @@ import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
+import kotlin.streams.asSequence
 
 private const val MAX_BLOCKS_PER_UPDATE = 10
 private val LOGGER: Logger = LoggerFactory.getLogger(FortressBuildingBlockEntity::class.java)
@@ -84,7 +84,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
 
         this.blockData = FortressBuildingBlockData(movedBlocksData, metadata.floorLevel)
 
-        this.findFurnaces();
+        this.findFurnaces()
 
         this.hireHandler = BuildingHireHandler()
     }
@@ -123,7 +123,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     override fun getHireHandler() = hireHandler
 
     override fun getFurnacePos(): List<BlockPos>? =
-        furnaceBlockPositions;
+        furnaceBlockPositions
 
     override fun findFurnaces() {
         this.furnaceBlockPositions = this.blockData?.referenceState
@@ -205,14 +205,15 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     override fun getEnd(): BlockPos? = end
 
     override fun getFreeBed(world: World?): Optional<BlockPos> {
-        return BlockPos
+        val nullableBed = BlockPos
             .stream(start, end)
-            .toList()
+            .asSequence()
+            .map { it.toImmutable() }
             .firstOrNull {
                 val blockState = world?.getBlockState(it) ?: Blocks.AIR.defaultState
                 blockState.isIn(BlockTags.BEDS) && !blockState.get(BedBlock.OCCUPIED)
             }
-            ?.let { Optional.of(it) } ?: Optional.empty()
+        return Optional.ofNullable(nullableBed)
     }
 
 
