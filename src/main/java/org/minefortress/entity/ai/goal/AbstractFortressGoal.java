@@ -21,10 +21,6 @@ public abstract class AbstractFortressGoal extends Goal {
         }
     }
 
-    protected String getColonistName() {
-        return colonist.getName().getString();
-    }
-
     protected boolean isHungry() {
         return colonist.getEatControl().map(IEatControl::isHungry).orElse(false);
     }

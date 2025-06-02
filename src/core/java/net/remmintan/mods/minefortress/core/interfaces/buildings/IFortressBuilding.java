@@ -2,7 +2,6 @@ package net.remmintan.mods.minefortress.core.interfaces.buildings;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
@@ -12,6 +11,7 @@ import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +27,9 @@ public interface IFortressBuilding {
             throw new IllegalStateException("This building has no associated block entity!");
         }
     }
+
+    @Nullable
+    BlockPos getRandomPosToComeToBuilding();
 
     default List<String> getUpgrades() {
         return getMetadata().getRequirement().getUpgrades();

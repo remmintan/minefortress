@@ -19,6 +19,7 @@ import net.minecraft.screen.ScreenHandler
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
+import net.minecraft.world.Heightmap
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo
@@ -34,6 +35,9 @@ import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.streams.asSequence
 
 private const val MAX_BLOCKS_PER_UPDATE = 10
@@ -118,6 +122,31 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
             }
         }
         error("Trying to get managers on the client side")
+    }
+
+    override fun getRandomPosToComeToBuilding(): BlockPos? {
+        val world = world ?: return null
+        val start = start ?: return null
+        val end = end ?: return null
+
+        val startY = min(start.y + metadata.floorLevel, end.y)
+        val endY = max(start.y + metadata.floorLevel, end.y)
+
+        var attempts = 0
+        do {
+            val randPos = BlockPos.iterateRandomly(world.random, 1, pos, 10)
+                .map {
+                    val y = world.getTopY(Heightmap.Type.WORLD_SURFACE, it.x, it.z)
+                    BlockPos(it.x, y, it.z)
+                }
+                .first()
+
+
+            val probablyOnTheRoof = endY - startY > 3 && abs(randPos.y - startY) > abs(endY - randPos.y)
+            if (!probablyOnTheRoof) return randPos
+        } while (++attempts < 5)
+
+        return null
     }
 
     override fun getHireHandler() = hireHandler

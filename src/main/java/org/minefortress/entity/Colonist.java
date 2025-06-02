@@ -164,6 +164,7 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
         this.goalSelector.add(6, new PawnExecuteAreaBasedTaskGoal(this));
         this.goalSelector.add(8, new WanderAroundTheFortressGoal(this));
         this.goalSelector.add(8, new SleepOnTheBedGoal(this));
+        this.goalSelector.add(9, new ReturnToFireGoal(this));
         this.goalSelector.add(10, new LookAroundGoal(this));
 
         this.targetSelector.add(1, new FortressRevengeGoal(this).setGroupRevenge());

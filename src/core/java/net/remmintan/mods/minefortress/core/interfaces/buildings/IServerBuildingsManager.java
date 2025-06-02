@@ -8,6 +8,7 @@ import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,8 @@ public interface IServerBuildingsManager extends IServerManager, IWritableManage
     long getTotalBedsCount();
     Optional<IFortressBuilding> findNearest(BlockPos pos);
     Optional<IFortressBuilding> findNearest(BlockPos pos, ProfessionType requirement);
+
+    @Nullable BlockPos getRandomPositionToGoTo();
 
     Optional<HostileEntity> getRandomBuildingAttacker();
     Optional<BlockPos> getFreeBed();

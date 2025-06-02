@@ -56,6 +56,9 @@ public interface IServerFortressManager extends IFortressManager, IWritableManag
     void addPawn(LivingEntity pawn);
     Optional<BlockPos> getRandomPositionAroundCampfire();
 
+    @Nullable
+    BlockPos getRandomFortressPosition();
+
     Optional<LivingEntity> spawnPawnNearCampfire();
     void setSpawnPawns(boolean spawnPawns);
     void spawnDebugEntitiesAroundCampfire(EntityType<? extends IFortressAwareEntity> entityType, int num, ServerPlayerEntity player);

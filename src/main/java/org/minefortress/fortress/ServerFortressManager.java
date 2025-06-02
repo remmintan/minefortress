@@ -20,6 +20,7 @@ import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.entities.IPawnNameGenerator;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
@@ -421,8 +422,8 @@ public final class ServerFortressManager implements IServerFortressManager {
     }
 
     public Optional<BlockPos> getRandomPositionAroundCampfire() {
-        final var fortressCenter = getFortressCenter();
-        if(fortressCenter == null) return Optional.empty();
+        final var position = getFortressCenter();
+        if (position == null) return Optional.empty();
 
         final var random = getWorld().random;
 
@@ -431,11 +432,21 @@ public final class ServerFortressManager implements IServerFortressManager {
         final var x = (int) Math.round(radius * Math.cos(angle) * getCampfireWarmRadius());
         final var z = (int) Math.round(radius * Math.sin(angle) * getCampfireWarmRadius());
 
-        final var blockX = fortressCenter.getX() + x;
-        final var blockZ = fortressCenter.getZ() + z;
+        final var blockX = position.getX() + x;
+        final var blockZ = position.getZ() + z;
         final var blockY = getWorld().getTopY(Heightmap.Type.WORLD_SURFACE, blockX, blockZ);
 
         return Optional.of(new BlockPos(blockX, blockY, blockZ));
+    }
+
+    @Override
+    public @Nullable BlockPos getRandomFortressPosition() {
+        if (fortressCenter == null || server == null || world == null) return null;
+        return ServerModUtils.getManagersProvider(server, fortressCenter)
+                .map(IServerManagersProvider::getBuildingsManager)
+                .map(IServerBuildingsManager::getRandomPositionToGoTo)
+                .or(this::getRandomPositionAroundCampfire)
+                .orElse(null);
     }
 
     public double getCampfireWarmRadius() {

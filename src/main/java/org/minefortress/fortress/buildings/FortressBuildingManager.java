@@ -47,7 +47,6 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     public FortressBuildingManager(BlockPos fortressPos, ServerWorld world) {
         this.world = world;
         this.fortressPos = fortressPos;
-
     }
 
     private static @NotNull BlockPos getCenterTop(BlockBox blockBox) {
@@ -203,6 +202,16 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
                 .map(this::getBuilding)
                 .filter(Optional::isPresent)
                 .map(Optional::get);
+    }
+
+    @Override
+    public @Nullable BlockPos getRandomPositionToGoTo() {
+        if (buildings.isEmpty()) return null;
+
+        final var randomBuildingPos = buildings.get(world.random.nextInt(buildings.size()));
+        return this.getBuilding(randomBuildingPos)
+                .map(IFortressBuilding::getRandomPosToComeToBuilding)
+                .orElse(null);
     }
 
     public Optional<HostileEntity> getRandomBuildingAttacker() {
