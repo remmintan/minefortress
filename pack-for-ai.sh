@@ -40,7 +40,8 @@ should_include_file() {
     esac
 
     # Additional check using file command to detect binary files
-    if file "$file" | grep -q "binary\|data\|executable"; then
+    if ! file -b "$file" | grep -q "text"; then
+        echo "Skipping non-text file detected by 'file' command: $file"
         return 1
     fi
 

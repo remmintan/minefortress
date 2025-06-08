@@ -196,6 +196,10 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         blockData?.actualState?.forEach {
             world?.removeBlock(it, false)
         }
+        BlockPos.iterate(start, end)
+            .map { it.toImmutable() }
+            .filter { world?.getBlockState(it)?.fluidState?.isEmpty == false }
+            .forEach { world?.setBlockState(it, Blocks.AIR.defaultState) }
         world?.removeBlock(pos, false)
         LOGGER.info("The building ${blueprintMetadata?.name ?: "No Name"} was destroyed!")
     }
