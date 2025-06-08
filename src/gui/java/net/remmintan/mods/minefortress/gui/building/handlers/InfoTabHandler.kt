@@ -43,11 +43,11 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
     override fun getItemsToRepair(): List<ItemInfo> = building.repairItemInfos
 
     override fun getEnoughItems(): Map<ItemInfo, Boolean> {
-        val itemsToRepair = getItemsToRepair()
+        val itemsToRepair = getItemsToRepair().sortedBy { it.item.toString() }
         val resourceManager = ClientModUtils.getFortressManager().resourceManager
-        return itemsToRepair
-            .associateWith { SimilarItemsHelper.isIgnorable(it.item) || resourceManager.hasItem(it, itemsToRepair) }
-            .withDefault { false }
+        val metRequirements = resourceManager.getMetRequirements(itemsToRepair)
+
+        return metRequirements.entries.associate { (item, met) -> item to (SimilarItemsHelper.isIgnorable(item.item) || met) }
     }
 
     override fun upgrade(slot: BlueprintSlot) {

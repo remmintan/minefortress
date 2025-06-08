@@ -15,6 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
@@ -26,6 +27,7 @@ import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.utils.ModUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public final class BlueprintsScreen extends Screen {
@@ -218,16 +220,17 @@ public final class BlueprintsScreen extends Screen {
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
             final var fortressClientManager = ClientModUtils.getFortressManager();
-            final var resourceManager = fortressClientManager.getResourceManager();
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(drawContext, slotX, slotY, 10);
             final var x = this.x - this.backgroundWidth / 2;
+            final var resourceManager = fortressClientManager.getResourceManager();
             if(blueprintSlot != BlueprintSlot.EMPTY) {
                 if (ClientExtensionsKt.isSurvivalFortress(MinecraftClient.getInstance())) {
                     final var stacks = blueprintSlot.getBlockData().getStacks();
+                    final Map<ItemInfo, Boolean> metRequirements = resourceManager.getMetRequirements(stacks);
                     for (int i1 = 0; i1 < stacks.size(); i1++) {
                         final var stack = stacks.get(i1);
-                        final var hasItem = resourceManager.hasItem(stack, stacks);
+                        final var hasItem = metRequirements.getOrDefault(stack, false);
                         final var itemX = x + 25 + i1%10 * 30;
                         final var itemY = i1/10 * 20 + this.backgroundHeight;
                         final var convertedItem = SimilarItemsHelper.convertItemIconInTheGUI(stack.item());

@@ -64,11 +64,12 @@ class BlueprintUpgradeSlot(
 
 
             if (MinecraftClient.getInstance().isSurvivalFortress() && showItems) {
-                val fortressManager = ClientModUtils.getFortressManager()
+                val resourceManager = ClientModUtils.getFortressManager().resourceManager
                 val stacks: List<ItemInfo> = slot.blockData.getStacks()
+                val metRequirements = resourceManager.getMetRequirements(stacks)
                 for (i1 in stacks.indices) {
                     val stack = stacks[i1]
-                    val hasItem = fortressManager.resourceManager.hasItem(stack, stacks)
+                    val hasItem = metRequirements.getOrDefault(stack, false)
                     val itemX = costsX + i1 % 10 * 30
                     val itemY = costsY + i1 / 10 * 20
                     val convertedItem = SimilarItemsHelper.convertItemIconInTheGUI(stack.item())
@@ -76,8 +77,8 @@ class BlueprintUpgradeSlot(
                     context.drawText(
                         this.textRenderer,
                         stack.amount().toString(),
-                        itemX + 17,
-                        itemY + 7,
+                        itemX + 18,
+                        itemY + 4,
                         if (hasItem) 0xFFFFFF else 0xFF0000,
                         false
                     )

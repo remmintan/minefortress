@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface IClientResourceManager extends IResourceManager {
@@ -13,7 +14,7 @@ public interface IClientResourceManager extends IResourceManager {
     Set<ItemGroup> getGroups();
     boolean hasStacks(List<ItemStack> stacks);
 
-    boolean hasItem(ItemInfo item, List<ItemInfo> items);
+    Map<ItemInfo, Boolean> getMetRequirements(List<ItemInfo> costs);
     List<ItemStack> getStacks(ItemGroup group);
     void setItemAmount(Item item, int amount);
     int getItemAmount(Item item);
