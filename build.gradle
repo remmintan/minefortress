@@ -149,41 +149,45 @@ kotlin {
 }
 
 // Publishing configurations
-def changelogContent = file("changelog.md").exists() ? file("changelog.md").text : "See the [commit history](https://github.com/minefortress-mod/minefortress/commits/master) for details."
+// This section is wrapped in a conditional to prevent it from running during regular builds.
+// It will only be configured when the 'modrinth' or 'curseforge' tasks are explicitly called.
 
-modrinth {
-    token = System.getenv("MODRINTH_TOKEN")
-    projectId = "lcUdtArI"
-    versionNumber = version
-    versionName = "${version}"
-    changelog = changelogContent
-    uploadFile = remapJar
-    gameVersions = [project.minecraft_version]
-    loaders = ["fabric"]
-    dependencies {
-        required.project "fabric-api"
-        required.project "keybind-fix"
-        required.project "fabric-language-kotlin"
-    }
-}
+if (gradle.startParameter.taskNames.contains("modrinth") || gradle.startParameter.taskNames.contains("curseforge")) {
+    def changelogContent = file("changelog.md").exists() ? file("changelog.md").text : "See the [commit history](https://github.com/minefortress-mod/minefortress/commits/master) for details."
 
-curseforge {
-    apiKey = System.getenv("CURSEFORGE_TOKEN")
-
-    project {
-        id = "684798"
+    modrinth {
+        token = System.getenv("MODRINTH_TOKEN")
+        projectId = "minefortress"
+        versionNumber = project.version
+        versionName = "MineFortress ${project.version}"
         changelog = changelogContent
-        releaseType = "release"
-        addGameVersion "${minecraft_version}"
+        uploadFile = remapJar
+        gameVersions = [project.minecraft_version]
+        loaders = ["fabric"]
+        dependencies {
+            required.project "fabric-api"
+            optional.project "keybind-fix"
+        }
+    }
 
-        mainArtifact(remapJar) {
-            displayName = "${version}"
+    curseforge {
+        apiKey = System.getenv("CURSEFORGE_TOKEN")
+
+        project {
+            id = "437943"
+            changelog = changelogContent
+            releaseType = "release"
+
+            mainArtifact(remapJar)
+
+            relations {
+                requiredDependency "fabric-api"
+                optionalDependency "keybind-fix-for-all"
+            }
         }
 
-        relations {
-            requiredDependency "fabric-api"
-            requiredDependency "keybind-fix"
-            requiredDependency "fabric-language-kotlin"
+        options {
+            javaVersion = "Java 17"
         }
     }
 }
