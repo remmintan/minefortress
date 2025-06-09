@@ -3,6 +3,8 @@ plugins {
     id 'fabric-loom' version '1.4-SNAPSHOT'
     id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '1.9.21'
+    id "com.modrinth.minotaur" version "2.+"
+    id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
 if (System.getenv("BUILD_NUMBER") != null) {
@@ -144,4 +146,44 @@ publishing {
 }
 kotlin {
     jvmToolchain(17)
+}
+
+// Publishing configurations
+def changelogContent = file("changelog.md").exists() ? file("changelog.md").text : "See the [commit history](https://github.com/minefortress-mod/minefortress/commits/master) for details."
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = "lcUdtArI"
+    versionNumber = version
+    versionName = "${version}"
+    changelog = changelogContent
+    uploadFile = remapJar
+    gameVersions = [project.minecraft_version]
+    loaders = ["fabric"]
+    dependencies {
+        required.project "fabric-api"
+        required.project "keybind-fix"
+        required.project "fabric-language-kotlin"
+    }
+}
+
+curseforge {
+    apiKey = System.getenv("CURSEFORGE_TOKEN")
+
+    project {
+        id = "684798"
+        changelog = changelogContent
+        releaseType = "release"
+        addGameVersion "${minecraft_version}"
+
+        mainArtifact(remapJar) {
+            displayName = "${version}"
+        }
+
+        relations {
+            requiredDependency "fabric-api"
+            requiredDependency "keybind-fix"
+            requiredDependency "fabric-language-kotlin"
+        }
+    }
 }

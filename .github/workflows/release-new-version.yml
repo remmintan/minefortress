@@ -1,87 +1,127 @@
-name: Release new version on TAG push
+name: Release New Version
+
+# This workflow runs in two stages:
+# 1. Automatic: On a tag push, it builds the mod and generates a changelog.
+# 2. Manual: After reviewing, you can manually trigger the second stage to publish and release.
 
 on:
   push:
     tags:
       - '1.*.*'
+  workflow_dispatch: # Allows manual triggering of the 'publish-and-release' job
 
 jobs:
-  build-and-publish:
+  # ====================================================================
+  # JOB 1: Build the mod and prepare release assets automatically
+  # ====================================================================
+  build-and-prepare:
+    name: Build and Prepare Release
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: write
+      contents: write # Needed for checkout and potentially other steps
+      packages: write # Needed to publish to GitHub Packages
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Required to get all tags for changelog generation
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          server-id: github
+          server-id: github # for GitHub Packages
           settings-path: ${{ github.workspace }}
 
+      - name: Set up jq
+        uses: dcarbone/install-jq-action@v2.1.0
+
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-        with:
-          arguments: build
+        run: ./gradlew build
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ github.ref_name }}
 
       - name: Publish to GitHub Packages
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-        with:
-          arguments: publishAllPublicationsToGitHubPackagesRepository
+        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ github.ref_name }}
 
-  create-release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Retrieve all commit messages between the latest two tags
+      - name: Retrieve commit messages for changelog
         id: get_commits
         run: |
-          export commitsText=$(./automation-scripts/prepare-commits-texts.sh)
-          echo "$commitsText"
-          echo "commitsTexts=$commitsText" >> $GITHUB_OUTPUT
-          
-      - name: OpenAI CreateCompletion
+          commits_list=$(./automation-scripts/prepare-commits-texts.sh)
+          echo "commits_list<<EOF" >> $GITHUB_OUTPUT
+          echo "$commits_list" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Generate Release Notes with OpenAI
         id: openai
         run: |
-          export response=$(./automation-scripts/create-release-text.sh ${{secrets.OPENAI_API_KEY}} "${{ steps.get_commits.outputs.commitsTexts }}" ${{ vars.OPEN_AI_MODEL_NAME }})
-          echo "Response:"
-          echo ""
-          echo "$response"
-          echo "$response" > ./response.txt
+          response=$(./automation-scripts/generate-changelog.sh ${{ secrets.OPENAI_API_KEY }} "${{ steps.get_commits.outputs.commits_list }}" "gpt-4o")
+          body=$(echo "$response" | jq -r .choices[0].message.content)
+          echo "Generated release body."
+          # Save the generated changelog to a file
+          echo "$body" > changelog.md
 
-      - name: Read response
-        id: read_response
-        uses: juliangruber/read-file-action@v1
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          path: ./response.txt
+          name: release-assets-${{ github.ref_name }}
+          path: |
+            build/libs/minefortress-*.jar
+            changelog.md
 
-      - name: Create Release on GitHub
-        uses: ncipollo/release-action@v1
+  # ====================================================================
+  # JOB 2: Manually triggered job to publish and create the release
+  # ====================================================================
+  publish-and-release:
+    name: Publish and Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-and-prepare # This job can only run if the build job succeeds
+    if: github.event_name == 'workflow_dispatch' # Only run this job when manually triggered
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-${{ github.ref_name }}
+          path: build/libs/
+
+      - name: Display downloaded files
+        run: ls -R build/libs
+
+      - name: Rename changelog for Gradle
+        run: mv build/libs/changelog.md .
+
+      - name: Publish to Modrinth and CurseForge
+        run: ./gradlew curseforge modrinth
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
         with:
+          artifacts: "build/libs/minefortress-*.jar"
           tag: ${{ github.ref_name }}
           name: MineFortress ${{ github.ref_name }}
-          body: ${{ fromJson(steps.read_response.outputs.content).choices[0].text }}
+          bodyFile: "changelog.md" # Use the downloaded changelog file for the release body
           prerelease: false
           allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
