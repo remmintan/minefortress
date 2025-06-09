@@ -60,14 +60,18 @@ jobs:
           echo "$commits_list" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Generate Release Notes with OpenAI
+      - name: Generate and Sanitize Release Notes
         id: openai
         run: |
           response=$(./automation-scripts/generate-changelog.sh ${{ secrets.OPENAI_API_KEY }} "${{ steps.get_commits.outputs.commits_list }}" "gpt-4o")
-          body=$(echo "$response" | jq -r .choices[0].message.content)
-          echo "Generated release body."
-          # Save the generated changelog to a file
+          # Extract the content AND pipe it to sed to remove the code block fences
+          body=$(echo "$response" | jq -r .choices[0].message.content | sed '/^```/d')
+          echo "Generated and sanitized release body."
+          # Save the cleaned changelog to a file
           echo "$body" > changelog.md
+          echo "release_body<<EOF" >> $GITHUB_OUTPUT
+          echo "$body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -84,7 +88,6 @@ jobs:
     name: Publish and Create GitHub Release
     runs-on: ubuntu-latest
     needs: build-and-prepare # This job can only run if the build job succeeds
-    if: github.event_name == 'workflow_dispatch' # Only run this job when manually triggered
 
     steps:
       - name: Checkout repository
