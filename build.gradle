@@ -157,16 +157,17 @@ if (gradle.startParameter.taskNames.contains("modrinth") || gradle.startParamete
 
     modrinth {
         token = System.getenv("MODRINTH_TOKEN")
-        projectId = "minefortress"
-        versionNumber = project.version
-        versionName = "MineFortress ${project.version}"
+        projectId = "lcUdtArI"
+        versionNumber = version
+        versionName = "${version}"
         changelog = changelogContent
         uploadFile = remapJar
         gameVersions = [project.minecraft_version]
         loaders = ["fabric"]
         dependencies {
             required.project "fabric-api"
-            optional.project "keybind-fix"
+            required.project "keybind-fix"
+            required.project "fabric-language-kotlin"
         }
     }
 
@@ -174,20 +175,20 @@ if (gradle.startParameter.taskNames.contains("modrinth") || gradle.startParamete
         apiKey = System.getenv("CURSEFORGE_TOKEN")
 
         project {
-            id = "437943"
+            id = "684798"
             changelog = changelogContent
             releaseType = "release"
+            addGameVersion "${minecraft_version}"
 
-            mainArtifact(remapJar)
+            mainArtifact(remapJar) {
+                displayName = "${version}"
+            }
 
             relations {
                 requiredDependency "fabric-api"
-                optionalDependency "keybind-fix-for-all"
+                requiredDependency "keybind-fix"
+                requiredDependency "fabric-language-kotlin"
             }
-        }
-
-        options {
-            javaVersion = "Java 17"
         }
     }
 }
