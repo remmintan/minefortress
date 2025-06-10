@@ -179,6 +179,7 @@ if (gradle.startParameter.taskNames.contains("modrinth") || gradle.startParamete
             changelog = changelogContent
             releaseType = "release"
             addGameVersion "${minecraft_version}"
+            addGameVersion "Fabric"
 
             mainArtifact(remapJar) {
                 displayName = "${version}"

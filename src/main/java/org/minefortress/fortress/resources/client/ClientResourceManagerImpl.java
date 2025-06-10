@@ -46,6 +46,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
         Map<ItemInfo, Boolean> result = new LinkedHashMap<>();
 
         for (ItemInfo cost : costs) {
+
             Item requiredItem = cost.item();
             int requiredAmount = cost.amount();
 
@@ -72,7 +73,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
                 }
             }
 
-            result.put(cost, remainingNeeded == 0);
+            result.put(cost, SimilarItemsHelper.isIgnorable(requiredItem) || remainingNeeded == 0);
         }
 
         return result;
