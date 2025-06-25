@@ -24,6 +24,9 @@
       "org.minefortress.MineFortressClient"
     ],
     "server": [],
+    "preLaunch": [
+      "org.minefortress.earlyriser.MineFortressPreLaunch"
+    ],
     "mm:early_risers": [
       "org.minefortress.earlyriser.GameModeEarlyRiser"
     ],
@@ -43,8 +46,10 @@
     "minecraft": "1.20.2",
     "java": ">=17",
     "mm": ">=2.3",
-    "keybind_fix": ">=1.0.0",
     "fabric-language-kotlin": ">=1.10.20+kotlin.1.9.24"
+  },
+  "recommends": {
+    "keybind_fix": ">=1.0.0"
   },
   "suggests": {}
 }
