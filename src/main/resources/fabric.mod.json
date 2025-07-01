@@ -13,7 +13,7 @@
   },
 
   "license": "MIT",
-  "icon": "assets/minefortress/icon.png",
+  "icon": "assets/minefortress/logo.png",
 
   "environment": "*",
   "entrypoints": {
