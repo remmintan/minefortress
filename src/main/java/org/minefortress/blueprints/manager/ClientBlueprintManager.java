@@ -2,6 +2,7 @@ package org.minefortress.blueprints.manager;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.ModLogger;
@@ -79,6 +80,8 @@ public final class ClientBlueprintManager extends BaseClientStructureManager imp
         }
 
         if (!super.canBuild()) return;
+
+        ClientModUtils.playSound(SoundEvents.BLOCK_ANVIL_USE);
 
         if (selectedStructure.getId().equals("campfire")) {
             final var packet = new C2SSetupCampfirePacket(getStructureBuildPos());

@@ -5,7 +5,9 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.Drawable
 import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.widget.ButtonWidget
+import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.gui.building.handlers.IWorkforceTabHandler
 import net.remmintan.mods.minefortress.gui.widget.professions.*
 import kotlin.properties.Delegates
@@ -97,6 +99,7 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
             Text.literal("+")
         ) { _: ButtonWidget? ->
             if (handler.canHireMore(profId)) {
+                ClientModUtils.playSound(SoundEvents.ENTITY_VILLAGER_YES)
                 handler.increaseAmount(profId)
             }
         }
@@ -147,6 +150,7 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
             Text.literal("+")
         ) { _: ButtonWidget? ->
             if (handler.canHireMore(profId)) {
+                ClientModUtils.playSound(SoundEvents.ENTITY_VILLAGER_YES)
                 handler.increaseAmount(profId)
             }
         }

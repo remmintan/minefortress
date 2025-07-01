@@ -11,6 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -117,6 +118,7 @@ public final class BlueprintsScreen extends Screen {
                 if(button == 1) return true;
 
                 if(this.client != null){
+                    ClientModUtils.playSound(SoundEvents.UI_BUTTON_CLICK);
                     this.client.setScreen(null);
                 }
                 this.handler.clickOnFocusedSlot();

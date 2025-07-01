@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.Items;
 import net.minecraft.resource.featuretoggle.FeatureSet;
+import net.minecraft.sound.SoundEvents;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.utils.ClientExtensionsKt;
@@ -51,7 +52,10 @@ public class ColonistsHudLayer extends AbstractHudLayer {
                 new ItemButtonWidget(
                         35+20, 0,
                         Items.CHEST,
-                        btn -> client.setScreen(new CreativeInventoryScreen(client.player, FeatureSet.empty(), false)),
+                        btn -> {
+                            ClientModUtils.playSound(SoundEvents.BLOCK_CHEST_OPEN);
+                            client.setScreen(new CreativeInventoryScreen(client.player, FeatureSet.empty(), false));
+                        },
                         "Inventory"
                 )
         );

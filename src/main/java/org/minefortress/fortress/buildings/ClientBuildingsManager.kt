@@ -2,6 +2,7 @@ package org.minefortress.fortress.buildings
 
 import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.remmintan.mods.minefortress.core.FortressState.*
@@ -103,6 +104,7 @@ class ClientBuildingsManager : IClientBuildingsManager {
 
     override fun openBuildingScreen(playerEntity: PlayerEntity) {
         hoveredBuilding?.pos?.let {
+            ClientModUtils.playSound(SoundEvents.BLOCK_WOODEN_DOOR_OPEN)
             val packet = C2SOpenBuildingScreen(it)
             FortressClientNetworkHelper.send(C2SOpenBuildingScreen.CHANNEL, packet)
         }

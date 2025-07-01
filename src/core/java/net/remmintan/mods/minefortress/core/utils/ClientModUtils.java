@@ -2,6 +2,9 @@ package net.remmintan.mods.minefortress.core.utils;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.sound.SoundEvent;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IClientBlueprintManager;
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
@@ -20,6 +23,18 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class ClientModUtils {
+
+    public static void playSound(RegistryEntry.Reference<SoundEvent> event) {
+        final var soundManager = MinecraftClient.getInstance().getSoundManager();
+        final var soundInstance = PositionedSoundInstance.master(event, 1.0f);
+        soundManager.play(soundInstance);
+    }
+
+    public static void playSound(SoundEvent event) {
+        final var soundManager = MinecraftClient.getInstance().getSoundManager();
+        final var soundInstance = PositionedSoundInstance.master(event, 1.0f);
+        soundManager.play(soundInstance);
+    }
 
     public static IRenderersProvider getRenderersProvider() {
         final var client = MinecraftClient.getInstance();

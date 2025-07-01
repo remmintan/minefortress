@@ -5,8 +5,10 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.player.PlayerInventory
+import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.gui.building.handlers.InfoTabState
 
 class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInventory, title: Text) :
@@ -94,6 +96,11 @@ class BuildingScreen(handler: BuildingScreenHandler, playerInventory: PlayerInve
             tab.backgroundWidth = backgroundWidth
             tab.backgroundHeight = backgroundHeight
         }
+    }
+
+    override fun removed() {
+        ClientModUtils.playSound(SoundEvents.BLOCK_WOODEN_DOOR_CLOSE)
+        super.removed()
     }
 
     private fun renderTabsContents(context: DrawContext, mouseX: Int, mouseY: Int) {

@@ -3,6 +3,8 @@ package net.remmintan.mods.minefortress.gui.widget.hud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
+import net.minecraft.sound.SoundEvents;
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -34,6 +36,7 @@ public class ItemToggleWidget extends ItemButtonWidget {
     @Override
     public void onClick(double mouseX, double mouseY) {
         if(!shouldRenderSupplier.get()) return;
+        ClientModUtils.playSound(SoundEvents.UI_BUTTON_CLICK);
         super.onClick(mouseX, mouseY);
     }
 
