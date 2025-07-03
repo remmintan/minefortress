@@ -21,6 +21,7 @@ class C2SSwitchToMinecraftSurvival : FortressC2SPacket {
         fortressServerManager.teleportToCampfireGround(player)
 
         // Then change the player's game mode to Survival directly on the server
+        player.inventory.clear()
         player.changeGameMode(GameMode.SURVIVAL)
     }
 
