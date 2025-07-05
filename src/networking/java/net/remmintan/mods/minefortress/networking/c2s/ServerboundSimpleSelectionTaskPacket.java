@@ -3,6 +3,7 @@ package net.remmintan.mods.minefortress.networking.c2s;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -131,6 +132,17 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
             final var info = new ItemInfo(placingItem, blocksCount);
 
             getManagersProvider(player).getResourceManager().reserveItems(task.getId(), Collections.singletonList(info));
+        }
+
+        if (task.getTaskType() == TaskType.REMOVE) {
+            final var buildingsManager = getManagersProvider(player).getBuildingsManager();
+            final boolean intersectsWithABuilding = task.toTaskInformationDto().stream().flatMap(it -> it.positions().stream())
+                    .anyMatch(buildingsManager::isPartOfAnyBuilding);
+
+            if (intersectsWithABuilding) {
+                player.sendMessage(Text.of("Can't execute task. Targeted blocks intersect with one of the buildings. Use building menu to destroy the building"));
+                return;
+            }
         }
 
         taskManager.addTask(task, selectedPawns, player);
