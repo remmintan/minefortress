@@ -252,6 +252,10 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
             }
         }
 
+        if (enoughItems.values.contains(false)) {
+            repairConfirmationButton.active = false
+        }
+
         repairConfirmationButton.setPosition(x + this.backgroundWidth / 2 - 102 - 3, itemY + 45)
         cancelButton.setPosition(x + this.backgroundWidth / 2 + 3, itemY + 45)
 
