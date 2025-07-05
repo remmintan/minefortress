@@ -25,8 +25,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
     @Override
     public boolean canStart() {
         final var hasTask = getTaskControl().hasTask();
-        final var notStarving = !super.isHungry();
-        return  hasTask && notStarving;
+        return hasTask && !wantAndCanEatSomeFood();
     }
 
 
@@ -65,7 +64,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
         if (getMovementHelper().getGoal() == null) {
             var distance = getTaskControl().taskIsOfType(CutTreesTask.class) ? 6f : Colonist.WORK_REACH_DISTANCE;
-            getMovementHelper().goTo(goal.getPos(), Colonist.FAST_MOVEMENT_SPEED, distance);
+            getMovementHelper().goTo(goal.getPos(), colonist.getAdjustedMovementSpeed(), distance);
         }
 
         if (getMovementHelper().hasReachedGoal()) {
@@ -86,7 +85,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
 
     @Override
     public boolean shouldContinue() {
-        return getTaskControl().hasTask() && !super.isHungry();
+        return getTaskControl().hasTask() && !super.wantAndCanEatSomeFood();
     }
 
     @Override
@@ -123,7 +122,7 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         if (goal == null) {
             return;
         }
-        getMovementHelper().goTo(goal.getPos(), Colonist.FAST_MOVEMENT_SPEED);
+        getMovementHelper().goTo(goal.getPos());
         colonist.setGoal(goal);
     }
     private ITaskControl getTaskControl() {

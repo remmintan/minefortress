@@ -48,7 +48,7 @@ public class LumberjackDailyTask extends AbstractAutomationAreaTask {
         }
 
         if (goal != null && movementHelper.getGoal() == null) {
-            movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
+            movementHelper.goTo(goal.pos().up());
         }
 
         if (movementHelper.hasReachedGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone()) {

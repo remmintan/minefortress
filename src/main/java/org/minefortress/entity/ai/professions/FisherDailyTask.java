@@ -55,7 +55,7 @@ public class FisherDailyTask implements ProfessionDailyTask {
         final var movementHelper = colonist.getMovementHelper();
         final var earthPos = goal.getEarthPos();
         if (!earthPos.equals(movementHelper.getGoal()))
-            movementHelper.goTo(earthPos, Colonist.FAST_MOVEMENT_SPEED);
+            movementHelper.goTo(earthPos);
 
         if (movementHelper.hasReachedGoal()) {
             colonist.putItemInHand(Items.FISHING_ROD);

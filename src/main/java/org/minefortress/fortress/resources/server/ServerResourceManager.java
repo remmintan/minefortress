@@ -1,5 +1,8 @@
 package org.minefortress.fortress.resources.server;
 
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -223,13 +226,30 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
         }
     }
 
+    private static boolean isEatable(ItemStack stack) {
+        if (stack.isEmpty() || !stack.getItem().isFood())
+            return false;
+
+        final var foodComponent = stack.getItem().getFoodComponent();
+        final var statusEffects = foodComponent.getStatusEffects();
+        if (statusEffects.isEmpty())
+            return true;
+
+        for (Pair<StatusEffectInstance, Float> statusEffect : statusEffects) {
+            if (statusEffect.getFirst().getEffectType().getCategory() == StatusEffectCategory.HARMFUL)
+                return false;
+        }
+
+        return true;
+    }
+
     @Override
     public void returnReservedItems(UUID taskId) {
-        if(!reservedResources.containsKey(taskId)) return;
+        if (!reservedResources.containsKey(taskId)) return;
         final var manager = this.getManagerFromTaskId(taskId);
 
         final var infosToSync = new ArrayList<ItemInfo>();
-        for(ItemInfo info: manager.getAll()) {
+        for (ItemInfo info : manager.getAll()) {
             final var item = info.item();
             final var stack = this.resources.getStack(item);
             final var amount = info.amount();
@@ -246,7 +266,7 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
     @Override
     public void write(NbtCompound tag) {
         final var stacks = new NbtList();
-        for(ItemInfo info : resources.getAll()) {
+        for (ItemInfo info : resources.getAll()) {
             final var item = info.item();
             final var amount = info.amount();
 
@@ -262,12 +282,17 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
     }
 
     @Override
+    public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
+        synchronizer.sync(player);
+    }
+
+    @Override
     public void read(NbtCompound tag) {
-        if(tag.contains("resources")) {
+        if (tag.contains("resources")) {
             this.resources.clear();
             final var resourcesTags = tag.getList("resources", NbtList.COMPOUND_TYPE);
             final var size = resourcesTags.size();
-            for(int i = 0; i < size; i++) {
+            for (int i = 0; i < size; i++) {
                 final var resourceTag = resourcesTags.getCompound(i);
                 final var id = resourceTag.getInt("id");
                 final var amount = resourceTag.getInt("amount");
@@ -279,16 +304,34 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
     }
 
     @Override
-    public void tick(@NotNull MinecraftServer server, @NotNull ServerWorld world, @Nullable ServerPlayerEntity player) {
-        synchronizer.sync(player);
-    }
-
-    @Override
     public List<ItemStack> getAllItems() {
         return resources.getAll().stream()
                 .filter(info -> info.amount() > 0)
-                .map(it -> (ItemStack)new FortressItemStack(it.item(), it.amount()))
+                .map(it -> (ItemStack) new FortressItemStack(it.item(), it.amount()))
                 .toList();
+    }
+
+    @Override
+    public boolean hasEatableItem() {
+        return getEatableItem().isPresent();
+    }
+
+    @Override
+    @NotNull
+    public Optional<ItemStack> getEatableItem() {
+        return this
+                .getAllItems()
+                .stream()
+                .filter(ServerResourceManager::isEatable)
+                .max(
+                        Comparator.comparingDouble(stack ->
+                                {
+                                    final var foodComponent = stack.getItem().getFoodComponent();
+                                    //noinspection DataFlowIssue
+                                    return foodComponent.getHunger() * foodComponent.getSaturationModifier() * 2.0f;
+                                }
+                        )
+                );
     }
 
     @Override
@@ -345,7 +388,7 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
         }
         return true; // All costs satisfied
     }
-    
+
     private ItemStacksManager getManagerFromTaskId(UUID taskId) {
         return reservedResources.computeIfAbsent(taskId, k -> new ItemStacksManager());
     }
@@ -366,7 +409,7 @@ public class ServerResourceManager implements IServerResourceManager, ITickableM
         }
 
         void sync(ServerPlayerEntity player) {
-            if(player == null || (infosToSync.isEmpty() && !needReset)) return;
+            if (player == null || (infosToSync.isEmpty() && !needReset)) return;
             final var packet = new ClientboundSyncItemsPacket(infosToSync, needReset);
             FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESOURCES_SYNC, packet);
             infosToSync.clear();

@@ -99,6 +99,14 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
         this.dataTracker.startTracking(HAS_TASK, false);
     }
 
+    public float getAdjustedMovementSpeed() {
+        final var currentFoodLevel = getCurrentFoodLevel();
+        if (currentFoodLevel < 10)
+            return Colonist.SLOW_MOVEMENT_SPEED;
+        else
+            return Colonist.FAST_MOVEMENT_SPEED;
+    }
+
     public IBaritone getBaritone() {
         return baritone;
     }

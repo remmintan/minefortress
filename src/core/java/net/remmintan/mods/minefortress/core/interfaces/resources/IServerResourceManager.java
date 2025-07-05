@@ -5,8 +5,10 @@ import net.minecraft.item.ItemStack;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.ISyncableServerManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface IServerResourceManager extends IResourceManager, IServerManager, ISyncableServerManager {
@@ -22,5 +24,10 @@ public interface IServerResourceManager extends IResourceManager, IServerManager
     void returnReservedItems(UUID taskId);
 
     List<ItemStack> getAllItems();
+
+    boolean hasEatableItem();
+
+    @NotNull
+    Optional<ItemStack> getEatableItem();
 
 }

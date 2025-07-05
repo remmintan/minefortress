@@ -55,10 +55,10 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
                 if(!this.iterator.hasNext()) return;
                 this.goal = this.iterator.next();
             } while(goalAlreadyInCorrectState(colonist));
-            movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
+            movementHelper.goTo(goal.pos().up());
         }
         if (this.goal != null && movementHelper.getGoal() == null) {
-            movementHelper.goTo(goal.pos().up(), Colonist.FAST_MOVEMENT_SPEED);
+            movementHelper.goTo(goal.pos().up());
         }
 
         if (movementHelper.hasReachedGoal() && colonist.getPlaceControl().isDone() && colonist.getDigControl().isDone()) {
@@ -102,7 +102,7 @@ public class FarmerDailyTask extends AbstractAutomationAreaTask {
                     final var blockItem = seedsOpt.get();
                     final var bsTaskBlockInfo = new BlockStateTaskBlockInfo(blockItem, aboveBlockPos, blockItem.getBlock().getDefaultState());
                     colonist.setGoal(bsTaskBlockInfo);
-                    movementHelper.goTo(aboveBlockPos, Colonist.FAST_MOVEMENT_SPEED);
+                    movementHelper.goTo(aboveBlockPos);
                 } else {
                     this.goal = null;
                 }

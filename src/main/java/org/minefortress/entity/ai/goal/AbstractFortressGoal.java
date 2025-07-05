@@ -4,7 +4,11 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
+import org.minefortress.events.HungryPawnStartsWorkingCallback;
 
 import java.util.EnumSet;
 
@@ -21,8 +25,18 @@ public abstract class AbstractFortressGoal extends Goal {
         }
     }
 
-    protected boolean isHungry() {
-        return colonist.getEatControl().map(IEatControl::isHungry).orElse(false);
+    protected boolean wantAndCanEatSomeFood() {
+        final var hungry = colonist.getEatControl().map(IEatControl::isHungry).orElse(false);
+        final var hasSomeFoodToIt = ServerModUtils.getManagersProvider(colonist.getServer(), colonist.getFortressPos())
+                .map(IServerManagersProvider::getResourceManager)
+                .map(IServerResourceManager::hasEatableItem)
+                .orElse(false);
+
+        if (hungry && !hasSomeFoodToIt) {
+            HungryPawnStartsWorkingCallback.EVENT.invoker().hungryPawnStartsWorking(colonist, colonist.getCurrentFoodLevel());
+        }
+
+        return hungry && hasSomeFoodToIt;
     }
 
 

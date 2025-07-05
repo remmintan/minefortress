@@ -30,7 +30,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
     public void start(Colonist colonist) {
         colonist.setCurrentTaskDesc("Looking for food");
         this.setGoal(colonist);
-        colonist.getMovementHelper().goTo(this.goal, Colonist.FAST_MOVEMENT_SPEED);
+        colonist.getMovementHelper().goTo(this.goal);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ForesterDailyTask implements ProfessionDailyTask{
                 this.gatherItemAndAddToInventory(colonist);
                 if(this.interactionsCount > 2) {
                     this.setGoal(colonist);
-                    colonist.getMovementHelper().goTo(this.goal, Colonist.FAST_MOVEMENT_SPEED);
+                    colonist.getMovementHelper().goTo(this.goal);
                     this.interactionsCount = 0;
                 }
             }

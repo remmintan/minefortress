@@ -7,7 +7,7 @@ class PawnExecuteAreaBasedTaskGoal(colonist: Colonist) : AbstractFortressGoal(co
 
 
     override fun canStart(): Boolean {
-        return colonist.areaBasedTaskControl.hasMoreBlocks() && !isHungry
+        return colonist.areaBasedTaskControl.hasMoreBlocks() && !wantAndCanEatSomeFood()
     }
 
     override fun start() {

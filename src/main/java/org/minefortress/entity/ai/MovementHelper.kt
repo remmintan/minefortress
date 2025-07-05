@@ -54,7 +54,7 @@ class MovementHelper(private val colonist: Colonist) {
     @JvmOverloads
     fun goTo(
         goal: BlockPos,
-        speed: Float = Colonist.FAST_MOVEMENT_SPEED,
+        speed: Float = colonist.adjustedMovementSpeed,
         reachDistance: Double = Colonist.WORK_REACH_DISTANCE.toDouble()
     ) {
         if (this.goal != null && this.goal == goal) {
