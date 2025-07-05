@@ -2,7 +2,7 @@
 # MineFortress
 [![Support the project](https://img.shields.io/badge/PATREON-SUPPORT_THE_PROJECT-f96854?style=for-the-badge&logo=patreon&logoColor=f96854&labelColor=052d49&color=f96854)](https://www.patreon.com/minefortress)
 [![Join Discord](https://img.shields.io/discord/906943962659561515?style=for-the-badge&logo=discord&label=discord&color=5865F2)](https://discord.gg/6rt7VJxPcq)
-[![Website](https://img.shields.io/badge/website-minefortress-CC9966?style=for-the-badge)](https://minecraftfortress.org/)
+[![Website](https://img.shields.io/badge/website-minefortress-CC9966?style=for-the-badge)](https://minefortress.net/)
 
 The mod that turns your Minecraft into RTS. Take the role of a village leader, gather resources, build houses, hire professionals to grow and expand your village and even conquer your neighbors! Forget about the first-person view and control everything with your mouse pointer like in classic RTS games.
 ## Links
