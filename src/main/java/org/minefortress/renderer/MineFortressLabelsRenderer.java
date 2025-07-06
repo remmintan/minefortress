@@ -8,34 +8,24 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
-import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
-import org.apache.commons.lang3.StringUtils;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class MineFortressLabelsRenderer {
 
-    public static final int GREEN = 0xff008450;
-    public static final int YELLOW = 0xffefb700;
-    public static final int RED = 0xffb81d13;
-    public static final int BLACK = 0xff000000;
     private final TextRenderer font;
     private final Supplier<ISelectionManager> selectionManagerSupplier;
-    private final Supplier<List<BuildingHealthRenderInfo>> buildingsHealthSupplier;
     private Camera camera;
     private Quaternionf cameraOrientation;
 
     public MineFortressLabelsRenderer(TextRenderer font,
-                                      Supplier<ISelectionManager> selectionManagerSupplier,
-                                      Supplier<List<BuildingHealthRenderInfo>> buildingsHealthSupplier) {
+                                      Supplier<ISelectionManager> selectionManagerSupplier) {
         this.font = font;
         this.selectionManagerSupplier = selectionManagerSupplier;
-        this.buildingsHealthSupplier = buildingsHealthSupplier;
     }
 
     public void prepare(Camera camera) {
@@ -45,67 +35,8 @@ public class MineFortressLabelsRenderer {
 
     public void render(double x, double y, double z, MatrixStack matrixStack, VertexConsumerProvider source, int packLightCoords) {
         renderSelectionLabels(x, y, z, matrixStack, source, packLightCoords);
-        renderBuildingHealth(x, y, z, matrixStack, source, packLightCoords);
     }
 
-    private void renderBuildingHealth(double x, double y, double z, MatrixStack matrixStack, VertexConsumerProvider source, int packLightCoords) {
-        final var totalHealthLength = 30;
-        final var healthbarBackground = StringUtils.repeat("|", totalHealthLength);
-        final var healthbarWidth = this.font.getWidth(healthbarBackground);
-        final var healthbarVerticalOffset = -4f;
-
-        for (BuildingHealthRenderInfo renderInfo : buildingsHealthSupplier.get()) {
-            final var pos = renderInfo.pos();
-            final var health = renderInfo.health();
-            final var healthLength = (int) (health / 100f * totalHealthLength);
-            final var healthbar = StringUtils.repeat("|", healthLength);
-
-
-            int color;
-            if (health > 66) {
-                color = GREEN;
-            } else if (health > 33) {
-                color = YELLOW;
-            } else {
-                color = RED;
-            }
-
-            final Consumer<Matrix4f> renderAction = matrix -> {
-
-                this.font.draw(
-                        healthbarBackground,
-                        -healthbarWidth/2f,
-                        healthbarVerticalOffset,
-                        BLACK,
-                        false,
-                        matrix,
-                        source,
-                        TextRenderer.TextLayerType.NORMAL,
-                        BLACK,
-                        packLightCoords
-                );
-
-                matrixStack.push();
-                matrixStack.translate(0, 0, -0.05f);
-                final var newMatrix = matrixStack.peek().getPositionMatrix();
-                this.font.draw(
-                        healthbar,
-                        -healthbarWidth/2f,
-                        healthbarVerticalOffset,
-                        color,
-                        false,
-                        newMatrix,
-                        source,
-                        TextRenderer.TextLayerType.NORMAL,
-                        color,
-                        packLightCoords
-                );
-                matrixStack.pop();
-            };
-
-            this.renderTranslated(x, y, z, matrixStack, pos, renderAction, 0.5f);
-        }
-    }
 
     private void renderSelectionLabels(double x, double y, double z, MatrixStack matrixStack, VertexConsumerProvider source, int packLightCoords) {
         for(Pair<Vec3d, String> pair : getSelectionManager().getLabels()) {

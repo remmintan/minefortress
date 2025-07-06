@@ -46,8 +46,7 @@ public abstract class FortressWorldRendererMixin  {
         final var fortressClient = (IClientManagersProvider) client;
         this.entityRenderer = new MineFortressLabelsRenderer(
                 client.textRenderer,
-                fortressClient::get_SelectionManager,
-                () -> ClientModUtils.getBuildingsManager().getBuildingHealths()
+                fortressClient::get_SelectionManager
         );
     }
 

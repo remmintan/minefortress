@@ -4,9 +4,6 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
-import net.remmintan.mods.minefortress.core.FortressState.*
-import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingHealthRenderInfo
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
@@ -18,7 +15,6 @@ import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
-import kotlin.math.max
 
 class ClientBuildingsManager : IClientBuildingsManager {
 
@@ -78,23 +74,6 @@ class ClientBuildingsManager : IClientBuildingsManager {
         return if (blockEntity is IFortressBuilding) Optional.of(blockEntity) else Optional.empty()
     }
 
-    override fun getBuildingHealths(): List<BuildingHealthRenderInfo> {
-
-        return when (ClientModUtils.getFortressManager().state) {
-            COMBAT -> getBuildingsStream()
-                .filter { it.health < 100 }
-                .map { buildingToHealthRenderInfo(it) }
-                .toList()
-
-            BUILD_SELECTION, BUILD_EDITING -> getBuildingsStream()
-                .filter { it.health < 33 }
-                .map { buildingToHealthRenderInfo(it) }
-                .toList()
-
-            else -> emptyList()
-        }
-    }
-
     override fun hasRequiredBuilding(type: ProfessionType, level: Int, minCount: Int): Boolean {
         return getBuildingsStream()
             .filter { b -> b.satisfiesRequirement(type, level) }
@@ -108,20 +87,6 @@ class ClientBuildingsManager : IClientBuildingsManager {
             val packet = C2SOpenBuildingScreen(it)
             FortressClientNetworkHelper.send(C2SOpenBuildingScreen.CHANNEL, packet)
         }
-    }
-
-    private fun buildingToHealthRenderInfo(buildingInfo: IFortressBuilding): BuildingHealthRenderInfo {
-        val start = buildingInfo.start
-        val end = buildingInfo.end
-
-        val maxY = max(start.y.toDouble(), end.y.toDouble()).toInt()
-        val centerX = (start.x + end.x) / 2
-        val centerZ = (start.z + end.z) / 2
-
-        val center = Vec3d(centerX.toDouble(), maxY.toDouble(), centerZ.toDouble())
-        val health = buildingInfo.health
-
-        return BuildingHealthRenderInfo(center, health)
     }
 
     private fun getBuildingsStream(): Stream<IFortressBuilding> {
