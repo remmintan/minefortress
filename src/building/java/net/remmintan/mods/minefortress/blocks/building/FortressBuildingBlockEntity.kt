@@ -258,11 +258,13 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun getAttackers() = attackers
-    override fun getRepairItemInfos() = getRepairStates()
-        .entries
-        .groupingBy { it.value.block.asItem() }
-        .eachCount()
-        .map { ItemInfo(it.key, it.value) }
+    override fun getRepairItemInfos(): List<ItemInfo> {
+        return getRepairStates()
+            .entries
+            .groupingBy { it.value.block.asItem() }
+            .eachCount()
+            .map { ItemInfo(it.key, it.value) }
+    }
 
     private fun getRepairStates() = blockData?.allBlockStatesToRepairTheBuilding ?: mapOf()
 

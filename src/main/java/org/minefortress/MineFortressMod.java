@@ -8,6 +8,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.blocks.FortressBlocks;
+import net.remmintan.mods.minefortress.blocks.building.BuildingsHudRenderer;
 import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
 import net.remmintan.mods.minefortress.core.dtos.SupportLevel;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressManager;
@@ -61,6 +62,7 @@ public class MineFortressMod implements ModInitializer {
     public void onInitialize() {
         FortressServerEvents.register();
         FortressBlocks.register();
+        BuildingsHudRenderer.INSTANCE.register();
         FortressEntities.register();
         FortressItems.register();
         NetworkReaders.register();

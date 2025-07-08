@@ -5,11 +5,13 @@ import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.remmintan.mods.minefortress.blocks.building.FortressBuildingBlock;
 import net.remmintan.mods.minefortress.blocks.building.FortressBuildingBlockEntity;
+import net.remmintan.mods.minefortress.blocks.building.FortressBuildingBlockEntityRenderer;
 import net.remmintan.mods.minefortress.blocks.campfire.FortressCampfireBlock;
 import net.remmintan.mods.minefortress.blocks.campfire.FortressCampfireBlockEntity;
 
@@ -51,6 +53,7 @@ public class FortressBlocks {
                 buildingBlockId,
                 FabricBlockEntityTypeBuilder.create(FortressBuildingBlockEntity::new, FORTRESS_BUILDING).build()
         );
+        BlockEntityRendererFactories.register(BUILDING_ENT_TYPE, ctx -> new FortressBuildingBlockEntityRenderer());
 
         final var campfireId = Identifier.of("minefortress", "fortress_campfire");
         FORTRESS_CAMPFIRE = Registry.register(Registries.BLOCK, campfireId, new FortressCampfireBlock());
