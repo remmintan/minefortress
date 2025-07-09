@@ -1,8 +1,10 @@
 package net.remmintan.mods.minefortress.blocks.building
 
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.util.math.MatrixStack
+import net.remmintan.mods.minefortress.core.utils.camera.CameraTools
 
 
 class FortressBuildingBlockEntityRenderer : BlockEntityRenderer<FortressBuildingBlockEntity> {
@@ -15,6 +17,11 @@ class FortressBuildingBlockEntityRenderer : BlockEntityRenderer<FortressBuilding
         light: Int,
         overlay: Int
     ) {
-        BuildingsHudRenderer.addVisibleBuilding(entity.pos)
+        val minecraft = MinecraftClient.getInstance()
+        val buildingBlockCenter = entity.pos.toCenterPos()
+        val projectedBuildingPos =
+            CameraTools.projectToScreenSpace(buildingBlockCenter, minecraft)
+        val distance = minecraft.cameraEntity?.pos?.distanceTo(buildingBlockCenter) ?: 1.0
+        BuildingsHudRenderer.addVisibleBuilding(projectedBuildingPos, distance)
     }
 }

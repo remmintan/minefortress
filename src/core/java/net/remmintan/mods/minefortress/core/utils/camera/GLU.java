@@ -1,4 +1,4 @@
-package org.minefortress.renderer;
+package net.remmintan.mods.minefortress.core.utils.camera;
 
 import org.lwjgl.BufferUtils;
 

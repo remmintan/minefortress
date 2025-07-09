@@ -1,4 +1,4 @@
-package org.minefortress.interfaces;
+package net.remmintan.mods.minefortress.core.interfaces.renderers;
 
 public interface FortressGameRenderer {
 

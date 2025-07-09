@@ -16,7 +16,7 @@ import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.ITargetedP
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.core.utils.GlobalProjectionCache;
-import org.minefortress.renderer.CameraTools;
+import net.remmintan.mods.minefortress.core.utils.camera.CameraTools;
 
 import java.util.ArrayList;
 import java.util.HashMap;

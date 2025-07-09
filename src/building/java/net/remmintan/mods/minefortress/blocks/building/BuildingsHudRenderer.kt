@@ -3,46 +3,38 @@ package net.remmintan.mods.minefortress.blocks.building
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Vec2f
 
 private val BARS_TEXTURE = Identifier("minefortress", "textures/gui/bars.png")
 private const val TEXTURE_SIDE = 256
 
 object BuildingsHudRenderer {
 
-    private val visibleBuildings = mutableSetOf<BlockPos>()
+    private val visibleBuildings = mutableSetOf<BuildingRenderState>()
 
-    fun addVisibleBuilding(pos: BlockPos) {
-        visibleBuildings.add(pos)
+    fun addVisibleBuilding(pos: Vec2f, distance: Double) {
+        val state = BuildingRenderState(pos, distance.toFloat())
+        visibleBuildings.add(state)
     }
 
     fun register() {
         HudRenderCallback.EVENT.register { context, tickDelta ->
-            TODO()
+            for ((screenPos, distance) in visibleBuildings) {
+                val matrices = context.matrices
+                matrices.push()
+                matrices.translate(screenPos.x / 2.0, screenPos.y / 2.0, 0.0)
 
-//            for (buildingPos in visibleBuildings) {
-//                val rel = buildingPos.toCenterPos().subtract(camera.pos)
-//                val vec = Vector4f(rel.x.toFloat(), rel.y.toFloat(), rel.z.toFloat(), 1.0f);
-//                val projectedVec = vec.mul(modelView).mul(proj)
-//
-//                if (projectedVec.w > 0) {
-//                    val xNdc = projectedVec.x / projectedVec.w
-//                    val yNdc = projectedVec.y / projectedVec.w
-//
-//                    val screenX = (xNdc + 1f) / 2f * screenW
-//                    val screenY = (1f-yNdc) / 2f * screenH
-//
-//                    val matrices = context.matrices
-//                    matrices.push()
-//                    matrices.translate(screenX.toDouble(), screenY.toDouble(), 0.0)
-//
-//                    val barRenderer = BarRenderer(ctx = context)
-//                    barRenderer.barWidth = 182f
-//                    barRenderer.renderBarWithProgress(0, BarColor.BLUE, 0.33f)
-//
-//                    matrices.pop()
-//                }
-//            }
+                val adjustedDistance = distance / 5f
+                matrices.scale(1 / adjustedDistance, 1 / adjustedDistance, 1 / adjustedDistance)
+
+                val barRenderer = BarRenderer(ctx = context)
+                barRenderer.renderBarWithProgress(0, BarColor.GREEN, 1f)
+                barRenderer.renderBarWithProgress(1, BarColor.BLUE, 0.45f)
+
+                matrices.pop()
+            }
+
+            visibleBuildings.clear()
         }
     }
 
@@ -50,7 +42,7 @@ object BuildingsHudRenderer {
         private val ctx: DrawContext,
     ) {
 
-        var barWidth: Float = 10f
+        var barWidth: Float = 182f
 
         fun renderBarWithProgress(barNumber: Int, barColor: BarColor, progress: Float = 1.0f) {
             renderSingleBar(barNumber, barColor.barTextureNumber)
@@ -63,7 +55,7 @@ object BuildingsHudRenderer {
             val finalWidth = (barWidth * progress).toInt()
 
             val barX = (-barWidth / 2f).toInt()
-            val barY = barNumber * barHeight
+            val barY = (barNumber * (barHeight * 1.3f)).toInt()
 
             val v = 5f
 
