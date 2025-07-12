@@ -1,6 +1,6 @@
 package net.remmintan.mods.minefortress.core.dtos.buildings
 
-data class BuildingBar(val index: Int, val progress: Float, val color: BarColor)
+data class HudBar(val index: Int, val progress: Float, val color: BarColor)
 
 enum class BarColor(val barTextureNumber: Int) {
     PINK(0),

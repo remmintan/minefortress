@@ -17,6 +17,7 @@ import net.remmintan.mods.minefortress.gui.FortressHandledScreensKt;
 import net.remmintan.mods.minefortress.gui.building.functions.BuildingFunctionsRegistry;
 import net.remmintan.mods.minefortress.networking.registries.ClientNetworkReceivers;
 import org.minefortress.entity.FakeColonistSkinPreview;
+import org.minefortress.entity.renderer.PawnDataHudRenderer;
 import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreen;
 import org.minefortress.fortress.resources.gui.smelt.FortressFurnaceScreen;
 import org.minefortress.registries.FortressEntities;
@@ -34,6 +35,7 @@ public class MineFortressClient implements ClientModInitializer {
     public void onInitializeClient() {
         FortressKeybindings.init();
         FortressEntities.registerRenderers();
+        PawnDataHudRenderer.INSTANCE.register();
         NetworkReaders.register();
 
         HandledScreens.register(FORTRESS_CRAFTING_SCREEN_HANDLER, FortressCraftingScreen::new);

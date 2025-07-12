@@ -1,23 +1,29 @@
-package net.remmintan.mods.minefortress.blocks.building
+package org.minefortress.entity.renderer
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.minecraft.client.MinecraftClient
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.util.Identifier
 import net.minecraft.util.math.Vec2f
 import net.remmintan.mods.minefortress.core.dtos.buildings.HudBar
 import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
 import net.remmintan.mods.minefortress.core.services.BarRenderer
 
+private val BARS_SHORT_TEXTURE = Identifier("minefortress", "textures/gui/bars_short.png")
 
+object PawnDataHudRenderer {
 
-object BuildingsHudRenderer {
+    private val pawnsToRender = mutableListOf<PawnRenderData>()
 
-    private val visibleBuildings = mutableSetOf<BuildingRenderState>()
-
-    fun addVisibleBuilding(pos: Vec2f, distance: Double, bars: List<HudBar>, icon: Item?) {
-        val state = BuildingRenderState(pos, distance.toFloat(), bars, icon)
-        visibleBuildings.add(state)
+    fun addPawnData(pos: Vec2f, distance: Double, bars: List<HudBar>, profession: ItemStack?) {
+        pawnsToRender.add(
+            PawnRenderData(
+                pos,
+                distance,
+                bars,
+                profession
+            )
+        )
     }
 
     fun register() {
@@ -26,7 +32,8 @@ object BuildingsHudRenderer {
                 val scaleFactor = MinecraftClient.getInstance().window.scaleFactor
                 val windowScaleRatio = scaleFactor / 2.0
 
-                for ((screenPos, distance, bars, icon) in visibleBuildings) {
+                for ((screenPos, distance, bars, icon) in pawnsToRender) {
+
                     val matrices = context.matrices
                     matrices.push()
                     matrices.translate(
@@ -36,28 +43,36 @@ object BuildingsHudRenderer {
                     )
 
                     val adjustedDistance = distance / 8f
-                    val ratio = 1 / adjustedDistance
+                    val ratio = 1f / adjustedDistance.toFloat()
                     matrices.scale(ratio, ratio, ratio)
 
-                    val barRenderer = BarRenderer(ctx = context)
+                    val barRenderer = BarRenderer(
+                        ctx = context,
+                        barWidth = 27f,
+                        barOverlayTextureNumber = 14,
+                        texture = BARS_SHORT_TEXTURE
+                    )
                     bars.forEach { (index, progress, color) ->
                         barRenderer.renderBarWithProgress(index, color, progress)
                     }
-                    context.drawItem(ItemStack(icon), -8, -20)
+                    icon?.let {
+                        context.drawItem(it, -8, -20)
+                    }
                     matrices.pop()
                 }
             }
 
 
-            visibleBuildings.clear()
+            pawnsToRender.clear()
         }
     }
 
+    private data class PawnRenderData(
+        val pos: Vec2f,
+        val distance: Double,
+        val bars: List<HudBar>,
+        val icon: ItemStack?
+    )
+
 }
 
-private data class BuildingRenderState(
-    val screenPos: Vec2f,
-    val distance: Float,
-    val bars: List<HudBar>,
-    val icon: Item?
-)

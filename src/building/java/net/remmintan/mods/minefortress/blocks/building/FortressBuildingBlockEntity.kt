@@ -25,7 +25,7 @@ import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.buildings.BarColor
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
-import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingBar
+import net.remmintan.mods.minefortress.core.dtos.buildings.HudBar
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
@@ -163,17 +163,17 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
             ?.map { it.pos.toImmutable() }
     }
 
-    override fun getBars(): List<BuildingBar> {
+    override fun getBars(): List<HudBar> {
         val hovered = ClientModUtils.getBuildingsManager().getHoveredBuilding().map { it.pos == pos }.orElse(false)
 
-        val list = mutableListOf<BuildingBar>()
+        val list = mutableListOf<HudBar>()
         if (this.health < 100 || hovered) {
             val color = when {
                 this.health < 30 -> BarColor.RED
                 this.health < 70 -> BarColor.YELLOW
                 else -> BarColor.GREEN
             }
-            list += BuildingBar(0, this.health / 100f, color)
+            list += HudBar(0, this.health / 100f, color)
         }
 
 
@@ -193,8 +193,8 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
 
 
         if (hireProgress != null || productionProgress != null || hovered) {
-            list += BuildingBar(1, (productionProgress ?: 0) / 100f, BarColor.BLUE)
-            list += BuildingBar(2, (hireProgress ?: 0) / 100f, BarColor.PURPLE)
+            list += HudBar(1, (productionProgress ?: 0) / 100f, BarColor.BLUE)
+            list += HudBar(2, (hireProgress ?: 0) / 100f, BarColor.PURPLE)
         }
 
         return list

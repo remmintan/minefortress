@@ -1,37 +1,31 @@
 package org.minefortress.entity.renderer;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Box;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
+import net.remmintan.mods.minefortress.core.dtos.buildings.BarColor;
+import net.remmintan.mods.minefortress.core.dtos.buildings.HudBar;
+import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IProfessional;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWarrior;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
+import net.remmintan.mods.minefortress.core.utils.camera.CameraTools;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.joml.AxisAngle4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.renderer.models.PawnModel;
 
-public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel> {
+import java.util.List;
 
-    private static final Vector3f GREEN_COLOR = new Vector3f(0f, 1f, 0f);
-    private static final Vector3f YELLOW_COLOR = new Vector3f(1f, 1f, 0f);
+public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel> {
 
     private static final Identifier GUY = new Identifier("minefortress", "textures/skins/guy.png");
     private static final Identifier GUY2 = new Identifier("minefortress", "textures/skins/guy2.png");
@@ -68,15 +62,27 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
         return colonist.hasCustomName();
     }
 
+
     @NotNull
-    private static Vector3f getColorBaseOnMode(BasePawnEntity pawn) {
+    private static BarColor getColorBaseOnMode(BasePawnEntity pawn) {
         final var state = ClientModUtils.getManagersProvider().get_ClientFortressManager().getState();
         final boolean warrior = pawn instanceof IWarrior;
         final var combatState = state == FortressState.COMBAT;
         if (combatState && warrior || !combatState && !warrior)
-            return new Vector3f(GREEN_COLOR);
+            return BarColor.GREEN;
         else
-            return new Vector3f(YELLOW_COLOR);
+            return BarColor.YELLOW;
+    }
+
+    private boolean isThisPawnSelected(BasePawnEntity pawn) {
+        return ClientModUtils.getManagersProvider().get_PawnsSelectionManager().isSelected(pawn);
+    }
+
+    private float getHealthFoodLevel(BasePawnEntity colonist) {
+        final var health = colonist.getHealth();
+        final var foodLevel = colonist.getCurrentFoodLevel();
+
+        return Math.min(health, foodLevel);
     }
 
     @Override
@@ -93,47 +99,53 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
         final MinecraftClient client = getClient();
         if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
             final boolean hovering = client.crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == pawn;
-            final var fightSelecting = isThisPawnSelected(pawn);
-            var color = getHealthFoodLevelColor(pawn);
-            if(hovering || color != null || fightSelecting) {
-                final VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-                if(color == null)
-                    color = getColorBaseOnMode(pawn);
+            final var selected = isThisPawnSelected(pawn);
+            var shouldShowBasedOnHealth = shouldShowBarsBasedOnHealth(pawn);
+            if (hovering || shouldShowBasedOnHealth || selected) {
+                final var pawnEyesPos = pawn.getEyePos();
 
-                if(!hovering)
-                    color.mul(0.7f);
+                final var pawnScreenPos = CameraTools.projectToScreenSpace(pawnEyesPos, client);
+                final var distance = client.getCameraEntity().getPos().distanceTo(pawnEyesPos);
 
-                PawnRenderer.renderRhombus(matrixStack, buffer, pawn, color);
+                ItemStack profIcon = null;
+                if ((hovering || selected) && pawn instanceof IProfessional prof) {
+                    final var professionId = prof.getProfessionId();
+                    if (!professionId.startsWith("warrior") || !professionId.startsWith("archer")) {
+                        final var pawnProf = ClientModUtils.getProfessionManager().getProfession(professionId);
+                        profIcon = pawnProf.getIcon();
+                    }
+                }
+
+                final var health = pawn.getHealth();
+                final var healthColor = shouldShowBasedOnHealth ? getHealthColor(pawn) : getColorBaseOnMode(pawn);
+                final var healthBar = new HudBar(0, health / 20f, healthColor);
+
+                final var foodLevel = pawn.getCurrentFoodLevel();
+                final var foodColor = BarColor.GRAY;
+                final var foodBar = new HudBar(1, foodLevel / 20f, foodColor);
+
+
+                PawnDataHudRenderer.INSTANCE.addPawnData(
+                        pawnScreenPos,
+                        distance,
+                        List.of(healthBar, foodBar),
+                        profIcon
+                );
             }
         }
     }
 
-    private boolean isThisPawnSelected(BasePawnEntity pawn) {
-        return ClientModUtils.getManagersProvider().get_PawnsSelectionManager().isSelected(pawn);
+    private boolean shouldShowBarsBasedOnHealth(BasePawnEntity pawn) {
+        final var healthFoodLevel = getHealthFoodLevel(pawn);
+
+        return healthFoodLevel <= 10;
     }
 
-    private float getHealthFoodLevel(BasePawnEntity colonist) {
-        final var health = colonist.getHealth();
-        final var foodLevel = colonist.getCurrentFoodLevel();
-
-        return Math.min(health, foodLevel);
-    }
-
-    @Nullable
-    private Vector3f getHealthFoodLevelColor(BasePawnEntity colonist) {
-        final var healthFoodLevel = getHealthFoodLevel(colonist);
-        final var maxLevelOfEachColor = (float)0xFF;
-        if(healthFoodLevel > 10) return null;
-        if(healthFoodLevel <= 10 && healthFoodLevel >= 5) {
-            final var red = 0xFF / maxLevelOfEachColor;
-            final var green = 0xAA / maxLevelOfEachColor;
-            final var blue = 0x00 / maxLevelOfEachColor;
-            return new Vector3f(red, green, blue);
-        }
-        final var red = 0xFF / maxLevelOfEachColor;
-        final var green = 0x55 / maxLevelOfEachColor;
-        final var blue = 0x55 / maxLevelOfEachColor;
-        return new Vector3f(red, green, blue);
+    private BarColor getHealthColor(BasePawnEntity pawn) {
+        final var health = pawn.getHealth();
+        if (health < 5) return BarColor.RED;
+        if (health < 10) return BarColor.YELLOW;
+        return BarColor.GREEN;
     }
 
     private MinecraftClient getClient() {
@@ -141,34 +153,13 @@ public class PawnRenderer extends BipedEntityRenderer<BasePawnEntity, PawnModel>
     }
 
     private void setClothesVilibility(MobEntity colonist) {
-        final var colonistModel = (PlayerEntityModel<BasePawnEntity>)this.getModel();
+        final var colonistModel = (PlayerEntityModel<BasePawnEntity>) this.getModel();
         colonistModel.hat.visible = true;
         colonistModel.jacket.visible = !colonist.isSleeping();
         colonistModel.leftPants.visible = !colonist.isSleeping();
         colonistModel.rightPants.visible = !colonist.isSleeping();
         colonistModel.leftSleeve.visible = !colonist.isSleeping();
         colonistModel.rightSleeve.visible = !colonist.isSleeping();
-    }
-
-    private static void renderRhombus(MatrixStack matrices, VertexConsumer vertices, Entity entity, Vector3f color) {
-        Box box = entity.getBoundingBox().offset(-entity.getX(), -entity.getY(), -entity.getZ());
-        if (entity instanceof LivingEntity) {
-            matrices.push();
-            final double xCenter = (box.minX + box.maxX) / 2;
-            final double zCenter = (box.minZ + box.maxZ) / 2;
-            matrices.translate(xCenter, box.maxY * 1.5, zCenter);
-
-            float radians = (float) Math.toRadians(45);
-
-            final Quaternionf xRotation = new Quaternionf().set(new AxisAngle4f(radians, 1, 0, 0));
-            final Quaternionf yRoation = new Quaternionf().set(new AxisAngle4f(radians, 0, 1, 0));
-            matrices.multiply(xRotation);
-            matrices.multiply(yRoation);
-            matrices.scale(0.3f, 0.3f, 0.3f);
-
-            WorldRenderer.drawBox(matrices, vertices, -0.5f,  -0.5f, -0.5f, 0.5f,  0.5f, 0.5f, color.x(), color.y(), color.z(), 1.0f);
-            matrices.pop();
-        }
     }
 
 }

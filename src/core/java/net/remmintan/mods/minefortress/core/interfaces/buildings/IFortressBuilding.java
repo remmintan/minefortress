@@ -9,7 +9,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
-import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingBar;
+import net.remmintan.mods.minefortress.core.dtos.buildings.HudBar;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import org.jetbrains.annotations.Nullable;
@@ -87,5 +87,5 @@ public interface IFortressBuilding {
 
     IBuildingHireHandler getHireHandler();
 
-    List<BuildingBar> getBars();
+    List<HudBar> getBars();
 }

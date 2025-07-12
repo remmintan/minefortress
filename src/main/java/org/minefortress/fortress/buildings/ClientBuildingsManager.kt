@@ -3,6 +3,7 @@ package org.minefortress.fortress.buildings
 import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.sound.SoundEvents
+import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingsManager
@@ -59,6 +60,9 @@ class ClientBuildingsManager : IClientBuildingsManager {
     }
 
     override fun getHoveredBuilding(): Optional<IFortressBuilding> {
+        if (hoveredBuilding == null || MinecraftClient.getInstance().crosshairTarget is EntityHitResult)
+            return Optional.empty()
+
         return Optional.ofNullable(hoveredBuilding)
     }
 
