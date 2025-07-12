@@ -40,6 +40,11 @@ public class CameraTools {
 
         resultingViewBuffer.position(0);
         GLU.gluProject((float) position.x, (float) position.y, (float) position.z, modelViewBuffer, projectionBuffer, viewport, resultingViewBuffer);
+
+        if (resultingViewBuffer.get(2) > 1) {
+            return new Vec2f(Float.MAX_VALUE, Float.MAX_VALUE);
+        }
+
         return new Vec2f(resultingViewBuffer.get(0), winHeight - resultingViewBuffer.get(1));
     }
 

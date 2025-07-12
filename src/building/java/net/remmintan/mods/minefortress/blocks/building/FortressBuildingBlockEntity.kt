@@ -23,13 +23,16 @@ import net.minecraft.world.Heightmap
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo
+import net.remmintan.mods.minefortress.core.dtos.buildings.BarColor
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
+import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingBar
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager
 import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
+import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils
 import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
 import org.slf4j.Logger
@@ -149,7 +152,7 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         return null
     }
 
-    override fun getHireHandler() = hireHandler
+    override fun getHireHandler(): BuildingHireHandler = hireHandler
 
     override fun getFurnacePos(): List<BlockPos>? =
         furnaceBlockPositions
@@ -158,6 +161,43 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         this.furnaceBlockPositions = this.blockData?.referenceState
             ?.filter { it.blockState?.isOf(Blocks.FURNACE) == true }
             ?.map { it.pos.toImmutable() }
+    }
+
+    override fun getBars(): List<BuildingBar> {
+        val hovered = ClientModUtils.getBuildingsManager().getHoveredBuilding().map { it.pos == pos }.orElse(false)
+
+        val list = mutableListOf<BuildingBar>()
+        if (this.health < 100 || hovered) {
+            val color = when {
+                this.health < 30 -> BarColor.RED
+                this.health < 70 -> BarColor.YELLOW
+                else -> BarColor.GREEN
+            }
+            list += BuildingBar(0, this.health / 100f, color)
+        }
+
+
+        val hireProgress = hireHandler
+            .getProfessions()
+            .map {
+                hireHandler.getHireProgress(it.professionId)
+            }
+            .filter { it.queueLength > 0 }
+            .minByOrNull { it.queueLength }
+            ?.progress
+
+
+        // TODO: add production queue
+        val productionProgress: Int? = null
+
+
+
+        if (hireProgress != null || productionProgress != null || hovered) {
+            list += BuildingBar(1, (productionProgress ?: 0) / 100f, BarColor.BLUE)
+            list += BuildingBar(2, (hireProgress ?: 0) / 100f, BarColor.PURPLE)
+        }
+
+        return list
     }
 
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {

@@ -1,9 +1,15 @@
 package net.remmintan.mods.minefortress.blocks.building
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Vec2f
+import net.remmintan.mods.minefortress.core.dtos.buildings.BarColor
+import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingBar
+import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
 
 private val BARS_TEXTURE = Identifier("minefortress", "textures/gui/bars.png")
 private const val TEXTURE_SIDE = 256
@@ -12,27 +18,39 @@ object BuildingsHudRenderer {
 
     private val visibleBuildings = mutableSetOf<BuildingRenderState>()
 
-    fun addVisibleBuilding(pos: Vec2f, distance: Double) {
-        val state = BuildingRenderState(pos, distance.toFloat())
+    fun addVisibleBuilding(pos: Vec2f, distance: Double, bars: List<BuildingBar>, icon: Item?) {
+        val state = BuildingRenderState(pos, distance.toFloat(), bars, icon)
         visibleBuildings.add(state)
     }
 
     fun register() {
         HudRenderCallback.EVENT.register { context, tickDelta ->
-            for ((screenPos, distance) in visibleBuildings) {
-                val matrices = context.matrices
-                matrices.push()
-                matrices.translate(screenPos.x / 2.0, screenPos.y / 2.0, 0.0)
+            if (isClientInFortressGamemode()) {
+                val scaleFactor = MinecraftClient.getInstance().window.scaleFactor
+                val windowScaleRatio = scaleFactor / 2.0
 
-                val adjustedDistance = distance / 5f
-                matrices.scale(1 / adjustedDistance, 1 / adjustedDistance, 1 / adjustedDistance)
+                for ((screenPos, distance, bars, icon) in visibleBuildings) {
+                    val matrices = context.matrices
+                    matrices.push()
+                    matrices.translate(
+                        screenPos.x.toDouble() / windowScaleRatio,
+                        screenPos.y.toDouble() / windowScaleRatio,
+                        -1000.0
+                    )
 
-                val barRenderer = BarRenderer(ctx = context)
-                barRenderer.renderBarWithProgress(0, BarColor.GREEN, 1f)
-                barRenderer.renderBarWithProgress(1, BarColor.BLUE, 0.45f)
+                    val adjustedDistance = distance / 8f
+                    val ratio = 1 / adjustedDistance
+                    matrices.scale(ratio, ratio, ratio)
 
-                matrices.pop()
+                    val barRenderer = BarRenderer(ctx = context)
+                    bars.forEach { (index, progress, color) ->
+                        barRenderer.renderBarWithProgress(index, color, progress)
+                    }
+                    context.drawItem(ItemStack(icon), -8, -20)
+                    matrices.pop()
+                }
             }
+
 
             visibleBuildings.clear()
         }
@@ -46,8 +64,9 @@ object BuildingsHudRenderer {
 
         fun renderBarWithProgress(barNumber: Int, barColor: BarColor, progress: Float = 1.0f) {
             renderSingleBar(barNumber, barColor.barTextureNumber)
-            renderSingleBar(barNumber, barColor.barTextureNumber + 1, progress)
             renderSingleBar(barNumber, 22)
+            renderSingleBar(barNumber, barColor.barTextureNumber + 1, progress)
+
         }
 
         private fun renderSingleBar(barNumber: Int, barTextureNumber: Int, progress: Float = 1.0f) {
@@ -65,15 +84,11 @@ object BuildingsHudRenderer {
         }
 
     }
-
-    private enum class BarColor(val barTextureNumber: Int) {
-        PINK(0),
-        BLUE(2),
-        RED(4),
-        GREEN(6),
-        YELLOW(8),
-        PURPLE(10),
-        GRAY(12)
-    }
-
 }
+
+private data class BuildingRenderState(
+    val screenPos: Vec2f,
+    val distance: Float,
+    val bars: List<BuildingBar>,
+    val icon: Item?
+)
