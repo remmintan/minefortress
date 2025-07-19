@@ -20,7 +20,8 @@ class BuildingConfigurationScreenHandler(
     }
 
     override fun quickMove(player: PlayerEntity?, slot: Int): ItemStack {
-        TODO("Not yet implemented")
+        // NO OP
+        return ItemStack.EMPTY
     }
 
     override fun canUse(player: PlayerEntity?): Boolean = player?.world?.registryKey == BLUEPRINT_DIMENSION_KEY

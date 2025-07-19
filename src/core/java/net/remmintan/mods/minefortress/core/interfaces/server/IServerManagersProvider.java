@@ -7,7 +7,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServer
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksCreator;
 

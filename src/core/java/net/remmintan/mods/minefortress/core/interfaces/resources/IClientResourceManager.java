@@ -9,17 +9,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface IClientResourceManager extends IResourceManager {
+public interface IClientResourceManager {
 
+    // Screen related
     Set<ItemGroup> getGroups();
-    boolean hasStacks(List<ItemStack> stacks);
-
-    Map<ItemInfo, Boolean> getMetRequirements(List<ItemInfo> costs);
     List<ItemStack> getStacks(ItemGroup group);
-    void setItemAmount(Item item, int amount);
-    int getItemAmount(Item item);
-    void reset();
 
-    int getCountIncludingSimilars(Item item);
+    boolean hasItems(List<ItemInfo> stacks);
+
+    // Blueprint screen related
+    Map<ItemInfo, Boolean> getMetRequirements(List<ItemInfo> costs);
+
+    void sync(List<ItemInfo> items, boolean needReset);
+
+    int getCountIncludingSimilar(Item item);
 
 }

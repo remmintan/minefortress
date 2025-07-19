@@ -22,7 +22,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LevelProperties.class)
 public abstract class LevelPropertiesMixin implements IFortressGamemodeHolder, IFortressModVersionHolder {
 
-    private static final int CURRENT_VERSION = 3;
+    @Unique
+    private static final int CURRENT_VERSION = 4;
 
     @Unique
     private FortressGamemode fortressGamemode = FortressGamemode.SURVIVAL;

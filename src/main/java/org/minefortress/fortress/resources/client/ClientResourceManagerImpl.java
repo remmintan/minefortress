@@ -22,15 +22,6 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
     }
 
     @Override
-    public boolean hasStacks(List<ItemStack> stacks) {
-        final var itemInfos = stacks
-                .stream()
-                .map(it -> new ItemInfo(it.getItem(), it.getCount()))
-                .toList();
-        return hasItems(itemInfos);
-    }
-
-    @Override
     public Map<ItemInfo, Boolean> getMetRequirements(List<ItemInfo> costs) {
         if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) {
             return costs.stream().collect(Collectors.toMap(it -> it, it -> true, (a, b) -> b, LinkedHashMap::new));
@@ -85,7 +76,7 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
     }
 
     @Override
-    public int getCountIncludingSimilars(Item item) {
+    public int getCountIncludingSimilar(Item item) {
         if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) {
             return 999; // Or Integer.MAX_VALUE
         }
@@ -102,14 +93,16 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
     }
 
     @Override
-    public void setItemAmount(Item item, int amount) {
-        final var group = groupManager.getGroup(item);
-        final var manager = groupManager.getStacksManager(group);
-        manager.getStack(item).setCount(amount);
+    public void sync(List<ItemInfo> items, boolean needReset) {
+        if (needReset) {
+            reset();
+        }
+        for (var itemInfo : items) {
+            setItemAmount(itemInfo.item(), itemInfo.amount());
+        }
     }
 
-    @Override
-    public int getItemAmount(Item item) {
+    private int getItemAmount(Item item) {
         if (ClientExtensionsKt.isCreativeFortress(MinecraftClient.getInstance())) {
             return 999;
         }
@@ -118,8 +111,13 @@ public class ClientResourceManagerImpl implements IClientResourceManager {
         return manager.getStack(item).getCount();
     }
 
-    @Override
-    public void reset() {
+    private void setItemAmount(Item item, int amount) {
+        final var group = groupManager.getGroup(item);
+        final var manager = groupManager.getStacksManager(group);
+        manager.getStack(item).setCount(amount);
+    }
+
+    private void reset() {
         groupManager.clear();
     }
 

@@ -26,7 +26,7 @@ public class EatGoal extends Goal {
     @Override
     public void start() {
         getResourceManager().ifPresent(it ->
-                it.getEatableItem().ifPresent(st -> {
+                it.eatableItem.ifPresent(st -> {
                 it.increaseItemAmount(st.getItem(), -1);
                 getEatControl().eatFood(st.getItem());
             })

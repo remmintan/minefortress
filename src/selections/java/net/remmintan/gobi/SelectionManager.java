@@ -7,13 +7,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ClickType;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelection;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ISelectionManager;
@@ -109,8 +109,8 @@ public class SelectionManager implements ISelectionManager {
                         final var item = clickingBlockState.getBlock().asItem();
                         final var fortressManager = ClientModUtils.getFortressManager();
                         final var resourceManager = fortressManager.getResourceManager();
-                        final var itemStack = new ItemStack(item, blocksAmount);
-                        inCorrectState = resourceManager.hasStacks(Collections.singletonList(itemStack));
+                        final var itemStack = new ItemInfo(item, blocksAmount);
+                        inCorrectState = resourceManager.hasItems(Collections.singletonList(itemStack));
                     } else {
                         inCorrectState = true;
                     }

@@ -28,7 +28,7 @@ public class ProfessionCostsWidget implements Drawable, Element {
 
     private static int getItemAmountIncludingSimilars(Item item) { // Changed from getItemAmount
         final var fortressClientManager = ClientModUtils.getFortressManager();
-        return fortressClientManager.getResourceManager().getCountIncludingSimilars(item);
+        return fortressClientManager.getResourceManager().getCountIncludingSimilar(item);
     }
 
     @Override
