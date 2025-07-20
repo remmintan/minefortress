@@ -28,7 +28,7 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
 
     private var assignedWorkers = 0
 
-    override fun getId(): UUID {
+    override fun getPos(): BlockPos {
         return uuid
     }
 
@@ -73,7 +73,7 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
                 FortressServerNetworkHelper.send(
                     it,
                     FortressChannelNames.FINISH_TASK,
-                    ClientboundTaskExecutedPacket(this.getId())
+                    ClientboundTaskExecutedPacket(this.getPos())
                 )
             }
         }
@@ -85,7 +85,7 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
 
     override fun toTaskInformationDto(): List<TaskInformationDto> {
         val positions = trees.values.flatMap { listOf(it.treeLogBlocks, it.treeLeavesBlocks).flatten() }
-        return listOf(TaskInformationDto(getId(), positions, TaskType.REMOVE))
+        return listOf(TaskInformationDto(getPos(), positions, TaskType.REMOVE))
     }
 
     override fun canTakeMoreWorkers(): Boolean {

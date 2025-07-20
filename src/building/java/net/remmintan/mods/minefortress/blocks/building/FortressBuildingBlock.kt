@@ -10,7 +10,10 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
 
-class FortressBuildingBlock : BlockWithEntity(FabricBlockSettings.create().dropsNothing().noCollision()) {
+private val SETTINGS = FabricBlockSettings.create().strength(-1.0f, 3600000.0f).dropsNothing().noCollision()
+
+class FortressBuildingBlock :
+    BlockWithEntity(SETTINGS) {
     override fun createBlockEntity(pos: BlockPos?, state: BlockState?): BlockEntity {
         return FortressBuildingBlockEntity(pos, state)
     }

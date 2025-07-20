@@ -1,11 +1,11 @@
 package net.remmintan.mods.minefortress.core.interfaces.tasks
 
+import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto
-import java.util.*
 
 interface IBaseTask {
 
-    fun getId(): UUID
+    fun getPos(): BlockPos
     fun toTaskInformationDto(): List<TaskInformationDto>
     fun isComplete(): Boolean
 

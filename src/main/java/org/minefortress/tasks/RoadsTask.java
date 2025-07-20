@@ -81,8 +81,9 @@ public class RoadsTask implements ITask {
         return new TaskPart(partStartAndEnd, blocks, this);
     }
 
+    @NotNull
     @Override
-    public UUID getId() {
+    public BlockPos getPos() {
         return id;
     }
 
@@ -124,7 +125,7 @@ public class RoadsTask implements ITask {
             throw new IllegalStateException("Finished more parts than total parts");
 
         if(taskParts.isEmpty() && totalParts == finishedParts){
-            world.getPlayers().stream().findAny().ifPresent(player -> FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId())));
+            world.getPlayers().stream().findAny().ifPresent(player -> FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getPos())));
             taskFinishListeners.forEach(Runnable::run);
         }
     }

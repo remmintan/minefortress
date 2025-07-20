@@ -76,7 +76,7 @@ class AreaBlueprintTask(
         assignedWorkers--
     }
 
-    override fun getId() = id
+    override fun getPos(): BlockPos = id
 
     override fun getNextBlock(): ITaskBlockInfo? {
         return blocksQueue.poll()
@@ -140,9 +140,9 @@ class AreaBlueprintTask(
                 .map { it.resourceManager }
                 .ifPresent {
                     if (SimilarItemsHelper.isIgnorable(item)) {
-                        it.removeItemIfExists(this.getId(), item)
+                        it.removeItemIfExists(this.getPos(), item)
                     } else {
-                        it.removeReservedItem(this.getId(), item)
+                        it.removeReservedItem(this.getPos(), item)
                     }
                 }
         }

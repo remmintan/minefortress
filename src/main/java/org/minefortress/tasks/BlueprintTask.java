@@ -116,9 +116,9 @@ public class BlueprintTask extends AbstractTask {
                     .map(IServerManagersProvider::getResourceManager)
                     .ifPresent(it -> {
                         if (SimilarItemsHelper.isIgnorable(item)) {
-                            it.removeItemIfExists(this.getId(), item);
+                            it.removeItemIfExists(this.getPos(), item);
                         } else {
-                            it.removeReservedItem(this.getId(), item);
+                            it.removeReservedItem(this.getPos(), item);
                         }
                     });
         }

@@ -91,7 +91,7 @@ public class TaskControl implements ITaskControl {
 
     @Override
     public Optional<UUID> getTaskId() {
-        return Optional.ofNullable(task).map(ITask::getId);
+        return Optional.ofNullable(task).map(ITask::getPos);
     }
 
     @Override

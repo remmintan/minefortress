@@ -14,6 +14,8 @@ import net.remmintan.mods.minefortress.blocks.building.FortressBuildingBlockEnti
 import net.remmintan.mods.minefortress.blocks.building.FortressBuildingBlockEntityRenderer;
 import net.remmintan.mods.minefortress.blocks.campfire.FortressCampfireBlock;
 import net.remmintan.mods.minefortress.blocks.campfire.FortressCampfireBlockEntity;
+import net.remmintan.mods.minefortress.blocks.task.FortressTaskBlock;
+import net.remmintan.mods.minefortress.blocks.task.FortressTaskBlockEntity;
 
 public class FortressBlocks {
 
@@ -21,11 +23,13 @@ public class FortressBlocks {
     public static Block FORTRESS_BUILDING_CONFIGURATION;
     public static Block FORTRESS_BUILDING;
     public static Block FORTRESS_CAMPFIRE;
+    public static Block FORTRESS_TASK;
 
     public static BlockEntityType<FortressScaffoldBlockEntity> SCAFFOLD_ENT_TYPE;
     public static BlockEntityType<FortressBuildingConfigurationBlockEntity> BUILDING_CONFIGURATION_ENT_TYPE;
     public static BlockEntityType<FortressBuildingBlockEntity> BUILDING_ENT_TYPE;
     public static BlockEntityType<FortressCampfireBlockEntity> CAMPFIRE_ENT_TYPE;
+    public static BlockEntityType<FortressTaskBlockEntity> TASK_ENT_TYPE;
 
     public static void register() {
         final var scaffoldId = Identifier.of("minefortress", "scaffold_oak_planks");
@@ -61,6 +65,14 @@ public class FortressBlocks {
                 Registries.BLOCK_ENTITY_TYPE,
                 campfireId,
                 FabricBlockEntityTypeBuilder.create(FortressCampfireBlockEntity::new, FORTRESS_CAMPFIRE).build()
+        );
+
+        final var taskId = Identifier.of("minefortress", "fortress_task");
+        FORTRESS_TASK = Registry.register(Registries.BLOCK, taskId, new FortressTaskBlock());
+        TASK_ENT_TYPE = Registry.register(
+                Registries.BLOCK_ENTITY_TYPE,
+                taskId,
+                FabricBlockEntityTypeBuilder.create(FortressTaskBlockEntity::new, FORTRESS_TASK).build()
         );
     }
 }

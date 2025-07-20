@@ -5,25 +5,34 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IWorkerPawn
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager
 import net.remmintan.mods.minefortress.core.interfaces.tasks.*
+import net.remmintan.mods.minefortress.core.utils.LogCompanion
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils
+import net.remmintan.mods.minefortress.core.utils.getManagersProvider
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
 import net.remmintan.mods.minefortress.networking.s2c.S2CAddClientTasksPacket
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 
-class ServerTaskManager : IServerTaskManager, IWritableManager, ITickableManager {
-    private val tasksInProgress: MutableMap<UUID, IBaseTask> = ConcurrentHashMap()
+class ServerTaskManager(server: MinecraftServer, fortressPos: BlockPos) : IServerTaskManager, IWritableManager,
+    ITickableManager {
+    private val tasksInProgress: MutableMap<BlockPos, IBaseTask> = ConcurrentHashMap()
     private val notStartedTasks: Queue<IBaseTask> = LinkedList()
+
+    private val managersProvider: IServerManagersProvider by lazy { server.getManagersProvider(fortressPos)!! }
+    private val world: ServerWorld by lazy { server.overworld }
 
     override fun addTask(task: IBaseTask, selectedPawnIds: List<Int>, player: ServerPlayerEntity) {
         val packet = S2CAddClientTasksPacket(task.toTaskInformationDto())
         FortressServerNetworkHelper.send(player, S2CAddClientTasksPacket.CHANNEL, packet)
+
+        //TODO place the task in the world + reserve items
 
         if (selectedPawnIds.isEmpty()) {
             notStartedTasks.add(task)
@@ -38,7 +47,7 @@ class ServerTaskManager : IServerTaskManager, IWritableManager, ITickableManager
 
         if (task is ITaskWithPreparation)
             task.prepareTask()
-        tasksInProgress[task.getId()] = task
+        tasksInProgress[task.getPos()] = task
         setPawnsToTask(task, selectedWorkers)
     }
 
@@ -67,17 +76,23 @@ class ServerTaskManager : IServerTaskManager, IWritableManager, ITickableManager
         }
     }
 
-    override fun cancelTask(id: UUID, player: ServerPlayerEntity) {
-        val removedTask = tasksInProgress.remove(id)
+    override fun cancelTask(pos: BlockPos, player: ServerPlayerEntity) {
+        val removedTask = tasksInProgress.remove(pos)
         removedTask?.cancel()
-        ServerModUtils.getManagersProvider(player).ifPresent { it: IServerManagersProvider ->
-            it.resourceManager.returnReservedItems(id)
+        val resourceManager = managersProvider.resourceManager
+        val resourceHelper = managersProvider.resourceHelper
+        if (!resourceHelper.transferItemsFromTask(resourceManager, pos)) {
+            log.error("Couldn't return items from task at $pos to the resource manager")
         }
+        world.removeBlock(pos, false)
     }
 
     private fun removeAllFinishedTasks() {
         val finishedTasks = tasksInProgress.filterValues { it.isComplete() }.keys
-        finishedTasks.forEach { tasksInProgress.remove(it) }
+        finishedTasks.forEach {
+            tasksInProgress.remove(it)
+            world.removeBlock(it, false)
+        }
     }
 
     private fun setPawnsToTask(task: IBaseTask, workers: List<IWorkerPawn>) {
@@ -107,7 +122,7 @@ class ServerTaskManager : IServerTaskManager, IWritableManager, ITickableManager
     override fun read(tag: NbtCompound) {
     }
 
-    companion object {
+    companion object : LogCompanion(ServerTaskManager::class) {
         private fun filterWorkers(selectedPawnIds: List<Int>, player: ServerPlayerEntity): List<IWorkerPawn> {
             val serverWorld = player.world
             return selectedPawnIds

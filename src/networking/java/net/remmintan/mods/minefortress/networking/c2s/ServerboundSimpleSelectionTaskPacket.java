@@ -131,7 +131,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
 
             final var info = new ItemInfo(placingItem, blocksCount);
 
-            getManagersProvider(player).getResourceManager().reserveItems(task.getId(), Collections.singletonList(info));
+            getManagersProvider(player).getResourceManager().reserveItems(task.getPos(), Collections.singletonList(info));
         }
 
         if (task.getTaskType() == TaskType.REMOVE) {

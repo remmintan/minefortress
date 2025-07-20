@@ -50,8 +50,9 @@ public abstract class AbstractTask implements ITask, ITaskWithPreparation {
         this.endingBlock = endingBlock;
     }
 
+    @NotNull
     @Override
-    public UUID getId() {
+    public BlockPos getPos() {
         return id;
     }
 
@@ -150,7 +151,7 @@ public abstract class AbstractTask implements ITask, ITaskWithPreparation {
     }
 
     protected void sendFinishTaskNotificationToPlayer(ServerPlayerEntity player) {
-        FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getId()));
+        FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(this.getPos()));
     }
 
     public void addFinishListener(Runnable listener) {
