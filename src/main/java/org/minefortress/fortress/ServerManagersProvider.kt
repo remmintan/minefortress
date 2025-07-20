@@ -8,7 +8,8 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServer
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager
-import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceHelper
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager
 import net.remmintan.mods.minefortress.core.interfaces.server.*
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IServerTaskManager
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksCreator
@@ -16,6 +17,7 @@ import net.remmintan.mods.minefortress.core.utils.getFortressOwner
 import org.minefortress.fight.ServerFightManager
 import org.minefortress.fortress.automation.areas.AreasServerManager
 import org.minefortress.fortress.buildings.FortressBuildingManager
+import org.minefortress.fortress.resources.server.ServerResourceHelper
 import org.minefortress.fortress.resources.server.ServerResourceManager
 import org.minefortress.professions.ServerProfessionManager
 import org.minefortress.tasks.ServerTaskManager
@@ -30,6 +32,7 @@ class ServerManagersProvider(private val fortressPos: BlockPos, world: ServerWor
         registerManager(IServerProfessionsManager::class.java, ServerProfessionManager(fortressPos, world))
         registerManager(IServerResourceManager::class.java, ServerResourceManager(world.server))
         registerManager(IServerBuildingsManager::class.java, FortressBuildingManager(fortressPos, world))
+        registerManager(IServerResourceHelper::class.java, ServerResourceHelper(world.server, fortressPos))
         registerManager(IServerAutomationAreaManager::class.java, AreasServerManager())
         registerManager(IServerFightManager::class.java, ServerFightManager(fortressPos))
         registerManager(ITasksCreator::class.java, TasksCreator(world))

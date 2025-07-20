@@ -3,6 +3,7 @@ package net.remmintan.mods.minefortress.core.interfaces.resources;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface IClientResourceManager {
     // Blueprint screen related
     Map<ItemInfo, Boolean> getMetRequirements(List<ItemInfo> costs);
 
-    void sync(List<ItemInfo> items, boolean needReset);
+    void sync(List<BlockPos> containerPositions);
 
     int getCountIncludingSimilar(Item item);
 

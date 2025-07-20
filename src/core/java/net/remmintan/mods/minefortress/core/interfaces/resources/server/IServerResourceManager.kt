@@ -1,14 +1,13 @@
 package net.remmintan.mods.minefortress.core.interfaces.resources.server
 
-import net.minecraft.item.Item
-import net.minecraft.util.math.BlockPos
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage
+import net.minecraft.item.ItemStack
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager
 
 interface IServerResourceManager : IServerManager {
-    fun hasItems(stacks: List<ItemInfo>): Boolean
 
-    fun findContainerToPut(item: Item): BlockPos?
-    fun findContainerToGet(item: Item): BlockPos?
+    fun hasItems(stacks: List<ItemStack>): Boolean
+    fun getStorage(): Storage<ItemVariant>
 
 }
