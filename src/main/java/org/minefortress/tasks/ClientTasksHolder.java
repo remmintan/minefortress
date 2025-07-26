@@ -42,10 +42,13 @@ public class ClientTasksHolder implements IClientTasksHolder {
     }
 
     @Override
-    public void addTasks(List<TaskInformationDto> tasks) {
-        for(TaskInformationDto task: tasks) {
-            addTask(task.pos(), task.positions(), task.type());
-        }
+    public void addTask(TaskInformationDto task) {
+        addTask(task.pos(), task.positions(), task.type());
+    }
+
+    @Override
+    public void removeTask(BlockPos pos) {
+        tasks.remove(pos);
     }
 
     private void addTask(BlockPos taskPos, Iterable<BlockPos> blocks, TaskType type) {

@@ -2,6 +2,7 @@ package org.minefortress.tasks
 
 import com.mojang.datafixers.util.Pair
 import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.TaskType
@@ -12,22 +13,21 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket
-import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo
-import org.minefortress.tasks.block.info.DigTaskBlockInfo
-import org.minefortress.utils.BlockUtils
+import org.minefortress.tasks.block.info.ReplaceTaskBlockInfo
 import java.util.*
-import java.util.function.Consumer
 import kotlin.math.max
 
-class RoadsTask(override val positions: List<BlockPos>, private val item: Item?) : ITask {
+class RoadsTask(override val positions: List<BlockPos>, private val item: Item) : ITask {
     private val taskParts: Queue<ITaskPart> = ArrayDeque()
     private val totalParts: Int
     private var finishedParts = 0
 
     private var canceled = false
-    private val taskFinishListeners: MutableList<Runnable> = ArrayList()
 
     private var assignedWorkers = 0
+
+    override val taskType = TaskType.REPLACE
+    val requiredItems: List<ItemStack> = listOf(ItemStack(item, positions.size))
 
     init {
         this.totalParts = prepareParts()
@@ -46,7 +46,7 @@ class RoadsTask(override val positions: List<BlockPos>, private val item: Item?)
             }
         }
 
-        if (!partBlocks.isEmpty()) {
+        if (partBlocks.isNotEmpty()) {
             val taskPart = createTaskPart(partBlocks)
             taskParts.add(taskPart)
         }
@@ -60,20 +60,8 @@ class RoadsTask(override val positions: List<BlockPos>, private val item: Item?)
 
         val partStartAndEnd = Pair.of(first, last)
 
-
-        val blocks = partBlocks
-            .map { pos ->
-                if (Objects.isNull(item)) {
-                    DigTaskBlockInfo(pos)
-                } else {
-                    BlockStateTaskBlockInfo(item, pos, BlockUtils.getBlockStateFromItem(item))
-                }
-            }.toList()
+        val blocks = partBlocks.map { ReplaceTaskBlockInfo(it, item) }
         return TaskPart(partStartAndEnd, blocks, this)
-    }
-
-    override fun getTaskType(): TaskType {
-        return if (item == null) TaskType.REMOVE else TaskType.BUILD
     }
 
     override fun hasAvailableParts(): Boolean {
@@ -111,7 +99,6 @@ class RoadsTask(override val positions: List<BlockPos>, private val item: Item?)
                     ClientboundTaskExecutedPacket(this.pos)
                 )
             }
-            taskFinishListeners.forEach(Consumer { obj: Runnable -> obj.run() })
         }
     }
 
@@ -123,12 +110,8 @@ class RoadsTask(override val positions: List<BlockPos>, private val item: Item?)
         return !canceled
     }
 
-    override fun addFinishListener(listener: Runnable) {
-        taskFinishListeners.add(listener)
-    }
-
-    override fun toTaskInformationDto(): List<TaskInformationDto> {
-        return listOf(TaskInformationDto(pos, positions, taskType))
+    override fun toTaskInformationDto(): TaskInformationDto {
+        return TaskInformationDto(pos, positions, taskType)
     }
 
     override fun isComplete(): Boolean {

@@ -13,7 +13,7 @@ interface IBaseTask {
             val center = box.center
             return BlockPos(center.x, box.maxY + 1, center.z)
         }
-    fun toTaskInformationDto(): List<TaskInformationDto>
+    fun toTaskInformationDto(): TaskInformationDto
     val positions: List<BlockPos>
     fun isComplete(): Boolean
 

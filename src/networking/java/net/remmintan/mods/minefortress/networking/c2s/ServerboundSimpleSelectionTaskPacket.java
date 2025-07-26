@@ -117,7 +117,7 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
 
         if (task.getTaskType() == TaskType.REMOVE) {
             final var buildingsManager = getManagersProvider(player).getBuildingsManager();
-            final boolean intersectsWithABuilding = task.toTaskInformationDto().stream().flatMap(it -> it.positions().stream())
+            final boolean intersectsWithABuilding = task.toTaskInformationDto().positions().stream()
                     .anyMatch(buildingsManager::isPartOfAnyBuilding);
 
             if (intersectsWithABuilding) {

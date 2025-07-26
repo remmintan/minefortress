@@ -1,9 +1,7 @@
 package net.remmintan.mods.minefortress.core.utils;
 
-import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.IFortressAwareEntity;
 import net.remmintan.mods.minefortress.core.interfaces.entities.player.IFortressPlayerEntity;
@@ -12,7 +10,6 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IServerFortressMan
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -51,21 +48,6 @@ public final class ServerModUtils {
     @NotNull
     public static Optional<IServerFortressManager> getFortressManager(MinecraftServer server, BlockPos fortressCenter) {
         return getFortressHolder(server, fortressCenter).map(IFortressHolder::getServerFortressManager);
-    }
-
-    public static void addDropToTheResourceManager(ServerWorld w, BlockPos pos, IFortressAwareEntity c) {
-        if (ServerExtensionsKt.isSurvivalFortress(c.getServer())) {
-            getManagersProvider(c).ifPresent(it -> {
-                final var blockState = w.getBlockState(pos);
-                final var blockEntity = w.getBlockEntity(pos);
-                // FIXME: consider the tool and the entity
-                final var drop = Block.getDroppedStacks(blockState, w, pos, blockEntity);
-                if (!it.getResourceHelper().putItemsToSuitableContainer(drop)) {
-                    // FIXME: chests are full!
-                    LoggerFactory.getLogger(ServerModUtils.class).error("THE ITEMS ARE NOT SAVED, ALL CHESTS FULL");
-                }
-            });
-        }
     }
 
     @NotNull

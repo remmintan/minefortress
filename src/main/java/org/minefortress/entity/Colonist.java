@@ -19,7 +19,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.CreeperEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.FluidTags;
@@ -297,14 +296,17 @@ public class Colonist extends NamedPawnEntity implements IMinefortressEntity, IW
 
     private BlockPos goal;
 
-    public void setGoal(ITaskBlockInfo taskBlockInfo) {
-        this.goal = taskBlockInfo.getPos();
-        Item placingItem = taskBlockInfo.getPlacingItem();
-        if(placingItem != null) {
-            this.setStackInHand(Hand.MAIN_HAND, new ItemStack(placingItem));
-            this.placeControl.set(taskBlockInfo);
-        } else {
-            this.digControl.set(taskBlockInfo);
+    public void setGoal(ITaskBlockInfo blockInfo) {
+        this.goal = blockInfo.getPos();
+        final var type = blockInfo.getType();
+
+        switch (type) {
+            case BUILD -> placeControl.set(blockInfo);
+            case REMOVE -> digControl.set(blockInfo);
+            case REPLACE -> {
+                placeControl.set(blockInfo);
+                digControl.set(blockInfo);
+            }
         }
     }
 

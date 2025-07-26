@@ -16,7 +16,6 @@ class ClientboundTaskExecutedPacket(private val pos: BlockPos) : FortressS2CPack
 
     override fun handle(client: MinecraftClient) {
         val world = client.world as ITasksInformationHolder?
-//        world?._ClientTasksHolder?.removeTask(pos)
-        TODO()
+        world?._ClientTasksHolder?.removeTask(pos)
     }
 }

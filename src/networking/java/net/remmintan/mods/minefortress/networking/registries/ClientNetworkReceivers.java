@@ -24,7 +24,7 @@ public class ClientNetworkReceivers {
         registerReceiver(FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, ClientboundBlueprintsProcessImportExportPacket::new);
         registerReceiver(S2CSyncAreasPacket.CHANNEL, S2CSyncAreasPacket::new);
         registerReceiver(S2CSyncFightManager.CHANNEL, S2CSyncFightManager::new);
-        registerReceiver(S2CAddClientTasksPacket.CHANNEL, S2CAddClientTasksPacket::new);
+        registerReceiver(S2CAddClientTaskPacket.CHANNEL, S2CAddClientTaskPacket::new);
         registerReceiver(S2CSyncGamemodePacket.CHANNEL, S2CSyncGamemodePacket::new);
         registerReceiver(S2CStartFortressConfiguration.CHANNEL, S2CStartFortressConfiguration::new);
     }

@@ -1,8 +1,6 @@
 package org.minefortress.tasks
 
 import com.mojang.datafixers.util.Pair
-import net.minecraft.block.BlockState
-import net.minecraft.item.Item
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3i
@@ -18,10 +16,11 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket
 import java.util.*
-import java.util.function.Consumer
+
+private const val PART_SIZE = 3
 
 abstract class AbstractTask protected constructor(
-    @JvmField protected val taskType: TaskType,
+    override val taskType: TaskType,
     @JvmField protected var startingBlock: BlockPos,
     @JvmField protected var endingBlock: BlockPos
 ) : ITask, ITaskWithPreparation {
@@ -30,28 +29,21 @@ abstract class AbstractTask protected constructor(
 
     @JvmField
     protected var totalParts: Int = 0
-    protected var completedParts: Int = 0
-        private set
+    private var completedParts: Int = 0
 
     private var assignedWorkers = 0
-
-    private val taskFinishListeners: MutableList<Runnable> = ArrayList()
 
     private var canceled: Boolean = false
 
     override val positions: List<BlockPos> = BlockPos.iterate(startingBlock, endingBlock).map { it.toImmutable() }
-
-    override fun getTaskType(): TaskType {
-        return taskType
-    }
 
 
     override fun hasAvailableParts(): Boolean {
         return !parts.isEmpty()
     }
 
-    override fun returnPart(part: Pair<BlockPos, BlockPos>) {
-        parts.add(part)
+    override fun returnPart(partStartAndEnd: Pair<BlockPos, BlockPos>) {
+        parts.add(partStartAndEnd)
     }
 
     override fun prepareTask() {
@@ -77,16 +69,15 @@ abstract class AbstractTask protected constructor(
         this.totalParts = parts.size
     }
 
-    override fun finishPart(part: ITaskPart, worker: IWorkerPawn) {
+    override fun finishPart(part: ITaskPart, colonist: IWorkerPawn) {
         completedParts++
         check(completedParts <= totalParts) { "Completed parts cannot be greater than total parts" }
 
         if (parts.isEmpty() && totalParts <= completedParts) {
-            val owner = worker.server.getFortressOwner(worker.fortressPos!!)
+            val owner = colonist.server.getFortressOwner(colonist.fortressPos!!)
             if (owner != null) {
                 this.sendFinishTaskNotificationToPlayer(owner)
             }
-            taskFinishListeners.forEach(Consumer { obj: Runnable -> obj.run() })
         }
     }
 
@@ -114,8 +105,8 @@ abstract class AbstractTask protected constructor(
         assignedWorkers++
     }
 
-    override fun toTaskInformationDto(): List<TaskInformationDto> {
-        return listOf(TaskInformationDto(pos, positions, taskType))
+    override fun toTaskInformationDto(): TaskInformationDto {
+        return TaskInformationDto(pos, positions, taskType)
     }
 
     protected fun sendFinishTaskNotificationToPlayer(player: ServerPlayerEntity?) {
@@ -124,10 +115,6 @@ abstract class AbstractTask protected constructor(
             FortressChannelNames.FINISH_TASK,
             ClientboundTaskExecutedPacket(pos)
         )
-    }
-
-    override fun addFinishListener(listener: Runnable) {
-        taskFinishListeners.add(listener)
     }
 
     private fun createPartEnd(start: BlockPos, direction: Vec3i): BlockPos {
@@ -141,15 +128,5 @@ abstract class AbstractTask protected constructor(
             cursor.setZ(endingBlock.z)
         }
         return cursor.toImmutable()
-    }
-
-    companion object {
-        protected const val PART_SIZE: Int = 3
-
-        @JvmStatic
-        protected fun getItemFromState(state: BlockState): Item {
-            val block = state.block
-            return block.asItem()
-        }
     }
 }

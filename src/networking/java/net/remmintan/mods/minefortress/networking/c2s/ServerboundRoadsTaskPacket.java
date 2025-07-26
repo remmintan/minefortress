@@ -6,8 +6,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
-import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -58,19 +56,9 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
         final var taskManager = provider.getTaskManager();
         final var tasksCreator = provider.getTasksCreator();
 
-        final var stackInHand = player.getStackInHand(Hand.MAIN_HAND);
-        final var item = stackInHand.getItem();
+        final var item = player.getStackInHand(Hand.MAIN_HAND).getItem();
+        final var task = tasksCreator.createRoadsTask(blocks, item);
 
-        if (ServerExtensionsKt.isSurvivalFortress(server))
-            //TODO: implement transferring items to the task block
-            throw new NotImplementedException();
-//            resourceManager.reserveItems(placeUuid, Collections.singletonList(new ItemInfo(item, blocks.size())));
-
-        final var digTask = tasksCreator.createRoadsTask(blocks, null);
-        digTask.addFinishListener(() -> {
-            final var buildTask = tasksCreator.createRoadsTask(blocks, item);
-            taskManager.addTask(buildTask, selectedPawns, player);
-        });
-        taskManager.addTask(digTask, selectedPawns, player);
+        taskManager.addTask(task, selectedPawns, player);
     }
 }

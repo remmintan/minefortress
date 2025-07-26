@@ -98,8 +98,8 @@ class AreaBlueprintTask(
 
     override fun hasMoreBlocks() = blocksQueue.isNotEmpty()
 
-    override fun toTaskInformationDto(): List<TaskInformationDto> {
-        return listOf(TaskInformationDto(pos, positions, TaskType.BUILD))
+    override fun toTaskInformationDto(): TaskInformationDto {
+        return TaskInformationDto(pos, positions, TaskType.BUILD)
     }
 
     override fun isComplete() = succeededBlocks.size == totalManualBlocks

@@ -28,12 +28,9 @@ class CutTreesTask(private val trees: Map<BlockPos, TreeData>) : ITask {
 
     private var assignedWorkers = 0
 
+    override val taskType: TaskType = TaskType.REMOVE
     override val positions: List<BlockPos> =
         trees.values.flatMap { listOf(it.treeLogBlocks, it.treeLeavesBlocks).flatten() }
-
-    override fun getTaskType(): TaskType {
-        return TaskType.REMOVE
-    }
 
     override fun hasAvailableParts(): Boolean {
         return !treeRoots.isEmpty()
@@ -58,17 +55,17 @@ class CutTreesTask(private val trees: Map<BlockPos, TreeData>) : ITask {
         return !canceled
     }
 
-    override fun finishPart(part: ITaskPart, pawn: IWorkerPawn) {
+    override fun finishPart(part: ITaskPart, colonist: IWorkerPawn) {
         val root = part.startAndEnd.first
         val tree = trees[root] ?: return
-        val managersProvider = ServerModUtils.getManagersProvider(pawn).orElseThrow()
-        TreeRemover(pawn.serverWorld, managersProvider.resourceHelper, pawn as LivingEntity).removeTheTree(tree)
+        val managersProvider = ServerModUtils.getManagersProvider(colonist).orElseThrow()
+        TreeRemover(colonist.serverWorld, managersProvider.resourceHelper, colonist as LivingEntity).removeTheTree(tree)
 
         removedTrees++
         check(removedTrees <= totalTreesCount) { "Removed more roots than total roots" }
 
         if (treeRoots.isEmpty() && removedTrees == totalTreesCount) {
-            (pawn as IWorkerPawn).server.getFortressOwner(pawn.fortressPos!!)?.let {
+            (colonist as IWorkerPawn).server.getFortressOwner(colonist.fortressPos!!)?.let {
                 FortressServerNetworkHelper.send(
                     it,
                     FortressChannelNames.FINISH_TASK,
@@ -82,8 +79,8 @@ class CutTreesTask(private val trees: Map<BlockPos, TreeData>) : ITask {
         return removedTrees == totalTreesCount
     }
 
-    override fun toTaskInformationDto(): List<TaskInformationDto> {
-        return listOf(TaskInformationDto(pos, positions, TaskType.REMOVE))
+    override fun toTaskInformationDto(): TaskInformationDto {
+        return TaskInformationDto(pos, positions, TaskType.REMOVE)
     }
 
     override fun canTakeMoreWorkers(): Boolean {

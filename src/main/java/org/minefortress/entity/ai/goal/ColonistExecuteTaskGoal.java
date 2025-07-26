@@ -70,7 +70,8 @@ public class ColonistExecuteTaskGoal extends AbstractFortressGoal {
         if (getMovementHelper().hasReachedGoal()) {
             boolean digSuccess = goal.getType() == TaskType.REMOVE && colonist.getDigControl().isDone();
             boolean placeSuccess = goal.getType() == TaskType.BUILD && colonist.getPlaceControl().isDone();
-            if(digSuccess || placeSuccess) {
+            boolean replaceSuccess = goal.getType() == TaskType.REPLACE && colonist.getDigControl().isDone() && colonist.getPlaceControl().isDone();
+            if (digSuccess || placeSuccess || replaceSuccess) {
                 moveToNextBlock();
             }
         }

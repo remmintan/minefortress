@@ -23,7 +23,7 @@ class TasksCreator(private val serverWorld: ServerWorld) : ITasksCreator {
 
     override fun createRoadsTask(
         blocks: List<BlockPos>,
-        itemInHand: Item?
+        itemInHand: Item
     ): ITask {
         return RoadsTask(blocks, itemInHand)
     }

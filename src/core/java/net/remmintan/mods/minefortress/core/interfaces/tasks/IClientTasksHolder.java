@@ -1,12 +1,13 @@
 package net.remmintan.mods.minefortress.core.interfaces.tasks;
 
+import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
-
-import java.util.List;
 
 public interface IClientTasksHolder extends ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider {
 
-    void addTasks(List<TaskInformationDto> tasks);
+    void addTask(TaskInformationDto task);
+
+    void removeTask(BlockPos pos);
     void cancelLatestTask();
 
     void toggleSelectionVisibility();

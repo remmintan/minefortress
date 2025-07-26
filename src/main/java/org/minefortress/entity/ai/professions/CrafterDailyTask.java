@@ -4,7 +4,6 @@ import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
 
@@ -63,7 +62,8 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask {
     }
 
     private boolean isCraftingInProgress(Colonist colonist) {
-        throw new NotImplementedException();
+        return false;
+        // TODO: check if crafting is in progress!
     }
 
 }

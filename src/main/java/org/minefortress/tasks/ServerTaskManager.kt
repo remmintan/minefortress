@@ -21,7 +21,7 @@ import net.remmintan.mods.minefortress.core.utils.isSurvivalFortress
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket
-import net.remmintan.mods.minefortress.networking.s2c.S2CAddClientTasksPacket
+import net.remmintan.mods.minefortress.networking.s2c.S2CAddClientTaskPacket
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -144,8 +144,8 @@ class ServerTaskManager(private val server: MinecraftServer, fortressPos: BlockP
             }
         }
 
-        val packet = S2CAddClientTasksPacket(taskInformationDto)
-        FortressServerNetworkHelper.send(player, S2CAddClientTasksPacket.CHANNEL, packet)
+        val packet = S2CAddClientTaskPacket(taskInformationDto)
+        FortressServerNetworkHelper.send(player, S2CAddClientTaskPacket.CHANNEL, packet)
     }
 
     private fun reserveItems(task: IBaseTask, taskPos: BlockPos): Boolean {
@@ -180,6 +180,14 @@ class ServerTaskManager(private val server: MinecraftServer, fortressPos: BlockP
                     resourceManager,
                     taskPos,
                     task.repairItems
+                )
+            }
+
+            is RoadsTask -> {
+                resourceHelper.transferItemsToTask(
+                    resourceManager,
+                    taskPos,
+                    task.requiredItems
                 )
             }
 
