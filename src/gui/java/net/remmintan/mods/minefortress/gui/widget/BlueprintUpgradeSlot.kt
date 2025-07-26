@@ -8,7 +8,6 @@ import net.minecraft.client.render.DiffuseLighting
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.item.ItemStack
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper
@@ -64,19 +63,19 @@ class BlueprintUpgradeSlot(
 
 
             if (MinecraftClient.getInstance().isSurvivalFortress() && showItems) {
-                val resourceManager = ClientModUtils.getFortressManager().resourceManager
-                val stacks: List<ItemInfo> = slot.blockData.getStacks()
+                val resourceManager = ClientModUtils.getFortressManager().resourceHelper
+                val stacks: List<ItemStack> = slot.blockData.getStacks()
                 val metRequirements = resourceManager.getMetRequirements(stacks)
                 for (i1 in stacks.indices) {
                     val stack = stacks[i1]
                     val hasItem = metRequirements.getOrDefault(stack, false)
                     val itemX = costsX + i1 % 10 * 30
                     val itemY = costsY + i1 / 10 * 20
-                    val convertedItem = SimilarItemsHelper.convertItemIconInTheGUI(stack.item())
+                    val convertedItem = SimilarItemsHelper.convertItemIconInTheGUI(stack.item)
                     context.drawItem(ItemStack(convertedItem), itemX, itemY)
                     context.drawText(
                         this.textRenderer,
-                        stack.amount().toString(),
+                        stack.count.toString(),
                         itemX + 18,
                         itemY + 4,
                         if (hasItem) 0xFFFFFF else 0xFF0000,

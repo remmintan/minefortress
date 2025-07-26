@@ -16,7 +16,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.remmintan.mods.minefortress.core.FortressGamemodeUtilsKt;
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintGroup;
@@ -28,7 +27,6 @@ import org.minefortress.renderer.gui.blueprints.handler.BlueprintScreenHandler;
 import org.minefortress.utils.ModUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public final class BlueprintsScreen extends Screen {
@@ -70,7 +68,7 @@ public final class BlueprintsScreen extends Screen {
 
     @Override
     protected void init() {
-        if(this.client != null) {
+        if (this.client != null) {
             if (FortressGamemodeUtilsKt.isClientInFortressGamemode()) {
                 super.init();
                 this.x = (this.width - backgroundWidth - previewWidth - previewOffset) / 2;
@@ -79,7 +77,7 @@ public final class BlueprintsScreen extends Screen {
                 this.handler = new BlueprintScreenHandler(this.client);
                 this.blueprintRenderer = ModUtils.getFortressClient().get_BlueprintRenderer();
                 final var connectedToTheServer = ClientModUtils.getFortressManager().isConnectedToTheServer();
-                if(!connectedToTheServer) {
+                if (!connectedToTheServer) {
                     importExportButton = ButtonWidget
                             .builder(Text.literal("Import / Export"), btn -> client.setScreen(new ImportExportBlueprintsScreen()))
                             .dimensions(this.x + backgroundWidth + previewOffset, this.y - 22, 120, 20)
@@ -94,30 +92,30 @@ public final class BlueprintsScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(button == 0) {
+        if (button == 0) {
             for (BlueprintGroup group : BlueprintGroup.nonHidden()) {
-                if(isClickInTab(group, mouseX, mouseY)) return true;
+                if (isClickInTab(group, mouseX, mouseY)) return true;
             }
 
-            if(this.isClickInScrollbar(mouseX, mouseY)) {
+            if (this.isClickInScrollbar(mouseX, mouseY)) {
                 this.isScrolling = this.handler.isNeedScrollbar();
                 return true;
             }
         }
 
-        if(super.mouseClicked(mouseX, mouseY, button)) return true;
+        if (super.mouseClicked(mouseX, mouseY, button)) return true;
 
-        if(button == 0 || button == 1) {
-            if(this.handler.hasFocusedSlot()) {
-                if(this.handler.getFocusedSlot() == BlueprintSlot.EMPTY) {
-                    if(this.client != null)
+        if (button == 0 || button == 1) {
+            if (this.handler.hasFocusedSlot()) {
+                if (this.handler.getFocusedSlot() == BlueprintSlot.EMPTY) {
+                    if (this.client != null)
                         this.client.setScreen(new AddBlueprintScreen(handler.getSelectedGroup()));
                     return true;
                 }
 
-                if(button == 1) return true;
+                if (button == 1) return true;
 
-                if(this.client != null){
+                if (this.client != null) {
                     ClientModUtils.playSound(SoundEvents.UI_BUTTON_CLICK);
                     this.client.setScreen(null);
                 }
@@ -133,7 +131,7 @@ public final class BlueprintsScreen extends Screen {
         if (this.isScrolling) {
             int minScroll = this.y + 18;
             int maxScroll = minScroll + 112;
-            this.scrollPosition = ((float)mouseY - (float)minScroll - 7.5f) / ((float)(maxScroll - minScroll) - 15.0f);
+            this.scrollPosition = ((float) mouseY - (float) minScroll - 7.5f) / ((float) (maxScroll - minScroll) - 15.0f);
             this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
             this.handler.scroll(scrollPosition);
             return true;
@@ -154,9 +152,9 @@ public final class BlueprintsScreen extends Screen {
             }
         }
 
-        if(button == 1) {
-            if(this.handler.hasFocusedSlot()) {
-                if(sneakButtonDown) {
+        if (button == 1) {
+            if (this.handler.hasFocusedSlot()) {
+                if (sneakButtonDown) {
                     Optional.ofNullable(this.client)
                             .ifPresent(it -> {
                                 final var metadata = handler.getFocusedSlot().getMetadata();
@@ -178,7 +176,7 @@ public final class BlueprintsScreen extends Screen {
             return false;
         }
         int i = (this.handler.getSelectedGroupSize() + 9 - 1) / 9 - 5;
-        this.scrollPosition = (float)((double)this.scrollPosition - verticalAmount / (double)i);
+        this.scrollPosition = (float) ((double) this.scrollPosition - verticalAmount / (double) i);
         this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
         this.handler.scroll(scrollPosition);
         return true;
@@ -193,7 +191,7 @@ public final class BlueprintsScreen extends Screen {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
         this.drawBackground(drawContext, mouseX, mouseY);
         RenderSystem.disableDepthTest();
-        if(importExportButton!=null)
+        if (importExportButton != null)
             importExportButton.render(drawContext, mouseX, mouseY, delta);
 //        super.render(drawContext, mouseX, mouseY, delta);
 
@@ -217,7 +215,7 @@ public final class BlueprintsScreen extends Screen {
             int slotX = slotColumn * 18 + 9;
             int slotY = slotRow * 18 + 18;
 
-            final BlueprintSlot blueprintSlot = i<currentSlotsSize ? currentSlots.get(i) : BlueprintSlot.EMPTY;
+            final BlueprintSlot blueprintSlot = i < currentSlotsSize ? currentSlots.get(i) : BlueprintSlot.EMPTY;
             this.drawSlot(drawContext, blueprintSlot, slotColumn, slotRow);
 
             if (!this.isPointOverSlot(slotX, slotY, mouseX, mouseY)) continue;
@@ -225,19 +223,19 @@ public final class BlueprintsScreen extends Screen {
             this.handler.focusOnSlot(blueprintSlot);
             HandledScreen.drawSlotHighlight(drawContext, slotX, slotY, 10);
             final var x = this.x - this.backgroundWidth / 2;
-            final var resourceManager = fortressClientManager.getResourceManager();
-            if(blueprintSlot != BlueprintSlot.EMPTY) {
+            final var resourceManager = fortressClientManager.getResourceHelper();
+            if (blueprintSlot != BlueprintSlot.EMPTY) {
                 if (ClientExtensionsKt.isSurvivalFortress(MinecraftClient.getInstance())) {
                     final var stacks = blueprintSlot.getBlockData().getStacks();
-                    final Map<ItemInfo, Boolean> metRequirements = resourceManager.getMetRequirements(stacks);
+                    final var metRequirements = resourceManager.getMetRequirements(stacks);
                     for (int i1 = 0; i1 < stacks.size(); i1++) {
                         final var stack = stacks.get(i1);
                         final var hasItem = metRequirements.getOrDefault(stack, false);
-                        final var itemX = x + 25 + i1%10 * 30;
-                        final var itemY = i1/10 * 20 + this.backgroundHeight;
-                        final var convertedItem = SimilarItemsHelper.convertItemIconInTheGUI(stack.item());
+                        final var itemX = x + 25 + i1 % 10 * 30;
+                        final var itemY = i1 / 10 * 20 + this.backgroundHeight;
+                        final var convertedItem = SimilarItemsHelper.convertItemIconInTheGUI(stack.getItem());
                         drawContext.drawItem(new ItemStack(convertedItem), itemX, itemY);
-                        drawContext.drawText(this.textRenderer, String.valueOf(stack.amount()), itemX + 17, itemY + 7, hasItem?0xFFFFFF:0xFF0000, false);
+                        drawContext.drawText(this.textRenderer, String.valueOf(stack.getCount()), itemX + 17, itemY + 7, hasItem ? 0xFFFFFF : 0xFF0000, false);
                     }
                 }
 
@@ -246,7 +244,7 @@ public final class BlueprintsScreen extends Screen {
         }
 
         this.drawForeground(drawContext);
-        if(this.handler.hasFocusedSlot()){
+        if (this.handler.hasFocusedSlot()) {
             final var focusedSlot = handler.getFocusedSlot();
             final var focusedSlotIsNotEmpty = focusedSlot != BlueprintSlot.EMPTY;
             if (this.sneakButtonDown && focusedSlotIsNotEmpty) {
@@ -282,7 +280,7 @@ public final class BlueprintsScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if(isSneak(keyCode, scanCode)) {
+        if (isSneak(keyCode, scanCode)) {
             this.sneakButtonDown = true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -290,7 +288,7 @@ public final class BlueprintsScreen extends Screen {
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if(isSneak(keyCode,scanCode)) {
+        if (isSneak(keyCode, scanCode)) {
             this.sneakButtonDown = false;
         }
         return super.keyReleased(keyCode, scanCode, modifiers);
@@ -314,7 +312,7 @@ public final class BlueprintsScreen extends Screen {
         } else {
             y += this.backgroundHeight;
         }
-        return mouseX >= (double)x && mouseX <= (double)(x + 28) && mouseY >= (double)y && mouseY <= (double)(y + 32);
+        return mouseX >= (double) x && mouseX <= (double) (x + 28) && mouseY >= (double) y && mouseY <= (double) (y + 32);
     }
 
     private boolean isClickInScrollbar(double mouseX, double mouseY) {
@@ -324,7 +322,7 @@ public final class BlueprintsScreen extends Screen {
         int l = j + 18;
         int m = k + 14;
         int n = l + 112;
-        return mouseX >= (double)k && mouseY >= (double)l && mouseX < (double)m && mouseY < (double)n;
+        return mouseX >= (double) k && mouseY >= (double) l && mouseX < (double) m && mouseY < (double) n;
     }
 
     private boolean isPointOverSlot(int slotX, int slotY, int mouseX, int mouseY) {
@@ -353,7 +351,7 @@ public final class BlueprintsScreen extends Screen {
         RenderSystem.enableDepthTest();
         int slotX = slotColumn * 18 + 9 + 5;
         int slotY = slotRow * 18 + 18 + 5;
-        if(slot == BlueprintSlot.EMPTY){
+        if (slot == BlueprintSlot.EMPTY) {
             final var matrices = drawContext.getMatrices();
             final var item = Items.BRICK;
             drawItemInSlot(drawContext, matrices, 0.5f, item, slotX, slotY);
@@ -390,7 +388,7 @@ public final class BlueprintsScreen extends Screen {
 
         drawContext.drawGuiTexture(scrollBarTexture, scrollbarX, scrollbarY, 12, 15);
 
-        if(selectedGroup != null)
+        if (selectedGroup != null)
             this.renderTabIcon(drawContext, selectedGroup);
 
 
@@ -428,7 +426,7 @@ public final class BlueprintsScreen extends Screen {
 
     private Identifier getTabTexture(boolean topRow, boolean selected, int groupIndex) {
         final Identifier[] identifiers;
-        if(topRow) {
+        if (topRow) {
             identifiers = selected ? TAB_TOP_SELECTED_TEXTURES : TAB_TOP_UNSELECTED_TEXTURES;
         } else {
             identifiers = selected ? TAB_BOTTOM_SELECTED_TEXTURES : TAB_BOTTOM_UNSELECTED_TEXTURES;

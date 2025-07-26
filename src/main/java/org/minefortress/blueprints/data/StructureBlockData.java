@@ -2,14 +2,13 @@ package org.minefortress.blueprints.data;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.BlueprintDataLayer;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.IStructureBlockData;
 import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,7 +20,7 @@ public final class StructureBlockData implements IStructureBlockData {
 
     private final Vec3i size;
     private final Map<BlueprintDataLayer, Map<BlockPos, BlockState>> layers = new HashMap<>();
-    private List<ItemInfo> stacks;
+    private List<ItemStack> stacks;
 
     private StructureBlockData(Vec3i size) {
         this.size = size;
@@ -43,7 +42,7 @@ public final class StructureBlockData implements IStructureBlockData {
     }
 
     @Override
-    public List<ItemInfo> getStacks() {
+    public List<ItemStack> getStacks() {
         return stacks;
     }
 
@@ -82,16 +81,12 @@ public final class StructureBlockData implements IStructureBlockData {
             instance.stacks = layerBlockByItems.entrySet()
                     .stream()
                     .filter(it -> it.getValue() > 0 && !SimilarItemsHelper.isIgnorable(it.getKey()))
-                    .map(this::getItemInfo)
+                    .map(it -> new ItemStack(it.getKey(), it.getValue().intValue()))
                     .toList();
 
             return instance;
         }
 
-        @NotNull
-        private ItemInfo getItemInfo(Map.Entry<Item, Long> it) {
-            return new ItemInfo(it.getKey(), getItemAmount(it));
-        }
 
         private int getItemAmount(Map.Entry<Item, Long> entry) {
             final var defaultStack = entry.getKey().getDefaultStack();

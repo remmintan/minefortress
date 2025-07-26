@@ -8,6 +8,7 @@ import net.minecraft.block.entity.BlockEntity
 import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.Packet
@@ -22,7 +23,6 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.Heightmap
 import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.buildings.BarColor
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.dtos.buildings.HudBar
@@ -297,12 +297,12 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
     }
 
     override fun getAttackers() = attackers
-    override fun getRepairItemInfos(): List<ItemInfo> {
+    override fun getRepairItemInfos(): List<ItemStack> {
         return getRepairStates()
             .entries
             .groupingBy { it.value.block.asItem() }
             .eachCount()
-            .map { ItemInfo(it.key, it.value) }
+            .map { ItemStack(it.key, it.value) }
     }
 
     private fun getRepairStates() = blockData?.allBlockStatesToRepairTheBuilding ?: mapOf()

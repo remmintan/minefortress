@@ -3,11 +3,11 @@ package net.remmintan.mods.minefortress.core.interfaces.buildings;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata;
 import net.remmintan.mods.minefortress.core.dtos.buildings.HudBar;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
@@ -77,7 +77,7 @@ public interface IFortressBuilding {
 
     Set<HostileEntity> getAttackers();
 
-    List<ItemInfo> getRepairItemInfos();
+    List<ItemStack> getRepairItemInfos();
 
     Map<BlockPos, BlockState> getBlocksToRepair();
 

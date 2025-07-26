@@ -46,7 +46,7 @@ class AreaBlueprintTask(
 
     override val positions: List<BlockPos>
 
-    val requiredResources: List<ItemStack> = blueprintData.stacks.map { ItemStack(it.item, it.amount) }
+    val requiredResources: List<ItemStack> = blueprintData.stacks.map { ItemStack(it.item, it.count) }
 
     init {
         val areaBox = BlockBox.create(startPos, endPos)

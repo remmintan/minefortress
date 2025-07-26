@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.entity.effect.StatusEffectCategory
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.Registries
 import net.minecraft.server.MinecraftServer
@@ -25,6 +26,13 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkH
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncContainerPositionsPacket
 
 private const val CONTAINER_POSITIONS_NBT_KEY = "containerPositions"
+
+private val FARMER_SEEDS = listOf(
+    Items.WHEAT_SEEDS,
+    Items.BEETROOT_SEEDS,
+    Items.CARROT,
+    Items.POTATO
+)
 
 @Suppress("UnstableApiUsage")
 class ServerResourceManager(private val server: MinecraftServer) :
@@ -59,21 +67,6 @@ class ServerResourceManager(private val server: MinecraftServer) :
         }
     }
 
-    override fun hasItems(stacks: List<ItemStack>): Boolean {
-        val storage = getStorage()
-        Transaction.openOuter().use { tr ->
-            for (stack in stacks) {
-                val itemVariant = ItemVariant.of(stack)
-                val amountToExtract = stack.count.toLong()
-                val extractedAmount = storage.extract(itemVariant, amountToExtract, tr)
-                if (extractedAmount != amountToExtract) {
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
     override fun hasFood(): Boolean {
         return findFood() != null
     }
@@ -89,6 +82,20 @@ class ServerResourceManager(private val server: MinecraftServer) :
             }
         }
 
+        return null
+    }
+
+    override fun getFarmerSeeds(): Item? {
+        val storage = getStorage()
+        Transaction.openOuter().use { tr ->
+            FARMER_SEEDS.forEach {
+                val extracted = storage.extract(ItemVariant.of(it), 1, tr)
+                if (extracted == 1L) {
+                    tr.commit()
+                    return it
+                }
+            }
+        }
         return null
     }
 

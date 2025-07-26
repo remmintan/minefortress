@@ -5,6 +5,7 @@ import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceHelper;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceManager;
 
 public interface IClientFortressManager extends IFortressManager {
@@ -32,6 +33,8 @@ public interface IClientFortressManager extends IFortressManager {
     FortressState getState();
 
     IClientResourceManager getResourceManager();
+
+    IClientResourceHelper getResourceHelper();
 
     IClientFightManager getFightManager();
 

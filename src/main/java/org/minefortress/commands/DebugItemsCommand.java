@@ -2,10 +2,11 @@ package org.minefortress.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.command.ServerCommandSource;
+import org.apache.commons.lang3.stream.IntStreams;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+@SuppressWarnings("UnstableApiUsage")
 public class DebugItemsCommand extends MineFortressCommand {
 
     private static final List<Item> ITEMS_TO_ADD = Arrays.asList(
@@ -63,14 +65,18 @@ public class DebugItemsCommand extends MineFortressCommand {
                             context -> {
                                 int num = IntegerArgumentType.getInteger(context, "num");
                                 final var serverManager = getServerManagersProvider(context);
-                                final var resourceManager = serverManager.getResourceManager();
+                                final var resourceHelper = serverManager.getResourceHelper();
 
                                 final var random = context.getSource().getWorld().random;
-                                for (int i = 0; i < num; i++) {
-                                    final var item = ITEMS_TO_ADD.get(random.nextInt(ITEMS_TO_ADD.size()));
-                                    resourceManager.increaseItemAmount(item, random.nextInt(250));
-                                }
-                                return 1;
+
+                                final var items = IntStreams
+                                        .range(num)
+                                        .mapToObj(i -> ITEMS_TO_ADD.get(random.nextInt(ITEMS_TO_ADD.size())))
+                                        .map(it -> it.getDefaultStack())
+                                        .toList();
+                                if (resourceHelper.putItemsToSuitableContainer(items))
+                                    return 1;
+                                return 0;
                             }
                         )
                     )
@@ -86,11 +92,13 @@ public class DebugItemsCommand extends MineFortressCommand {
                                             final var serverManager = getServerManagersProvider(context);
                                             final var resourceManager = serverManager.getResourceManager();
 
-                                            resourceManager
-                                                    .getAllItems()
-                                                    .stream()
-                                                    .map(ItemStack::getItem)
-                                                    .forEach(it -> resourceManager.setItemAmount(it, 0));
+                                            final var storage = resourceManager.getStorage();
+                                            try (var tr = Transaction.openOuter()) {
+                                                for (var nonEmptyView : storage.nonEmptyViews()) {
+                                                    storage.extract(nonEmptyView.getResource(), nonEmptyView.getAmount(), tr);
+                                                }
+                                                tr.commit();
+                                            }
                                             return 1;
                                         }
                                 )

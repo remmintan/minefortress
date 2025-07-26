@@ -10,6 +10,9 @@ import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager
 @Suppress("UnstableApiUsage")
 interface IServerResourceHelper : IServerManager {
 
+    fun putItemToSuitableContainer(stack: ItemStack) {
+        putItemsToSuitableContainer(listOf(stack))
+    }
     fun putItemsToSuitableContainer(stacks: List<ItemStack>): Boolean
 
     fun transferItemsToTask(resourceManager: IServerResourceManager, taskPos: BlockPos, items: List<ItemStack>): Boolean

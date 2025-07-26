@@ -240,7 +240,7 @@ internal class InfoTab(private val handler: IInfoTabHandler, private val textRen
         var itemY = y + 50
         handler.getItemsToRepair().forEach {
             context.drawItem(it.item.defaultStack, itemX, itemY)
-            val text = "x${it.amount}"
+            val text = "x${it.count}"
             val color = if (enoughItems.getValue(it)) 0xFFFFFF else 0xb81d13
             context.drawText(textRenderer, text, itemX + 16 + 2, itemY + 6, color, false)
 

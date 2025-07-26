@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceHelper
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager
 import net.remmintan.mods.minefortress.core.utils.LogCompanion
+import net.remmintan.mods.minefortress.core.utils.extractItemsConsideringSimilar
 import net.remmintan.mods.minefortress.core.utils.getManagersProvider
 
 @Suppress("UnstableApiUsage")
@@ -82,7 +83,7 @@ class ServerResourceHelper(server: MinecraftServer, fortressPos: BlockPos) : ISe
 
         Transaction.openOuter().use { tr ->
             val variant = ItemVariant.of(item)
-            val extractedAmount = taskStorage.extract(variant, 1, tr)
+            val extractedAmount = taskStorage.extractItemsConsideringSimilar(variant, 1, tr)
             if (extractedAmount == 1L) {
                 tr.commit()
             } else {
@@ -97,7 +98,7 @@ class ServerResourceHelper(server: MinecraftServer, fortressPos: BlockPos) : ISe
             for (stack in items) {
                 val item = ItemVariant.of(stack)
                 val amountToExtract = stack.count.toLong()
-                val extractedAmount = from.extract(item, amountToExtract, tr)
+                val extractedAmount = from.extractItemsConsideringSimilar(item, amountToExtract, tr)
                 if (amountToExtract != extractedAmount)
                     return false
             }
@@ -116,7 +117,7 @@ class ServerResourceHelper(server: MinecraftServer, fortressPos: BlockPos) : ISe
                 val item = ItemVariant.of(stack)
                 val amountToTransfer = stack.count.toLong()
 
-                val extractedAmount = fromStorage.extract(item, amountToTransfer, tr)
+                val extractedAmount = fromStorage.extractItemsConsideringSimilar(item, amountToTransfer, tr)
                 val insertedAmount = toStorage.insert(item, amountToTransfer, tr)
                 if (extractedAmount != amountToTransfer || insertedAmount != amountToTransfer)
                     return false

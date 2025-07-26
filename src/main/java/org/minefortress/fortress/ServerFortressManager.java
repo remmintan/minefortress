@@ -6,7 +6,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -519,8 +518,7 @@ public final class ServerFortressManager implements IServerFortressManager {
         final var building = buildingManager.getBuilding(pos)
                 .orElseThrow(() -> new IllegalStateException("Building not found"));
 
-        final var repairStacks = building
-                .getRepairItemInfos().stream().map(it -> new ItemStack(it.item(), it.amount())).toList();
+        final var repairStacks = building.getRepairItemInfos();
         final var blocksToRepair = building.getBlocksToRepair();
 
         final var task = new RepairBuildingTask(building.getStart(), building.getEnd(), blocksToRepair, repairStacks);

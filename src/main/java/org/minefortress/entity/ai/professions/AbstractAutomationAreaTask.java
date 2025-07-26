@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Random;
 
-abstract class AbstractAutomationAreaTask implements ProfessionDailyTask{
+public abstract class AbstractAutomationAreaTask implements ProfessionDailyTask {
 
     private final Random rand = new Random();
 

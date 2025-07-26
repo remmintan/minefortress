@@ -1,13 +1,12 @@
 package net.remmintan.mods.minefortress.gui.building.handlers
 
 import net.minecraft.client.MinecraftClient
+import net.minecraft.item.ItemStack
 import net.minecraft.util.BlockRotation
 import net.minecraft.util.math.BlockBox
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.blueprints.BlueprintSlot
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils
-import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper
 import net.remmintan.mods.minefortress.networking.c2s.C2SDestroyBuilding
 import net.remmintan.mods.minefortress.networking.c2s.C2SRepairBuilding
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
@@ -40,14 +39,12 @@ class InfoTabHandler(provider: IBuildingProvider) : IInfoTabHandler {
 
     override fun getBlueprintMetadata(): BlueprintMetadata = building.metadata
     override fun getHealth() = building.health
-    override fun getItemsToRepair(): List<ItemInfo> = building.repairItemInfos
+    override fun getItemsToRepair(): List<ItemStack> = building.repairItemInfos
 
-    override fun getEnoughItems(): Map<ItemInfo, Boolean> {
+    override fun getEnoughItems(): Map<ItemStack, Boolean> {
         val itemsToRepair = getItemsToRepair().sortedBy { it.item.toString() }
-        val resourceManager = ClientModUtils.getFortressManager().resourceManager
-        val metRequirements = resourceManager.getMetRequirements(itemsToRepair)
-
-        return metRequirements.entries.associate { (item, met) -> item to (SimilarItemsHelper.isIgnorable(item.item) || met) }
+        val resourceHelper = ClientModUtils.getFortressManager().resourceHelper
+        return resourceHelper.getMetRequirements(itemsToRepair)
     }
 
     override fun upgrade(slot: BlueprintSlot) {
