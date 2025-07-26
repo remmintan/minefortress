@@ -100,7 +100,6 @@ public class ServerBlueprintManager implements IServerBlueprintManager {
         final var metadata = this.get(blueprintId);
         final var structureData = blockDataManager.getBlockData(blueprintId, rotation, metadata.getFloorLevel());
         return new AreaBlueprintTask(
-                taskId,
                 metadata,
                 startPos,
                 structureData,

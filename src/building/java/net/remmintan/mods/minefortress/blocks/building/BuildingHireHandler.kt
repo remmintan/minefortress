@@ -2,13 +2,16 @@ package net.remmintan.mods.minefortress.blocks.building
 
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
+import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.professions.HireProgressInfo
 import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionHireInfo
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IBuildingHireHandler
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager
-import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceHelper
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager
+import net.remmintan.mods.minefortress.core.utils.LogCompanion
 import java.util.*
 
 class BuildingHireHandler : IBuildingHireHandler {
@@ -16,22 +19,26 @@ class BuildingHireHandler : IBuildingHireHandler {
     private var professionManager: IServerProfessionsManager? = null
     private var buildingsManager: IServerBuildingsManager? = null
     private var resourceManger: IServerResourceManager? = null
+    private var resourceHelper: IServerResourceHelper? = null
 
     private var professions: List<ProfessionHireInfo> = emptyList()
     private var hireQueues = mutableMapOf<String, Queue<HireRequest>>()
     private var hireProgresses = mutableMapOf<String, HireProgressInfo>()
 
-    fun initialized(): Boolean = professionManager != null && buildingsManager != null && resourceManger != null
+    fun initialized(): Boolean =
+        professionManager != null && buildingsManager != null && resourceManger != null && resourceHelper != null
 
     fun init(
         professionType: ProfessionType,
         professionManager: IServerProfessionsManager,
         buildingsManager: IServerBuildingsManager,
-        resourceManager: IServerResourceManager
+        resourceManager: IServerResourceManager,
+        resourceHelper: IServerResourceHelper
     ) {
         this.professionManager = professionManager
         this.buildingsManager = buildingsManager
         this.resourceManger = resourceManager
+        this.resourceHelper = resourceHelper
 
         professions = professionManager
             .getProfessionsByType(professionType)
@@ -41,7 +48,7 @@ class BuildingHireHandler : IBuildingHireHandler {
                     it.id,
                     it.title,
                     it.icon,
-                    it.itemsRequirement
+                    it.itemsRequirement.map { r -> ItemInfo(r.item, r.count) }
                 )
             }
     }
@@ -62,12 +69,20 @@ class BuildingHireHandler : IBuildingHireHandler {
     override fun hire(professionId: String) {
         val hireProgress = computeHireProgress(professionId)
         if (!hireProgress.canHireMore) return
+        val rHelper = resourceHelper
+        val rManager = resourceManger
+        val pManager = professionManager
 
-        val cost = professionManager?.getProfession(professionId)?.itemsRequirement ?: error("Profession not found")
-        professionManager?.reservePawn()
-        resourceManger?.removeItems(cost)
+        require(rHelper != null && rManager != null && pManager != null)
 
-        hireQueues.computeIfAbsent(professionId) { LinkedList() }.add(HireRequest())
+        val cost = pManager.getProfession(professionId)?.itemsRequirement ?: error("Profession not found")
+
+        if (rHelper.payItems(rManager.getStorage(), cost)) {
+            professionManager?.reservePawn()
+            hireQueues.computeIfAbsent(professionId) { LinkedList() }.add(HireRequest())
+        } else {
+            log.error("Can't hire professional $professionId. Not enough items $cost")
+        }
     }
 
     override fun getProfessions(): List<ProfessionHireInfo> = professions
@@ -167,5 +182,7 @@ class BuildingHireHandler : IBuildingHireHandler {
     private class HireRequest {
         var progress: Int = 0
     }
+
+    companion object : LogCompanion(BuildingHireHandler::class)
 
 }

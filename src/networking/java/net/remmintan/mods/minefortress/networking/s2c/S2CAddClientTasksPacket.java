@@ -25,14 +25,14 @@ public class S2CAddClientTasksPacket implements FortressS2CPacket {
         final int size = buf.readVarInt();
         this.tasks = new ArrayList<>(size);
         for(int i = 0; i < size; i++) {
-            final var id = buf.readUuid();
+            final var pos = buf.readBlockPos();
             final var positions = new ArrayList<BlockPos>();
             final int positionsSize = buf.readInt();
             for(int j = 0; j < positionsSize; j++) {
                 positions.add(buf.readBlockPos());
             }
             final var type = buf.readEnumConstant(TaskType.class);
-            this.tasks.add(new TaskInformationDto(id, positions, type));
+            this.tasks.add(new TaskInformationDto(pos, positions, type));
         }
     }
 
@@ -40,7 +40,7 @@ public class S2CAddClientTasksPacket implements FortressS2CPacket {
     public void write(PacketByteBuf buf) {
         buf.writeVarInt(tasks.size());
         for(TaskInformationDto task: tasks) {
-            buf.writeUuid(task.id());
+            buf.writeBlockPos(task.pos());
             final var blockPositions = task.positions();
             buf.writeInt(blockPositions.size());
             for(BlockPos pos: blockPositions) {

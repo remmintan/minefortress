@@ -1,5 +1,6 @@
 package org.minefortress.entity.ai.controls;
 
+import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.ITaskControl;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IBaseTask;
@@ -9,13 +10,9 @@ import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.tasks.BlueprintTask;
 import org.minefortress.tasks.CutTreesTask;
 import org.minefortress.tasks.RoadsTask;
 import org.minefortress.tasks.SimpleSelectionTask;
-
-import java.util.Optional;
-import java.util.UUID;
 
 public class TaskControl implements ITaskControl {
 
@@ -41,17 +38,17 @@ public class TaskControl implements ITaskControl {
 
     @Override
     public void fail() {
-        if(taskPart!=null)
+        if (taskPart != null)
             taskPart.returnTaskPart();
         this.resetAll();
     }
 
     @Override
     public void success() {
-        if(taskPart!=null)
+        if (taskPart != null)
             this.task.finishPart(taskPart, worker);
 
-        if(this.taskPart != null && !this.taskPart.hasNext())
+        if (this.taskPart != null && !this.taskPart.hasNext())
             this.findNextPart();
     }
 
@@ -82,7 +79,7 @@ public class TaskControl implements ITaskControl {
 
     @Override
     public void findNextPart() {
-        if(task.hasAvailableParts()) {
+        if (task.hasAvailableParts()) {
             this.setTask(task);
         } else {
             this.resetTaskPart();
@@ -90,8 +87,11 @@ public class TaskControl implements ITaskControl {
     }
 
     @Override
-    public Optional<UUID> getTaskId() {
-        return Optional.ofNullable(task).map(ITask::getPos);
+    public BlockPos getCurrentTaskPos() {
+        if (task != null)
+            return task.getPos();
+        else
+            return null;
     }
 
     @Override
@@ -121,8 +121,6 @@ public class TaskControl implements ITaskControl {
             } else {
                 worker.setCurrentTaskDesc("Building");
             }
-        } else if (task instanceof BlueprintTask) {
-            worker.setCurrentTaskDesc("Building blueprint");
         } else if (task instanceof CutTreesTask) {
             worker.setCurrentTaskDesc("Falling trees");
         } else if (task instanceof RoadsTask) {

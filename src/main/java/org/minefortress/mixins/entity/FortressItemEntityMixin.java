@@ -21,6 +21,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.List;
+
 import static org.minefortress.professions.ProfessionManager.FISHERMAN_ITEMS;
 import static org.minefortress.professions.ProfessionManager.FORESTER_ITEMS;
 
@@ -50,11 +52,11 @@ public abstract class FortressItemEntityMixin extends Entity {
                     if (ServerExtensionsKt.isSurvivalFortress(closestSPE.server)) {
                         ServerModUtils.getManagersProvider(closestSPE).ifPresent(
                                 provider -> {
-                                    final var resourceManager = provider.getResourceManager();
+                                    final var resourceHelper = provider.getResourceHelper();
                                     final var stack = this.getStack();
-                                    final var item = stack.getItem();
-                                    if (shouldCollectInInventory(provider.getProfessionsManager(), item))
-                                        resourceManager.increaseItemAmount(item, stack.getCount());
+
+                                    if (shouldCollectInInventory(provider.getProfessionsManager(), stack.getItem()))
+                                        resourceHelper.putItemsToSuitableContainer(List.of(stack));
                                 });
                     }
                     this.discard();

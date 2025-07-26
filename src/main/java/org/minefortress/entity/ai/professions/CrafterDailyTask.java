@@ -3,11 +3,10 @@ package org.minefortress.entity.ai.professions;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
-import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.Colonist;
-import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandler;
 
 import java.util.Collections;
 
@@ -17,7 +16,7 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask {
 
     @Override
     public boolean canStart(Colonist colonist) {
-        return craftingTableMenuOpened(colonist);
+        return isCraftingInProgress(colonist);
     }
 
 
@@ -30,7 +29,7 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask {
     @Override
     public void tick(Colonist colonist) {
         super.tick(colonist);
-        if (craftingTableMenuOpened(colonist)) {
+        if (isCraftingInProgress(colonist)) {
             ticksAfterTableClose = 400;
         } else {
             ticksAfterTableClose--;
@@ -39,7 +38,7 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask {
 
     @Override
     public boolean shouldContinue(Colonist colonist) {
-        return super.shouldContinue(colonist) && ticksAfterTableClose > 0 || craftingTableMenuOpened(colonist);
+        return super.shouldContinue(colonist) && ticksAfterTableClose > 0 || isCraftingInProgress(colonist);
     }
 
     @Override
@@ -63,9 +62,8 @@ public class CrafterDailyTask extends AbstractStayNearBlockDailyTask {
         return buildings.get(0).getCenter();
     }
 
-    // TODO get rid of this
-    private boolean craftingTableMenuOpened(Colonist colonsit) {
-        return ServerExtensionsKt.fortressOwnerHasScreenOpened(colonsit.getServer(), colonsit.getFortressPos(), FortressCraftingScreenHandler.class);
+    private boolean isCraftingInProgress(Colonist colonist) {
+        throw new NotImplementedException();
     }
 
 }

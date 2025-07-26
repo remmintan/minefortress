@@ -29,11 +29,8 @@ import net.remmintan.mods.minefortress.core.dtos.buildings.HudBar
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
-import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
-import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager
-import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils
-import net.remmintan.mods.minefortress.core.utils.ServerModUtils
+import net.remmintan.mods.minefortress.core.utils.getManagersProvider
 import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -103,7 +100,19 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         hireHandler.let {
             if (!it.initialized()) {
                 val professionType = metadata.requirement.type ?: return@let
-                getManagers(world).ifPresent { (prof, build, res) -> it.init(professionType, prof, build, res) }
+
+                if (world is ServerWorld) {
+                    val provider = world.server.getManagersProvider(fortressPos!!)
+                    checkNotNull(provider)
+
+                    it.init(
+                        professionType,
+                        provider.professionsManager,
+                        provider.buildingsManager,
+                        provider.resourceManager,
+                        provider.resourceHelper
+                    )
+                }
             }
 
             if (it.initialized())
@@ -115,16 +124,6 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
             val state = this.cachedState
             this.world?.updateListeners(this.pos, state, state, Block.NOTIFY_ALL)
         }
-    }
-
-    private fun getManagers(world: World): Optional<Triple<IServerProfessionsManager, IServerBuildingsManager, IServerResourceManager>> {
-        if (world is ServerWorld) {
-            val server = world.server
-            return ServerModUtils.getManagersProvider(server, fortressPos).map {
-                Triple(it.professionsManager, it.buildingsManager, it.resourceManager)
-            }
-        }
-        error("Trying to get managers on the client side")
     }
 
     override fun getRandomPosToComeToBuilding(): BlockPos? {

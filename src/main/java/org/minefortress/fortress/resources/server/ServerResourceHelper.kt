@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.world.ServerWorld
@@ -17,7 +18,7 @@ import net.remmintan.mods.minefortress.core.utils.getManagersProvider
 @Suppress("UnstableApiUsage")
 class ServerResourceHelper(server: MinecraftServer, fortressPos: BlockPos) : IServerResourceHelper {
 
-    private val resourceManager: IServerResourceManager by lazy { server.getManagersProvider(fortressPos)!!.resourceManager }
+    private val resourceManager: IServerResourceManager by lazy { server.getManagersProvider(fortressPos).resourceManager }
     private val world: ServerWorld by lazy { server.overworld }
 
     override fun putItemsToSuitableContainer(stacks: List<ItemStack>): Boolean {
@@ -55,7 +56,7 @@ class ServerResourceHelper(server: MinecraftServer, fortressPos: BlockPos) : ISe
         val resourceManagerStorage = resourceManager.getStorage()
         val taskStorage = ItemStorage.SIDED.find(world, taskPos, null)
         if (taskStorage == null || !taskStorage.supportsInsertion()) {
-            log.error("Trying to transfer items to task but the task inventory is invalid")
+            log.error("Trying to transfer items from task but the task inventory is invalid")
             return false
         }
 
@@ -66,6 +67,39 @@ class ServerResourceHelper(server: MinecraftServer, fortressPos: BlockPos) : ISe
                 StorageUtil.move(taskStorage, resourceManagerStorage, { variant -> true }, totalItemsAmount, tr)
             if (totalItemsAmount != movedItems) {
                 return false
+            }
+            tr.commit()
+        }
+        return true
+    }
+
+    override fun payItemFromTask(taskPos: BlockPos, item: Item, canIgnore: Boolean) {
+        val taskStorage = ItemStorage.SIDED.find(world, taskPos, null)
+        if (taskStorage == null || !taskStorage.supportsInsertion()) {
+            log.error("Trying to remove $item from task but the task inventory is invalid")
+            return
+        }
+
+        Transaction.openOuter().use { tr ->
+            val variant = ItemVariant.of(item)
+            val extractedAmount = taskStorage.extract(variant, 1, tr)
+            if (extractedAmount == 1L) {
+                tr.commit()
+            } else {
+                if (!canIgnore)
+                    log.warn("Trying to remove the item $item from a task $taskPos. But there is no such resource left in the task storage")
+            }
+        }
+    }
+
+    override fun payItems(from: Storage<ItemVariant>, items: List<ItemStack>): Boolean {
+        Transaction.openOuter().use { tr ->
+            for (stack in items) {
+                val item = ItemVariant.of(stack)
+                val amountToExtract = stack.count.toLong()
+                val extractedAmount = from.extract(item, amountToExtract, tr)
+                if (amountToExtract != extractedAmount)
+                    return false
             }
             tr.commit()
         }

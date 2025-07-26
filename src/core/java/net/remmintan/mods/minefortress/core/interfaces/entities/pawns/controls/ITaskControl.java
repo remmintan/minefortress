@@ -1,12 +1,10 @@
 package net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls;
 
+import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IBaseTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.UUID;
 
 public interface ITaskControl {
 
@@ -28,7 +26,7 @@ public interface ITaskControl {
 
     void findNextPart();
 
-    Optional<UUID> getTaskId();
+    BlockPos getCurrentTaskPos();
 
     @Nullable ITaskBlockInfo getNextBlock();
 

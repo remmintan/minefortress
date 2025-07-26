@@ -8,7 +8,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraft.world.event.GameEvent
-import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceHelper
 import net.remmintan.mods.minefortress.core.utils.isSurvivalFortress
 import java.util.*
 
@@ -159,7 +159,7 @@ class TreeFinder(private val world: World, alreadySelectedLogs: Set<BlockPos> = 
 
 class TreeRemover(
     private val world: ServerWorld,
-    private val resourceManager: IServerResourceManager,
+    private val resourceHelper: IServerResourceHelper,
     private val entity: LivingEntity? = null
 ) {
 
@@ -186,11 +186,7 @@ class TreeRemover(
             val blockEntity = world.getBlockEntity(pos)
             // FIXME: consider the tool and the entity
             val drop = Block.getDroppedStacks(blockState, world, pos, blockEntity)
-            for (itemStack in drop) {
-                val item = itemStack.item
-                val count = itemStack.count
-                resourceManager.increaseItemAmount(item, count)
-            }
+            resourceHelper.putItemsToSuitableContainer(drop)
         }
     }
 }

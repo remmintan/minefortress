@@ -18,7 +18,6 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkH
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -59,7 +58,6 @@ public class TwoDotsSelection extends Selection {
                 final var selectionManager = ClientModUtils.getManagersProvider().get_PawnsSelectionManager();
                 final var selectedPawnsIds = selectionManager.getSelectedPawnsIds();
                 final var packet = new ServerboundSimpleSelectionTaskPacket(
-                        UUID.randomUUID(),
                         taskType,
                         this.selectionStart,
                         this.selectionEnd,

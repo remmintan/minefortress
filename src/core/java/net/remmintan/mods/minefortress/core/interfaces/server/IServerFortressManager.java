@@ -4,7 +4,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
@@ -49,7 +48,6 @@ public interface IServerFortressManager extends IFortressManager, IWritableManag
 
     void spawnInitialPawns();
 
-    void openHandledScreen(ScreenType type, ServerPlayerEntity player, BlockPos pos);
 
     void expandTheVillage(BlockPos pos);
 

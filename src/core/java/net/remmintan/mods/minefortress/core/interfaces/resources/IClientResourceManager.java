@@ -19,7 +19,7 @@ public interface IClientResourceManager {
     boolean hasItems(List<ItemInfo> stacks);
 
     // Blueprint screen related
-    Map<ItemInfo, Boolean> getMetRequirements(List<ItemInfo> costs);
+    Map<ItemStack, Boolean> getMetRequirements(List<ItemInfo> costs);
 
     void sync(List<BlockPos> containerPositions);
 

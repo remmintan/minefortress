@@ -19,7 +19,7 @@ import org.minefortress.tasks.block.info.DigTaskBlockInfo
 import java.util.*
 import kotlin.math.max
 
-class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, TreeData>) : ITask {
+class CutTreesTask(private val trees: Map<BlockPos, TreeData>) : ITask {
     private val treeRoots: Queue<BlockPos> = ArrayDeque(trees.keys)
     private val totalTreesCount = treeRoots.size
 
@@ -28,9 +28,8 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
 
     private var assignedWorkers = 0
 
-    override fun getPos(): BlockPos {
-        return uuid
-    }
+    override val positions: List<BlockPos> =
+        trees.values.flatMap { listOf(it.treeLogBlocks, it.treeLeavesBlocks).flatten() }
 
     override fun getTaskType(): TaskType {
         return TaskType.REMOVE
@@ -63,7 +62,7 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
         val root = part.startAndEnd.first
         val tree = trees[root] ?: return
         val managersProvider = ServerModUtils.getManagersProvider(pawn).orElseThrow()
-        TreeRemover(pawn.serverWorld, managersProvider.resourceManager, pawn as LivingEntity).removeTheTree(tree)
+        TreeRemover(pawn.serverWorld, managersProvider.resourceHelper, pawn as LivingEntity).removeTheTree(tree)
 
         removedTrees++
         check(removedTrees <= totalTreesCount) { "Removed more roots than total roots" }
@@ -73,7 +72,7 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
                 FortressServerNetworkHelper.send(
                     it,
                     FortressChannelNames.FINISH_TASK,
-                    ClientboundTaskExecutedPacket(this.getPos())
+                    ClientboundTaskExecutedPacket(pos)
                 )
             }
         }
@@ -84,8 +83,7 @@ class CutTreesTask(private val uuid: UUID, private val trees: Map<BlockPos, Tree
     }
 
     override fun toTaskInformationDto(): List<TaskInformationDto> {
-        val positions = trees.values.flatMap { listOf(it.treeLogBlocks, it.treeLeavesBlocks).flatten() }
-        return listOf(TaskInformationDto(getPos(), positions, TaskType.REMOVE))
+        return listOf(TaskInformationDto(pos, positions, TaskType.REMOVE))
     }
 
     override fun canTakeMoreWorkers(): Boolean {

@@ -57,7 +57,6 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
         final var provider = getManagersProvider(player);
         final var taskManager = provider.getTaskManager();
         final var tasksCreator = provider.getTasksCreator();
-        final var resourceManager = provider.getResourceManager();
 
         final var stackInHand = player.getStackInHand(Hand.MAIN_HAND);
         final var item = stackInHand.getItem();
@@ -67,9 +66,9 @@ public class ServerboundRoadsTaskPacket implements FortressC2SPacket {
             throw new NotImplementedException();
 //            resourceManager.reserveItems(placeUuid, Collections.singletonList(new ItemInfo(item, blocks.size())));
 
-        final var digTask = tasksCreator.createRoadsTask(digUuid, blocks, null);
+        final var digTask = tasksCreator.createRoadsTask(blocks, null);
         digTask.addFinishListener(() -> {
-            final var buildTask = tasksCreator.createRoadsTask(placeUuid, blocks, item);
+            final var buildTask = tasksCreator.createRoadsTask(blocks, item);
             taskManager.addTask(buildTask, selectedPawns, player);
         });
         taskManager.addTask(digTask, selectedPawns, player);

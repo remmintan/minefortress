@@ -4,7 +4,7 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import net.remmintan.mods.minefortress.core.interfaces.entities.pawns.controls.IEatControl;
-import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerFoodManager;
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManagersProvider;
 import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import org.minefortress.entity.Colonist;
@@ -28,8 +28,8 @@ public abstract class AbstractFortressGoal extends Goal {
     protected boolean wantAndCanEatSomeFood() {
         final var hungry = colonist.getEatControl().map(IEatControl::isHungry).orElse(false);
         final var hasSomeFoodToIt = ServerModUtils.getManagersProvider(colonist.getServer(), colonist.getFortressPos())
-                .map(IServerManagersProvider::getResourceManager)
-                .map(IServerResourceManager::hasEatableItem)
+                .map(IServerManagersProvider::getFoodManager)
+                .map(IServerFoodManager::hasFood)
                 .orElse(false);
 
         if (hungry && !hasSomeFoodToIt) {

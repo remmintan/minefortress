@@ -4,7 +4,6 @@ import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
 
 import java.util.List;
@@ -36,7 +35,7 @@ public interface IProfession {
 
     IProfession getParent();
 
-    List<ItemInfo> getItemsRequirement();
+    List<ItemStack> getItemsRequirement();
 
     ProfessionType getRequirementType();
 

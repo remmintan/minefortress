@@ -14,8 +14,8 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
-import net.remmintan.mods.minefortress.core.interfaces.resources.server.IEatableItemsManager
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerContainersRegistry
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerFoodManager
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager
 import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager
@@ -30,7 +30,7 @@ private const val CONTAINER_POSITIONS_NBT_KEY = "containerPositions"
 class ServerResourceManager(private val server: MinecraftServer) :
     IServerResourceManager,
     IServerContainersRegistry,
-    IEatableItemsManager,
+    IServerFoodManager,
     ITickableManager,
     IWritableManager {
 
@@ -75,13 +75,31 @@ class ServerResourceManager(private val server: MinecraftServer) :
     }
 
     override fun hasFood(): Boolean {
-        for (view in getStorage()) {
-            if (view.isResourceBlank) continue
-            if (foodItems.contains(view.resource.item))
-                return true
+        return findFood() != null
+    }
+
+    override fun getFood(): ItemStack? {
+        val item = findFood() ?: return null
+        Transaction.openOuter().use { tr ->
+            val variant = ItemVariant.of(item)
+            val extractedAmount = getStorage().extract(variant, 1, tr)
+            if (extractedAmount == 1L) {
+                tr.commit()
+                return ItemStack(item)
+            }
         }
 
-        return false
+        return null
+    }
+
+    private fun findFood(): Item? {
+        for (view in getStorage()) {
+            if (view.isResourceBlank) continue
+            val item = view.resource.item
+            if (foodItems.contains(item))
+                return item
+        }
+        return null
     }
 
     override fun tick(server: MinecraftServer, world: ServerWorld, player: ServerPlayerEntity?) {

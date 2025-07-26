@@ -1,6 +1,5 @@
 package net.remmintan.mods.minefortress.core.utils
 
-import net.minecraft.screen.ScreenHandler
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
@@ -27,22 +26,12 @@ fun MinecraftServer.sendMessageToFortressOwner(fortressPos: BlockPos, message: S
 private fun MinecraftServer.getFortressHolder(fortressPos: BlockPos) =
     this.overworld.getBlockEntity(fortressPos) as? IFortressHolder
 
-fun MinecraftServer.fortressOwnerHasScreenOpened(
-    fortressPos: BlockPos,
-    screenHandlerClass: Class<out ScreenHandler>
-): Boolean {
-    return this.getFortressHolder(fortressPos)
-        ?.getFortressOwner()
-        ?.currentScreenHandler
-        ?.let { screenHandlerClass.isInstance(it) } ?: false
-}
-
 fun MinecraftServer.getFortressOwner(fortressPos: BlockPos): ServerPlayerEntity? {
     return this.getFortressHolder(fortressPos)?.getFortressOwner()
 }
 
-fun MinecraftServer.getManagersProvider(fortressPos: BlockPos): IServerManagersProvider? {
-    return this.getFortressHolder(fortressPos)?.getServerManagersProvider()
+fun MinecraftServer.getManagersProvider(fortressPos: BlockPos): IServerManagersProvider {
+    return this.getFortressHolder(fortressPos)?.getServerManagersProvider()!!
 }
 
 fun MinecraftServer.getFortressManager(fortressPos: BlockPos): IServerFortressManager? {

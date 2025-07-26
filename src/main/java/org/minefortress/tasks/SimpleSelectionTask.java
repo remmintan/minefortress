@@ -15,6 +15,7 @@ import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectio
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskPart;
 import net.remmintan.mods.minefortress.core.utils.PathUtils;
+import org.jetbrains.annotations.NotNull;
 import org.minefortress.entity.Colonist;
 import org.minefortress.tasks.block.info.BlockStateTaskBlockInfo;
 import org.minefortress.tasks.block.info.DigTaskBlockInfo;
@@ -23,7 +24,6 @@ import org.minefortress.utils.BlockInfoUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class SimpleSelectionTask extends AbstractTask {
 
@@ -31,11 +31,11 @@ public class SimpleSelectionTask extends AbstractTask {
     private final Direction horizontalDirection;
     private final ServerSelectionType selectionType;
 
-    private Item placingItem;
+    private final Item placingItem;
     private final List<BlockPos> positions;
 
-    public SimpleSelectionTask(UUID id, TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, HitResult hitResult, ServerSelectionType selectionType, List<BlockPos> positions) {
-        super(id, taskType, startingBlock, endingBlock);
+    public SimpleSelectionTask(TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, HitResult hitResult, ServerSelectionType selectionType, List<BlockPos> positions, Item placingItem) {
+        super(taskType, startingBlock, endingBlock);
         this.selectionType = selectionType;
 
         final boolean shouldSwapStartAndEnd = isShouldSwapEnds(taskType, startingBlock, endingBlock, selectionType);
@@ -59,6 +59,7 @@ public class SimpleSelectionTask extends AbstractTask {
         }
 
         this.positions = positions;
+        this.placingItem = placingItem;
     }
 
     private boolean isShouldSwapEnds(TaskType taskType, BlockPos startingBlock, BlockPos endingBlock, ServerSelectionType selectionType) {
@@ -76,10 +77,6 @@ public class SimpleSelectionTask extends AbstractTask {
         } else {
             super.prepareTask();
         }
-    }
-
-    public void setPlacingItem(Item placingItem) {
-        this.placingItem = placingItem;
     }
 
     public Item getPlacingItem() {
@@ -126,7 +123,13 @@ public class SimpleSelectionTask extends AbstractTask {
     }
 
     @Override
+    public @NotNull List<BlockPos> getPositions() {
+        return positions;
+    }
+
+    @Override
+    @NotNull
     public List<TaskInformationDto> toTaskInformationDto() {
-        return List.of(new TaskInformationDto(id, positions, taskType));
+        return List.of(new TaskInformationDto(getPos(), getPositions(), taskType));
     }
 }

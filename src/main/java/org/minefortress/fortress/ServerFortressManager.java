@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
-import net.remmintan.mods.minefortress.core.ScreenType;
 import net.remmintan.mods.minefortress.core.dtos.PawnSkin;
 import net.remmintan.mods.minefortress.core.interfaces.automation.IAutomationAreaProvider;
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea;
@@ -33,16 +33,12 @@ import net.remmintan.mods.minefortress.core.utils.ServerModUtils;
 import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames;
 import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper;
 import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncFortressManagerPacket;
-import net.remmintan.mods.minefortress.networking.s2c.ClientboundTaskExecutedPacket;
-import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.minefortress.entity.BasePawnEntity;
 import org.minefortress.entity.Colonist;
 import org.minefortress.entity.colonist.ColonistNameGenerator;
 import org.minefortress.fortress.automation.areas.ServerAutomationAreaInfo;
-import org.minefortress.fortress.resources.gui.craft.FortressCraftingScreenHandlerFactory;
-import org.minefortress.fortress.resources.gui.smelt.FurnaceScreenHandlerFactory;
 import org.minefortress.professions.ServerProfessionManager;
 import org.minefortress.registries.FortressEntities;
 import org.minefortress.tasks.RepairBuildingTask;
@@ -125,13 +121,14 @@ public final class ServerFortressManager implements IServerFortressManager {
             final var pawn = entityType.spawn(
                     getWorld(),
                     infoTag,
-                    (it) -> {},
+                    (it) -> {
+                    },
                     spawnPosition,
                     SpawnReason.EVENT,
                     true,
                     false
             );
-            if(pawn instanceof LivingEntity le)
+            if (pawn instanceof LivingEntity le)
                 pawns.add(le);
         }
     }
@@ -144,7 +141,7 @@ public final class ServerFortressManager implements IServerFortressManager {
     public void tick(@Nullable final ServerPlayerEntity player) {
         tickFortress();
 
-        if(!needSync || player == null) return;
+        if (!needSync || player == null) return;
         final var isServer = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
         final var syncFortressPacket = new ClientboundSyncFortressManagerPacket(
                 pawns.size(),
@@ -166,7 +163,8 @@ public final class ServerFortressManager implements IServerFortressManager {
 
         colonist.damage(getOutOfWorldDamageSource(), Float.MAX_VALUE);
         pawns.remove(colonist);
-        final var typedReplacement = entityType.spawn(world, infoTag, (it) -> {}, pos, SpawnReason.EVENT, true, false);
+        final var typedReplacement = entityType.spawn(world, infoTag, (it) -> {
+        }, pos, SpawnReason.EVENT, true, false);
         pawns.add(typedReplacement);
         getManagersProvider().getFightManager().sync();
     }
@@ -180,8 +178,8 @@ public final class ServerFortressManager implements IServerFortressManager {
     }
 
     private void keepColonistsBelowMax() {
-        if(maxColonistsCount != -1 && getTotalColonistsCount() > maxColonistsCount) {
-            final var deltaColonists = Math.max( pawns.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
+        if (maxColonistsCount != -1 && getTotalColonistsCount() > maxColonistsCount) {
+            final var deltaColonists = Math.max(pawns.stream().filter(LivingEntity::isAlive).count() - maxColonistsCount, 0);
 
             pawns.stream()
                     .filter(LivingEntity::isAlive)
@@ -218,9 +216,9 @@ public final class ServerFortressManager implements IServerFortressManager {
 
         final var deadPawns = pawns.stream()
                 .filter(is -> !is.isAlive()).toList();
-        if(!deadPawns.isEmpty()) {
-            for(LivingEntity pawn : deadPawns) {
-                if(pawn instanceof IProfessional professional) {
+        if (!deadPawns.isEmpty()) {
+            for (LivingEntity pawn : deadPawns) {
+                if (pawn instanceof IProfessional professional) {
                     final String professionId = professional.getProfessionId();
                     getManagersProvider().getProfessionsManager().decreaseAmount(professionId, true);
                 }
@@ -230,13 +228,13 @@ public final class ServerFortressManager implements IServerFortressManager {
         }
 
 
-        if(this.fortressCenter != null) {
+        if (this.fortressCenter != null) {
             final var colonistsCount = this.pawns.size();
             final var spawnFactor = MathHelper.clampedLerp(82, 99, colonistsCount / 50f);
-            if(spawnPawns && (maxColonistsCount == -1 || colonistsCount < maxColonistsCount)) {
-                if(getWorld().getTime() % 100 == 0  && getWorld().random.nextInt(100) >= spawnFactor) {
+            if (spawnPawns && (maxColonistsCount == -1 || colonistsCount < maxColonistsCount)) {
+                if (getWorld().getTime() % 100 == 0 && getWorld().random.nextInt(100) >= spawnFactor) {
                     final long bedsCount = getManagersProvider().getBuildingsManager().getTotalBedsCount();
-                    if(colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
+                    if (colonistsCount < bedsCount || colonistsCount < DEFAULT_COLONIST_COUNT) {
                         spawnPawnNearCampfire()
                                 .ifPresent(it -> sendMessageToFortressOwner(it.getName().getString() + " appeared in the village."));
                     }
@@ -247,10 +245,10 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     @Override
     public void spawnInitialPawns() {
-        if(minX > this.fortressCenter.getX()-10) minX = this.fortressCenter.getX()-10;
-        if(minZ > this.fortressCenter.getZ()-10) minZ = this.fortressCenter.getZ()-10;
-        if(maxX < this.fortressCenter.getX()+10) maxX = this.fortressCenter.getX()+10;
-        if(maxZ < this.fortressCenter.getZ()+10) maxZ = this.fortressCenter.getZ()+10;
+        if (minX > this.fortressCenter.getX() - 10) minX = this.fortressCenter.getX() - 10;
+        if (minZ > this.fortressCenter.getZ() - 10) minZ = this.fortressCenter.getZ() - 10;
+        if (maxX < this.fortressCenter.getX() + 10) maxX = this.fortressCenter.getX() + 10;
+        if (maxZ < this.fortressCenter.getZ() + 10) maxZ = this.fortressCenter.getZ() + 10;
 
         for (int i = 0; i < 5; i++) {
             spawnPawnNearCampfire();
@@ -261,18 +259,11 @@ public final class ServerFortressManager implements IServerFortressManager {
         this.scheduleSync();
     }
 
-    @Override
-    public void openHandledScreen(ScreenType type, ServerPlayerEntity player, BlockPos pos) {
-        switch (type) {
-            case CRAFTING -> player.openHandledScreen(new FortressCraftingScreenHandlerFactory());
-            case FURNACE -> player.openHandledScreen(new FurnaceScreenHandlerFactory(pos));
-        }
-    }
 
     @Override
     public void jumpToCampfire(ServerPlayerEntity player) {
-        if(fortressCenter == null) return;
-        if(player.getWorld().getRegistryKey() != World.OVERWORLD) return;
+        if (fortressCenter == null) return;
+        if (player.getWorld().getRegistryKey() != World.OVERWORLD) return;
 
         player.teleport(fortressCenter.getX() + 10, fortressCenter.getY() + 20, fortressCenter.getZ() + 10);
     }
@@ -294,7 +285,8 @@ public final class ServerFortressManager implements IServerFortressManager {
         final var tag = getColonistInfoTag();
         final var colonistType = FortressEntities.COLONIST_ENTITY_TYPE;
         final var world = getWorld();
-        final var spawnedPawn = colonistType.spawn(world, tag, (it) -> {}, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
+        final var spawnedPawn = colonistType.spawn(world, tag, (it) -> {
+        }, randomSpawnPosition, SpawnReason.MOB_SUMMONED, true, false);
         return Optional.ofNullable(spawnedPawn);
     }
 
@@ -343,7 +335,7 @@ public final class ServerFortressManager implements IServerFortressManager {
         this.nameGenerator.write(nameGeneratorTag);
         tag.put("nameGenerator", nameGeneratorTag);
 
-        if(maxColonistsCount != -1) {
+        if (maxColonistsCount != -1) {
             tag.putInt("maxColonistsCount", maxColonistsCount);
         }
 
@@ -352,24 +344,24 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     @Override
     public void read(NbtCompound tag) {
-        if(tag.contains("minX")) minX = tag.getInt("minX");
-        if(tag.contains("minZ")) minZ = tag.getInt("minZ");
-        if(tag.contains("maxX")) maxX = tag.getInt("maxX");
-        if(tag.contains("maxZ")) maxZ = tag.getInt("maxZ");
+        if (tag.contains("minX")) minX = tag.getInt("minX");
+        if (tag.contains("minZ")) minZ = tag.getInt("minZ");
+        if (tag.contains("maxX")) maxX = tag.getInt("maxX");
+        if (tag.contains("maxZ")) maxZ = tag.getInt("maxZ");
 
         if (tag.contains(BasePawnEntity.PAWN_SKIN_NBT_KEY))
             pawnsSkin = PawnSkin.valueOf(tag.getString(BasePawnEntity.PAWN_SKIN_NBT_KEY));
 
-        if(tag.contains("nameGenerator")) {
+        if (tag.contains("nameGenerator")) {
             final NbtCompound nameGeneratorTag = tag.getCompound("nameGenerator");
             this.nameGenerator = new ColonistNameGenerator(nameGeneratorTag);
         }
 
-        if(tag.contains("maxColonistsCount")) {
+        if (tag.contains("maxColonistsCount")) {
             this.maxColonistsCount = tag.getInt("maxColonistsCount");
         }
 
-        if(tag.contains("spawnPawns")) {
+        if (tag.contains("spawnPawns")) {
             this.spawnPawns = tag.getBoolean("spawnPawns");
         }
 
@@ -389,9 +381,9 @@ public final class ServerFortressManager implements IServerFortressManager {
                     .concat(buildings, areas)
                     .min(Comparator.comparing(IAutomationArea::getUpdated));
 
-            if(areaOpt.isPresent()) {
+            if (areaOpt.isPresent()) {
                 final var area = areaOpt.get();
-                if(area instanceof ServerAutomationAreaInfo saai && area.isEmpty(getWorld()) && saai.getAreaType() == QUARRY) {
+                if (area instanceof ServerAutomationAreaInfo saai && area.isEmpty(getWorld()) && saai.getAreaType() == QUARRY) {
                     saai.sendFinishMessage(it -> ServerExtensionsKt.sendMessageToFortressOwner(server, fortressCenter, it));
                     automationAreaManager.removeArea(area.getId());
                     return getAutomationAreaByProfessionType(professionType);
@@ -410,11 +402,11 @@ public final class ServerFortressManager implements IServerFortressManager {
     }
 
     public BlockPos getFortressCenter() {
-        return fortressCenter!=null?fortressCenter.toImmutable():null;
+        return fortressCenter != null ? fortressCenter.toImmutable() : null;
     }
 
     public boolean isPositionWithinFortress(BlockPos pos) {
-        if(minX == Integer.MAX_VALUE) {
+        if (minX == Integer.MAX_VALUE) {
             return false;
         }
 
@@ -494,9 +486,9 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     @Override
     public void increaseMaxColonistsCount() {
-        if(maxColonistsCount == -1) return;
+        if (maxColonistsCount == -1) return;
         this.maxColonistsCount++;
-        if(this.maxColonistsCount >= getTotalColonistsCount()) {
+        if (this.maxColonistsCount >= getTotalColonistsCount()) {
             this.maxColonistsCount = -1;
         }
         this.scheduleSync();
@@ -504,46 +496,36 @@ public final class ServerFortressManager implements IServerFortressManager {
 
     @Override
     public void decreaseMaxColonistsCount() {
-        if(maxColonistsCount == -1)
+        if (maxColonistsCount == -1)
             this.maxColonistsCount = getTotalColonistsCount();
 
         this.maxColonistsCount--;
 
-        if(this.maxColonistsCount <= 0)
+        if (this.maxColonistsCount <= 0)
             this.maxColonistsCount = 1;
         this.scheduleSync();
     }
 
     public void expandTheVillage(BlockPos pos) {
-        if(maxX < pos.getX()) maxX = pos.getX();
-        if(minX > pos.getX()) minX = pos.getX();
-        if(maxZ < pos.getZ()) maxZ = pos.getZ();
-        if(minZ > pos.getZ()) minZ = pos.getZ();
+        if (maxX < pos.getX()) maxX = pos.getX();
+        if (minX > pos.getX()) minX = pos.getX();
+        if (maxZ < pos.getZ()) maxZ = pos.getZ();
+        if (minZ > pos.getZ()) minZ = pos.getZ();
     }
 
     @Override
     public void repairBuilding(ServerPlayerEntity player, BlockPos pos, List<Integer> selectedPawns) {
         final var buildingManager = getManagersProvider().getBuildingsManager();
-        final var resourceManager = getManagersProvider().getResourceManager();
+        final var building = buildingManager.getBuilding(pos)
+                .orElseThrow(() -> new IllegalStateException("Building not found"));
 
-        final var taskId = UUID.randomUUID();
-        try {
-            final var building = buildingManager.getBuilding(pos)
-                    .orElseThrow(() -> new IllegalStateException("Building not found"));
+        final var repairStacks = building
+                .getRepairItemInfos().stream().map(it -> new ItemStack(it.item(), it.amount())).toList();
+        final var blocksToRepair = building.getBlocksToRepair();
 
-            final var itemInfos = building.getRepairItemInfos();
-            final var blocksToRepair = building.getBlocksToRepair();
+        final var task = new RepairBuildingTask(building.getStart(), building.getEnd(), blocksToRepair, repairStacks);
+        getManagersProvider().getTaskManager().addTask(task, selectedPawns, player);
 
-            if (ServerExtensionsKt.isSurvivalFortress(player.server)) {
-                resourceManager.reserveItems(taskId, itemInfos);
-            }
-
-            final var task = new RepairBuildingTask(taskId, building.getStart(), building.getEnd(), blocksToRepair);
-            getManagersProvider().getTaskManager().addTask(task, selectedPawns, player);
-        } catch (RuntimeException exp) {
-            LogManager.getLogger().error("Error while repairing building", exp);
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FINISH_TASK, new ClientboundTaskExecutedPacket(taskId));
-        }
     }
 
 }

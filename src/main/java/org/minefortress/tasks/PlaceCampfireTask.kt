@@ -9,7 +9,7 @@ import net.remmintan.gobi.helpers.TreeFinder
 import net.remmintan.gobi.helpers.TreeRemover
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
-import net.remmintan.mods.minefortress.core.interfaces.resources.IServerResourceManager
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceHelper
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IPlaceCampfireTask
 import net.remmintan.mods.minefortress.core.utils.getFortressManager
 import net.remmintan.mods.minefortress.core.utils.getManagersProvider
@@ -70,7 +70,7 @@ class PlaceCampfireTask(
         }
 
         val stableFortressCenter = fortressPos ?: error("Fortress pos is null")
-        world.server.getManagersProvider(stableFortressCenter)?.let {
+        world.server.getManagersProvider(stableFortressCenter).let {
             it.buildingsManager?.addBuilding(
                 metadata,
                 start,
@@ -78,7 +78,7 @@ class PlaceCampfireTask(
                 blockData
             )
             it.professionsManager?.sendProfessions(player)
-            removeAllTreesInTheRadius(world, stableFortressCenter, it.resourceManager)
+            removeAllTreesInTheRadius(world, stableFortressCenter, it.resourceHelper)
         }
 
         val fortressManager = world.server.getFortressManager(stableFortressCenter)
@@ -94,11 +94,11 @@ class PlaceCampfireTask(
     private fun removeAllTreesInTheRadius(
         world: ServerWorld,
         center: BlockPos,
-        resourceManager: IServerResourceManager
+        resourceHelper: IServerResourceHelper
     ) {
         val c = center.toImmutable()
         val tf = TreeFinder(world)
-        val tr = TreeRemover(world, resourceManager)
+        val tr = TreeRemover(world, resourceHelper)
         val r = 20
         BlockPos.iterate(c.add(-r, -r, -r), c.add(r, r, r))
             .asSequence()

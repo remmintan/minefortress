@@ -6,8 +6,6 @@ import net.remmintan.mods.minefortress.core.TaskType;
 import net.remmintan.mods.minefortress.core.dtos.tasks.TaskInformationDto;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTask;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.IClientTasksHolder;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksModelBuilderInfoProvider;
-import net.remmintan.mods.minefortress.core.interfaces.tasks.ITasksRenderInfoProvider;
 import net.remmintan.mods.minefortress.core.utils.BuildingHelper;
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.ServerboundCancelTaskPacket;
@@ -17,16 +15,13 @@ import org.joml.Vector4f;
 
 import java.util.*;
 
-public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasksRenderInfoProvider, IClientTasksHolder {
+public class ClientTasksHolder implements IClientTasksHolder {
     private static final Vector4f DESTROY_COLOR = new Vector4f(170f/255f, 0, 0, 1f);
     private static final Vector4f BUILD_COLOR = new Vector4f(0, 170f/255f, 0, 1f);
 
-    private final Map<UUID, UUID> subtasksMap = new HashMap<>();
+    private final Map<BlockPos, IClientTask> tasks = new HashMap<>();
 
-    private final Map<UUID, IClientTask> removeTasks = new HashMap<>();
-    private final Map<UUID, IClientTask> buildTasks = new HashMap<>();
-
-    private final Stack<UUID> tasksStack = new Stack<>();
+    private final Stack<BlockPos> tasksStack = new Stack<>();
 
     private boolean selectionHidden = false;
     private boolean needRebuild = false;
@@ -34,13 +29,13 @@ public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasks
     @Override
     public void cancelLatestTask() {
         if(tasksStack.empty()) return;
-        final UUID lastTaskId = tasksStack.pop();
-        subtasksMap.entrySet().stream().filter(it -> it.getValue().equals(lastTaskId)).map(Map.Entry::getKey).forEach(it -> {
-            removeTask(it);
-            FortressClientNetworkHelper.send(FortressChannelNames.CANCEL_TASK, new ServerboundCancelTaskPacket(it));
-        });
-        removeTask(lastTaskId);
-        FortressClientNetworkHelper.send(FortressChannelNames.CANCEL_TASK, new ServerboundCancelTaskPacket(lastTaskId));
+        final BlockPos pos = tasksStack.pop();
+
+        tasks.remove(pos);
+        tasksStack.remove(pos);
+
+        this.setNeedRebuild(true);
+        FortressClientNetworkHelper.send(FortressChannelNames.CANCEL_TASK, new ServerboundCancelTaskPacket(pos));
         if(tasksStack.empty()) {
             ClientModUtils.getManagersProvider().get_PawnsSelectionManager().resetSelection();
         }
@@ -49,50 +44,27 @@ public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasks
     @Override
     public void addTasks(List<TaskInformationDto> tasks) {
         for(TaskInformationDto task: tasks) {
-            addTask(task.id(), task.positions(), task.type(), null);
+            addTask(task.pos(), task.positions(), task.type());
         }
     }
 
-    @Override
-    public void addTask(UUID uuid, Iterable<BlockPos> blocks, TaskType type, UUID superTaskId) {
+    private void addTask(BlockPos taskPos, Iterable<BlockPos> blocks, TaskType type) {
         IClientTask newTask = new ClientTask(
                 blocks,
                 type == TaskType.REMOVE ? DESTROY_COLOR: BUILD_COLOR,
                 (w, p) -> type == TaskType.REMOVE ? BuildingHelper.canRemoveBlock(w, p) : BuildingHelper.canPlaceBlock(w, p)
         );
-        if(superTaskId != null) {
-            subtasksMap.put(uuid, superTaskId);
-        }
 
-        if(type == TaskType.REMOVE) {
-            removeTasks.put(uuid, newTask);
-        } else {
-            buildTasks.put(uuid, newTask);
-        }
 
-        tasksStack.push(uuid);
+        tasks.put(taskPos, newTask);
+
+        tasksStack.push(taskPos);
         this.setNeedRebuild(true);
     }
 
     @Override
     public Set<IClientTask> getAllSelections() {
-        final var clientSelections = new HashSet<>(buildTasks.values());
-        clientSelections.addAll(removeTasks.values());
-        return clientSelections;
-    }
-
-    @Override
-    public void removeTask(UUID uuid) {
-        if(buildTasks.containsKey(uuid)) {
-            buildTasks.remove(uuid);
-        } else {
-            removeTasks.remove(uuid);
-        }
-
-        subtasksMap.remove(uuid);
-        tasksStack.remove(uuid);
-
-        this.setNeedRebuild(true);
+        return new HashSet<>(tasks.values());
     }
 
     @Override
@@ -107,7 +79,7 @@ public class ClientTasksHolder implements ITasksModelBuilderInfoProvider, ITasks
 
     @Override
     public boolean shouldRender() {
-        return !selectionHidden && (!removeTasks.isEmpty() || !buildTasks.isEmpty());
+        return !selectionHidden && !tasks.isEmpty();
     }
 
     @Override

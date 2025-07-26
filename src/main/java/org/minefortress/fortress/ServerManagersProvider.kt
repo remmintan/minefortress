@@ -8,6 +8,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServer
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerFoodManager
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceHelper
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager
 import net.remmintan.mods.minefortress.core.interfaces.server.*
@@ -28,9 +29,11 @@ class ServerManagersProvider(private val fortressPos: BlockPos, world: ServerWor
     private val managers = mutableMapOf<Class<out IServerManager>, IServerManager>()
 
     init {
-        registerManager(IServerTaskManager::class.java, ServerTaskManager())
+        registerManager(IServerTaskManager::class.java, ServerTaskManager(world.server, fortressPos))
         registerManager(IServerProfessionsManager::class.java, ServerProfessionManager(fortressPos, world))
-        registerManager(IServerResourceManager::class.java, ServerResourceManager(world.server))
+        val resourceManager = ServerResourceManager(world.server)
+        registerManager(IServerResourceManager::class.java, resourceManager)
+        registerManager(IServerFoodManager::class.java, resourceManager)
         registerManager(IServerBuildingsManager::class.java, FortressBuildingManager(fortressPos, world))
         registerManager(IServerResourceHelper::class.java, ServerResourceHelper(world.server, fortressPos))
         registerManager(IServerAutomationAreaManager::class.java, AreasServerManager())

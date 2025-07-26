@@ -4,22 +4,20 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.TaskType;
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
 import net.remmintan.mods.minefortress.core.interfaces.networking.FortressC2SPacket;
 import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectionType;
-import net.remmintan.mods.minefortress.core.utils.ServerExtensionsKt;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
 
-    private final UUID id;
     private final TaskType taskType;
     private final BlockPos start;
     private final BlockPos end;
@@ -27,8 +25,8 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
     private final String selectionType;
     private final List<Integer> selectedPawns;
     private final List<BlockPos> positions;
-    public ServerboundSimpleSelectionTaskPacket(UUID id, TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, String selectionType, List<BlockPos> positions, List<Integer> selectedPawns) {
-        this.id = id;
+
+    public ServerboundSimpleSelectionTaskPacket(TaskType taskType, BlockPos start, BlockPos end, HitResult hitResult, String selectionType, List<BlockPos> positions, List<Integer> selectedPawns) {
         this.taskType = taskType;
         this.start = start;
         this.end = end;
@@ -39,7 +37,6 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
     }
 
     public ServerboundSimpleSelectionTaskPacket(PacketByteBuf buffer) {
-        this.id = buffer.readUuid();
         this.taskType = buffer.readEnumConstant(TaskType.class);
         this.start = buffer.readBlockPos();
         this.end = buffer.readBlockPos();
@@ -66,7 +63,6 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
 
     @Override
     public void write(PacketByteBuf buffer) {
-        buffer.writeUuid(id);
         buffer.writeEnumConstant(this.taskType);
         buffer.writeBlockPos(this.start);
         buffer.writeBlockPos(this.end);
@@ -108,31 +104,16 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
         return ServerSelectionType.valueOf(selectionType);
     }
 
-    public UUID getId() {
-        return id;
-    }
-
     @Override
     public void handle(@NotNull MinecraftServer server, @NotNull ServerPlayerEntity player) {
         final var provider = getManagersProvider(player);
-        final var id = this.getId();
         final var taskType = this.getTaskType();
-        final var taskManager = provider.getTaskManager();
-        final var tasksCreator = provider.getTasksCreator();
         final var startingBlock = this.getStart();
         final var endingBlock = this.getEnd();
         final var hitResult = this.getHitResult();
         final var selectionType = this.getSelectionType();
-        final var task = tasksCreator.createSelectionTask(id, taskType, startingBlock, endingBlock, selectionType, hitResult, positions, player);
-
-        if (ServerExtensionsKt.isSurvivalFortress(server) && task.getTaskType() == TaskType.BUILD) {
-            final var blocksCount = positions.size();
-            final var placingItem = player.getStackInHand(Hand.MAIN_HAND).getItem();
-
-            final var info = new ItemInfo(placingItem, blocksCount);
-
-            getManagersProvider(player).getResourceManager().reserveItems(task.getPos(), Collections.singletonList(info));
-        }
+        final var tasksCreator = provider.getTasksCreator();
+        final var task = tasksCreator.createSelectionTask(taskType, startingBlock, endingBlock, selectionType, hitResult, positions, player);
 
         if (task.getTaskType() == TaskType.REMOVE) {
             final var buildingsManager = getManagersProvider(player).getBuildingsManager();
@@ -145,6 +126,6 @@ public class ServerboundSimpleSelectionTaskPacket implements FortressC2SPacket {
             }
         }
 
-        taskManager.addTask(task, selectedPawns, player);
+        provider.getTaskManager().addTask(task, selectedPawns, player);
     }
 }

@@ -5,7 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.interfaces.tasks.ITaskBlockInfo;
 import org.minefortress.entity.Colonist;
 
-abstract class PositionedActionControl  {
+public abstract class PositionedActionControl {
 
     protected BlockPos goal;
     protected Item item;

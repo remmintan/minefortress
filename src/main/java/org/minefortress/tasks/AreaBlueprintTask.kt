@@ -4,6 +4,7 @@ import net.minecraft.block.BedBlock
 import net.minecraft.block.enums.BedPart
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.math.BlockBox
 import net.minecraft.util.math.BlockPos
@@ -28,7 +29,6 @@ import kotlin.math.max
 import kotlin.math.sqrt
 
 class AreaBlueprintTask(
-    private val id: UUID,
     private val metadata: BlueprintMetadata,
     placePos: BlockPos,
     private val blueprintData: IStructureBlockData,
@@ -43,6 +43,10 @@ class AreaBlueprintTask(
 
     private var canceled: Boolean = false
     private var assignedWorkers = 0
+
+    override val positions: List<BlockPos>
+
+    val requiredResources: List<ItemStack> = blueprintData.stacks.map { ItemStack(it.item, it.amount) }
 
     init {
         val areaBox = BlockBox.create(startPos, endPos)
@@ -64,6 +68,10 @@ class AreaBlueprintTask(
             .map { (p, s) -> BlockStateTaskBlockInfo(s.block.asItem(), p.add(startPos), s) }
         blocksQueue.addAll(preparedBlockInfos)
         totalManualBlocks = preparedBlockInfos.size
+
+        positions = (manualLayer.keys + autoLayer.keys + entityLayer.keys)
+            .map { it.add(startPos) }
+            .toList()
     }
 
     override fun canTakeMoreWorkers() = hasMoreBlocks() && (assignedWorkers < max(totalManualBlocks / 10, 1))
@@ -75,8 +83,6 @@ class AreaBlueprintTask(
     override fun removeWorker() {
         assignedWorkers--
     }
-
-    override fun getPos(): BlockPos = id
 
     override fun getNextBlock(): ITaskBlockInfo? {
         return blocksQueue.poll()
@@ -93,15 +99,7 @@ class AreaBlueprintTask(
     override fun hasMoreBlocks() = blocksQueue.isNotEmpty()
 
     override fun toTaskInformationDto(): List<TaskInformationDto> {
-        val manualLayer = blueprintData.getLayer(BlueprintDataLayer.MANUAL)
-        val autoLayer = blueprintData.getLayer(BlueprintDataLayer.AUTOMATIC)
-        val entityLayer = blueprintData.getLayer(BlueprintDataLayer.ENTITY)
-
-        val positions = (manualLayer.keys + autoLayer.keys + entityLayer.keys)
-            .map { it.add(startPos) }
-            .toList()
-
-        return listOf(TaskInformationDto(id, positions, TaskType.BUILD))
+        return listOf(TaskInformationDto(pos, positions, TaskType.BUILD))
     }
 
     override fun isComplete() = succeededBlocks.size == totalManualBlocks
@@ -125,26 +123,19 @@ class AreaBlueprintTask(
 
         val manualLayer = blueprintData.getLayer(BlueprintDataLayer.MANUAL)
         server.getManagersProvider(pos)
-            ?.buildingsManager
+            .buildingsManager
             ?.addBuilding(metadata, startPos, endPos, (entityLayer + automaticLayer + manualLayer))
 
         server.getFortressOwner(pos)?.let {
-            val packet = ClientboundTaskExecutedPacket(this.id)
+            val packet = ClientboundTaskExecutedPacket(pos)
             FortressServerNetworkHelper.send(it, FortressChannelNames.FINISH_TASK, packet)
         }
     }
 
     private fun removeReservedItem(worker: IFortressAwareEntity, item: Item) {
         if (worker.server.isSurvivalFortress()) {
-            ServerModUtils.getManagersProvider(worker)
-                .map { it.resourceManager }
-                .ifPresent {
-                    if (SimilarItemsHelper.isIgnorable(item)) {
-                        it.removeItemIfExists(this.getPos(), item)
-                    } else {
-                        it.removeReservedItem(this.getPos(), item)
-                    }
-                }
+            val provider = worker.server.getManagersProvider(worker.fortressPos!!)
+            provider.resourceHelper.payItemFromTask(pos, item, SimilarItemsHelper.isIgnorable(item))
         }
     }
 

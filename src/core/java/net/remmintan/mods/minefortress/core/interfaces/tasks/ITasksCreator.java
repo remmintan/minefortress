@@ -9,14 +9,13 @@ import net.remmintan.mods.minefortress.core.interfaces.selections.ServerSelectio
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface ITasksCreator extends IServerManager {
 
-    ITask createCutTreesTask(UUID uuid, List<BlockPos> treeRoots);
+    ITask createCutTreesTask(List<BlockPos> treeRoots);
 
-    ITask createRoadsTask(UUID uuid, List<BlockPos> blocks, Item itemInHand);
+    ITask createRoadsTask(List<BlockPos> blocks, Item itemInHand);
 
-    ITask createSelectionTask(UUID id, TaskType taskType, BlockPos start, BlockPos end, ServerSelectionType selectionType, HitResult hitResult, List<BlockPos> positions, ServerPlayerEntity player);
+    ITask createSelectionTask(TaskType taskType, BlockPos start, BlockPos end, ServerSelectionType selectionType, HitResult hitResult, List<BlockPos> positions, ServerPlayerEntity player);
 
 }
