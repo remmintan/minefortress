@@ -3,6 +3,7 @@ package org.minefortress.fortress.buildings;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -38,8 +39,7 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
     private final List<BlockPos> buildings = new ArrayList<>();
     private final ServerWorld world;
     private final BlockPos fortressPos;
-    private final Cache<BlockPos, Object> bedsCache =
-            CacheBuilder.newBuilder()
+    private final Cache<BlockPos, Object> bedsCache = CacheBuilder.newBuilder()
                     .expireAfterWrite(10, TimeUnit.SECONDS)
                     .build();
     private boolean needSync = false;
@@ -66,6 +66,15 @@ public class FortressBuildingManager implements IAutomationAreaProvider, IServer
         if (blockEntity instanceof FortressBuildingBlockEntity b) {
             b.init(fortressPos, metadata, start, end, blockData);
         }
+
+        final var managersProvider = ServerModUtils.getManagersProvider(world.getServer(), fortressPos).get();
+        final var containerRegistry = managersProvider.getContainerRegistry();
+
+        blockData.forEach((p, s) -> {
+            if (s.isIn(ConventionalBlockTags.CHESTS)) {
+                containerRegistry.register(p.toImmutable().add(start));
+            }
+        });
 
         getFortressManager().expandTheVillage(start);
         getFortressManager().expandTheVillage(end);

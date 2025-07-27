@@ -7,6 +7,7 @@ import net.remmintan.mods.minefortress.core.interfaces.automation.server.IServer
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IServerFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IServerProfessionsManager;
+import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerContainersRegistry;
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerFoodManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceHelper;
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager;
@@ -26,9 +27,12 @@ public interface IServerManagersProvider {
     default IServerResourceManager getResourceManager() {
         return getManager(IServerResourceManager.class);
     }
-
     default IServerResourceHelper getResourceHelper() {
         return getManager(IServerResourceHelper.class);
+    }
+
+    default IServerContainersRegistry getContainerRegistry() {
+        return getManager(IServerContainersRegistry.class);
     }
 
     default IServerFoodManager getFoodManager() {
