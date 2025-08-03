@@ -1,10 +1,7 @@
 package net.remmintan.mods.minefortress.blocks.building
 
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtList
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo
 import net.remmintan.mods.minefortress.core.dtos.professions.HireProgressInfo
-import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionHireInfo
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IBuildingHireHandler
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IServerBuildingsManager
@@ -20,8 +17,8 @@ class BuildingHireHandler : IBuildingHireHandler {
     private var buildingsManager: IServerBuildingsManager? = null
     private var resourceManger: IServerResourceManager? = null
     private var resourceHelper: IServerResourceHelper? = null
+    private var professionIds: List<String> = emptyList()
 
-    private var professions: List<ProfessionHireInfo> = emptyList()
     private var hireQueues = mutableMapOf<String, Queue<HireRequest>>()
     private var hireProgresses = mutableMapOf<String, HireProgressInfo>()
 
@@ -39,18 +36,7 @@ class BuildingHireHandler : IBuildingHireHandler {
         this.buildingsManager = buildingsManager
         this.resourceManger = resourceManager
         this.resourceHelper = resourceHelper
-
-        professions = professionManager
-            .getProfessionsByType(professionType)
-            .filter { buildingsManager.hasRequiredBuilding(it.requirementType, it.requirementLevel, 0) }
-            .map {
-                ProfessionHireInfo(
-                    it.id,
-                    it.title,
-                    it.icon,
-                    it.itemsRequirement.map { r -> ItemInfo(r.item, r.count) }
-                )
-            }
+        this.professionIds = professionManager.getProfessionsByType(professionType).map { it.id }
     }
 
     fun tick() {
@@ -85,7 +71,9 @@ class BuildingHireHandler : IBuildingHireHandler {
         }
     }
 
-    override fun getProfessions(): List<ProfessionHireInfo> = professions
+    override fun getProfessionIds(): List<String> {
+        return professionIds
+    }
 
     override fun getHireProgress(professionId: String): HireProgressInfo {
         if (buildingsManager == null) {
@@ -127,10 +115,6 @@ class BuildingHireHandler : IBuildingHireHandler {
         val rootTag = NbtCompound()
 
         // professions
-        val profList = NbtList().apply {
-            professions.forEach { add(it.toNbt()) }
-        }
-
         val queuesTag = NbtCompound()
         hireQueues.forEach { (professionId, queue) ->
             val queueTag = NbtCompound()
@@ -143,12 +127,11 @@ class BuildingHireHandler : IBuildingHireHandler {
         }
 
         val progressesTag = NbtCompound()
-        professions.map { it.professionId }.forEach {
+        professionIds.forEach {
             val hireProgress = getHireProgress(it)
             progressesTag.put(it, hireProgress.toNbt())
         }
 
-        rootTag.put("professions", profList)
         rootTag.put("queues", queuesTag)
         rootTag.put("progresses", progressesTag)
 
@@ -156,8 +139,6 @@ class BuildingHireHandler : IBuildingHireHandler {
     }
 
     fun updateFromNbt(tag: NbtCompound) {
-        val professions = tag.getList("professions", 10).map { ProfessionHireInfo.fromNbt(it as NbtCompound) }
-        this.professions = professions
 
         val queuesTag = tag.getCompound("queues")
         queuesTag.keys.forEach { professionId ->

@@ -88,6 +88,7 @@ public abstract class ProfessionManager implements IProfessionsManager {
 
     @Override
     public List<IProfession> getProfessionsByType(ProfessionType type) {
+        if (type == null) return List.of();
         return getProfessions()
                 .values()
                 .stream()

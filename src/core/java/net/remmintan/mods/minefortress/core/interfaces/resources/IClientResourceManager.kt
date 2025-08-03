@@ -1,10 +1,11 @@
 package net.remmintan.mods.minefortress.core.interfaces.resources
 
-import net.minecraft.util.math.BlockPos
+import net.minecraft.item.ItemStack
 
 
-interface IClientResourceManager : IResourceManager {
+interface IClientResourceManager {
 
-    fun sync(containerPositions: List<BlockPos>)
+    fun hasItems(stacks: List<ItemStack>): Boolean
+    fun syncRequestedItems(stacks: List<ItemStack>)
 
 }

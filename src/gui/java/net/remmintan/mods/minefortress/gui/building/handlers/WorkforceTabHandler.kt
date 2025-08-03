@@ -1,7 +1,8 @@
 package net.remmintan.mods.minefortress.gui.building.handlers
 
 import net.minecraft.item.ItemStack
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionCost
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionHireInfo
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.networking.c2s.C2SHireProfessional
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
@@ -9,11 +10,16 @@ import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkH
 class WorkforceTabHandler(private val provider: IBuildingProvider) : IWorkforceTabHandler {
 
     private val handler by lazy { provider.building.hireHandler }
-    private val professions by lazy { handler.getProfessions().associateBy { it.professionId } }
+    private val professions: Map<String, ProfessionHireInfo>
+        get() {
+            val fortressManager = ClientModUtils.getFortressManager()
+            val buildingScreenInfoService = fortressManager.clientBuildingScreenInfoService
+            return buildingScreenInfoService.getProfessions().associateBy { it.professionId }
+        }
 
     override fun getProfessions(): List<String> = professions.keys.toList()
 
-    override fun getCost(professionId: String): List<ItemInfo> {
+    override fun getCost(professionId: String): List<ProfessionCost> {
         return professions.getValue(professionId).professionCost
     }
 
@@ -52,11 +58,6 @@ class WorkforceTabHandler(private val provider: IBuildingProvider) : IWorkforceT
         val pos = provider.building.pos
         val packet = C2SHireProfessional(pos, professionId)
         FortressClientNetworkHelper.send(C2SHireProfessional.CHANNEL, packet)
-    }
-
-    override fun decreaseAmount(professionId: String) {
-        // No longer needed as all professions use the hire menu approach
-        // and can't be decreased directly
     }
 
     override fun canHireMore(professionId: String): Boolean {

@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.interfaces.server.IServerManager
 
@@ -20,5 +21,8 @@ interface IServerResourceHelper : IServerManager {
 
     fun payItemFromTask(taskPos: BlockPos, item: Item, canIgnore: Boolean)
     fun payItems(from: Storage<ItemVariant>, items: List<ItemStack>): Boolean
+
+    fun getCountIncludingSimilar(item: Item): Long
+    fun syncRequestedItems(items: Set<Item>, player: ServerPlayerEntity)
 
 }

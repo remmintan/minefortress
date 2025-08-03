@@ -24,7 +24,14 @@ class BuildingScreenHandler(
     IProductionLineTabHandler by ProductionLineTabHandler(getBuildingProvider(propertyDelegate)),
     IScreenHandlerWithTabs {
 
-    val tabs: List<BuildingScreenTab> by lazy {
+    val tabs: MutableList<BuildingScreenTab> by lazy { getTabsInternal() }
+
+    fun refreshTabs() {
+        tabs.clear()
+        tabs.addAll(getTabsInternal())
+    }
+
+    private fun getTabsInternal(): MutableList<BuildingScreenTab> {
         val tabsList = mutableListOf<BuildingScreenTab>()
 
         // Always add the Info tab
@@ -54,7 +61,7 @@ class BuildingScreenHandler(
             )
         }
 
-        tabsList
+        return tabsList
     }
 
     override var selectedTabIndex: Int
@@ -84,6 +91,10 @@ class BuildingScreenHandler(
 
     override fun canUse(player: PlayerEntity?): Boolean = isFortressGamemode(player)
 
+    fun getBuildingPos(): BlockPos {
+        return getBuildingPosFromPropertyDelegate(propertyDelegate)
+    }
+
 }
 
 private fun getBuildingProvider(propertyDelegate: PropertyDelegate): IBuildingProvider {
@@ -97,11 +108,16 @@ private fun getBuildingProvider(propertyDelegate: PropertyDelegate): IBuildingPr
 private fun getBuildingFromPropertyDelegate(propertyDelegate: PropertyDelegate): IFortressBuilding {
     val world = MinecraftClient.getInstance().world ?: error("Can't access the world")
 
+    val blockPos = getBuildingPosFromPropertyDelegate(propertyDelegate)
+    return world.getBlockEntity(blockPos) as? IFortressBuilding
+        ?: error("Can't access the building from the screen handler")
+}
+
+private fun getBuildingPosFromPropertyDelegate(propertyDelegate: PropertyDelegate): BlockPos {
     val x = propertyDelegate[0]
     val y = propertyDelegate[1]
     val z = propertyDelegate[2]
 
     val blockPos = BlockPos(x, y, z)
-    return world.getBlockEntity(blockPos) as? IFortressBuilding
-        ?: error("Can't access the building from the screen handler")
+    return blockPos
 }

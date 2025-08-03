@@ -16,9 +16,11 @@ import net.remmintan.mods.minefortress.core.isClientInFortressGamemode
 import net.remmintan.mods.minefortress.core.isFortressGamemode
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils
 import net.remmintan.mods.minefortress.core.utils.getMineFortressVersion
+import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
 import net.remmintan.mods.minefortress.networking.c2s.C2SClientReadyPacket
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper
 import org.minefortress.controls.MouseEvents
+import org.minefortress.events.BuildingScreenInfoSyncedCallback
 import org.minefortress.interfaces.IFortressMinecraftClient
 import org.minefortress.registries.FortressKeybindings
 import org.minefortress.registries.events.client.ToastEvents
@@ -64,6 +66,13 @@ object FortressClientEvents {
                 ActionResult.PASS
             }
         }
+
+        BuildingScreenInfoSyncedCallback.EVENT.register {
+            MinecraftClient.getInstance().player?.currentScreenHandler?.let {
+                if (it is BuildingScreenHandler)
+                    it.refreshTabs()
+            }
+        }
     }
 
     private fun startClientTick(client: MinecraftClient) {
@@ -86,6 +95,8 @@ object FortressClientEvents {
     }
 
     private fun endClientTick(client: MinecraftClient) {
+        ClientModUtils.getFortressManager().clientBuildingScreenInfoService.tick(client)
+
         val selectionManager = ClientModUtils.getSelectionManager()
 
         if (InputTracker.wasLeftMouseButtonPressedLastTick()) {

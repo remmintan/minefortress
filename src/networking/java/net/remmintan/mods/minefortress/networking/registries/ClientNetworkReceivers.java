@@ -19,7 +19,6 @@ public class ClientNetworkReceivers {
         registerReceiver(FortressChannelNames.FORTRESS_RESET_BLUEPRINT, ClientboundResetBlueprintPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_BUILDINGS_SYNC, ClientboundSyncBuildingsPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_SYNC, ClientboundProfessionSyncPacket::new);
-        registerReceiver(FortressChannelNames.FORTRESS_RESOURCES_SYNC, ClientboundSyncContainerPositionsPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_PROFESSION_INIT, ClientboundProfessionsInitPacket::new);
         registerReceiver(FortressChannelNames.FORTRESS_BLUEPRINTS_PROCESS_IMPORT_EXPORT, ClientboundBlueprintsProcessImportExportPacket::new);
         registerReceiver(S2CSyncAreasPacket.CHANNEL, S2CSyncAreasPacket::new);
@@ -27,6 +26,8 @@ public class ClientNetworkReceivers {
         registerReceiver(S2CAddClientTaskPacket.CHANNEL, S2CAddClientTaskPacket::new);
         registerReceiver(S2CSyncGamemodePacket.CHANNEL, S2CSyncGamemodePacket::new);
         registerReceiver(S2CStartFortressConfiguration.CHANNEL, S2CStartFortressConfiguration::new);
+        registerReceiver(S2CSyncBuildingScreenInfo.CHANNEL, S2CSyncBuildingScreenInfo::new);
+        registerReceiver(S2CSyncItemsState.CHANNEL, S2CSyncItemsState::new);
     }
 
     private static void registerReceiver(String channelName, Function<PacketByteBuf, FortressS2CPacket> packetConstructor) {

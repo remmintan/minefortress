@@ -8,13 +8,17 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.server.MinecraftServer
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceHelper
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager
 import net.remmintan.mods.minefortress.core.utils.LogCompanion
+import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper
 import net.remmintan.mods.minefortress.core.utils.extractItemsConsideringSimilar
 import net.remmintan.mods.minefortress.core.utils.getManagersProvider
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
+import net.remmintan.mods.minefortress.networking.s2c.S2CSyncItemsState
 
 @Suppress("UnstableApiUsage")
 class ServerResourceHelper(server: MinecraftServer, fortressPos: BlockPos) : IServerResourceHelper {
@@ -105,6 +109,27 @@ class ServerResourceHelper(server: MinecraftServer, fortressPos: BlockPos) : ISe
             tr.commit()
         }
         return true
+    }
+
+    override fun getCountIncludingSimilar(item: Item): Long {
+        val storage = resourceManager.getStorage()
+        val items = SimilarItemsHelper.getSimilarItems(item).toSet() + item
+        var totalCount = 0L
+        for (view in storage) {
+            if (items.contains(view.resource.item))
+                totalCount += view.amount
+        }
+
+        return totalCount
+    }
+
+    override fun syncRequestedItems(items: Set<Item>, player: ServerPlayerEntity) {
+        val requestedStates = items.map {
+            val count = getCountIncludingSimilar(it)
+            ItemStack(it, count.toInt())
+        }
+        val packet = S2CSyncItemsState(requestedStates)
+        FortressServerNetworkHelper.send(player, S2CSyncItemsState.CHANNEL, packet)
     }
 
     private fun transferItems(

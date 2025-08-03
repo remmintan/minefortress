@@ -82,53 +82,8 @@ class WorkforceTab(private val handler: IWorkforceTabHandler, private val textRe
 
         for (i in professions.indices) {
             val profId = professions[i]
-            val legacy = handler.getCost(profId).isEmpty()
-            if (legacy)
-                addNewLegacyHireRow(profId, rowY + i * 24, leftX, rightX)
-            else
-                addNewHireProgressRow(profId, rowY + i * 24, leftX, rightX)
+            addNewHireProgressRow(profId, rowY + i * 24, leftX, rightX)
         }
-    }
-
-    private fun addNewLegacyHireRow(profId: String, rowY: Int, leftX: Int, rightX: Int) {
-        // Name
-        addNameWidget(profId, leftX, rowY)
-
-        // Plus button
-        val plusButton = HireScreenButtonWidget.builder(
-            Text.literal("+")
-        ) { _: ButtonWidget? ->
-            if (handler.canHireMore(profId)) {
-                ClientModUtils.playSound(SoundEvents.ENTITY_VILLAGER_YES)
-                handler.increaseAmount(profId)
-            }
-        }
-            .dimensions(rightX - 70, rowY, 20, 20)
-            .build()
-        this.addDrawable(plusButton)
-        hireButtons.add(profId to plusButton)
-
-        // Amount
-        this.addDrawable(
-            ProfessionAmountWidget(
-                rightX - 120,
-                rowY,
-                handler.getProfessionItem(profId),
-                { handler.getCurrentCount(profId) },
-                { handler.getMaxCount(profId) }
-            )
-        )
-
-        // Minus button
-        val minusButton = HireScreenButtonWidget.builder(
-            Text.literal("-")
-        ) { _: ButtonWidget? ->
-            handler.decreaseAmount(profId)
-        }
-            .dimensions(rightX - 150, rowY, 20, 20)
-            .build()
-        this.addDrawable(minusButton)
-        minusButtons.add(profId to minusButton)
     }
 
     private fun addNewHireProgressRow(profId: String, rowY: Int, leftX: Int, rightX: Int) {

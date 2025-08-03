@@ -1,33 +1,31 @@
 package net.remmintan.mods.minefortress.core.dtos.professions
 
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtList
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo
+import net.minecraft.network.PacketByteBuf
 
 data class ProfessionHireInfo(
     val professionId: String,
     val professionName: String,
     val professionItem: ItemStack,
-    val professionCost: List<ItemInfo>
+    val professionCost: List<ProfessionCost>
 ) {
-    fun toNbt(): NbtCompound {
-        val nbt = NbtCompound()
-        nbt.putString("professionId", professionId)
-        nbt.putString("professionName", professionName)
-        nbt.put("professionItem", professionItem.writeNbt(NbtCompound()))
-        nbt.put("professionCost", NbtList().apply { professionCost.forEach { add(it.toNbt()) } })
-        return nbt
+    fun writeToPacketByteBuf(buf: PacketByteBuf) {
+        buf.writeString(professionId)
+        buf.writeString(professionName)
+        buf.writeItemStack(professionItem)
+        buf.writeCollection(professionCost) { b, it -> it.writeToPacketByteBuf(b) }
     }
 
     companion object {
-        fun fromNbt(nbt: NbtCompound): ProfessionHireInfo {
-            return ProfessionHireInfo(
-                nbt.getString("professionId"),
-                nbt.getString("professionName"),
-                ItemStack.fromNbt(nbt.getCompound("professionItem")),
-                nbt.getList("professionCost", 10).map { ItemInfo.fromNbt(it as NbtCompound) }
-            )
+        fun readFromPacketByteBuf(buf: PacketByteBuf): ProfessionHireInfo {
+            val professionId = buf.readString()
+            val professionName = buf.readString()
+            val professionItem = buf.readItemStack()
+            val professionCosts =
+                buf.readCollection({ mutableListOf<ProfessionCost>() }) { ProfessionCost.readFromPacketByteBuf(it) }
+                    .toList()
+
+            return ProfessionHireInfo(professionId, professionName, professionItem, professionCosts)
         }
     }
 }

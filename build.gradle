@@ -30,7 +30,7 @@ sourceSets {
         compileClasspath += main.compileClasspath + core.output + networking.output
     }
     building {
-        compileClasspath += main.compileClasspath + core.output + gui.output
+        compileClasspath += main.compileClasspath + core.output + gui.output + networking.output
     }
     selections {
         compileClasspath += main.compileClasspath + core.output + building.output + networking.output

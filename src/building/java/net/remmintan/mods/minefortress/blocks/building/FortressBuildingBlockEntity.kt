@@ -17,6 +17,7 @@ import net.minecraft.registry.tag.BlockTags
 import net.minecraft.screen.NamedScreenHandlerFactory
 import net.minecraft.screen.PropertyDelegate
 import net.minecraft.screen.ScreenHandler
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
@@ -25,13 +26,19 @@ import net.minecraft.world.World
 import net.remmintan.mods.minefortress.blocks.FortressBlocks
 import net.remmintan.mods.minefortress.core.dtos.buildings.BarColor
 import net.remmintan.mods.minefortress.core.dtos.buildings.BlueprintMetadata
+import net.remmintan.mods.minefortress.core.dtos.buildings.BuildingScreenInfo
 import net.remmintan.mods.minefortress.core.dtos.buildings.HudBar
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionCost
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionHireInfo
 import net.remmintan.mods.minefortress.core.interfaces.automation.area.IAutomationArea
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType
 import net.remmintan.mods.minefortress.core.interfaces.buildings.IFortressBuilding
 import net.remmintan.mods.minefortress.core.utils.ClientModUtils
+import net.remmintan.mods.minefortress.core.utils.ServerModUtils
 import net.remmintan.mods.minefortress.core.utils.getManagersProvider
 import net.remmintan.mods.minefortress.gui.building.BuildingScreenHandler
+import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
+import net.remmintan.mods.minefortress.networking.s2c.S2CSyncBuildingScreenInfo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -103,7 +110,6 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
 
                 if (world is ServerWorld) {
                     val provider = world.server.getManagersProvider(fortressPos!!)
-                    checkNotNull(provider)
 
                     it.init(
                         professionType,
@@ -177,10 +183,8 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
 
 
         val hireProgress = hireHandler
-            .getProfessions()
-            .map {
-                hireHandler.getHireProgress(it.professionId)
-            }
+            .getProfessionIds()
+            .map { hireHandler.getHireProgress(it) }
             .filter { it.queueLength > 0 }
             .minByOrNull { it.queueLength }
             ?.progress
@@ -199,10 +203,40 @@ class FortressBuildingBlockEntity(pos: BlockPos?, state: BlockState?) :
         return list
     }
 
+    override fun constructAndSendBuildingScreenInfo(player: ServerPlayerEntity) {
+        val managersProvider = ServerModUtils.getManagersProvider(player).orElseThrow()
+
+        val professionsManager = managersProvider.professionsManager
+        val buildingsManager = managersProvider.buildingsManager
+        val resourceHelper = managersProvider.resourceHelper
+
+        val professions = professionsManager
+            .getProfessionsByType(metadata.requirement.type)
+            .filter { buildingsManager.hasRequiredBuilding(it.requirementType, it.requirementLevel, 0) }
+            .map {
+                ProfessionHireInfo(
+                    it.id,
+                    it.title,
+                    it.icon,
+                    it.itemsRequirement.map { r ->
+                        ProfessionCost(
+                            r.item,
+                            r.count,
+                            resourceHelper.getCountIncludingSimilar(item = r.item)
+                        )
+                    }
+                )
+            }
+
+        val buildingScreenInfo = BuildingScreenInfo(professions)
+        val packet = S2CSyncBuildingScreenInfo(buildingScreenInfo)
+        FortressServerNetworkHelper.send(player, S2CSyncBuildingScreenInfo.CHANNEL, packet)
+    }
+
     override fun createMenu(syncId: Int, playerInventory: PlayerInventory?, player: PlayerEntity?): ScreenHandler {
         val propertyDelegate = object : PropertyDelegate {
             override fun get(index: Int): Int {
-                return when(index) {
+                return when (index) {
                     0 -> pos.x
                     1 -> pos.y
                     2 -> pos.z

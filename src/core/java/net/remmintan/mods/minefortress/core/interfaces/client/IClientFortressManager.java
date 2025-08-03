@@ -3,6 +3,7 @@ package net.remmintan.mods.minefortress.core.interfaces.client;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.IFortressManager;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingScreenInfoService;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
 import net.remmintan.mods.minefortress.core.interfaces.professions.IClientProfessionManager;
 import net.remmintan.mods.minefortress.core.interfaces.resources.IClientResourceHelper;
@@ -39,4 +40,6 @@ public interface IClientFortressManager extends IFortressManager {
     IClientFightManager getFightManager();
 
     IClientProfessionManager getProfessionManager();
+
+    IClientBuildingScreenInfoService getClientBuildingScreenInfoService();
 }

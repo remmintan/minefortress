@@ -5,10 +5,8 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.item.Item;
 import net.minecraft.text.Text;
-import net.remmintan.mods.minefortress.core.dtos.ItemInfo;
-import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
+import net.remmintan.mods.minefortress.core.dtos.professions.ProfessionCost;
 import net.remmintan.mods.minefortress.gui.util.GuiUtils;
 
 import java.util.List;
@@ -18,17 +16,12 @@ public class ProfessionCostsWidget implements Drawable, Element {
 
     private final int x;
     private final int y;
-    private final List<ItemInfo> costs;
+    private final List<ProfessionCost> costs;
 
-    public ProfessionCostsWidget(int x, int y, List<ItemInfo> costs) {
+    public ProfessionCostsWidget(int x, int y, List<ProfessionCost> costs) {
         this.x = x;
         this.y = y;
         this.costs = costs;
-    }
-
-    private static long getItemAmountIncludingSimilars(Item item) { // Changed from getItemAmount
-        final var fortressClientManager = ClientModUtils.getFortressManager();
-        return fortressClientManager.getResourceHelper().getCountIncludingSimilar(item);
     }
 
     @Override
@@ -36,10 +29,10 @@ public class ProfessionCostsWidget implements Drawable, Element {
         int i = 0;
 
         for(var ent : costs) {
-            final var stack = ent.item().getDefaultStack();
-            final var requiredAmount = ent.amount();
-            final var totalAvailableForThisType = getItemAmountIncludingSimilars(ent.item());
-            final var color = totalAvailableForThisType >= requiredAmount ? 0xFFFFFF : 0xFF0000; // Color based on overall check
+            final var stack = ent.getItem().getDefaultStack();
+            final var requiredAmount = ent.getRequiredAmount();
+            final var totalAvailableForThisType = ent.getTotalAmount();
+            final var color = ent.getEnoughItems() ? 0xFFFFFF : 0xFF0000; // Color based on overall check
 
             final var countLabel = requiredAmount + "/" + GuiUtils.formatSlotCount(totalAvailableForThisType);
             final var textRenderer = getTextRenderer();

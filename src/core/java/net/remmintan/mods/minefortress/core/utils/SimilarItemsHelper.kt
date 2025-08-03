@@ -13,7 +13,6 @@ import net.remmintan.mods.minefortress.core.utils.SimilarItemsHelper.isIgnorable
 import org.spongepowered.include.com.google.common.collect.Sets
 import java.util.*
 
-@Suppress("UnstableApiUsage")
 object SimilarItemsHelper {
     private val tags: List<TagKey<Item>> = Arrays.asList(
         ItemTags.WOODEN_BUTTONS,
@@ -122,7 +121,6 @@ object SimilarItemsHelper {
             Items.AIR,
             Items.STRUCTURE_VOID,
             Items.BARRIER,
-            Items.DIRT,
             Items.GRASS_BLOCK,
             Items.DIRT_PATH,
             Items.WHITE_BED,

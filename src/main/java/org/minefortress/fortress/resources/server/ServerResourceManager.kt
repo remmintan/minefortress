@@ -12,18 +12,13 @@ import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.Registries
 import net.minecraft.server.MinecraftServer
-import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerContainersRegistry
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerFoodManager
 import net.remmintan.mods.minefortress.core.interfaces.resources.server.IServerResourceManager
-import net.remmintan.mods.minefortress.core.interfaces.server.ITickableManager
 import net.remmintan.mods.minefortress.core.interfaces.server.IWritableManager
 import net.remmintan.mods.minefortress.core.utils.LogCompanion
-import net.remmintan.mods.minefortress.networking.helpers.FortressChannelNames
-import net.remmintan.mods.minefortress.networking.helpers.FortressServerNetworkHelper
-import net.remmintan.mods.minefortress.networking.s2c.ClientboundSyncContainerPositionsPacket
 
 private const val CONTAINER_POSITIONS_NBT_KEY = "containerPositions"
 
@@ -39,7 +34,6 @@ class ServerResourceManager(private val server: MinecraftServer) :
     IServerResourceManager,
     IServerContainersRegistry,
     IServerFoodManager,
-    ITickableManager,
     IWritableManager {
 
     private val world: ServerWorld by lazy { server.overworld }
@@ -51,20 +45,15 @@ class ServerResourceManager(private val server: MinecraftServer) :
             .toSet()
     }
 
-    private val synchronizer = Synchronizer()
     private val containerPositions = mutableSetOf<BlockPos>()
 
 
     override fun register(pos: BlockPos) {
-        if (containerPositions.add(pos.toImmutable())) {
-            synchronizer.scheduleSync(containerPositions.toList())
-        }
+        containerPositions.add(pos.toImmutable())
     }
 
     override fun unregister(pos: BlockPos) {
-        if (containerPositions.remove(pos.toImmutable())) {
-            synchronizer.scheduleSync(containerPositions.toList())
-        }
+        containerPositions.remove(pos.toImmutable())
     }
 
     override fun hasFood(): Boolean {
@@ -109,9 +98,6 @@ class ServerResourceManager(private val server: MinecraftServer) :
         return null
     }
 
-    override fun tick(server: MinecraftServer, world: ServerWorld, player: ServerPlayerEntity?) {
-        synchronizer.sync(player)
-    }
 
     override fun write(tag: NbtCompound) {
         tag.putLongArray(CONTAINER_POSITIONS_NBT_KEY, containerPositions.map { it.asLong() })
@@ -138,24 +124,6 @@ class ServerResourceManager(private val server: MinecraftServer) :
         }
 
         return CombinedStorage(storages)
-    }
-
-    private class Synchronizer {
-        private var positionsToSync: List<BlockPos>? = null
-
-        fun sync(player: ServerPlayerEntity?) {
-            val toSync = positionsToSync
-            if (player == null || toSync == null) return
-
-            val packet = ClientboundSyncContainerPositionsPacket(toSync)
-            FortressServerNetworkHelper.send(player, FortressChannelNames.FORTRESS_RESOURCES_SYNC, packet)
-
-            positionsToSync = null
-        }
-
-        fun scheduleSync(positions: List<BlockPos>) {
-            positionsToSync = positions
-        }
     }
 
     companion object : LogCompanion(ServerResourceManager::class)

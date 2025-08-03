@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.remmintan.mods.minefortress.core.FortressState;
 import net.remmintan.mods.minefortress.core.interfaces.blueprints.ProfessionType;
+import net.remmintan.mods.minefortress.core.interfaces.buildings.IClientBuildingScreenInfoService;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientFortressManager;
 import net.remmintan.mods.minefortress.core.interfaces.client.IClientManagersProvider;
 import net.remmintan.mods.minefortress.core.interfaces.combat.IClientFightManager;
@@ -14,6 +15,7 @@ import net.remmintan.mods.minefortress.core.utils.ClientModUtils;
 import net.remmintan.mods.minefortress.networking.c2s.C2SJumpToCampfire;
 import net.remmintan.mods.minefortress.networking.helpers.FortressClientNetworkHelper;
 import org.minefortress.fight.ClientFightManager;
+import org.minefortress.fortress.buildings.ClientBuildingScreenInfoService;
 import org.minefortress.fortress.resources.client.ClientResourceHelper;
 import org.minefortress.fortress.resources.client.ClientResourceManager;
 import org.minefortress.professions.ClientProfessionManager;
@@ -24,6 +26,7 @@ public final class ClientFortressManager implements IClientFortressManager {
     private final IClientResourceManager resourceManager = new ClientResourceManager();
     private final IClientResourceHelper resourceHelper = new ClientResourceHelper();
     private final IClientFightManager fightManager = new ClientFightManager();
+    private final IClientBuildingScreenInfoService clientBuildingScreenInfoService = new ClientBuildingScreenInfoService();
     private boolean connectedToTheServer = false;
     private boolean initialized = false;
 
@@ -104,6 +107,11 @@ public final class ClientFortressManager implements IClientFortressManager {
     @Override
     public IClientResourceHelper getResourceHelper() {
         return resourceHelper;
+    }
+
+    @Override
+    public IClientBuildingScreenInfoService getClientBuildingScreenInfoService() {
+        return clientBuildingScreenInfoService;
     }
 
     @Override
